@@ -1,0 +1,390 @@
+		
+--- Extreme NetFlow has moved under extremeAgent tree; as extremeAgent.22 
+-- ============================================================================
+EXTREME-NETFLOW-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+		    OBJECT-TYPE             FROM SNMPv2-SMI
+		    IpAddress               FROM SNMPv2-SMI
+                MacAddress              FROM SNMPv2-TC
+                TruthValue          FROM SNMPv2-TC
+                extremeAgent            FROM EXTREME-BASE-MIB;
+
+
+        extremeNetFlow MODULE-IDENTITY
+                LAST-UPDATED "0010310000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme NetFlow tables."
+        ::= { extremeAgent 22 }
+
+        extremeNetFlowConfigPort OBJECT IDENTIFIER
+        ::= { extremeNetFlow 1 }
+
+        extremeNetFlowConfigGroup OBJECT IDENTIFIER
+        ::= { extremeNetFlow 2 }
+
+
+        extremeNetFlowGroupCollectorTable                  OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeNetFlowGroupCollectorEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         for a defined NetFlow group flow entry."
+                ::= { extremeNetFlowConfigGroup 2 }
+
+        extremeNetFlowGroupCollectorEntry                      OBJECT-TYPE
+                SYNTAX   ExtremeNetFlowGroupCollectorEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeNetFlowGroupNumber,
+                       extremeNetFlowCollectorId}
+                ::= {extremeNetFlowGroupCollectorTable 1}
+
+
+        ExtremeNetFlowGroupCollectorEntry ::= SEQUENCE {
+                extremeNetFlowGroupNumber             INTEGER,
+                extremeNetFlowCollectorId             INTEGER,
+                extremeNetFlowGroupPingEnabled        TruthValue,
+                extremeNetFlowGroupSourceIp           IpAddress,
+                extremeNetFlowCollectorIpAddress      IpAddress,
+                extremeNetFlowCollectorUdpPort        INTEGER,
+                extremeNetFlowCollectorStatusUp       TruthValue,
+                extremeNetFlowCollectorDowntime       INTEGER,
+		extremeNetFlowCollectorPacketsTx      INTEGER
+        }
+
+        extremeNetFlowGroupNumber                   OBJECT-TYPE
+                SYNTAX  INTEGER (1..32)
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The group number."
+                ::= { extremeNetFlowGroupCollectorEntry 1 }
+
+        extremeNetFlowCollectorId               OBJECT-TYPE
+                SYNTAX  INTEGER (1..8)
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The collector number."
+                ::= { extremeNetFlowGroupCollectorEntry 2 }
+
+        extremeNetFlowGroupPingEnabled        OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating if ping is enabled for the group"
+                ::= { extremeNetFlowGroupCollectorEntry 3 }
+
+        extremeNetFlowGroupSourceIp              OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Source IP address for the group."
+                ::= { extremeNetFlowGroupCollectorEntry 4 }
+
+        extremeNetFlowCollectorIpAddress              OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The collector's configured IP address."
+                ::= { extremeNetFlowGroupCollectorEntry 5 }
+
+        extremeNetFlowCollectorUdpPort                        OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The collector's configured UDP port number."
+                ::= { extremeNetFlowGroupCollectorEntry 6 }
+
+        extremeNetFlowCollectorStatusUp                  OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating if the collector is up."
+                ::= { extremeNetFlowGroupCollectorEntry 7 }
+
+        extremeNetFlowCollectorDowntime                       OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The downtime value for the collector."
+                ::= { extremeNetFlowGroupCollectorEntry 8 }
+		
+	extremeNetFlowCollectorPacketsTx                      OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The transmit packet count for the collector."
+                ::= { extremeNetFlowGroupCollectorEntry 9 }
+
+
+
+--
+-- NetFlow Port Configuration Table
+--
+
+        extremeNetFlowPortConfigTable                   OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeNetFlowPortConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         for a defined NetFlow port."
+                ::= { extremeNetFlowConfigPort 1 }
+
+        extremeNetFlowPortConfigEntry                   OBJECT-TYPE
+                SYNTAX  ExtremeNetFlowPortConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeNetFlowPortConfigPortIndex}
+                ::= {extremeNetFlowPortConfigTable 1}
+
+
+        ExtremeNetFlowPortConfigEntry ::= SEQUENCE {
+                extremeNetFlowPortConfigPortIndex       INTEGER,
+                extremeNetFlowPortConfigEnabled         TruthValue,
+                extremeNetFlowPortConfigTimout          INTEGER,
+                extremeNetFlowPortOverFlowPackets       INTEGER
+        }
+
+        extremeNetFlowPortConfigPortIndex               OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The index value for the port."
+                ::= { extremeNetFlowPortConfigEntry 1 }
+
+        extremeNetFlowPortConfigEnabled              OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating if port is enabled."
+                ::= { extremeNetFlowPortConfigEntry 2 }
+
+        extremeNetFlowPortConfigTimout                       OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The port timeout value."
+                ::= { extremeNetFlowPortConfigEntry 3 }
+
+        extremeNetFlowPortOverFlowPackets                      OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of packets not accounted for due to lack of resources.  Implemented on PoS ports only"
+                ::= { extremeNetFlowPortConfigEntry 4 }
+
+
+
+--
+-- NetFlow Port Filter Entry Configuration Table
+--
+
+        extremeNetFlowPortFilterConfigTable                     OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeNetFlowPortFilterConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         for a defined NetFlow filter."
+                ::= { extremeNetFlowConfigPort 2 }
+
+        extremeNetFlowPortFilterConfigEntry                     OBJECT-TYPE
+                SYNTAX  ExtremeNetFlowPortFilterConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeNetFlowPortConfigPortNumber,
+                       extremeNetFlowPortConfigFilterEgress,
+                       extremeNetFlowPortConfigFilterNumber}
+                ::= {extremeNetFlowPortFilterConfigTable 1}
+
+        ExtremeNetFlowPortFilterConfigEntry ::= SEQUENCE {
+                extremeNetFlowPortConfigPortNumber      INTEGER,
+                extremeNetFlowPortConfigFilterEgress    TruthValue,
+                extremeNetFlowPortConfigFilterNumber    INTEGER,
+                extremeNetFlowPortEnabled               TruthValue,
+                extremeNetFlowFilterEnabled             TruthValue,
+                extremeNetFlowDestIpAddress             IpAddress,
+                extremeNetFlowDestIpAddressMask         IpAddress,
+                extremeNetFlowSourceIpAddress           IpAddress,
+                extremeNetFlowSourceIpAddressMask       IpAddress,
+                extremeNetFlowDestPort                  INTEGER,
+                extremeNetFlowDestPortMask              INTEGER,
+                extremeNetFlowSourcePort                INTEGER,
+                extremeNetFlowSourcePortMask            INTEGER,
+                extremeNetFlowProtocol                  INTEGER,
+                extremeNetFlowProtocolMask              INTEGER,
+                extremeNetFlowFilterGroupNumber         INTEGER,
+                extremeNetFlowMatchAllFlag              TruthValue,
+                extremeNetFlowMatchNoneFlag             TruthValue
+        }
+
+        extremeNetFlowPortConfigPortNumber                     OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The port number for the filter."
+                ::= { extremeNetFlowPortFilterConfigEntry 1 }
+
+        extremeNetFlowPortConfigFilterEgress                     OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating whether this is a request for an
+			 egress filter (1) or an ingress filter (0)."
+                ::= { extremeNetFlowPortFilterConfigEntry 2 }
+
+        extremeNetFlowPortConfigFilterNumber                     OBJECT-TYPE
+                SYNTAX  INTEGER (1..8)
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The filter number being requested (1-8)."
+                ::= { extremeNetFlowPortFilterConfigEntry 3 }
+
+        extremeNetFlowPortEnabled                                OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating whether port is enabled."
+                ::= { extremeNetFlowPortFilterConfigEntry 4 }
+
+        extremeNetFlowFilterEnabled                    OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Flag indicating whether filter is enabled."
+                ::= { extremeNetFlowPortFilterConfigEntry 5 }
+
+        extremeNetFlowDestIpAddress                    OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter Destination IP address."
+                ::= { extremeNetFlowPortFilterConfigEntry 6 }
+
+        extremeNetFlowDestIpAddressMask                OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter Destination IP address Mask."
+                ::= { extremeNetFlowPortFilterConfigEntry 7 }
+
+        extremeNetFlowSourceIpAddress                  OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter Source IP address."
+                ::= { extremeNetFlowPortFilterConfigEntry 8 }
+
+        extremeNetFlowSourceIpAddressMask              OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter Source IP address Mask."
+                ::= { extremeNetFlowPortFilterConfigEntry 9 }
+
+        extremeNetFlowDestPort                         OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The destination port (valid for TCP and UDP flows only)."
+                ::= { extremeNetFlowPortFilterConfigEntry 10 }
+
+        extremeNetFlowDestPortMask                     OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The destination port mask."
+                ::= { extremeNetFlowPortFilterConfigEntry 11 }
+
+        extremeNetFlowSourcePort                       OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The source port (valid for TCP and UDP flows only)."
+                ::= { extremeNetFlowPortFilterConfigEntry 12 }
+
+        extremeNetFlowSourcePortMask                   OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The source port mask."
+                ::= { extremeNetFlowPortFilterConfigEntry 13 }
+
+        extremeNetFlowProtocol                         OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The IP protocol for the filter."
+                ::= { extremeNetFlowPortFilterConfigEntry 14 }
+
+        extremeNetFlowProtocolMask                     OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The IP protocol mask."
+                ::= { extremeNetFlowPortFilterConfigEntry 15 }
+
+        extremeNetFlowFilterGroupNumber                OBJECT-TYPE
+                SYNTAX  INTEGER (1..32)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The Group Number."
+                ::= { extremeNetFlowPortFilterConfigEntry 16 }
+
+        extremeNetFlowMatchAllFlag                     OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter is set to match all flows."
+                ::= { extremeNetFlowPortFilterConfigEntry 17 }
+
+        extremeNetFlowMatchNoneFlag                    OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "Filter is set to not match any flows."
+                ::= { extremeNetFlowPortFilterConfigEntry 18 }
+	
+
+END
