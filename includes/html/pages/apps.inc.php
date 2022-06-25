@@ -404,7 +404,6 @@ $graphs['sagan'] = [
     'threshold',
     'total',
     'uptime',
-    'alert',
 ];
 
 echo '<div class="panel panel-default">';
