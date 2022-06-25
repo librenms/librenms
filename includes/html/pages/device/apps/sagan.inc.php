@@ -29,7 +29,7 @@ while (isset($sagan_instances[$int_int])) {
         $append = ', ';
     }
 
-    echo generate_link($label, $link_array, ['instance'=>$instance]) . $append;
+    echo generate_link($label, $link_array, ['pool'=>$instance]) . $append;
 }
 
 print_optionbar_end();
@@ -42,14 +42,13 @@ $graphs = [
     'sagan_drop_percent'=>'Drop Percent',
     'sagan_f_total'=>'Flows Total',
     'sagan_f_dropped'=>'Flows Dropped',
-    'sagan_f_dropped_percent'=>'Flows Dropped Percent',
+    'sagan_f_drop_percent'=>'Flows Dropped Percent',
     'sagan_ignore'=>'Ignore',
     'sagan_bytes_ignored'=>'Bytes Ignored',
     'sagan_match'=>'Match',
     'sagan_max_bytes_log_line'=>'Max Bytes Log Line',
     'sagan_threshold'=>'Threshold',
     'sagan_uptime'=>'Uptime',
-    'sagan_alert'=>'Alert Status: 0=OK, 1=WARNING, 2=CRITICAL, 3+=UNKNOWN',
 ];
 
 foreach ($graphs as $key => $text) {
@@ -60,8 +59,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
-    if (isset($vars['instance'])) {
-        $graph_array['instance'] = $vars['instance'];
+    if (isset($vars['pool'])) {
+        $graph_array['pool'] = $vars['pool'];
     }
 
     echo '<div class="panel panel-default">
