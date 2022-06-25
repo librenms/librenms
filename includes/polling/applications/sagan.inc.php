@@ -51,7 +51,7 @@ $field_keys = [
     'eps',
     'f_total',
     'f_dropped',
-    'f_dropped_percent',
+    'f_drop_percent',
     'drop_percent',
 ];
 
@@ -65,12 +65,9 @@ foreach ($sagan['data'] as $instance => $stats) {
         $instance_list[] = $instance;
     }
 
-    foreach ($instance_keys as $metric_key) {
-        $metrics[$instance . '_' . $metric_key] = $stats[$metric_key];
-    }
-
     $fields = [];
-    foreach ($field_keys as $field_key) {
+    foreach ($field_keys as $metric_key) {
+        $metrics[$instance . '_' . $metric_key] = $stats[$metric_key];
         $fields[$field_key] = $stats[$field_key];
     }
 
