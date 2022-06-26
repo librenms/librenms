@@ -19,40 +19,42 @@ try {
 $metrics = ['alert'=>$sagan['alert']];
 
 $rrd_def = RrdDefinition::make()
-    ->addDataset('uptime', 'GAUGE', 0)
-    ->addDataset('total', 'GAUGE', 0)
-    ->addDataset('drop', 'GAUGE', 0)
-    ->addDataset('ignore', 'GAUGE', 0)
-    ->addDataset('threshold', 'GAUGE', 0)
     ->addDataset('after', 'GAUGE', 0)
-    ->addDataset('match', 'GAUGE', 0)
+    ->addDataset('alert', 'GAUGE', 0)
     ->addDataset('bytes', 'GAUGE', 0)
     ->addDataset('bytes_ignored', 'GAUGE', 0)
-    ->addDataset('max_bytes_log_line', 'GAUGE', 0)
-    ->addDataset('eps', 'GAUGE', 0)
-    ->addDataset('f_total', 'GAUGE', 0)
-    ->addDataset('f_dropped', 'GAUGE', 0)
-    ->addDataset('f_drop_percent', 'GAUGE', 0)
+    ->addDataset('drop', 'GAUGE', 0)
     ->addDataset('drop_percent', 'GAUGE', 0)
+    ->addDataset('eps', 'GAUGE', 0)
+    ->addDataset('f_drop_percent', 'GAUGE', 0)
+    ->addDataset('f_dropped', 'GAUGE', 0)
+    ->addDataset('f_total', 'GAUGE', 0)
+    ->addDataset('ignore', 'GAUGE', 0)
+    ->addDataset('match', 'GAUGE', 0)
+    ->addDataset('max_bytes_log_line', 'GAUGE', 0)
+    ->addDataset('threshold', 'GAUGE', 0)
+    ->addDataset('total', 'GAUGE', 0)
+    ->addDataset('uptime', 'GAUGE', 0)
 ;
 
 // keys to add to the RRD field
 $field_keys = [
-    'uptime',
-    'total',
-    'drop',
-    'ignore',
-    'threshold',
     'after',
-    'match',
+    'alert',
     'bytes',
     'bytes_ignored',
-    'max_bytes_log_line',
-    'eps',
-    'f_total',
-    'f_dropped',
-    'f_drop_percent',
+    'drop',
     'drop_percent',
+    'eps',
+    'f_drop_percent',
+    'f_dropped',
+    'f_total',
+    'ignore',
+    'match',
+    'max_bytes_log_line',
+    'threshold',
+    'total',
+    'uptime',
 ];
 
 // process each instance
