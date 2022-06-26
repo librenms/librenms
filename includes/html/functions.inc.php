@@ -1378,7 +1378,6 @@ function get_sagan_instances($device_id)
     return [];
 }
 
-
 /**
  * @params int unix time
  * @params int seconds

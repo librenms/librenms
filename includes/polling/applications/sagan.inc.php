@@ -34,8 +34,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('max_bytes_log_line', 'GAUGE', 0)
     ->addDataset('threshold', 'GAUGE', 0)
     ->addDataset('total', 'GAUGE', 0)
-    ->addDataset('uptime', 'GAUGE', 0)
-;
+    ->addDataset('uptime', 'GAUGE', 0);
 
 // keys to add to the RRD field
 $field_keys = [
