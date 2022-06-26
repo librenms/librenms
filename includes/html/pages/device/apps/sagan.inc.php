@@ -49,6 +49,7 @@ $graphs = [
     'sagan_max_bytes_log_line'=>'Max Bytes Log Line',
     'sagan_threshold'=>'Threshold',
     'sagan_uptime'=>'Uptime',
+    'sagan_alert'=>'Alert: 0=OK, 1=WARNING, 2=CRITICAL, 3+UNKNOWN',
 ];
 
 foreach ($graphs as $key => $text) {
