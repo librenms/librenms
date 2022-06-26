@@ -2152,6 +2152,71 @@ extend supervisord /etc/snmp/supervisord.py
 systemctl restart snmpd
 ```
 
+## Sagan
+
+For metrics the stats are migrated as below from the stats JSON.
+
+'f_drop_percent' and 'drop_percent' are computed based on the found data.
+
+```
+uptime              => $json->{stats}{uptime},
+total               => $json->{stats}{captured}{total},
+drop                => $json->{stats}{captured}{drop},
+ignore              => $json->{stats}{captured}{ignore},
+threshold           => $json->{stats}{captured}{theshold},
+after               => $json->{stats}{captured}{after},
+match               => $json->{stats}{captured}{match},
+bytes               => $json->{stats}{captured}{bytes_total},
+bytes_ignored       => $json->{stats}{captured}{bytes_ignored},
+max_bytes_log_line  => $json->{stats}{captured}{max_bytes_log_line},
+eps                 => $json->{stats}{captured}{eps},
+f_total             => $json->{stats}{flow}{total},
+f_dropped           => $json->{stats}{flow}{dropped},
+```
+
+Those keys are appended with the name of the instance running. The
+default is named 'ids' unless otherwise specified via the extend.
+
+There is a special instance name of '.total' which is the total of all
+the instances. So if you want the total eps, the metric would be
+'.total_eps'. Also worth noting that the alert value is the highest
+one found among all the instances.
+
+### SNMP Extend
+
+1. Install the extend.
+```
+cpanm Sagan::Monitoring
+```
+
+2. Setup cron. Below is a example.
+```
+*/5 * * * * /usr/local/bin/sagan_stat_check > /dev/null
+```
+
+3. Configure snmpd.conf
+```
+extend sagan-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin sagan_stat_check -c
+```
+
+4. Restart snmpd on your system.
+
+You will want to make sure that sagan is setup to with the values set
+below for stats-json processor, for a single instance setup..
+
+```
+enabled: yes
+time: 300
+subtract_old_values: true
+filename: "$LOG_PATH/stats.json"
+```
+
+Any configuration of sagan_stat_check should be done in the cron
+setup. If the default does not work, check the docs for it at
+[MetaCPAN for
+sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
+
+
 ## Suricata
 
 ### SNMP Extend
