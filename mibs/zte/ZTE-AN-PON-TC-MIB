@@ -1,0 +1,135 @@
+ZTE-AN-PON-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises         FROM SNMPv2-SMI
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    OBJECT-TYPE         FROM SNMPv2-SMI
+    Integer32           FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION  FROM SNMPv2-TC
+    zxAnPon             FROM ZTE-AN-SMI;
+        
+zxAnPonTcMib MODULE-IDENTITY
+    LAST-UPDATED "201202291600Z"
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO    
+        "Guo HongJian      ZTE Corporation
+         Mail: guo.hongjian@zte.com.cn
+         Tel: +86-21-68897417"
+    DESCRIPTION  "The MIB module which provides a ZTE access node device PON 
+                 managment MIB Textual Conventions."
+
+    REVISION     "201202291600Z"
+    DESCRIPTION  
+        "Initial version of this MIB module."
+    ::= { zxAnPon 100 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+    ZxAnPonOnuIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnPonOnuIndex represents the index of ONU.
+             Each bit field of ZxAnPonOnuIndex has
+             its definitions such as follows.
+        
+             MSB -- Most Significant Byte
+             LSB -- Least Significant Byte
+            
+             |MSB   Byte 4   |   Byte 3    |  Byte 2    |   Byte 1  LSB|
+             |---------------------------------------------------------|
+             |  Type |                 Index                           |
+             |(4bits)|                 (28bits)                        |
+             +-------+-------------------------------------------------+
+
+             ZxAnPonOnuIndex type : 
+                The values definition is,
+                0 - Normal ONU index
+                3 - Virtual ONU index for profile       
+          
+             0 - Normal ONU index
+             |MSB   Byte 4   |   Byte 3    |  Byte 2    |   Byte 1  LSB|
+             |-----------------------------+---------------------------|
+             |   0   |    Reserve          |   ONU  Index(1..128)      |
+             |(4bits)|    (20bits)         |                           |
+             +---------------------------------------------------------+
+             
+             3 - Virtual ONU index for profile
+             |MSB   Byte 4   |   Byte 3    |  Byte 2    |   Byte 1  LSB|
+             |-----------------------------+---------------------------|
+             |   3   |                   Profile Index                 |
+             |(4bits)|                   (28bits)                      |
+             +---------------------------------------------------------+
+             The 'Profile Index' is derived from 'zxAnPonSrvOnuPrfId' of 
+             'zxAnPonSrvOnuProfileTable'. 
+             "
+        SYNTAX  Integer32    
+                   
+    ZxAnPonRmOnuIfIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnPonRmOnuIfIndex reprensents the index of interface in ONU. 
+             The definition is as follows: 
+        | MSB  Byte 4          |     Byte 3   |    Byte 2      |  Byte 1  LSB |
+        |   Type               |    Reserved  |                |              |
+        |----------------------+--------------+----------------+--------------|
+        | 0: ETH UNI           |       0      |  Slot No.      |  Port No.    |
+        | 1: WiFi UNI          |       0      |  Slot No.      |  Port No.    |
+        | 2: IP host           |       0      |      0         |  Index       |
+        | 3: Flow              |       0      |      0         |  Index       |
+        | 4: GEM port          |       0      |      0         |  Index       |
+        | 5: Multicast GEM port|       0      |      0         |  Index       |
+        | 6: VEIP              |       0      |      0         |  Index       |
+        | 7: WAN               |       0      |      0         |  Index       |
+        | 8: xDSL UNI          |       0      |  Slot No.      |  Port No.    |
+        |---------------------------------------------------------------------|
+        "
+        SYNTAX   Integer32
+
+    ZxAnPonRmOnuAniIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnPonRmOnuAniIndex reprensents the index of ANI in ONU.
+            Usually there's only one ANI in ONU.
+            Two ANIs appear in ONU that supports type C/D protection function.
+            "
+        SYNTAX   Integer32
+
+    ZxAnPonRmOnuUniIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnPonRmOnuUniIndex reprensents the index of UNI in ONU. 
+            
+             |MSB          Byte 2           |           Byte 1       LSB|
+             |------------------------------+---------------------------|
+             |             Slot No.         |          Port No.         |
+             +------------------------------+---------------------------+ 
+            "
+        SYNTAX   Integer32
+        
+    ZxAnGponOnuTcontIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnGponOnuTcontIndex reprensents the index of T-CONT in ONU, 
+             from 1 to upper limit supported T-CONT count of ONU type.
+            "
+        SYNTAX   Integer32  
+         
+    ZxAnGponOnuGemPortIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnGponOnuGemPortIndex reprensents the index of GEM port in ONU, 
+             from 1 to upper limit supported GEM port count of ONU type.
+            "
+        SYNTAX   Integer32   
+        
+    ZxAnGponOnuVportIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnGponOnuVportIndex reprensents the index of vport in ONU, 
+             from 1 to 256.
+            "
+        SYNTAX   Integer32          
+
+END
+

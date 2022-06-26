@@ -1,0 +1,82 @@
+--------------------------------------------------------------------------------
+-- File Name : ZTE-AN-IF-MIB.mib
+-- Date      : 2006-09-05
+-- Author    : ZTE Nms dept.
+--
+-- ZTE Interface MIB for Access Node
+--------------------------------------------------------------------------------
+
+ZTE-AN-IF-MIB    DEFINITIONS ::= BEGIN
+IMPORTS     
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE     FROM SNMPv2-SMI
+    DisplayString                                       FROM SNMPv2-TC
+    ifIndex                                             FROM IF-MIB
+    ZxAnSubIfIndex                                      FROM ZTE-AN-TC-MIB
+    zxAnInterface                                       FROM ZTE-AN-SMI;
+
+zxAnIfMib    MODULE-IDENTITY
+    LAST-UPDATED    "201106081500Z"
+    ORGANIZATION    "ZTE Corporation"
+    CONTACT-INFO    "Su Chunshan
+                     Mail: suchunshan@zte.com.cn
+                     Tel : 021-68896284"
+    DESCRIPTION     "The MIB module for the management of the interface for 
+                     ZTE Access Node."
+    REVISION        "201106081500Z"
+    DESCRIPTION
+        "New oid assignments for xxx xxx."
+
+    ::=  {  zxAnInterface  5  }
+        
+zxAnIfObjects     OBJECT IDENTIFIER  ::=  { zxAnIfMib 5 }
+zxAnIfNotifications OBJECT IDENTIFIER  ::=  { zxAnIfMib 6 }
+
+--------------------------------------------------------------------------------
+-- Following objects are defined.
+-- 1.Interface Extended Table
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- 1.Interface Extended Table
+--------------------------------------------------------------------------------
+    zxAnIfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the general interface infomation."
+        ::=  { zxAnIfObjects  1 }
+  
+    zxAnIfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnIfTable."
+        INDEX   { ifIndex, zxAnSubIfIndex }
+        ::=  { zxAnIfTable 1 }
+  
+    ZxAnIfEntry  ::=  SEQUENCE {
+        zxAnSubIfIndex    ZxAnSubIfIndex,
+        zxAnSubIfAlias    DisplayString
+        }
+  
+    zxAnSubIfIndex    OBJECT-TYPE 
+        SYNTAX          ZxAnSubIfIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "Sub-interface index at this interface."
+        ::=  {  zxAnIfEntry  2  }
+      
+    zxAnSubIfAlias   OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The alias of the sub-interface."
+        ::= { zxAnIfEntry  3 }
+           
+END
+

@@ -1,0 +1,377 @@
+ZTE-AN-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises         FROM SNMPv2-SMI
+    MODULE-IDENTITY     FROM SNMPv2-SMI
+    OBJECT-TYPE         FROM SNMPv2-SMI
+    Integer32           FROM SNMPv2-SMI
+    Unsigned32          FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION  FROM SNMPv2-TC
+    zxAccessNode        FROM ZTE-AN-SMI;
+        
+zxAnTcMib MODULE-IDENTITY
+    LAST-UPDATED "201107111600Z"
+    ORGANIZATION "ZTE Corporation"
+    CONTACT-INFO "ZTE NMS dept. 
+                  Su Chunshan   68896292,
+                  Zeng Nanxi    68896250,
+                  Ma Jian       68896249"
+    DESCRIPTION  "The MIB module which provides a ZTE access node device MIB
+                  Textual Conventions."
+    --  Revision history
+    REVISION     "201107111600Z"
+    DESCRIPTION  
+        "Add description of ifIndex."
+    REVISION     "200605181400Z"
+    DESCRIPTION  
+        "Initial version of this MIB module."
+    ::= { zxAccessNode 1010 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    VlanId ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "A 12-bit VLAN ID used in the VLAN Tag header."
+        SYNTAX      Integer32 (1..4094)
+
+    ZxAnSubIfIndex ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnSubIfIndex represents a sub-interface of a physical port.
+             It must be used with ifIndex. ZxAnSubIfIndex uses a complex coding
+             to construct the subIfIndex. Each bit field of ZxAnSubIfIndex has
+             its definitions such as follows.
+        
+             MSB -- Most Significant Byte
+             LSB -- Least Significant Byte
+            
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+----------------------------------------------|
+             | SubIfType |                 SubIf No.                    |
+             |  (5bits)  |                 (27bits)                     |
+             +-----------+----------------------------------------------+
+
+             SubIfType : 
+                The values definition is,
+                0 - Invalid sub-interface
+                1 - ONU sub-interface
+                2 - ONU vport sub-interface
+                3 - ONU service port sub-interface
+                4 - ONU gemport sub-interface
+                5 - ONU UNI sub-interface
+                6 - DSL PVC sub-interface
+                7 - ATM/IMA PVC sub-interface
+                8 - VLAN sub-interface        
+                9 - Ethernet service port sub-interface        
+          
+             0 - Invalid sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+----------------------------------------------|
+             |     0     |                    0                         |
+             |  (5bits)  |                 (27bits)                     |
+             +-----------+----------------------------------------------+
+             
+             1 - ONU sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+---------------------------|
+             |     1     |       ONU No.    |            0              |
+             |  (5bits)  |      (11bits)    |         (16bits)          |
+             +-----------+------------------+---------------------------+
+
+             2 - ONU vport sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+--------------+------------|
+             |     2     |       ONU No.    |   VPort No.  |     0      |
+             |  (5bits)  |      (11bits)    |   (8bits)    |  (8bits)   |
+             +-----------+------------------+--------------+------------+ 
+
+             3 - ONU service port sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+---------------------------|
+             |     3     |       ONU No.    | Service Port |     0      |
+             |           |                  |     No.      |            |
+             |  (5bits)  |      (11bits)    |   (8bits)    |  (8bits)   |
+             +-----------+------------------+--------------+------------+ 
+
+             4 - ONU gemport sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+--------------+------------|
+             |     4     |       ONU No.    | Gemport No.  |     0      |
+             |  (5bits)  |      (11bits)    |   (8bits)    |  (8bits)   |
+             +-----------+------------------+--------------+------------+ 
+
+             5 - ONU UNI sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+--------------+------------|
+             |     5     |       ONU No.    | ONU Slot No. |ONU UNI No. |
+             |  (5bits)  |      (11bits)    |   (8bits)    |  (8bits)   |
+             +-----------+------------------+--------------+------------+                 
+             
+             6 - DSL PVC sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+---------------------------------+------------|
+             |     6     |               0                 |  PVC No.   |
+             |  (5bits)  |           (19bits)              |  (8bits)   |
+             +-----------+---------------------------------+------------+  
+
+             7 - ATM/IMA PVC sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+------------------+---------------------------|
+             |     7     |        0         |          PVC No.          |
+             |  (5bits)  |    (11bits)      |         (16bits)          |
+             +-----------+------------------+---------------------------+
+
+             8 - VLAN sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+---+----------------------+-------------------|
+             |     8     | 0 |       SVLAN ID       |      CVLAN ID     |
+             |  (5bits)  |(3)|       (12bits)       |      (12bits)     |
+             +-----------+---+----------------------+-------------------+   
+             
+             9 - Ethernet service port sub-interface
+             |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+             |-----------+---------------------------------+------------|
+             |     9     |               0                 |Service Port|
+             |           |                                 |   No.      |
+             |  (5bits)  |           (19bits)              |  (8bits)   |
+             +-----------+---------------------------------+------------+                
+
+            "
+        SYNTAX  Integer32    
+                   
+    ZxAnPortList ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnPortList reprensents a map of ports. It uses a complex coding 
+             to construct a OCTET STRING. 
+             ZxAnPortList is consisted of many physical port units. Each port 
+             unit is the type of OCTET STRING which including some bit fields.
+                
+             +-----------+-----------+      +-------------+-------------+ 
+             | Phy Port 1| Phy Port 2|  ... | Phy Port n-1| Phy Port n  | 
+             |    Unit   |    Unit   |      |    Unit     |     Unit    | 
+             +-----------+-----------+------+-------------+-------------+
+                                 
+             Each port unit has some bit fields to indicate some information.
+             The definition of a port unit is as follows.
+        
+             |  Byte 0 |   Byte 1    | Byte 2   |  Byte 3   |Byte 4 .. Byte n|
+             |---------|-------------|----------|-----------|----------------|
+             |Unit Size|InterfaceType| Port No. |ServiceType|   Ports List   |
+             |         |             |(Phy port)|           | (logical port) |
+             +---------+-------------+----------+-----------+----------------+            
+                 
+             Unit Size:      
+                The length of this port unit, UNIT is byte.
+             InterfaceType:  
+                The values definition of interfaceType             
+                    1 - Physical Port
+                    2 - DSL PVC
+                    4 - EPON/GPON vport
+                    5 - ATM PVC
+                    6 - VDSL PVC
+                    241 - Smartgroup                               
+             Port No.:           
+                 The port No. in a slot.                            
+             ServiceType:    
+                 The service is carried by these ports or virtual circuits.  
+             Ports List:     
+                 Each octet within this field specifies a set of eight
+                 ports, with the first octet specifying ports 1 through
+                 8, the second octet specifying ports 9 through 16, etc.
+                 Within each octet, the most significant bit represents
+                 the lowest numbered port, and the least significant bit
+                 represents the highest numbered port. Thus, each port
+                 of the service entity is represented by a single bit within 
+                 the value of this object. If that bit has a value of '1'
+                 then that port is included in the set of ports, the port
+                 is not included if its bit has a value of '0'.  
+                 
+             For Example:
+             
+             InterfaceType: 1 - Physical Port
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|    1     |    0     |    0     |Physical Ports List   |             
+             +---------+----------+----------+----------+----------------------+  
+             
+             InterfaceType: 2 - DSL PVC
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|    2     | Port No. |    0     |DSL PVCs List         |             
+             +---------+----------+----------+----------+----------------------+  
+             
+             InterfaceType: 4 - EPON/GPON vport
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|    4     | Port No. |    ONU   |VPorts List           |             
+             +---------+----------+----------+----------+----------------------+         
+             
+             InterfaceType: 5 - ATM PVC
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|    5     | Port No. |    0     |ATM PVCs List         |             
+             +---------+----------+----------+----------+----------------------+                       
+             
+             InterfaceType: 6 - VDSL PVC
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|    6     | Port No. |    0     |VDSL PVCs List        |             
+             +---------+----------+----------+----------+----------------------+       
+             
+             InterfaceType: 241 - Smartgroup      
+             |  Byte 0 |  Byte 1  |  Byte 2  |  Byte 3  |Byte 4     ..   Byte n|
+             |---------|----------|----------|----------|----------------------|
+             |Unit Size|   241    |     0    |    0     |Smart Groups List     |             
+             +---------+----------+----------+----------+----------------------+                    
+            "
+        SYNTAX   OCTET STRING
+  
+    ZxAnIdList ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+            "ZxAnIdList reprensents a map of id,such as vlan id list,
+             multicast pkg id list.
+             Each octet within this field specifies a set of eight
+             id, with the first octet specifying id 1 through
+             8, the second octet specifying id 9 through 16, etc.
+             Within each octet, the most significant bit represents
+             the lowest numbered id, and the least significant bit
+             represents the highest numbered id.  Thus, each id
+             of the service entity is represented by a single bit within the
+             value of this object.  If that bit has a value of '1'
+             then that id is included in the set of ids; the id
+             is not included if its bit has a value of '0'. 
+            "
+        SYNTAX   OCTET STRING
+    
+-- -------------------------------------------------------------
+-- Description of ifIndex.
+-- -------------------------------------------------------------
+--         
+--         A unique index value of a physical interface or a logical 
+--         interface. Each bit field of ifIndex has its definitions such as 
+--         follows.
+--    
+--         MSB : Most Significant Byte
+--         LSB : Least Significant Byte
+--        
+--         |      MSB      |    Byte 2    |    Byte 1    |    LSB     |
+--         |--------------------------------------------------------- |
+--         |IfType |                  If No.                          |
+--         |(4bits)|                 (28bits)                         |
+--         |--------------------------------------------------------- |
+--
+--         IfType: 
+--            The values definition is,            
+--            1 - Physical Interface
+--            2 - Logical Interface 
+--            3 - Inner-port Interface               
+--         
+--         1 - Physical Interface
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   1   |Rack No.|  Shelf No.   |  Slot No.    | Port No.   |
+--         |(4bits)|(4bits) |  (8bits)     |  (8bits)     | (8bits)    |
+--         |---------------------------------------------------------  |
+--
+-- -----------------------------------------------------------------------------
+--
+--         2 - Logical Interface
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |SubType |           Logical If No.                 |
+--         |(4bits)|(4bits) |             (24bits)                     |
+--         |---------------------------------------------------------  |
+--        
+--         SubType:
+--            The values definition is,            
+--            1 - Smartgroup
+--            2 - Interface VLAN
+--            3 - Interface Super VLAN
+--            4 - Loopback ID
+--            5 - Interface Inband VLAN
+--            6 - Pseudo-wire
+--            7 - If Mng
+--            8 - CIP
+--            9 - CPU
+--         
+--         1 - Smartgroup
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   1    |     0        |      Smartgroup ID        |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |
+--
+--         2 - Interface VLAN
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   2    |     0        |       If VLAN ID          |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |
+--
+--         3 - Interface Super VLAN
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   3    |     0        |    If Super VLAN ID       |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |
+--
+--         4 - Loopback Id
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   4    |     0        |       Loopback ID         |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |
+--
+--         5 - Interface Inband VLAN
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   5    |     0        |   If Inband VLAN ID       |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  | 
+--
+--         6 - Pseudo Wire
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   6    |     0        |     Pseudo-wire No.       |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |  
+--
+--         7 - Interface MNG
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   7    |     0        |       If Mng No.          |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  |  
+--
+--         8 - CIP
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   8    |     0        |          CIP              |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  | 
+--
+--         9 - CPU
+--         |      MSB       |    Byte 2    |    Byte 1    |    LSB     |
+--         |---------------------------------------------------------  |
+--         |   2   |   9    |     0        |          CPU              |
+--         |(4bits)|(4bits) |  (8bits)     |        (16bits)           |
+--         |---------------------------------------------------------  | 
+--
+-- -----------------------------------------------------------------------------
+--
+--         3 - Inner-port Interface 
+--         |      MSB       |    Byte 2    |    Byte 1    | Type  |    LSB     |
+--         |-----------------------------------------------------------------  |
+--         |   3   |Rack No.|  Shelf No.   |  Slot No.    | Type  | Port No.   |
+--         |       |        |              |              |       | Smartgroup |
+--         |(4bits)|(4bits) |  (8bits)     |  (8bits)     |(1bit) | (7bits)    |
+--         |-----------------------------------------------------------------  |
+--
+      
+END
+
