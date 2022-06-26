@@ -1,0 +1,73 @@
+HP-SN-ROOT-MIB DEFINITIONS ::= BEGIN
+
+-- LAN Switch-Router Root MIB Release 1.0.1
+-- Revision 01/30/99
+
+-- Copyright 1996 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry SNMP Management Information Base Specification
+-- (Specification) embodies Foundry's confidential and
+-- proprietary intellectual property. Foundry retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Branches under "switch"
+
+-- Branch for registration of values for objects
+-- with syntax of OBJECT IDENTIFIER
+--  snReg		OBJECT IDENTIFIER ::= { switch 1 }
+
+-- Branch for 'Enterprise' field value in traps
+--  snTraps		OBJECT IDENTIFIER ::= { switch 2 }
+--  snChaTrap   OBJECT IDENTIFIER ::= { snTraps 1 }
+
+-- Major Switch MIB branches
+ 
+
+IMPORTS
+	enterprises
+		FROM	RFC1155-SMI;	
+
+hp		OBJECT IDENTIFIER ::= { enterprises 11 }
+nm			OBJECT IDENTIFIER ::= { hp 2 }
+system      OBJECT IDENTIFIER ::= { nm 3 }
+netElement  OBJECT IDENTIFIER ::= { system 7 }
+
+hpEtherSwitch  	OBJECT IDENTIFIER ::= { netElement 11 }
+hpSwitchCore	OBJECT IDENTIFIER ::= { hpEtherSwitch 12 }
+hpSwitch9308	OBJECT IDENTIFIER ::= { hpEtherSwitch 13 }
+hpSwitch9304	OBJECT IDENTIFIER ::= { hpEtherSwitch 14 }
+hpSwitch6308	OBJECT IDENTIFIER ::= { hpEtherSwitch 15 }
+hpSwitch6208	OBJECT IDENTIFIER ::= { hpEtherSwitch 16 }
+hpSwitch9315	OBJECT IDENTIFIER ::= { hpEtherSwitch 28 }
+switch		OBJECT IDENTIFIER ::= { hpSwitchCore 1 }
+  snChassis		OBJECT IDENTIFIER ::= { switch 1 }
+  snAgentSys	OBJECT IDENTIFIER ::= { switch 2 }
+  snSwitch		OBJECT IDENTIFIER ::= { switch 3 }
+  snL4			OBJECT IDENTIFIER ::= { switch 4 }
+  snStack		OBJECT IDENTIFIER ::= { switch 5 }
+
+router 		OBJECT IDENTIFIER ::= { hpSwitchCore 2 }
+  snIpx			OBJECT IDENTIFIER ::= { router 1 }
+  snIp			OBJECT IDENTIFIER ::= { router 2 }
+  snRip			OBJECT IDENTIFIER ::= { router 3 }
+  snOspf		OBJECT IDENTIFIER ::= { router 4 }
+  snDvmrp		OBJECT IDENTIFIER ::= { router 5 }
+  snIgmp		OBJECT IDENTIFIER ::= { router 6 }
+  snFsrp		OBJECT IDENTIFIER ::= { router 7 }
+  snGblRt		OBJECT IDENTIFIER ::= { router 8 }
+  snPim			OBJECT IDENTIFIER ::= { router 9 }
+  snAppleTalk	OBJECT IDENTIFIER ::= { router 10 }
+  snBgp4		OBJECT IDENTIFIER ::= { router 11 }
+  snVrrp		OBJECT IDENTIFIER ::= { router 12 }
+  snLoopbackIf	OBJECT IDENTIFIER ::= { router 13 }
+  snPOS 		OBJECT IDENTIFIER ::= { router 14 }
+  snMpls	OBJECT IDENTIFIER ::= { router 15 }
+END

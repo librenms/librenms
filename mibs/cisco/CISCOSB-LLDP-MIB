@@ -35,7 +35,7 @@ IMPORTS
 		FROM INET-ADDRESS-MIB;
 
 rlLldp MODULE-IDENTITY
-         LAST-UPDATED "200506200000Z"
+         LAST-UPDATED "202105190000Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -48,7 +48,7 @@ rlLldp MODULE-IDENTITY
 
          DESCRIPTION
                 "This private MIB module adds MIBs to LLDP (Link Layer Discovery Protocol)."
-         REVISION "200506200000Z"
+         REVISION "202105190000Z"
          DESCRIPTION
                 "Initial revision."
         ::= { switch001 110 }

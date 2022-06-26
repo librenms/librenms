@@ -1,0 +1,588 @@
+
+
+
+-- ===============================================================================
+
+--
+-- Extreme QoS objects
+--
+
+EXTREME-QOS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+                TruthValue      FROM SNMPv2-TC
+		DisplayString   FROM RFC1213-MIB
+		RowStatus       FROM SNMPv2-TC
+		ifIndex                 FROM RFC1213-MIB
+		extremeVlanIfIndex	FROM EXTREME-VLAN-MIB
+                extremeAgent            FROM EXTREME-BASE-MIB;
+
+        extremeQos MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Quality-of-Service objects"
+        ::= { extremeAgent 3 }
+
+	extremeQosCommon	OBJECT IDENTIFIER ::= { extremeQos 1 }
+
+
+	extremeUnitPaceMode OBJECT-TYPE
+       	        SYNTAX  INTEGER {
+            	        notApplicable(1),
+                        normalEthernet(2),
+                        lowLatency(3)
+		}
+                MAX-ACCESS	read-write
+                STATUS deprecated
+                DESCRIPTION
+            	"This object specifies whether the device currently
+                recognises and gives priority treatment to the 
+                forwarding of packets with the PACE(tm) bit set in 
+                their MAC Source Address fields.
+                
+                PACE(tm) mode applies to the whole unit only and
+                is only valid when device is in Ingress QoS mode
+                as specified by extremeQosMode ingress(1). This
+                object will report notApplicable(1) when in 
+                egress(2) mode. Set operations with value
+                notApplicable(1) will be rejected."
+	::= { extremeQosCommon 1 }                
+
+--
+-- Select QoS Mode
+--
+	extremeQosMode OBJECT-TYPE
+		SYNTAX  INTEGER { ingress(1), egress(2) }
+		MAX-ACCESS  read-write
+		STATUS deprecated
+		DESCRIPTION
+                      "Indicates which QoS mode the device should
+                       use. ingress(1) applies priority-based QoS based 
+                       on the incoming packet's destination IP or MAC
+                       address, 802.1p priority, PACE(tm), Source Port or
+                       VLAN. egress(2) applies priority- and bandwidth-based
+                       QoS based on destination IP or MAC address or VLAN.
+                       See ExtremeWare documentation for further information."
+	::= { extremeQosCommon 4 }
+
+--
+-- Reset all QoS settings to defaults
+--
+	extremeQosUnconfigure OBJECT-TYPE
+		SYNTAX  TruthValue
+		MAX-ACCESS  read-write
+		STATUS deprecated
+		DESCRIPTION
+                      "Setting this to true will reset all QoS settings
+                        in the device to factory defaults. Reads from this
+                        value return an undefined value."
+	::= { extremeQosCommon 5 }
+
+
+--
+-- QoS Profile table
+--
+
+	extremeQosProfileTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeQosProfileEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table lists QoS profiles."
+		::= { extremeQosCommon 6 }
+
+	extremeQosProfileEntry	OBJECT-TYPE
+		SYNTAX	ExtremeQosProfileEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual QoS profile Entry."
+		INDEX {extremeQosProfileIndex}
+		::= {extremeQosProfileTable 1}
+
+	ExtremeQosProfileEntry ::= SEQUENCE {
+                extremeQosProfileIndex          INTEGER,
+                extremeQosProfileName           DisplayString,
+                extremeQosProfileMinBw          INTEGER,
+                extremeQosProfileMaxBw          INTEGER,
+                extremeQosProfilePriority       INTEGER,
+                extremeQosProfileRowStatus      RowStatus
+        }
+
+        extremeQosProfileIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	read-create
+                STATUS	current
+                DESCRIPTION
+                        "An index that uniquely identifies an entry in the
+                        qos table."
+                ::= { extremeQosProfileEntry 1}
+
+        extremeQosProfileName OBJECT-TYPE
+                SYNTAX	DisplayString (SIZE (0..127))
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                        "A unique qos profile name."
+                ::= {extremeQosProfileEntry 2}
+
+        extremeQosProfileMinBw  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                 "The minumum percentage of bandwidth that this queue requires.
+                 The Switch is required to provide the minumum amount of 
+                 bandwidth to the queue. The lowest possible value is 0%."
+                DEFVAL { 0 }
+                ::= {extremeQosProfileEntry 3 }
+
+                
+        extremeQosProfileMaxBw	OBJECT-TYPE
+                SYNTAX	INTEGER
+        	MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                 "The maximum percentage of bandwidth that this queue is
+                 permitted to use.
+
+                 If a non-default value is set for this object then it negates
+                 any previously set value of extremeQosProfileMaxSustBwBps. In 
+                 In addition, a set operation that supplies non-default values
+                 for both this object and for extremeQosProfileMaxSustBwBps
+                 will be rejected by the agent. In other words, you may supply
+                 either an absolute or a percent limit, not both."
+                DEFVAL { 100 }
+                ::= {extremeQosProfileEntry 4 }
+
+        extremeQosProfilePriority OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                low(1),
+                                lowHi(2),
+                                normal(3),
+                                normalHi(4),
+                                medium(5),
+                                mediumHi(6),
+                                high(7),
+                                highHi(8)
+                }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The level of priority in which this queue will be
+                        serviced by the Switch."
+                ::= {extremeQosProfileEntry 5 }
+
+        extremeQosProfileRowStatus OBJECT-TYPE
+                SYNTAX	RowStatus
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                    "The status of the extremeQosProfile entry.
+                    This object can be set to:
+                                active(1)
+                        	createAndGo(4)
+                                createAndWait(5)
+                                destroy(6)
+
+                    The following values may be read:
+                                active(1)
+                                notInService(2)
+                                notReady(3).
+                        
+                    Setting this object to createAndGo(4) causes the agent
+                    to attempt to create and commit the row based on 
+                    the contents of the objects in the row.  If all necessary
+                    information is present in the row and the values are
+                    acceptible to the agent, the agent will change the 
+                    status to active(1).  If any of the necessary objects  
+                    are not available, the agent will reject the creation
+                    request.        
+
+                    Setting this object to createAndWait(5) causes a row
+                    in this table to be created.  The agent sets the
+                    status to notInService(2) if all of the information is
+                    present in the row and the values are acceptable to the
+                    agent; otherwise, the agent sets the status to notReady(3).
+
+                    Setting this object to active(1) is only valid when
+                    the current status is active(1) or notInService(2).  
+
+                    When the state of the row transitions is set to active(1),
+                    the agent creates the corresponding row in the ifTable..
+
+                    Setting this object to destroy(6) will remove the
+                    corresponding QoS Profile Entry.
+
+                    In order for a set of this object to destroy(6) to succeed,
+                    all dependencies on this row must have been removed.  These
+                    will include any stacking dependencies in the ifStackTable
+                    and any protocol specific tables dependencies."
+        ::= { extremeQosProfileEntry 6 }
+
+--
+-- VLAN-based QoS Table
+--
+       	extremeQosByVlanMappingTable	OBJECT-TYPE
+
+		SYNTAX  SEQUENCE OF ExtremeQosByVlanMappingEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		  "Table to associate a Vlan with the QoS profile that the
+		   Vlan is using. Every Vlan is assigned a Qos Profile and
+		   hence there is an entry in this table corresponding to every
+		   entry in the extremeVlanIfTable."
+		::= { extremeQosCommon 7 }
+
+	extremeQosByVlanMappingEntry	OBJECT-TYPE
+		SYNTAX	ExtremeQosByVlanMappingEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+                        "The QoS associated with a particular Vlan."
+		INDEX {extremeVlanIfIndex}
+		::= {extremeQosByVlanMappingTable 1}
+
+	ExtremeQosByVlanMappingEntry ::= SEQUENCE {
+        	extremeQosByVlanMappingQosProfileIndex	INTEGER
+	}
+
+	extremeQosByVlanMappingQosProfileIndex OBJECT-TYPE
+		SYNTAX	INTEGER (1..65535)
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+		    "Value of extremeQosProfileIndex that uniquely 
+                    identifies a QoS Profile entry in extremeQosProfileTable.
+                    This indicates the QoS to be given to traffic for this
+                    Vlan in the absence of any other more specific 
+                    configuration information for this traffic."
+	::= { extremeQosByVlanMappingEntry 1 }
+
+--
+-- Per Port QOS Table
+--
+	extremePerPortQosTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremePerPortQosEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		    "Global Qos Profiles are defined in the
+	            extremeQosProfileTable. This table contains a list
+                    of ports for which the definition of certain global
+		    Qos Profiles has been overridden. The new definition
+                    of the Qos profile parameters is in this table."
+		::= { extremeQosCommon 8 }
+
+	extremePerPortQosEntry	OBJECT-TYPE
+		SYNTAX	ExtremePerPortQosEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual overridden QoS profile Entry."
+		INDEX {ifIndex, extremePerPortQosIndex}
+		::= {extremePerPortQosTable 1}
+
+	ExtremePerPortQosEntry ::= SEQUENCE {
+                extremePerPortQosIndex          INTEGER,
+                extremePerPortQosMinBw          INTEGER,
+                extremePerPortQosMaxBw          INTEGER,
+                extremePerPortQosPriority       INTEGER,
+                extremePerPortQosRowStatus      RowStatus
+        }
+
+        extremePerPortQosIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	read-create
+                STATUS	current
+                DESCRIPTION
+                        "The value of this variable is the same as the value
+			of extremeQosProfileIndex of the Qos Profile which
+			is overridden (for the port specified by ifIndex) by 
+			the definition in this table."
+                ::= { extremePerPortQosEntry 1}
+
+        extremePerPortQosMinBw  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                   "The minumum percentage of bandwidth that this queue on the
+		   specified port requires. The Switch is required to provide 
+		   the minumum amount of bandwidth to the queue. The lowest 
+		   possible value is 0%."
+                DEFVAL { 0 }
+                ::= {extremePerPortQosEntry 2 }
+
+                
+        extremePerPortQosMaxBw	OBJECT-TYPE
+                SYNTAX	INTEGER
+        	MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                 "The maximum percentage of bandwidth that this queue on the
+                 specified port is permitted to use."
+                DEFVAL { 100 }
+                ::= {extremePerPortQosEntry 3 }
+
+        extremePerPortQosPriority OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                low(1),
+                                lowHi(2),
+                                normal(3),
+                                normalHi(4),
+                                medium(5),
+                                mediumHi(6),
+                                high(7),
+                                highHi(8)
+                }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                 "The level of priority in which this queue will be
+                 serviced by the Switch."
+                ::= {extremePerPortQosEntry 4 }
+
+        extremePerPortQosRowStatus OBJECT-TYPE
+                SYNTAX	RowStatus
+                MAX-ACCESS 	read-create
+                STATUS	current
+                DESCRIPTION
+                 "The status of the extremePerPortQos entry.
+		 This object can be set to 
+            		active(1)
+			createAndGo(4)
+                 The following value may be read:
+            		active(1)
+		 Note that a destroy(6) is not supported. A row will only be
+		 deleted from this table when the Qos Profile indicated
+		 in that row is changed globally."
+
+        ::= { extremePerPortQosEntry 5 }
+
+        
+--
+-- QoS Ingress Priority
+--
+	extremeQosIngressPriorityTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeQosIngressPriorityEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table lists QoS ingress priority settings."
+		::= { extremeQosCommon 9 }
+
+	extremeQosIngressPriorityEntry	OBJECT-TYPE
+		SYNTAX	ExtremeQosIngressPriorityEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual QoS ingress priority Entry."
+		INDEX {extremeQosIngressPriorityIndex}
+		::= {extremeQosIngressPriorityTable 1}
+
+	ExtremeQosIngressPriorityEntry ::= SEQUENCE {
+                extremeQosIngressPriorityIndex          INTEGER,
+                extremeQosIngressPriorityName           DisplayString,
+                extremeQosIngressPriorityValue          INTEGER
+        }
+
+        extremeQosIngressPriorityIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	read-only
+                STATUS	current
+                DESCRIPTION
+                        "An index that uniquely identifies an entry in the
+                        qos ingress priority table."
+                ::= { extremeQosIngressPriorityEntry 1}
+
+        extremeQosIngressPriorityName OBJECT-TYPE
+                SYNTAX	DisplayString (SIZE (0..15))
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "A qos ingress priority name."
+                ::= {extremeQosIngressPriorityEntry 2}
+                
+        extremeQosIngressPriorityValue OBJECT-TYPE
+                SYNTAX  INTEGER (0..15)
+                MAX-ACCESS	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The ingress Qos priority value."
+                ::= { extremeQosIngressPriorityEntry 3}
+                
+
+--
+-- IQoS Profile table
+--
+
+	extremeIQosProfileTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeIQosProfileEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table lists ingress QoS profiles."
+		::= { extremeQosCommon 10 }
+
+	extremeIQosProfileEntry	OBJECT-TYPE
+		SYNTAX	ExtremeIQosProfileEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual ingress QoS profile Entry."
+		INDEX {ifIndex ,
+                       extremeIQosProfileIndex}
+		::= {extremeIQosProfileTable 1}
+
+	ExtremeIQosProfileEntry ::= SEQUENCE {
+                extremeIQosProfileIndex          INTEGER,
+                extremeIQosProfileName           DisplayString,
+                extremeIQosProfileMinBwType      INTEGER,
+                extremeIQosProfileMinBw          INTEGER,
+                extremeIQosProfileMaxBwType      INTEGER,
+                extremeIQosProfileMaxBw          INTEGER,
+                extremeIQosProfileRED            INTEGER,
+                extremeIQosProfileMaxBuf         INTEGER
+        }
+
+        extremeIQosProfileIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	read-only
+                STATUS	current
+                DESCRIPTION
+                        "An index that uniquely identifies an entry in the
+                        ingress Qos table."
+                ::= { extremeIQosProfileEntry 1}
+                
+        extremeIQosProfileName OBJECT-TYPE
+                SYNTAX	DisplayString (SIZE (0..127))
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "A unique ingress Qos profile name."
+                ::= {extremeIQosProfileEntry 2}
+                
+        extremeIQosProfileMinBwType  OBJECT-TYPE
+                SYNTAX  INTEGER {
+			percentage(1),
+			kbps(2),
+                        mbps(3)
+		}
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The type of the current minimum bandwith setting. A value
+                   of 1 signifies that the minimum bandwith value is a percentage
+                   of the configurable port bandwidth. A value of 2 or 3 signifies
+                   a guaranteed minimum available bandwidth in Kbps or Mbps
+                   respectively."
+                ::= {extremeIQosProfileEntry 3 }
+
+        extremeIQosProfileMinBw  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The guaranteed minimum bandwidth for this queue, expressed as either
+                 a percentage or a specific bandwidth value, as specified by the value
+                 of extremeIQosProfileMinBwType."
+                DEFVAL { 0 }
+                ::= {extremeIQosProfileEntry 4 }
+                
+        extremeIQosProfileMaxBwType  OBJECT-TYPE
+                SYNTAX  INTEGER {
+			percentage(1),
+			kbps(2),
+                        mbps(3)
+		}
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The type of the current maximum bandwith setting. A value
+                   of 1 signifies that the maximum bandwith value is a percentage
+                   of the configurable port bandwidth. A value of 2 or 3 signifies
+                   a maximum allowed bandwidth in Kbps or Mbps respectively."
+                ::= {extremeIQosProfileEntry 5 }
+                
+        extremeIQosProfileMaxBw	OBJECT-TYPE
+                SYNTAX	INTEGER
+        	MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The maximum allowed input bandwidth for this queue, expressed as 
+                 either a percentage or a specific bandwidth value, as specified by 
+                 the value of extremeIQosProfileMaxBwType."
+                DEFVAL { 0 }
+                ::= {extremeIQosProfileEntry 6 }
+
+        extremeIQosProfileRED OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "The Random Early Drop threshold. When the input queue fill
+                        ratio exceeds this percentage, frames start to drop randomly
+                        with a linear increasing drop probability as the queue fill
+                        count approaches the max queue size. A value of 100 indicates
+                        that this feature is currently disabled."
+                ::= {extremeIQosProfileEntry 7 }
+
+        extremeIQosProfileMaxBuf OBJECT-TYPE
+                SYNTAX	INTEGER
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                    "The percentage of the total ingress queue size to use. Lower values
+                    can be used to reduce the max latency through this queue, but with
+                    potentially greater loss with bursty traffic."
+        ::= { extremeIQosProfileEntry 8 }
+        
+
+--
+-- VLAN-based Ingress QoS Table
+--
+       	extremeIQosByVlanMappingTable	OBJECT-TYPE
+
+		SYNTAX  SEQUENCE OF ExtremeIQosByVlanMappingEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		  "Table to associate a Vlan with the ingress QoS profile 
+                  that the Vlan is using. Every Vlan is assigned a Qos Profile 
+                  and hence there is an entry in this table corresponding to
+                  every entry in the extremeVlanIfTable."
+		::= { extremeQosCommon 11 }
+
+	extremeIQosByVlanMappingEntry	OBJECT-TYPE
+		SYNTAX	ExtremeIQosByVlanMappingEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+                        "The ingress QoS associated with a particular Vlan."
+		INDEX {extremeVlanIfIndex}
+		::= {extremeIQosByVlanMappingTable 1}
+
+	ExtremeIQosByVlanMappingEntry ::= SEQUENCE {
+        	extremeIQosByVlanMappingIQosProfileIndex	INTEGER
+	}
+
+	extremeIQosByVlanMappingIQosProfileIndex OBJECT-TYPE
+		SYNTAX	INTEGER (1..65535)
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+		    "Value of extremeIQosProfileIndex that uniquely 
+                    identifies an ingress QoS Profile entry in extremeIQosProfileTable.
+                    This indicates the QoS to be given to traffic for this
+                    Vlan in the absence of any other more specific 
+                    configuration information for this traffic."
+	::= { extremeIQosByVlanMappingEntry 1 }
+
+
+
+END

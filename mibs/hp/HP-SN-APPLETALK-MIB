@@ -1,0 +1,772 @@
+HP-SN-APPLETALK-MIB DEFINITIONS ::= BEGIN
+
+
+-- Foundry snAppleTalk Group MIB Release 1.0.0
+-- Revision 0 1/19/98
+
+-- Copyright 1996-98 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base 
+-- Specification embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Imports
+
+IMPORTS
+	Counter
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	ClearStatus, RowSts, PortIndex
+		FROM HP-SN-IP-MIB
+	snAppleTalk
+		FROM HP-SN-ROOT-MIB;
+
+
+    ATNetworkNumber ::=         -- 2 octets of net number
+                                -- in network byte order
+        OCTET STRING (SIZE (2))
+
+    DdpNodeAddress ::=          -- 2 octets of net number
+                                -- in network byte order,
+                                -- 1 octet of node number
+        OCTET STRING (SIZE (3))
+
+    ATName ::=                  -- 0 to 32 octets of AppleTalk
+                                -- ASCII [Inside AppleTalk]
+        OCTET STRING (SIZE (0..32))
+
+	--  RtrStatus Values
+
+	     RtrStatus ::= INTEGER { disabled(0), enabled (1) }
+
+	--  Action 
+
+		Action ::= INTEGER { deny(0), permit(1) }
+
+-- SECTION 2: MIB 
+
+-- Router AppleTalk MIB
+-- This section contains AppleTalk specific router MIB object definitions.
+
+-- AppleTalk general group
+
+snRtATGeneral               OBJECT IDENTIFIER ::= { snAppleTalk 1 }
+
+snRtATRoutingEnable            OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable AppleTalk routing function on this box."
+	::= { snRtATGeneral 1 }
+
+snRtATClearArpCache            OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear AppleTalk arp cache table."
+	::= { snRtATGeneral 2 }
+
+snRtATClearFwdCache            OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear AppleTalk forward cache table."
+	::= { snRtATGeneral 3 }
+
+snRtATClearRoute               OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear AppleTalk route table."
+	::= { snRtATGeneral 4 }
+
+snRtATClearTrafficCounters     OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear AppleTalk network statistics counters."
+	::= { snRtATGeneral 5 }
+
+snRtATArpRetransmitCount       OBJECT-TYPE
+	SYNTAX  INTEGER (1..10)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of AppleTalk ARP request retransmits if the
+		first request timeouts."
+    DEFVAL  { 2 }
+	::= { snRtATGeneral 6 }
+
+snRtATArpRetransmitInterval    OBJECT-TYPE
+	SYNTAX  INTEGER (1..120)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The waiting time interval for an AppleTalk ARP response
+		before retransmission of an ARP request. Each unit value
+		is one second."
+    DEFVAL  { 1 }
+	::= { snRtATGeneral 7 }
+
+snRtATGleanPacketsEnable       OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable AppleTalk glean packets function on this box."
+    DEFVAL  { disabled }
+	::= { snRtATGeneral 8 }
+
+snRtATRtmpUpdateInterval       OBJECT-TYPE
+	SYNTAX  INTEGER (1..3600)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The periodic time interval to transmit a RTMP
+		update. Each unit value is one second."
+    DEFVAL  { 10 }
+	::= { snRtATGeneral 9 }
+
+snRtATZipQueryInterval         OBJECT-TYPE
+	SYNTAX  INTEGER (1..1000)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The periodic time interval to transmit a ZIP
+		query. Each unit value is one second."
+    DEFVAL  { 10 }
+	::= { snRtATGeneral 10 }
+
+snRtATInRtmpPkts               OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of RTMP packets received by
+		this entity."
+	::= { snRtATGeneral 11 }
+
+snRtATOutRtmpPkts              OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of RTMP packets which were
+		transmitted from this entity."
+	::= { snRtATGeneral 12 }
+
+snRtATFilteredRtmpPkts         OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of RTMP packets which were
+		filtered by this entity."
+	::= { snRtATGeneral 13 }
+
+snRtATInZipPkts                OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP packets received by
+		this entity."
+	::= { snRtATGeneral 14 }
+
+snRtATOutZipPkts               OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP packets which were
+		transmitted from this entity."
+	::= { snRtATGeneral 15 }
+
+snRtATInZipGZLPkts             OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP get zone list packets received by
+		this entity."
+	::= { snRtATGeneral 16 }
+
+snRtATOutZipGZLPkts            OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP get zone list packets which were
+		transmitted from this entity."
+	::= { snRtATGeneral 17 }
+
+snRtATInZipNetInfoPkts         OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP network information packets received by
+		this entity."
+	::= { snRtATGeneral 18 }
+
+snRtATOutZipNetInfoPkts        OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of ZIP network information packets which were
+		transmitted from this entity."
+	::= { snRtATGeneral 19 }
+
+snRtATInDdpPkts                OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of DDP datagrams received by
+		this entity."
+	::= { snRtATGeneral 20 }
+
+snRtATOutDdpPkts               OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of DDP datagrams which were
+		transmitted from this entity."
+	::= { snRtATGeneral 21 }
+
+snRtATForwardedDdpPkts         OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of input DDP datagrams for which this entity
+		was not their final DDP destination, as a result of
+		which an attempt was made to find a route to forward
+		them to that final destination."
+	::= { snRtATGeneral 22 }
+
+snRtATInDeliveredDdpPkts       OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of input DDP datagrams for which
+		this entity was their final DDP destination."
+	::= { snRtATGeneral 23 }
+
+snRtATDroppedNoRouteDdpPkts    OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of DDP datagrams dropped because a
+		route could not be found to their final destination."
+	::= { snRtATGeneral 24 }
+
+snRtATDroppedBadHopCountsDdpPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of input DDP datagrams dropped
+		because this entity was not their final destination
+		and their hop count would exceed 15."
+	::= { snRtATGeneral 25 }
+
+snRtATDroppedOtherReasonsDdpPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of DDP datagrams dropped because
+		of other reasons, e.g. run out of resouces."
+	::= { snRtATGeneral 26 }
+
+snRtATInAarpPkts               OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of AppleTalk ARP packets received by
+		this entity."
+	::= { snRtATGeneral 27 }
+
+snRtATOutAarpPkts              OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of AppleTalk ARP packets which were
+		transmitted from this entity."
+	::= { snRtATGeneral 28 }
+
+
+-- AppleTalk socket priority table
+
+snRtATSocketPriorityTable      OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATSocketPriorityEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk socket priority table."
+	::= { snAppleTalk 2 }
+
+snRtATSocketPriorityEntry      OBJECT-TYPE
+	SYNTAX  SnRtATSocketPriorityEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk socket priority table."
+	INDEX   { snRtATSocketPrioritySocket }
+	::= { snRtATSocketPriorityTable 1 }
+
+SnRtATSocketPriorityEntry ::= SEQUENCE {
+	snRtATSocketPrioritySocket
+		INTEGER,
+	snRtATSocketPriorityPriority
+		INTEGER
+	}
+
+snRtATSocketPrioritySocket     OBJECT-TYPE
+	SYNTAX  INTEGER (1..254)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Socket number for a socket priority entry."
+	::= { snRtATSocketPriorityEntry 1 }
+
+snRtATSocketPriorityPriority OBJECT-TYPE
+	SYNTAX  INTEGER {
+		level0(0),
+		level1(1),
+		level2(2),
+		level3(3),
+		level4(4),
+		level5(5),
+		level6(6),
+		level7(7)
+		}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The Standalone router Priority level applies to a socket number:
+		 low(0)   -- low prority
+		 high(1) -- high prority.
+		 The BigIron Priority levels applies to a socket number are:
+		level0(0), level1(1), level2(2), level3(3),
+		level4(4), level5(5), level6(6), level7(7) "
+	::= { snRtATSocketPriorityEntry 2 }
+
+
+-- AppleTalk interface zone filter table
+
+snRtATPortZoneFilterTable      OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATPortZoneFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk interface zone filter table."
+	::= { snAppleTalk 3 }
+
+snRtATPortZoneFilterEntry      OBJECT-TYPE
+	SYNTAX  SnRtATPortZoneFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk interface zone filter table."
+	INDEX   { snRtATPortZoneFilterPortIndex, snRtATPortZoneFilterZone }
+	::= { snRtATPortZoneFilterTable 1 }
+
+SnRtATPortZoneFilterEntry ::= SEQUENCE {
+	snRtATPortZoneFilterPortIndex
+		PortIndex,
+	snRtATPortZoneFilterZone
+		ATName,
+	snRtATPortZoneFilterAction
+		Action,
+	snRtATPortZoneFilterRtmpEnable
+		RtrStatus,
+	snRtATPortZoneFilterRowStatus
+		RowSts
+	}
+
+snRtATPortZoneFilterPortIndex  OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for a zone filter entry."
+	::= { snRtATPortZoneFilterEntry 1 }
+
+snRtATPortZoneFilterZone       OBJECT-TYPE
+	SYNTAX  ATName
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The zone name granted for this filter."
+	::= { snRtATPortZoneFilterEntry 2 }
+
+snRtATPortZoneFilterAction     OBJECT-TYPE
+	SYNTAX  Action
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the AppleTalk packet match
+		with this filter."
+	::= { snRtATPortZoneFilterEntry 3 }
+
+snRtATPortZoneFilterRtmpEnable OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable RTMP filtering."
+	::= { snRtATPortZoneFilterEntry 4 }
+
+snRtATPortZoneFilterRowStatus  OBJECT-TYPE
+	SYNTAX  RowSts
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a zone filter entry."
+	::= { snRtATPortZoneFilterEntry 5 }
+
+
+-- AppleTalk port table
+
+snRtATPortTable                OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk port table."
+	::= { snAppleTalk 4 }
+
+snRtATPortEntry                OBJECT-TYPE
+	SYNTAX  SnRtATPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk port table."
+	INDEX   { snRtATPortIndex }
+	::= { snRtATPortTable 1 }
+
+SnRtATPortEntry ::= SEQUENCE {
+	snRtATPortIndex
+		PortIndex,
+	snRtATPortArpAge
+		INTEGER,
+	snRtATPortState
+		INTEGER,
+	snRtATPortSeedRouter
+		INTEGER,
+	snRtATPortOperationMode
+		INTEGER
+	}
+
+snRtATPortIndex                OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for port table entry."
+	::= { snRtATPortEntry 1 }
+
+snRtATPortArpAge               OBJECT-TYPE
+	SYNTAX  INTEGER (0..240)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The time in minutes an ARP entry can
+		be valid without relearning. 
+		0 - Don't age."
+    DEFVAL  { 10 }
+	::= { snRtATPortEntry 2 }
+
+snRtATPortState                OBJECT-TYPE
+	SYNTAX  INTEGER {
+             other(1),
+             down(2),
+             up(3) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The up and down state of this port."
+	::= { snRtATPortEntry 3 }
+
+snRtATPortSeedRouter           OBJECT-TYPE
+	SYNTAX  INTEGER {
+             other(1),
+             seedRouter(2),
+             nonSeedRouter(3) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This port was configured to seed or non-seed router."
+	::= { snRtATPortEntry 4 }
+
+snRtATPortOperationMode        OBJECT-TYPE
+	SYNTAX  INTEGER {
+             other(1),
+             seedRouter(2),
+             nonSeedRouter(3),
+             notOperational(4),
+             routingDisabled(5) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The operation mode of this port."
+	::= { snRtATPortEntry 5 }
+
+
+-- AppleTalk forwarding cache table
+
+snRtATFwdCacheTable            OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATFwdCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk forwarding cache table."
+	::= { snAppleTalk 5 }
+
+snRtATFwdCacheEntry            OBJECT-TYPE
+	SYNTAX  SnRtATFwdCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk forwarding cache table."
+	INDEX   { snRtATFwdCacheIndex }
+	::= { snRtATFwdCacheTable 1 }
+
+SnRtATFwdCacheEntry ::= SEQUENCE {
+	snRtATFwdCacheIndex
+		INTEGER,
+	snRtATFwdCacheNetAddr
+		DdpNodeAddress,
+	snRtATFwdCacheMacAddr
+		OCTET STRING,
+	snRtATFwdCacheNextHop
+		DdpNodeAddress,
+	snRtATFwdCacheOutgoingPort
+		INTEGER,
+	snRtATFwdCacheType
+		INTEGER,
+	snRtATFwdCacheAction
+		INTEGER,
+	snRtATFwdCacheVLanId
+		INTEGER
+	}
+
+snRtATFwdCacheIndex            OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for an AppleTalk forwarding cache table entry."
+	::= { snRtATFwdCacheEntry 1 }
+
+snRtATFwdCacheNetAddr          OBJECT-TYPE
+	SYNTAX  DdpNodeAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The AppleTalk network address of a station."
+	::= { snRtATFwdCacheEntry 2 }
+
+snRtATFwdCacheMacAddr          OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (6))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Mac address of an AppleTalk station."
+	::= { snRtATFwdCacheEntry 3 }
+
+snRtATFwdCacheNextHop          OBJECT-TYPE
+	SYNTAX  DdpNodeAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The next hop router network address."
+	::= { snRtATFwdCacheEntry 4 }
+
+snRtATFwdCacheOutgoingPort     OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The outgoing port of which packets will forward to.
+		Return port value of zero to indicate no outgoing port
+		associated to this entry."
+	::= { snRtATFwdCacheEntry 5 }
+
+snRtATFwdCacheType             OBJECT-TYPE
+	SYNTAX  INTEGER { dynamic(1), permanent(2) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 'dynamic' or 'permanent' type for an AppleTalk forwarding
+		cache table entry."
+	::= { snRtATFwdCacheEntry 6 }
+
+snRtATFwdCacheAction           OBJECT-TYPE
+	SYNTAX  INTEGER {
+			other(1),
+			forward(2),
+			forUs(3),
+			waitForArp(4),
+			dropPacket(5)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The action to take."
+	::= { snRtATFwdCacheEntry 7 }
+
+snRtATFwdCacheVLanId        OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The VLAN ID for an AppleTalk forwarding cache table entry.
+		Return VLAN ID value of zero to indicate no VLAN associated
+		to this entry."
+	::= { snRtATFwdCacheEntry 8 }
+
+
+-- AppleTalk zone table
+
+snRtATZoneTable            OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATZoneEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk zone table."
+	::= { snAppleTalk 6 }
+
+snRtATZoneEntry            OBJECT-TYPE
+	SYNTAX  SnRtATZoneEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk zone table."
+	INDEX   { snRtATZoneIndex }
+	::= { snRtATZoneTable 1 }
+
+SnRtATZoneEntry ::= SEQUENCE {
+	snRtATZoneIndex
+		INTEGER,
+	snRtATZoneNetStart
+		ATNetworkNumber,
+	snRtATZoneNetEnd
+		ATNetworkNumber,
+	snRtATZoneName
+		ATName
+	}
+
+snRtATZoneIndex            OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for an AppleTalk zone table entry."
+	::= { snRtATZoneEntry 1 }
+
+snRtATZoneNetStart         OBJECT-TYPE
+	SYNTAX  ATNetworkNumber
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+        "The first AppleTalk network address in the range
+        of this zone name."
+	::= { snRtATZoneEntry 2 }
+
+snRtATZoneNetEnd           OBJECT-TYPE
+	SYNTAX  ATNetworkNumber
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+        "The last AppleTalk network address in the range
+        of this zone name."
+	::= { snRtATZoneEntry 3 }
+
+snRtATZoneName             OBJECT-TYPE
+	SYNTAX  ATName
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The zone name."
+	::= { snRtATZoneEntry 4 }
+
+
+-- AppleTalk additional zone filter table
+
+snRtATAddZoneFilterTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnRtATAddZoneFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"AppleTalk additional zone filter table. Additional zones
+		are those zones that do not match any zones defined in the
+		zone filter table."
+	::= { snAppleTalk 7 }
+
+snRtATAddZoneFilterEntry       OBJECT-TYPE
+	SYNTAX  SnRtATAddZoneFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the AppleTalk additional zone filter table."
+	INDEX   { snRtATAddZoneFilterPortIndex }
+	::= { snRtATAddZoneFilterTable 1 }
+
+SnRtATAddZoneFilterEntry ::= SEQUENCE {
+	snRtATAddZoneFilterPortIndex
+		PortIndex,
+	snRtATAddZoneFilterAction
+		Action,
+	snRtATAddZoneFilterRtmpEnable
+		RtrStatus
+	}
+
+snRtATAddZoneFilterPortIndex   OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for additional zone filter table entry."
+	::= { snRtATAddZoneFilterEntry 1 }
+
+snRtATAddZoneFilterAction      OBJECT-TYPE
+	SYNTAX  Action
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if no zone filter match."
+	::= { snRtATAddZoneFilterEntry 2 }
+
+snRtATAddZoneFilterRtmpEnable  OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/disable RTMP filtering on additional zone."
+	::= { snRtATAddZoneFilterEntry 3 }
+
+END
