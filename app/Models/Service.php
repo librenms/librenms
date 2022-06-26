@@ -51,7 +51,7 @@ class Service extends DeviceRelatedModel
 
     // ---- Accessors/Mutators ----
 
-    public function getServiceTypeAttribute()
+    public function getServiceTypeAttribute(): string
     {
         return Clean::fileName($this->attributes['service_type']);
     }

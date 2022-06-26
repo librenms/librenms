@@ -14,7 +14,7 @@ class ServiceHelpParserTest extends TestCase
      *
      * @return void
      */
-    public function test_example($check, $help, $expected)
+    public function test_example(string $check, string $help, array $expected): void
     {
         /** @var HelpParser $parser */
         $parser = $this->partialMock(HelpParser::class, function (MockInterface $mock) use ($check, $help) {
@@ -32,7 +32,6 @@ class ServiceHelpParserTest extends TestCase
             $this->assertEquals($check_parameter, $actual->get($check_parameter->short));
         }
     }
-
 
     public function helpData(): array
     {
@@ -135,8 +134,8 @@ EOF,
                     new CheckParameter('--starttls', '-S', '', 'Use STARTTLS for the connection.'),
                     new CheckParameter('--ignore-quit-failure', '-q', '', 'Ignore failure when sending QUIT command to server'),
                     new CheckParameter('--verbose', '-v', '', "Show details for command-line debugging (output may be truncated by\nthe monitoring system)"),
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

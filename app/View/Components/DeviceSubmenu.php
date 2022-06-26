@@ -44,13 +44,17 @@ class DeviceSubmenu extends Component
     /**
      * Create a new component instance.
      *
-     * @return void
+     * @param string $title
+     * @param string $menu
+     * @param int|string $deviceId
+     * @param string $currentTab
+     * @param string $selected
      */
     public function __construct($title, $menu, $deviceId, $currentTab, $selected)
     {
         $this->title = $title;
         $this->menu = $menu;
-        $this->device_id = $deviceId;
+        $this->device_id = "$deviceId";
         $this->current_tab = $currentTab;
         $this->selected = $selected;
     }

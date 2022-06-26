@@ -101,6 +101,7 @@ class HelpParser
         $required_args = [];
         $filtered = preg_replace_callback('/\[(-\w.*?)\] /', function ($match) use (&$optional_args) {
             $optional_args[] = $match[1];
+
             return '';
         }, $usage);
 

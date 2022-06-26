@@ -32,9 +32,9 @@ class CheckStatus
     public const CRITICAL = 2;
     public const UNKNOWN = 3;
 
-    public static function toState(string $name)
+    public static function toState(string $name): int
     {
-        switch($name) {
+        switch ($name) {
             case 'ok':
                 return self::OK;
             case 'warning':

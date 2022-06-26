@@ -50,8 +50,6 @@ return [
                 'description' => 'Server',
                 'default' => 'This Device',
             ],
-        ]
+        ],
     ],
 ];
-
-

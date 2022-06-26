@@ -42,10 +42,6 @@ class GraphRow extends Component
      * @var string
      */
     public $aspect;
-    /**
-     * @var array
-     */
-    private $vars;
 
     /**
      * Create a new component instance.
@@ -56,6 +52,7 @@ class GraphRow extends Component
      * @param  string  $aspect
      * @param  int|string  $columns  Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
+     * @param  array  $vars
      * @param  \App\Models\Device|int|null  $device
      * @param  \App\Models\Port|int|null  $port
      */

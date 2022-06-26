@@ -41,8 +41,7 @@ use Symfony\Component\Process\Process;
 
 class Services implements Module
 {
-
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         if (Config::get('discover_services_templates')) {
             (new ServiceTemplateController())->applyAll(); // FIXME applyAll() should not be on a controller
@@ -79,7 +78,7 @@ class Services implements Module
                             'service_status' => 3,
                             'service_message' => 'Service not yet checked',
                             'service_ds' => '{}',
-                            'service_template_id' => 0
+                            'service_template_id' => 0,
                         ]);
 
                         if (! $new_service->exists && $new_service->save()) {
@@ -120,7 +119,7 @@ class Services implements Module
         return $count;
     }
 
-    public function cleanup(OS $os)
+    public function cleanup(OS $os): void
     {
         $os->getDevice()->services()->delete();
     }
@@ -130,7 +129,7 @@ class Services implements Module
         $command = \LibreNMS\Services::makeCheck($service)->buildCommand();
         $process = new Process($command, null, ['LC_NUMERIC' => 'C']);
 
-        Log::debug(sprintf("[Service Check] %s", $process->getCommandLine()));
+        Log::debug(sprintf('[Service Check] %s', $process->getCommandLine()));
 
         $process->run();
 
@@ -150,7 +149,7 @@ class Services implements Module
         return false;
     }
 
-    private function printService(Service $service)
+    private function printService(Service $service): void
     {
         switch ($service->service_status) {
             case CheckStatus::OK:
@@ -173,7 +172,7 @@ class Services implements Module
     private function saveMetrics(array $metrics, Service $service, OS $os): void
     {
         // If we have performance data we will store it.
-        if (! empty ($metrics)) {
+        if (! empty($metrics)) {
             $service->service_ds = array_map(function ($metric) {
                 return $metric['uom'];
             }, $metrics);

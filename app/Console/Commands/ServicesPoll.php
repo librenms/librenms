@@ -38,6 +38,7 @@ class ServicesPoll extends LnmsCommand
 
         if (Config::get('poller_modules.services')) {
             $this->warn(trans('commands.services:poll.module_enabled'));
+
             return 0;
         }
 
@@ -68,17 +69,17 @@ class ServicesPoll extends LnmsCommand
             $polled_services += $services->poll($os);
         });
 
-
         $poller_end = microtime(true);
         $poller_run = ($poller_end - $poller_start);
         $this->newLine();
         Log::info(trans('commands.services:poll.polled', [
             'timestamp' => date(\LibreNMS\Config::get('dateformat.compact')),
             'count' => $polled_services,
-            'duration' => substr($poller_run, 0, 5),
+            'duration' => round($poller_run, 3),
         ]));
 
         Datastore::terminate();
+
         return 0;
     }
 }

@@ -2730,7 +2730,7 @@ function add_service_for_host(Illuminate\Http\Request $request)
     ]);
 
     if ($service->exists) {
-        return api_success_noresult(201, "Service " . ($data['type']) . " has been added to device $hostname (#$service_id)");
+        return api_success_noresult(201, 'Service ' . ($data['type']) . " has been added to device $hostname (#$service_id)");
     }
 
     return api_error(500, 'Failed to add the service');

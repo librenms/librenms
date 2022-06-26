@@ -6,5 +6,3 @@ if (! $os instanceof OS) {
     $os = OS::make($device);
 }
 (new \LibreNMS\Modules\Services())->poll($os);
-
-

@@ -25,20 +25,22 @@
 
 namespace LibreNMS\Services;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Log extends DefaultServiceCheck
 {
-    public function availableParameters(): array
+    public function availableParameters(): Collection
     {
-        return [
+        return collect([
             CheckParameter::make('--filename', '-F', 'logfile', 'Log file to check'),
             CheckParameter::make('--oldlog', '-O', 'oldlog', 'Location to store the old log file, must start with /tmp/check_log/'),
             CheckParameter::make('--query', '-q', 'query', 'grep query to run against the file'),
-        ];
+        ]);
     }
 
-    public function validateParameters(): array{
+    public function validateParameters(): array
+    {
         return [
             '--filename' => function ($attribute, $value, $fail) {
                 if (Str::startsWith($value, ['/etc', '/usr', '/bin']) || ! is_readable($value)) {
@@ -46,7 +48,7 @@ class Log extends DefaultServiceCheck
                 }
             },
             '--oldlog' => 'required|starts_with:/tmp/check_log/',
-            '--query' => 'required|string'
+            '--query' => 'required|string',
         ];
     }
 }

@@ -39,7 +39,7 @@ class ServiceController extends Controller
                 ['key' => 'basic', 'name' => trans('service.view_basic')],
                 ['key' => 'detailed', 'name' => trans('service.view_detailed'), 'default' => true],
                 ['key' => 'graphs', 'name' => trans('service.view_graphs')],
-            ]
+            ],
         ];
 
         $state_menu = [
@@ -48,7 +48,7 @@ class ServiceController extends Controller
                 ['key' => 'ok', 'name' => trans('service.state_ok')],
                 ['key' => 'warning', 'name' => trans('service.state_warning')],
                 ['key' => 'critical', 'name' => trans('service.state_critical')],
-            ]
+            ],
         ];
 
         return view('service.index', [
@@ -74,12 +74,14 @@ class ServiceController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): JsonResponse
     {
         $service = $this->validateNewService($request);
         $service->save();
+
         return response()->json($service);
     }
 
@@ -100,6 +102,7 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function update(Request $request, Service $service): JsonResponse
@@ -109,17 +112,17 @@ class ServiceController extends Controller
         unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
-                'device_id' => 'int|exists:App\Models\Device,device_id',
-                'service_ip' => 'nullable|ip_or_hostname',
-                'service_type' => ['nullable', Rule::in($services)],
-                'service_desc' => 'nullable|string',
-                'service_param' => 'nullable|array',
-                'service_param.*' => 'string',
-                'service_ignore' => 'boolean',
-                'service_disabled' => 'boolean',
-                'service_name' => 'nullable|string',
-                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
-            ] + $param_rules);
+            'device_id' => 'int|exists:App\Models\Device,device_id',
+            'service_ip' => 'nullable|ip_or_hostname',
+            'service_type' => ['nullable', Rule::in($services)],
+            'service_desc' => 'nullable|string',
+            'service_param' => 'nullable|array',
+            'service_param.*' => 'string',
+            'service_ignore' => 'boolean',
+            'service_disabled' => 'boolean',
+            'service_name' => 'nullable|string',
+            'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+        ] + $param_rules);
 
         $service->fill($validated);
         $service->save();
@@ -176,14 +179,14 @@ class ServiceController extends Controller
                 $rules[] = 'required';
             } elseif ($parameter->inclusive_group) {
                 $rules[] = 'required_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
-                        return 'service_param.' . $param->param ?: $param->short;
-                    })->all());
+                    return 'service_param.' . ($param->param ?: $param->short);
+                })->all());
             }
 
             if ($parameter->exclusive_group) {
                 $rules[] = 'exclude_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
-                        return 'service_param.' . $param->param ?: $param->short;
-                    })->all());
+                    return 'service_param.' . ($param->param ?: $param->short);
+                })->all());
             }
 
             if ($parameter->value == 'INTEGER') {
@@ -203,6 +206,7 @@ class ServiceController extends Controller
     /**
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function test(Request $request): JsonResponse
@@ -216,6 +220,12 @@ class ServiceController extends Controller
         ]);
     }
 
+    /**
+     * @param string $state
+     * @param bool $disabled
+     * @param bool $ignored
+     * @return \Closure
+     */
     private function filterServices($state, $disabled, $ignored): Closure
     {
         return function ($query) use ($state, $disabled, $ignored) {
@@ -236,6 +246,7 @@ class ServiceController extends Controller
     /**
      * @param  \Illuminate\Http\Request  $request
      * @return \App\Models\Service
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     private function validateNewService(Request $request): Service
@@ -245,20 +256,20 @@ class ServiceController extends Controller
         unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
-                'device_id' => 'required|int|exists:devices,device_id',
-                'service_type' => [
-                    'required',
-                    Rule::in($services),
-                ],
-                'service_ip' => 'nullable|ip_or_hostname',
-                'service_desc' => 'nullable|string',
-                'service_param' => 'nullable|array',
-                'service_param.*' => 'string',
-                'service_ignore' => 'boolean',
-                'service_disabled' => 'boolean',
-                'service_name' => 'nullable|string',
-                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
-            ] + $param_rules);
+            'device_id' => 'required|int|exists:devices,device_id',
+            'service_type' => [
+                'required',
+                Rule::in($services),
+            ],
+            'service_ip' => 'nullable|ip_or_hostname',
+            'service_desc' => 'nullable|string',
+            'service_param' => 'nullable|array',
+            'service_param.*' => 'string',
+            'service_ignore' => 'boolean',
+            'service_disabled' => 'boolean',
+            'service_name' => 'nullable|string',
+            'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+        ] + $param_rules);
 
         return new Service($validated);
     }

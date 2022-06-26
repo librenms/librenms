@@ -29,7 +29,7 @@ use LibreNMS\Data\Store\Rrd;
 
 class ServiceCheckResponse
 {
-    /** @var array The metrics parsed from the response {ds: {value: <value>, uom: <uom>}}*/
+    /** @var array The metrics parsed from the response {ds: {value: <value>, uom: <uom>}} */
     public $metrics = [];
     /** @var int The result of the check */
     public $result;
@@ -81,6 +81,7 @@ class ServiceCheckResponse
                     $tmp_ds_name = substr($normalized_ds, 0, 19 - strlen("$i")) . $i;
                     if (! isset($this->metrics[$tmp_ds_name])) {
                         \Log::debug("$normalized_ds collides with an existing index");
+
                         return $tmp_ds_name;
                     }
                 }

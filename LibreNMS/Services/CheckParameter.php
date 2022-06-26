@@ -37,9 +37,9 @@ class CheckParameter
     public $description = '';
     /** @var bool */
     public $required = false;
-    /** @var string[] */
+    /** @var string[]|null */
     public $exclusive_group;
-    /** @var string[] */
+    /** @var string[]|null */
     public $inclusive_group;
     /** @var bool */
     public $default = false;

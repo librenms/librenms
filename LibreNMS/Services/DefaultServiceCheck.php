@@ -116,6 +116,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     protected function parseLegacyParams(): array
     {
         $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($this->service->service_param));
+
         return array_map(function ($part) {
             return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
         }, $parts);
@@ -130,7 +131,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 
     public function getDefault(string $flag): string
     {
-        switch($flag) {
+        switch ($flag) {
             case '-H':
                 return $this->service->service_ip ?? $this->service->device->overwrite_ip ?? $this->service->device->hostname;
             default:
