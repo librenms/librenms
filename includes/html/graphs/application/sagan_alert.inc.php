@@ -2,7 +2,7 @@
 
 $name = 'sagan';
 $app_id = $app['app_id'];
-$unit_text = 'After';
+$unit_text = 'Status';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
@@ -19,8 +19,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'After',
-        'ds'       => 'after',
+        'descr'    => 'Alert',
+        'ds'       => 'alert',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
