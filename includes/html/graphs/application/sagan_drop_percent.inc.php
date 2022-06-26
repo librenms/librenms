@@ -2,7 +2,7 @@
 
 $name = 'sagan';
 $app_id = $app['app_id'];
-$unit_text = 'Drop Percent';
+$unit_text = 'Percent';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
