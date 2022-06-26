@@ -532,5 +532,40 @@
     "rule": "applications.app_type = \"mysql\" && applications.app_state != \"OK\"",
     "name": "MySQL Server not responding",
     "severity":"critical"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_alert\" && application_metrics.value = \"1\"",
+    "name": "Sagan has a WARNING alert",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_alert\" && application_metrics.value = \"2\"",
+    "name": "Sagan has a CRITICAL alert",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_alert\" && application_metrics.value = \"3\"",
+    "name": "Sagan has a UNKNOWN alert",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_f_drop_percent\" && application_metrics.value >= \"1\"",
+    "name": "Sagan Flow Drop Percent >= 1%",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_f_drop_percent\" && application_metrics.value >= \"2\"",
+    "name": "Sagan Flow Drop Percent >= 2%",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_drop_percent\" && application_metrics.value >= \"1\"",
+    "name": "Sagan Drop Percent >= 1%",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_drop_percent\" && application_metrics.value >= \"2\"",
+    "name": "Sagan Drop Percent >= 2%",
+    "severity": "critical"
   }
 ]
