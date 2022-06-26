@@ -68,8 +68,8 @@ foreach ($sagan['data'] as $instance => $stats) {
     }
 
     $fields = [];
-    foreach ($field_keys as $metric_key) {
-        $metrics[$instance . '_' . $metric_key] = $stats[$metric_key];
+    foreach ($field_keys as $field_key) {
+        $metrics[$instance . '_' . $field_key] = $stats[$field_key];
         $fields[$field_key] = $stats[$field_key];
     }
 
