@@ -99,7 +99,28 @@ class AvailabilityMapController extends WidgetController
         if (! $settings['show_disabled_and_ignored']) {
             $device_query->isNotDisabled();
         }
-        $device_query->orderBy($settings['order_by']);
+        //$device_query->orderBy($settings['order_by']);
+        $order_by = $settings['order_by'];
+        $allowed_single_columns = [
+            'status',
+            'hostname',
+            'display',
+            'sysName',
+        ];
+        $allowed_multi_columns = [
+            'status,hostname',
+            'status,display',
+            'status,sysName',
+        ];
+        if (in_array($order_by, $allowed_single_columns)) {
+            $device_query->orderBy($settings['order_by']);
+        } elseif (in_array($order_by, $allowed_multi_columns)) {
+            $columns = explode(",", $order_by);
+            foreach ($columns as $column) {
+                $device_query->orderBy($column);
+            }
+        }
+
         $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
 
         // process status
