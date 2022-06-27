@@ -77,7 +77,7 @@ if ($_POST['interface'] == 'Vlan%') {
                "<div class=\"form-group\">"+
                "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
 <?php
-echo '"' . htmlspecialchars($_REQUEST['address']) . '"+';
+echo '"' . htmlspecialchars($vars['address']) . '"+';
 ?>
 
                "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+
@@ -93,7 +93,7 @@ echo '"' . htmlspecialchars($_REQUEST['address']) . '"+';
             search_type: "mac",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
             interface: '<?php echo htmlspecialchars($_POST['interface']); ?>',
-            address: '<?php echo htmlspecialchars($_REQUEST['address']); ?>'
+            address: '<?php echo htmlspecialchars($vars['address']); ?>'
         };
     },
     url: "ajax_table.php",
