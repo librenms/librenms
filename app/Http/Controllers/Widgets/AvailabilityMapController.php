@@ -115,7 +115,7 @@ class AvailabilityMapController extends WidgetController
         if (in_array($order_by, $allowed_single_columns)) {
             $device_query->orderBy($settings['order_by']);
         } elseif (in_array($order_by, $allowed_multi_columns)) {
-            $columns = explode(",", $order_by);
+            $columns = explode(',', $order_by);
             foreach ($columns as $column) {
                 $device_query->orderBy($column);
             }
