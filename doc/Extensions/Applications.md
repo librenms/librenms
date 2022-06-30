@@ -1167,7 +1167,7 @@ Note: Some distributions need sudo-permissions for the script to work with SNMP 
 
 4. Restart snmpd service on the host
 
-Application should be auto-discovered and it's stats presented on the Apps-page on the host. Note: Applications module needs to be enabled on the host or globally for the statistics to work as intended.
+Application should be auto-discovered and its stats presented on the Apps-page on the host. Note: Applications module needs to be enabled on the host or globally for the statistics to work as intended.
 
 ## Nvidia GPU
 
@@ -2314,7 +2314,7 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify it's name as an argument into `/etc/snmp/ups-nut.sh`
+Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify its name as an argument into `/etc/snmp/ups-nut.sh`
 ```
 extend ups-nut /etc/snmp/ups-nut.sh ups1
 extend ups-nut /etc/snmp/ups-nut.sh ups2
