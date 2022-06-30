@@ -20,7 +20,7 @@
             <option value="1" @if($color_only_select == 1) selected @endif>{{ __('empty') }}</option>
             <option value="4" @if($color_only_select == 4) selected @endunless>{{ __('Display Name') }}</option>
             <option value="2" @if($color_only_select == 2) selected @endunless>{{ __('Hostname') }}</option>
-            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('Sysname') }}</option>
+            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('System Name') }}</option>
             <option value="0" @unless($color_only_select) selected @endunless>{{ __('Device Status') }}</option>
         </select>
     </div>
@@ -52,8 +52,13 @@
     <div class="form-group">
         <label for="order_by-{{ $id }}" class="control-label">{{ __('Order By') }}</label>
         <select class="form-control" name="order_by" id="order_by-{{ $id }}">
+            <option value="display" @if($order_by == 'display') selected @endif>{{ __('Display Name') }}</option>
             <option value="hostname" @if($order_by == 'hostname') selected @endif>{{ __('Hostname') }}</option>
+            <option value="sysName" @if($order_by == 'sysName') selected @endif>{{ __('System Name') }}</option>
             <option value="status" @if($order_by == 'status') selected @endif>{{ __('Status') }}</option>
+            <option value="status,display" @if($order_by == 'status,display') selected @endif>{{ __('Status') }}, {{ __('Display Name') }}</option>
+            <option value="status,hostname" @if($order_by == 'status,hostname') selected @endif>{{ __('Status') }}, {{ __('Hostname') }}</option>
+            <option value="status,sysName" @if($order_by == 'status,sysName') selected @endif>{{ __('Status') }}, {{ __('System Name') }}</option>
         </select>
     </div>
 
