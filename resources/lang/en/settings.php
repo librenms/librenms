@@ -1163,9 +1163,6 @@ return [
             'applications' => [
                 'description' => 'Applications',
             ],
-            'mib' => [
-                'description' => 'MIB',
-            ],
             'stp' => [
                 'description' => 'STP',
             ],
