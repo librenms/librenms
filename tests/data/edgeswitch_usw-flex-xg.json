@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1",
+                    "sysDescr": "USW-Flex-XG, 6.2.14.13855",
+                    "sysContact": "<private>",
+                    "version": "6.2.14.13855",
+                    "hardware": "USW-Flex-XG",
+                    "features": null,
+                    "os": "edgeswitch",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "ubiquiti.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

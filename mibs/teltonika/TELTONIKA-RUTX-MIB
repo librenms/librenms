@@ -26,8 +26,8 @@ mobile                  OBJECT IDENTIFIER ::= { teltonika 2 }
 gps                     OBJECT IDENTIFIER ::= { teltonika 3 }
 notifications           OBJECT IDENTIFIER ::= { teltonika 4 }
 hotspot					OBJECT IDENTIFIER ::= { teltonika 5 }
+io                      OBJECT IDENTIFIER ::= { teltonika 6 }
 mobileNotifications     OBJECT IDENTIFIER ::= { notifications 1 }
-mobileNotificationsObs  OBJECT IDENTIFIER ::= { mobileNotifications 0 }
 ioNotifications         OBJECT IDENTIFIER ::= { notifications 2 }
 ioNotificationsObs      OBJECT IDENTIFIER ::= { ioNotifications 0 }
 
@@ -134,7 +134,12 @@ ModemEntry ::=
         mCellID             DisplayString,
         mSINR               DisplayString,
         mRSRP               DisplayString,
-        mRSRQ               DisplayString
+        mRSRQ               DisplayString,
+        mSent               INTEGER,
+        mReceived           INTEGER,
+        mIP                 DisplayString,
+        mSentToday          INTEGER,
+        mReceivedToday      INTEGER,
     }
 
 mIndex OBJECT-TYPE
@@ -305,6 +310,46 @@ mRSRQ OBJECT-TYPE
     DESCRIPTION
             "LTE RSRQ level"
     ::= { modemEntry 21 }
+
+mSent OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total bytes sent."
+    ::= { modemEntry 22 }
+
+mReceived OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total bytes received."
+    ::= { modemEntry 23 }
+
+mIP OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem IP address(es)"
+    ::= { modemEntry 24 }
+
+mSentToday OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Bytes sent today."
+    ::= { modemEntry 25 }
+
+mReceivedToday OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Bytes received today."
+    ::= { modemEntry 26 }
 
 --
 --
@@ -542,6 +587,129 @@ hssURL OBJECT-TYPE
 	::= { hsSessionEntry 13 }
 
 --
+-- I/O
+--
+
+ioCount  OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Count of I/O"
+	::= { io 1 }
+
+ioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of I/O.  The number of entries is given by the value of ioCount."
+    ::= { io 2 }
+
+ioEntry OBJECT-TYPE
+    SYNTAX      IOEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information of a particular I/O."
+    INDEX   { ioIndex }
+    ::= { ioTable 1 }
+
+IOEntry ::=
+    SEQUENCE {
+        ioIndex         INTEGER,
+        ioSystemName    DisplayString,
+        ioName          DisplayString,
+        ioType          DisplayString,
+        ioBidirectional INTEGER,
+        ioState         DisplayString,
+        ioInput         INTEGER,
+        ioInverted      INTEGER,
+        ioCurrent       DisplayString,
+        ioPercentage    DisplayString
+    }
+
+ioIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each session."
+    ::= { ioEntry 1 } 
+
+ioSystemName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the I/O."
+    ::= { ioEntry 2 } 
+
+ioName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the I/O, as displayed in WebUI."
+    ::= { ioEntry 3 } 
+
+ioType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A description of I/O type."
+    ::= { ioEntry 4 } 
+
+ioBidirectional OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Is I/O bidirectional?"
+    ::= { ioEntry 5 } 
+
+ioState OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "State of I/O."
+    ::= { ioEntry 6 } 
+
+ioInput OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Is I/O an input?"
+    ::= { ioEntry 7 } 
+
+ioInverted OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Is value of I/O inverted?"
+    ::= { ioEntry 8 } 
+
+ioCurrent OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Current amount flowing though ACL."
+    ::= { ioEntry 9 } 
+
+ioPercentage OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Percentage of ACL."
+    ::= { ioEntry 10 } 
+
+--
 -- Traps
 --
 
@@ -568,30 +736,6 @@ digitalOutputNotification NOTIFICATION-TYPE
     DESCRIPTION
             "Digital output trap"
     ::= { ioNotifications 2 }
-
-modemDescription OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..255))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-            "Modem description"
-    ::= { mobileNotificationsObs 1 }
-
-signalStrength OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-            "Modem signal strength"
-    ::= { mobileNotificationsObs 2 }
-
-connectionType OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (0..255))
-    MAX-ACCESS  read-only
-    STATUS  current
-    DESCRIPTION
-            "Connection type"
-    ::= { mobileNotificationsObs 3 }
 
 doutState OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..255))

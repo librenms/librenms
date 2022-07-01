@@ -1,4 +1,4 @@
--- $OpenBSD: OPENBSD-SENSORS-MIB.txt,v 1.5 2012/09/20 20:51:51 reyk Exp $
+-- $OpenBSD: OPENBSD-SENSORS-MIB.txt,v 1.7 2018/12/10 13:35:54 landry Exp $
 --
 -- Copyright (c) 2006-2007 Joel Knight <knight.joel@gmail.com>
 -- 
@@ -26,12 +26,12 @@ IMPORTS
 	    FROM SNMPv2-CONF;
 
 sensorsMIBObjects MODULE-IDENTITY
-	LAST-UPDATED "201209200000Z"
+	LAST-UPDATED "201812100000Z"
 	ORGANIZATION "OpenBSD"
 	CONTACT-INFO
 	    "Editor:    Reyk Floeter
 	    EMail:      reyk@openbsd.org
-	    WWW:        http://www.openbsd.org/
+	    WWW:        https://www.openbsd.org/
 
 	    Editor:     Joel Knight
 	    EMail:      knight.joel@gmail.com
@@ -39,6 +39,9 @@ sensorsMIBObjects MODULE-IDENTITY
 	DESCRIPTION
 	    "The MIB module for gathering information from
 	    OpenBSD's kernel sensor framework."
+	REVISION "201812100000Z"
+	DESCRIPTION
+	    "Add new sensor types."
 	REVISION "201209200000Z"
 	DESCRIPTION
 	    "Add new sensor types."
@@ -136,7 +139,8 @@ sensorType OBJECT-TYPE
 				angle(17),
 				distance(18),
 				pressure(19),
-				accel(20)
+				accel(20),
+				velocity(21)
 			}
 	MAX-ACCESS	read-only
 	STATUS		current

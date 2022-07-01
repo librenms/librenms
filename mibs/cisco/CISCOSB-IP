@@ -12,7 +12,6 @@ IMPORTS
     ipCidrRouteEntry,ipCidrRouteDest,
     ipCidrRouteMask, ipCidrRouteTos, ipCidrRouteNextHop     FROM IP-FORWARD-MIB
     Unsigned32, Integer32, Counter32, IpAddress,
-    zeroDotZero,
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
     TEXTUAL-CONVENTION,
     DisplayString, RowStatus, TruthValue, PhysAddress,
@@ -27,7 +26,7 @@ IMPORTS
 
 
 ipSpec MODULE-IDENTITY
-       LAST-UPDATED "200606220000Z"
+       LAST-UPDATED "200606220001Z"
        ORGANIZATION "Cisco Systems, Inc."
 
        CONTACT-INFO

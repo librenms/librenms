@@ -458,7 +458,7 @@ class Config
         }
 
         // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
             if (! is_executable(self::get($bin))) {
                 self::persist($bin, self::locateBinary($bin));
             }

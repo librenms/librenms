@@ -53,12 +53,13 @@ class Pagerduty extends Transport
      */
     public function contactPagerduty($obj, $config)
     {
+        $custom_details = ['message' => strip_tags($obj['msg']) ?: 'Test'];
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
             'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
-                'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+                'custom_details'  => $custom_details,
                 'group'   => (string) \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
@@ -69,11 +70,11 @@ class Pagerduty extends Transport
         // EU service region
         if ($config['region'] == 'EU') {
             $url = 'https://events.eu.pagerduty.com/v2/enqueue';
-        }
-
-        // US service region
-        else {
+        } elseif ($config['region'] == 'US') {
+            // US service region
             $url = 'https://events.pagerduty.com/v2/enqueue';
+        } else {
+            $url = $config['custom-url'];
         }
 
         $client = new Client();
@@ -106,6 +107,7 @@ class Pagerduty extends Transport
                     'options' => [
                         'EU' => 'EU',
                         'US' => 'US',
+                        'Custom URL' => 'CUSTOM',
                     ],
                 ],
                 [
@@ -113,9 +115,16 @@ class Pagerduty extends Transport
                     'type'  => 'text',
                     'name'  => 'service_key',
                 ],
+                [
+                    'title' => 'Custom API URL',
+                    'type' => 'text',
+                    'name' => 'custom-url',
+                    'descr' => 'Custom PagerDuty API URL',
+                ],
             ],
             'validation' => [
-                'region' => 'in:EU,US',
+                'region' => 'in:EU,US,CUSTOM',
+                'custom-url' => 'url',
             ],
         ];
     }

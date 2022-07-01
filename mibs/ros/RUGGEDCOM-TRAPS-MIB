@@ -1,0 +1,1176 @@
+RUGGEDCOM-TRAPS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,Integer32,
+	IpAddress					    FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP				FROM SNMPv2-CONF    
+	DisplayString					FROM SNMPv2-TC
+	ruggedcomTraps, ruggedcomMgmt   FROM RUGGEDCOM-MIB
+	rcDeviceInfoBootSwVersion,
+	rcDeviceInfoMainSwVersion,
+	rcDeviceInfoPendingBootSwVersion,
+	rcDeviceInfoPendingMainSwVersion,
+	rcDeviceInfoCfgRevision,
+	rcDeviceInfoMinBootSwVer,
+	RcHotswapModuleSlot,
+	RcHotswapModuleState,
+	rcDeviceStsKeysDflt,
+	rcDeviceStsPwdsWeak				FROM RUGGEDCOM-SYS-INFO-MIB
+	ifIndex							FROM RUGGEDCOM-SWITCH-MIB;
+
+ruggedcomTrapsModule MODULE-IDENTITY
+	LAST-UPDATED "201802091100Z"      -- Feb. 09, 11:00 EST 2018
+	ORGANIZATION "Siemens Canada Ltd., Process Industries and Drives"
+	CONTACT-INFO
+	   "Postal: Siemens Canada Ltd.
+				300 Applewood Crescent
+				Concord, Ontario, 
+				L4K 5C7 Canada
+		Tel:    1-905-856-5288
+		E-Mail: support.canada.automation@siemens.com"
+
+	DESCRIPTION
+		"The RuggedCom MIB providing traps information."
+
+	REVISION    "202002141100Z"      -- Feb. 14, 11:00 EST 2020
+	DESCRIPTION
+		"Added localConsoleServiceChanged traps."
+
+	REVISION    "201802091100Z"      -- Feb. 09, 11:00 EST 2018
+	DESCRIPTION
+		"Added deviceErrTrap, privKeySnmpV3UserUnknwnTrap, loginInformationTrap
+		loginFailureTrap, excessLoginFailureTrap, rcGMRPCantLrnMoreAddrs,
+		rcGVRPCantLrnMoreVLANs, rcMcastCpuFiltTblFull, rcIgmpGrpMembershipTblFull,
+		rcIgmpMcastForwardTblFull, rcMacAddressNotLearned, rcPortSecurityViolatedTrap,
+		rcIeee1588HoldoverStateTrap, rcIeee1588BMCErrorTrap, rcLoopedBpduRcvd,
+		rcBpduGuardActivated, serialCommBlockedTrap and unknownRouteSerialProto traps."
+		
+	REVISION    "201702151000Z"      -- Feb 15, 10:00 EST 2017
+	DESCRIPTION
+		"Fixed CONTACT-INF. 
+		Added comment note that ruggedcomTraps nodes 19,20,21 are reserved
+		for other RUGGEDCOM MIBs."
+
+	REVISION    "201411051000Z"      -- Nov 5, 10:00 EST 2014
+	DESCRIPTION                
+		"Added comment note that ruggedcomTraps.18 node is reserved for
+		RUGGEDCOM-DIGITAL-INPUTS-MIB."
+
+	REVISION    "201304291510Z"      -- Apr 29, 15:10 EST 2013
+	DESCRIPTION                
+		"Added Brute Force Attacks (BFA) traps"
+		
+	REVISION    "201208301700Z"      -- Aug 30, 17:00 EST 2012
+	DESCRIPTION                
+		"Added defaultKeysTrap, bootVersionMismatchTrap and 
+		ruggedcomSecurityGroup01.
+		Added moduleTypeMismatchTrap and ruggedcomHotswapModuleSCNotifGroup01."
+
+	REVISION    "201206011700Z"      -- Jun 01, 17:00 EST 2012
+	DESCRIPTION                
+		"Added weakPasswordTrap and ruggedcomSecurityGroup."
+
+	 REVISION "201009161030Z"      -- Sep 16, 10:30 EST 2010
+	 DESCRIPTION
+		"Added traps related to the fan bank and hot swap-able modules state."
+
+	 REVISION "201001121030Z"      -- January 12, 10:30 EST 2010
+	 DESCRIPTION
+		"Added cfgChangeNoRevTrap and ruggedcomNoRevCfgNotifGroup.
+		 Updated MIB comments with product specific information."
+
+	 REVISION "200809041030Z"      -- September 04, 10:30 EST 2008
+	 DESCRIPTION
+		"Fixed error where rcDeviceInfoCfgInternalVersion object was 
+		 included instead of rcDeviceinfoCfgRevision."
+
+	 REVISION "200802121630Z"      -- February 12, 16:30 EST 2008
+	 DESCRIPTION
+		"Added trap upon software upgrade (swUpgradeTrap) and
+		 configuration change (cfgChangeTrap).
+		 Fixed definitions causing SMIC compiler errors."
+	 
+	 REVISION "200609061630Z"      -- September 6, 16:30 EST 2006
+	 DESCRIPTION
+		"IMPORT clause was missing for OBJECT-GROUP. Changed description of
+		object powerSupplyTrap, referring to the RUGGEDCOM-SYS-INFO-MIB to
+		retrieve status of traps. 
+		Updated CONTACT-INFO."
+
+	 REVISION "200301171400Z"      -- January 17, 14:00 EST 2003 
+	 DESCRIPTION
+		"The initial version of MIB providing RuggedCom traps information."
+	::= { ruggedcomMgmt 1 }
+
+-- ---------------------------------------------------------------------- --
+ruggedcomTrapsModuleObjects OBJECT IDENTIFIER ::= {ruggedcomTrapsModule 1}
+-- ruggedcomTrapsModule 2 to 4 are reserved for future implementation
+-- ruggedcomTrapsModuleConfig OBJECT IDENTIFIER ::= {ruggedcomTrapsModule 2}
+ruggedcomTrapsModuleConformance OBJECT IDENTIFIER ::= {ruggedcomTrapsModule 5}
+-- ruggedcomTrapsModuleCompliances  OBJECT IDENTIFIER ::= { ruggedcomTrapsModuleConformance 1 }
+ruggedcomTrapsModuleGroups OBJECT IDENTIFIER ::= { ruggedcomTrapsModuleConformance 2 }
+
+-- ---------------------------------------------------------------------- --
+--  Trap sub-trees
+-- ---------------------------------------------------------------------- --
+
+trapGenericTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom generic traps."
+	::= { ruggedcomTrapsModuleObjects 1 }  
+
+
+trapPowerSupplyTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom power supply trap."
+	::= { ruggedcomTrapsModuleObjects 2 }  
+
+trapSwUpgradeTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom software upgrade trap."
+	::= { ruggedcomTrapsModuleObjects 3 }  
+
+trapCfgChangeTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom configuration change trap."
+	::= { ruggedcomTrapsModuleObjects 4 }  
+
+trapFanBankTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom fan bank trap."
+	::= { ruggedcomTrapsModuleObjects 5 }  
+
+trapHotswapModuleStateChangeTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom hot-swap module state change trap."
+	::= { ruggedcomTrapsModuleObjects 6 }  
+
+
+trapWeakPasswordTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom weak password generation trap."
+	::= { ruggedcomTrapsModuleObjects 7 }  
+
+trapModuleTypeMismatchTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom module type mismatch trap."
+	::= { ruggedcomTrapsModuleObjects 8 }  
+trapDefaultKeysTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom default keys use trap."
+	::= { ruggedcomTrapsModuleObjects 9 }  
+
+trapBootVersionMismatchTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom boot version mismatch trap."
+	::= { ruggedcomTrapsModuleObjects 10 }  
+
+trapRTCBatteryLowTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom RTC Battery low trap."
+	::= { ruggedcomTrapsModuleObjects 11 }  
+
+trapSecurityCertificateExpiryTrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom security certificate expiration trap."
+	::= { ruggedcomTrapsModuleObjects 12 }  
+
+trapBFATrap OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom brute force detection attack traps."
+	::= { ruggedcomTrapsModuleObjects 13 }
+	
+trapDeviceLogin OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION
+		"The main sub-tree for RuggedCom device login traps."
+	::= { ruggedcomTrapsModuleObjects 14 }
+	
+-- ---------------------------------------------------------------------- --
+--  Generic Trap Objects
+-- ---------------------------------------------------------------------- --
+genericTrapSeverity OBJECT-TYPE
+	SYNTAX      INTEGER {
+					emergency(1),
+					alert(2),
+					critical(3),
+					error(4),
+					warning(5),
+					notification(6),
+					informational(7),
+					debugging(8)
+				}
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The severity level of the generic trap."
+	::= { trapGenericTrap 1 }
+
+genericTrapDescription OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"A description of a generic trap."
+	::= { trapGenericTrap 2 }
+
+-- ---------------------------------------------------------------------- --
+--  Power Supply Failure Objects
+-- ---------------------------------------------------------------------- --
+
+powerSupplyDescription  OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"A description of power supply that fails."
+	::= { trapPowerSupplyTrap 1 }
+
+powerSupplyIdentifier OBJECT-TYPE
+	SYNTAX  	Integer32
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The power supply identified (i.e. power supply 1)"
+	::= { trapPowerSupplyTrap 2 }
+	
+-- ---------------------------------------------------------------------- --
+--  Fan Bank Failure Objects
+-- ---------------------------------------------------------------------- --
+
+fanBankDescription  OBJECT-TYPE
+	SYNTAX      DisplayString 
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"A description of Fan Bank failure."
+	::= { trapFanBankTrap 1 }
+
+fanBankIdentifier OBJECT-TYPE
+	SYNTAX  	Integer32
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The Fan Bank identified (i.e. Fan Bank 1)"
+	::= { trapFanBankTrap 2 }
+
+-- ---------------------------------------------------------------------- --
+--  hot-swap Module State Change Objects
+-- ---------------------------------------------------------------------- --
+
+hotswapModuleSlot OBJECT-TYPE
+	SYNTAX  	RcHotswapModuleSlot
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The physical slot the module is in"
+	::= { trapHotswapModuleStateChangeTrap 1 }
+	
+hotswapModulePreviousState OBJECT-TYPE
+	SYNTAX  	RcHotswapModuleState
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The previous state of the module"
+	::= { trapHotswapModuleStateChangeTrap 2 }  
+
+hotswapModuleCurrentState OBJECT-TYPE
+	SYNTAX  	RcHotswapModuleState
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		 "The current state of the module"
+	::= { trapHotswapModuleStateChangeTrap 3 }        
+
+
+-- ---------------------------------------------------------------------- --
+--  Brute Force Attack (BFA) Objects
+-- ---------------------------------------------------------------------- --
+
+bfaInfoIP    OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The IP address that informs about an on-going BFA without blocking any IP."
+	::= { trapBFATrap 1 }
+
+bfaBlockedIP    OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The IP address that is being blocked from now on."
+	::= { trapBFATrap 2 }
+
+bfaReleasedIP   OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The IP address that is being released from now on."
+	::= { trapBFATrap 3 }
+	
+-- ---------------------------------------------------------------------- --
+--  Device Login Trap Objects
+-- ---------------------------------------------------------------------- --
+
+loginUser OBJECT-TYPE
+	SYNTAX  	DisplayString
+	MAX-ACCESS 	accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"User that tried to access management application."
+	::= {trapDeviceLogin 1 } 
+
+loginMgmtApp OBJECT-TYPE
+	SYNTAX  	INTEGER {
+						serial(1),
+						telnet(2),
+						ssh(3),
+						rsh(4),
+						webServer(5),
+						cliShel(6),
+						snmp(7)
+						}
+	MAX-ACCESS accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"Management application used to login to the device."
+	::= {trapDeviceLogin 2 } 	
+
+loginRemoteIP OBJECT-TYPE
+	SYNTAX  	IpAddress
+	MAX-ACCESS 	accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"IP address where remote access is attempted."
+	::= {trapDeviceLogin 3 } 
+	
+loginAccessLevel OBJECT-TYPE
+	SYNTAX  	INTEGER {
+						"no access"(0),
+						guest(1),
+						operator(2),
+						admin(3),
+						factory(4)
+						}
+	MAX-ACCESS accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"Access level granted to login to the device."
+	::= {trapDeviceLogin 4 }
+	
+	
+-- ---------------------------------------------------------------------- --
+--  Definition of generic trap
+-- ---------------------------------------------------------------------- --
+
+genericTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					genericTrapSeverity,
+					genericTrapDescription
+				}
+	STATUS      current
+	DESCRIPTION
+		"A generic trap generated by RuggedCom devices."
+	REFERENCE
+		"See rcSysInfo module to find out about status of generic traps that
+		can be retrieved from RuggedCom devices."   
+	::= { ruggedcomTraps 1 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of power supply trap
+-- ---------------------------------------------------------------------- --
+
+powerSupplyTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					powerSupplyDescription
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when a power supply fails or comes up.  The first
+		trap would be generated on first power supply failure.  The state
+		of power supply (failed or restored ) is retrieved via object
+		powerSupplyDescription at the time when trap is generated.
+		The status of power supply units in device can be retrieved via 
+		objects rcDeviceStsPowerSupply1 and rcDeviceStsPowerSupply2.
+		
+		powerSupplyIdentifier object is recommended to be added as an optional
+		parameter to the list of objects."
+	REFERENCE
+		"rcDeviceStsPowerSupply1 and rcDeviceStsPowerSupply2 object are
+		defined in rcSysInfo module."   
+	::= { ruggedcomTraps 2 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of software upgrade trap
+-- ---------------------------------------------------------------------- --
+
+swUpgradeTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceInfoBootSwVersion,
+					rcDeviceInfoMainSwVersion,
+					rcDeviceInfoPendingBootSwVersion,
+					rcDeviceInfoPendingMainSwVersion
+				}
+	STATUS      current
+	DESCRIPTION
+		"A generic trap generated upon software upgrade.
+		The rate at which this notification can be provided is 60 seconds."
+	REFERENCE
+		"See rcSysInfo module for definition of objects."   
+	::= { ruggedcomTraps 3 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of configuration change
+-- ---------------------------------------------------------------------- --
+
+cfgChangeTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceInfoCfgRevision
+				}
+	STATUS      current
+	DESCRIPTION
+		"A generic trap generated upon configuration change. 
+		The rate at which this notification can be provided is 60 seconds."
+	REFERENCE
+		"See rcSysInfo module for definition of object."   
+	::= { ruggedcomTraps 4 }
+
+
+
+cfgChangeNoRevTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A generic trap generated upon configuration change by
+		device that does not use the concept of configuration
+		revision number."
+
+	::= { ruggedcomTraps 5 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of fan bank trap
+-- ---------------------------------------------------------------------- --
+
+fanBankTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					fanBankDescription,
+					fanBankIdentifier
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when a fan bank fails or fails to comes up.  The 
+		first trap would be generated on first fan bank failure.  The state
+		of fan bank (failed or restored ) is retrieved via object
+		fan bank Description at the time when trap is generated.
+		The status of power supply units in device can be retrieved via 
+		objects rcDeviceStsFanBank1 and rcDeviceStsFanBank2."
+	REFERENCE
+		"rcDeviceStsPowerSupply1 and rcDeviceStsPowerSupply2 object are 
+		defined in rcSysInfo module."   
+	::= { ruggedcomTraps 6 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of hot swap module state change trap
+-- ---------------------------------------------------------------------- --
+
+hotswapModuleStateChangeTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					hotswapModuleSlot,
+					hotswapModulePreviousState,
+					hotswapModuleCurrentState
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when a ROX 2 Module changes state.  The first
+		traps would be generated during initial start up."
+	REFERENCE
+		"RcHotswapModuleSlot and RcHotswapModuleState are types defined in rcSysInfo module."   
+	::= { ruggedcomTraps 7 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of weak password trap
+-- ---------------------------------------------------------------------- --
+
+weakPasswordTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceStsPwdsWeak
+				}    
+	STATUS      current
+	DESCRIPTION
+		"A weak password indication trap generated by RuggedCom devices."
+	::= { ruggedcomTraps 8 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of module type mismatch trap
+-- ---------------------------------------------------------------------- --
+
+moduleTypeMismatchTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					hotswapModuleSlot
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when ROX 2 sees that, for a given slot, the configured module type
+	   does not match the detected module type.  The first
+		traps would be generated during initial start up."
+	REFERENCE
+		"RcHotswapModuleSlot and RcHotswapModuleState are types defined in rcSysInfo module."   
+	::= { ruggedcomTraps 9 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of default keys use trap
+-- ---------------------------------------------------------------------- --
+
+defaultKeysTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceStsKeysDflt
+				}    
+	STATUS      current
+	DESCRIPTION
+		"A use of default keys for secure services (SSH and SSL) indication
+		trap generated by RuggedCom devices."
+	::= { ruggedcomTraps 13 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of boot version mismatch trap
+-- ---------------------------------------------------------------------- --
+
+bootVersionMismatchTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceInfoBootSwVersion,
+					rcDeviceInfoMinBootSwVer
+				}    
+	STATUS      current
+	DESCRIPTION
+		"A boot software version indication trap generated by RuggedCom 
+		devices."
+	::= { ruggedcomTraps 14 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of RTC Battery Low trap
+-- ---------------------------------------------------------------------- --
+
+rtcBatteryLowTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating that the device's RTC Battery level is low enough
+	that there may be a problem after the next device reboot cycle.  
+	It is generated by RuggedCom devices."
+	::= { ruggedcomTraps 15 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of Security Certificate Expiry trap
+-- ---------------------------------------------------------------------- --
+
+securityCertificateExpiryTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating that at least one security certificate on the device
+	is within 30 days of expiration. It is generated by RuggedCom devices."
+	::= { ruggedcomTraps 16 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of Brute Force Attack trap
+-- ---------------------------------------------------------------------- --
+bfaTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"The bfaTrap is generated when Brute Force Attack is detected
+		on the unit and source of attack is blocked, or released.
+		Different devices might block attacking IP address for all the
+		IP services, others might block the service on which
+		attack is detected for all IP addresses, while some might just
+		give a status of unit being under attack."
+	::= { ruggedcomTraps 17 }
+
+
+-- ---------------------------------------------------------------------- --
+--  Definition of Successful User Changed Password trap
+-- ---------------------------------------------------------------------- --
+rcSuccessUsrChgPwdTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					successUsrChgPwd
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when a user's password is successfully changed."
+
+	::= { ruggedcomTraps 20 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of Device Error trap
+-- ---------------------------------------------------------------------- --
+deviceErrTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					rcDeviceErrSystem 
+				}
+	STATUS      current
+	DESCRIPTION
+		"A device error indication trap generated by RuggedCom devices."
+	::= { ruggedcomTraps 24 }	
+
+
+-- ---------------------------------------------------------------------- --
+--  Private Key SNMP V3 User Unknown trap
+-- ---------------------------------------------------------------------- --
+privKeySnmpV3UserUnknwnTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating unknown private key from an SNMP V3 user."
+	::= { ruggedcomTraps 25 }	
+
+-- ---------------------------------------------------------------------- --
+--  Definition of login information trap
+-- ---------------------------------------------------------------------- --
+
+loginInformationTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					loginUser,
+					loginMgmtApp,
+					loginRemoteIP,
+					loginAccessLevel
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap informing successful login to the device."
+	::= { ruggedcomTraps 26 }
+	
+-- ---------------------------------------------------------------------- --
+--  Definition of login failure trap
+-- ---------------------------------------------------------------------- --
+
+loginFailureTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					loginUser,
+					loginMgmtApp,
+					loginRemoteIP,
+					loginAccessLevel
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating login failure attempt to the device."
+	::= { ruggedcomTraps 27 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of excessive login failure trap
+-- ---------------------------------------------------------------------- --
+
+excessLoginFailureTrap NOTIFICATION-TYPE
+	OBJECTS     {
+					loginUser,
+					loginMgmtApp 
+				}
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating excessive login failure attempts to the device."
+	::= { ruggedcomTraps 28 }
+	
+-- ---------------------------------------------------------------------- --
+--  GMRP Cannot Learn More Addresses trap
+-- ---------------------------------------------------------------------- --
+rcGMRPCantLrnMoreAddrs NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating GMRP cannot learn more addresses"
+	::= { ruggedcomTraps 29 }	
+
+-- ---------------------------------------------------------------------- --
+--  GVRP Cannot Learn More VLANs trap
+-- ---------------------------------------------------------------------- --
+rcGVRPCantLrnMoreVLANs NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating GVRP cannot learn more VLANs"
+	::= { ruggedcomTraps 30 }	
+
+-- ---------------------------------------------------------------------- --
+--  Mcast CPU Filtering Table Full trap
+-- ---------------------------------------------------------------------- --
+rcMcastCpuFiltTblFull NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating Mcast CPU filtering table is full"
+	::= { ruggedcomTraps 31 }
+	
+-- ---------------------------------------------------------------------- --
+--  IGMP Group Membership Table Full trap
+-- ---------------------------------------------------------------------- --
+rcIgmpGrpMembershipTblFull NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating IGMP Group Membership table full"
+	::= { ruggedcomTraps 32 }
+
+-- ---------------------------------------------------------------------- --
+--  IGMP Mcast Forward Table Full trap
+-- ---------------------------------------------------------------------- --
+rcIgmpMcastForwardTblFull NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating IGMP Mcast Forwarding table full"
+	::= { ruggedcomTraps 33 }
+
+-- ---------------------------------------------------------------------- --
+--  Mac Address Not Learned trap
+-- ---------------------------------------------------------------------- --
+rcMacAddressNotLearned NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap indicating MAC address not learned"
+	::= { ruggedcomTraps 34 }
+
+-- ---------------------------------------------------------------------- --
+--  IEEE1588 Holdover State trap
+-- ---------------------------------------------------------------------- --
+rcIeee1588HoldoverStateTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap generated to indicate that IEEE1588 PTP lost master clock, in holdover state now."
+	::= { ruggedcomTraps 36 }
+	
+-- ---------------------------------------------------------------------- --
+--  IEEE1588 BMC Error trap
+-- ---------------------------------------------------------------------- --
+rcIeee1588BMCErrorTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap generated to indicate that IEEE1588 PTP BMC foreign master comparison error."
+	::= { ruggedcomTraps 37 }
+
+-- ---------------------------------------------------------------------- --
+--  Definition of Port Security related traps
+-- ---------------------------------------------------------------------- --
+
+rcPortSecurityViolatedTrap NOTIFICATION-TYPE
+	OBJECTS {
+				ifIndex  -- ifIndex of interface on which violation happened
+			}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated upon port security violation."
+	::= { ruggedcomTraps 38 }
+
+
+-- ---------------------------------------------------------------------- --
+--  Definition of BPDU related traps
+-- ---------------------------------------------------------------------- --
+
+rcLoopedBpduRcvd NOTIFICATION-TYPE
+	OBJECTS {
+				ifIndex -- interface index of the port where 
+						-- looped BPDU was detected
+			}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when looped back BPDU received on the port."
+	::= { ruggedcomTraps 40 }
+
+
+rcBpduGuardActivated NOTIFICATION-TYPE
+	OBJECTS {
+				ifIndex 
+			}
+	STATUS      current
+	DESCRIPTION
+		"A trap generated when BPDU Guard is activated on the port."
+	::= { ruggedcomTraps 41 }
+
+serialCommBlockedTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap generated to indicate serial communication is blocked."
+	::= { ruggedcomTraps 42 }
+	
+unknownRouteSerialProto NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap generated to indicate unknown route for serial protocol."
+	::= { ruggedcomTraps 43 }
+	
+rcConsoleServiceChangedTrap NOTIFICATION-TYPE
+	STATUS      current
+	DESCRIPTION
+		"A trap generated to indicate the console service changed."
+	::= { ruggedcomTraps 44 }
+
+
+-- ---------------------------------------------------------------------- --
+-- DON't USE THIS OIDs in any new traps definition.
+-- ---------------------------------------------------------------------- --
+-- ruggedcomTraps.18 is reserved for digitalInputTrap NOTIFICATION-TYPE 
+-- defined in RUGGEDCOM-DIGITAL-INPUTS-MIB
+-- ruggedcomTraps.19 is reserved for rcGpsStatusChange NOTIFICATION-TYPE  
+-- defined in RUGGEDCOM-GPS-MIB
+-- ruggedcomTraps.21 is reserved for rcNTPServiceStatusChangedTrap 
+-- NOTIFICATION-TYPE defined in RUGGEDCOM-NTP-MIB
+-- ruggedcomTraps.22 is reserved for radiusServiceAvailableChange 
+-- NOTIFICATION-TYPE defined in RUGGEDCOM-AAA-SERVER-MIB
+-- ruggedcomTraps.23 is reserved for tacacsServiceAvailableChange 
+-- NOTIFICATION-TYPE defined in RUGGEDCOM-AAA-SERVER-MIB
+-- ---------------------------------------------------------------------- --
+
+-- ---------------------------------------------------------------------- --
+-- ruggedcomTraps.10 branch is reserved for ruggedmaxTraps defined in 
+-- BS-E-12-MIB 
+-- ---------------------------------------------------------------------- --
+-- ruggedmaxTraps	OBJECT-IDENTIFIER ::= {ruggedcomTraps 10}
+
+-- ---------------------------------------------------------------------- --
+-- ruggedcomTraps.11 branch is reserved for ruggedcomRstpTraps defined in 
+-- RUGGEDCOM-RSTP-MIB
+-- ---------------------------------------------------------------------- --
+-- ruggedcomRstpTraps	OBJECT-IDENTIFIER ::= {ruggedcomTraps 11}
+
+-- ---------------------------------------------------------------------- --
+-- ruggedcomTraps.12 branch is reserved for ruggedcomPoeTraps defined in 
+-- RUGGEDCOM-POE-MIB
+-- ---------------------------------------------------------------------- --
+-- ruggedcomPoeTraps	OBJECT-IDENTIFIER ::= {ruggedcomTraps 12}
+
+
+rcChgPswdAdminTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Admin Level Password Changed"		       
+	::= { rcSuccessUsrChgPwdTrap 1 }
+
+rcChgPswdOperTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Operator Level Password Changed"		       
+	::= { rcSuccessUsrChgPwdTrap 2 }
+	
+rcChgPswdGuestTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Guest Level Password Changed"		       
+	::= { rcSuccessUsrChgPwdTrap 3 }
+
+rcChgPswdRadiusTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"RADIUS authenticate key changed"		       
+	::= { rcSuccessUsrChgPwdTrap 4 }
+
+rcChgPswdTacplusTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Tacacs+ authenticate key changed"		       
+	::= { rcSuccessUsrChgPwdTrap 5 }
+	
+rcChgPswdDataStoreTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Data Storage pass-phrase changed"		       
+	::= { rcSuccessUsrChgPwdTrap 6 }
+
+rcChgPswdSnmpCommunityTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"SNMP community character string changed"		       
+	::= { rcSuccessUsrChgPwdTrap 7 }
+
+rcChgPswdSnmpAuthKeyTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"SNMP authenticate key changed"		       
+	::= { rcSuccessUsrChgPwdTrap 8 }
+	
+rcChgPswdSnmpPrivKeyTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"SNMP private Key changed"		       
+	::= { rcSuccessUsrChgPwdTrap 9 }
+
+
+rcLocalConsoleServiceEnabledTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Local Console Enabled"		       
+	::= { rcConsoleServiceChangedTrap 1 }
+
+rcLocalConsoleServiceDisabledTrap 	NOTIFICATION-TYPE
+	STATUS     current
+	DESCRIPTION
+	"Local Console Disabled"		       
+	::= { rcConsoleServiceChangedTrap 2 }
+
+-- ---------------------------------------------------------------------- --
+--  Trap Groups
+-- ---------------------------------------------------------------------- --
+
+ruggedcomGenericTrapGroup  OBJECT-GROUP
+	OBJECTS     {
+					genericTrapSeverity,
+					genericTrapDescription
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of objects that define RuggedCom generic traps."
+	::= { ruggedcomTrapsModuleGroups 1 }    
+
+ruggedcomPowerSupplyGroup  OBJECT-GROUP
+	OBJECTS     {
+					powerSupplyDescription
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of objects that define RuggedCom power supply failure trap."
+	::= { ruggedcomTrapsModuleGroups 2 }    
+
+ruggedcomNotificationsGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						genericTrap,
+						powerSupplyTrap,
+						swUpgradeTrap,
+						cfgChangeTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"The RuggedCom notifications group."
+	::= { ruggedcomTrapsModuleGroups 3 }   
+
+
+ruggedcomNoRevCfgNotifGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						cfgChangeNoRevTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"The RuggedCom notifications group for devices that do not use
+		the concept of configuration revision number."
+	::= { ruggedcomTrapsModuleGroups 4 }   
+
+ruggedcomPowerSupplyIdentGroup  OBJECT-GROUP
+	OBJECTS     {
+					powerSupplyIdentifier
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of objects that define RuggedCom power supply identification."
+	::= { ruggedcomTrapsModuleGroups 5 }    
+
+ruggedcomFanBankNotiGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						fanBankTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"The RuggedCom notifications group."
+	::= { ruggedcomTrapsModuleGroups 6 } 
+
+ruggedcomHotswapModuleSCNotifGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						hotswapModuleStateChangeTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"The RuggedCom Hot-swap Module notifications group."
+	::= { ruggedcomTrapsModuleGroups 7 } 
+
+
+ruggedcomFanBankGroup  OBJECT-GROUP
+	OBJECTS     {
+				   fanBankDescription,
+				   fanBankIdentifier                   
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of objects that define RuggedCom fan bank failure trap."
+	::= { ruggedcomTrapsModuleGroups 8 }    
+
+ruggedcomModuleStateChangeGroup  OBJECT-GROUP
+	OBJECTS     {
+				   hotswapModuleSlot,
+				   hotswapModulePreviousState,
+				   hotswapModuleCurrentState                   
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of objects that define RuggedCom Module State Change trap."
+	::= { ruggedcomTrapsModuleGroups 9 }         
+
+
+ruggedcomSecurityGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						weakPasswordTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for insecurity indication."
+	::= { ruggedcomTrapsModuleGroups 10 }   
+
+
+ruggedcomHotswapModuleSCNotifGroup01	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						hotswapModuleStateChangeTrap,
+						moduleTypeMismatchTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"The RuggedCom Hot-swap Module notifications group."
+	::= { ruggedcomTrapsModuleGroups 11 } 
+
+ruggedcomSecurityGroup01	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						weakPasswordTrap,
+						defaultKeysTrap,
+						bootVersionMismatchTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for insecurity indication."
+	::= { ruggedcomTrapsModuleGroups 12 }   
+
+ruggedcomRTCBatteryLowGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						trapRTCBatteryLowTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for RTC Battery Low indication."
+	::= { ruggedcomTrapsModuleGroups 13 }   
+
+ruggedcomSecurityGroup02	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						trapSecurityCertificateExpiryTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for security certificate expiry indication."
+	::= { ruggedcomTrapsModuleGroups 14 }   
+
+ruggedcomBFATrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						trapBFATrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for security certificate expiry indication."
+	::= { ruggedcomTrapsModuleGroups 15 }   
+
+	
+ruggedcomDeviceErrTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						deviceErrTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects for device error indication."
+	::= { ruggedcomTrapsModuleGroups 16 }  
+
+ruggedcomDeviceLoginTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						loginInformationTrap,
+						loginFailureTrap,
+						excessLoginFailureTrap,
+						privKeySnmpV3UserUnknwnTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify device login events."
+	::= { ruggedcomTrapsModuleGroups 17 }
+
+	
+ruggedcomGMRPTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcGMRPCantLrnMoreAddrs
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify GMRP events."
+	::= { ruggedcomTrapsModuleGroups 18 }
+
+ruggedcomGVRPTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcGVRPCantLrnMoreVLANs
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify GMRP events."
+	::= { ruggedcomTrapsModuleGroups 19 }
+
+ruggedcomMcastCpuFiltTblTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcMcastCpuFiltTblFull
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify Mcast CPU Filter Table events."
+	::= { ruggedcomTrapsModuleGroups 20 }
+
+ruggedcomIgmpTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcIgmpGrpMembershipTblFull,
+						rcIgmpMcastForwardTblFull
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify IGMP events."
+	::= { ruggedcomTrapsModuleGroups 21 }
+	
+ruggedcomMacAddrAuthTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcMacAddrAuthFailedTrap
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify MAC Address Authentication events."
+	::= { ruggedcomTrapsModuleGroups 22 }
+	
+ruggedcomBpduTrapGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						rcLoopedBpduRcvd,
+						rcBpduGuardActivated
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify BPDU events."
+	::= { ruggedcomTrapsModuleGroups 23 } 
+
+ruggedcomSerialCommGroup	NOTIFICATION-GROUP     
+	NOTIFICATIONS	{
+						serialCommBlockedTrap,
+						unknownRouteSerialProto
+					}
+	STATUS			current				
+	DESCRIPTION
+		"A group of objects to notify serial communication events."
+	::= { ruggedcomTrapsModuleGroups 24 } 
+
+rcPswdChgTrapNotifyGroup OBJECT-GROUP
+	OBJECTS     {
+					rcChgPswdAdminTrap,
+					rcChgPswdOperTrap,
+					rcChgPswdGuestTrap,
+					rcChgPswdRadiusTrap,
+					rcChgPswdTacplusTrap,
+					rcChgPswdDataStoreTrap,
+					rcChgPswdSnmpCommunityTrap,
+					rcChgPswdSnmpAuthKeyTrap,
+					rcChgPswdSnmpPrivKeyTrap
+				}
+	STATUS      current
+	DESCRIPTION 
+		"A group of trap objects to notify password successfully changed"
+	::= { ruggedcomTrapsModuleGroups 25 }    
+
+END

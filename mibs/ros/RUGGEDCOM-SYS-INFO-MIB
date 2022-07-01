@@ -9,17 +9,32 @@ IMPORTS
     ruggedcomMgmt						FROM RUGGEDCOM-MIB;
 	
 rcSysInfo MODULE-IDENTITY
-    LAST-UPDATED "201410081700Z"      -- Oct 08, 17:00 EST 2014
-    ORGANIZATION "RuggedCom"
+    LAST-UPDATED "201711021000Z"      -- Nov. 02, 10:00 EST 2017
+    ORGANIZATION "Siemens Canada Ltd., Process Industries and Drives"
     CONTACT-INFO
-       "Postal: RuggedCom Inc.
+       "Postal: Siemens Canad Ltd.
                 300 Applewood Crescent
                 Concord, Ontario, 
                 L4K 5C7 Canada
         Tel:    1-905-856-5288
-        E-Mail: support@ruggedcom.com"
-    DESCRIPTION
+        E-Mail: support.canada.automation@siemens.com"
+
+	DESCRIPTION
         "RuggedCom system information MIB."
+
+	REVISION    "201711021000Z"      -- Nov. 02, 10:00 EST 2017
+    DESCRIPTION                
+        "Added new object rcDeviceErrSystem."
+	
+	REVISION    "201709201100Z"      -- Sept. 20, 11:00 EST 2017
+    DESCRIPTION                
+        "Updated DESCRIPTION of objects rcDeviceErrRadiusServerUnreachable and
+		 rcDeviceErrTacacsServerUnreachable."
+
+	REVISION    "201702151000Z"      -- Feb 15, 10:00 EST 2017
+    DESCRIPTION                
+        "Updated ORGANIZATION and CONTACT-INFO. Updated DESCRIPTION of
+        object rcDeviceErrNtpServerUnreachable."
 
 	REVISION    "201410081700Z"      -- Oct 08, 17:00 EST 2014
     DESCRIPTION                
@@ -263,7 +278,7 @@ rcDeviceCommands OBJECT-IDENTITY
 rcDeviceErrBootupError OBJECT-TYPE
     SYNTAX  	DisplayString
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "The error discovered during bootup process.
          If there was no error during device bootup, zero length string
@@ -273,7 +288,7 @@ rcDeviceErrBootupError OBJECT-TYPE
 rcDeviceErrWatchdogReset OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether the last device reboot was caused by wachdog."
     ::= { rcDeviceError 2}
@@ -281,7 +296,7 @@ rcDeviceErrWatchdogReset OBJECT-TYPE
 rcDeviceErrConfigurationFailure OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether errors were detected while applying configuration 
          settings from configuration file.  
@@ -297,7 +312,7 @@ rcDeviceErrConfigurationFailure OBJECT-TYPE
 rcDeviceErrCrashLogCreated OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether the device error that caused creation of an 
          entry in crashlog.txt file was detected.
@@ -310,7 +325,7 @@ rcDeviceErrCrashLogCreated OBJECT-TYPE
 rcDeviceErrStackOverflow OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether the stack of any of the system tasks is used
          over the system threshold.
@@ -323,7 +338,7 @@ rcDeviceErrStackOverflow OBJECT-TYPE
 rcDeviceErrHeapError OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether the system memory corruption was detected.
          Whenever the value of this object changes from false(2) to true(1),
@@ -335,7 +350,7 @@ rcDeviceErrHeapError OBJECT-TYPE
 rcDeviceErrDateAndTimeSetFailed OBJECT-TYPE
     SYNTAX  	TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
          "Indicates whether the date and time setting in the device falied.
          Whenever the value of this object changes from false(2) to true(1),
@@ -349,11 +364,12 @@ rcDeviceErrNtpServerUnreachable OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-         "Indicates whether the NTP server (if required) can be reached.
-         Whenever the value of this object changes from false(2) to true(1),
-         the device will generate genericTrap notification."
+         "Indicates whether any of NTP servers (if required) can be reached.
+         The value of this object is 'false' if both servers become unreachable.
+         Whenever the value of this object changes, the device will generate
+		 the ntpServiceAvailableChange notification."
     REFERENCE
-    	"genericTrap notification is defined in ruggedcomTrapsModule."   
+    	"ntpServiceAvailableChange notification is defined in RUGGEDCOM-NTP-MIB file."   
     ::= { rcDeviceError 8 }
 
 rcDeviceErrBootPTftpTrFailed OBJECT-TYPE
@@ -375,10 +391,10 @@ rcDeviceErrRadiusServerUnreachable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
          "Indicates whether the RADIUS server (if required) can be reached.
-         Whenever the value of this object changes from false(2) to true(1),
-         the device will generate genericTrap notification."
+         Whenever the value of this object changes, the device will generate
+		 the radiusServiceAvailableChange notification."
     REFERENCE
-    	"genericTrap notification is defined in ruggedcomTrapsModule."   
+    	"radiusServiceAvailableChange notification is defined in ruggedcomTrapsModule."   
     ::= { rcDeviceError 10 }
 
 rcDeviceErrTacacsServerUnreachable OBJECT-TYPE
@@ -387,12 +403,37 @@ rcDeviceErrTacacsServerUnreachable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
          "Indicates whether the TACACS+ server (if required) can be reached.
-         Whenever the value of this object changes from false(2) to true(1),
-         the device will generate genericTrap notification."
+         Whenever the value of this object changes, the device will generate
+		 the tacacsServiceAvailableChange notification."
     REFERENCE
-    	"genericTrap notification is defined in ruggedcomTrapsModule."   
-    ::= { rcDeviceError 11 }
-
+    	"tacacsServiceAvailableChange notification is defined in ruggedcomTrapsModule."   
+    ::= { rcDeviceError 11 }	
+	
+	
+rcDeviceErrSystem OBJECT-TYPE
+	SYNTAX  BITS {
+               errCrashLog(0),
+               errWatchdogRst(1),
+               errBootupErr(2),
+               errCfgFailure(3),
+               errStackOvfl(4),
+               errHeapErr(5),
+               errRealTimeClk(6),
+               errRxBuffersLow(7),
+			   errClockManager_OutOfResources(8),
+			   errClockManager_PrimarySourceFailed(9),
+			   errFpgaCompatibility(10),
+			   }
+	MAX-ACCESS read-only
+	STATUS      current
+	DESCRIPTION 
+		"Indicated whether a device failure occured. Whenever the value of this object
+		changes, the device will generate the deviceErrTrap notification."
+	REFERENCE
+		"deviceErrTrap notification is defined in ruggedcomTrapsModule."
+	::= {rcDeviceError 12 }
+	
+	
 -- ---------------------------------------------------------------------- --
 --  Device Status information objects
 -- ---------------------------------------------------------------------- --
@@ -737,7 +778,7 @@ rcSysErrObjectsGroup OBJECT-GROUP
 					rcDeviceErrRadiusServerUnreachable,
 					rcDeviceErrTacacsServerUnreachable
                 }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION 
         "A group of objects providing information about irregularities
         in the device."
@@ -749,7 +790,7 @@ rcSysStsObjectsGroup OBJECT-GROUP
 					rcDeviceStsCpuUsagePercent,
 					rcDeviceStsAvailableRam
 				}
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION 
         "A group of objects providing information device resources."
     ::= { rcSysInfoGroups 2 }    
@@ -831,7 +872,7 @@ rcSysStsObjectsGroup1 OBJECT-GROUP
 				}
     STATUS      current
     DESCRIPTION 
-        "A group of objects providing information device resources."
+        "A group of objects providing information about device resources."
     ::= { rcSysInfoGroups 8 }
       
 
@@ -866,6 +907,15 @@ rcSysDeviceSecurityGroup01  OBJECT-GROUP
     STATUS      current
     DESCRIPTION 
         "A group of object providing device control commands."
-    ::= { rcSysInfoGroups 11 }    
+    ::= { rcSysInfoGroups 11 } 
+
+rcSysErrObjectsGroup1 OBJECT-GROUP
+    OBJECTS     {
+					rcDeviceErrSystem
+                }
+    STATUS      current
+    DESCRIPTION 
+        "A group of objects providing information about device system errors."
+    ::= { rcSysInfoGroups 12 } 	
 
 END

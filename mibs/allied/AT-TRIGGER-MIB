@@ -20,7 +20,7 @@
 
 
         trigger MODULE-IDENTITY
-            LAST-UPDATED "201009070000Z"
+            LAST-UPDATED "201501050000Z"
             ORGANIZATION
                 "Allied Telesis, Inc"
             CONTACT-INFO
@@ -28,15 +28,18 @@
             DESCRIPTION
                 "This MIB file contains definitions of managed objects for the
                 TRIGGER module. "
-            REVISION "200711281600Z"
+            REVISION "201501050000Z"
             DESCRIPTION
-                "Added trigger configuration details for AW+"
-            REVISION "201006150015Z"
-            DESCRIPTION
-                "MIB revision history dates in descriptions updated."
+                "Add ATMF node trigger MIB"
             REVISION "201009070000Z"
             DESCRIPTION
                 "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200711281600Z"
+            DESCRIPTION
+                "Added trigger configuration details for AW+"
             ::= { modules 53 }
 
 
@@ -440,6 +443,14 @@
             ::= { triggerCounters 10 }
 
 
+        triggerNumOfATMFNodeActivationToday OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This objects represents the number of times a ATMF
+                node trigger has been activated today."
+            ::= { triggerCounters 11 }
 
     END
 

@@ -67,6 +67,10 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::post('{hostname}/maintenance', 'LegacyApiController@maintenance_device')->name('maintenance_device');
         });
 
+        Route::group(['prefix' => 'devicegroups'], function () {
+            Route::post('{name}/maintenance', 'LegacyApiController@maintenance_devicegroup')->name('maintenance_devicegroup');
+        });
+
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
         Route::delete('bills/{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
         Route::put('alerts/{id}', 'LegacyApiController@ack_alert')->name('ack_alert');

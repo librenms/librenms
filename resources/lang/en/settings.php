@@ -801,6 +801,10 @@ return [
                 ],
             ],
         ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.',
@@ -1466,9 +1470,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',

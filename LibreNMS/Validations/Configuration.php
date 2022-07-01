@@ -38,7 +38,7 @@ class Configuration extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Test transports
         if (Config::get('alerts.email.enable') == true) {

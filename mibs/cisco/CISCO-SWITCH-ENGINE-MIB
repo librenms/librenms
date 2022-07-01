@@ -7,8 +7,9 @@
 -- February 2003, Edward Pham
 -- May 2003, Jayakumar Kadirvelu
 -- August 2003, Edward Pham
+-- %DNP% March 2005, Jayakumar Kadirvelu
 --   
--- Copyright (c) 2000-2013 by cisco Systems Inc.
+-- Copyright (c) 2000-2020 by cisco Systems Inc.
 -- by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
@@ -59,7 +60,7 @@ IMPORTS
 
 
 ciscoSwitchEngineMIB MODULE-IDENTITY
-    LAST-UPDATED    "201302130000Z"
+    LAST-UPDATED    "202005260000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -96,6 +97,21 @@ ciscoSwitchEngineMIB MODULE-IDENTITY
         Layer 2 forwarding. However, they can also learn 'flows' through
         other physically-separate (external) Cisco routers that are
         connected to the switch-engine through the network."
+    REVISION        "202005260000Z"
+    DESCRIPTION
+        "Add enumerated value 304 - 308 to cseTcamResourceType."    
+    REVISION        "202003060000Z"
+    DESCRIPTION
+        "Add enumerated value 282 - 303 to cseTcamResourceType."    
+    REVISION        "201907110000Z"
+    DESCRIPTION
+        "Add enumerated value 232 - 281 to cseTcamResourceType."
+    REVISION        "201806200000Z"
+    DESCRIPTION
+        "Add enumerated value 229 - 231 to cseTcamResourceType."
+    REVISION        "201712070000Z"
+    DESCRIPTION
+        "Add enumerated value 86 - 228 to cseTcamResourceType."
     REVISION        "201302130000Z"
     DESCRIPTION
         "Add enumerated value 37 - 85 to cseTcamResourceType."
@@ -4439,7 +4455,7 @@ cseTcamResourceType OBJECT-TYPE
                         ingressDestInfoTable(62),
                         egressDestInfoTable(63),
                         ingressTcam(64),
-                        ingressIpv6Tcam(65), 
+                        ingressIpv6Tcam(65),
                         ingressLou(66),
                         ingressBothLouOperands(67),
                         ingressSingleLouOperands(68),
@@ -4450,7 +4466,7 @@ cseTcamResourceType OBJECT-TYPE
                         ingressLouL2Ttl(73),
                         ingressTcpFlags(74),
                         egressTcam(75),
-                        egressIpv6Tcam(76), 
+                        egressIpv6Tcam(76),
                         egressLou(77),
                         egressBothLouOperands(78),
                         egressSingleLouOperands(79),
@@ -4459,7 +4475,230 @@ cseTcamResourceType OBJECT-TYPE
                         egressLouL3PacketLength(82),
                         egressLouL3Ttl(83),
                         egressLouL2Ttl(84),
-                        egressTcpFlags(85)
+                        egressTcpFlags(85),
+                        l4OpLabelTcam2(86),
+                        l4OpLabelTcam3(87),
+                        l4OpLabelTcam4(88),
+                        l4OpLabelTcam5(89),
+                        l4OpLabelTcam6(90),
+                        l4OpLabelTcam7(91),
+                        l4OpLabelTcam8(92),
+                        l4OpLabelTcam9(93),
+                        l4OpLabelTcam10(94),
+                        l4OpLabelTcam11(95),
+                        l4OpLabelTcam12(96),
+                        l4OpLabelTcam13(97),
+                        l4OpLabelTcam14(98),
+                        l4OpLabelTcam15(99),
+                        l4OpLabelTcam16(100),
+                        l4OpLabelTcam17(101),
+                        l4OpLabelTcam18(102),
+                        l4OpLabelTcam19(103),
+                        ingressPacl(104),
+                        ingressVacl(105),
+                        ingressRacl(106),
+                        ingressRbacl(107),
+                        ingressNbm(108),
+                        ingressL2Qos(109),
+                        ingressL3VlanQos(110),
+                        ingressSup(111),
+                        ingressL2SpanAcl(112),
+                        ingressL3VlanSpanAcl(113),
+                        ingressFstat(114),
+                        ingressLatency(115),
+                        span(116),
+                        nat(117),
+                        egressVacl(118),
+                        egressRacl(119),
+                        egressRbacl(120),
+                        egressSup(121),
+                        egressL2Qos(122),
+                        egressL3VlanQos(123),
+                        netflowAnalyticsFilterTcam(124),
+                        ingressNetflowL3(125),
+                        ingressNetflowL2(126),
+                        featureVxLanOam(127),
+                        featureBfd(128),
+                        featureDhcpSnoop(129),
+                        ingressRedirect(130),
+                        featureDhcpV6Relay(131),
+                        featureArpSnoop(132),
+                        featureDhcpSnoopFhs(133),
+                        featureDhcpVaclFhs(134),
+                        featureDhcpSisf(135),
+                        egressSystem(136),
+                        rplusEgressSystem(137),
+                        supSystem(138),
+                        rplusSupSystem(139),
+                        fmSupSystem(140),
+                        supCopp(141),
+                        rplusSupCopp(142),
+                        supCoppReasonCode(143),
+                        ingressIpv4Pacl(144),
+                        ingressIpv6Pacl(145),
+                        ingressMacPacl(146),
+                        ingressFexIpv4Pacl(147),
+                        ingressFexIpv6Pacl(148),
+                        ingressFexMacPacl(149),
+                        ingressIpv4PortQos(150),
+                        ingressIpv4PortQosLite(151),
+                        ingressIpv6PortQos(152),
+                        ingressMacPortQos(153),
+                        ingressIpv4FexPortQos(154),
+                        ingressIpv4FexPortQosLite(155),
+                        ingressIpv6FexPortQos(156),
+                        ingressMacFexPortQos(157),
+                        ingressIpv4Vacl(158),
+                        ingressIpv6Vacl(159),
+                        ingressMacVacl(160),
+                        ingressIpv4VlanQos(161),
+                        ingressIpv4VlanQosLite(162),
+                        ingressIpv6VlanQos(163),
+                        ingressMacVlanQos(164),
+                        ingressIpv4Racl(165),
+                        ingressIpv6Racl(166),
+                        ingressIpv4L3Qos(167),
+                        ingressIPv4L3QosLite(168),
+                        ingressIPv6L3Qos(169),
+                        ingressMacL3Qos(170),
+                        ingressFlowCounters(171),
+                        ingressSviCounters(172),
+                        egressIpv4Vacl(173),
+                        egressIpv6Vacl(174),
+                        egressMacVacl(175),
+                        egressIpv4Qos(176),
+                        egressIpv4QosLite(177),
+                        egressIpv6Qos(178),
+                        egressMacQos(179),
+                        rplusIngressEgressIpv4Qos(180),
+                        redirect(181),
+                        rplusIngressEgressIpv4QosLite(182),
+                        rplusIngressEgressIpv6Qos(183),
+                        rplusIngressEgressMacQos(184),
+                        egressIpv4Racl(185),
+                        egressIpv6Racl(186),
+                        egressFlowCounters(187),
+                        ingressNsIpv4PortQos(188),
+                        ingressNsIpv6PortQos(189),
+                        ingressNsMacPortQos(190),
+                        ingressNsIpv4VlanQos(191),
+                        ingressNsIpv6VlanQos(192),
+                        ingressNsMacVlanQos(193),
+                        ingressNsIpv4L3Qos(194),
+                        ingressNsIpv6L3Qos(195),
+                        vpcConvergence(196),
+                        ipsgSmacIpBindingTable(197),
+                        openflowAcl(198),
+                        openflowIpv6Acl(199),
+                        ingressEtherAcl(200),
+                        mplsFeature(201),
+                        ingressIpv4Qos(202),
+                        ingressIpv6Qos(203),
+                        ipv6Sup(204),
+                        ingressIpv4Pbr(205),
+                        ingressIpv6Pbr(206),
+                        ingressIpv4PaclDoubleWide(207),
+                        arpAcl(208),
+                        sflowNorthstarAcl(209),
+                        mcastBidir(210),
+                        redirectTunnel(211),
+                        ingressFcoeCounters(212),
+                        egressFcoeCounters(213),
+                        spanSflowCombined(214),
+                        mcastPerformance(215),
+                        fhs(216),
+                        openflowLiteAcl(217),
+                        ipv6DestCompression(218),
+                        ingressIpv4RaclLite(219),
+                        ipv6SrcCompression(220),
+                        ipv4RaclSpanUdf(221),
+                        ingressIpv4PortQosIntraTcamLite(222),
+                        ingressIpv4L3QosIntraTcamLite(223),
+                        ingressIpv4VlanQosIntraTcamLite(224),
+                        ipv4PaclSpanUdf(225),
+                        coppSystem(226),
+                        ingressIpv4PaclLite(227),
+                        ingressIpv4VaclLite(228),
+                        vxLanXConnect(229),
+                        dot1X(230),
+                        dot1XMultiAuth(231),
+                        ingressPaclAll(232),
+                        ingressRaclAll(233),
+                        ingressVaclAll(234),
+                        ingressMacPqos(235),
+                        ingressIpv4Pqos(236),
+                        ingressIpv6Pqos(237),
+                        ingressPqos(238),
+                        ingressMacVqos(239),
+                        ingressIpv4Vqos(240),
+                        ingressIpv6Vqos(241),
+                        ingressVqosAll(242),
+                        ingressIpv4L3qos(243),
+                        ingressIpv6L3qos(244),
+                        ingressL3qosAll(245),
+                        ingressCopp(246),
+                        ingressMacSpan(247),
+                        ingressIpv4Span(248),
+                        ingressSpan(249),
+                        ingressSpanAll(250),
+                        egressRaclAll(251),
+                        egressVaclAll(252),
+                        egressMacPortQos(253),
+                        egressIpv4PortQos(254),
+                        egressIv6PortQos(255),
+                        egressPortQos(256),
+                        egressMacVlanQos(257),
+                        egressIpv4VlanQos(258),
+                        egressIpv6VlanQos(259),
+                        egressVlanQos(260),
+                        egressIpv4L3Qos(261),
+                        egressIpv6L3Qos(262),
+                        egressL3QosAll(263),
+                        egressMacSpan(264),
+                        egressIpv4Span(265),
+                        egressIpv6Span(266),
+                        egressSpanAll(267),
+                        dhcp(268),
+                        labelLblA(269),
+                        labelLblB(270),
+                        labelLblD(271),
+                        labelLblE(272),
+                        labelLblF(273),
+                        labelLblG(274),
+                        labelLblH(275),
+                        labelLblI(276),
+                        labelLblK(277),
+                        ingressSupAll(278),
+                        egressSupAll(279),
+                        ingressVlanSpan(280),
+                        ingressNetflow(281),
+                        ingressCntAcl(282),
+                        egressCntAcl(283),
+                        ingressHwTelemetry(284),
+                        labelLblAv1(285),
+                        labelLblBv1(286),
+                        labelLblCv1(287),
+                        labelLblDv1(288),
+                        labelLblEv1(289),
+                        labelLblFv1(290),
+                        labelLblGv1(291),
+                        labelLblHv1(292),
+                        labelLblIv1(293),
+                        labelLblJv1(294),
+                        labelLblKv1(295),
+                        labelLblLv1(296),
+                        labelLblMv1(297),
+                        labelLblNv1(298),
+                        labelLblOv1(299),
+                        labelLblPv1(300),
+                        labelLblQv1(301),
+                        labelLblRv1(302),
+                        ingressNetflowAnalytics(303),
+                        ingressNatOutside(304),
+                        ingressNatInside(305),
+                        ingressL2L3QosAll(306),
+                        natRewriteTable(307),
+                        tcpAwareNat(308)
                     }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -4727,7 +4966,663 @@ cseTcamResourceType OBJECT-TYPE
         for LOUs with L2 TTL in comparison.
 
         egressTcpFlags(85) indicates that egress TCAM space is allocated
-        for TCP Flags."
+        for TCP Flags.
+
+        l4OpLabelTcam2(86) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 2.
+
+        l4OpLabelTcam3(87) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 3.
+
+        l4OpLabelTcam4(88) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 4.
+
+        l4OpLabelTcam5(89) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 5.
+
+        l4OpLabelTcam6(90) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 6.
+
+        l4OpLabelTcam7(91) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 7.
+
+        l4OpLabelTcam8(92) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 8.
+
+        l4OpLabelTcam9(93) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 9.
+
+        l4OpLabelTcam10(94) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 10.
+
+        l4OpLabelTcam11(95) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 11.
+
+        l4OpLabelTcam12(96) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 12.
+
+        l4OpLabelTcam13(97) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 13.
+
+        l4OpLabelTcam14(98) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 14.
+
+        l4OpLabelTcam15(99) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 15.
+
+        l4OpLabelTcam16(100) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 16.
+
+        l4OpLabelTcam17(101) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 17.
+
+        l4OpLabelTcam18(102) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 18.
+
+        l4OpLabelTcam19(103) indicates that TCAM space is allocated for
+        labels using any L4 operator resources like LOUs or TCP Flags
+        for TCAM 19.
+
+        ingressPacl(104) indicates that ingress TCAM space is allocated
+        for PACL.
+
+        ingressVacl(105) indicates that ingress TCAM space is allocated
+        for VACL.
+
+        ingressRacl(106) indicates that ingress TCAM space is allocated
+        for RACL.
+
+        ingressRbacl(107) indicates that ingress TCAM space is allocated
+        for RBACL.
+
+        ingressNbm(108) indicates that ingress TCAM space is allocated
+        for NBM.
+
+        ingressL2Qos(109) indicates that ingress TCAM space is allocated
+        for L2 QoS.
+
+        ingressL3VlanQos(110) indicates that ingress TCAM space is allocated
+        for L3/VLAN QOS.
+
+        ingressSup(111) indicates that ingress TCAM space is allocated for
+        SUP.
+
+        ingressL2SpanAcl(112) indicates that ingress TCAM space is allocated
+        for L2 SPAN ACL.
+
+        ingressL3VlanSpanAcl(113) indicates that ingress TCAM space is
+        allocated for L3/VLAN SPAN ACL.
+
+        ingressFstat(114) indicates that ingress TCAM space is allocated
+        for FSTAT.
+
+        ingressLatency(115) indicates that ingress TCAM space is allocated
+        for LATENCY.
+
+        span(116) indicates that TCAM space is allocated for SPAN.
+
+        nat(117) indicates that TCAM space is allocated for NAT.
+
+        egressVacl(118) indicates that egress TCAM space is allocated
+        for VACL. 
+
+        egressRacl(119) indicates that egress TCAM space is allocated
+        for RACL.
+
+        egressRbacl(120) indicates that egress TCAM space is allocated
+        for RBACL.
+
+        egressSup(121) indicates that egress TCAM space is allocated for
+        SUP.
+
+        egressL2Qos(122) indicates that egress TCAM space is allocated
+        for L2 QoS.
+
+        egressL3VlanQos(123) indicates that egress TCAM space is allocated
+        for L3/VLAN QoS.
+
+        netflowAnalyticsFilterTcam(124) indicates that TCAM space is
+        allocated for Netflow/Analytics Filter.
+
+        ingressNetflowL3(125) indicates that ingress TCAM space is allocated
+        for L3 Netflow.
+
+        ingressNetflowL2(126) indicates that ingress TCAM space is allocated
+        for L2 Netflow.
+
+        featureVxLanOam(127) indicates that TCAM space is allocated for
+        Feature VxLAN OAM.
+
+        featureBfd(128) indicates that TCAM space is allocated for Feature
+        BFD.
+
+        featureDhcpSnoop(129) indicates that TCAM space is allocated for
+        Feature DHCP SNOOP.
+
+        ingressRedirect(130) indicates that TCAM space is allocated for
+        ingress REDIRECT.
+
+        featureDhcpV6Relay(131) indicates that TCAM space is allocated for
+        Feature DHCPv6 RELAY.
+
+        featureArpSnoop(132) indicates that TCAM space is allocated for
+        Feature ARP SNOOP.
+
+        featureDhcpSnoopFhs(133) indicates that TCAM space is allocated for
+        Feature DHCP SNOOP FHS.
+
+        featureDhcpVaclFhs(134) indicates that TCAM space is allocated for
+        Feature DHCP VACL FHS.
+
+        featureDhcpSisf(135) indicates that TCAM space is allocated for
+        Feature DHCP SISF.
+
+        egressSystem(136) indicates that egress TCAM space is allocated for
+        System.
+
+        rplusEgressSystem(137) indicates that TCAM space is allocated for
+        RPLUS Egress System.
+
+        supSystem(138) indicates that TCAM space is allocated for SUP System.
+
+        rplusSupSystem(139) indicates that TCAM space is allocated for RPLUS
+        SUP System.
+
+        fmSupSystem(140) indicates that TCAM space is allocated for FM SUP
+        System.
+
+        supCopp(141) indicates that TCAM space is allocated for SUP COPP.
+
+        rplusSupCopp(142) indicates that TCAM space is allocated for RPLUS
+        SUP COPP.
+
+        supCoppReasonCode(143) indicates that TCAM space is allocated for
+        SUP COPP Reason Code.
+
+        ingressIpv4Pacl(144) indicates that ingress TCAM space is allocated
+        for IPv4 PACL.
+
+        ingressIpv6Pacl(145) indicates that ingress TCAM space is allocated
+        for IPv6 PACL.
+
+        ingressMacPacl(146) indicates that ingress TCAM space is allocated
+        for MAC PACL.
+
+        ingressFexIpv4Pacl(147) indicates that ingress TCAM space is
+        allocated for Fex IPv4 PACL.
+
+        ingressFexIpv6Pacl(148) indicates that ingress TCAM space is
+        allocated for Ingress Fex IPv6 PACL.
+
+        ingressFexMacPacl(149) indicates that ingress TCAM space is
+        allocated for Ingress Fex MAC PACL.
+
+        ingressIpv4PortQos(150) indicates that ingress TCAM space is
+        allocated for IPv4 Port QoS.
+
+        ingressIpv4PortQosLite(151) indicates that ingress TCAM space is
+        allocated for IPv4 Port QoS (Lite).
+
+        ingressIpv6PortQos(152) indicates that ingress TCAM space is
+        allocated for IPv6 Port QoS.
+
+        ingressMacPortQos(153) indicates that ingress TCAM space is
+        allocated for MAC Port QoS.
+
+        ingressIpv4FexPortQos(154) indicates that ingress TCAM space is
+        allocated for IPv4 FEX Port QoS.
+
+        ingressIpv4FexPortQosLite(155) indicates that ingress TCAM space
+        is allocated for IPv4 FEX Port QoS (Lite).
+
+        ingressIpv6FexPortQos(156) indicates that ingress TCAM space is
+        allocated for IPv6 FEX Port QoS.
+
+        ingressMacFexPortQos(157) indicates that ingress TCAM space is
+        allocated for MAC FEX Port QoS.
+
+        ingressIpv4Vacl(158) indicates that ingress TCAM space is allocated
+        for IPv4 VACL.
+
+        ingressIpv6Vacl(159) indicates that ingress TCAM space is allocated
+        for IPv6 VACL.
+
+        ingressMacVacl(160) indicates that ingress TCAM space is allocated
+        for MAC VACL.
+
+        ingressIpv4VlanQos(161) indicates that ingress TCAM space is
+        allocated for IPv4 VLAN QoS.
+
+        ingressIpv4VlanQosLite(162) indicates that ingress TCAM space is
+        allocated for IPv4 VLAN QoS (Lite).
+
+        ingressIpv6VlanQos(163) indicates that ingress TCAM space is
+        allocated for IPv6 VLAN QoS.
+
+        ingressMacVlanQos(164) indicates that ingress TCAM space is allocated
+        for MAC VLAN QoS.
+
+        ingressIpv4Racl(165) indicates that ingress TCAM space is allocated
+        for IPv4 RACL.
+
+        ingressIpv6Racl(166) indicates that ingress TCAM space is allocated
+        for IPv6 RACL.
+
+        ingressIpv4L3Qos(167) indicates that ingress TCAM space is allocated
+        for IPv4 L3 QoS.
+
+        ingressIPv4L3QosLite(168) indicates that ingress TCAM space is
+        allocated for IPv4 L3 QoS (Lite).
+
+        ingressIPv6L3Qos(169) indicates that ingress TCAM space is allocated
+        for IPv6 L3 QoS.
+
+        ingressMacL3Qos(170) indicates that ingress TCAM space is allocated
+        for MAC L3 QoS.
+
+        ingressFlowCounters(171) indicates that TCAM space is allocated for
+        ingress Flow Counters.
+
+        ingressSviCounters(172) indicates that TCAM space is allocated for
+        Ingress SVI Counters.
+
+        egressIpv4Vacl(173) indicates that egress TCAM space is allocated
+        for IPv4 VACL.
+
+        egressIpv6Vacl(174) indicates that egress TCAM space is allocated
+        for IPv6 VACL.
+
+        egressMacVacl(175) indicates that egress TCAM space is allocated
+        for MAC VACL.
+
+        egressIpv4Qos(176) indicates that egress TCAM space is allocated
+        for IPv4 QoS.
+
+        egressIpv4QosLite(177) indicates that egress TCAM space is allocated
+        for IPv4 QoS Lite.
+
+        egressIpv6Qos(178) indicates that egress TCAM space is allocated for
+        IPv6 QoS.
+
+        egressMacQos(179) indicates that egress TCAM space is allocated for
+        MAC QoS.
+
+        rplusIngressEgressIpv4Qos(180) indicates that TCAM space is allocated
+        for RPLUS Ingress/Egress IPv4 QoS.
+
+        redirect(181) indicates that TCAM space is allocated for Redirect.
+
+        rplusIngressEgressIpv4QosLite(182) indicates that TCAM space is
+        allocated for RPLUS Ingress/Egress IPv4 QoS Lite.
+
+        rplusIngressEgressIpv6Qos(183) indicates that TCAM space is allocated
+        for Ingress/Egress IPv6 QoS.
+
+        rplusIngressEgressMacQos(184) indicates that TCAM space is allocated
+        for Ingress/Egress MAC QoS.
+
+        egressIpv4Racl(185) indicates that egress TCAM space is allocated for
+        IPv4 RACL.
+
+        egressIpv6Racl(186) indicates that egress TCAM space is allocated for
+        IPv6 RACL.
+
+        egressFlowCounters(187) indicates that TCAM space is allocated for
+        Egress Flow Counters.
+
+        ingressNsIpv4PortQos(188) indicates that ingress TCAM space is
+        allocated for NS IPv4 Port QoS.
+
+        ingressNsIpv6PortQos(189) indicates that ingress TCAM space is
+        allocated for NS IPv6 Port QoS.
+
+        ingressNsMTCAM_MIB.myacPortQos(190) indicates that ingress TCAM space is
+        allocated for NS MAC Port QoS.
+
+        ingressNsIpv4VlanQos(191) indicates that ingress TCAM space is
+        allocated for NS IPv4 VLAN QoS.
+
+        ingressNsIpv6VlanQos(192) indicates that ingress TCAM space is
+        allocated for NS IPv6 VLAN QoS.
+
+        ingressNsMacVlanQos(193) indicates that ingress TCAM space is
+        allocated for NS MAC VLAN QoS.
+
+        ingressNsIpv4L3Qos(194) indicates that ingress TCAM space is
+        allocated for NS IPv4 L3 QoS.
+
+        ingressNsIpv6L3Qos(195) indicates that ingress TCAM space is
+        allocated for NS IPv6 L3 QoS.
+
+        vpcConvergence(196) indicates that TCAM space is allocated for
+        VPC Convergence.
+
+        ipsgSmacIpBindingTable(197) indicates that TCAM space is
+        allocated for IPSG SMAC-IP binding table.
+
+        openflowAcl(198) indicates that TCAM space is allocated for
+        OPENFLOW ACL.
+
+        openflowIpv6Acl(199) indicates that TCAM space is allocated
+        for OPENFLOW IPV6 ACL.
+
+        ingressEtherAcl(200) indicates that ingress TCAM space is
+        allocated for Ether ACL.
+
+        mplsFeature(201) indicates that TCAM space is allocated for
+        MPLS feature.
+
+        ingressIpv4Qos(202) indicates that ingress TCAM space is
+        allocated for IPv4 QoS.
+
+        ingressIpv6Qos(203) indicates that ingress TCAM space is
+        allocated for IPv6 QoS.
+
+        ipv6Sup(204) indicates that TCAM space is allocated for
+        IPV6 SUP.
+
+        ingressIpv4Pbr(205) indicates that ingress TCAM space is
+        allocated for IPv4 PBR.
+
+        ingressIpv6Pbr(206) indicates that ingress TCAM space is
+        allocated for IPv6 PBR.
+
+        ingressIpv4PaclDoubleWide(207) indicates that ingress TCAM
+        space is allocated for IPv4 PACL DoubleWide.
+
+        arpAcl(208) indicates that TCAM space is allocated for ARP ACL.
+
+        sflowNorthstarAcl(209) indicates that TCAM space is allocated for
+        sFlow Northstar ACL.
+
+        mcastBidir(210) indicates that TCAM space is allocated for mcast
+        bidir.
+
+        redirectTunnel(211) indicates that TCAM space is allocated for
+        Redirect TUNNEL.
+
+        ingressFcoeCounters(212) indicates that TCAM space is allocated
+        for Ingress FCoE Counters.
+
+        egressFcoeCounters(213) indicates that egress TCAM space is
+        allocated for Egress FCoE Counters.
+
+        spanSflowCombined(214) indicates that TCAM space is allocated for
+        SPAN SFLOW combined.
+
+        mcastPerformance(215) indicates that TCAM space is allocated for
+        mcast performance.
+
+        fhs(216) indicates that TCAM space is allocated for FHS.
+
+        openflowLiteAcl(217) indicates that TCAM space is allocated for
+        OPENFLOW LITE ACL.
+
+        ipv6DestCompression(218) indicates that TCAM space is allocated
+        for IPv6 Dest Compression.
+
+        ingressIpv4RaclLite(219) indicates that TCAM space is allocated
+        for Ingress IPv4 RACL Lite.
+
+        ipv6SrcCompression(220) indicates that TCAM space is allocated for
+        IPv6 Src Compression.
+
+        ipv4RaclSpanUdf(221) indicates that TCAM space is allocated for
+        IPV4 RACL SPAN UDF.
+
+        ingressIpv4PortQosIntraTcamLite(222) indicates that TCAM space is
+        allocated for Ingress IPv4 Port QoS (Intra-TCAM Lite).
+
+        ingressIpv4L3QosIntraTcamLite(223) indicates that TCAM space is
+        allocated for Ingress IPv4 L3 QoS (Intra-TCAM Lite).
+
+        ingressIpv4VlanQosIntraTcamLite(224) indicates that TCAM space is
+        allocated for Ingress IPv4 VLAN QoS (Intra-TCAM Lite).
+
+        ipv4PaclSpanUdf(225) indicates that TCAM space is allocated for IPV4
+        PACL SPAN UDF.
+
+        coppSystem(226) indicates that TCAM space is allocated for COPP
+        SYSTEM.
+
+        ingressIpv4PaclLite(227) indicates that TCAM space is allocated for
+        ingress IPv4 PACL lite.
+
+        ingressIpv4VaclLite(228) indicates that TCAM space is allocated for
+        ingress IPv4 VACL lite.
+
+        vxLanXConnect(229) indicates that TCAM space is allocated for VxLAN XConnect.
+
+        dot1X(230) indicates that TCAM space is allocated for DOT1X.
+
+        dot1XMultiAuth(231) indicates that TCAM space is allocated for DOT1X Multi
+        Auth.
+        
+        ingressPaclAll(232) indicates that TCAM space is allocated for
+        Ingress PACL ALL.
+
+        ingressRaclAll(233) indicates that TCAM space is allocated for
+        Ingress RACL ALL.
+
+        ingressVaclAll(234) indicates that TCAM space is allocated for
+        Ingress VACL ALL.
+
+        ingressMacPqos(235) indicates that TCAM space is allocated for
+        Ingress MAC PQOS.
+
+        ingressIpv4Pqos(236) indicates that TCAM space is allocated for
+        Ingress IPV4 PQOS.
+
+        ingressIpv6Pqos(237) indicates that TCAM space is allocated for
+        Ingress IPV6 PQOS.
+
+        ingressPqos(238) indicates that TCAM space is allocated for Ingress PQOS.
+        
+        ingressMacVqos(239) indicates that TCAM space is allocated for
+        Ingress MAC VQOS.
+
+        ingressIpv4Vqos(240) indicates that TCAM space is allocated for
+        Ingress IPV4 VQOS.
+
+        ingressIpv6Vqos(241) indicates that TCAM space is allocated for
+        Ingress IPV6 VQOS.
+
+        ingressVqosAll(242) indicates that TCAM space is allocated for
+        Ingress VQOS ALL.
+
+        ingressIpv4L3qos(243) indicates that TCAM space is allocated for
+        Ingress IPV4 L3QOS.
+
+        ingressIpv6L3qos(244) indicates that TCAM space is allocated for
+        Ingress IPV6 L3QOS.
+
+        ingressL3qosAll(245) indicates that TCAM space is allocated for
+        Ingress L3QOS ALL.
+
+        ingressCopp(246) indicates that TCAM space is allocated for Ingress COPP.
+        
+        ingressMacSpan(247) indicates that TCAM space is allocated for
+        Ingress MAC SPAN.
+
+        ingressIpv4Span(248) indicates that TCAM space is allocated for
+        Ingress IPV4 SPAN.
+
+        ingressSpan(249) indicates that TCAM space is allocated for Ingress SPAN.
+        
+        ingressSpanAll(250) indicates that TCAM space is allocated for
+        Ingress SPAN ALL.
+
+        egressRaclAll(251) indicates that TCAM space is allocated for
+        Egress RACL ALL.
+
+        egressVaclAll(252) indicates that TCAM space is allocated for
+        Egress VACL ALL.
+
+        egressMacPortQos(253) indicates that TCAM space is allocated for
+        Egress MAC Port QOS.
+
+        egressIpv4PortQos(254) indicates that TCAM space is allocated for
+        Egress IPV4 Port QOS.
+
+        egressIv6PortQos(255) indicates that TCAM space is allocated for
+        Egress IPv6 Port QOS.
+
+        egressPortQos(256) indicates that TCAM space is allocated for
+        Egress Port QOS.
+
+        egressMacVlanQos(257) indicates that TCAM space is allocated for
+        Egress MAC VLAN QOS.
+
+        egressIpv4VlanQos(258) indicates that TCAM space is allocated for
+        Egress IPV4 VLAN QOS.
+
+        egressIpv6VlanQos(259) indicates that TCAM space is allocated for
+        Egress IPV6 VLAN QOS.
+
+        egressVlanQos(260) indicates that TCAM space is allocated for
+        Egress VLAN QOS.
+
+        egressIpv4L3Qos(261) indicates that TCAM space is allocated for
+        Egress IPV4 L3 QOS.
+
+        egressIpv6L3Qos(262) indicates that TCAM space is allocated for
+        Egress IPV6 L3 QOS.
+
+        egressL3QosAll(263) indicates that TCAM space is allocated for
+        Egress L3 QOS ALL.
+
+        egressMacSpan(264) indicates that TCAM space is allocated for
+        Egress MAC SPAN.
+
+        egressIpv4Span(265) indicates that TCAM space is allocated for
+        Egress IPV4 SPAN.
+
+        egressIpv6Span(266) indicates that TCAM space is allocated for
+        Egress IPV6 SPAN.
+
+        egressSpanAll(267) indicates that TCAM space is allocated for
+        Egress SPAN ALL.
+
+        dhcp(268) indicates that TCAM space is allocated for DHCP.
+        
+        labelLblA(269) indicates that TCAM space is allocated for
+        Label LBL A, Ingress-Physical interface-PACL,PQOS.
+
+        labelLblB(270) indicates that TCAM space is allocated for
+        Label LBL B, Ingress-Logical interface-PACL,PQOS.
+
+        labelLblD(271) indicates that TCAM space is allocated for
+        Label LBL D, Ingress-Physical interface-RACL,L3QOS.
+
+        labelLblE(272) indicates that TCAM space is allocated for
+        Label LBL E, Ingress-Logical interface-RACL,L3QOS.
+
+        labelLblF(273) indicates that TCAM space is allocated for
+        Label LBL F, Egress-Physical interface-RACL,L3QOS.
+
+        labelLblG(274) indicates that TCAM space is allocated for
+        Label LBL G, Egress-Logical interface-RACL,L3QOS.
+
+        labelLblH(275) indicates that TCAM space is allocated for
+        Label LBL H, Ingress-VLAN-VACL,VQOS.
+
+        labelLblI(276) indicates that TCAM space is allocated for
+        Label LBL I, Egress-VLAN-VACL,VQOS.
+
+        labelLblK(277) indicates that TCAM space is allocated for
+        Label LBL K, Ingress-All interface-DHCP.
+
+        ingressSupAll(278) indicates that TCAM space is allocated for
+        Ingress SUP ALL.
+
+        egressSupAll(279) indicates that TCAM space is allocated for
+        Egress SUP ALL.
+
+        ingressVlanSpan(280) indicates that TCAM space is allocated for
+        Ingress Vlan SPAN.
+
+        ingressNetflow(281) indicates that TCAM space is allocated for
+        Ingress Netflow.
+        
+        ingressCntAcl(282) indicates that TCAM space is allocated for
+        Ingress CNTACL.
+
+        egressCntAcl(283) indicates that TCAM space is allocated for
+        Egress CNTACL.
+
+        ingressHwTelemetry(284) indicates that TCAM space is allocated for
+        Ingress HW-TELEMETRY.
+
+        labelLblAv1(285) indicates that TCAM space is allocated for Label LBL A.
+
+        labelLblBv1(286) indicates that TCAM space is allocated for Label LBL B.
+
+        labelLblCv1(287) indicates that TCAM space is allocated for Label LBL C.
+
+        labelLblDv1(288) indicates that TCAM space is allocated for Label LBL D.
+
+        labelLblEv1(289) indicates that TCAM space is allocated for Label LBL E.
+
+        labelLblFv1(290) indicates that TCAM space is allocated for Label LBL F.
+
+        labelLblGv1(291) indicates that TCAM space is allocated for Label LBL G.
+
+        labelLblHv1(292) indicates that TCAM space is allocated for Label LBL H.
+
+        labelLblIv1(293) indicates that TCAM space is allocated for Label LBL I.
+
+        labelLblJv1(294) indicates that TCAM space is allocated for Label LBL J.
+
+        labelLblKv1(295) indicates that TCAM space is allocated for Label LBL K.
+
+        labelLblLv1(296) indicates that TCAM space is allocated for Label LBL L.
+
+        labelLblMv1(297) indicates that TCAM space is allocated for Label LBL M.
+
+        labelLblNv1(298) indicates that TCAM space is allocated for Label LBL N.
+
+        labelLblOv1(299) indicates that TCAM space is allocated for Label LBL O.
+
+        labelLblPv1(300) indicates that TCAM space is allocated for Label LBL P.
+
+        labelLblQv1(301) indicates that TCAM space is allocated for Label LBL Q.
+
+        labelLblRv1(302) indicates that TCAM space is allocated for Label LBL R.
+
+        ingressNetflowAnalytics(303) indicates that TCAM space is allocated for
+        Ingress Netflow/Analytics.
+
+        ingressNatOutside(304) indicates that TCAM space is allocated for Ingress
+        NAT OUTSIDE.
+
+        ingressNatInside(305) indicates that TCAM space is allocated for Ingress
+        NAT INSIDE.
+
+        ingressL2L3QosAll(306) indicates that TCAM space is allocated for
+        Ingress L2 L3 QOS ALL.
+
+        natRewriteTable(307) indicates that TCAM space is allocated for NAT
+        Rewrite Table.
+
+        tcpAwareNat(308) indicates that TCAM space is allocated for TCP
+        Aware NAT."
         
     ::= { cseTcamUsageEntry 1 }
 
@@ -6138,3 +7033,5 @@ cseStatisticsFlowGroup1 OBJECT-GROUP
     ::= { cseMIBGroups 40 }
 
 END
+
+

@@ -1,0 +1,12 @@
+os: eaton-sc200
+text: 'Eaton SC200 Controller'
+type: power
+icon: eaton
+snmp_bulk: false
+over:
+    - { graph: device_current, text: Load }
+    - { graph: device_voltage, text: Voltage }
+mib_dir: eaton
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.1918.2.13

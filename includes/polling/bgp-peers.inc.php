@@ -26,6 +26,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
         } elseif ($device['os_group'] == 'cisco') {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
+        } elseif ($device['os'] == 'cumulus') {
+            $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         }
@@ -358,6 +360,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
                                 'cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
                             ];
+                        } elseif ($device['os'] == 'cumulus') {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'CUMULUS-BGPUN-MIB';
+                            $oid_map = [
+                                'bgpPeerState' => 'bgpPeerState',
+                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
+                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'bgpPeerIface' => 'bgpPeerIface',
+                            ];
                         } else {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
                             $mib = 'BGP4-MIB';
@@ -409,6 +427,29 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerLastErrorCode'] = $error_code;
                         $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
                     }
+
+                    // --- Fill the bgpPeerIface column ---
+                    $bgpPeerIfaceFilled = false;
+                    if (isset($peer_data['bgpPeerIface'])) {
+                        if (! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) && ! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+                            // The column is already filled with the ifName, we change it to ifIndex
+                            $bgpPeerIface = DB::table('ports')->where('device_id', '=', $device['device_id'])->where('ifName', '=', $peer_data['bgpPeerIface'])->first()->ifIndex;
+                            $bgpPeerIfaceFilled = true;
+                        }
+                    }
+                    if (! ($bgpPeerIfaceFilled) && isset($peer_data['bgpLocalAddr'])) {
+                        // else we use the bgpLocalAddr to find ifIndex
+                        if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                            $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->first()->ifIndex;
+                        } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                            $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv6_addresses', 'ports.port_id', '=', 'ipv6_addresses.port_id')->where('ipv6_address', '=', $ipv6)->first()->ifIndex;
+                        }
+                    }
+                    if (isset($bgpPeerIface)) {
+                        $peer_data['bgpPeerIface'] = $bgpPeerIface;
+                    }
                 }
 
                 d_echo($peer_data);
@@ -423,11 +464,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
                 ) {
                     if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
-                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
+                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
                     } elseif ($peer_data['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 1, $peer_ip);
+                        log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device, 'bgpPeer', 1, $peer_ip);
                     } elseif ($peer['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
+                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
                     }
                 }
             }

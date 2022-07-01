@@ -527,5 +527,10 @@
     "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_error_delta\" && application_metrics.value >= \"2\"",
     "name": "Suricata Packet Error >= 2%",
     "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"mysql\" && applications.app_state != \"OK\"",
+    "name": "MySQL Server not responding",
+    "severity":"critical"
   }
 ]

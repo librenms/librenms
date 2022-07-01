@@ -128,7 +128,7 @@ if ($device['os'] == 'netscaler') {
     foreach ($vsvrs as $db_name => $db_id) {
         if (! $vsvr_exist[$db_name]) {
             echo '-' . $db_name;
-            dbDelete('netscaler_vservers', '`vsvr_id` =  ?', [$db_id]);
+            dbDelete('netscaler_vservers', '`vsvr_id` =  ?', [$db_id['vsvr_id']]);
         }
     }
 }//end if

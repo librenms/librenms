@@ -150,7 +150,7 @@ class ModuleTestHelper
     public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
     {
         if ($full) {
-            $snmp_oids[] = [
+            $snmp_oids[][] = [
                 'oid' => '.',
                 'method' => 'walk',
                 'mib' => null,
@@ -213,7 +213,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):[^:]+:[0-9]+\' \'(.+)\']/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\']/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
@@ -567,7 +567,7 @@ class ModuleTestHelper
                 'port' => $snmpsim->getPort(),
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device))->execute();
+            (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
