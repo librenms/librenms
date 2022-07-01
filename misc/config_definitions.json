@@ -4699,13 +4699,6 @@
             "default": true,
             "type": "boolean"
         },
-        "poller_modules.mib": {
-            "order": 260,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.stp": {
             "order": 380,
             "group": "poller",
