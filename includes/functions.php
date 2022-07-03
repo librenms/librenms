@@ -21,6 +21,8 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\JsonAppDataNoAppId;
+use LibreNMS\Exceptions\JsonAppDataNoData;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Proxy;
@@ -1487,4 +1489,50 @@ function describe_bgp_error_code($code, $subcode)
     }
 
     return $message;
+}
+
+/**
+ * Gets stored app data JSON and returns it.
+ * If none is present or it is bad, a blank array is returned.
+ *
+ * @params int $app_id
+ * @return array
+ */
+function get_app_data($app_id)
+{
+    if (is_null($app_id)) {
+        throw new JsonAppDataNoAppId;
+    }
+
+    $app = Application::where(['app_id' => $app_id])->first();
+
+    $parsed_json = json_decode($app->data, true);
+
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return [];
+    }
+
+    return $parsed_json;
+}
+
+/**
+ * Takes a array to save as JSON for the app.
+ *
+ * @params int $app_id
+ * @params array $data
+ * @return null
+ */
+function save_app_data($app_id, $data)
+{
+    if (is_null($app_id)) {
+        throw new JsonAppDataNoAppId;
+    }
+    if (is_null($data)) {
+        throw new JsonAppDataNoData;
+    }
+
+    $app = Application::where(['app_id' => $app_id])->first();
+
+    $app->fill(['data'=>json_encode($data)]);
+    $app->save();
 }
