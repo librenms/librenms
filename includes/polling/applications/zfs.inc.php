@@ -3,9 +3,12 @@
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
+use App\Models\Application;
 
 $name = 'zfs';
 $app_id = $app['app_id'];
+
+$app_data=get_app_data($app_id);
 
 // Is set to false later if missing keys are found.
 $not_legacy = 1;
@@ -176,42 +179,7 @@ foreach ($zfs['pools'] as $pool) {
     }
 }
 
-//
-// component processing for ZFS
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'zfs'],
-    ],
-];
-
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-// if no pools, delete zfs components
-if (empty($pools)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
-    }
-} else {
-    if (isset($components[$device_id])) {
-        $zfsc = $components[$device_id];
-    } else {
-        $zfsc = $component->createComponent($device_id, 'zfs');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($pools);
-
-    $id = $component->getFirstComponentID($zfsc);
-    $zfsc[$id]['label'] = 'ZFS';
-    $zfsc[$id]['pools'] = json_encode($pools);
-
-    $component->setComponentPrefs($device_id, $zfsc);
-}
+$app_data['pools']=$pools;
+save_app_data($app_id, $app_data);
 
 update_application($app, 'OK', $metrics);
