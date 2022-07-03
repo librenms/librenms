@@ -10,6 +10,10 @@ $app_id = $app['app_id'];
 
 $app_data=get_app_data($app_id);
 
+if (! is_array($app_data['pools'])) {
+    $app_data['pools']=[];
+}
+
 // Is set to false later if missing keys are found.
 $not_legacy = 1;
 
@@ -178,8 +182,50 @@ foreach ($zfs['pools'] as $pool) {
         $metrics['pool_' . $pool['name'] . '_' . $field] = $value;
     }
 }
+$old_pools=$app_data['pools'];
 
+// save thge found pools
 $app_data['pools']=$pools;
 save_app_data($app_id, $app_data);
+
+//check for added pools
+$added_pools=[];
+foreach ($pools as $pool_check) {
+    $pool_found=false;
+    foreach ($old_pools as $pool_check2) {
+        if ($pool_check == $pool_check2) {
+            $pool_found=true;
+        }
+    }
+    if (!$pool_found) {
+        $added_pools[]=$pool_check;
+    }
+}
+
+//check for removed pools
+$removed_pools=[];
+foreach ($old_pools as $pool_check) {
+    $pool_found=false;
+    foreach ($pools as $pool_check2) {
+        if ($pool_check == $pool_check2) {
+            $pool_found=true;
+        }
+    }
+    if (!$pool_found) {
+        $removed_pools[]=$pool_check;
+    }
+}
+
+// if we have any pool changes, log it
+if (isset($added_pools[0]) or isset($removed_pools[0])) {
+    $log_message='ZFS Pool Change:';
+    if (isset($added_pools[0])) {
+        $log_message=$log_message . ' Added'. json_encode($added_pools);
+    }
+    if (isset($removed_pools[0])) {
+        $log_message=$log_message . ' Removed'. json_encode($removed_pools);
+    }
+    log_event($log_message, $device, 'application');
+}
 
 update_application($app, 'OK', $metrics);
