@@ -1,6 +1,6 @@
 <?php
 
-$pools = get_zfs_pools($device['device_id']);
+$pools=get_app_data($app['app_id'])['pools'];
 
 $link_array = [
     'page'   => 'device',
