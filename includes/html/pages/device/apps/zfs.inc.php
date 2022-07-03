@@ -1,6 +1,6 @@
 <?php
 
-$pools=get_app_data($app['app_id'])['pools'];
+$pools = get_app_data($app['app_id'])['pools'];
 
 $link_array = [
     'page'   => 'device',
