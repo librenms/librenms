@@ -100,7 +100,7 @@ $metrics = [
     'trc_hits' => $data['trc_hits'],
     'trc_misses' => $data['trc_misses'],
     'tst_size' => $data['tst_size'],
-    'tst_res_size' => $data['tst_res_size']
+    'tst_res_size' => $data['tst_res_size'],
 ];
 
 $rrd_name = ['app', $name, $app_id];
@@ -188,7 +188,7 @@ $rrd_def = RrdDefinition::make()
 
 // skip logging initial set, only log changes
 if (isset($app_data['cluster'])) {
-    if ($app_data['cluster'] != $returned['data']['cluster_name']){
+    if ($app_data['cluster'] != $returned['data']['cluster_name']) {
         log_event('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device, 'application');
     }
 }
