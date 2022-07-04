@@ -2,6 +2,8 @@
 
 $pools = get_app_data($app['app_id'])['pools'];
 
+sort($pools);
+
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],

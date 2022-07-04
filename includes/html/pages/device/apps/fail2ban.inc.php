@@ -26,6 +26,8 @@ foreach ($graphs as $key => $text) {
 
 $jails = get_app_data($app['app_id'])['jails'];
 
+sort($jails);
+
 foreach ($jails as $jail) {
     $graph_type = 'fail2ban_jail';
     $graph_array['height'] = '100';

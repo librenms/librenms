@@ -2,6 +2,8 @@
 
 $sources = get_app_data($app['app_id'])['sources'];
 
+sort($sources);
+
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],

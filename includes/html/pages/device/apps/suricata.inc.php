@@ -2,6 +2,8 @@
 
 $suricata_instances = get_app_data($app['app_id'])['instances'];
 
+sort($suricata_instances);
+
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
