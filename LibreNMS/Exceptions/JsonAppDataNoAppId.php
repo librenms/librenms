@@ -4,6 +4,6 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppDataNoAppId extends Exception
+class JsonAppDataNoAppId extends \Exception
 {
 }
