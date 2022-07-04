@@ -14,7 +14,7 @@ class AddAppData extends Migration
     public function up()
     {
         Schema::table('applications', function (Blueprint $table) {
-            $table->json('data')->default('')->after('app_instance');
+            $table->json('data')->after('app_instance');
         });
     }
 
