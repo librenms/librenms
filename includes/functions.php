@@ -8,8 +8,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Device;
 use App\Models\Application;
+use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
