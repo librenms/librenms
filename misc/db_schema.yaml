@@ -171,7 +171,7 @@ applications:
     - { Field: app_status, Type: varchar(1024), 'Null': false, Extra: '' }
     - { Field: timestamp, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: app_instance, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: data, Type: longtext, 'Null': true, Extra: '' }
+    - { Field: data, Type: json, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [app_id], Unique: true, Type: BTREE }
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
