@@ -1076,33 +1076,6 @@ function get_oxidized_nodes_list()
 }
 
 /**
- * Get the fail2ban jails for a device... just requires the device ID
- * an empty return means either no jails or fail2ban is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_fail2ban_jails($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'fail2ban'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $f2bc = $component->getComponents($device_id, $options);
-
-    if (isset($f2bc[$device_id])) {
-        $id = $component->getFirstComponentID($f2bc, $device_id);
-
-        return json_decode($f2bc[$device_id][$id]['jails']);
-    }
-
-    return [];
-}
-
-/**
  * Get the Postgres databases for a device... just requires the device ID
  * an empty return means Postres is not in use
  *
@@ -1295,33 +1268,6 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
 
     return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
-}
-
-/**
- * Returns a list of the various suricata instances for
- * the specified device id.
- *
- * @param $device_id
- * @return array
- */
-function get_suricata_instances($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'suricata'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $ourc = $component->getComponents($device_id, $options);
-
-    if (isset($ourc[$device_id])) {
-        $id = $component->getFirstComponentID($ourc, $device_id);
-
-        return json_decode($ourc[$device_id][$id]['instances']);
-    }
-
-    return [];
 }
 
 /**
