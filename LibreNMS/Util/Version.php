@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    public const VERSION = '22.5.0';
+    public const VERSION = '22.6.0';
 
     /**
      * @var bool
@@ -71,7 +71,7 @@ class Version
     {
         if ($this->is_git_install) {
             $install_dir = base_path();
-            $version_process = new Process(['git', 'show', '-q', '--pretty=%H|%ct'], $install_dir);
+            $version_process = new Process(['git', 'show', '--no-patch', '--pretty=%H|%ct'], $install_dir);
             $version_process->run();
 
             // failed due to permissions issue

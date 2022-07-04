@@ -1,0 +1,170 @@
+
+-- ===========================================================================
+
+EXTREME-RTSTATS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, TimeTicks,
+                	Counter32 FROM SNMPv2-SMI
+                extremeAgent    FROM EXTREME-BASE-MIB;
+
+        extremeRtStats MODULE-IDENTITY
+                LAST-UPDATED "9906240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION 
+                        "Extreme real time stats related objects"
+        ::= { extremeAgent 11 }
+
+          extremeRtStatsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF ExtremeRtStatsEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "A list of real time stats entries."
+              ::= { extremeRtStats 1 }
+
+          extremeRtStatsEntry OBJECT-TYPE
+              SYNTAX ExtremeRtStatsEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "The last sample of Ethernet statistics on a
+                  particular Ethernet interface.  This sample is
+                  associated with the RMON historyControlEntry 
+		  which set up the parameters for a regular collection 
+		  of these samples."
+              INDEX { extremeRtStatsIndex }
+              ::= { extremeRtStatsTable 1 }
+
+          ExtremeRtStatsEntry ::= SEQUENCE {
+              extremeRtStatsIndex               INTEGER (1..65535),
+              extremeRtStatsIntervalStart       TimeTicks,
+              extremeRtStatsCRCAlignErrors      Counter32,
+              extremeRtStatsUndersizePkts       Counter32,
+              extremeRtStatsOversizePkts        Counter32,
+              extremeRtStatsFragments           Counter32,
+              extremeRtStatsJabbers             Counter32,
+              extremeRtStatsCollisions          Counter32,
+              extremeRtStatsTotalErrors         Counter32,
+              extremeRtStatsUtilization         INTEGER (0..10000)
+          }
+
+          extremeRtStatsIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The history of which this entry is a part.  The
+                  history identified by a particular value of this
+                  index is the same history as identified by the same 
+                  value of historyControlIndex of the RMON historyControl
+                  table."
+              ::= { extremeRtStatsEntry 1 }
+
+          extremeRtStatsIntervalStart OBJECT-TYPE
+              SYNTAX TimeTicks
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The value of sysUpTime at the start of the interval
+                  over which this sample was measured."
+              ::= { extremeRtStatsEntry 2 }
+
+          extremeRtStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The number of packets received during the last 
+		  sampling interval that had a length (excluding 
+		  framing bits but including FCS octets) between 64 
+		  and 1518 octets, inclusive, but had either a bad 
+		  Frame Check Sequence (FCS) with an integral number 
+		  of octets (FCS Error) or a bad FCS with a non-integral 
+		  number of octets (Alignment Error)."
+              ::= { extremeRtStatsEntry 3 }
+
+          extremeRtStatsUndersizePkts OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The number of packets received during the last
+                  sampling interval that were less than 64 octets
+                  long (excluding framing bits but including FCS
+                  octets) and were otherwise well formed."
+              ::= { extremeRtStatsEntry 4 }
+
+          extremeRtStatsOversizePkts OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The number of packets received during the 
+                  last sampling interval that were longer than 
+                  1518 octets (excluding framing bits but including
+                  FCS octets) but were otherwise well formed."
+              ::= { extremeRtStatsEntry 5 }
+
+          extremeRtStatsFragments OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of packets received during the
+                  last sampling interval that were less than 64 octets 
+                  in length (excluding framing bits but including FCS
+                  octets) had either a bad Frame Check Sequence (FCS)
+                  with an integral number of octets (FCS Error) or a bad
+                  FCS with a non-integral number of octets (Alignment
+                  Error)."
+              ::= { extremeRtStatsEntry 6 }
+
+          extremeRtStatsJabbers OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The number of packets received during the last
+                  sampling interval that were longer than 1518 octets
+                  (excluding framing bits but including FCS octets),
+                  and  had either a bad Frame Check Sequence (FCS)
+                  with an integral number of octets (FCS Error) or
+                  a bad FCS with a non-integral number of octets
+                  (Alignment Error)."
+              ::= { extremeRtStatsEntry 7 }
+
+          extremeRtStatsCollisions OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The best estimate of the total number of collisions
+                  on this Ethernet segment during this sampling
+                  interval."
+              ::= { extremeRtStatsEntry 8 }
+
+          extremeRtStatsTotalErrors OBJECT-TYPE
+              SYNTAX Counter32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The total number of errors on this Ethernet segment 
+                  during this sampling interval. This is the sum of the
+                  crc, fragments, jabbers and collisions counters over
+                  this sampling interval."
+              ::= { extremeRtStatsEntry 9 }
+
+          extremeRtStatsUtilization OBJECT-TYPE
+              SYNTAX INTEGER (0..10000)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "The best estimate of the mean physical layer
+                  network utilization on this interface during this
+                  sampling interval, in hundredths of a percent."
+              ::= { extremeRtStatsEntry 10 }
+
+
+END

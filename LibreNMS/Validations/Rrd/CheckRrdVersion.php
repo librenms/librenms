@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationFixer;
+use LibreNMS\Util\Version;
 use LibreNMS\ValidationResult;
 use Storage;
 
@@ -38,13 +39,15 @@ class CheckRrdVersion implements Validation, ValidationFixer
     public function validate(): ValidationResult
     {
         // Check that rrdtool config version is what we see
-        $rrd_version = '0.1'; //Version::get()->rrdtool();
-        if (version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
-            && version_compare(Config::get('rrdtool_version'), $rrd_version, '>')
+        $rrd_version = Version::get()->rrdtool();
+        $config_version = Config::get('rrdtool_version');
+
+        if (version_compare($config_version, '1.5.5', '<')
+            && version_compare($config_version, $rrd_version, '>')
         ) {
             return ValidationResult::fail(
-                trans('validation.validations.rrd.CheckRrdVersion.fail'),
-                trans('validation.validations.rrd.CheckRrdVersion.fix', ['version' => Config::get('rrdtool_version')])
+                trans('validation.validations.rrd.CheckRrdVersion.fail', ['config_version' => $config_version, 'installed_version' => $rrd_version]),
+                trans('validation.validations.rrd.CheckRrdVersion.fix', ['version' => $config_version])
             )->setFixer(__CLASS__, is_writable(base_path('config.php')));
         }
 

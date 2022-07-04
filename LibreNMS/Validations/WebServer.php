@@ -31,23 +31,31 @@ use LibreNMS\Validator;
 
 class WebServer extends BaseValidation
 {
+    /** @var string */
+    private $http_regex = '#(http://[^:/]+)(?::80)?/#';
+    /** @var string */
+    private $https_regex = '#(https://[^:/]+)(?::443)?/#';
+    /** @var string */
+    private $host_regex = '#://([^/:]+)#';
+
     /**
      * @inheritDoc
      */
     public function validate(Validator $validator): void
     {
         if (! app()->runningInConsole()) {
-            $url = request()->url();
-            $expected = Str::finish(Config::get('base_url'), '/') . 'validate/results';
+            $url = $this->removeStandardPorts(request()->url());
+            $expected = $this->removeStandardPorts(Str::finish(Config::get('base_url'), '/') . 'validate/results');
+
             if ($url !== $expected) {
-                preg_match('#://([^/]+)/#', $url, $actual_host_match);
-                preg_match('#://([^/]+)/#', $expected, $expected_host_match);
+                preg_match($this->host_regex, $url, $actual_host_match);
+                preg_match($this->host_regex, $expected, $expected_host_match);
                 $actual_host = $actual_host_match[1];
                 if ($actual_host != $expected_host_match[1]) {
                     $nginx = Str::startsWith(request()->server->get('SERVER_SOFTWARE'), 'nginx');
                     $server_name = $nginx ? 'server_name' : 'ServerName';
                     $fix = $nginx ? "server_name $actual_host;" : "ServerName $actual_host";
-                    $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config.", $fix);
+                    $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config. $actual_host $expected_host_match[1]", $fix);
                 } else {
                     $correct_base = str_replace('validate/results', '', $url);
                     $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");
@@ -59,5 +67,10 @@ class WebServer extends BaseValidation
     public function isDefault(): bool
     {
         return ! app()->runningInConsole();
+    }
+
+    private function removeStandardPorts(string $url): string
+    {
+        return preg_replace($this->http_regex, '$1/', preg_replace($this->https_regex, '$1/', $url));
     }
 }

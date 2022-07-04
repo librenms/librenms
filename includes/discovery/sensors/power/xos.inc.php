@@ -1,10 +1,10 @@
 <?php
 
-echo ' EXTREME-BASE-MIB ';
+echo ' EXTREME-SYSTEM-MIB ';
 // Power Usage
 $descr = 'Power Usage';
 $oid = '.1.3.6.1.4.1.1916.1.1.1.40.1.0'; // extremeSystemPowerUsage
-$value = snmp_get($device, $oid, '-Oqv', 'EXTREME-BASE-MIB');
+$value = snmp_get($device, $oid, '-Oqv', 'EXTREME-SYSTEM-MIB');
 $divisor = '1000';
 
 if (is_numeric($value)) {

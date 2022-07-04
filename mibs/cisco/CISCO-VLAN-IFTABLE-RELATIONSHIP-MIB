@@ -1,13 +1,12 @@
 -- *****************************************************************
--- CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB - show the VLAN-ID and 
---    ifIndex for routed VLANs (ISL subinterfaces, and SVIs)
---
+-- CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB - show the VLAN-ID and
+-- ifIndex for routed VLANs (ISL subinterfaces, and SVIs)
+--   
 -- January 1999, Cliff Sojourner
---
--- Copyright (c) 1999 by cisco Systems, Inc.
+--   
+-- Copyright (c) 1999, 2013 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
---
 
 CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB DEFINITIONS ::= BEGIN
 
@@ -15,50 +14,60 @@ IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE
         FROM SNMPv2-SMI
-    MODULE-COMPLIANCE, OBJECT-GROUP
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
         FROM SNMPv2-CONF
-    ciscoMgmt
-        FROM CISCO-SMI
-    InterfaceIndexOrZero
-        FROM CISCO-TC
     InterfaceIndex
         FROM IF-MIB
+    InterfaceIndexOrZero
+        FROM CISCO-TC
     VlanIndex
-        FROM CISCO-VTP-MIB;
+        FROM CISCO-VTP-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
 
 ciscoVlanIfTableRelationshipMIB MODULE-IDENTITY
-    LAST-UPDATED        "9904010530Z"
-    ORGANIZATION        "Cisco Systems, Inc."
+    LAST-UPDATED    "9904010530Z"
+    ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
-        "Cisco Systems
-        Customer Service
+            "Cisco Systems
+            Customer Service
 
-        Postal: 170 W Tasman Drive
-                San Jose, CA  95134
-                USA
+            Postal: 170 W Tasman Drive
+                    San Jose, CA  95134
+                    USA
 
-        Tel: +1 800 553-NETS
+            Tel: +1 800 553-NETS
 
-        E-mail: cs-snmp@cisco.com"
+            E-mail: cs-snmp@cisco.com"
     DESCRIPTION
-        "Cisco VLAN ifTable Relationship MIB lists VLAN-id and ifIndex 
-         information for routed VLAN interfaces.  
+        "Cisco VLAN ifTable Relationship MIB lists VLAN-id and ifIndex
+        information for routed VLAN interfaces.  
 
-         A routed VLAN interface is the router interface or sub-interface 
-         to which the router's IP address on the VLAN is attached.  
-         For example, an ISL, SDE, or 802.1Q encapsulated
-         subinterface, or Switched Virtual Interface (SVI)."
+        A routed VLAN interface is the router interface or sub-interface 
+        to which the router's IP address on the VLAN is attached.  
+        For example, an ISL, SDE, or 802.1Q encapsulated
+        subinterface, or Switched Virtual Interface (SVI)."
+    REVISION        "201307150000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { ciscoMgmt 128 }
 
-cviMIBObjects OBJECT IDENTIFIER ::=  { ciscoVlanIfTableRelationshipMIB 1 }
-cviGlobals    OBJECT IDENTIFIER ::=  { cviMIBObjects 1 }
+
+cviMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoVlanIfTableRelationshipMIB 1 }
+
+cviGlobals  OBJECT IDENTIFIER
+    ::= { cviMIBObjects 1 }
+
 
 cviVlanInterfaceIndexTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CviVlanInterfaceIndexEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CviVlanInterfaceIndexEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "The cviVlanInterfaceIndexTable provides a way to 
+        "The cviVlanInterfaceIndexTable provides a way to
         translate a VLAN-id in to an ifIndex, so that 
         the routed VLAN interface's routing configuration 
         can be obtained from interface entry in ipRouteTable.
@@ -73,16 +82,10 @@ cviVlanInterfaceIndexTable OBJECT-TYPE
         to find the VLAN-id from an ifTable VLAN's ifIndex."
     ::= { cviGlobals 1 }
 
-CviVlanInterfaceIndexEntry ::= SEQUENCE {
-    cviVlanId	        VlanIndex,
-    cviPhysicalIfIndex  InterfaceIndexOrZero,
-    cviRoutedVlanIfIndex      InterfaceIndex
-    } 
-
 cviVlanInterfaceIndexEntry OBJECT-TYPE
-    SYNTAX     CviVlanInterfaceIndexEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CviVlanInterfaceIndexEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "Each entry represents a routed VLAN interface, its
         corresponding physical port if any, and the ifTable entry
@@ -95,68 +98,81 @@ cviVlanInterfaceIndexEntry OBJECT-TYPE
 
         Entries are deleted by the agent when the routed VLAN interface
         is removed from the system configuration."
-    INDEX { cviVlanId, cviPhysicalIfIndex }
+    INDEX           {
+                        cviVlanId,
+                        cviPhysicalIfIndex
+                    } 
     ::= { cviVlanInterfaceIndexTable 1 }
 
-cviVlanId  OBJECT-TYPE
-    SYNTAX     VlanIndex
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION 
-        "The VLAN-id number of the routed VLAN interface."
+CviVlanInterfaceIndexEntry ::= SEQUENCE {
+        cviVlanId            VlanIndex,
+        cviPhysicalIfIndex   InterfaceIndexOrZero,
+        cviRoutedVlanIfIndex InterfaceIndex
+}
+
+cviVlanId OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The VLAN-id number of the routed VLAN interface." 
     ::= { cviVlanInterfaceIndexEntry 1 }
 
-cviPhysicalIfIndex  OBJECT-TYPE
-    SYNTAX     InterfaceIndexOrZero
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION 
-        "For subinterfaces, this object is the ifIndex of the 
+cviPhysicalIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndexOrZero
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "For subinterfaces, this object is the ifIndex of the
         physical interface for the subinterface.
-        
-        For Switch Virtual Interfaces (SVIs), this object is zero."
+
+        For Switch Virtual Interfaces (SVIs), this object is zero." 
     ::= { cviVlanInterfaceIndexEntry 2 }
 
 cviRoutedVlanIfIndex OBJECT-TYPE
-    SYNTAX     InterfaceIndex
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION 
-        "The index for the ifTable entry associated with 
-        this routed VLAN interface."
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The index for the ifTable entry associated with
+        this routed VLAN interface." 
     ::= { cviVlanInterfaceIndexEntry 3 }
+ 
+
+cviMIBConformance  OBJECT IDENTIFIER
+    ::= { cviMIBObjects 3 }
+
+cviMIBCompliances  OBJECT IDENTIFIER
+    ::= { cviMIBConformance 1 }
+
+cviMIBGroups  OBJECT IDENTIFIER
+    ::= { cviMIBConformance 2 }
 
 
-cviMIBConformance OBJECT IDENTIFIER ::= { cviMIBObjects 3 }
-cviMIBCompliances OBJECT IDENTIFIER ::= { cviMIBConformance 1 }
-cviMIBGroups      OBJECT IDENTIFIER ::= { cviMIBConformance 2 }
-
---
 -- Conformance
---
 
 cviMIBCompliance MODULE-COMPLIANCE
-    STATUS current
+    STATUS          current
     DESCRIPTION
         "The compliance statement for entities which implement
-         the CISCO-VLAN-INTERFACE-MIB"
-    MODULE        -- this module
-        MANDATORY-GROUPS { cviMIBGroup }
+        the CISCO-VLAN-INTERFACE-MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS { cviMIBGroup }
     ::= { cviMIBCompliances 1 }
 
---
 -- Units of Conformance
---
 
 cviMIBGroup OBJECT-GROUP
-    OBJECTS {
-        cviRoutedVlanIfIndex
-    }
-    STATUS current
+    OBJECTS         { cviRoutedVlanIfIndex }
+    STATUS          current
     DESCRIPTION
         "A set of objects to obtain VLAN-ID and ifIndex
-         information for routed VLAN interfaces."
+        information for routed VLAN interfaces."
     ::= { cviMIBGroups 1 }
 
 END
+
+
+
+
 

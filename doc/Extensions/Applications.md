@@ -1142,6 +1142,33 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Chronyd
+
+A shell script that gets the stats from chronyd and exports them with SNMP Extend.
+
+### SNMP Extend
+
+1. Download the shell script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chrony -O /etc/snmp/chrony
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/chrony
+```
+
+3. Edit the snmpd.conf file to include the extend by adding the following line to the end of the config file:
+```
+extend chronyd /etc/snmp/chrony
+```
+
+Note: Some distributions need sudo-permissions for the script to work with SNMP Extend. See the instructions on the section SUDO for more information.
+
+4. Restart snmpd service on the host
+
+Application should be auto-discovered and its stats presented on the Apps-page on the host. Note: Applications module needs to be enabled on the host or globally for the statistics to work as intended.
+
 ## Nvidia GPU
 
 ### SNMP Extend
@@ -2326,7 +2353,7 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify it's name as an argument into `/etc/snmp/ups-nut.sh`
+Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify its name as an argument into `/etc/snmp/ups-nut.sh`
 ```
 extend ups-nut /etc/snmp/ups-nut.sh ups1
 extend ups-nut /etc/snmp/ups-nut.sh ups2
