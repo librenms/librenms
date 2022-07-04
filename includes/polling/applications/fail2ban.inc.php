@@ -13,7 +13,6 @@ if (! is_array($app_data['jails'])) {
     $app_data['jails'] = [];
 }
 
-
 try {
     $f2b = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {
@@ -55,7 +54,7 @@ $fields['firewalled'] = 'U'; // legacy ds
 $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-$jails=[];
+$jails = [];
 foreach ($f2b['jails'] as $jail => $banned) {
     $rrd_name = ['app', $name, $app_id, $jail];
     $rrd_def = RrdDefinition::make()->addDataset('banned', 'GAUGE', 0);
@@ -65,10 +64,9 @@ foreach ($f2b['jails'] as $jail => $banned) {
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
-    $jails[]=$jail;
+    $jails[] = $jail;
 }
 $old_jails = $app_data['jails'];
-
 
 // save thge found jails
 $app_data['jails'] = $jails;
@@ -114,6 +112,4 @@ if (isset($added_jails[0]) or isset($removed_jails[0])) {
     log_event($log_message, $device, 'application');
 }
 
-
 update_application($app, 'ok', $metrics);
-
