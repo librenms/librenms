@@ -6,6 +6,12 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'chronyd';
 $app_id = $app['app_id'];
 
+$app_data = get_app_data($app_id);
+
+if (! is_array($app_data['sources'])) {
+    $app_data['sources'] = [];
+}
+
 try {
     $chronyd = json_app_get($device, $name, 1)['data'];
 } catch (JsonAppException $e) {
@@ -95,43 +101,50 @@ foreach ($chronyd['sources'] as $source) {
         $metrics['source_' . $source['source_name'] . '_' . $field] = $value;
     }
 }
+$old_sources = $app_data['sources'];
 
-//
-// component processing for Chrony
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'chronyd'],
-    ],
-];
+// save thge found sources
+$app_data['sources'] = $sources;
+save_app_data($app_id, $app_data);
 
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-// if no sources, delete chrony components
-if (empty($sources)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
+//check for added sources
+$added_sources = [];
+foreach ($sources as $source_check) {
+    $source_found = false;
+    foreach ($old_sources as $source_check2) {
+        if ($source_check == $source_check2) {
+            $source_found = true;
         }
     }
-} else {
-    if (isset($components[$device_id])) {
-        $chrony_cpnt = $components[$device_id];
-    } else {
-        $chrony_cpnt = $component->createComponent($device_id, 'chronyd');
+    if (! $source_found) {
+        $added_sources[] = $source_check;
     }
+}
 
-    // Make sure we don't readd it, just in a different order.
-    sort($sources);
+//check for removed sources
+$removed_sources = [];
+foreach ($old_sources as $source_check) {
+    $source_found = false;
+    foreach ($sources as $source_check2) {
+        if ($source_check == $source_check2) {
+            $source_found = true;
+        }
+    }
+    if (! $source_found) {
+        $removed_sources[] = $source_check;
+    }
+}
 
-    $id = $component->getFirstComponentID($chrony_cpnt);
-    $chrony_cpnt[$id]['label'] = 'Chrony';
-    $chrony_cpnt[$id]['sources'] = json_encode($sources);
-
-    $component->setComponentPrefs($device_id, $chrony_cpnt);
+// if we have any source changes, log it
+if (isset($added_sources[0]) or isset($removed_sources[0])) {
+    $log_message = 'Chronyd Source Change:';
+    if (isset($added_sources[0])) {
+        $log_message = $log_message . ' Added' . json_encode($added_sources);
+    }
+    if (isset($removed_sources[0])) {
+        $log_message = $log_message . ' Removed' . json_encode($removed_sources);
+    }
+    log_event($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', $metrics);

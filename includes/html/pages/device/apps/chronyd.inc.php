@@ -1,6 +1,6 @@
 <?php
 
-$sources = get_chrony_sources($device['device_id']);
+$sources = get_app_data($app['app_id'])['sources'];
 
 $link_array = [
     'page'   => 'device',
