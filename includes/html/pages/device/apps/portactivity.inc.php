@@ -1,6 +1,6 @@
 <?php
 
-$ports = get_portactivity_ports($device['device_id']);
+$ports = get_app_data($app['app_id'])['ports'];
 
 sort($ports);
 

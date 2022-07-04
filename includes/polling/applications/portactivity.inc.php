@@ -6,6 +6,12 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'portactivity';
 $app_id = $app['app_id'];
 
+$app_data = get_app_data($app_id);
+
+if (! is_array($app_data['ports'])) {
+    $app_data['ports'] = [];
+}
+
 try {
     $returned = json_app_get($device, 'portactivity', 1);
 } catch (JsonAppException $e) { // Only doing the generic one as this has no non-JSON return
@@ -118,44 +124,52 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
 
     $ports_keys_int++;
 }
+$old_ports = $app_data['ports'];
 
-//
-// component processing for portsactivity
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'portsactivity'],
-    ],
-];
+// save thge found ports
+$app_data['ports'] = $ports_keys;
+save_app_data($app_id, $app_data);
 
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-//delete portsactivity component if nothing is found
-if (empty($ports_keys)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
+//check for added ports
+$added_ports = [];
+foreach ($ports_keys as $port_check) {
+    $port_found = false;
+    foreach ($old_ports as $port_check2) {
+        if ($port_check == $port_check2) {
+            $port_found = true;
         }
     }
-    //add portsactivity component if found
-} else {
-    if (isset($components[$device_id])) {
-        $portsc = $components[$device_id];
-    } else {
-        $portsc = $component->createComponent($device_id, 'portsactivity');
+    if (! $port_found) {
+        $added_ports[] = $port_check;
     }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($ports_keys);
-
-    $id = $component->getFirstComponentID($portsc);
-    $portsc[$id]['label'] = 'Portsactivity';
-    $portsc[$id]['ports'] = json_encode($ports_keys);
-
-    $component->setComponentPrefs($device_id, $portsc);
 }
+
+//check for removed ports
+$removed_ports = [];
+foreach ($old_ports as $port_check) {
+    $port_found = false;
+    foreach ($ports_keys as $port_check2) {
+        if ($port_check == $port_check2) {
+            $port_found = true;
+        }
+    }
+    if (! $port_found) {
+        $removed_ports[] = $port_check;
+    }
+}
+
+// if we have any port changes, log it
+if (isset($added_ports[0]) or isset($removed_ports[0])) {
+    $log_message = 'ZFS port Change:';
+    if (isset($added_ports[0])) {
+        $log_message = $log_message . ' Added' . json_encode($added_ports);
+    }
+    if (isset($removed_ports[0])) {
+        $log_message = $log_message . ' Removed' . json_encode($removed_ports);
+    }
+    log_event($log_message, $device, 'application');
+}
+
+
 
 update_application($app, 'OK', data_flatten($ports));

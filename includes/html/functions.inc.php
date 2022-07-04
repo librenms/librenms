@@ -1121,33 +1121,6 @@ function parse_at_time($time)
 }
 
 /**
- * Get the ports for a device... just requires the device ID
- * an empty return means portsactivity is not in use or there are currently no ports
- *
- * @param $device_id
- * @return array
- */
-function get_portactivity_ports($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'portsactivity'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $portsc = $component->getComponents($device_id, $options);
-
-    if (isset($portsc[$device_id])) {
-        $id = $component->getFirstComponentID($portsc, $device_id);
-
-        return json_decode($portsc[$device_id][$id]['ports']);
-    }
-
-    return [];
-}
-
-/**
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
