@@ -1,6 +1,6 @@
 <?php
 
-$suricata_instances = get_app_data($app['app_id'])['instances'];;
+$suricata_instances = get_app_data($app['app_id'])['instances'];
 
 $link_array = [
     'page'   => 'device',
