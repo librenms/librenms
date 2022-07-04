@@ -8,7 +8,7 @@ $app_id = $app['app_id'];
 
 $app_data = get_app_data($app_id);
 
-if (! is_array($app_data['instance'])) {
+if (! is_array($app_data['instances'])) {
     $app_data['instances'] = [];
 }
 
