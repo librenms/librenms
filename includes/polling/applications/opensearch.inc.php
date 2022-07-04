@@ -6,6 +6,8 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'opensearch';
 $app_id = $app['app_id'];
 
+$app_data = get_app_data($app_id);
+
 try {
     $returned = json_app_get($device, 'opensearch');
 } catch (JsonAppException $e) {
@@ -98,7 +100,7 @@ $metrics = [
     'trc_hits' => $data['trc_hits'],
     'trc_misses' => $data['trc_misses'],
     'tst_size' => $data['tst_size'],
-    'tst_res_size' => $data['tst_res_size'],
+    'tst_res_size' => $data['tst_res_size']
 ];
 
 $rrd_name = ['app', $name, $app_id];
@@ -184,35 +186,21 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tst_size', 'GAUGE', 0)
     ->addDataset('tst_res_size', 'GAUGE', 0);
 
+// skip logging initial set, only log changes
+if (isset($app_data['cluster'])) {
+    if ($app_data['cluster'] != $returned['data']['cluster_name']){
+        log_event('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device, 'application');
+    }
+}
+
 $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
 
+// save thge found cluster name
+$app_data['cluster'] = $returned['data']['cluster_name'];
+save_app_data($app_id, $app_data);
+
 //
-// mostly done so update the app metrics
+// update the app metrics
 //
 update_application($app, 'OK', $metrics);
-
-//
-// component processing
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', $name],
-    ],
-];
-
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-if (isset($components[$device_id])) {
-    $ourc = $components[$device_id];
-} else {
-    $ourc = $component->createComponent($device_id, $name);
-}
-
-$id = $component->getFirstComponentID($ourc);
-$ourc[$id]['label'] = 'Opensearch';
-$ourc[$id]['cluster'] = $returned['data']['cluster_name'];
-$component->setComponentPrefs($device_id, $ourc);
