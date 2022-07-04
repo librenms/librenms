@@ -170,6 +170,4 @@ if (isset($added_ports[0]) or isset($removed_ports[0])) {
     log_event($log_message, $device, 'application');
 }
 
-
-
 update_application($app, 'OK', data_flatten($ports));
