@@ -97,7 +97,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckColumnCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' OR COLLATION_NAME != 'utf8mb4_bin' );"));
         $error = '';
         foreach ($collation as $data) {
             $error .= implode(' ', (array) $data) . PHP_EOL;
