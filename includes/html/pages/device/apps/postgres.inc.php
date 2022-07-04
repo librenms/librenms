@@ -1,6 +1,6 @@
 <?php
 
-$databases = get_postgres_databases($device['device_id']);
+$databases = get_app_data($app['app_id'])['databases'];
 
 $link_array = [
     'page'   => 'device',
