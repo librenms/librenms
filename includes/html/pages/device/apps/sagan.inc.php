@@ -1,6 +1,8 @@
 <?php
 
-$sagan_instances = get_sagan_instances($device['device_id']);
+$sagan_instances = get_app_data($app['app_id'])['instances'];
+
+sort($sagan_instances);
 
 $link_array = [
     'page'   => 'device',
