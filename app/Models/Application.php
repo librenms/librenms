@@ -46,7 +46,7 @@ class Application extends DeviceRelatedModel
     /**
      * Data scratch space for the app.
      *
-     * @var array
+     * @var string
      */
     protected $fillable = ['data'];
 
