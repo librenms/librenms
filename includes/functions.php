@@ -1496,6 +1496,7 @@ function describe_bgp_error_code($code, $subcode)
  * If none is present or it is bad, a blank array is returned.
  *
  * @params int $app_id
+ *
  * @return array
  */
 function get_app_data($app_id)
@@ -1520,6 +1521,7 @@ function get_app_data($app_id)
  *
  * @params int $app_id
  * @params array $data
+ *
  * @return null
  */
 function save_app_data($app_id, $data)
