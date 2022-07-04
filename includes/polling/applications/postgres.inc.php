@@ -5,6 +5,12 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'postgres';
 $app_id = $app['app_id'];
 
+$app_data = get_app_data($app_id);
+
+if (! is_array($app_data['databases'])) {
+    $app_data['databases'] = [];
+}
+
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
 $postgres = snmp_walk($device, $oid, $options);
@@ -61,7 +67,7 @@ data_update($device, 'app', $tags, $fields);
 //process each database
 $db_lines = explode("\n", $postgres);
 $db_lines_int = 17;
-$found_dbs = [];
+$databases = [];
 
 while (isset($db_lines[$db_lines_int])) {
     [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
@@ -69,7 +75,7 @@ while (isset($db_lines[$db_lines_int])) {
 
     $rrd_name = ['app', $name, $app_id, $dbname];
 
-    $found_dbs[] = $dbname;
+    $databases[] = $dbname;
 
     $fields = [
         'backends' => $backends,
@@ -97,42 +103,50 @@ while (isset($db_lines[$db_lines_int])) {
 
     $db_lines_int++;
 }
-update_application($app, $postgres, $metrics);
+$old_databases = $app_data['databases'];
 
-//
-// component processing for postgres
-//
-$device_id = $device['device_id'];
+// save thge found databases
+$app_data['databases'] = $databases;
+save_app_data($app_id, $app_data);
 
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'postgres'],
-    ],
-];
-
-$component = new LibreNMS\Component();
-$pg_components = $component->getComponents($device_id, $options);
-
-if (empty($found_dbs)) {
-    if (isset($pg_components[$device_id])) {
-        foreach ($pg_components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
+//check for added databases
+$added_databases = [];
+foreach ($databases as $database_check) {
+    $database_found = false;
+    foreach ($old_databases as $database_check2) {
+        if ($database_check == $database_check2) {
+            $database_found = true;
         }
     }
-} else {
-    if (isset($pg_components[$device_id])) {
-        $pgc = $pg_components[$device_id];
-    } else {
-        $pgc = $component->createComponent($device_id, 'postgres');
+    if (! $database_found) {
+        $added_databases[] = $database_check;
     }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($found_dbs);
-
-    $id = $component->getFirstComponentID($pgc);
-    $pgc[$id]['label'] = 'Postgres';
-    $pgc[$id]['databases'] = json_encode($found_dbs);
-
-    $component->setComponentPrefs($device_id, $pgc);
 }
+
+//check for removed databases
+$removed_databases = [];
+foreach ($old_databases as $database_check) {
+    $database_found = false;
+    foreach ($databases as $database_check2) {
+        if ($database_check == $database_check2) {
+            $database_found = true;
+        }
+    }
+    if (! $database_found) {
+        $removed_databases[] = $database_check;
+    }
+}
+
+// if we have any database changes, log it
+if (isset($added_databases[0]) or isset($removed_databases[0])) {
+    $log_message = 'Postgres Database Change:';
+    if (isset($added_databases[0])) {
+        $log_message = $log_message . ' Added' . json_encode($added_databases);
+    }
+    if (isset($removed_databases[0])) {
+        $log_message = $log_message . ' Removed' . json_encode($removed_databases);
+    }
+    log_event($log_message, $device, 'application');
+}
+
+update_application($app, $postgres, $metrics);
