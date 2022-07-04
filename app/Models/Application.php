@@ -43,6 +43,13 @@ class Application extends DeviceRelatedModel
      */
     protected $primaryKey = 'app_id';
 
+    /**
+     * Data scratch space for the app.
+     *
+     * @var array
+     */
+    protected $fillable = ['data'];
+
     // ---- Helper Functions ----
 
     public function displayName()
