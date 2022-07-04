@@ -14,7 +14,7 @@ class AddAppData extends Migration
     public function up()
     {
         Schema::table('applications', function (Blueprint $table) {
-            $table->json('data')->after('app_instance')->nullable()->collate('utf8mb4_unicode_ci');
+            $table->json('data')->collate('utf8mb4_unicode_ci')->after('app_instance')->nullable();
         });
     }
 
