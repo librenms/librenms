@@ -9,6 +9,7 @@
  */
 
 use App\Models\Device;
+use App\Models\Application;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
