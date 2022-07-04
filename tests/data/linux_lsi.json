@@ -4121,7 +4121,8 @@
                     "discovered": 1,
                     "app_state_prev": null,
                     "app_status": "",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ]
         },
@@ -4133,7 +4134,8 @@
                     "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ]
         }
