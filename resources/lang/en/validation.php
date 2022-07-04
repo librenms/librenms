@@ -164,7 +164,7 @@ return [
         'fix' => 'Fix',
         'fixed' => 'Fix has completed, refresh to re-run validations.',
         'fetch_failed' => 'Failed to fetch validation results',
-        'backend_failed' => 'Failed to load data from backend, check webserver.',
+        'backend_failed' => 'Failed to load data from backend, check console for error.',
         'invalid_fixer' => 'Invalid Fixer',
         'show_all' => 'Show all',
         'show_less' => 'Show less',
@@ -174,7 +174,7 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'The rrdtool version you have specified is newer than what is installed.',
+                'fail' => 'The rrdtool version you have specified is newer than what is installed. Config: :config_version Installed :installed_version',
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],

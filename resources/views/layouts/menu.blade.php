@@ -159,11 +159,6 @@
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
                         </li>
-                        @config('poller_modules.mib')
-                            <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('mibs') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                           aria-hidden="true"></i> {{ __('MIB definitions') }}</a></li>
-                        @endconfig
                     </ul>
                 </li>
 {{-- Devices --}}

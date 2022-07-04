@@ -1,0 +1,207 @@
+--/* 
+-- *
+-- * Copyright (c) 1997 - 2002 by Extreme Networks Inc.
+-- * 
+-- *	  Extreme Networks
+-- *      http://www.extremenetworks.com
+-- *
+-- * extracted from $Extreme_Id: extreme.mib,v 1.24.6.35 2006/01/09 15:15:18 build-sc Exp $
+-- *
+-- */
+
+
+-- << end >>
+
+-- ============================================================================
+--
+-- Extreme Traps
+--
+
+EXTREME-TRAP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        extremenetworks, extremeV1Traps		FROM EXTREME-BASE-MIB
+		extremeSlotNumber		FROM EXTREME-SYSTEM-MIB
+		extremeSlotModuleConfiguredType	FROM EXTREME-SYSTEM-MIB
+		extremeSlotModuleInsertedType	FROM EXTREME-SYSTEM-MIB
+		extremeSlotModuleState		FROM EXTREME-SYSTEM-MIB
+        extremePowerSupplyNumber, extremeFanNumber
+					 	FROM EXTREME-SYSTEM-MIB	
+		extremeCurrentTemperature	FROM EXTREME-SYSTEM-MIB	
+        extremeEsrpGroup, extremeEsrpState,
+		extremeEsrpNetAddress  FROM EXTREME-ESRP-MIB
+        extremeEsrpActivePorts, extremeEsrpInternalActivePorts
+						FROM EXTREME-ESRP-MIB
+        extremeEsrpTrackedActivePorts, extremeEsrpTrackedIpRoutes
+						FROM EXTREME-ESRP-MIB
+        extremeVlanIfIndex, extremeVlanIfDescr FROM EXTREME-VLAN-MIB
+		extremeEdpPortIfIndex, extremeEdpNeighborId,
+		extremeEdpEntryAge, extremeEdpNeighborVlanName,
+		extremeEdpNeighborVlanIpAddress	       FROM EXTREME-EDP-MIB
+		sysUpTime, sysDescr, ifPhysAddress,
+                ifDescr                                FROM RFC1213-MIB
+                ifAlias                                FROM IF-MIB
+                NOTIFICATION-TYPE		       FROM SNMPv2-SMI;
+
+          extremeOverheat NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr, extremeCurrentTemperature }
+	      STATUS current
+              DESCRIPTION
+                          "A overheat trap indicates that the on board
+                          tempature sensor has reported a overheat 
+                          condition.  System will shutdown until unit has
+			  suficiently cooled such that operation may begin
+                          again.  A cold start trap will be issued when
+                          the unit has come back on line."
+              ::= {extremeV1Traps 6} 
+
+          extremeFanfailed NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr, extremeFanNumber }
+	      STATUS current
+              DESCRIPTION
+                          "A fan failed trap indicates one or more of the
+                          cooling fans inside the device has failed.  A
+                          fanOK trap will be sent once the fan has attained
+                          normal operation."
+              ::= {extremeV1Traps 7}
+
+          extremeFanOK NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr, extremeFanNumber }
+	      STATUS current
+              DESCRIPTION
+                          "A fan has transitioned out of a failure state and
+                          is now operating correctly."
+              ::= {extremeV1Traps 8} 
+
+          extremeInvalidLoginAttempt NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr }
+	      STATUS current
+              DESCRIPTION
+                "A user attempted to login to console or by telnet but was
+                 refused access due to incorrect username or password"
+              ::= {extremeV1Traps 9} 
+
+          extremePowerSupplyFail NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr, extremePowerSupplyNumber }
+	      STATUS current
+              DESCRIPTION
+                "One or more sources of power to this agent has failed.
+                 Presumably a redundant power-supply has taken over."
+              ::= {extremeV1Traps 10} 
+
+          extremePowerSupplyGood NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr, extremePowerSupplyNumber }
+	      STATUS current
+              DESCRIPTION
+                 "One or more previously bad sources of power to this agent 
+                 has come back to life without causing an agent restart."
+              ::= {extremeV1Traps 11} 
+
+          extremeRpsAlarm NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr }
+	      STATUS current
+              DESCRIPTION
+                          "Attached Redundant Power Supply device is indicating
+                           an alarm condition."
+              ::= {extremeV1Traps 12} 
+
+          extremeRpsNoAlarm NOTIFICATION-TYPE
+              OBJECTS   { sysUpTime, sysDescr }
+	      STATUS current
+              DESCRIPTION
+                          "Attached Redundant Power Supply device is no longer
+                           indicating an alarm condition."
+              ::= {extremeV1Traps 13} 
+
+--
+-- SmartTrap definition
+--
+        extremeSmartTrap NOTIFICATION-TYPE
+                OBJECTS   { sysUpTime, sysDescr }
+	        STATUS current
+        	DESCRIPTION
+                "Signifies that the value of one of the object identifiers 
+                (or the value of an object below that in the MIB tree) 
+                defined in the extremeSmartTrapRulesTable has changed, 
+                and hence a new entry has been created in the 
+                extremeSmartTrapInstanceTable. Such a trap is sent 
+                at most once every thirty seconds if one or more entry 
+                was created in the last thirty seconds." 
+              ::= {extremeV1Traps 14} 
+
+--
+-- Traps for Black Diamond
+--
+	extremeModuleStateChanged NOTIFICATION-TYPE
+		OBJECTS { sysUpTime, extremeSlotNumber, 
+                            extremeSlotModuleConfiguredType, 
+                            extremeSlotModuleInsertedType, 
+                            extremeSlotModuleState }
+	        STATUS current
+		DESCRIPTION
+		"Signifies that the value of the extremeSlotModuleState for 
+		the specified extremeSlotNumber has changed."
+              ::= {extremeV1Traps 15} 
+
+--	extremeModuleOverheat TRAP-TYPE
+--		ENTERPRISE  extremenetworks
+--		VARIABLES {sysUpTime, extremeSlotNumber }
+--		DESCRIPTION
+--		"Signifies that the temperature sensor on the module 
+--		inside this slot has reported an Overheat condition."
+--	::= 16
+
+	extremeEsrpStateChange NOTIFICATION-TYPE
+        	OBJECTS {sysUpTime, sysDescr, extremeVlanIfIndex,
+			extremeVlanIfDescr, extremeEsrpGroup, extremeEsrpState,
+			extremeEsrpNetAddress, ifPhysAddress,
+                        extremeEsrpActivePorts, extremeEsrpInternalActivePorts,
+                        extremeEsrpTrackedActivePorts, extremeEsrpTrackedIpRoutes
+                }
+		STATUS current
+        DESCRIPTION
+        "Signifies Esrp state change"
+        ::= {extremeV1Traps 17}
+
+        extremeSlbUnitAdded NOTIFICATION-TYPE
+		STATUS current
+                DESCRIPTION
+                "The server load balancer has activated a group of virtual
+                servers that it normally would not activate.  This may be
+                due to the failure of another server load balancer."
+                
+        ::= {extremeV1Traps 18}
+
+        extremeSlbUnitRemoved NOTIFICATION-TYPE
+		STATUS current
+                DESCRIPTION
+                "The server load balancer has deactivated a group of virtual
+                servers that it normally has active.  This indicates that
+                something is wrong in the server load balancer; for example,
+                its ping check may be failing."
+        ::= {extremeV1Traps 19}
+
+	extremeEdpNeighborAdded NOTIFICATION-TYPE
+        	OBJECTS {sysUpTime, extremeEdpPortIfIndex,
+			extremeEdpNeighborId, extremeEdpEntryAge,
+			ifAlias, ifDescr
+                }
+	STATUS current
+        DESCRIPTION
+        "This node discovers a new neighbor through Extreme Discovery
+	 Protocol."
+        ::= {extremeV1Traps 20}
+
+	extremeEdpNeighborRemoved NOTIFICATION-TYPE
+        	OBJECTS {sysUpTime, extremeEdpPortIfIndex,
+			extremeEdpNeighborId, extremeEdpEntryAge,
+			ifAlias, ifDescr
+                }
+	STATUS current
+        DESCRIPTION
+        "No EDP updates are received from this neighbor within
+	the configured timeout period and this neighbor entry is aged
+	out by the device."
+        ::= {extremeV1Traps 21}
+        
+END

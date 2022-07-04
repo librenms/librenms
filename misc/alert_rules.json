@@ -542,5 +542,15 @@
     "rule": "applications.app_type = \"opensearch\" && application_metrics.metric = \".status\" && application_metrics.value = \"2\"",
     "name": "Opensearch/Elasticsearch Cluster Status Red",
     "severity": "critical"
+  },
+  {
+    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 90 AND storage.storage_perc < 95",
+    "name": "Space on / is >= 90% and < 95% in use",
+    "severity":"warning"
+  },
+  {
+    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
+    "name": "Space on / is >= 95% in use",
+    "severity":"critical"
   }
 ]

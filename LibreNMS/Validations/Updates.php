@@ -35,6 +35,7 @@ use LibreNMS\Util\Git;
 use LibreNMS\Util\Version;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
+use Symfony\Component\Process\Process;
 
 class Updates extends BaseValidation
 {
@@ -64,16 +65,24 @@ class Updates extends BaseValidation
             $local_ver = Version::get()->localCommit();
             $remote_ver = Version::get()->remoteCommit();
             if ($local_ver['sha'] != ($remote_ver['sha'] ?? null)) {
-                try {
-                    $commit_date = new DateTime('@' . $local_ver['date'], new DateTimeZone(date_default_timezone_get()));
-                    if ($commit_date->diff(new DateTime())->days > 0) {
-                        $validator->warn(
-                            'Your install is over 24 hours out of date, last update: ' . $commit_date->format('r'),
-                            'Make sure your daily.sh cron is running and run ./daily.sh by hand to see if there are any errors.'
-                        );
+                if (empty($local_ver['date'])) {
+                    $process = new Process(['git', 'show', '-q', '--pretty=%H|%ct'], base_path());
+                    $process->run();
+                    $error = rtrim($process->getErrorOutput());
+
+                    $validator->fail('Failed to fetch version from local git: ' . $error);
+                } else {
+                    try {
+                        $commit_date = new DateTime('@' . $local_ver['date'], new DateTimeZone(date_default_timezone_get()));
+                        if ($commit_date->diff(new DateTime())->days > 0) {
+                            $validator->warn(
+                                'Your install is over 24 hours out of date, last update: ' . $commit_date->format('r'),
+                                'Make sure your daily.sh cron is running and run ./daily.sh by hand to see if there are any errors.'
+                            );
+                        }
+                    } catch (Exception $e) {
+                        $validator->fail($e->getMessage());
                     }
-                } catch (Exception $e) {
-                    $validator->fail($e->getMessage());
                 }
             }
 
