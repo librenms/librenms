@@ -24,7 +24,7 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-$jails = get_fail2ban_jails($device['device_id']);
+$jails = get_app_data($app['app_id'])['jails'];
 
 foreach ($jails as $jail) {
     $graph_type = 'fail2ban_jail';
