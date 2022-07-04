@@ -29,25 +29,8 @@ use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'app_id';
-
-    /**
-     * Data scratch space for the app.
-     *
-     * @var string
-     */
     protected $fillable = ['data'];
 
     // ---- Helper Functions ----
