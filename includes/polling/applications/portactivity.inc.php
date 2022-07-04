@@ -160,7 +160,7 @@ foreach ($old_ports as $port_check) {
 
 // if we have any port changes, log it
 if (isset($added_ports[0]) or isset($removed_ports[0])) {
-    $log_message = 'ZFS port Change:';
+    $log_message = 'Portactivity Port Change:';
     if (isset($added_ports[0])) {
         $log_message = $log_message . ' Added' . json_encode($added_ports);
     }
