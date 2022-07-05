@@ -10,6 +10,11 @@ $app_id = $app['app_id'];
 
 $app_data = get_app_data($app_id);
 
+$old_checks=[];
+if (isset($app_data['data']) and isset($app_data['data']['checks']){
+	$old_checks = array_keys($app_data['data']['checks']);
+}
+
 if (Config::has('apps.sneck.polling_time_diff')) {
     $compute_time_diff = Config::get('apps.sneck.polling_time_diff');
 } else {
@@ -24,6 +29,11 @@ try {
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
 
     return;
+}
+
+$new_checks=[];
+if (isset($json_return['data']) and isset($json_return['data']['checks']){
+	$new_checks = array_keys($json_return['data']['checks']);
 }
 
 $rrd_name = ['app', $name, $app_id];
@@ -71,6 +81,20 @@ if (abs($time_to_polling) > 540) {
 
 // save the returned data
 save_app_data($app_id, $json_return);
+
+//check for added checks
+$added_checks = array_values(array_diff($new_checks, $old_checks));
+
+//check for removed checks
+$removed_checks = array_values(array_diff($old_checks, $new_checks));
+
+// if we have any check changes, log it
+if (sizeof($added_checks) > 0 or sizeof($removed_checks) > 0) {
+    $log_message = 'Sneck Check Change:';
+    $log_message .= count($added_checks) > 0 ? ' Added ' . json_encode($added_checks) : '';
+    $log_message .= count($removed_checks) > 0 ? ' Removed ' . json_encode($added_checks) : '';
+    log_event($log_message, $device, 'application');
+}
 
 // update it here as we are done with this mostly
 update_application($app, 'OK', $fields);
