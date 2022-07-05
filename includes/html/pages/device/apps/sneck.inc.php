@@ -40,10 +40,10 @@ foreach ($graphs as $key => $text) {
 }
 
 // print any alerts if found
-$sneck_data = get_sneck_data($device['device_id']);
+$sneck_data = get_app_data($app['app_id']);
 if (isset($sneck_data)) {
     print_optionbar_start();
-    echo 'Information From The Last Saved Alert State...<br>';
+    echo 'Last Return...<br>';
     echo "<b>Alert(s):</b><br>\n";
     echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>\n";
     echo "<b>Raw JSON:</b><br>\n";
