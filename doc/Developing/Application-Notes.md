@@ -1,0 +1,87 @@
+# Notes On Application Development
+
+## LibreNMS JSON SNMP Extends
+
+The polling funtion `json_app_get` makes it easy to poll complex data
+using SNMP extends and JSON.
+
+The following exceptions are provided by it.
+
+It takes three paramters, in order in the list below.
+
+- Integer :: Device ID to fetch it for.
+- String :: The extend name. For example, if 'zfs' is passed it will
+  be converted to 'nsExtendOutputFull.3.122.102.115'.
+- Integer :: Minium expected version of the JSON return.
+
+The required keys for the returned JSON are as below.
+
+- version :: The version of the snmp extend script. Should be numeric
+  and at least 1.
+- error :: Error code from the snmp extend script. Should be > 0
+   (0 will be ignored and negatives are reserved)
+- errorString :: Text to describe the error.
+- data :: An key with an array with the data to be used.
+
+The supported exceptions are as below.
+
+- JsonAppPollingFailedException :: Empty return from SNMP.
+- JsonAppParsingFailedException :: Could not parse the JSON
+- JsonAppBlankJsonException :: Blank JSON.
+- JsonAppMissingKeysException :: Missing required keys.
+- JsonAppWrongVersionException :: Older version than supported.
+- JsonAppExtendErroredException :: Polling and parsing was good, but
+  the returned data has an error set. This may be checked via
+  $e->getParsedJson() and then checking the keys error and
+  errorString.
+
+The error value can be accessed via $e->getCode(). The output can be
+accessed via $->getOutput() Only returned
+JsonAppParsingFailedException. The parsed JSON can be access via
+$e->getParsedJson().
+
+An example below from `includes/polling/applications/zfs.inc.php`...
+
+```php
+try {
+    $zfs = json_app_get($device, $name, 1)['data'];
+} catch (JsonAppMissingKeysException $e) {
+    //old version with out the data key
+    $zfs = $e->getParsedJson();
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
+
+    return;
+}
+```
+
+## Application Data Storage
+
+### Storing Data
+
+Relevant data may be stored using the data column of the applications
+table using the function `get_app_data`.
+
+- Integer :: App ID of the application in question.
+- Array :: The data to convert to JSON for storage.
+
+Example from `includes/polling/applications/zfs.inc.php`...
+
+```php
+$app_data['pools'] = $pools;
+save_app_data($app_id, $app_data);
+```
+
+### Retrieving Data
+
+The data will be fetched, decoded as JSON and returned as a array. The
+required variables are as below.
+
+- Integer :: App ID of the application in question.
+
+An exmaple from `includes/html/pages/device/apps/zfs.inc.php`...
+
+```php
+$pools = get_app_data($app['app_id'])['pools'];
+```
