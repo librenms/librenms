@@ -11,9 +11,12 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width'] = '400';
 $graph_array['legend'] = 'no';
 
+$index = 0;
 foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE)->groupBy('app_type') as $type => $groupedApps) {
     echo '<div style="clear: both;">';
-    echo '<h2>' . generate_link($groupedApps->first()->displayName(), ['page' => 'apps', 'app' => $type]) . '</h2>';
+    echo $index > 0 ? '<hr />' : '';
+    $index++;
+    echo '<h4>' . generate_link($groupedApps->first()->displayName(), ['page' => 'apps', 'app' => $type]) . '</h4>';
     /** @var \Illuminate\Support\Collection $groupedApps */
     $groupedApps = $groupedApps->sortBy(function ($app) {
         return $app->device->hostname;
@@ -33,7 +36,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
 
         $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">' . $app_state_info . optional($app->device)->shortDisplayName() . '</span>';
-        if (! empty($app->app_instance)) {
+        if (!empty($app->app_instance)) {
             $overlib_link .= '<span style="float:right; margin-right: 10px; font-weight: bold;">' . $app->app_instance . '</span>';
             $content_add = '(' . $app->app_instance . ')';
         }
@@ -46,7 +49,6 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
                       text-align: center; float: left;'>";
         echo \LibreNMS\Util\Url::overlibLink($overlib_url, $overlib_link, $overlib_content);
         echo '</div>';
-    }//end foreach
-
+    } //end foreach
     echo '</div>';
 }//end foreach
