@@ -194,7 +194,7 @@ $added_pools = array_values(array_diff($pools, $old_pools));
 $removed_pools = array_values(array_diff($old_pools, $pools));
 
 // if we have any pool changes, log it
-if (isset($added_pools[0]) or isset($removed_pools[0])) {
+if (sizeof($added_pools) > 0 or sizeof($removed_pools) > 0) {
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . json_encode($added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . json_encode($added_pools) : '';

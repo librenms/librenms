@@ -191,7 +191,7 @@ $added_instances = array_values(array_diff($instances, $old_instances));
 $removed_instances = array_values(array_diff($old_instances, $instances));
 
 // if we have any instance changes, log it
-if (isset($added_instances[0]) or isset($removed_instances[0])) {
+if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';

@@ -79,7 +79,7 @@ $added_jails = array_values(array_diff($jails, $old_jails));
 $removed_jails = array_values(array_diff($old_jails, $jails));
 
 // if we have any jail changes, log it
-if (isset($added_jails[0]) or isset($removed_jails[0])) {
+if (sizeof($added_jails) > 0 or sizeof($removed_jails) > 0) {
     $log_message = 'Fail2ban Jail Change:';
     $log_message .= count($added_jails) > 0 ? ' Added ' . json_encode($added_jails) : '';
     $log_message .= count($removed_jails) > 0 ? ' Removed ' . json_encode($added_jails) : '';

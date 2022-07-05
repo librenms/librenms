@@ -137,7 +137,7 @@ $added_ports = array_values(array_diff($ports_keys, $old_ports));
 $removed_ports = array_values(array_diff($old_ports, $ports_keys));
 
 // if we have any port changes, log it
-if (isset($added_ports[0]) or isset($removed_ports[0])) {
+if (sizeof($added_ports) > 0 or sizeof($removed_ports) > 0) {
     $log_message = 'Portactivity Port Change:';
     $log_message .= count($added_ports) > 0 ? ' Added ' . json_encode($added_ports) : '';
     $log_message .= count($removed_ports) > 0 ? ' Removed ' . json_encode($added_ports) : '';

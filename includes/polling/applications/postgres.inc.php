@@ -138,7 +138,7 @@ foreach ($old_databases as $database_check) {
 }
 
 // if we have any database changes, log it
-if (isset($added_databases[0]) or isset($removed_databases[0])) {
+if (sizeof($added_databases) > 0 or sizeof($removed_databases) > 0) {
     $log_message = 'Postgres Database Change:';
     if (isset($added_databases[0])) {
         $log_message = $log_message . ' Added' . json_encode($added_databases);

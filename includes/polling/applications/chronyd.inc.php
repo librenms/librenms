@@ -114,7 +114,7 @@ $added_sources = array_values(array_diff($sources, $old_sources));
 $removed_sources = array_values(array_diff($old_sources, $sources));
 
 // if we have any source changes, log it
-if (isset($added_sources[0]) or isset($removed_sources[0])) {
+if (sizeof($added_sources) > 0 or sizeof($removed_sources) > 0) {
     $log_message = 'Chronyd Source Change:';
     $log_message .= count($added_sources) > 0 ? ' Added ' . json_encode($added_sources) : '';
     $log_message .= count($removed_sources) > 0 ? ' Removed ' . json_encode($added_sources) : '';
