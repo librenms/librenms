@@ -146,6 +146,7 @@ class ConnectivityHelper
         }
 
         $process = new Process($command);
+        $process->setTimeout(120);
         $process->run();
 
         return [
