@@ -257,6 +257,15 @@ return [
             'description' => 'Utilisateur AD "bind"',
             'help' => 'Utilisé pour questionner l\'AD quand aucun autre utilisateur n\'est dans le contexte (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Utiliser STARTTLS',
+            'help' => 'Utiliser STARTTLS pour sécuriser la connexion.  Alternative à LDAPS.',
+            'options' => [
+                'disabled' => 'Désactivé',
+                'optional' => 'Optionnel',
+                'required' => 'Obligatoire',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'Expiration du cache LDAP',
             'help' => 'Durée du cache LDAP conservant les résultats des requêtes. Meilleure réactivité mais risque de données imprécises/en retard',
