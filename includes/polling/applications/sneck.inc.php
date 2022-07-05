@@ -11,7 +11,7 @@ $app_id = $app['app_id'];
 $app_data = get_app_data($app_id);
 
 $old_checks=[];
-if (isset($app_data['data']) and isset($app_data['data']['checks']){
+if (isset($app_data['data']) and isset($app_data['data']['checks'])) {
 	$old_checks = array_keys($app_data['data']['checks']);
 }
 
