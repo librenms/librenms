@@ -88,42 +88,16 @@ $app_data['instances'] = $instances;
 save_app_data($app_id, $app_data);
 
 //check for added instances
-$added_instances = [];
-foreach ($instances as $instance_check) {
-    $instance_found = false;
-    foreach ($old_instances as $instance_check2) {
-        if ($instance_check == $instance_check2) {
-            $instance_found = true;
-        }
-    }
-    if (! $instance_found) {
-        $added_instances[] = $instance_check;
-    }
-}
+$added_instances = array_values(array_diff($instances, $old_instances));
 
 //check for removed instances
-$removed_instances = [];
-foreach ($old_instances as $instance_check) {
-    $instance_found = false;
-    foreach ($instances as $instance_check2) {
-        if ($instance_check == $instance_check2) {
-            $instance_found = true;
-        }
-    }
-    if (! $instance_found) {
-        $removed_instances[] = $instance_check;
-    }
-}
+$removed_instances = array_values(array_diff($old_instances, $instances));
 
 // if we have any instance changes, log it
-if (isset($added_instances[0]) or isset($removed_instances[0])) {
+if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
     $log_message = 'Sagan Instance Change:';
-    if (isset($added_instances[0])) {
-        $log_message = $log_message . ' Added' . json_encode($added_instances);
-    }
-    if (isset($removed_instances[0])) {
-        $log_message = $log_message . ' Removed' . json_encode($removed_instances);
-    }
+    $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
+    $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
     log_event($log_message, $device, 'application');
 }
 
