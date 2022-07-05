@@ -36,7 +36,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
         $app_state_info = '<font color="' . $app_state['color'] . '"><i title="' . $app_state['hover_text'] . '" class="fa ' . $app_state['icon'] . ' fa-fw fa-lg" aria-hidden="true"></i></font>';
 
         $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">' . $app_state_info . optional($app->device)->shortDisplayName() . '</span>';
-        if (!empty($app->app_instance)) {
+        if (! empty($app->app_instance)) {
             $overlib_link .= '<span style="float:right; margin-right: 10px; font-weight: bold;">' . $app->app_instance . '</span>';
             $content_add = '(' . $app->app_instance . ')';
         }
