@@ -172,6 +172,7 @@ if (isset($options['t'])) {
                     'app_state_prev' => null,
                     'app_status' => '',
                     'app_instance' => '',
+                    'data' => null,
                 ]],
             ],
             'poller' => [
@@ -182,6 +183,7 @@ if (isset($options['t'])) {
                     'app_state_prev' => 'UNKNOWN',
                     'app_status' => '',
                     'app_instance' => '',
+                    'data' => null,
                 ]],
                 'application_metrics' => [],
             ],
