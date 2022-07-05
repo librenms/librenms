@@ -80,7 +80,7 @@ required variables are as below.
 
 - Integer :: App ID of the application in question.
 
-An exmaple from `includes/html/pages/device/apps/zfs.inc.php`...
+An example from `includes/html/pages/device/apps/zfs.inc.php`...
 
 ```php
 $pools = get_app_data($app['app_id'])['pools'];
