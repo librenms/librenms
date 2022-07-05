@@ -108,42 +108,16 @@ $app_data['sources'] = $sources;
 save_app_data($app_id, $app_data);
 
 //check for added sources
-$added_sources = [];
-foreach ($sources as $source_check) {
-    $source_found = false;
-    foreach ($old_sources as $source_check2) {
-        if ($source_check == $source_check2) {
-            $source_found = true;
-        }
-    }
-    if (! $source_found) {
-        $added_sources[] = $source_check;
-    }
-}
+$added_sources = array_values(array_diff($sources, $old_sources));
 
 //check for removed sources
-$removed_sources = [];
-foreach ($old_sources as $source_check) {
-    $source_found = false;
-    foreach ($sources as $source_check2) {
-        if ($source_check == $source_check2) {
-            $source_found = true;
-        }
-    }
-    if (! $source_found) {
-        $removed_sources[] = $source_check;
-    }
-}
+$removed_sources = array_values(array_diff($old_sources, $sources));
 
 // if we have any source changes, log it
 if (isset($added_sources[0]) or isset($removed_sources[0])) {
     $log_message = 'Chronyd Source Change:';
-    if (isset($added_sources[0])) {
-        $log_message = $log_message . ' Added' . json_encode($added_sources);
-    }
-    if (isset($removed_sources[0])) {
-        $log_message = $log_message . ' Removed' . json_encode($removed_sources);
-    }
+    $log_message .= count($added_sources) > 0 ? ' Added ' . json_encode($added_sources) : '';
+    $log_message .= count($removed_sources) > 0 ? ' Removed ' . json_encode($added_sources) : '';
     log_event($log_message, $device, 'application');
 }
 

@@ -131,42 +131,16 @@ $app_data['ports'] = $ports_keys;
 save_app_data($app_id, $app_data);
 
 //check for added ports
-$added_ports = [];
-foreach ($ports_keys as $port_check) {
-    $port_found = false;
-    foreach ($old_ports as $port_check2) {
-        if ($port_check == $port_check2) {
-            $port_found = true;
-        }
-    }
-    if (! $port_found) {
-        $added_ports[] = $port_check;
-    }
-}
+$added_ports = array_values(array_diff($ports_keys, $old_ports));
 
 //check for removed ports
-$removed_ports = [];
-foreach ($old_ports as $port_check) {
-    $port_found = false;
-    foreach ($ports_keys as $port_check2) {
-        if ($port_check == $port_check2) {
-            $port_found = true;
-        }
-    }
-    if (! $port_found) {
-        $removed_ports[] = $port_check;
-    }
-}
+$removed_ports = array_values(array_diff($old_ports, $ports_keys));
 
 // if we have any port changes, log it
 if (isset($added_ports[0]) or isset($removed_ports[0])) {
     $log_message = 'Portactivity Port Change:';
-    if (isset($added_ports[0])) {
-        $log_message = $log_message . ' Added' . json_encode($added_ports);
-    }
-    if (isset($removed_ports[0])) {
-        $log_message = $log_message . ' Removed' . json_encode($removed_ports);
-    }
+    $log_message .= count($added_ports) > 0 ? ' Added ' . json_encode($added_ports) : '';
+    $log_message .= count($removed_ports) > 0 ? ' Removed ' . json_encode($added_ports) : '';
     log_event($log_message, $device, 'application');
 }
 

@@ -73,42 +73,16 @@ $app_data['jails'] = $jails;
 save_app_data($app_id, $app_data);
 
 //check for added jails
-$added_jails = [];
-foreach ($jails as $jail_check) {
-    $jail_found = false;
-    foreach ($old_jails as $jail_check2) {
-        if ($jail_check == $jail_check2) {
-            $jail_found = true;
-        }
-    }
-    if (! $jail_found) {
-        $added_jails[] = $jail_check;
-    }
-}
+$added_jails = array_values(array_diff($jails, $old_jails));
 
 //check for removed jails
-$removed_jails = [];
-foreach ($old_jails as $jail_check) {
-    $jail_found = false;
-    foreach ($jails as $jail_check2) {
-        if ($jail_check == $jail_check2) {
-            $jail_found = true;
-        }
-    }
-    if (! $jail_found) {
-        $removed_jails[] = $jail_check;
-    }
-}
+$removed_jails = array_values(array_diff($old_jails, $jails));
 
 // if we have any jail changes, log it
 if (isset($added_jails[0]) or isset($removed_jails[0])) {
     $log_message = 'Fail2ban Jail Change:';
-    if (isset($added_jails[0])) {
-        $log_message = $log_message . ' Added' . json_encode($added_jails);
-    }
-    if (isset($removed_jails[0])) {
-        $log_message = $log_message . ' Removed' . json_encode($removed_jails);
-    }
+    $log_message .= count($added_jails) > 0 ? ' Added ' . json_encode($added_jails) : '';
+    $log_message .= count($removed_jails) > 0 ? ' Removed ' . json_encode($added_jails) : '';
     log_event($log_message, $device, 'application');
 }
 

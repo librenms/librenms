@@ -188,42 +188,16 @@ $app_data['pools'] = $pools;
 save_app_data($app_id, $app_data);
 
 //check for added pools
-$added_pools = [];
-foreach ($pools as $pool_check) {
-    $pool_found = false;
-    foreach ($old_pools as $pool_check2) {
-        if ($pool_check == $pool_check2) {
-            $pool_found = true;
-        }
-    }
-    if (! $pool_found) {
-        $added_pools[] = $pool_check;
-    }
-}
+$added_pools = array_values(array_diff($pools, $old_pools));
 
 //check for removed pools
-$removed_pools = [];
-foreach ($old_pools as $pool_check) {
-    $pool_found = false;
-    foreach ($pools as $pool_check2) {
-        if ($pool_check == $pool_check2) {
-            $pool_found = true;
-        }
-    }
-    if (! $pool_found) {
-        $removed_pools[] = $pool_check;
-    }
-}
+$removed_pools = array_values(array_diff($old_pools, $pools));
 
 // if we have any pool changes, log it
 if (isset($added_pools[0]) or isset($removed_pools[0])) {
     $log_message = 'ZFS Pool Change:';
-    if (isset($added_pools[0])) {
-        $log_message = $log_message . ' Added' . json_encode($added_pools);
-    }
-    if (isset($removed_pools[0])) {
-        $log_message = $log_message . ' Removed' . json_encode($removed_pools);
-    }
+    $log_message .= count($added_pools) > 0 ? ' Added ' . json_encode($added_pools) : '';
+    $log_message .= count($removed_pools) > 0 ? ' Removed ' . json_encode($added_pools) : '';
     log_event($log_message, $device, 'application');
 }
 
