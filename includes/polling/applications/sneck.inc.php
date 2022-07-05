@@ -10,9 +10,9 @@ $app_id = $app['app_id'];
 
 $app_data = get_app_data($app_id);
 
-$old_checks=[];
+$old_checks = [];
 if (isset($app_data['data']) and isset($app_data['data']['checks'])) {
-	$old_checks = array_keys($app_data['data']['checks']);
+    $old_checks = array_keys($app_data['data']['checks']);
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -31,9 +31,9 @@ try {
     return;
 }
 
-$new_checks=[];
+$new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
-	$new_checks = array_keys($json_return['data']['checks']);
+    $new_checks = array_keys($json_return['data']['checks']);
 }
 
 $rrd_name = ['app', $name, $app_id];
