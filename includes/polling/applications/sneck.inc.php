@@ -32,7 +32,7 @@ try {
 }
 
 $new_checks=[];
-if (isset($json_return['data']) and isset($json_return['data']['checks']){
+if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
 	$new_checks = array_keys($json_return['data']['checks']);
 }
 
