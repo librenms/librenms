@@ -102,6 +102,8 @@ class ServiceConfig:
     db_user = "librenms"
     db_pass = ""
     db_name = "librenms"
+    db_sslmode = "disabled"
+    db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
@@ -226,6 +228,12 @@ class ServiceConfig:
         )
         self.db_user = os.getenv(
             "DB_USERNAME", config.get("db_user", ServiceConfig.db_user)
+        )
+        self.db_sslmode = os.getenv(
+            "DB_SSLMODE", config.get("db_sslmode", ServiceConfig.db_sslmode)
+        )
+        self.db_ssl_ca = os.getenv(
+            "MYSQL_ATTR_SSL_CA", config.get("db_ssl_ca", ServiceConfig.db_ssl_ca)
         )
 
         self.watchdog_enabled = config.get(

@@ -248,6 +248,19 @@ class DB:
             if self.config.db_socket:
                 args["unix_socket"] = self.config.db_socket
 
+            sslmode = self.config.db_sslmode.lower()
+            if sslmode == 'disabled':
+                logger.debug("Using cleartext MySQL connection")
+            elif sslmode == 'verify_ca':
+                logger.info("Using TLS MySQL connection without CA trust validation only")
+                args["ssl"] = {"ca": self.config.db_ssl_ca, "check_hostname": False}
+            elif sslmode == 'verify_identity':
+                logger.info("Using TLS MySQL connection with full validation")
+                args["ssl"] = {"ca": self.config.db_ssl_ca}
+            else:
+                logger.critical("Unsupported MySQL sslmode %s, dispatcher supports DISABLED, VERIFY_CA, and VERIFY_IDENTITY only", self.config.db_sslmode)
+                raise SystemExit(2)
+
             conn = MySQLdb.connect(**args)
             conn.autocommit(True)
             conn.ping(True)
