@@ -232,4 +232,14 @@ class SnmpResponse
 
         return $this;
     }
+
+    public function append(SnmpResponse $response): SnmpResponse
+    {
+        $this->raw .= $response->raw;
+        $this->stderr .= $response->stderr;
+        $this->exitCode = $this->exitCode ?: $response->exitCode;
+        $this->errorMessage = $this->errorMessage ?: $response->errorMessage;
+
+        return $this;
+    }
 }

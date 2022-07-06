@@ -243,7 +243,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        return $this->exec('snmpwalk', $this->parseOid($oid));
+        return $this->execMultiple('snmpwalk', $this->parseOid($oid));
     }
 
     /**
@@ -328,6 +328,19 @@ class NetSnmpQuery implements SnmpQueryInterface
         } else {
             Log::debug("Unsupported SNMP Version: {$this->device->snmpver}");
         }
+    }
+
+    private function execMultiple(string $command, array $oids): ?SnmpResponse
+    {
+        $combined = null;
+
+        foreach ($oids as $oid) {
+            $response = $this->exec($command, [$oid]);
+
+            $combined = $combined ? $combined->append($response) : $response;
+        }
+
+        return $combined;
     }
 
     private function exec(string $command, array $oids): SnmpResponse

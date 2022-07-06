@@ -1,0 +1,1565 @@
+-- ################################################################################
+
+EXTREME-PORT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+        MODULE-IDENTITY         FROM SNMPv2-SMI
+        RowStatus               FROM SNMPv2-TC
+        OBJECT-TYPE             FROM SNMPv2-SMI
+        ifIndex                 FROM IF-MIB
+        ClientAuthType          FROM EXTREME-BASE-MIB
+        extremeAgent            FROM EXTREME-BASE-MIB
+        Counter64               FROM SNMPv2-SMI
+        extremeVlanIfIndex      FROM EXTREME-VLAN-MIB
+        Counter32, TimeTicks    FROM SNMPv2-SMI 
+        IpAddress               FROM SNMPv2-SMI 
+        MacAddress              FROM SNMPv2-TC
+        DisplayString           FROM RFC1213-MIB;
+
+        extremePort MODULE-IDENTITY
+                LAST-UPDATED "201903210100Z" -- March 21,2019
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme network port objects"
+
+	        REVISION    "201903210100Z"
+            DESCRIPTION "Increased the range of extremePortLoadshare2MasterIfIndex
+                         and extremePortLoadshare2SlaveIfIndex to support dot1br
+                         extended ports."
+
+	        REVISION    "201803130000Z"
+                DESCRIPTION
+                    "Added the extremePortConfigTable group."
+        ::= { extremeAgent 4 }
+
+
+    ExtremePortTrafficDirection ::= INTEGER {
+        ingress(1),
+        egress(2)
+    }
+
+--
+-- Load-sharing. Table exists but support removed for 6.0.
+--
+    extremePortLoadshareTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortLoadshareEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                      "A table of bindings between a master port 
+                        and its load-sharing slaves: create/delete 
+                        entries here to add/delete a port to/from a 
+                        load-sharing group. Default is empty table. 
+                        There are restrictions on what row creates 
+                        will be accepted by each device - see Summit 
+                        release notes for details."
+    ::= { extremePort 1 }
+
+    extremePortLoadshareEntry OBJECT-TYPE
+        SYNTAX  ExtremePortLoadshareEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                      "A binding between a master port and one
+                       of its load-sharing slave ports."
+                INDEX { extremePortLoadshareMasterIfIndex, 
+                        extremePortLoadshareSlaveIfIndex } 
+    ::= { extremePortLoadshareTable 1 }
+
+    ExtremePortLoadshareEntry ::= SEQUENCE {
+                extremePortLoadshareMasterIfIndex INTEGER, 
+                extremePortLoadshareSlaveIfIndex INTEGER,
+           extremePortLoadshareGrouping    INTEGER,
+                extremePortLoadshareStatus RowStatus 
+    }
+
+    extremePortLoadshareMasterIfIndex OBJECT-TYPE
+--              SYNTAX INTEGER
+                SYNTAX    INTEGER (1..65535)
+                MAX-ACCESS  read-create
+                STATUS deprecated
+                DESCRIPTION
+                      "The ifIndex value which identifies the
+                       port controlling a loadsharing group
+                       of ports which includes
+                       extremePortLoadshareSlaveIfIndex."
+        ::= { extremePortLoadshareEntry 1 }
+
+    extremePortLoadshareSlaveIfIndex OBJECT-TYPE
+--              SYNTAX INTEGER
+                SYNTAX    INTEGER (1..65535)
+                MAX-ACCESS  read-create
+                STATUS deprecated
+                DESCRIPTION
+                      "The ifIndex value which identifies the
+                       port which is a member of a loadsharing 
+                       group controlled by 
+                        extremePortLoadshareMasterIfIndex."
+        ::= { extremePortLoadshareEntry 2 }
+
+    extremePortLoadshareGrouping OBJECT-TYPE
+                SYNTAX INTEGER { other (1), pair (2), quad (4) }
+                MAX-ACCESS  read-create
+                STATUS deprecated
+                DESCRIPTION
+                      "The Grouping value which identifies if load sharing is
+                      in pair or quad."
+        ::= { extremePortLoadshareEntry 3 }
+
+    extremePortLoadshareStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS deprecated
+                DESCRIPTION
+                        "The row status variable, used according to
+                        row installation and removal conventions."
+        ::= { extremePortLoadshareEntry 4 }
+
+-- Support dropped in 6.0
+
+-- Summitlink Table
+
+        extremePortSummitlinkTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortSummitlinkEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                      "A table of Extreme link configuration
+                        and status information. Contains a row 
+                        for only those ports that are capable of 
+                        operating in Summitlink-mode."
+    ::= { extremePort 2 }
+
+    extremePortSummitlinkEntry OBJECT-TYPE
+        SYNTAX  ExtremePortSummitlinkEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                      "Link configuration and status information
+                        for a Summitlink Port."
+               INDEX { ifIndex }
+    ::= { extremePortSummitlinkTable 1 }
+
+        ExtremePortSummitlinkEntry ::=  SEQUENCE {
+                extremePortSummitlinkAdminMode INTEGER,
+                extremePortSummitlinkOperMode INTEGER,
+                extremePortSummitlinkState INTEGER,
+                extremePortSummitlinkRejectReason INTEGER
+        } 
+
+        extremePortSummitlinkAdminMode OBJECT-TYPE
+                SYNTAX INTEGER { ethernetOnly(1), summitlinkOnly(2) }
+                MAX-ACCESS  read-write
+                STATUS deprecated
+                DESCRIPTION
+                      "Configurable operating mode for this
+                       Summitlink port. Configure to summitlinkOnly(1)
+                       before connecting this port to a SummitVC device."
+                DEFVAL { ethernetOnly }
+        ::= { extremePortSummitlinkEntry 1 }
+
+        extremePortSummitlinkOperMode OBJECT-TYPE
+                SYNTAX INTEGER { ethernetOnly(1), summitlinkOnly(2) }
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                      "Actual Operating mode."
+                DEFVAL { ethernetOnly }
+        ::= { extremePortSummitlinkEntry 2 }
+ 
+        extremePortSummitlinkState OBJECT-TYPE
+                SYNTAX INTEGER { up(1), down(2) }
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                      "Current status of a Summitlink link. Where a port
+                        has redundant PMD capability, this indicates up if
+                        either of the PMDs has an active link."
+        ::= { extremePortSummitlinkEntry 3 }
+
+        extremePortSummitlinkRejectReason OBJECT-TYPE
+                SYNTAX INTEGER { none(1), other(2), stackMisconnected(3) }
+                MAX-ACCESS  read-only
+                STATUS deprecated
+                DESCRIPTION
+                     "If a Summitlink connection has been attempted 
+                        and failed to reach the up(1) state, this 
+                        indicates the potential source of the failure."
+        ::= { extremePortSummitlinkEntry 4 }
+
+
+--
+-- New load share table for 6.0
+--
+    extremePortLoadshare2Table OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortLoadshare2Entry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "A table of bindings between a master port 
+                        and its load-sharing slaves: create/delete 
+                        entries here to add/delete a port to/from a 
+                        load-sharing group. Default is empty table. 
+                        There are restrictions on what row creates 
+                        will be accepted by each device - see Summit 
+                        release notes for details."
+    ::= { extremePort 3 }
+
+    extremePortLoadshare2Entry OBJECT-TYPE
+        SYNTAX  ExtremePortLoadshare2Entry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "A binding between a master port and one
+                       of its load-sharing slave ports."
+                INDEX { extremePortLoadshare2MasterIfIndex, 
+                        extremePortLoadshare2SlaveIfIndex } 
+    ::= { extremePortLoadshare2Table 1 }
+
+    ExtremePortLoadshare2Entry ::= SEQUENCE {
+                extremePortLoadshare2MasterIfIndex  INTEGER, 
+                extremePortLoadshare2SlaveIfIndex   INTEGER,
+                extremePortLoadshare2Algorithm      INTEGER,
+                extremePortLoadshare2Status         RowStatus, 
+                extremePortLoadshare2MinActiveLinks Unsigned32,
+		extremePortLoadshare2AggControlType INTEGER
+    }
+
+    extremePortLoadshare2MasterIfIndex OBJECT-TYPE
+--              SYNTAX INTEGER
+                SYNTAX    INTEGER (1..2147483647)
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                      "The ifIndex value which identifies the
+                       port controlling a loadsharing group
+                       of ports which includes
+                       extremePortLoadshareSlaveIfIndex."
+        ::= { extremePortLoadshare2Entry 1 }
+
+    extremePortLoadshare2SlaveIfIndex OBJECT-TYPE
+--              SYNTAX INTEGER
+                SYNTAX    INTEGER (1..2147483647)
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                      "The ifIndex value which identifies the
+                       port which is a member of a loadsharing 
+                       group controlled by extremePortLoadshare2MasterIfIndex."
+        ::= { extremePortLoadshare2Entry 2 }
+
+    extremePortLoadshare2Algorithm OBJECT-TYPE
+                SYNTAX INTEGER { ingressPortOffset (1),
+                                 hash (2),
+                                 roundRobin (3),
+                                 l2Address (4),
+                                 l3Address (5),
+                                 l3l4Address(6),
+                                 customAddress (7)
+                                  }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                      "This value identifies the load sharing algorithm
+                      to be used for this group of load shared ports."
+        ::= { extremePortLoadshare2Entry 3 }
+
+    extremePortLoadshare2Status OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The row status variable, used according to
+                        row installation and removal conventions."
+        ::= { extremePortLoadshare2Entry 4 }
+
+    extremePortLoadshare2MinActiveLinks OBJECT-TYPE
+                SYNTAX    Unsigned32 (1..8)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                      "The minimum active links that must be up in order
+                       for group to remain up."  
+        ::= { extremePortLoadshare2Entry 5 }
+
+    extremePortLoadshare2AggControlType OBJECT-TYPE
+                SYNTAX INTEGER { static (1),
+                                 lacp (2),
+                                 healthcheck (3)
+                                  }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                      "This value identifies the load sharing link aggregation
+                       control type to be used for this group of load shared ports."
+        ::= { extremePortLoadshare2Entry 6 }
+
+
+----
+-- Port Rate Shape Table
+----
+    extremePortRateShapeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortRateShapeEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "A list of ports that have ingress rate limiting
+                       enforced."
+    ::= { extremePort 4 }
+
+    extremePortRateShapeEntry OBJECT-TYPE
+        SYNTAX  ExtremePortRateShapeEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "An entry that is either a rate limited or
+                       a loopback port. Any vlan that has rate
+               limited ports should have one loopback port
+               defined. The traffic parameters for the rate
+               limited ports correspond to those that are
+               defined for the loopback port in the
+               extremePerPortQosTable."
+                INDEX { ifIndex, extremeVlanIfIndex }
+    ::= { extremePortRateShapeTable 1 }
+
+    ExtremePortRateShapeEntry ::= SEQUENCE {
+           extremePortRateShapePortType      INTEGER,
+        extremePortRateShapeLoopbackTag   INTEGER,
+                extremePortRateShapeStatus        RowStatus 
+    }
+
+    extremePortRateShapePortType OBJECT-TYPE
+                SYNTAX INTEGER 
+                {
+			        rateLimited(1),
+			        loopBack(2)
+                }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                      "Whether a loopback or rate limited port." 
+        ::= { extremePortRateShapeEntry 1 }
+
+    extremePortRateShapeLoopbackTag OBJECT-TYPE
+        SYNTAX     INTEGER (2..4094)
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "An unique internal tag that will needs to be set
+            up for the vlan corresponding to this entry for
+            adding ingress rate limited ports to the corresponding
+            vlan."
+        ::= { extremePortRateShapeEntry 2 }
+
+    extremePortRateShapeStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                        "The row status variable, used according to
+                        row installation and removal conventions."
+        ::= { extremePortRateShapeEntry 3 }
+
+--
+-- Per Port QoSReport Table
+--
+    extremePortUtilizationTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremePortUtilizationEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Global Qos Profiles are defined in the
+                extremeQosProfileTable. This table contains a list
+                    of ports for which certain QoS parms are reported."
+        ::= { extremePort 5 }
+
+    extremePortUtilizationEntry    OBJECT-TYPE
+        SYNTAX    ExtremePortUtilizationEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An individual QoSReport Entry."
+        INDEX {ifIndex}
+        ::= {extremePortUtilizationTable 1}
+
+    ExtremePortUtilizationEntry ::= SEQUENCE {
+                extremePortUtilizationAvgTxBw        Integer32,
+                extremePortUtilizationAvgRxBw        Integer32,
+                extremePortUtilizationPeakTxBw       Integer32,
+                extremePortUtilizationPeakRxBw       Integer32
+        }
+
+        extremePortUtilizationAvgTxBw  OBJECT-TYPE
+--              SYNTAX  INTEGER
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported average bandwidth in the txmit direction. When displayed
+                    it shows as an Integer value i.e 99.99% is displayed as 9999."
+                ::= {extremePortUtilizationEntry 1 }
+
+                
+        extremePortUtilizationAvgRxBw    OBJECT-TYPE
+--              SYNTAX  INTEGER
+                SYNTAX    Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                 "The reported average bandwidth in the receive direction. When displayed
+                    it shows as an Integer value i.e 99.99% is displayed as 9999." 
+                ::= {extremePortUtilizationEntry 2 }
+
+        extremePortUtilizationPeakTxBw  OBJECT-TYPE
+--              SYNTAX  INTEGER
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The reported peak bandwidth in the txmit direction. When displayed
+                    it shows as an Integer value i.e 99.99% is displayed as 9999."
+                ::= {extremePortUtilizationEntry 3 }
+
+
+        extremePortUtilizationPeakRxBw  OBJECT-TYPE
+--              SYNTAX  INTEGER
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The reported peak bandwidth in the receive direction. When displayed
+                    it shows as an Integer value i.e 99.99% is displayed as 9999."
+                ::= {extremePortUtilizationEntry 4 }
+
+--
+-- Per Port Information Table
+--
+       extremePortInfoTable   OBJECT-TYPE
+               SYNTAX  SEQUENCE OF ExtremePortInfoEntry
+               MAX-ACCESS  not-accessible
+               STATUS current
+               DESCRIPTION
+                "This table contains a list of port information."
+               ::= { extremePort 6 }
+
+       extremePortInfoEntry   OBJECT-TYPE
+               SYNTAX  ExtremePortInfoEntry
+               MAX-ACCESS      not-accessible
+               STATUS  current
+               DESCRIPTION
+                   "An individual Port Information Entry."
+               INDEX {ifIndex}
+               ::= {extremePortInfoTable 1}
+
+       ExtremePortInfoEntry ::= SEQUENCE {
+               extremePortInfoFilterUpCounter        Counter32,
+               extremePortInfoFilterDownCounter      Counter32
+       }
+
+       extremePortInfoFilterUpCounter  OBJECT-TYPE
+               SYNTAX  Counter32
+--             MAX-ACCESS  read-write
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The reported Port Filter up counter value.
+                  This counter indicates the number of times a port's link
+                  state has transitioned from DOWN to UP state. "
+               ::= {extremePortInfoEntry 1 }
+
+
+       extremePortInfoFilterDownCounter        OBJECT-TYPE
+               SYNTAX        Counter32
+--             MAX-ACCESS  read-write
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The reported Port Filter down counter value.
+                  This counter indicates the number of times a port's link
+                  state has transitioned from UP to DOWN state. "
+               ::= {extremePortInfoEntry 2 }
+
+--
+-- extremePortXenpakVendor Table
+--
+
+        extremePortXenpakVendorTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortXenpakVendorEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "A table of Extreme Xenpak Module Vendor Name
+                        and type information. Contains a row 
+                        for only those ports that are part of 
+                        Xenpak module ."
+    ::= { extremePort 7 }
+
+    extremePortXenpakVendorEntry OBJECT-TYPE
+        SYNTAX  ExtremePortXenpakVendorEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "Vendor name and type for Xenpak module."
+               INDEX { ifIndex }
+    ::= { extremePortXenpakVendorTable 1 }
+
+        ExtremePortXenpakVendorEntry ::=  SEQUENCE {
+                extremePortXenpakVendorName DisplayString
+        } 
+
+          extremePortXenpakVendorName OBJECT-TYPE
+                SYNTAX  DisplayString (SIZE(0..22))
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                      "A human-readable string representing Vendor name 
+                        of this module.
+                        This string should be the same for all entries
+                        having the same Xenpak module: 
+                        this entry may not be modified."
+    ::= { extremePortXenpakVendorEntry 1 }
+
+--
+-- Per Port Ingress Statistics Table
+--
+
+        extremePortIngressStats OBJECT IDENTIFIER
+        ::= { extremePort 8 }
+
+	extremePortIngressStatsPortTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremePortIngressPortStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		    "Port ingress statistics are returned for ports which
+                    support ingress queuing. This table contains a list
+                    of counters for each port."
+		::= { extremePortIngressStats 1 }
+
+	extremePortIngressPortStatsEntry	OBJECT-TYPE
+		SYNTAX	ExtremePortIngressPortStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual IngressStats Entry."
+		INDEX {ifIndex}
+		::= {extremePortIngressStatsPortTable 1}
+
+	ExtremePortIngressPortStatsEntry ::= SEQUENCE {
+--                extremePortIngressStatsPortIndex          INTEGER,
+                extremePortIngressStatsLinkStatus         INTEGER,
+                extremePortIngressStatsPortHighPriBytes   Counter64,
+                extremePortIngressStatsPortLowPriBytes    Counter64,
+                extremePortIngressStatsPortDroppedBytes   Counter64,
+                extremePortIngressStatsTxXoff             Counter64 
+        }
+
+
+--        extremePortIngressStatsPortIndex  OBJECT-TYPE
+--              SYNTAX  INTEGER
+--                MAX-ACCESS  read-only  
+--                STATUS current
+--                DESCRIPTION
+--                   "The index of the port being queried."
+--                ::= {extremePortIngressPortStatsEntry 1 }
+
+        extremePortIngressStatsLinkStatus  OBJECT-TYPE
+                SYNTAX  INTEGER {
+			ready(1),
+			active(2),
+                        disabled(3),
+                        notPresent(4)
+		}
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The current status of the link. Ready indicates the port is ready
+                   to accept a link; Active indicates the link is present at this port;
+                   Disabled shows that the link is disabled at this port; Not Present
+                   means the link is not present at this port."
+                ::= {extremePortIngressPortStatsEntry 1 }
+
+                
+        extremePortIngressStatsPortHighPriBytes	OBJECT-TYPE
+                SYNTAX	Counter64
+        	MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                 "The sum of all per queue CIR counts for this port, which indicates the
+                 bytes forwarded for high-priority packets." 
+                ::= {extremePortIngressPortStatsEntry 2 }
+
+        extremePortIngressStatsPortLowPriBytes  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The sum of all per queue PR counts for this port, which indicates the
+                   bytes forwarded for low-priority packets."
+                ::= {extremePortIngressPortStatsEntry 3 }
+
+        extremePortIngressStatsPortDroppedBytes  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The total number of bytes dropped for this port."
+                ::= {extremePortIngressPortStatsEntry 4 }
+                
+        extremePortIngressStatsTxXoff  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The number of XOFF Flow Control packets sent from this port due to
+                 receive traffic congestion."
+                ::= {extremePortIngressPortStatsEntry 5 }
+                
+
+--
+-- Per Queue Ingress Statistics Table
+--        
+
+        extremePortIngressStatsQueueTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremePortIngressQueueStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		    "Port ingress statistics are returned for ingress queues. 
+                    This table contains a list of counters for each ingress
+                    queue."
+		::= { extremePortIngressStats 2 }
+
+        extremePortIngressQueueStatsEntry	OBJECT-TYPE
+		SYNTAX	ExtremePortIngressQueueStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual IngressStatsQueue Entry."
+		INDEX {ifIndex,
+                       extremePortIngressStatsQueueIndex}
+		::= {extremePortIngressStatsQueueTable 1}
+
+	ExtremePortIngressQueueStatsEntry ::= SEQUENCE {
+--                extremePortIngressStatsQueuePortIndex      INTEGER,
+--                extremePortIngressStatsQueueIndex          INTEGER,
+                extremePortIngressStatsQueueIndex          Integer32,
+                extremePortIngressStatsQueueHighPriBytes   Counter64,
+                extremePortIngressStatsQueueLowPriBytes    Counter64,
+--                extremePortIngressStatsQueuePercentDropped INTEGER
+                extremePortIngressStatsQueuePercentDropped Integer32
+        }
+        
+--        extremePortIngressStatsQueuePortIndex  OBJECT-TYPE
+--                SYNTAX  INTEGER
+--                MAX-ACCESS  read-only  
+--                STATUS current
+--                DESCRIPTION
+--                   "The index of the port being queried."
+--                ::= {extremePortIngressQueueStatsEntry 1 }
+
+
+        extremePortIngressStatsQueueIndex  OBJECT-TYPE
+--              SYNTAX  INTEGER
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The ingress queue being queried."
+                ::= {extremePortIngressQueueStatsEntry 1 }
+
+        extremePortIngressStatsQueueHighPriBytes	OBJECT-TYPE
+                SYNTAX	Counter64
+        	MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                 "The sum of all per queue CIR counts for this queue, which indicates the
+                 bytes forwarded for high-priority packets." 
+                ::= {extremePortIngressQueueStatsEntry 2 }
+
+        extremePortIngressStatsQueueLowPriBytes  OBJECT-TYPE
+                SYNTAX  Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                   "The sum of all per queue PR counts for this queue, which indicates the
+                   bytes forwarded for low-priority packets."
+                ::= {extremePortIngressQueueStatsEntry 3 }
+
+        extremePortIngressStatsQueuePercentDropped  OBJECT-TYPE
+--                SYNTAX  INTEGER
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                 "The percentage of receive bytes dropped by this queue relative to the total
+                 number of bytes input to this queue."
+                ::= {extremePortIngressQueueStatsEntry 4 }
+
+                
+
+--
+-- Per Port Egress Rate Limit Table
+--
+	extremePortEgressRateLimitTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremePortEgressRateLimitEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		    "Port egress rate limit statistics for a port."
+		::= { extremePort 9 }
+
+	extremePortEgressRateLimitEntry	OBJECT-TYPE
+		SYNTAX	ExtremePortEgressRateLimitEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An individual EgressRateLimit Entry."
+		INDEX {ifIndex}
+		::= {extremePortEgressRateLimitTable 1}
+
+	ExtremePortEgressRateLimitEntry ::= SEQUENCE {
+--                extremePortEgressRateLimitPortIndex          INTEGER,
+                extremePortEgressRateLimitType               INTEGER,
+--                extremePortEgressRateLimitValue              INTEGER
+                extremePortEgressRateLimitValue              Integer32
+        }
+        
+--        extremePortEgressRateLimitPortIndex  OBJECT-TYPE
+--                SYNTAX  INTEGER
+--                MAX-ACCESS  read-only  
+--                STATUS current
+--                DESCRIPTION
+--                   "The index of the port being queried."
+--                ::= {extremePortEgressRateLimitEntry 1 }
+
+        extremePortEgressRateLimitType  OBJECT-TYPE
+                SYNTAX  INTEGER {
+			percentage(1),
+			kbps(2),
+                        mbps(3)
+		}
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The type of the current egress rate setting. A value of 1 
+                   signifies that the egress rate limit value is represented by
+                   a percentage of the maximum configurable port bandwidth. A value 
+                   of 2 or 3 signifies the rate is configured in Kbps or Mbps
+                   respectively."
+                ::= {extremePortEgressRateLimitEntry 1 }
+
+                
+        extremePortEgressRateLimitValue	OBJECT-TYPE
+--                SYNTAX	INTEGER
+                SYNTAX	Integer32
+        	MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                 "The configured egress rate value." 
+                ::= {extremePortEgressRateLimitEntry 2 }
+
+--
+-- Clients connected to the Port
+--
+	extremeWiredClientTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeWiredClientEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		    "This table contains the entries for authenticated Clinets."
+		::= { extremePort 10 }
+
+extremeWiredClientEntry OBJECT-TYPE
+        SYNTAX          ExtremeWiredClientEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+        "An entry in the extremeWiredClientTable."
+    INDEX {ifIndex, extremeWiredClientID}
+        ::= { extremeWiredClientTable 1 }
+
+ExtremeWiredClientEntry ::= SEQUENCE {
+        extremeWiredClientID                     MacAddress,
+        extremeWiredClientState                  INTEGER,
+--        extremeWiredClientVLAN                   INTEGER,
+        extremeWiredClientVLAN                   Integer32,
+--        extremeWiredClientPriority               INTEGER,
+        extremeWiredClientPriority               Integer32,
+        extremeWiredClientAuthType               ClientAuthType,
+		extremeWiredClientLastStateChangeTime    TimeTicks,
+        extremeWiredClientIP                     IpAddress}
+
+extremeWiredClientID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Unique MAC Address of the station for which this address
+         table entry pertains."
+    ::= { extremeWiredClientEntry 1 }
+
+extremeWiredClientState OBJECT-TYPE
+    SYNTAX INTEGER { authenticated (1),
+                        unauthenticated (2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This attribute shall indicate the current state of the client. 
+         The attribute is enumerated as follows:
+
+        1 - Authenticated - client is authenticated.
+        2 - Unauthenticated - the client is connect but unauthenticated.
+        "
+    ::= { extremeWiredClientEntry 2 }
+
+extremeWiredClientVLAN OBJECT-TYPE
+--    SYNTAX          INTEGER
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the per-client VLAN which was pushed over
+         by a RADIUS server or other mechanism."
+    ::= { extremeWiredClientEntry 3 }
+
+extremeWiredClientPriority OBJECT-TYPE
+--    SYNTAX          INTEGER
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is a per-client 802.1p value which was either
+         configured by the RADIUS server or statically through
+         the port configuration table."
+    ::= { extremeWiredClientEntry 4 }
+
+extremeWiredClientAuthType OBJECT-TYPE
+    SYNTAX          ClientAuthType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is an indication of what access method was
+         used to authenticated the client."
+    ::= { extremeWiredClientEntry 5 }
+
+extremeWiredClientLastStateChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the sysUpTime of the switch when the clients state changed last"
+    ::= { extremeWiredClientEntry 6 }
+
+extremeWiredClientIP OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "IP Address of the wired client."
+    ::= { extremeWiredClientEntry 7 }
+
+--
+-- Per Port Utilization Extension Table
+--
+    extremePortUtilizationExtnTable    OBJECT-TYPE
+        SYNTAX    SEQUENCE OF ExtremePortUtilizationExtnEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Global Qos Profiles are defined in the
+             extremeQosProfileTable. This table contains a list
+             of ports for which certain QoS parms are reported."
+        ::= { extremePort 11 }
+
+    extremePortUtilizationExtnEntry    OBJECT-TYPE
+        SYNTAX    ExtremePortUtilizationExtnEntry
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "An individual QoSReport Entry."
+        INDEX {ifIndex}
+        ::= {extremePortUtilizationExtnTable 1}
+
+    ExtremePortUtilizationExtnEntry ::= SEQUENCE {
+                extremePortUtilizationAvgTxPkts      Integer32,
+                extremePortUtilizationAvgRxPkts      Integer32,
+                extremePortUtilizationPeakTxPkts     Integer32,
+                extremePortUtilizationPeakRxPkts     Integer32,
+                extremePortUtilizationAvgTxBytes     Integer32,
+                extremePortUtilizationAvgRxBytes     Integer32,
+                extremePortUtilizationPeakTxBytes    Integer32,
+                extremePortUtilizationPeakRxBytes    Integer32
+        }
+
+        extremePortUtilizationAvgTxPkts  OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average packets in the transmit direction 
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 1 }
+
+        extremePortUtilizationAvgRxPkts  OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average packets in the receive direction 
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 2 }
+                
+        extremePortUtilizationPeakTxPkts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak packets in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 3 }
+
+        extremePortUtilizationPeakRxPkts OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak packets in the receive direction 
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 4 }
+
+        extremePortUtilizationAvgTxBytes  OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average bytes in the transmit direction 
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 5 }
+
+        extremePortUtilizationAvgRxBytes  OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of average bytes in the receive direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 6 }
+                
+        extremePortUtilizationPeakTxBytes OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak bytes in the transmit direction
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 7 }
+
+        extremePortUtilizationPeakRxBytes OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS  read-only  
+                STATUS current
+                DESCRIPTION
+                   "The reported number of peak bytes in the receive direction 
+                    per second."
+                ::= {extremePortUtilizationExtnEntry 8 }
+
+--
+-- Per Port QoS Stats Table
+--
+
+    extremePortQosStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortQosStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists Ports Qos information for either 
+             ingress or egress"
+        ::= { extremePort 12 }
+
+    extremePortQosStatsEntry OBJECT-TYPE
+        SYNTAX  ExtremePortQosStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port related qos information for each   
+            port entry." 
+        INDEX {ifIndex, extremePortQosIngress}
+    ::= { extremePortQosStatsTable 1 }
+
+    ExtremePortQosStatsEntry ::=
+        SEQUENCE {
+            extremePortQosIngress
+                ExtremePortTrafficDirection,
+            extremePortQP0TxBytes
+                Counter64,
+            extremePortQP0TxPkts
+                Counter64,
+            extremePortQP1TxBytes
+                Counter64,
+            extremePortQP1TxPkts
+                Counter64,
+            extremePortQP2TxBytes
+                Counter64,
+            extremePortQP2TxPkts
+                Counter64,
+            extremePortQP3TxBytes
+                Counter64,
+            extremePortQP3TxPkts
+                Counter64,
+            extremePortQP4TxBytes
+                Counter64,
+            extremePortQP4TxPkts
+                Counter64,
+            extremePortQP5TxBytes
+                Counter64,
+            extremePortQP5TxPkts
+                Counter64,
+            extremePortQP6TxBytes
+                Counter64,
+            extremePortQP6TxPkts
+                Counter64,
+            extremePortQP7TxBytes
+                Counter64,
+            extremePortQP7TxPkts
+                Counter64
+        }
+
+    extremePortQosIngress OBJECT-TYPE
+        SYNTAX  ExtremePortTrafficDirection
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates whether the port is in ingress/egress"       
+    ::= { extremePortQosStatsEntry 1 }
+
+    extremePortQP0TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 0 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 2 }
+
+    extremePortQP0TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 0 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 3 }
+
+    extremePortQP1TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 1 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 4 }
+
+    extremePortQP1TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 1 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 5 }
+
+    extremePortQP2TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 2 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 6 }
+
+    extremePortQP2TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 2 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 7 }
+
+    extremePortQP3TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 3 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 8 }
+
+    extremePortQP3TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 3 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 9 }
+
+    extremePortQP4TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 4 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 10 }
+
+    extremePortQP4TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 4 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 11 }
+
+    extremePortQP5TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 5 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 12 }
+
+    extremePortQP5TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 5 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 13 }
+
+    extremePortQP6TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 6 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 14 }
+
+    extremePortQP6TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 6 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 15 }
+
+    extremePortQP7TxBytes OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 7 bytes gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 16 }
+
+    extremePortQP7TxPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 7 packets gets transmitted from this port"
+    ::= { extremePortQosStatsEntry 17 }
+
+--
+-- Per Port Mau Table
+--
+extremePortMau OBJECT IDENTIFIER
+::= {  extremePort 13 }
+
+extremePortMauTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ExtremePortMauEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "Port Optics Status Table."
+    ::= { extremePortMau 1 }
+
+extremePortMauEntry    OBJECT-TYPE
+    SYNTAX      ExtremePortMauEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An individual Port Mau Entry."
+    INDEX { ifIndex }
+    ::= {extremePortMauTable 1}
+
+ExtremePortMauEntry ::= SEQUENCE {
+    extremePortMauType DisplayString,
+    extremePortMauVendorName DisplayString,
+    extremePortMauStatus INTEGER,
+    extremePortMauRestrict DisplayString
+    }
+
+extremePortMauType OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+         "This object identifies the MAU type."
+    ::= {extremePortMauEntry 1 }
+
+extremePortMauVendorName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+         "This object identifies the MAU Vendor Name."
+    ::= {extremePortMauEntry 2 }
+
+extremePortMauStatus  OBJECT-TYPE
+    SYNTAX INTEGER {
+        inserted(1),
+        empty(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "This object idetifies the status of the mau for this interface."
+    ::= {extremePortMauEntry 3 }
+
+extremePortMauRestrict OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..100))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+         "This object identifies the unsupported MAU restriction, if any."
+    ::= {extremePortMauEntry 4 }
+
+extremePortMauTraps OBJECT IDENTIFIER
+    ::= {extremePortMau 2}
+
+extremePortMauTrapsPrefix OBJECT IDENTIFIER
+    ::= { extremePortMauTraps 0}
+
+extremePortMauChangeTrap NOTIFICATION-TYPE
+    OBJECTS { ifIndex,
+             extremePortMauType,
+             extremePortMauStatus
+             }
+    STATUS      current
+    DESCRIPTION "This trap is sent whenever a  MAU is inserted or removed. When the mau is inserted, the value of extremePortMauStatus will be 'inserted' and extremePortMauType indicates the type of the mau inserted. If mau is removed, the value of extremePortMauStatus is empty and the type of the mau will be NONE"
+    ::= { extremePortMauTrapsPrefix 1 }
+
+extremePortMauRestrictionTrap NOTIFICATION-TYPE
+    OBJECTS { ifIndex,
+              extremePortMauRestrict
+             }
+    STATUS      current
+    DESCRIPTION "This trap is sent whenever a  restricted MAU is inserted or removed, or a port attached to a restricted Mau is enabled."
+    ::= { extremePortMauTrapsPrefix 2 }
+
+--
+-- Per Port Congestion Stats Table
+--
+
+    extremePortCongestionStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortCongestionStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists ports congestion information"
+        ::= { extremePort 14 }
+
+    extremePortCongestionStatsEntry OBJECT-TYPE
+        SYNTAX  ExtremePortCongestionStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port related congestion information." 
+        INDEX { ifIndex }
+    ::= { extremePortCongestionStatsTable 1 }
+
+    ExtremePortCongestionStatsEntry ::=
+        SEQUENCE {
+            extremePortCongDropPkts
+                Counter64
+        }
+
+    extremePortCongDropPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packets dropped due to congestion on this port"
+    ::= { extremePortCongestionStatsEntry 1 }
+
+
+--
+-- Per Port QoS Congestion Stats Table
+--
+
+    extremePortQosCongestionStatsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortQosCongestionStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists ports per QOS congestion information"
+        ::= { extremePort 15 }
+
+    extremePortQosCongestionStatsEntry OBJECT-TYPE
+        SYNTAX  ExtremePortQosCongestionStatsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Port related QOS congestion information." 
+        INDEX { ifIndex }
+    ::= { extremePortQosCongestionStatsTable 1 }
+
+    ExtremePortQosCongestionStatsEntry ::=
+        SEQUENCE {
+            extremePortQP0CongPkts
+                Counter64,
+            extremePortQP1CongPkts
+                Counter64,
+            extremePortQP2CongPkts
+                Counter64,
+            extremePortQP3CongPkts
+                Counter64,
+            extremePortQP4CongPkts
+                Counter64,
+            extremePortQP5CongPkts
+                Counter64,
+            extremePortQP6CongPkts
+                Counter64,
+            extremePortQP7CongPkts
+                Counter64
+        }
+
+    extremePortQP0CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 0 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 1 }
+
+    extremePortQP1CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 1 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 2 }
+
+    extremePortQP2CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 2 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 3 }
+
+    extremePortQP3CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 3 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 4 }
+
+    extremePortQP4CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 4 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 5 }
+
+    extremePortQP5CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 5 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 6 }
+
+    extremePortQP6CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 6 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 7 }
+
+    extremePortQP7CongPkts OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "The number of QOS 7 packets gets dropped due to congestion
+             on this port"
+    ::= { extremePortQosCongestionStatsEntry 8 }
+
+--
+-- Per Port Rate Limit Exceeded Alarm Trap
+--
+
+    extremeRateLimitExceededAlarm NOTIFICATION-TYPE
+             OBJECTS     { ifIndex }
+             STATUS             current
+             DESCRIPTION
+                 "This Notification indicates the first time a poll of a Rate-Limited Port has a non-zero counter."
+            ::= { extremePort 16 }
+
+--
+-- Per Port VLAN Info Table
+--
+    extremePortVlanInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortVlanInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "This table lists port with VLAN information including MAC Learning Limit Status, Max Number of MAC Learning, and MAC Lockdown Status"
+    ::= { extremePort 17 }
+
+
+    extremePortVlanInfoEntry OBJECT-TYPE
+        SYNTAX  ExtremePortVlanInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "Port entry indexed with VLAN for MAC Learning information and Lockdown Status "
+        INDEX { ifIndex, extremeVlanIfIndex }
+    ::= { extremePortVlanInfoTable 1 }
+
+    ExtremePortVlanInfoEntry ::= SEQUENCE {
+           extremePortVlanInfoDescr              DisplayString,
+           extremePortVlanInfoLimitLearningEnabled   Integer32,
+           extremePortVlanInfoLimitLearningNumber    Integer32,
+           extremePortVlanInfoMacLockDownEnabled     Integer32
+    }
+
+   extremePortVlanInfoDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS     read-only
+        STATUS current
+        DESCRIPTION
+            "VLAN Name defined over port"
+    ::= { extremePortVlanInfoEntry 1 }
+
+   extremePortVlanInfoLimitLearningEnabled OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     read-write
+        STATUS current
+        DESCRIPTION
+            "FDB Learning limit status. if it's enabled(1), switch limits the number of dynamically-learned MAC addresses per VLAN based on the extremePortVlanInfoLimitLearning Number. In case of disabled(0), switch allows to learn dynamic MAC addresses without limit."
+        DEFVAL      { 0 }
+    ::= { extremePortVlanInfoEntry 2 }
+
+   extremePortVlanInfoLimitLearningNumber OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     read-write
+        STATUS current
+        DESCRIPTION
+            "Max Number of FDB Learning Limit. Specifies a limit on the number of MAC addresses that can be dynamically learned on the specific VLAN over port"
+        DEFVAL      { 0 }
+    ::= { extremePortVlanInfoEntry 3 }
+
+   extremePortVlanInfoMacLockDownEnabled OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS     read-write
+        STATUS current
+        DESCRIPTION
+            "MAC Lock Down Status.  If it's enabled(1), the current FDB entries is made performanent static, and no additional learning should be allowed. In case of disabled(0), port is unclocked to allow unlimiated and dynamic learning."
+        DEFVAL      { 0 }
+    ::= { extremePortVlanInfoEntry 4 }
+
+--
+-- Per Port Configuration Table
+--
+
+    extremePortConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremePortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "This table lists port entries with informaion including
+		       auto negotitation, configured port speed, and duplex. "
+    ::= { extremePort 18 }
+
+    extremePortConfigEntry OBJECT-TYPE
+        SYNTAX  ExtremePortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+                      "An individual Port Information Entry with information
+		       including auto negotitation, configured port speed, and duplex. "
+        INDEX { ifIndex }
+    ::= { extremePortConfigTable 1 }
+
+    ExtremePortConfigEntry ::= SEQUENCE {
+           extremePortAutoNegotiation INTEGER,
+           extremePortAdminSpeed      INTEGER,
+           extremePortDuplex          INTEGER,
+	   extremePortMedium          INTEGER
+    }
+
+    extremePortAutoNegotiation OBJECT-TYPE
+                SYNTAX INTEGER {
+		off(0),
+		on(1)
+		}
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                      "Indicates whether the port is operating
+		       auto negotiation mode."
+        ::= { extremePortConfigEntry 1 }
+
+    extremePortAdminSpeed OBJECT-TYPE
+                SYNTAX INTEGER {
+		auto(0),     -- read-only
+		s10(1),
+		s100(2),
+		s1000(3),     -- 1 Gbps
+		s10000(4),    -- 10 Gbps
+		s25000(5),    -- 25 Gbps
+		s40000(6),    -- 40 Gbps
+		s50000(7),    -- 50 Gbps
+		s100000(10),  -- 100 Gbps
+		s2500(11),    -- 2.5 Gbps
+		s5000(12)     -- 5 Gbps
+		}
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                      "The configured speed of the port.
+		       The current actual speed of the port
+		       can be determined from ifSpeed."
+        ::= { extremePortConfigEntry 2 }
+
+    extremePortDuplex OBJECT-TYPE
+                SYNTAX INTEGER {
+		half(0),
+                full(1),
+                auto(2) -- read-only
+		}
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                      "Indicates whether the port is operating in half-
+                       duplex, full-duplex, or auto negotiation
+                       mode."
+        ::= { extremePortConfigEntry 3 }
+
+    extremePortMedium OBJECT-TYPE
+                SYNTAX INTEGER {
+		copper(0),
+                fiber(1),
+		nonComboPort(2) -- read-only
+		}
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                      "Medium-specific attributes for combination ports."
+        ::= { extremePortConfigEntry 4 }
+
+END

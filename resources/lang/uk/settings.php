@@ -1155,9 +1155,6 @@ return [
             'applications' => [
                 'description' => 'Застосунки',
             ],
-            'mib' => [
-                'description' => 'MIB',
-            ],
             'stp' => [
                 'description' => 'STP',
             ],
@@ -1458,9 +1455,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Шлях до traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Шлях до traceroute6',
         ],
         'twofactor' => [
             'description' => 'Двохфакторна автентифікація',

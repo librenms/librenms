@@ -1,0 +1,1937 @@
+-- ################################################################################
+
+EXTREME-VLAN-MIB DEFINITIONS ::= BEGIN
+
+    -- =========================================================================
+    --
+    --    Interpretation of the Interface Table for VLAN and encapsulation
+    --    interfaces:
+    -- 
+    --    OBJECT    VALUE/USE
+    --
+    --    ifIndex    Same interpretation as RFC1573.  A unique value,
+    --            greater than zero for each VLAN/Encapsulation interface.
+    --
+    --    ifDescr    Same interpretation as RFC1573.  A textual string
+    --            containing information about the interface.  This
+    --            string should include the name of the manufacturer,
+    --            the product name, the version of the software, and that
+    --            the entry is a vlan or encapsulation interface.
+    --
+    --            Example: "VLAN Red"
+    --            Example: "802.1Q Encapsulation Tag 004"
+    --
+    --    ifType    propVirtual(53)
+    --
+    --    ifMtu        Equivalent to the least common denominator MTU of the
+    --            set of ports associated with the VLAN or ENCAPS interface.
+    --            For example, if the VLAN contains one ethernet port, then
+    --            the value of this object is 1518.  If the VLAN contains
+    --            all FDDI ports, the value of this object is 4500.  If
+    --            a vlan contains a mix of ethernet and FDDI ports, the
+    --            value of this object is 1518.  If there are no ports associated
+    --            with the interface, then the ifMtu is zero.
+    --
+    --    ifSpeed        The value of this object is zero, as defined by RFC1573
+    --            for sub-layers that have no concept of bandwidth.             
+    --
+    --    ifPhysAddress    The value of this object is always equal to a null octet
+    --            string.
+    --
+    --    ifAdminStatus    Always equal to up(1).  SetRequest-PDUs fail.
+    --
+    --    ifOperStatus    The value of this object is equal to up(1) if the
+    --            ifOperStatus of at least one port in in the set of ports
+    --            stacked below the VLAN layer is up(1).  The value of this 
+    --            object is down(2) if the ifOperStatus of all ports stacked
+    --            below the vlan layer is down(2).  The value of this
+    --            object is down(2) if there are no ports stacked below the
+    --               the vlan sublayer.
+    --
+    --    ifLastChange     Same interpretation as RFC1573.  The value of sysUpTime
+    --             at the time the interface entered its current operational
+    --            state.  If the current state was entered prior to the 
+    --            last re-initialization of the local network management
+    --            subsystem, then this object contains a zero value.
+    --     
+    --    ifInOctets    These objects  return NO_SUCH_NAME on reads and writes. 
+    --    ifInUcastPkts      This approach is more desireable than returning zero
+    --    ifInNUcastPkt    on reads because NMS's cannot differentiate between
+    --    ifInDiscards    returning a zero for non-support vs returning a real
+    --    ifInErrors    zero value for the counter.  Inability to distinguish
+    --    ifInUnknownProtos between these two cases would essentially prevent
+    --    ifOutOctets    future implementation of these objects, therefore
+    --    ifOutUcastPkts    NO_SUCH_NAME is returned to indicate no-support.
+    --    ifOutNUcastPkts    Future implementations may choose to return real values
+    --    ifOutDiscards    for these counters.
+    --    ifOutDiscards                "
+    --    ifOutErrors                "
+    --    ifLinkUpDownTrapEnable                  "
+    --    ifConnectorPresent            "
+    --    ifHighSpeed                "
+    --    ifName                    "
+    --
+    --    ifOutQLen    Deprecated in RFC1573.  Set to zero if present.
+    --    ifSpecific    Deprecated in RFC1573.  Set to {0.0} if present. 
+    --
+    --    linkUp TRAP    Not supported for the vlan/encaps sublayers
+    --    linkDown TRAP    Not supported for the vlan/encaps sublayer
+    --
+    -- ======================================================================
+
+
+    IMPORTS
+        MODULE-IDENTITY             FROM SNMPv2-SMI
+        RowStatus, TruthValue,
+        MacAddress                  FROM SNMPv2-TC
+        DisplayString               FROM SNMPv2-TC
+        OBJECT-TYPE                 FROM SNMPv2-SMI
+        Integer32, IpAddress        FROM SNMPv2-SMI
+        extremeAgent                FROM EXTREME-BASE-MIB
+        PortList                    FROM EXTREME-BASE-MIB
+        extremeSlotNumber           FROM EXTREME-SYSTEM-MIB
+        Counter64                   FROM SNMPv2-SMI
+        InterfaceIndex              FROM IF-MIB
+        InterfaceIndexOrZero        FROM IF-MIB;
+
+    extremeVlan MODULE-IDENTITY
+        LAST-UPDATED "201310230000Z"
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO "www.extremenetworks.com"
+        DESCRIPTION "Extreme Virtual LAN objects"
+    ::= { extremeAgent 2 }
+
+    --
+    -- The objects are arranged into the following groups:
+    --
+    extremeVlanGroup            OBJECT IDENTIFIER ::= { extremeVlan 1 }
+    extremeVirtualGroup         OBJECT IDENTIFIER ::= { extremeVlan 2 }
+    extremeEncapsulationGroup   OBJECT IDENTIFIER ::= { extremeVlan 3 }
+    extremeVlanIpGroup          OBJECT IDENTIFIER ::= { extremeVlan 4 }
+    extremeProtocolGroup        OBJECT IDENTIFIER ::= { extremeVlan 5 }
+    extremeVlanOpaqueGroup      OBJECT IDENTIFIER ::= { extremeVlan 6 }
+    extremeVlanStackGroup       OBJECT IDENTIFIER ::= { extremeVlan 7 }
+    extremeVlanStatsGroup       OBJECT IDENTIFIER ::= { extremeVlan 8 }
+    extremeVlanAggregationGroup OBJECT IDENTIFIER ::= { extremeVlan 9 }
+    extremeVlanTranslationGroup OBJECT IDENTIFIER ::= { extremeVlan 10 }
+    extremePrivateVlan          OBJECT IDENTIFIER ::= { extremeVlan 11 }
+
+    --    
+    --
+    -- Extreme Networks Vlan Type Textual Convention
+    --
+    --  vlanLayer2(1) = The globally identified VLAN interface is protocol
+    --  independent and based on port grouping.  The configuration of
+    --  port grouping is controlled through the ifStackTable.
+    --
+
+    ExtremeVlanType ::= INTEGER {
+        vlanLayer2(1)
+    }
+
+    ExtremeVlanEncapsType ::= INTEGER { 
+        vlanEncaps8021q(1),
+        vlanEncapsNone(2)
+    }
+
+
+    --
+    -- All groups in this MIB are optional.  Support for a 
+    -- particular group is dependent upon the capabilities
+    -- of the network device.
+    --
+    -- The VLAN Group
+    --
+    --    The VLAN mapping group contains objects for
+    --    identifying VLANs within a device, and for mapping
+    --    these VLANs to a global identifier.  It consists of the
+    --    extremeVlanGlobalMappingTable and the extremeVlanIfTable.
+    --
+    -- The Virtual Group
+    --
+    --    The virtual group contains the extremeNextVirtIfIndex object.
+    --    In the future, other groups and object will be added as
+    --    capabilities are added.
+    --
+    -- The Encapsulation Group
+    --
+    --    The Encapsulation Group contains objects for identifying
+    --    and configuring encapsulation entries within a device.
+    --    It consists of the extremeVlanEncapsIfTable.
+    --
+    -- The Forwarding Database Group
+    --
+    --    Contains objects for managing MAC-layer FDBs, including
+    --    the extremeVlanDot1qStaticTable
+
+
+    --
+    -- The Extreme Networks VLAN Global Mapping Table
+    --
+    -- This table is implemented by all Extreme Networks network devices  
+    -- that support interfaces to globally identified VLANs.
+    --
+
+    extremeVlanGlobalMappingTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanGlobalMappingEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "This table lists VLAN interfaces that are globally
+            identified.  A single entry exists in this list for
+            each VLAN interface in the system that is bound to
+            a global identifier."
+    ::= { extremeVlanGroup 1 }
+
+    extremeVlanGlobalMappingEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanGlobalMappingEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "An individual VLAN interface global mapping entry.
+            Entries in this table are created by setting the
+            extremeVlanIfGlobalIdentifier object in the
+            extremeVlanIfTable to a non-zero value."
+        INDEX { extremeVlanGlobalMappingIdentifier }
+    ::= { extremeVlanGlobalMappingTable 1 }
+
+    ExtremeVlanGlobalMappingEntry ::=
+        SEQUENCE {
+            extremeVlanGlobalMappingIdentifier
+                INTEGER ,
+            extremeVlanGlobalMappingIfIndex
+                Integer32
+        }
+
+    extremeVlanGlobalMappingIdentifier OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "An index into the extremeVlanGlobalMappingTable and an
+            administratively assigned global VLAN identifier.  The
+            value of this object globally identifies the VLAN interface.
+            For VLAN interfaces, on different network devices, which are
+            part of the same globally identified VLAN, the value of this
+            object will be the same."
+    ::= { extremeVlanGlobalMappingEntry 1 }
+
+    extremeVlanGlobalMappingIfIndex OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The value of extremeVlanIfIndex for the VLAN interface in the
+            extremeVlanIfTable, which is bound to the global identifier
+            specified by this entry."
+    ::= { extremeVlanGlobalMappingEntry 2 }
+
+    --
+    -- The Extreme Networks VLAN Interface Table
+    --
+    -- This table is implemented by all Extreme Networks network devices  
+    -- that support VLAN interfaces.
+    --
+
+    extremeVlanIfTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists VLAN interfaces that exist within
+            a device.  A single entry exists in this list for each
+            VLAN interface in the system.  A VLAN interface may
+            be created, destroyed and/or mapped to a globally 
+            identified vlan."
+    ::= { extremeVlanGroup 2 }
+
+    extremeVlanIfEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "An individual VLAN interface entry.  When an NMS wishes
+            to create a new entry in this table, it must obtain a 
+            non-zero index from the extremeNextAvailableVirtIfIndex
+            object.  Row creation in this table will fail if the
+            chosen index value does not match the current value 
+            returned from the extremeNextAvailableVirtIfIndex object."
+        INDEX { extremeVlanIfIndex }
+    ::= { extremeVlanIfTable 1 }
+
+    ExtremeVlanIfEntry ::=
+        SEQUENCE {
+            extremeVlanIfIndex
+                Integer32,
+            extremeVlanIfDescr
+                DisplayString,
+            extremeVlanIfType
+                ExtremeVlanType,
+            extremeVlanIfGlobalIdentifier
+                INTEGER,
+            extremeVlanIfStatus
+                RowStatus,
+            extremeVlanIfIgnoreStpFlag
+                TruthValue,
+            extremeVlanIfIgnoreBpduFlag
+                TruthValue,
+            extremeVlanIfLoopbackModeFlag
+                TruthValue,
+            extremeVlanIfVlanId
+                Integer32,
+            extremeVlanIfEncapsType
+                ExtremeVlanEncapsType,
+            extremeVlanIfAdminStatus
+                TruthValue
+        }
+
+    extremeVlanIfIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     read-create
+        STATUS current
+        DESCRIPTION
+            "The index value of this row and the vlan's ifIndex in the
+            ifTable. The NMS obtains the index value for this row by
+            reading the extremeNextAvailableVirtIfIndex object."
+    ::= { extremeVlanIfEntry 1 }
+
+    extremeVlanIfDescr OBJECT-TYPE
+        SYNTAX    DisplayString (SIZE(0..32))
+        MAX-ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+            "This is a description of the VLAN interface."
+    ::= {extremeVlanIfEntry 2}
+
+    extremeVlanIfType OBJECT-TYPE
+        SYNTAX     ExtremeVlanType
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The VLAN interface type."
+    ::= { extremeVlanIfEntry 3 }
+
+    extremeVlanIfGlobalIdentifier OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS    read-create 
+        STATUS deprecated
+        DESCRIPTION
+            "An administratively assigned global VLAN identifier.  For
+            VLAN interfaces, on different network devices, which are
+            part of the same globally identified VLAN, the value of this
+            object will be the same.  
+
+            The binding between a global identifier and a VLAN 
+            interface can be created or removed.  To create a binding
+            an NMS must write a non-zero value to this object.  To
+            delete a binding, the NMS must write a zero to this
+            object. The value 1 is reserved for the default VLAN and
+            this cannot be deleted or re-assigned."
+    ::= { extremeVlanIfEntry 4 }
+
+    extremeVlanIfStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The status column for this VLAN interface. 
+            This OBJECT can be set to:
+                active(1)
+                createAndGo(4)
+                createAndWait(5)
+                destroy(6)
+
+            The following values may be read:
+                active(1)
+                notInService(2)
+                notReady(3).
+            
+            Setting this object to createAndGo(4) causes the agent
+            to attempt to create and commit the row based on 
+            the contents of the objects in the row.  If all necessary
+            information is present in the row and the values are
+            acceptible to the agent, the agent will change the 
+            status to active(1).  If any of the necessary objects  
+            are not available, the agent will reject the creation
+            request.    
+
+            Setting this object to createAndWait(5) causes a row
+            in this table to be created.  The agent sets the
+            status to notInService(2) if all of the information is
+            present in the row and the values are acceptable to the
+            agent; otherwise, the agent sets the status to notReady(3).
+
+            Setting this object to active(1) is only valid when
+            the current status is active(1) or notInService(2).  
+
+            When the state of the row transitions is set to active(1),
+            the agent creates the corresponding row in the ifTable.
+
+            Setting this object to destroy(6) will remove the
+            corresponding VLAN interface, remove the entry in this
+            table, and the corresponding entries in the
+            extremeVlanGlobalMappingTable and the ifTable.
+
+            In order for a set of this object to destroy(6) to succeed,
+            all dependencies on this row must have been removed. These
+            will include any stacking dependencies in the ifStackTable
+            and any protocol specific tables dependencies."
+    ::= { extremeVlanIfEntry 6 }
+
+    extremeVlanIfIgnoreStpFlag OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Enable/disable STP for this VLAN interface. Setting this
+            object to true will cause the ports on this VLAN to ignore
+            STP BPDUs. When a vlan is first created, the Default value 
+            is FALSE, which means that the VLAN uses STP port information"
+    ::= { extremeVlanIfEntry 7 }
+
+    extremeVlanIfIgnoreBpduFlag OBJECT-TYPE
+         SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Setting this object to true causes this VLAN's BPDU's to be ignored by 
+            the Spanning Tree process. This can be used to keep the root bridge within 
+            one's own network when external switches also fall within the same Spanning 
+            Tree Domain. When a vlan is first created, the Default value is FALSE."
+    ::= { extremeVlanIfEntry 8 }
+
+    extremeVlanIfLoopbackModeFlag OBJECT-TYPE
+         SYNTAX        TruthValue
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+            "Setting this object to true causes loopback mode to be enabled on this VLAN."
+    ::= { extremeVlanIfEntry 9 }
+
+    extremeVlanIfVlanId OBJECT-TYPE
+                SYNTAX  Integer32 (1..4095)
+                MAX-ACCESS      read-write
+         STATUS current
+         DESCRIPTION
+            "The VLAN ID of this VLAN."
+    ::= { extremeVlanIfEntry 10 }
+
+    extremeVlanIfEncapsType OBJECT-TYPE
+        SYNTAX  ExtremeVlanEncapsType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The encapsulation algorithm used when encapsulating
+            packets transmitted, or de-encapsulating packets
+            received through this interface."
+    ::= { extremeVlanIfEntry 11 }
+
+    extremeVlanIfAdminStatus OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Enable/disable this VLAN interface. Setting this
+             object to true will administratively enable this VLAN."
+    ::= { extremeVlanIfEntry 12 }
+
+    --
+    -- The Extreme Networks VLAN Encapsulation Interface Table
+    --
+    -- VLAN Encapsulation refers to the ability to multiplex
+    -- several VLANs over a single network segment by explicitly
+    -- labeling eack packet with a tag that identifies the packet's
+    -- VLAN membership.
+    --
+    -- The only tagging scheme supported by this MIB is IEEE 802.1Q
+    -- Some ports support tagging, some don't.  For ports that support 
+    -- tagging, they may have some VLANs that operate in tagging mode, 
+    -- some not in tagging mode.
+    --
+    -- The encapsulation interface will be creatable by the NMS using
+    -- the extremeVlanIfTable.  This table will allow the NMS to define 
+    -- certain attributes of the encapsulation including an encapsulation 
+    -- algorithm and a tag value.  Using the ifStack table, an encapsulation
+    -- interface may be stacked underneath a VLAN interface and on top of port(s).
+    -- 
+    -- Example ifTable Stacking:
+    --
+    --        +=======================+=======================+
+    --        |     VLAN Xface 9      |       VLAN Xface 11   |
+    --        +=======================+=======================+
+    --        +=======================+
+    --        |      ENCAPS Xface 10  |
+    --        +=======================+
+    --        +=====+=====+=====+=====+=====+=====+=====+=====+
+    --        |  1  |  2  |  3  |  4  |  5  |  6  |  7  |  8  |<=== Ports
+    --        +=====+=====+=====+=====+=====+=====+=====+=====+
+    --
+    -- ifStackTable Instances:
+    --        ifStackHigher    ifStackLower
+    --                   0               9
+    --                   0               11
+    --                   1               0
+    --                   2               0
+    --                   3               0
+    --                   4               0
+    --                   9               10
+    --                  10               1
+    --                  10               2
+    --                  10               3
+    --                  10               4
+    --                  11               5
+    --                  11               6
+    --                  11               7
+    --                  11               8
+    --
+    -- A stack that contains a VLAN, encapsulation and a port interface,
+    -- specifies:
+    --
+    -- * For packets received through the given port that use the given
+    --   encapsulation scheme and contain the given tag, those packets
+    --   are members of the given VLAN.
+    --
+    -- * For unencapsulated packets from the given VLAN that are to be
+    --   transmitted out the given port, those packets must first be
+    --   encapsulated using the given encapsulation algorithm and tag.
+    -- 
+    -- This table is implemented by all Extreme Networks network devices  
+    -- that support the encapsulation of multiple VLANs over a single
+    -- interface.
+
+
+    extremeVlanEncapsIfTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanEncapsIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists VLAN encapsulation interfaces that
+            exist within a device.  A single entry exists in this
+            list for each VLAN encapsulation interface in the
+            system.  A VLAN encapsulation interface may be created
+            or destroyed."
+    ::= { extremeEncapsulationGroup 1 }
+
+    extremeVlanEncapsIfEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanEncapsIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "An individual VLAN encapsulation interface entry. 
+            When an NMS wishes to create a new entry in this table,
+            it must obtain a non-zero index from the
+            extremeNextAvailableVirtIfIndex object.  Row creation
+            in this table will fail if the chosen index value does
+            not match the current value returned from the
+            extremeNextAvailableVirtIfIndex object."
+        INDEX { extremeVlanEncapsIfIndex }
+    ::= { extremeVlanEncapsIfTable 1 }
+
+    ExtremeVlanEncapsIfEntry ::=
+        SEQUENCE {
+            extremeVlanEncapsIfIndex
+                Integer32,
+            extremeVlanEncapsIfType
+                ExtremeVlanEncapsType,
+            extremeVlanEncapsIfTag
+                Integer32,
+            extremeVlanEncapsIfStatus
+                RowStatus
+        }
+
+    extremeVlanEncapsIfIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS     read-create
+        STATUS current
+        DESCRIPTION
+            "The index value of this row and the encapsulation
+            interface's ifIndex in the ifTable.  The NMS obtains
+            the index value used for creating a row in this table
+            by reading the extremeNextAvailableVirtIfIndex object."
+    ::= { extremeVlanEncapsIfEntry 1 }
+
+    extremeVlanEncapsIfType OBJECT-TYPE
+        SYNTAX    ExtremeVlanEncapsType
+        MAX-ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+            "The encapsulation algorithm used when encapsulating
+            packets transmitted, or de-encapsulating packets
+            received through this interface."
+    ::= {extremeVlanEncapsIfEntry 2}
+
+    extremeVlanEncapsIfTag OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The tag used when encapsulating packets transmitted,
+            or de-encapsulating packets received through this
+            interface."
+    ::= { extremeVlanEncapsIfEntry 3 }
+
+    extremeVlanEncapsIfStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The row status for this VLAN encapsulation interface. 
+
+            This OBJECT can be set to:
+
+                active(1)
+                createAndGo(4)
+                createAndWait(5)
+                destroy(6)
+
+            The following values may be read:
+                active(1)
+                notReady(3).
+            
+            In order for a row to become active, the NMS must set
+            extremeVlanEncapsIfTagType and extremeVlanEncapsIfTag
+            to some valid and consistent values.  
+
+            Setting this object to createAndGo(4) causes the agent
+            to attempt to create and commit the row based on the
+            contents of the objects in the row. If all necessary
+            information is present in the row, the agent will
+            create the row and change the status to active(1).  If
+            any of the necessary objects are not available, or
+            specify an invalid configuration, the row will not be
+            created and the agent will return an appropriate error.
+
+            Setting this object to createAndWait(5) causes a row in
+            in this table to be created.  If all necessary objects
+            in the row have been assigned values and specify a
+            valid configuration, the status of the row will be set
+            to notInService(2); otherwise, the status will be set
+            to notReady(3).  
+
+            This object may only be set to createAndGo(4) or
+            createAndWait(5) if it does not exist.
+
+            Setting this object to active(1) when the status is
+            notInService(2) causes the agent to commit the
+            row.  Setting this object to active(1) when its value
+            is already active(1) is a no-op.
+
+            Setting this object to destroy(6) will remove the
+            corresponding VLAN encapsulation interface, remove the
+            entry in this table, and remove the corresponding entry
+            in the ifTable.
+
+            In order for a set of this object to destroy(6) to
+            succeed, all dependencies on this row must have been
+            removed.  These will include any references to this
+            interface in the ifStackTable."
+    ::= { extremeVlanEncapsIfEntry 4 }
+
+    --
+    -- The extremeNextAvailableVirtIfIndex
+    --
+
+    extremeNextAvailableVirtIfIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "The value of the next available virtual ifIndex.  This
+             object is used by an NMS to select an index value 
+             for row-creation in tables indexed by ifIndex.  The 
+             current value of this object is changed to a new
+             value when the current value is written to an agent's
+             table, that is indexed by ifIndex.  Row creation
+             using the current value of this object, allocates
+             a virtual ifIndex.  Note the following:
+            
+             1. A newly created row does not have to be active(1)
+                for the agent to allocate the virtual ifIndex.
+
+             2. Race conditions between multiple NMS's end when
+                a row is created.  Rows are deemed created when
+                a setRequest is successfully committed (i.e.
+                the errorStats is noError(0)).
+
+            3.  An agent that exhausts its supply of virual
+                ifIndex values returns zero as the value of this
+                object. This can be used by an NMS as an indication
+                to deleted unused rows and reboot the device."
+    ::= { extremeVirtualGroup 1 }         
+
+
+    --
+    --  The IP VLAN Interface Information Table
+    --
+    --  The IP VLAN Interface Information table is supported by 
+    --  network devices that support IP VLAN interfaces. 
+    --
+    --  A row must be created in this table for each IP
+    --  VLAN interface. The index used is the
+    --  same index as that used to create the IP VLAN interface
+    --  in the extremeVlanIfTable. 
+    --    
+
+    extremeVlanIpTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of IP VLAN interface information
+            entries.  Entries in this table are related
+            to entries in the extremeVlanIfTable by using the
+            same index."
+    ::= { extremeVlanIpGroup 1 }
+
+    extremeVlanIpEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A extremeVlanIpEntry contains layer 3
+            information about a particular IP VLAN
+            interface."
+        INDEX    { extremeVlanIfIndex }
+    ::= { extremeVlanIpTable 1 }
+
+    ExtremeVlanIpEntry ::=
+        SEQUENCE {
+            extremeVlanIpNetAddress
+                IpAddress,
+            extremeVlanIpNetMask
+                IpAddress,
+            extremeVlanIpStatus
+                RowStatus,    
+            extremeVlanIpForwardingState
+                TruthValue
+        }
+
+    extremeVlanIpNetAddress OBJECT-TYPE
+        SYNTAX  IpAddress 
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The IP network number for the IP VLAN interface defined
+            in the extremeVlanIfTable identified with the same index."
+    ::= { extremeVlanIpEntry 1 }
+
+    extremeVlanIpNetMask OBJECT-TYPE
+        SYNTAX  IpAddress 
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The IP network mask corresponding to the IP Network
+            address defined by extremeVlanIpIpNetAddress.  "
+    ::= { extremeVlanIpEntry 2 }
+
+    extremeVlanIpStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The status column for this IP VLAN entry.
+            This object can be set to:
+                active(1)
+                createAndGo(4)
+                destroy(6)
+
+            The following values may be read:
+                active(1)
+
+            Setting this object to active(1) or createAndGo(4) causes 
+            the agent to attempt to create and commit the row based on 
+            the contents of the objects in the row.  If all necessary
+            information is present in the row and the values are
+            acceptible to the agent, the agent will change the 
+            status to active(1).  If any of the necessary objects  
+            are not available, the agent will reject the row 
+            creation request.
+
+            Setting this object to createAndWait(5) is not supported.
+
+            When the status changes to active(1), the agent applies the
+            IP parmeters to the IP VLAN interface identified by the
+            corresponding value of the extremeVlanIpIndex object.
+
+            Setting this object to destroy(6) will remove the IP
+            parmeters from the IP VLAN interface and remove the
+            entry from this table."
+    ::= { extremeVlanIpEntry 3 }
+
+    extremeVlanIpForwardingState OBJECT-TYPE
+        SYNTAX  TruthValue 
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates whether the IP Forwarding  on this Vlan is
+            Enable or not. A true value indicates that the Vlan is
+            Enable."
+    ::= { extremeVlanIpEntry 4 }
+
+    -- 
+    -- Protocol Definition Table
+    --
+    -- we choose to define our own table as existing tables are 
+    -- overcomplex (RMON Protocol MIB, etc.)
+    --
+    extremeVlanProtocolTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table of defined combinations of protocol IDs 
+            that make up one protocol definition name. 
+            All members of one protocol definition share 
+            the same extremeVlanProtocolIndex. A given 
+            protocol ID may appear in the definition of 
+            just one protocol definition. This table will
+            typically contain some default entries for
+            popular protocols chosen by ExtremeWare."
+    ::= { extremeProtocolGroup 1 }
+
+    extremeVlanProtocolEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "One member protocol ID of a protocol definition."
+        INDEX { extremeVlanProtocolIndex, 
+                extremeVlanProtocolIdIndex }
+
+    ::= { extremeVlanProtocolTable 1 }
+
+    ExtremeVlanProtocolEntry ::= SEQUENCE {
+        extremeVlanProtocolIndex            INTEGER,
+        extremeVlanProtocolIdIndex          INTEGER,
+        extremeVlanProtocolName             DisplayString,
+        extremeVlanProtocolDllEncapsType    INTEGER,
+        extremeVlanProtocolId               INTEGER,
+        extremeVlanProtocolStatus           RowStatus,
+        extremeVlanProtocolDestAddress      MacAddress,
+        extremeVlanProtocolDestAddressValid TruthValue,
+        extremeVlanProtocolUserFieldOffset  Integer32,
+        extremeVlanProtocolUserFieldValue   OCTET STRING,
+        extremeVlanProtocolUserFieldMask    OCTET STRING
+    }
+        
+    extremeVlanProtocolIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "An index representing a protocol grouping of
+            protocol ID values. A limited number of
+            protocol groupings may be defined (up to 7 
+            in ExtremeWare and 16 in EXOS). 0 is used  
+            for internal purposes."
+    ::= { extremeVlanProtocolEntry 1 }
+
+    extremeVlanProtocolIdIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..16)
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "An index representing a particular protocol ID
+            within a protocol grouping. A limited number of
+            protocol IDs may be defined per 
+            extremeVlanProtocolIndex (up to 6 in ExtremeWare
+            and 16 in EXOS). 0 is used for internal purposes."
+    ::= { extremeVlanProtocolEntry 2 }
+
+    extremeVlanProtocolName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "A human-readable string representing this protocol.
+            This string should be the same for all entries
+            sharing a given extremeVlanProtocolIndex. 
+            A ExtremeVlanProtocolEntry with 
+            extremeVlanProtocolName of ANY represents a match 
+            on all protocols: this entry may not be modified."
+    ::= { extremeVlanProtocolEntry 3 }
+
+    extremeVlanProtocolDllEncapsType OBJECT-TYPE 
+        SYNTAX  INTEGER { any(1), ethertype(2), 
+                          llc(3), llcSnapEthertype(4), none(5) }
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "Represents the type of data-link encapsulation 
+            in which the extremeVlanProtocolId protocol ID 
+            is carried. The value any(1) is used to indicate 
+            a wildcard and matches all encapsulations and 
+            protocol IDs that are not explicitly mentioned 
+            in this table. Entries of type any(1) may not 
+            be created. The value none(5) is used to indicate 
+            that no protocol IDs match this entry. A value
+            of none(5) may not be set by a manager."
+    ::= { extremeVlanProtocolEntry 4 }
+
+    extremeVlanProtocolId OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The protocol ID: for entries of type ethertype(2)
+            or llcSnapEthertype(4) this represents a 16-bit
+            protocol ID. For entries of type llc(3) it 
+            represents a concatenation of LLC DSAP+SSAP in
+            network byte order. This value is not valid
+            for extremeVlanProtocolDllEncapsType values of
+            any(1) or none(5)."
+    ::= { extremeVlanProtocolEntry 5 }
+
+    extremeVlanProtocolStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions."
+    ::= { extremeVlanProtocolEntry 6 }
+
+    extremeVlanProtocolDestAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The destination MAC Address of the protocol. If the protocol
+             does not have a defined destination MAC address, then
+             extremeVlanProtocolDestAddressValid must be set to false."
+        DEFVAL      { '000000000000'H }
+        ::= { extremeVlanProtocolEntry 7 }
+
+    extremeVlanProtocolDestAddressValid OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the protocol defines a destination MAC address
+             or not. If the protocol defines a destination MAC address, this
+             field should be set to true and
+             extremeVlanProtocolDestAddressValid must be set to the
+             destination MAC address for the protocol."
+        DEFVAL      { false }
+        ::= { extremeVlanProtocolEntry 8 }
+
+    extremeVlanProtocolUserFieldOffset OBJECT-TYPE
+        SYNTAX     Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The offset of the user defined field, from the start of the PDU."
+        DEFVAL     { 0 }
+        ::= { extremeVlanProtocolEntry 9 }
+
+    extremeVlanProtocolUserFieldValue OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..16))
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The value of the user defined field. If the protocol does not use
+             user defined fields, this object must be set to zero length."
+        DEFVAL     { ''H }
+        ::= { extremeVlanProtocolEntry 10 }
+
+    extremeVlanProtocolUserFieldMask OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE(0..16))
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The mask for the user defined field. The length of this object
+             must be the same as that of extremeVlanProtocolUserFieldValue."
+        ::= { extremeVlanProtocolEntry 11 }
+
+    --
+    -- Protocol-based VLAN Table (extremeware)
+    --
+    extremeVlanProtocolVlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanProtocolVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table to apply one of the protocol definitions 
+            in extremeVlanProtocolTable to a given VLAN 
+            This applies to all ports that are untagged 
+            in this VLAN). A limited number of protocols
+            may be applied simultaneously in one device
+            (up to 8 in ExtremeWare)."
+    ::= { extremeProtocolGroup 2 }
+
+    extremeVlanProtocolVlanEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanProtocolVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A mapping of untagged packets of one protocol 
+            onto a particular VLAN."
+        INDEX { extremeVlanProtocolVlanIfIndex, 
+                extremeVlanProtocolVlanProtocolIndex }
+    ::= { extremeVlanProtocolVlanTable 1 }
+
+    ExtremeVlanProtocolVlanEntry ::= SEQUENCE {
+        extremeVlanProtocolVlanIfIndex Integer32,
+        extremeVlanProtocolVlanProtocolIndex Integer32,
+        extremeVlanProtocolVlanStatus         RowStatus
+    }
+
+    extremeVlanProtocolVlanIfIndex OBJECT-TYPE
+                --SYNTAX INTEGER (extremeware)
+                SYNTAX Integer32
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The index value of this row and the vlan's ifIndex in the
+            ifTable. The NMS obtains the index value for this row by
+            reading the extremeNextAvailableVirtIfIndex object."
+    ::= { extremeVlanProtocolVlanEntry 1 }
+
+    extremeVlanProtocolVlanProtocolIndex OBJECT-TYPE
+                --SYNTAX INTEGER (extremeware)
+                SYNTAX Integer32
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "An index representing a protocol grouping of
+            protocol ID values. A limited number of
+            protocol groupings may be defined (up to 7 
+            in ExtremeWare)."
+    ::= { extremeVlanProtocolVlanEntry 2 }
+
+
+    extremeVlanProtocolVlanStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions."
+    ::= { extremeVlanProtocolVlanEntry 3 }
+
+
+    --
+    -- Protocol Definition Table (Deprecated, supporting walk only )
+    -- This table will display only entries that do not define a destination
+    -- address and do not define an user field
+    --
+    extremeVlanProtocolDefTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanProtocolDefEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "Table of defined combinations of protocols and
+            DLLEncaps type. This table will
+            typically contain some default entries for
+            popular protocols chosen by ExtremeWare."
+    ::= { extremeProtocolGroup 3 }
+
+    extremeVlanProtocolDefEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanProtocolDefEntry
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "One member representing combination of protocol and
+            DLLEncaps Type."
+        INDEX { extremeVlanProtocolDefName, 
+                extremeVlanProtocolDefDllEncapsType,
+                extremeVlanProtocolDefValue}
+    ::= { extremeVlanProtocolDefTable 1 }
+
+    ExtremeVlanProtocolDefEntry ::= SEQUENCE {
+        extremeVlanProtocolDefName              DisplayString,
+        extremeVlanProtocolDefDllEncapsType     INTEGER,
+        extremeVlanProtocolDefValue             INTEGER,
+        extremeVlanProtocolDefStatus            RowStatus
+    }
+
+    extremeVlanProtocolDefName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(1..32))
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "A human-readable string representing this protocol.
+            A ExtremeVlanProtocolEntry with 
+            extremeVlanProtocol2Name of ANY represents a match 
+            on all protocols: this entry may not be modified."
+    ::= { extremeVlanProtocolDefEntry 1 }
+
+    extremeVlanProtocolDefDllEncapsType OBJECT-TYPE 
+        SYNTAX  INTEGER { any(1), ethertype(2), 
+                          llc(3), llcSnapEthertype(4), none(5) }
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "Represents the type of data-link encapsulation 
+            in which the protocol designated by 
+            extremeVlanProtocolDefName is carried. 
+            The value any(1) is used to indicate 
+            a wildcard and matches all encapsulations and 
+            protocol IDs that are not explicitly mentioned 
+            in this table. Entries of type any(1) may not 
+            be created. The value none(5) is used to indicate 
+            that no protocol IDs match this entry. A value
+            of none(5) may not be set by a manager."
+    ::= { extremeVlanProtocolDefEntry 2 }
+
+    extremeVlanProtocolDefValue OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  not-accessible
+        STATUS deprecated
+        DESCRIPTION
+            "The protocol ID: for entries of type ethertype(2)
+            or llcSnapEthertype(4) this represents a 16-bit
+            protocol ID. For entries of type llc(3) it 
+            represents a concatenation of LLC DSAP+SSAP in
+            network byte order. This value is not valid
+            for extremeVlanProtocolDefDllEncapsType values of
+            any(1) or none(5)."
+    ::= { extremeVlanProtocolDefEntry 3 }
+
+    extremeVlanProtocolDefStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-only
+        STATUS deprecated
+        DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions."
+    ::= { extremeVlanProtocolDefEntry 4 }
+
+    --
+    -- Protocol-based VLAN Table (EXOS,  supporting walk only )
+    --
+    extremeVlanProtocolBindingTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanProtocolBindingEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table to apply one of the protocol definitions 
+            in extremeVlanProtocolDefTable to a given VLAN 
+            This applies to all ports that are untagged 
+            in this VLAN). A limited number of protocols
+            may be applied simultaneously in one device
+            (up to 8 in ExtremeWare)."
+    ::= { extremeProtocolGroup 4 }
+
+    extremeVlanProtocolBindingEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanProtocolBindingEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A mapping of untagged packets of one protocol 
+            onto a particular VLAN."
+        INDEX { extremeVlanProtocolBindingIfIndex } 
+    ::= { extremeVlanProtocolBindingTable 1 }
+
+    ExtremeVlanProtocolBindingEntry ::= SEQUENCE {
+        extremeVlanProtocolBindingIfIndex     Integer32,
+        extremeVlanProtocolBindingName        DisplayString,
+        extremeVlanProtocolBindingStatus      RowStatus
+    }
+
+    extremeVlanProtocolBindingIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+             "The index value of this row and the vlan's ifIndex in the
+             ifTable. The NMS obtains the index value for this row by
+             reading the extremeNextAvailableVirtIfIndex object."
+    ::= { extremeVlanProtocolBindingEntry 1 }
+
+    extremeVlanProtocolBindingName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..31))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "A human-readable string representing this protocol.
+            A ExtremeVlanProtocolBindingEntry with 
+            extremeVlanProtocolBindingName of ANY represents a 
+            match on all protocols: this entry may not be modified."
+    ::= { extremeVlanProtocolBindingEntry 2 }
+
+    extremeVlanProtocolBindingStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The row status variable, used according to
+            row installation and removal conventions."
+    ::= { extremeVlanProtocolBindingEntry 3 }
+    --
+    -- The Extreme Networks VLAN Opaque Table
+    --
+    -- This table is implemented by all Extreme Networks network devices  
+    -- that support VLAN interfaces.
+    --
+
+    extremeVlanOpaqueTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanOpaqueEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists the ports associated with each VLAN interface."
+    ::= { extremeVlanOpaqueGroup 1 }
+
+    extremeVlanOpaqueEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanOpaqueEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This represents the tagged and untagged ports on each slot per vlan."
+        INDEX { extremeVlanIfIndex, extremeSlotNumber }
+    ::= { extremeVlanOpaqueTable 1 }
+
+    ExtremeVlanOpaqueEntry ::=
+        SEQUENCE {
+            extremeVlanOpaqueTaggedPorts
+            PortList,
+            extremeVlanOpaqueUntaggedPorts
+            PortList,
+            extremeVlanOpaqueTranslatedPorts
+            PortList
+        }
+
+
+    extremeVlanOpaqueTaggedPorts OBJECT-TYPE
+        SYNTAX    PortList
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "Each bit in the octet string represents one port.
+             A 1 means that the port is a tagged port in that vlan. 
+            The bit value for a port is 0 otherwise."
+    ::= { extremeVlanOpaqueEntry 1}
+
+    extremeVlanOpaqueUntaggedPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Each bit in the octet string represents one port.
+             A 1 means that the port is an untagged port in that vlan. 
+            The bit value for a port is 0 otherwise."
+    ::= { extremeVlanOpaqueEntry 2 }
+
+    extremeVlanOpaqueTranslatedPorts OBJECT-TYPE
+        SYNTAX    PortList
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "Each bit in the octet string represents one port.
+             A 1 means that the port is a translated port in that vlan. 
+             Translated ports are also tagged ports.
+             The bit value for a port is 0 otherwise."
+    ::= { extremeVlanOpaqueEntry 3}
+
+    --
+    -- The Extreme Networks VLAN Opaque Control Table
+    --
+    -- This table is implemented by all Extreme Networks networks devices  
+    -- on EXOS and that support VLAN interfaces. The table is  
+    -- used to add/delete ports on a vlan. The table is transitional in nature 
+    -- and SNMP read operations must not be performed on it. Use extremeVlanOpaqueTable
+    -- for reading the port membership association with vlans
+    --
+
+   extremeVlanOpaqueControlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanOpaqueControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the ports associated with each VLAN 
+             interface. The table is  used to add/delete ports on a vlan. The table is
+             transitional in nature and SNMP read operations must not be performed on it. 
+             Use extremeVlanOpaqueTable for reading the port membership association with vlans"
+    ::= { extremeVlanOpaqueGroup 2 }
+
+    extremeVlanOpaqueControlEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanOpaqueControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This represents a control table entry (command) to configure the tagged 
+             and untagged ports on each slot per vlan.  The first index of the entry is 
+             the ifIndex of the VLAN and second index is the slot number of the ports.
+
+             When adding untagged ports to a VLAN, those ports maybe not be untagged ports
+             for another VLAN (assuming both VLANs use the ANY protocol filter).  Such 
+             ports must first be deleted from the other VLAN(s) or an error will occur.
+
+             The operation will succeed or fail in its entirety, no partial results on some of the ports."
+        INDEX { extremeVlanIfIndex, extremeSlotNumber }
+    ::= { extremeVlanOpaqueControlTable 1 }
+
+    ExtremeVlanOpaqueControlEntry ::=
+        SEQUENCE {
+            extremeVlanOpaqueControlPorts
+            PortList,
+            extremeVlanOpaqueControlOperation
+            INTEGER,
+                    extremeVlanOpaqueControlStatus 
+            RowStatus
+        }
+
+    extremeVlanOpaqueControlPorts OBJECT-TYPE
+        SYNTAX    PortList
+        MAX-ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+           "The octet string representing a list of ports in
+            bitwise form."
+
+    ::= { extremeVlanOpaqueControlEntry 1}
+
+    extremeVlanOpaqueControlOperation OBJECT-TYPE
+        SYNTAX INTEGER {
+          addTagged(1),
+          addUntagged(2),
+          delete(3),
+          addTranslated(4)
+        }
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "The operation code for this entry. 
+               addTagged(1)   = Ports referred to in the extremeVlanOpaqueControlPorts 
+                                variable are added as tagged ports to the VLAN indicated
+                                by the index.  The ports belong to the slot number as 
+                                indicated by the second index of the variable.
+
+               addUntagged(2) = Ports referred to in the extremeVlanOpaqueControlPorts 
+                                  variable are added as tagged ports to the VLAN indicated
+                                  by the index.  The ports belong to the slot number as 
+                                  indicated by the second index of the variable.
+
+               delete(3)      = Ports referred to in the extremeVlanOpaqueControlPorts 
+                                 variable are removed from the VLAN indicated by the index.
+                                 The ports belong to the slot number as indicated by the
+                                 second index of the variable.
+
+               addTranslated(4) = Ports referred to in the extremeVlanOpaqueControlPorts 
+                                  variable are added as tagged translated ports to the 
+                                  VLAN indicated by the index.  The ports belong to the 
+                                  slot number as indicated by the second index of the
+                                  variable."
+
+    ::= { extremeVlanOpaqueControlEntry 2 }
+    
+    extremeVlanOpaqueControlStatus OBJECT-TYPE
+    SYNTAX        RowStatus                      
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The status of this entry as per standard RowStatus
+         conventions. Note however, that only the CreateAndGo 
+         state is supported."
+    ::= { extremeVlanOpaqueControlEntry 3 }
+
+    --
+    -- The Extreme Networks VLAN Stack Table
+    --
+    -- This table is essentially the ifStackTable without entries for any ports
+    --
+
+    extremeVlanStackTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeVlanStackEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Represents those components of the ifStackTable that do not
+            contain a Physical interface."
+    ::= { extremeVlanStackGroup 1 }
+
+    extremeVlanStackEntry OBJECT-TYPE
+        SYNTAX  ExtremeVlanStackEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each entry in this read-only table defines which interfaces are
+            on top of which one. All information in the table is also
+            contained in ifStackTable. The Physical interfaces in the 
+            ifStackTable are not represented here."
+        INDEX { extremeVlanStackHigherLayer, extremeVlanStackLowerLayer }
+    ::= { extremeVlanStackTable 1 }
+
+    ExtremeVlanStackEntry ::=
+        SEQUENCE {
+            extremeVlanStackHigherLayer
+                Integer32,
+            extremeVlanStackLowerLayer
+                Integer32
+        }
+
+
+    extremeVlanStackHigherLayer OBJECT-TYPE
+        SYNTAX    Integer32
+        MAX-ACCESS    read-only
+        STATUS    current
+        DESCRIPTION
+            "The higher layer in the logical vlan hierarchy."
+    ::= { extremeVlanStackEntry 1}
+
+    extremeVlanStackLowerLayer OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "The lower layer in the logical vlan hierarchy."
+    ::= { extremeVlanStackEntry 2 }
+
+    extremeVlanL2StatsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF ExtremeVlanL2StatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This tables contains per-VLAN layer 2 statistics information."
+    ::= { extremeVlanStatsGroup 1 }
+
+    extremeVlanL2StatsEntry OBJECT-TYPE
+        SYNTAX          ExtremeVlanL2StatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            ""
+        INDEX { extremeVlanIfIndex }
+    ::= { extremeVlanL2StatsTable 1 }
+
+    ExtremeVlanL2StatsEntry ::=
+        SEQUENCE {
+                    extremeVlanL2StatsIfDescr              DisplayString,
+                    extremeVlanL2StatsPktsToCpu            Counter64,
+                    extremeVlanL2StatsPktsLearnt           Counter64,
+                    extremeVlanL2StatsIgmpCtrlPktsSnooped  Counter64,
+                    extremeVlanL2StatsIgmpDataPktsSwitched Counter64
+        }
+        
+    extremeVlanL2StatsIfDescr      OBJECT-TYPE
+        SYNTAX                    DisplayString (SIZE(0..32))
+        MAX-ACCESS              read-only
+        STATUS                    current
+        DESCRIPTION
+            "This is a description(name) of the VLAN."
+    ::= {extremeVlanL2StatsEntry 1}
+
+    extremeVlanL2StatsPktsToCpu    OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "The total number of packets of this VLAN sent to the CPU."
+    ::= { extremeVlanL2StatsEntry 2 }
+
+    extremeVlanL2StatsPktsLearnt    OBJECT-TYPE
+        SYNTAX                  Counter64
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "The total number of packets learnt on this VLAN."
+    ::= { extremeVlanL2StatsEntry 3 }
+
+    extremeVlanL2StatsIgmpCtrlPktsSnooped   OBJECT-TYPE
+        SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+            "The total number of IGMP control packets snooped on this VLAN."
+    ::= { extremeVlanL2StatsEntry 4 }
+
+    extremeVlanL2StatsIgmpDataPktsSwitched  OBJECT-TYPE
+        SYNTAX                          Counter64
+        MAX-ACCESS                      read-only
+        STATUS                          current
+        DESCRIPTION
+            "The total number of IGMP data packets switched on this VLAN."
+    ::= { extremeVlanL2StatsEntry 5 }
+
+        extremeVlanAggregationTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF ExtremeVlanAggregationEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "This table contains the VLAN aggregation information."
+                ::= { extremeVlanAggregationGroup 1 }
+
+        extremeVlanAggregationEntry       OBJECT-TYPE
+                SYNTAX      ExtremeVlanAggregationEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "Information about the individual VLAN aggregation entry."
+                INDEX   { extremeVlanAggregationSuperVlanIfIndex, 
+                          extremeVlanAggregationSubVlanIfIndex }
+                ::= { extremeVlanAggregationTable 1 }
+
+        ExtremeVlanAggregationEntry ::= SEQUENCE {
+                extremeVlanAggregationSuperVlanIfIndex              Integer32,
+                extremeVlanAggregationSubVlanIfIndex                Integer32,
+                extremeVlanAggregationSubVlanStartIpNetAddress  IpAddress,
+                extremeVlanAggregationSubVlanStartIpNetMask        IpAddress,
+                extremeVlanAggregationSubVlanEndIpNetAddress        IpAddress,
+                extremeVlanAggregationSubVlanEndIpNetMask        IpAddress,
+                extremeVlanAggregationStatus                        RowStatus
+        }
+       
+        extremeVlanAggregationSuperVlanIfIndex    OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The Super Vlan index for this entry."
+                ::= { extremeVlanAggregationEntry 1 }
+
+        extremeVlanAggregationSubVlanIfIndex    OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The Sub Vlan index for this entry."
+                ::= { extremeVlanAggregationEntry 2 }
+
+        extremeVlanAggregationSubVlanStartIpNetAddress    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                "This represents the start network address of the IP range."
+                ::= { extremeVlanAggregationEntry 3 }
+       
+        extremeVlanAggregationSubVlanStartIpNetMask    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "This represents the start network address mask of the IP range"
+                ::= { extremeVlanAggregationEntry 4 }
+                                         
+        extremeVlanAggregationSubVlanEndIpNetAddress    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                "This represents the end network address of the IP range."
+                ::= { extremeVlanAggregationEntry 5 }
+               
+        extremeVlanAggregationSubVlanEndIpNetMask    OBJECT-TYPE
+                SYNTAX      IpAddress
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "This represents the end network address mask of the IP range."
+                ::= { extremeVlanAggregationEntry 6 }                                         
+        extremeVlanAggregationStatus                OBJECT-TYPE
+               SYNTAX       RowStatus
+               MAX-ACCESS   read-create
+               STATUS            current
+               DESCRIPTION
+               "The status of this entry."
+               ::= { extremeVlanAggregationEntry 7 }
+        
+        extremeVlanAggregationConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF ExtremeVlanAggregationConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "This table contains the sub VLAN proxy setting information."
+                ::= { extremeVlanAggregationGroup 2 }
+        
+        extremeVlanAggregationConfigEntry       OBJECT-TYPE
+                SYNTAX      ExtremeVlanAggregationConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "Information about the individual VLAN aggregation entry."
+                INDEX   { extremeVlanAggregationConfigSuperVlanIfIndex }
+                ::= { extremeVlanAggregationConfigTable 1 }
+        
+        ExtremeVlanAggregationConfigEntry ::= SEQUENCE {
+                extremeVlanAggregationConfigSuperVlanIfIndex         Integer32,
+                extremeVlanAggregationConfigSubVlanProxyEnable        TruthValue
+        }
+
+        extremeVlanAggregationConfigSuperVlanIfIndex    OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The Super Vlan index for this entry."
+                ::= { extremeVlanAggregationConfigEntry 1 }
+
+        extremeVlanAggregationConfigSubVlanProxyEnable    OBJECT-TYPE
+                SYNTAX      TruthValue
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                "The boolean flag that prevents normal communication between sub vlans."
+                ::= { extremeVlanAggregationConfigEntry 2 }
+    
+
+        extremeVlanTranslationTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF ExtremeVlanTranslationEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "This table contains the VLAN translation information."
+                ::= { extremeVlanTranslationGroup 1 }
+
+        extremeVlanTranslationEntry       OBJECT-TYPE
+                SYNTAX      ExtremeVlanTranslationEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "Information about the individual VLAN translation entry."
+                INDEX   { extremeVlanTranslationSuperVlanIfIndex, 
+                          extremeVlanTranslationMemberVlanIfIndex }
+                ::= { extremeVlanTranslationTable 1 }
+
+        ExtremeVlanTranslationEntry ::= SEQUENCE {
+                  extremeVlanTranslationSuperVlanIfIndex             Integer32,
+                  extremeVlanTranslationMemberVlanIfIndex        Integer32,
+                  extremeVlanTranslationStatus                        RowStatus
+        }
+          
+        extremeVlanTranslationSuperVlanIfIndex    OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The Super Vlan index for this entry."
+                ::= { extremeVlanTranslationEntry 1 }
+
+        extremeVlanTranslationMemberVlanIfIndex    OBJECT-TYPE
+                SYNTAX      Integer32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                        "The member Vlan index for this entry."
+                ::= { extremeVlanTranslationEntry 2 }
+     
+        extremeVlanTranslationStatus                OBJECT-TYPE
+               SYNTAX                RowStatus
+               MAX-ACCESS        read-create
+               STATUS                current
+               DESCRIPTION
+                        "The status of this entry."
+               ::= { extremeVlanTranslationEntry 3 }
+
+       extremePortVlanStatsTable   OBJECT-TYPE
+               SYNTAX      SEQUENCE OF ExtremePortVlanStatsEntry
+               MAX-ACCESS      not-accessible
+               STATUS  current
+               DESCRIPTION
+                   "Vlan statistics per port."
+               ::= { extremeVlanStatsGroup 2 }
+
+       extremePortVlanStatsEntry OBJECT-TYPE
+               SYNTAX          ExtremePortVlanStatsEntry
+               MAX-ACCESS      not-accessible
+               STATUS          current
+               DESCRIPTION
+                   "Vlan port statistics Entry."
+               INDEX { extremeStatsPortIfIndex, 
+                       extremeStatsVlanNameIndex}
+               ::= { extremePortVlanStatsTable 1 }
+
+       ExtremePortVlanStatsEntry ::= SEQUENCE {
+               extremeStatsPortIfIndex                            Integer32,
+               extremeStatsVlanNameIndex                          DisplayString,
+               extremePortVlanStatsCntrType                       Integer32,
+               extremePortVlanUnicastReceivedPacketsCounter       Counter64,
+               extremePortVlanMulticastReceivedPacketsCounter     Counter64,
+               extremePortVlanBroadcastReceivedPacketsCounter     Counter64,
+               extremePortVlanTotalReceivedBytesCounter           Counter64,
+               extremePortVlanTotalReceivedFramesCounter          Counter64,
+               extremePortVlanUnicastTransmittedPacketsCounter    Counter64,
+               extremePortVlanMulticastTransmittedPacketsCounter  Counter64,
+               extremePortVlanBroadcastTransmittedPacketsCounter  Counter64,
+               extremePortVlanTotalTransmittedBytesCounter        Counter64,
+               extremePortVlanTotalTransmittedFramesCounter       Counter64,
+               extremePortConfigureVlanStatus                     RowStatus
+       }
+
+       extremeStatsPortIfIndex OBJECT-TYPE
+               SYNTAX  Integer32
+               MAX-ACCESS  read-only
+               STATUS  current
+               DESCRIPTION
+                 "The index of this table."
+               ::= { extremePortVlanStatsEntry 1 }
+
+       extremeStatsVlanNameIndex OBJECT-TYPE
+               SYNTAX  DisplayString (SIZE(0..32))
+               MAX-ACCESS  read-only
+               STATUS  current
+               DESCRIPTION
+                 "The index of this table."
+               ::= { extremePortVlanStatsEntry 2 }
+
+       extremePortVlanStatsCntrType OBJECT-TYPE
+               SYNTAX  Integer32
+               MAX-ACCESS  read-only
+               STATUS  current
+               DESCRIPTION
+                 "The flag to decide what fields to display, basic
+                  or extended. Currently, it is read-only and will
+                  reflect whatever has been set for the switch
+                  through the cli."
+               ::= { extremePortVlanStatsEntry 3 }
+
+
+       extremePortVlanUnicastReceivedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Unicast packets received by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 4 }
+
+       extremePortVlanMulticastReceivedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Multicast packets received by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 5 }
+
+
+       extremePortVlanBroadcastReceivedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Broadcast packets received by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 6 }
+
+       extremePortVlanTotalReceivedBytesCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The total number of bytes received by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 7 }
+
+       extremePortVlanTotalReceivedFramesCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The total number of frames received by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 8 }
+
+       extremePortVlanUnicastTransmittedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Unicast packets transmitted by a
+                  port for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 9 }
+
+       extremePortVlanMulticastTransmittedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Multicast packets transmitted by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 10 }
+
+       extremePortVlanBroadcastTransmittedPacketsCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The number of Broadcast packets transmitted by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 11 }
+
+       extremePortVlanTotalTransmittedBytesCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The total number of bytes transmitted by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 12 }
+
+       extremePortVlanTotalTransmittedFramesCounter  OBJECT-TYPE
+               SYNTAX  Counter64
+               MAX-ACCESS  read-only
+               STATUS current
+               DESCRIPTION
+                 "The total number of frames transmitted by a port
+                  for a particular VLAN."
+               ::= { extremePortVlanStatsEntry 13 }
+
+       extremePortConfigureVlanStatus  OBJECT-TYPE
+               SYNTAX  RowStatus
+               MAX-ACCESS  read-create
+               STATUS current
+               DESCRIPTION
+                  "The row status variable, used according to
+                   row installation and removal conventions."
+               ::= { extremePortVlanStatsEntry 14 }
+
+    --
+    -- Private VLAN Table 
+    --
+
+       extremePvlanTable OBJECT-TYPE
+               SYNTAX      SEQUENCE OF ExtremePvlanEntry
+               MAX-ACCESS  not-accessible
+               STATUS      current
+               DESCRIPTION
+                   "This table contains the Private VLAN information."
+               ::= { extremePrivateVlan 1 }
+
+       extremePvlanEntry       OBJECT-TYPE
+              SYNTAX      ExtremePvlanEntry
+              MAX-ACCESS  not-accessible
+              STATUS      current
+              DESCRIPTION
+                  "Information about the individual private VLAN entry."
+              INDEX   { extremePvlanName }
+              ::= { extremePvlanTable 1 }
+
+       ExtremePvlanEntry ::= SEQUENCE {
+                  extremePvlanName                     DisplayString,
+                  extremePvlanVrName                   DisplayString,
+                  extremePvlanNetworkVlanIfIndex       InterfaceIndexOrZero,
+                  extremePvlanRowStatus                RowStatus
+       }
+          
+       extremePvlanName    OBJECT-TYPE
+             SYNTAX      DisplayString (SIZE(1..32))
+             MAX-ACCESS  read-create
+             STATUS      current
+             DESCRIPTION
+                 "PVLAN Name"
+             ::= { extremePvlanEntry 1 }
+
+       extremePvlanVrName  OBJECT-TYPE
+             SYNTAX      DisplayString (SIZE(1..32))
+             MAX-ACCESS  read-create
+             STATUS      current
+             DESCRIPTION
+                 "VR Name for which PVLAN belongs."
+             DEFVAL      { "VR-Default" }
+             ::= { extremePvlanEntry 2 }
+
+       extremePvlanNetworkVlanIfIndex    OBJECT-TYPE
+             SYNTAX      InterfaceIndexOrZero
+             MAX-ACCESS  read-create
+             STATUS      current
+             DESCRIPTION
+                  "VLAN IfIndex of the PVLAN Network VLAN."
+             DEFVAL      {0}
+             ::= { extremePvlanEntry 3 }
+
+       extremePvlanRowStatus   OBJECT-TYPE
+             SYNTAX        RowStatus
+             MAX-ACCESS    read-create
+             STATUS        current
+             DESCRIPTION
+                 "Supported actions taken on this row entry.
+                     active(1),
+                     createAndGo(4),
+                     destroy(6)"
+             ::= { extremePvlanEntry 4 }
+
+    --
+    -- Private VLAN Subscriber Table
+    --
+
+        extremePvlanSubscriberTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF ExtremePvlanSubscriberEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                   "This table contains the Private VLAN Subscriber VLAN 
+                    information.  Subscriber VLANs carry user data traffic.  
+                    This data traffic is then aggregated and forwarded out 
+                    of a single Private VLAN Network VLAN.  The Network VLAN may
+                    or may not translate the Subscriber VLAN traffic tags into a 
+                    single tag depending on the Network VLAN configuration.  
+                    Subscriber VLANs can be Isolated or Non-Isolated.  Isolated 
+                    Subscriber VLANs do not allow ports within the isolated 
+                    Subscriber VLAN to communicate with each other. Communication 
+                    is strictly with the Network VLAN ports."
+                ::= { extremePrivateVlan 2 }
+
+        extremePvlanSubscriberEntry OBJECT-TYPE
+                SYNTAX ExtremePvlanSubscriberEntry
+                MAX-ACCESS not-accessible
+                STATUS current
+                DESCRIPTION
+                    "This represents information about the individual private 
+                     VLAN Subscriber entry."
+                INDEX   { extremePvlanName, extremePvlanSubscriberVlanIfIndex }
+                ::= { extremePvlanSubscriberTable 1 }
+
+        ExtremePvlanSubscriberEntry ::= SEQUENCE {
+                  extremePvlanSubscriberVlanIfIndex           InterfaceIndex,
+                  extremePvlanSubscriberType                  INTEGER,
+                  extremePvlanSubscriberLoopBackPortIfIndex   InterfaceIndexOrZero,
+                  extremePvlanSubscriberRowStatus             RowStatus
+        }
+
+        extremePvlanSubscriberVlanIfIndex    OBJECT-TYPE
+                SYNTAX      InterfaceIndex
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "VLAN IfIndex of Subscriber VLAN.  Subscriber VLANs are user 
+                     facing VLANs. There can be many Subscriber VLANs associated 
+                     with a private VLAN.  User traffic from Subscriber VLANs are 
+                     aggregated and sent out the network ports of the Network VLAN. 
+                     There can only be a single Network VLAN for each Private VLAN."
+                ::= { extremePvlanSubscriberEntry 1 }
+
+        extremePvlanSubscriberType  OBJECT-TYPE
+                SYNTAX      INTEGER {
+                  nonIsolated(1),
+                  isolated(2)
+                }
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                    "Ports belonging to isolated Subscriber VLANs may not communicate 
+                     with other ports on the VLAN.  Those ports may only communicate 
+                     with the network port.  Ports belonging to non-isolated Subscriber 
+                     VLANs behave like normal VLAN ports and can communicate with all 
+                     other ports of the Subscriber in addition to the network port.
+                     This cannot be modified.  To change this value, user must delete
+                     entry and re-create." 
+                DEFVAL      {2}
+                ::= { extremePvlanSubscriberEntry 2 }
+
+        extremePvlanSubscriberLoopBackPortIfIndex    OBJECT-TYPE
+                SYNTAX      InterfaceIndexOrZero
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                        "Loopback port for the Subscriber VLAN.  Some Subscriber VLAN 
+                         configurations that have overlapping ports (ports assigned to 
+                         both Subscriber VLANS) must have a dedicated loopback ports 
+                         configured."
+                DEFVAL      {0}
+                ::= { extremePvlanSubscriberEntry 3 }
+
+        extremePvlanSubscriberRowStatus          OBJECT-TYPE
+               SYNTAX        RowStatus
+               MAX-ACCESS    read-create
+               STATUS        current
+               DESCRIPTION
+                 "Supported actions taken on this row entry.
+                     active(1),
+                     createAndGo(4),
+                     destroy(6)"
+               ::= { extremePvlanSubscriberEntry 4 }
+
+
+END
