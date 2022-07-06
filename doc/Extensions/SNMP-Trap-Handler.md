@@ -105,6 +105,27 @@ Add the following config to your snmptrapd.service after `ExecStart=/usr/sbin/sn
 
 ```
 
+On SELinux, you need to configure SELinux for SNMPd to communicate to LibreNMS:
+
+```
+echo 'module snmptrap 1.0;
+ 
+require {
+        type httpd_sys_rw_content_t;
+        type snmpd_t;
+        class file { append getattr open read };
+        class capability dac_override;
+}
+ 
+#============= snmpd_t ==============
+ 
+allow snmpd_t httpd_sys_rw_content_t:file { append getattr open read };
+allow snmpd_t self:capability dac_override;' > snmptrap.te
+checkmodule -M -m -o snmptrap.mod snmptrap.te
+semodule_package -o snmptrap.pp -m snmptrap.mod
+semodule -i snmptrap.pp
+```
+
 After successfully configuring the service, reload service files, enable, and start the snmptrapd service:
 
 ```
