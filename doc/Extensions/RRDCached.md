@@ -225,13 +225,41 @@ ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G 
 WantedBy=default.target
 ```
 
-2: Start rrdcached
+2: Configure SELinux for RRDCached
+
+```
+echo 'module rrdcached_librenms 1.0;
+ 
+require {
+        type var_run_t;
+        type tmp_t;
+        type httpd_t;
+        type rrdcached_t;
+        type httpd_sys_rw_content_t;
+        class dir { add_name getattr remove_name rmdir search write };
+        class file { create getattr open read rename setattr unlink write };
+        class sock_file { create setattr unlink write };
+        class capability { fsetid sys_resource };
+}
+ 
+#============= rrdcached_t ==============
+ 
+allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
+allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write };
+allow rrdcached_t self:capability fsetid;
+allow rrdcached_t var_run_t:sock_file { create setattr unlink };' > rrdcached_librenms.te
+checkmodule -M -m -o rrdcached_librenms.mod rrdcached_librenms.te
+semodule_package -o rrdcached_librenms.pp -m rrdcached_librenms.mod
+semodule -i rrdcached_librenms.pp
+```
+
+3: Start rrdcached
 
 ```bash
 systemctl enable --now rrdcached.service
 ```
 
-3: Edit `/opt/librenms/config.php` to include:
+4: Edit `/opt/librenms/config.php` to include:
 
 ```php
 $config['rrdcached'] = "unix:/run/rrdcached.sock";
