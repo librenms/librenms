@@ -284,6 +284,35 @@ directory; update the smokeping rrd directory if required.
 
 It's not recommended to run RRDCachedD without the -B switch.
 
+If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:
+
+```
+echo 'module smokeping_librenms 1.0;
+ 
+require {
+type httpd_t;
+type smokeping_t;
+type smokeping_var_lib_t;
+type var_run_t;
+type httpd_sys_rw_content_t;
+class dir { add_name create getattr read remove_name search write };
+class file { create getattr ioctl lock open read rename setattr unlink write };
+}
+ 
+#============= httpd_t ==============
+ 
+allow httpd_t smokeping_var_lib_t:dir read;
+allow httpd_t var_run_t:file { read write };
+ 
+#============= smokeping_t ==============
+ 
+allow smokeping_t httpd_sys_rw_content_t:dir { add_name create getattr remove_name search write };
+allow smokeping_t httpd_sys_rw_content_t:file { create getattr ioctl lock open read rename setattr unlink write };' > /root/smokeping_librenms.te
+checkmodule -M -m -o smokeping_librenms.mod smokeping_librenms.te
+semodule_package -o smokeping_librenms.pp -m smokeping_librenms.mod
+semodule -i smokeping_librenms.pp
+```
+
 #### Share RRDCached with LibreNMS
 
 Move the RRD's and give smokeping access rights to the LibreNMS RRD directory:
