@@ -26,7 +26,7 @@ from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
-MAX_LOGFILE_SIZE = (1024 ** 2) * 10  # 10 Megabytes max log files
+MAX_LOGFILE_SIZE = (1024**2) * 10  # 10 Megabytes max log files
 
 logger = logging.getLogger(__name__)
 
@@ -249,16 +249,21 @@ class DB:
                 args["unix_socket"] = self.config.db_socket
 
             sslmode = self.config.db_sslmode.lower()
-            if sslmode == 'disabled':
+            if sslmode == "disabled":
                 logger.debug("Using cleartext MySQL connection")
-            elif sslmode == 'verify_ca':
-                logger.info("Using TLS MySQL connection without CA trust validation only")
+            elif sslmode == "verify_ca":
+                logger.info(
+                    "Using TLS MySQL connection without CA trust validation only"
+                )
                 args["ssl"] = {"ca": self.config.db_ssl_ca, "check_hostname": False}
-            elif sslmode == 'verify_identity':
+            elif sslmode == "verify_identity":
                 logger.info("Using TLS MySQL connection with full validation")
                 args["ssl"] = {"ca": self.config.db_ssl_ca}
             else:
-                logger.critical("Unsupported MySQL sslmode %s, dispatcher supports DISABLED, VERIFY_CA, and VERIFY_IDENTITY only", self.config.db_sslmode)
+                logger.critical(
+                    "Unsupported MySQL sslmode %s, dispatcher supports DISABLED, VERIFY_CA, and VERIFY_IDENTITY only",
+                    self.config.db_sslmode,
+                )
                 raise SystemExit(2)
 
             conn = MySQLdb.connect(**args)
