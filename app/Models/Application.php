@@ -33,7 +33,7 @@ class Application extends DeviceRelatedModel
     protected $primaryKey = 'app_id';
     protected $fillable = ['data'];
     protected $casts = [
-        'data' => 'array',
+        'data' => 'string',
     ];
 
     // ---- Helper Functions ----
@@ -51,7 +51,8 @@ class Application extends DeviceRelatedModel
     /**
      * Saves the passed array as JSON to data.
      *
-     * @param  array
+     * @param array $data
+     * @return null
      */
     public function save_data($data = [])
     {
