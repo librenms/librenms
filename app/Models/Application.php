@@ -44,4 +44,21 @@ class Application extends DeviceRelatedModel
     {
         return StringHelpers::niceCase($this->app_type);
     }
+
+    public function save_data($data = [])
+    {
+       $this->fill(['data'=>json_encode($data)]);
+       $this->save();
+    }
+
+    public function get_data()
+    {
+        $parsed_json = json_decode($this->data, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return [];
+        }
+
+        return $parsed_json;
+    }
 }

@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\Application;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postgres';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
+$app = Application::where(['app_id' => $app_id])->first();
+$app_data = $app->get_data();
 
 if (! is_array($app_data['databases'])) {
     $app_data['databases'] = [];
@@ -107,7 +109,7 @@ $old_databases = $app_data['databases'];
 
 // save thge found databases
 $app_data['databases'] = $databases;
-save_app_data($app_id, $app_data);
+$app->save_data($app_data);
 
 //check for added databases
 $added_databases = [];

@@ -1,13 +1,16 @@
 <?php
 
+use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
+
 $name = 'zfs';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
+$app=Application::where(['app_id' => $app_id])->first();
+$app_data=$app->get_data();
 
 if (! is_array($app_data['pools'])) {
     $app_data['pools'] = [];
@@ -185,7 +188,7 @@ $old_pools = $app_data['pools'];
 
 // save thge found pools
 $app_data['pools'] = $pools;
-save_app_data($app_id, $app_data);
+$app->save_data($app_data);
 
 //check for added pools
 $added_pools = array_values(array_diff($pools, $old_pools));

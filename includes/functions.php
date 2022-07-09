@@ -1516,26 +1516,3 @@ function get_app_data($app_id)
 
     return $parsed_json;
 }
-
-/**
- * Takes a array to save as JSON for the app.
- *
- * @params int $app_id
- * @params array $data
- *
- * @return null
- */
-function save_app_data($app_id, $data)
-{
-    if (is_null($app_id)) {
-        throw new JsonAppDataNoAppId;
-    }
-    if (is_null($data)) {
-        throw new JsonAppDataNoData;
-    }
-
-    $app = Application::where(['app_id' => $app_id])->first();
-
-    $app->fill(['data'=>json_encode($data)]);
-    $app->save();
-}

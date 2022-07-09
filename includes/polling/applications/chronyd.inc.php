@@ -1,12 +1,14 @@
 <?php
 
+use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'chronyd';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
+$app = Application::where(['app_id' => $app_id])->first();
+$app_data = $app->get_data();
 
 if (! is_array($app_data['sources'])) {
     $app_data['sources'] = [];
@@ -105,7 +107,7 @@ $old_sources = $app_data['sources'];
 
 // save thge found sources
 $app_data['sources'] = $sources;
-save_app_data($app_id, $app_data);
+$app->save_data($app_data);
 
 //check for added sources
 $added_sources = array_values(array_diff($sources, $old_sources));
