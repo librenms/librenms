@@ -1491,28 +1491,3 @@ function describe_bgp_error_code($code, $subcode)
 
     return $message;
 }
-
-/**
- * Gets stored app data JSON and returns it.
- * If none is present or it is bad, a blank array is returned.
- *
- * @params int $app_id
- *
- * @return array
- */
-function get_app_data($app_id)
-{
-    if (is_null($app_id)) {
-        throw new JsonAppDataNoAppId;
-    }
-
-    $app = Application::where(['app_id' => $app_id])->first();
-
-    $parsed_json = json_decode($app->data, true);
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return [];
-    }
-
-    return $parsed_json;
-}

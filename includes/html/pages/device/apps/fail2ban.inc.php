@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\Application;
+
+$jails = Application::where(['app_id' => $app['app_id']])->first()->get_data()['jails'];
+
+sort($jails);
+
 $graphs = [
     'fail2ban_banned' => 'Total Banned',
 ];
@@ -24,9 +30,7 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-$jails = get_app_data($app['app_id'])['jails'];
 
-sort($jails);
 
 foreach ($jails as $jail) {
     $graph_type = 'fail2ban_jail';

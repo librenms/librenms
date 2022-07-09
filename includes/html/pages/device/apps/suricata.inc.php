@@ -1,6 +1,8 @@
 <?php
 
-$suricata_instances = get_app_data($app['app_id'])['instances'];
+use App\Models\Application;
+
+$suricata_instances = Application::where(['app_id' => $app['app_id']])->first()->get_data()['instances'];
 
 sort($suricata_instances);
 

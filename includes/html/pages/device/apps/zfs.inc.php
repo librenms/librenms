@@ -1,6 +1,8 @@
 <?php
 
-$pools = get_app_data($app['app_id'])['pools'];
+use App\Models\Application;
+
+$pools = Application::where(['app_id' => $app['app_id']])->first()->get_data()['pools'];
 
 sort($pools);
 

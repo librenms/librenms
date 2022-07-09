@@ -1,6 +1,8 @@
 <?php
 
-$sources = get_app_data($app['app_id'])['sources'];
+use App\Models\Application;
+
+$sources = Application::where(['app_id' => $app['app_id']])->first()->get_data()['sources'];
 
 sort($sources);
 
