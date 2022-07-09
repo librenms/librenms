@@ -32,6 +32,9 @@ class Application extends DeviceRelatedModel
     public $timestamps = false;
     protected $primaryKey = 'app_id';
     protected $fillable = ['data'];
+    protected $casts = [
+        'data' => 'array',
+    ];
 
     // ---- Helper Functions ----
 
