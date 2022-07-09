@@ -48,12 +48,22 @@ class Application extends DeviceRelatedModel
         return StringHelpers::niceCase($this->app_type);
     }
 
+    /**
+     * Saves the passed array as JSON to data.
+     *
+     * @param  array
+     */
     public function save_data($data = [])
     {
         $this->fill(['data'=>json_encode($data)]);
         $this->save();
     }
 
+    /**
+     * Decodes the JSON stored in data and returns a array.
+     *
+     * @return array
+     */
     public function get_data()
     {
         $parsed_json = json_decode($this->data, true);
