@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$sources = Application::find($app['app_id'])->get_data()['sources'];
+$sources = Application::find($app['app_id'])->data['sources'];
 
 sort($sources);
 

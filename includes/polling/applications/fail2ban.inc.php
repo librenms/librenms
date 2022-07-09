@@ -1,15 +1,11 @@
 <?php
 
-use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fail2ban';
 $app_id = $app['app_id'];
-
-$app = Application::find($app_id);
-$app_data = $app->get_data();
 
 if (! is_array($app_data['jails'])) {
     $app_data['jails'] = [];
@@ -72,7 +68,6 @@ $old_jails = $app_data['jails'];
 
 // save thge found jails
 $app_data['jails'] = $jails;
-$app->save_data($app_data);
 
 //check for added jails
 $added_jails = array_values(array_diff($jails, $old_jails));

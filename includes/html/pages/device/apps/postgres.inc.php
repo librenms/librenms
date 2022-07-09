@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$databases = Application::find($app['app_id'])->get_data()['databases'];
+$databases = Application::find($app['app_id'])->data['databases'];
 
 sort($databases);
 

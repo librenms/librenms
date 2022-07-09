@@ -33,7 +33,7 @@ class Application extends DeviceRelatedModel
     protected $primaryKey = 'app_id';
     protected $fillable = ['data'];
     protected $casts = [
-        'data' => 'string',
+        'data' => 'array',
     ];
 
     // ---- Helper Functions ----
@@ -46,33 +46,5 @@ class Application extends DeviceRelatedModel
     public function getShowNameAttribute()
     {
         return StringHelpers::niceCase($this->app_type);
-    }
-
-    /**
-     * Saves the passed array as JSON to data.
-     *
-     * @param  array  $data
-     * @return null
-     */
-    public function save_data($data = [])
-    {
-        $this->fill(['data'=>json_encode($data)]);
-        $this->save();
-    }
-
-    /**
-     * Decodes the JSON stored in data and returns a array.
-     *
-     * @return array
-     */
-    public function get_data()
-    {
-        $parsed_json = json_decode($this->data, true);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return [];
-        }
-
-        return $parsed_json;
     }
 }

@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$jails = Application::find($app['app_id'])->get_data()['jails'];
+$jails = Application::find($app['app_id'])->data['jails'];
 
 sort($jails);
 

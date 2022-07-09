@@ -1,14 +1,10 @@
 <?php
 
-use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'suricata';
 $app_id = $app['app_id'];
-
-$app = Application::find($app_id);
-$app_data = $app->get_data();
 
 if (! is_array($app_data['instances'])) {
     $app_data['instances'] = [];
@@ -184,7 +180,6 @@ $old_instances = $app_data['instances'];
 
 // save thge found instances
 $app_data['instances'] = $instances;
-$app->save_data($app_data);
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));

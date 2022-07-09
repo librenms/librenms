@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$suricata_instances = Application::find($app['app_id'])->get_data()['instances'];
+$suricata_instances = Application::find($app['app_id'])->data['instances'];
 
 sort($suricata_instances);
 

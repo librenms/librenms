@@ -1,14 +1,10 @@
 <?php
 
-use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
 $app_id = $app['app_id'];
-
-$app = Application::find($app_id);
-$app_data = $app->get_data();
 
 if (! is_array($app_data['ports'])) {
     $app_data['ports'] = [];
@@ -130,7 +126,6 @@ $old_ports = $app_data['ports'];
 
 // save thge found ports
 $app_data['ports'] = $ports_keys;
-$app->save_data($app_data);
 
 //check for added ports
 $added_ports = array_values(array_diff($ports_keys, $old_ports));
