@@ -1,6 +1,8 @@
 <?php
 
-$suricata_instances = get_suricata_instances($device['device_id']);
+use App\Models\Application;
+
+$app = Application::find($app['app_id']);
 
 $link_array = [
     'page'   => 'device',
@@ -10,7 +12,7 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo '<b>Cluster Name:</b> ' . get_app_data($app['app_id'])['cluster'] . '<br>';
+echo '<b>Cluster Name:</b> ' . $app->get_data()['cluster'] . '<br>';
 echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set'] = 'translog';

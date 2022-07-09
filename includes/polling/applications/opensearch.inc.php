@@ -1,12 +1,14 @@
 <?php
 
+use App\Models\Application;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
+$app = Application::find($app_id);
+$app_data=$app->get_data();
 
 try {
     $returned = json_app_get($device, 'opensearch');
@@ -198,7 +200,7 @@ data_update($device, 'app', $tags, $metrics);
 
 // save thge found cluster name
 $app_data['cluster'] = $returned['data']['cluster_name'];
-save_app_data($app_id, $app_data);
+$app->save_data($app_data);
 
 //
 // update the app metrics
