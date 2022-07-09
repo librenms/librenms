@@ -287,7 +287,8 @@ It's not recommended to run RRDCachedD without the -B switch.
 If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:
 
 ```
-echo 'module smokeping_librenms 1.0;
+cat > smokeping_librenms.te << EOF
+odule smokeping_librenms 1.0;
  
 require {
 type httpd_t;
@@ -307,7 +308,8 @@ allow httpd_t var_run_t:file { read write };
 #============= smokeping_t ==============
  
 allow smokeping_t httpd_sys_rw_content_t:dir { add_name create getattr remove_name search write };
-allow smokeping_t httpd_sys_rw_content_t:file { create getattr ioctl lock open read rename setattr unlink write };' > /root/smokeping_librenms.te
+allow smokeping_t httpd_sys_rw_content_t:file { create getattr ioctl lock open read rename setattr unlink write };
+EOF
 checkmodule -M -m -o smokeping_librenms.mod smokeping_librenms.te
 semodule_package -o smokeping_librenms.pp -m smokeping_librenms.mod
 semodule -i smokeping_librenms.pp
