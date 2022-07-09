@@ -32,7 +32,7 @@ use Symfony\Component\Process\Process;
 class HelpParser
 {
     /** @var \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter> */
-    private $params;
+    protected $params;
 
     public function __construct()
     {
