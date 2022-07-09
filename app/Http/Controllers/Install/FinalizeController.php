@@ -77,11 +77,15 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     private function writeEnvFile()
     {
-        return EnvHelper::writeEnv(
+        $env = EnvHelper::writeEnv(
             $this->envVars(),
             ['INSTALL'],
             base_path('.env')
         );
+
+        \Artisan::call('config:cache'); // make sure to update config in case it is cached
+
+        return $env;
     }
 
     private function envVars()
