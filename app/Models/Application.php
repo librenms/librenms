@@ -51,7 +51,7 @@ class Application extends DeviceRelatedModel
     /**
      * Saves the passed array as JSON to data.
      *
-     * @param array $data
+     * @param  array  $data
      * @return null
      */
     public function save_data($data = [])
