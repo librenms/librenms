@@ -284,6 +284,32 @@ directory; update the smokeping rrd directory if required.
 
 It's not recommended to run RRDCachedD without the -B switch.
 
+#### Share RRDCached with LibreNMS
+
+Move the RRD's and give smokeping access rights to the LibreNMS RRD directory:
+```bash
+sudo systemctl stop smokeping
+sudo mv /var/lib/smokeping /opt/librenms/rrd/
+sudo usermod -a -G librenms smokeping
+```
+
+Update data directory in */etc/smokeping*:
+
+```
+datadir = /opt/librenms/rrd/smokeping
+dyndir = /opt/librenms/rrd/smokeping/__cgi
+```
+
+If you have SELinux on, see next section before starting smokeping.
+Finally restart the smokeping service:
+
+```bash
+sudo systemctl start smokeping
+```
+
+Remember to update *config.php* with the new locations.
+
+#### Configure SELinux to allow smokeping to write in LibreNMS directory on Centos / RHEL
 If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:
 
 ```
@@ -314,30 +340,6 @@ checkmodule -M -m -o smokeping_librenms.mod smokeping_librenms.te
 semodule_package -o smokeping_librenms.pp -m smokeping_librenms.mod
 semodule -i smokeping_librenms.pp
 ```
-
-#### Share RRDCached with LibreNMS
-
-Move the RRD's and give smokeping access rights to the LibreNMS RRD directory:
-```bash
-sudo systemctl stop smokeping
-sudo mv /var/lib/smokeping /opt/librenms/rrd/
-sudo usermod -a -G librenms smokeping
-```
-
-Update data directory in */etc/smokeping*:
-
-```
-datadir = /opt/librenms/rrd/smokeping
-dyndir = /opt/librenms/rrd/smokeping/__cgi
-```
-
-Finally restart the smokeping service:
-
-```bash
-sudo systemctl start smokeping
-```
-
-Remember to update *config.php* with the new locations.
 
 ### Probe FPing missing missing from the probes section
 
