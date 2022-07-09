@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$ports = Application::where(['app_id' => $app['app_id']])->first()->get_data()['ports'];
+$ports = Application::find($app['app_id'])->get_data()['ports'];
 
 sort($ports);
 

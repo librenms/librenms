@@ -8,7 +8,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'fail2ban';
 $app_id = $app['app_id'];
 
-$app = Application::where(['app_id' => $app_id])->first();
+$app = Application::find($app_id);
 $app_data = $app->get_data();
 
 if (! is_array($app_data['jails'])) {

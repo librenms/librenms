@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$sources = Application::where(['app_id' => $app['app_id']])->first()->get_data()['sources'];
+$sources = Application::find($app['app_id'])->get_data()['sources'];
 
 sort($sources);
 

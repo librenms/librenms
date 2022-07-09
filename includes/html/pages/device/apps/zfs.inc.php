@@ -2,7 +2,7 @@
 
 use App\Models\Application;
 
-$pools = Application::where(['app_id' => $app['app_id']])->first()->get_data()['pools'];
+$pools = Application::find($app['app_id'])->get_data()['pools'];
 
 sort($pools);
 
