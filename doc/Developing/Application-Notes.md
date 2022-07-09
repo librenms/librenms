@@ -58,30 +58,33 @@ try {
 
 ## Application Data Storage
 
-### Storing Data
+### Saving Data
 
 Relevant data may be stored using the data column of the applications
-table using the function `get_app_data`.
+table using the helper function `save_data`.
 
-- Integer :: App ID of the application in question.
 - Array :: The data to convert to JSON for storage.
 
 Example from `includes/polling/applications/zfs.inc.php`...
 
 ```php
-$app_data['pools'] = $pools;
-save_app_data($app_id, $app_data);
+use App\Models\Application;
+
+$app=Application::where(['app_id' => $app_id])->first();
+
+$app->save_data($app_data);
 ```
 
 ### Retrieving Data
 
 The data will be fetched, decoded as JSON and returned as a array. The
-required variables are as below.
-
-- Integer :: App ID of the application in question.
+required variables are as below via the helper function `get_data`.
 
 An example from `includes/html/pages/device/apps/zfs.inc.php`...
 
 ```php
-$pools = get_app_data($app['app_id'])['pools'];
+use App\Models\Application;
+
+$app=Application::where(['app_id' => $app_id])->first();
+$app_data=$app->get_data();
 ```
