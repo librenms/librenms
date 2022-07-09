@@ -228,7 +228,6 @@ WantedBy=default.target
 2: Configure SELinux for RRDCached
 
 ```
-
 cat > rrdcached_librenms.te << EOF
 module rrdcached_librenms 1.0;
  
