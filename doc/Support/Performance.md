@@ -110,7 +110,7 @@ quick the icmp packet is returned.
 
 `poller-wrapper.py` defaults to using 16 threads, this isn't necessarily
 optimal. A general rule of thumb is 2 threads per core but we suggest 
-that you play around with lowering /increasing the number until you 
+that you play around with lowering / increasing the number until you 
 get the optimal value. **Note** KEEP in MIND that this doesn't 
 always help, it depends on your system and CPU. So be careful. 
 This can be changed by going to the cron job for librenms. 
