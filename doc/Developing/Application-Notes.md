@@ -58,10 +58,35 @@ try {
 
 ## Application Data Storage
 
-### Saving Data
+The variable `data` can be used to store what ever one wants, although
+the functions `save_data` and `get_data` expect JSON.
+
+```
+use App\Models\Application;
+$app=Application::find($app_id);
+
+// set the varaible data to foo
+$app->data="foo";
+
+// save the change
+$app->save
+
+// echo the contents of the variable
+echo $app->data;
+```
+
+### As JSON
+
+Since one will most likely want to work with more complex data than
+just a string or not have to deal with coverting/from what ever
+format, `save_data` and `get_data` can be used to store a array as
+JSON and then decode and return it.
+
+#### save_data
 
 Relevant data may be stored using the data column of the applications
-table using the helper function `save_data`.
+table using the helper function `save_data`. There is no need to call
+save as that is done automatically when this function is called.
 
 - Array :: The data to convert to JSON for storage.
 
@@ -70,12 +95,12 @@ Example from `includes/polling/applications/zfs.inc.php`...
 ```php
 use App\Models\Application;
 
-$app=Application::where(['app_id' => $app_id])->first();
+$app=Application::find($app_id);
 
 $app->save_data($app_data);
 ```
 
-### Retrieving Data
+#### get_data
 
 The data will be fetched, decoded as JSON and returned as a array. The
 required variables are as below via the helper function `get_data`.
@@ -85,6 +110,6 @@ An example from `includes/html/pages/device/apps/zfs.inc.php`...
 ```php
 use App\Models\Application;
 
-$app=Application::where(['app_id' => $app_id])->first();
+$app=Application::find($app_id);
 $app_data=$app->get_data();
 ```
