@@ -83,7 +83,11 @@ class FinalizeController extends InstallationController implements InstallerStep
             base_path('.env')
         );
 
-        \Artisan::call('config:cache'); // make sure to update config in case it is cached
+        // make sure the new env is reflected live
+        \Artisan::call('config:clear');
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
 
         return $env;
     }
