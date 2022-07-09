@@ -84,7 +84,7 @@ class FinalizeController extends InstallationController implements InstallerStep
         );
 
         // make sure the new env is reflected live
-        \Artisan::call('config:cache');
+        \Artisan::call('config:clear');
         if (function_exists('opcache_reset')) {
             opcache_reset();
         }
