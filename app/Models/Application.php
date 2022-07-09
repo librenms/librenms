@@ -47,8 +47,8 @@ class Application extends DeviceRelatedModel
 
     public function save_data($data = [])
     {
-       $this->fill(['data'=>json_encode($data)]);
-       $this->save();
+        $this->fill(['data'=>json_encode($data)]);
+        $this->save();
     }
 
     public function get_data()

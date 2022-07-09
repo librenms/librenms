@@ -30,8 +30,6 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-
-
 foreach ($jails as $jail) {
     $graph_type = 'fail2ban_jail';
     $graph_array['height'] = '100';

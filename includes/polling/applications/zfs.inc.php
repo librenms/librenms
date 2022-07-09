@@ -5,12 +5,11 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
-
 $name = 'zfs';
 $app_id = $app['app_id'];
 
-$app=Application::where(['app_id' => $app_id])->first();
-$app_data=$app->get_data();
+$app = Application::where(['app_id' => $app_id])->first();
+$app_data = $app->get_data();
 
 if (! is_array($app_data['pools'])) {
     $app_data['pools'] = [];

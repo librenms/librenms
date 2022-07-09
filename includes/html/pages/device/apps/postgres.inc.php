@@ -2,7 +2,6 @@
 
 use App\Models\Application;
 
-
 $databases = Application::where(['app_id' => $app['app_id']])->first()->get_data()['databases'];
 
 sort($databases);

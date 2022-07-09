@@ -8,7 +8,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use App\Models\Application;
 use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -22,8 +21,6 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
-use LibreNMS\Exceptions\JsonAppDataNoAppId;
-use LibreNMS\Exceptions\JsonAppDataNoData;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Proxy;
