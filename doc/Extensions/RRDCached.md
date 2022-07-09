@@ -228,7 +228,9 @@ WantedBy=default.target
 2: Configure SELinux for RRDCached
 
 ```
-echo 'module rrdcached_librenms 1.0;
+
+cat > rrdcached_librenms.te << EOF
+module rrdcached_librenms 1.0;
  
 require {
         type var_run_t;
@@ -247,7 +249,9 @@ require {
 allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
 allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write };
 allow rrdcached_t self:capability fsetid;
-allow rrdcached_t var_run_t:sock_file { create setattr unlink };' > rrdcached_librenms.te
+allow rrdcached_t var_run_t:sock_file { create setattr unlink };
+EOF
+
 checkmodule -M -m -o rrdcached_librenms.mod rrdcached_librenms.te
 semodule_package -o rrdcached_librenms.pp -m rrdcached_librenms.mod
 semodule -i rrdcached_librenms.pp
