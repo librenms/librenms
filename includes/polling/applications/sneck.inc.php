@@ -8,8 +8,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'sneck';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
-
 $old_checks = [];
 if (isset($app_data['data']) and isset($app_data['data']['checks'])) {
     $old_checks = array_keys($app_data['data']['checks']);
@@ -79,9 +77,6 @@ if (abs($time_to_polling) > 540) {
     $json_return['data']['alert'] = 1;
 }
 
-// save the returned data
-save_app_data($app_id, $json_return);
-
 //check for added checks
 $added_checks = array_values(array_diff($new_checks, $old_checks));
 
@@ -98,3 +93,6 @@ if (sizeof($added_checks) > 0 or sizeof($removed_checks) > 0) {
 
 // update it here as we are done with this mostly
 update_application($app, 'OK', $fields);
+
+// save the json_return to the app data
+$app_data = $json_return;
