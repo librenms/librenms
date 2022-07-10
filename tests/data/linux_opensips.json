@@ -747,7 +747,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": "[]"
                 },
                 {
                     "app_type": "opensips",
@@ -756,7 +756,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": "[]"
                 }
             ],
             "application_metrics": [
