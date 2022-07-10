@@ -12,7 +12,7 @@ if (count($app_rows) > 0) {
             $app_model = Application::find($app['app_id']);
             $app_data = $app_model->data;
             if (! is_array($app_data)) {
-                $app_data=[];
+                $app_data = [];
             }
             include $app_include;
             $app_model->data = $app_data;
