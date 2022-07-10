@@ -57,7 +57,7 @@ class ConfigSeeder extends Seeder
             return; // nothing to do
         }
 
-        if (\App\Models\Config::exists()) {
+        if (\App\Models\Config::exists() && ! getenv('REAPPLY_YAML_CONFIG')) {
             if (! app()->runningInConsole() || ! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
                 return; // don't overwrite existing settings.
             }
