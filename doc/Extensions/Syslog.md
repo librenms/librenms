@@ -190,7 +190,7 @@ Create a file called `/etc/rsyslog.d/30-librenms.conf`and add the following depe
     *.* :omprog:;librenms
     ```
 
-If your rsyslog server is recieving messages relayed by another syslog
+If your rsyslog server is receiving messages relayed by another syslog
 server, you may try replacing `%fromhost%` with `%hostname%`, since
 `fromhost` is the host the message was received from, not the host
 that generated the message.  The `fromhost` property is preferred as
