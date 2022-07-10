@@ -91,6 +91,15 @@ if (sizeof($added_checks) > 0 or sizeof($removed_checks) > 0) {
     log_event($log_message, $device, 'application');
 }
 
+// go through and looking for status changes
+$cleared=[];
+$warned=[];
+$alerted=[];
+$unknowned=[];
+foreach ($new_checks as $check) {
+
+}
+
 // update it here as we are done with this mostly
 update_application($app, 'OK', $fields);
 
