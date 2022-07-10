@@ -58,58 +58,27 @@ try {
 
 ## Application Data Storage
 
-The variable `data` can be used to store what ever one wants, although
-the functions `save_data` and `get_data` expect JSON.
+The variable `data` can be used to store arrays via the Application
+model.
 
 ```
 use App\Models\Application;
-$app=Application::find($app_id);
 
-// set the varaible data to foo
-$app->data="foo";
+// find the app in question via it's ID integer
+$app = Application::find($app_id);
+
+// set the varaible data to $foo
+$app->data = $foo;
 
 // save the change
 $app->save
 
-// echo the contents of the variable
-echo $app->data;
+// var_dump the contents of the variable
+var_dump($app->data);
 ```
 
-### As JSON
-
-Since one will most likely want to work with more complex data than
-just a string or not have to deal with coverting/from what ever
-format, `save_data` and `get_data` can be used to store a array as
-JSON and then decode and return it.
-
-#### save_data
-
-Relevant data may be stored using the data column of the applications
-table using the helper function `save_data`. There is no need to call
-save as that is done automatically when this function is called.
-
-- Array :: The data to convert to JSON for storage.
-
-Example from `includes/polling/applications/zfs.inc.php`...
-
-```php
-use App\Models\Application;
-
-$app=Application::find($app_id);
-
-$app->save_data($app_data);
-```
-
-#### get_data
-
-The data will be fetched, decoded as JSON and returned as a array. The
-required variables are as below via the helper function `get_data`.
-
-An example from `includes/html/pages/device/apps/zfs.inc.php`...
-
-```php
-use App\Models\Application;
-
-$app=Application::find($app_id);
-$app_data=$app->get_data();
-```
+When writing app pollers, the Application model for the app in
+question is made available as `$app_model` with the app data made
+available as `$app_data`, which is always be a array, initializing it
+as a array if needed. Any changes to `$app_data` will be saved
+automatically after the poller has returned.
