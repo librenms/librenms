@@ -2,8 +2,6 @@
 
 use App\Models\Application;
 
-$app = Application::find($app['app_id']);
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -12,7 +10,7 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo '<b>Cluster Name:</b> ' . $app->get_data()['cluster'] . '<br>';
+echo '<b>Cluster Name:</b> ' . Application::find($app['app_id'])->data['cluster'] . '<br>';
 echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set'] = 'translog';
