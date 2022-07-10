@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Application;
+
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -40,7 +42,7 @@ foreach ($graphs as $key => $text) {
 }
 
 // print any alerts if found
-$sneck_data = get_app_data($app['app_id']);
+$sneck_data = Application::find($app['app_id'])->data;
 if (isset($sneck_data)) {
     print_optionbar_start();
     echo 'Last Return...<br>';
