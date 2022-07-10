@@ -4136,7 +4136,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data" => "{\"pools\":[]}"
+                    "data": "{\"pools\":[]}"
                 }
             ]
         }
