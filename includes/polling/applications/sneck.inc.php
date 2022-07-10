@@ -148,7 +148,7 @@ if (sizeof($alerted) > 0) {
     log_event($log_message, $device, 'application', 5);
 }
 
-// log any alerts
+// log any unknowns
 if (sizeof($unknowned) > 0) {
     $log_message = 'Sneck Check Unknowns: ' . json_encode($unknownwed);
     log_event($log_message, $device, 'application', 6);
