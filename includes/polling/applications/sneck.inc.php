@@ -144,13 +144,13 @@ if (sizeof($warned) > 0) {
 
 // log any alerts
 if (sizeof($alerted) > 0) {
-    $log_message = 'Sneck Check Warns: ' . json_encode($alerted);
+    $log_message = 'Sneck Check Alerts: ' . json_encode($alerted);
     log_event($log_message, $device, 'application', 5);
 }
 
 // log any alerts
 if (sizeof($unknowned) > 0) {
-    $log_message = 'Sneck Check Warns: ' . json_encode($unknownwed);
+    $log_message = 'Sneck Check Unknowns: ' . json_encode($unknownwed);
     log_event($log_message, $device, 'application', 6);
 }
 
