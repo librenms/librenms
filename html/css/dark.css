@@ -1,3 +1,7 @@
+  body {
+    overflow-y: scroll;
+  }
+
   .fa-nav-icons {
     color: #bfc0c0;
   }
