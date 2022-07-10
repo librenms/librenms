@@ -6,8 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'sagan';
 $app_id = $app['app_id'];
 
-$app_data = get_app_data($app_id);
-
 if (! is_array($app_data['instances'])) {
     $app_data['instances'] = [];
 }
@@ -85,7 +83,6 @@ $old_instances = $app_data['instances'];
 
 // save thge found instances
 $app_data['instances'] = $instances;
-save_app_data($app_id, $app_data);
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));

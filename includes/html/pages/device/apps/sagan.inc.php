@@ -1,6 +1,8 @@
 <?php
 
-$sagan_instances = get_app_data($app['app_id'])['instances'];
+use App\Models\Application;
+
+$sagan_instances = Application::find($app['app_id'])->data['instances'];
 
 sort($sagan_instances);
 
