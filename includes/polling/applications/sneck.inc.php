@@ -11,6 +11,8 @@ $app_id = $app['app_id'];
 $old_checks = [];
 if (isset($app_data['data']) and isset($app_data['data']['checks'])) {
     $old_checks = array_keys($app_data['data']['checks']);
+} else {
+    $app_data['data'] = ['checks' => []];
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -92,12 +94,64 @@ if (sizeof($added_checks) > 0 or sizeof($removed_checks) > 0) {
 }
 
 // go through and looking for status changes
-$cleared=[];
-$warned=[];
-$alerted=[];
-$unknowned=[];
+$cleared = [];
+$warned = [];
+$alerted = [];
+$unknowned = [];
 foreach ($new_checks as $check) {
+    if (isset($app_data['data']['checks'][$check]) and isset($app_data['data']['checks'][$check]['exit']) and isset($app_data['data']['checks'][$check]['output'])) {
+        if ($json_return['data']['checks'][$check]['exit'] != $app_data['data']['checks'][$check]['exit']) {
+            $check_output = $json_return['data']['checks'][$check]['output'];
+            $exit_code = $json_return['data']['checks'][$check]['exit'];
 
+            if ($exit_code == 1) {
+                $warned[$check] = $check_output;
+            } elseif ($exit_code == 2) {
+                $alerted[$check] = $check_output;
+            } elseif ($exit_code >= 3) {
+                $unknowned[$check] = $check_output;
+            } elseif ($exit_code == 0) {
+                $cleared[$check] = $check_output;
+            }
+        }
+    } else {
+        if (isset($json_return['data']['checks'][$check]['exit']) and isset($json_return['data']['checks'][$check]['output'])) {
+            $check_output = $json_return['data']['checks'][$check]['output'];
+            $exit_code = $json_return['data']['checks'][$check]['exit'];
+
+            if ($exit_code == 1) {
+                $warned[$check] = $check_output;
+            } elseif ($exit_code == 2) {
+                $alerted[$check] = $check_output;
+            } elseif ($exit_code >= 3) {
+                $unknowned[$check] = $check_output;
+            }
+        }
+    }
+}
+
+// log any clears
+if (sizeof($cleared) > 0) {
+    $log_message = 'Sneck Check Clears: ' . json_encode($cleared);
+    log_event($log_message, $device, 'application', 1);
+}
+
+// log any warnings
+if (sizeof($warned) > 0) {
+    $log_message = 'Sneck Check Warns: ' . json_encode($warned);
+    log_event($log_message, $device, 'application', 4);
+}
+
+// log any alerts
+if (sizeof($alerted) > 0) {
+    $log_message = 'Sneck Check Warns: ' . json_encode($alerted);
+    log_event($log_message, $device, 'application', 5);
+}
+
+// log any alerts
+if (sizeof($unknowned) > 0) {
+    $log_message = 'Sneck Check Warns: ' . json_encode($unknownwed);
+    log_event($log_message, $device, 'application', 6);
 }
 
 // update it here as we are done with this mostly
