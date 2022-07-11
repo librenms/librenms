@@ -164,6 +164,7 @@ class AvailabilityMapController extends WidgetController
                 if ($retval == 0) {
                     $retval = $l['displayText'] <=> $r['displayText'];
                 }
+
                 return $retval;
             });
         } elseif ($order_by == 'display') {
