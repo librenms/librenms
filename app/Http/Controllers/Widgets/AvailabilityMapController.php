@@ -159,7 +159,7 @@ class AvailabilityMapController extends WidgetController
         $order_by = $settings['order_by'];
 
         if ($order_by == 'status') {
-            usort($data, function($l, $r) {
+            usort($data, function ($l, $r) {
                 $retval = $l['device']->status <=> $r['device']->status;
                 if ($retval == 0) {
                     $retval = $l['displayText'] <=> $r['displayText'];
@@ -167,7 +167,7 @@ class AvailabilityMapController extends WidgetController
                 return $retval;
             });
         } elseif ($order_by == 'display') {
-            usort($data, function($l, $r) {
+            usort($data, function ($l, $r) {
                 return $l['displayText'] <=> $r['displayText'];
             });
         }
