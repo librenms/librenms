@@ -25,44 +25,44 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "checks_clamav",
-                    "value": 0,
+                    "metric": "check_clamav",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_entropy",
-                    "value": 0,
+                    "metric": "check_entropy",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_http",
-                    "value": 0,
+                    "metric": "check_http",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_ipmi_sensor",
-                    "value": 0,
+                    "metric": "check_ipmi_sensor",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_mongodb",
-                    "value": 0,
+                    "metric": "check_mongodb",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_raid",
-                    "value": 0,
+                    "metric": "check_raid",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "checks_virtqemud_procs",
-                    "value": 0,
+                    "metric": "check_virtqemud_procs",
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
