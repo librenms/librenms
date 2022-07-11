@@ -66,7 +66,7 @@ $fields = [
 
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key=>$value) {
-    $fields['checks_' . $key] = $json_return['data']['checks'][$key]['exit'];
+    $fields['check_' . $key] = $value['exit'];
 }
 
 $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
