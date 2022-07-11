@@ -148,7 +148,7 @@ abstract class PaginatedAjaxController extends Controller
         foreach ($fields as $target => $field) {
             if (is_callable($field)) {
                 $field($query, $request->get($target));
-            } elseif ($value = $request->get($field)) {
+            } elseif (($value = $request->get($field)) !== null) {
                 $value = $this->adjustFilterValue($field, $value);
                 if (is_string($target)) {
                     $query->where($target, $value);
