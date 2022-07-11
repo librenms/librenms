@@ -362,8 +362,7 @@
     "Pollers": "Poller",
     "Groups": "Gruppen",
     "Performance": "Performance",
-    "History": "Geschichte",
+    "History": "Historie",
     "Display Name": "Anzeigename",
-    "Status, Hostname": "Status, Hostname",
-    "Status, Display Name": "Status, Anzeigename"
+    "Display Text": "Anzeigewert"
 }

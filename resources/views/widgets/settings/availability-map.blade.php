@@ -52,13 +52,8 @@
     <div class="form-group">
         <label for="order_by-{{ $id }}" class="control-label">{{ __('Order By') }}</label>
         <select class="form-control" name="order_by" id="order_by-{{ $id }}">
-            <option value="display" @if($order_by == 'display') selected @endif>{{ __('Display Name') }}</option>
-            <option value="hostname" @if($order_by == 'hostname') selected @endif>{{ __('Hostname') }}</option>
-            <option value="sysName" @if($order_by == 'sysName') selected @endif>{{ __('System Name') }}</option>
+            <option value="display" @if($order_by == 'display') selected @endif>{{ __('Display Text') }}</option>
             <option value="status" @if($order_by == 'status') selected @endif>{{ __('Status') }}</option>
-            <option value="status,display" @if($order_by == 'status,display') selected @endif>{{ __('Status') }}, {{ __('Display Name') }}</option>
-            <option value="status,hostname" @if($order_by == 'status,hostname') selected @endif>{{ __('Status') }}, {{ __('Hostname') }}</option>
-            <option value="status,sysName" @if($order_by == 'status,sysName') selected @endif>{{ __('Status') }}, {{ __('System Name') }}</option>
         </select>
     </div>
 

@@ -99,34 +99,15 @@ class AvailabilityMapController extends WidgetController
         if (! $settings['show_disabled_and_ignored']) {
             $device_query->isNotDisabled();
         }
-        //$device_query->orderBy($settings['order_by']);
-        $order_by = $settings['order_by'];
-        $allowed_single_columns = [
-            'status',
-            'hostname',
-            'display',
-            'sysName',
-        ];
-        $allowed_multi_columns = [
-            'status,hostname',
-            'status,display',
-            'status,sysName',
-        ];
-        if (in_array($order_by, $allowed_single_columns)) {
-            $device_query->orderBy($settings['order_by']);
-        } elseif (in_array($order_by, $allowed_multi_columns)) {
-            $columns = explode(',', $order_by);
-            foreach ($columns as $column) {
-                $device_query->orderBy($column);
-            }
-        }
-
         $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
 
         // process status
-        $uptime_warn = Config::get('uptime_warning', 84600);
+        $uptime_warn = Config::get('uptime_warning', 86400);
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         $data = [];
+
+        // add another field for the selected display text
+        $display_text_int = $settings['color_only_select'];
 
         foreach ($devices as $device) {
             $row = ['device' => $device];
@@ -158,7 +139,37 @@ class AvailabilityMapController extends WidgetController
                 $row['labelClass'] = 'label-default';
                 $totals['maintenance']++;
             }
+
+            if ($display_text_int == 1) {
+                $row['displayText'] = null;
+            } elseif ($display_text_int == 4) {
+                $row['displayText'] = strtolower($device->shortDisplayName());
+            } elseif ($display_text_int == 2) {
+                $row['displayText'] = strtolower($device->hostname);
+            } elseif ($display_text_int == 3) {
+                $row['displayText'] = strtolower($device->sysName);
+            } else {
+                $row['displayText'] = $device->status;
+            }
+
             $data[] = $row;
+        }
+
+        // now apply sorting, depending on the selected Display Text
+        $order_by = $settings['order_by'];
+
+        if ($order_by == 'status') {
+            usort($data, function($l, $r) {
+                $retval = $l['device']->status <=> $r['device']->status;
+                if ($retval == 0) {
+                    $retval = $l['displayText'] <=> $r['displayText'];
+                }
+                return $retval;
+            });
+        } elseif ($order_by == 'display') {
+            usort($data, function($l, $r) {
+                return $l['displayText'] <=> $r['displayText'];
+            });
         }
 
         return [$data, $totals];
