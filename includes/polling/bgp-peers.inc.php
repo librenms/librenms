@@ -14,14 +14,20 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
+        } elseif ($device['os'] === 'dell-os10') {
+            $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
         } elseif ($device['os'] === 'timos') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'tBgpInstanceRowStatus', [], 'TIMETRA-BGP-MIB', 'nokia');
+        } elseif ($device['os'] === 'firebrick') {
+            $peer_data_check = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
         } elseif ($device['os'] === 'aos7') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'alaBgpPeerAS', [], 'ALCATEL-IND1-BGP-MIB', 'aos7');
         } elseif ($device['os'] === 'vrp') {
             $peer_data_check = snmpwalk_cache_multi_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
         } elseif ($device['os_group'] == 'cisco') {
             $peer_data_check = snmpwalk_cache_oid($device, 'cbgpPeer2RemoteAs', [], 'CISCO-BGP4-MIB');
+        } elseif ($device['os'] == 'cumulus') {
+            $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'CUMULUS-BGPUN-MIB');
         } else {
             $peer_data_check = snmpwalk_cache_oid($device, 'bgpPeerRemoteAs', [], 'BGP4-MIB');
         }
@@ -160,6 +166,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         if (count(array_keys($bgpPeer)) == 1) { // We have only one vrf with a peer with this IP
                             $vrfInstance = array_keys($bgpPeer)[0];
                             $peer_data['bgpPeerState'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerState'];
+                            $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerAdminStatus'];
                             $peer_data['bgpPeerInUpdates'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerInUpdateMsgs'];
                             $peer_data['bgpPeerOutUpdates'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerOutUpdateMsgs'];
                             $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerInTotalMsgs'];
@@ -221,7 +228,58 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsRcvd'];  // That are actually only octets available,
                         $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['tBgpPeerNgOperMsgOctetsSent']; // not messages
                         $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
-                    // ToDo, It seems that bgpPeer(In|Out)Updates, bgpPeerInUpdateElapsedTime and  bgpLocalAddr are actually not available over SNMP
+                    } elseif ($device['os'] == 'firebrick') {
+                        // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
+                        $bgpPeer = null;
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode('.', $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0] . '.', '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+
+                            // Some older Firebrick software versions don't have this field
+                            if (isset($value['fbBgpPeerLocalAddress'])) {
+                                $peer_data['bgpLocalAddr'] = IP::fromHexString($value['fbBgpPeerLocalAddress'])->uncompressed();
+                            }
+
+                            if ($address == $peer_ip) {
+                                switch ($value['fbBgpPeerState']) {
+                                    case 0:
+                                        $peer_data['bgpPeerState'] = 'idle';
+                                        break;
+                                    case 1:
+                                    case 2:
+                                        $peer_data['bgpPeerState'] = 'active';
+                                        break;
+                                    case 3:
+                                        $peer_data['bgpPeerState'] = 'opensent';
+                                        break;
+                                    case 4:
+                                        $peer_data['bgpPeerState'] = 'openconfig';
+                                        break;
+                                    case 5:
+                                        $peer_data['bgpPeerState'] = 'established';
+                                        break;
+                                    case 6:
+                                        $peer_data['bgpPeerState'] = 'closed';
+                                        break;
+                                    case 7:
+                                        $peer_data['bgpPeerState'] = 'free';
+                                        break;
+                                }
+                                $peer_data['bgpPeerRemoteAddr'] = $address;
+                                $peer_data['bgpPeerRemoteAs'] = $value['fbBgpPeerRemoteAS'];
+                                $peer_data['bgpPeerAdminStatus'] = 'start';
+                                $peer_data['bgpPeerInUpdates'] = 0;
+                                $peer_data['bgpPeerOutUpdates'] = 0;
+                                $peer_data['bgpPeerInTotalMessages'] = 0;
+                                $peer_data['bgpPeerOutTotalMessages'] = 0;
+                                $peer_data['bgpPeerFsmEstablishedTime'] = 0;
+                                break;
+                            }
+                        }
                     } else {
                         $bgp_peer_ident = $peer_ip->toSnmpIndex();
                         $ip_ver = $peer_ip->getFamily();
@@ -251,25 +309,41 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                             ];
-                        } elseif ($device['os'] === 'aos7') {
-                            $peer_identifier = $peer['bgpPeerIdentifier'];
-                            $mib = 'BGP4-MIB';
+                        } elseif ($device['os'] == 'dell-os10') {
+                            $peer_identifier = '1.' . $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
+                            $mib = 'DELLEMC-OS10-BGP4V2-MIB';
                             $oid_map = [
-                                'bgpPeerState' => 'bgpPeerState',
-                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
-                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
-                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
-                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
-                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
-                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
-                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
-                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'os10bgp4V2PeerState' => 'bgpPeerState',
+                                'os10bgp4V2PeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'os10bgp4V2PeerInUpdates' => 'bgpPeerInUpdates',
+                                'os10bgp4V2PeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'os10bgp4V2PeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'os10bgp4V2PeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'os10bgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'os10bgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'os10bgp4V2PeerLocalAddr' => 'bgpLocalAddr',
+                                'os10bgp4V2PeerDescription' => 'bgpPeerDescr',
+                                'os10bgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
+                                'os10bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
+                                'os10bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                             ];
-
+                        } elseif ($device['os'] == 'aos7') {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
                             $peer_data = [];
                             $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', $al_descr, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                            $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [], 'BGP4-MIB', 'aos7', '-OQUs');
                             $peer_data['bgpPeerDescr'] = $al_descr[$peer_identifier]['alaBgpPeerName'];
+                            $peer_data['bgpPeerState'] = $al_peer[$peer_identifier]['bgpPeerState'];
+                            $peer_data['bgpPeerAdminStatus'] = $al_peer[$peer_identifier]['bgpPeerAdminStatus'];
+                            $peer_data['bgpPeerInUpdates'] = $al_peer[$peer_identifier]['bgpPeerInUpdates'];
+                            $peer_data['bgpPeerOutUpdates'] = $al_peer[$peer_identifier]['bgpPeerOutUpdates'];
+                            $peer_data['bgpPeerInTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerInTotalMessages'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerOutTotalMessages'];
+                            $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
+                            $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
+                            $error_data = explode(' ', $al_peer[$peer_identifier]['bgpPeerLastError']);
+                            $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
+                            $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                         } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';
@@ -285,6 +359,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'cbgpPeer2LocalAddr' => 'bgpLocalAddr',
                                 'cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
                                 'cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
+                            ];
+                        } elseif ($device['os'] == 'cumulus') {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'CUMULUS-BGPUN-MIB';
+                            $oid_map = [
+                                'bgpPeerState' => 'bgpPeerState',
+                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
+                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'bgpPeerIface' => 'bgpPeerIface',
                             ];
                         } else {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
@@ -337,6 +427,29 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerLastErrorCode'] = $error_code;
                         $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
                     }
+
+                    // --- Fill the bgpPeerIface column ---
+                    $bgpPeerIfaceFilled = false;
+                    if (isset($peer_data['bgpPeerIface'])) {
+                        if (! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) && ! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+                            // The column is already filled with the ifName, we change it to ifIndex
+                            $bgpPeerIface = DB::table('ports')->where('device_id', '=', $device['device_id'])->where('ifName', '=', $peer_data['bgpPeerIface'])->first()->ifIndex;
+                            $bgpPeerIfaceFilled = true;
+                        }
+                    }
+                    if (! ($bgpPeerIfaceFilled) && isset($peer_data['bgpLocalAddr'])) {
+                        // else we use the bgpLocalAddr to find ifIndex
+                        if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                            $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->first()->ifIndex;
+                        } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                            $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv6_addresses', 'ports.port_id', '=', 'ipv6_addresses.port_id')->where('ipv6_address', '=', $ipv6)->first()->ifIndex;
+                        }
+                    }
+                    if (isset($bgpPeerIface)) {
+                        $peer_data['bgpPeerIface'] = $bgpPeerIface;
+                    }
                 }
 
                 d_echo($peer_data);
@@ -351,17 +464,17 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
                 ) {
                     if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
-                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
+                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
                     } elseif ($peer_data['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 1, $peer_ip);
+                        log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . ')', $device, 'bgpPeer', 1, $peer_ip);
                     } elseif ($peer['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
+                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ' ' . $peer['bgpPeerDescr'] . '), last error: ' . describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
                     }
                 }
             }
 
             // --- Update rrd data ---
-            $peer_rrd_name = safename('bgp-' . $peer['bgpPeerIdentifier']);
+            $peer_rrd_name = \LibreNMS\Data\Store\Rrd::safeName('bgp-' . $peer['bgpPeerIdentifier']);
             $peer_rrd_def = RrdDefinition::make()
                 ->addDataset('bgpPeerOutUpdates', 'COUNTER', null, 100000000000)
                 ->addDataset('bgpPeerInUpdates', 'COUNTER', null, 100000000000)
@@ -372,6 +485,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             $peer_data['bgpPeerFsmEstablishedTime'] = set_numeric($peer_data['bgpPeerFsmEstablishedTime']);
             $peer_data['bgpPeerInUpdates'] = set_numeric($peer_data['bgpPeerInUpdates']);
             $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates']);
+            $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages']);
+            $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages']);
 
             $fields = [
                 'bgpPeerOutUpdates' => $peer_data['bgpPeerOutUpdates'],
@@ -401,7 +516,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
             }
 
             // --- Populate cbgp data ---
-            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista') {
+            if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
                 // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
                 $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
                 foreach ($peer_afis as $peer_afi) {
@@ -531,6 +646,25 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
                     }
 
+                    if ($device['os'] == 'dell-os10') {
+                        $safis['unicast'] = 1;
+                        $safis['multicast'] = 2;
+                        $afis['ipv4'] = 1;
+                        $afis['ipv6'] = 2;
+                        if (preg_match('/:/', $peer['bgpPeerIdentifier'])) {
+                            $tmp_peer = str_replace(':', '', $peer['bgpPeerIdentifier']);
+                            $tmp_peer = preg_replace('/([\w\d]{2})/', '\1:', $tmp_peer);
+                            $tmp_peer = rtrim($tmp_peer, ':');
+                        } else {
+                            $tmp_peer = $peer['bgpPeerIdentifier'];
+                        }
+                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixOutPrefixes', $out_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+
+                        $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixInPrefixesAccepted'];
+                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixOutPrefixes'];
+                    }
+
                     if ($device['os'] === 'aos7') {
                         $tmp_peer = $peer['bgpPeerIdentifier'];
                         $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', $al_prefixes, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
@@ -553,6 +687,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         if (isset($vrpPrefixes[$key6])) {
                             $cbgpPeerAcceptedPrefixes = $vrpPrefixes[$key6]['hwBgpPeerPrefixRcvCounter'];
                             $cbgpPeerAdvertisedPrefixes = $vrpPrefixes[$key6]['hwBgpPeerPrefixAdvCounter'];
+                        }
+                    }
+
+                    if ($devices['os'] == 'firebrick') {
+                        foreach ($peer_data_check as $key => $value) {
+                            $oid = explode('.', $key);
+                            $protocol = $oid[0];
+                            $address = str_replace($oid[0] . '.', '', $key);
+                            if (strlen($address) > 15) {
+                                $address = IP::fromHexString($address)->compressed();
+                            }
+                            if ($address == $peer['bgpPeerIdentifier']) {
+                                $cbgpPeerAcceptedPrefixes = $value['fbBgpPeerReceivedIpv4Prefixes'] + $value['fbBgpPeerReceivedIpv6Prefixes'];
+                                $cbgpPeerAdvertisedPrefixes = $value['fbBgpPeerExported'];
+                                break;
+                            }
                         }
                     }
 
@@ -611,7 +761,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         );
                     }
 
-                    $cbgp_rrd_name = safename('cbgp-' . $peer['bgpPeerIdentifier'] . ".$afi.$safi");
+                    $cbgp_rrd_name = \LibreNMS\Data\Store\Rrd::safeName('cbgp-' . $peer['bgpPeerIdentifier'] . ".$afi.$safi");
                     $cbgp_rrd_def = RrdDefinition::make()
                         ->addDataset('AcceptedPrefixes', 'GAUGE', null, 100000000000)
                         ->addDataset('DeniedPrefixes', 'GAUGE', null, 100000000000)

@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 // Example snmpwalk with units
 // "Interval" oids have been filtered out
@@ -42,7 +43,7 @@ use LibreNMS\RRD\RrdDefinition;
 // adslAturPerfValidIntervals.1 = 0
 // adslAturPerfInvalidIntervals.1 = 0
 if (isset($this_port['adslLineCoding'])) {
-    $rrd_name = getPortRrdName($port_id, 'adsl');
+    $rrd_name = Rrd::portName($port_id, 'adsl');
     $rrd_def = RrdDefinition::make()->disableNameChecking()
         ->addDataset('AtucCurrSnrMgn', 'GAUGE', 0, 635)
         ->addDataset('AtucCurrAtn', 'GAUGE', 0, 635)
@@ -162,5 +163,5 @@ if (isset($this_port['adslLineCoding'])) {
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
     data_update($device, 'adsl', $tags, $fields);
 
-    echo 'ADSL (' . $this_port['adslLineCoding'] . '/' . formatRates($this_port['adslAtucChanCurrTxRate']) . '/' . formatRates($this_port['adslAturChanCurrTxRate']) . ')';
+    echo 'ADSL (' . $this_port['adslLineCoding'] . '/' . Number::formatSi($this_port['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . Number::formatSi($this_port['adslAturChanCurrTxRate'], 2, 3, 'bps') . ')';
 }//end if

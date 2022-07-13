@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -26,8 +27,7 @@
 namespace LibreNMS\Util;
 
 use Exception;
-use Requests;
-use Requests_Response;
+use Illuminate\Support\Facades\Http;
 
 class GitHub
 {
@@ -40,22 +40,22 @@ class GitHub
     protected $pull_requests = [];
     protected $changelog = [
         'feature' => [],
-        'enhancement' => [],
         'breaking change' => [],
         'security' => [],
         'device' => [],
         'webui' => [],
-        'authentication' => [],
+        'alerting' => [],
         'graphs' => [],
         'snmp traps' => [],
         'applications' => [],
-        'api' => [],
-        'alerting' => [],
         'billing' => [],
+        'api' => [],
+        'settings' => [],
         'discovery' => [],
         'polling' => [],
         'rancid' => [],
         'oxidized' => [],
+        'authentication' => [],
         'bug' => [],
         'refactor' => [],
         'cleanup' => [],
@@ -63,6 +63,7 @@ class GitHub
         'translation' => [],
         'tests' => [],
         'misc' => [],
+        'mibs' => [],
         'dependencies' => [],
     ];
     protected $changelog_users = [];
@@ -105,14 +106,14 @@ class GitHub
     /**
      * Get the release information for a specific tag
      *
-     * @param $tag
+     * @param  string  $tag
      * @return mixed
      */
     public function getRelease($tag)
     {
-        $release = Requests::get($this->github . "/releases/tags/$tag", $this->getHeaders());
+        $release = Http::withHeaders($this->getHeaders())->get($this->github . "/releases/tags/$tag");
 
-        return json_decode($release->body, true);
+        return $release->json();
     }
 
     /**
@@ -120,15 +121,15 @@ class GitHub
      */
     public function getPullRequest()
     {
-        $pull_request = Requests::get($this->github . "/pulls/{$this->pr}", $this->getHeaders());
-        $this->pr = json_decode($pull_request->body, true);
+        $pull_request = Http::withHeaders($this->getHeaders())->get($this->github . "/pulls/{$this->pr}");
+        $this->pr = $pull_request->json();
     }
 
     /**
      * Get all closed pull requests up to a certain date
      *
-     * @param $date
-     * @param string $after
+     * @param  string  $date
+     * @param  string  $after
      */
     public function getPullRequests($date, $after = null)
     {
@@ -178,9 +179,8 @@ class GitHub
 }
 GRAPHQL;
 
-        $data = json_encode(['query' => $query]);
-        $prs = Requests::post($this->graphql, $this->getHeaders(), $data);
-        $prs = json_decode($prs->body, true);
+        $prs = Http::withHeaders($this->getHeaders())->post($this->graphql, ['query' => $query]);
+        $prs = $prs->json();
         if (! isset($prs['data'])) {
             var_dump($prs);
         }
@@ -200,7 +200,7 @@ GRAPHQL;
     /**
      * Parse labels response into standardized names and remove emoji
      *
-     * @param array $labels
+     * @param  array  $labels
      * @return array
      */
     private function parseLabels($labels)
@@ -259,8 +259,8 @@ GRAPHQL;
      * Record user info and count into the specified array (default changelog_users)
      * Record profile links too.
      *
-     * @param array $user
-     * @param string $type
+     * @param  array  $user
+     * @param  string  $type
      */
     private function recordUserInfo($user, $type = 'changelog_users')
     {
@@ -307,7 +307,8 @@ GRAPHQL;
 
     /**
      * Create a markdown list of users and link their github profile
-     * @param $users
+     *
+     * @param  array  $users
      * @return string
      */
     private function formatUserList($users)
@@ -350,6 +351,7 @@ GRAPHQL;
 
     /**
      * @return bool
+     *
      * @throws Exception
      */
     public function createRelease()
@@ -363,19 +365,21 @@ GRAPHQL;
             $this->createChangelog(false);
         }
 
-        $release = Requests::post($this->github . '/releases', $this->getHeaders(), json_encode([
+        $release = Http::withHeaders($this->getHeaders())->post($this->github . '/releases', [
             'tag_name' => $this->tag,
             'target_commitish' => $updated_sha,
             'body' => $this->markdown,
             'draft' => false,
-        ]));
+        ]);
 
-        return $release->status_code == 201;
+        return $release->status() == 201;
     }
 
     /**
      * Function to control the creation of creating a change log.
-     * @param bool $write
+     *
+     * @param  bool  $write
+     *
      * @throws Exception
      */
     public function createChangelog($write = true)
@@ -385,14 +389,14 @@ GRAPHQL;
             $this->getPullRequest();
         }
 
-        if (! isset($previous_release['published_at'])) {
+        if (! isset($previous_release['created_at'])) {
             throw new Exception(
                 $previous_release['message'] ??
                 "Could not find previous release tag. ($this->from)"
             );
         }
 
-        $this->getPullRequests($previous_release['published_at']);
+        $this->getPullRequests($previous_release['created_at']);
         $this->buildChangeLog();
         $this->formatChangeLog();
 
@@ -411,22 +415,21 @@ GRAPHQL;
     }
 
     /**
-     * @param string $file Path in git repo
-     * @param string $contents new file contents
-     * @param string $message The commit message
-     * @return Requests_Response
+     * @param  string  $file  Path in git repo
+     * @param  string  $contents  new file contents
+     * @param  string  $message  The commit message
      */
-    private function pushFileContents($file, $contents, $message)
+    private function pushFileContents($file, $contents, $message): string
     {
-        $existing = Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
-        $existing_sha = json_decode($existing->body)->sha;
+        $existing = Http::withHeaders($this->getHeaders())->get($this->github . '/contents/' . $file);
+        $existing_sha = $existing->json()['sha'];
 
-        $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([
+        $updated = Http::withHeaders($this->getHeaders())->put($this->github . '/contents/' . $file, [
             'message' => $message,
             'content' => base64_encode($contents),
             'sha' => $existing_sha,
-        ]));
+        ]);
 
-        return json_decode($updated->body)->commit->sha;
+        return $updated->json()['commit']['sha'];
     }
 }

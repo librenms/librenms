@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,6 +37,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -64,7 +66,7 @@ class PingCheck implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param array $groups List of distributed poller groups to check
+     * @param  array  $groups  List of distributed poller groups to check
      */
     public function __construct($groups = [])
     {
@@ -80,8 +82,10 @@ class PingCheck implements ShouldQueue
         // set up fping process
         $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
         $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
+        $tos = Config::get('fping_options.tos', 0);  // TOS marking
+        $fping = Config::get('fping', 'fping'); // use user defined binary
 
-        $this->command = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+        $this->command = [$fping, '-f', '-', '-e', '-t', $timeout, '-r', $retries, '-O', $tos];
         $this->wait = Config::get('rrd.step', 300) * 2;
     }
 
@@ -151,19 +155,19 @@ class PingCheck implements ShouldQueue
             return $this->devices;
         }
 
-        global $vdebug;
-
         /** @var Builder $query */
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken', 'max_depth'])
             ->orderBy('max_depth');
 
         if ($this->groups) {
-            $query->whereIn('poller_group', $this->groups);
+            $query->whereIntegerInRaw('poller_group', $this->groups);
         }
 
         $this->devices = $query->get()->keyBy(function ($device) {
-            return Device::pollerTarget(json_decode(json_encode($device), true));
+            /** @var Device $device */
+
+            return $device->overwrite_ip ?: $device->hostname;
         });
 
         // working collections
@@ -174,7 +178,7 @@ class PingCheck implements ShouldQueue
         $this->current_tier = 1;
         $this->current = $this->tiered->get($this->current_tier, collect());
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             $this->tiered->each(function (Collection $tier, $index) {
                 echo "Tier $index (" . $tier->count() . '): ';
                 echo $tier->implode('hostname', ', ');
@@ -191,8 +195,6 @@ class PingCheck implements ShouldQueue
      */
     private function processTier()
     {
-        global $vdebug;
-
         if ($this->current->isNotEmpty()) {
             return;
         }
@@ -204,7 +206,7 @@ class PingCheck implements ShouldQueue
             return;
         }
 
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo "Out of devices at this tier, moving to tier $this->current_tier\n";
         }
 
@@ -223,13 +225,11 @@ class PingCheck implements ShouldQueue
      * If the device is on the current tier, record the data and remove it
      * $data should have keys: hostname, status, and conditionally rtt
      *
-     * @param $data
+     * @param  array  $data
      */
-    private function recordData($data)
+    private function recordData(array $data)
     {
-        global $vdebug;
-
-        if ($vdebug) {
+        if (Debug::isVerbose()) {
             echo "Attempting to record data for {$data['hostname']}... ";
         }
 
@@ -238,7 +238,7 @@ class PingCheck implements ShouldQueue
 
         // process the data if this is a standalone device or in the current tier
         if ($device->max_depth === 0 || $this->current->has($device->hostname)) {
-            if ($vdebug) {
+            if (Debug::isVerbose()) {
                 echo "Success\n";
             }
 
@@ -269,7 +269,7 @@ class PingCheck implements ShouldQueue
             $this->complete($device->hostname);
             d_echo("Recorded data for $device->hostname (tier $device->max_depth)\n");
         } else {
-            if ($vdebug) {
+            if (Debug::isVerbose()) {
                 echo "Deferred\n";
             }
 
@@ -280,7 +280,7 @@ class PingCheck implements ShouldQueue
     /**
      * Done processing $hostname, remove it from our active data
      *
-     * @param $hostname
+     * @param  string  $hostname
      */
     private function complete($hostname)
     {
@@ -292,9 +292,9 @@ class PingCheck implements ShouldQueue
      * Defer this data processing until all parent devices are complete
      *
      *
-     * @param $data
+     * @param  array  $data
      */
-    private function defer($data)
+    private function defer(array $data)
     {
         $device = $this->devices->get($data['hostname']);
 

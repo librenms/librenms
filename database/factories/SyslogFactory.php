@@ -5,7 +5,9 @@ namespace Database\Factories;
 use App\Models\Syslog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use LibreNMS\Enum\SyslogSeverity;
 
+/** @extends Factory<Syslog> */
 class SyslogFactory extends Factory
 {
     /**
@@ -23,7 +25,7 @@ class SyslogFactory extends Factory
     public function definition()
     {
         $facilities = ['kern', 'user', 'mail', 'daemon', 'auth', 'syslog', 'lpr', 'news', 'uucp', 'cron', 'authpriv', 'ftp', 'ntp', 'security', 'console', 'solaris-cron', 'local0', 'local1', 'local2', 'local3', 'local4', 'local5', 'local6', 'local7'];
-        $levels = ['emerg', 'alert', 'crit', 'err', 'warning', 'notice', 'info', 'debug'];
+        $levels = SyslogSeverity::LEVELS;
 
         return [
             'facility' => $this->faker->randomElement($facilities),

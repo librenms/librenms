@@ -6,11 +6,11 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
+use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
-use Toastr;
 
 class ServiceTemplateController extends Controller
 {
@@ -57,10 +57,10 @@ class ServiceTemplateController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function store(Request $request)
+    public function store(Request $request, FlasherInterface $flasher)
     {
         $this->validate(
             $request, [
@@ -69,11 +69,9 @@ class ServiceTemplateController extends Controller
                 'groups.*' => 'integer',
                 'devices' => 'array',
                 'devices.*' => 'integer',
-                'type' => 'string',
-                'dtype' => 'required|in:dynamic,static',
-                'dgtype' => 'required|in:dynamic,static',
-                'drules' => 'json|required_if:dtype,dynamic',
-                'dgrules' => 'json|required_if:dgtype,dynamic',
+                'check' => 'string',
+                'type' => 'required|in:dynamic,static',
+                'rules' => 'json|required_if:type,dynamic',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',
                 'desc' => 'nullable|string',
@@ -87,11 +85,9 @@ class ServiceTemplateController extends Controller
             $request->only(
                 [
                     'name',
+                    'check',
                     'type',
-                    'dtype',
-                    'dgtype',
-                    'drules',
-                    'dgrules',
+                    'rules',
                     'param',
                     'ip',
                     'desc',
@@ -101,17 +97,15 @@ class ServiceTemplateController extends Controller
                 ]
             )
         );
-        $template->drules = json_decode($request->drules);
-        $template->dgrules = json_decode($request->dgrules);
+        $template->rules = json_decode($request->rules);
         $template->save();
 
-        if ($request->dtype == 'static') {
+        if ($request->type == 'static') {
             $template->devices()->sync($request->devices);
         }
-        if ($request->dgtype == 'static') {
-            $template->groups()->sync($request->groups);
-        }
-        Toastr::success(__('Service Template :name created', ['name' => $template->name]));
+
+        $template->groups()->sync($request->groups);
+        $flasher->addSuccess(__('Service Template :name created', ['name' => $template->name]));
 
         return redirect()->route('services.templates.index');
     }
@@ -119,7 +113,7 @@ class ServiceTemplateController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function show(ServiceTemplate $template)
@@ -130,7 +124,7 @@ class ServiceTemplateController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function edit(ServiceTemplate $template)
@@ -148,11 +142,11 @@ class ServiceTemplateController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request    $request
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function update(Request $request, ServiceTemplate $template)
+    public function update(Request $request, ServiceTemplate $template, FlasherInterface $flasher)
     {
         $this->validate(
             $request, [
@@ -165,15 +159,13 @@ class ServiceTemplateController extends Controller
                         }
                     ),
                 ],
-                'dtype' => 'required|in:dynamic,static',
-                'drules' => 'json|required_if:dtype,dynamic',
+                'type' => 'required|in:dynamic,static',
+                'rules' => 'json|required_if:type,dynamic',
                 'devices' => 'array',
                 'devices.*' => 'integer',
-                'dgtype' => 'required|in:dynamic,static',
-                'dgrules' => 'json|required_if:dgtype,dynamic',
                 'groups' => 'array',
                 'groups.*' => 'integer',
-                'type' => 'string',
+                'check' => 'string',
                 'param' => 'nullable|string',
                 'ip' => 'nullable|string',
                 'desc' => 'nullable|string',
@@ -187,11 +179,9 @@ class ServiceTemplateController extends Controller
             $request->only(
                 [
                     'name',
+                    'check',
                     'type',
-                    'dtype',
-                    'dgtype',
-                    'drules',
-                    'dgrules',
+                    'rules',
                     'param',
                     'ip',
                     'desc',
@@ -203,46 +193,40 @@ class ServiceTemplateController extends Controller
         );
 
         $devices_updated = false;
-        if ($template->dtype == 'static') {
+        if ($template->type == 'static') {
             // sync device_ids from input
             $updated = $template->devices()->sync($request->get('devices', []));
             // check for attached/detached/updated
             $devices_updated = array_sum(array_map(function ($device_ids) {
                 return count($device_ids);
             }, $updated)) > 0;
-        } else {
-            $template->drules = json_decode($request->drules);
-        }
-
-        $device_groups_updated = false;
-        if ($template->dgtype == 'static') {
+        } elseif ($template->type == 'dynamic') {
+            $template->rules = json_decode($request->rules);
+        } elseif ($template->type == 'groups') {
             // sync device_group_ids from input
             $updated = $template->groups()->sync($request->get('groups', []));
             // check for attached/detached/updated
             $device_groups_updated = array_sum(array_map(function ($device_group_ids) {
                 return count($device_group_ids);
             }, $updated)) > 0;
-        } else {
-            $template->dgrules = json_decode($request->dgrules);
         }
 
-        if ($template->isDirty() || $devices_updated || $device_groups_updated) {
+        if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
             try {
-                if ($template->save() || $devices_updated || $device_groups_updated) {
-                    Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
+                if ($template->save() || $devices_updated || isset($device_groups_updated)) {
+                    $flasher->addSuccess(__('Service Template :name updated', ['name' => $template->name]));
                 } else {
-                    Toastr::error(__('Failed to save'));
+                    $flasher->addError(__('Failed to save'));
 
                     return redirect()->back()->withInput();
                 }
             } catch (\Illuminate\Database\QueryException $e) {
                 return redirect()->back()->withInput()->withErrors([
-                    'drules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
-                    'dgrules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
+                    'rules' => __('Rules resulted in invalid query: ') . $e->getMessage(),
                 ]);
             }
         } else {
-            Toastr::info(__('No changes made'));
+            $flasher->addInfo(__('No changes made'));
         }
 
         return redirect()->route('services.templates.index');
@@ -251,7 +235,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template to Device Groups.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function applyDeviceGroups(ServiceTemplate $template)
@@ -264,7 +248,7 @@ class ServiceTemplateController extends Controller
                     ],
                     [
                         'service_name' => $template->name,
-                        'service_type' => $template->type,
+                        'service_type' => $template->check,
                         'service_template_id' => $template->id,
                         'service_param' => $template->param,
                         'service_ip' => $template->ip,
@@ -283,7 +267,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template to Devices.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function applyDevices(ServiceTemplate $template)
@@ -295,7 +279,7 @@ class ServiceTemplateController extends Controller
                 ],
                 [
                     'service_name' => $template->name,
-                    'service_type' => $template->type,
+                    'service_type' => $template->check,
                     'service_template_id' => $template->id,
                     'service_param' => $template->param,
                     'service_ip' => $template->ip,
@@ -318,7 +302,7 @@ class ServiceTemplateController extends Controller
     public function applyAll()
     {
         foreach (ServiceTemplate::all() as $template) {
-            ServiceTemplateController::apply($template);
+            $this->apply($template);
         }
         $msg = __('All Service Templates have been applied');
 
@@ -328,7 +312,7 @@ class ServiceTemplateController extends Controller
     /**
      * Apply specified Service Template.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function apply(ServiceTemplate $template)
@@ -348,7 +332,7 @@ class ServiceTemplateController extends Controller
     /**
      * Remove specified Service Template.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function remove(ServiceTemplate $template)
@@ -363,7 +347,7 @@ class ServiceTemplateController extends Controller
     /**
      * Destroy the specified resource from storage.
      *
-     * @param  \App\Models\ServiceTemplate $template
+     * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function destroy(ServiceTemplate $template)

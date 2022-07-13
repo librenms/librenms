@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -144,7 +145,7 @@ class GraphController extends WidgetController
         }
         $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
 
-        $data['graph_ports'] = Port::whereIn('port_id', $data['graph_ports'])
+        $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
             ->with(['device' => function ($query) {
                 $query->select('device_id', 'hostname', 'sysName');
@@ -158,7 +159,7 @@ class GraphController extends WidgetController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)

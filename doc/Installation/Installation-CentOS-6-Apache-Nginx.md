@@ -1,6 +1,3 @@
-source: Installation/Installation-CentOS-6-Apache-Nginx.md
-path: blob/master/doc/
-
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
 > at `mysql>` prompts) or temporarily become a user with root
@@ -52,7 +49,7 @@ Enter the MySQL/MariaDB root password to enter the command-line interface.
 Create database.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;

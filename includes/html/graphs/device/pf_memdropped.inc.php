@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'pf_memdropped');
+$rrd_filename = Rrd::name($device['hostname'], 'pf_memdropped');
 
 $ds = 'memdropped';
 

@@ -32,13 +32,13 @@ if ($width > '500') {
 $filename_dir = generate_smokeping_file($device);
 if ($src['hostname'] == Config::get('own_hostname')) {
     $filename = $filename_dir . $device['hostname'] . '.rrd';
-    if (! rrdtool_check_rrd_exists($filename)) {
+    if (! Rrd::checkRrdExists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '_', $device['hostname']) . '.rrd';
     }
 } else {
     $filename = $filename_dir . $device['hostname'] . '~' . $src['hostname'] . '.rrd';
-    if (! rrdtool_check_rrd_exists($filename)) {
+    if (! Rrd::checkRrdExists($filename)) {
         // Try with dots in hostname replaced by underscores
         $filename = $filename_dir . str_replace('.', '-', $device['hostname']) . '~' . $src['hostname'] . '.rrd';
     }
@@ -51,7 +51,7 @@ if (! Config::has("graph_colours.$colourset.$iter")) {
 $colour = Config::get("graph_colours.$colourset.$iter");
   $iter++;
 
-  $descr = rrdtool_escape($source, $descr_len);
+  $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);
 
   $rrd_options .= " DEF:median$i=" . $filename . ':median:AVERAGE ';
   $rrd_options .= " DEF:loss$i=" . $filename . ':loss:AVERAGE';

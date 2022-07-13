@@ -1,6 +1,3 @@
-source: Extensions/Dell-OpenManage.md
-path: blob/master/doc/
-
 # Dell OpenManage Support
 
 For Dell OpenManage support you will need to install Dell OpenManage
@@ -30,7 +27,7 @@ Ensure that srvadmin is started, this is usually done by executing:
 Once this has been done, add the device to LibreNMS as normal and you
 will start to receive Temperatures and Fan speed data.
 
-# Windows
+## Windows
 
 Download OpenManage from Dell's support page
 [Link](http://www.dell.com/support/contents/us/en/04/article/product-support/self-support-knowledgebase/enterprise-resource-center/systemsmanagement/OMSA)

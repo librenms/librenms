@@ -18,11 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ApiToken extends BaseModel
 {
@@ -34,7 +37,7 @@ class ApiToken extends BaseModel
     /**
      * Check if the given token is valid
      *
-     * @param string $token
+     * @param  string  $token
      * @return bool
      */
     public static function isValid($token, $user_id = null)
@@ -51,7 +54,7 @@ class ApiToken extends BaseModel
     /**
      * Get User model based on the given API token (or null if invalid)
      *
-     * @param string $token
+     * @param  string  $token
      * @return User|null
      */
     public static function userFromToken($token)
@@ -74,7 +77,7 @@ class ApiToken extends BaseModel
     /**
      * Get the user_id for the given token.
      *
-     * @param string $token
+     * @param  string  $token
      * @return int
      */
     public static function idFromToken($token)
@@ -91,7 +94,7 @@ class ApiToken extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }

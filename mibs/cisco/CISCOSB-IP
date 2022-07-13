@@ -26,7 +26,7 @@ IMPORTS
 
 
 ipSpec MODULE-IDENTITY
-       LAST-UPDATED "200606220000Z"
+       LAST-UPDATED "200606220001Z"
        ORGANIZATION "Cisco Systems, Inc."
 
        CONTACT-INFO
@@ -484,16 +484,17 @@ rsArpDeleteTable OBJECT-TYPE
             on get returns the last action"
     ::= { arpSpec 1  }
 
--- range 1 to 40,000,000 to allow system convesion to timer
+-- range 0 to 40,000,000 to allow system convesion to timer
 rsArpInactiveTimeOut OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..40000000)
+    SYNTAX      Unsigned32 (0..40000000)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
          "This variable defines the maximum time period (in second) that can
           pass between ARP requests concerning an entry in the ARP table.
-          After this time period, the entry is deleted from the table."
-    DEFVAL  { 60000 }
+          After this time period, the entry is deleted from the table.
+          Default value 0 means using value based on IP forwarding mode."
+    DEFVAL  { 0 }
     ::= { arpSpec 2  }
 
 rsArpProxy OBJECT-TYPE
@@ -1296,7 +1297,7 @@ rlIpAddressAddr OBJECT-TYPE
             and cannot be accessed using SNMPv1, SNMPv2c, or SNMPv3.
 
             Note:
-            Since interpeak doesn’t use origin, 3rd index (key) - rlIpAddressOrigin, as part of the key,
+            Since interpeak doesnt use origin, 3rd index (key) - rlIpAddressOrigin, as part of the key,
             we assume that no same address can exists from different origins."
     ::= { rlIpAddressEntry 2 }
 
@@ -1466,25 +1467,62 @@ rlIpAddressOperStatus   OBJECT-TYPE
     ::= { rlIpAddressEntry 15 }
 
 rlIpDefaultDSCP OBJECT-TYPE
-	SYNTAX  INTEGER(0..63)
-	MAX-ACCESS  read-write
-	STATUS  current
-	DESCRIPTION
-	      "The default value inserted into the DSCP
-	      field of the IP header of datagrams originated at
-	      this entity, whenever a DSCP value is not supplied
-	      by the application."
-	::= { ipSpec 37 }
+SYNTAX  INTEGER(0..63)
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+      "The default value inserted into the DSCP
+      field of the IP header of datagrams originated at
+      this entity, whenever a DSCP value is not supplied
+      by the application."
+::= { ipSpec 37 }
 
 rlIpDefaultUP OBJECT-TYPE
-	SYNTAX  INTEGER(0..7)
-	MAX-ACCESS  read-write
-	STATUS  current
-	DESCRIPTION
-	      "The default value inserted into the User Priority
-	      field in the 802.1q VLAN tag of IPv4 frames sent by the
-	      CPU."
-	::= { ipSpec 38 }
-	
+SYNTAX  INTEGER(0..7)
+MAX-ACCESS  read-write
+STATUS  current
+DESCRIPTION
+      "The default value inserted into the User Priority
+      field in the 802.1q VLAN tag of IPv4 frames sent by the
+      CPU."
+::= { ipSpec 38 }
+
+rlIpv4MtuSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Sets the maximum transmission unit (MTU) size in bytes of IPv4 packets (payload)."
+    ::= { ipSpec 39 }
+
+rlIcmpCountersClear OBJECT-TYPE
+    SYNTAX   INTEGER {
+                clear (0)
+             }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "clear - delete all icmp counters"
+    ::= { ipSpec 40 }
+
+rlIpCountersClear OBJECT-TYPE
+    SYNTAX   INTEGER {
+                clear (0)
+             }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "clear - delete all ip counters"
+    ::= { ipSpec 41 }
+    
+rlManagementIpPortIfindex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The system management port ifIndex"
+    ::= { ipSpec 42 }
+
 END
+
 

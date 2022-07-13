@@ -139,9 +139,9 @@ if ($vars['view'] == 'lsp') {
             <td>' . $lsp['vrf_name'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $lsp['mplsLspAdminState'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $lsp['mplsLspOperState'] . '</td>
-            <td>' . formatUptime($lsp['mplsLspLastChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastChange']) . '</td>
             <td>' . $lsp['mplsLspTransitions'] . '</td>
-            <td>' . formatUptime($lsp['mplsLspLastTransition']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($lsp['mplsLspLastTransition']) . '</td>
             <td><span class="label label-' . $path_status_color . '">' . $lsp['mplsLspConfiguredPaths'] . '      /     ' . $lsp['mplsLspStandbyPaths'] . ' / ' . $lsp['mplsLspOperationalPaths'] . '</td>
             <td>' . $lsp['mplsLspType'] . '</td>
             <td>' . $lsp['mplsLspFastReroute'] . '</td>
@@ -207,7 +207,7 @@ if ($vars['view'] == 'paths') {
             <td>' . $path['mplsLspPathType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $path['mplsLspPathAdminState'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $path['mplsLspPathOperState'] . '</td>
-            <td>' . formatUptime($path['mplsLspPathLastChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($path['mplsLspPathLastChange']) . '</td>
             <td>' . $path['mplsLspPathTransitionCount'] . '</td>
             <td>' . $path['mplsLspPathBandwidth'] . '</td>
             <td>' . $path['mplsLspPathOperBandwidth'] . '</td>
@@ -280,8 +280,8 @@ if ($vars['view'] == 'sdps') {
             <td><span class="label label-' . $operstate_status_color . '">' . $sdp['sdpOperStatus'] . '</td>
             <td>' . $sdp['sdpAdminPathMtu'] . '</td>
             <td>' . $sdp['sdpOperPathMtu'] . '</td>
-            <td>' . formatUptime($sdp['sdpLastMgmtChange']) . '</td>
-            <td>' . formatUptime($sdp['sdpLastStatusChange']) . '</td>';
+            <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastMgmtChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sdp['sdpLastStatusChange']) . '</td>';
         echo '</tr>';
 
         $i++;
@@ -342,8 +342,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
             <td>' . $sdpbind['sdpBindVcType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $sdpbind['sdpBindOperStatus'] . '</td>
-            <td>' . formatUptime($sdpbind['sdpBindLastMgmtChange']) . '</td>
-            <td>' . formatUptime($sdpbind['sdpBindLastStatusChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastMgmtChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sdpbind['sdpBindLastStatusChange']) . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsIngFwdPackets'] . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsIngFwdOctets'] . '</td>
             <td>' . $sdpbind['sdpBindBaseStatsEgrFwdPackets'] . '</td>
@@ -418,8 +418,8 @@ vprn services are up when the service is administratively up however routing fun
             <td>' . $svc['svcDescription'] . '</td>
             <td>' . $svc['svcMtu'] . '</td>
             <td>' . $svc['svcNumSaps'] . '</td>
-            <td>' . formatUptime($svc['svcLastMgmtChange']) . '</td>
-            <td>' . formatUptime($svc['svcLastStatusChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastMgmtChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastStatusChange']) . '</td>
             <td>' . $svc['vrf_name'] . '</td>
             <td>' . $svc['svcTlsMacLearning'] . '</td>
             <td>' . $svc['svcTlsFdbTableSize'] . '</td>
@@ -477,8 +477,8 @@ if ($vars['view'] == 'saps') {
             <td>' . $sap['sapDescription'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
             <td><span class="label label-' . $operstate_status_color . '">' . $sap['sapOperStatus'] . '</td>
-            <td>' . formatUptime($sap['sapLastMgmtChange']) . '</td>
-            <td>' . formatUptime($sap['sapLastStatusChange']) . '</td>';
+            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastMgmtChange']) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastStatusChange']) . '</td>';
         echo '</tr>';
 
         $i++;

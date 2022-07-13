@@ -1,0 +1,93 @@
+
+
+-- MIB File: BROCADE-PRODUCTS-MIB.mib
+-- ****************************************************************
+-- BROCADE-PRODUCTS-MIB.my: Extreme Products MIB.
+--
+-- Copyright (c) 2018 by Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- ****************************************************************
+BROCADE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY
+      	FROM SNMPv2-SMI
+        bcsiReg  
+        	FROM Brocade-REG-MIB;
+
+      brocadeProductsMIB MODULE-IDENTITY
+        LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO
+             "Postal:  Extreme Networks, Inc.
+                       6480 Via Del Oro
+                       San Jose, CA 95119 USA
+              Phone:   +1 408 579-2800
+              E-mail:  support@extremenetworks.com
+              WWW:     http://www.extremenetworks.com"
+
+        DESCRIPTION "This MIB module is for defining all the object 
+		             identifiers to identify various hardware 
+					 platforms. These identifiers are used as value
+					 for 'sysObjectID'."
+
+        REVISION "201805291200Z" -- May 29, 2018 12:00pm
+        DESCRIPTION	"Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+		
+        REVISION "201712070000Z"  -- 7 December, 2017
+		DESCRIPTION "Updated the product name for RIGEL1U as vdx6940Q36.
+				 then added RIGELMOR product name as vdx6940S144 and Removed RIGEL2U platform"
+
+		REVISION "201701050000Z"  -- 5 January, 2017
+	    DESCRIPTION "Added product types SLX9240 and SLX9140."
+
+		REVISION "201612260000Z"  -- 26 December, 2016
+	    DESCRIPTION "Added product type SLX9540."
+
+		REVISION "201606280000Z"  -- 28 June, 2016
+	    DESCRIPTION "Added product types SLX9850S4 and SLX9850S8."
+
+		REVISION "201410071405Z" 
+	    DESCRIPTION "Added product name for RIGEL1U as vdx7770P36
+				and RIGEL2U as vdx7770P72."
+		
+		REVISION "201311210000Z"
+		DESCRIPTION "Updated name for Blackbird as vdx2740"
+
+		REVISION "201309251300Z" 
+	    DESCRIPTION "Added new product name for Draco-T platform."
+
+		REVISION "201202030000Z" 
+	    DESCRIPTION "Initial version of this MIB module."
+
+        ::= { bcsiReg 3 }
+
+      brocadeProducts   OBJECT IDENTIFIER ::= { brocadeProductsMIB 1 }
+
+      vdx6740		OBJECT IDENTIFIER ::= { brocadeProducts 131 }
+
+      vdx6740T		OBJECT IDENTIFIER ::= { brocadeProducts 137 }
+
+	  vdx2740        OBJECT IDENTIFIER ::= { brocadeProducts 138 }
+
+      vdx6740T1G  	OBJECT IDENTIFIER ::= { brocadeProducts 151 }
+
+	  vdx6940Q36 	OBJECT IDENTIFIER ::= { brocadeProducts 153 }
+
+	  vdx6940S144 	OBJECT IDENTIFIER ::= { brocadeProducts 164 }
+
+      vdx8770S4		OBJECT IDENTIFIER ::= { brocadeProducts 1000 }
+
+      vdx8770S8   	OBJECT IDENTIFIER ::= { brocadeProducts 1001 }
+
+      vdx8770S16  	OBJECT IDENTIFIER ::= { brocadeProducts 1002 }
+
+      slx9850S4  	OBJECT IDENTIFIER ::= { brocadeProducts 2000 }
+      slx9850S8  	OBJECT IDENTIFIER ::= { brocadeProducts 2001 }
+
+      slx9240       OBJECT IDENTIFIER ::= { brocadeProducts 3000 }
+      slx9140       OBJECT IDENTIFIER ::= { brocadeProducts 3001 }
+
+      slx9540       OBJECT IDENTIFIER ::= { brocadeProducts 4000 }
+
+END

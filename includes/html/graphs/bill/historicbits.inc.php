@@ -3,8 +3,8 @@
 use Amenadiel\JpGraph\Graph\Graph;
 use Amenadiel\JpGraph\Plot\LinePlot;
 
-$bill_hist_id = mres($vars['bill_hist_id']);
-$reducefactor = mres($vars['reducefactor']);
+$bill_hist_id = $vars['bill_hist_id'];
+$reducefactor = $vars['reducefactor'];
 
 if (is_numeric($bill_hist_id)) {
     if ($reducefactor < 2) {
@@ -57,7 +57,7 @@ function InvertCallback($x)
 
 function YCallback($y)
 {
-    return format_si($y, 2, 0);
+    return \LibreNMS\Util\Number::formatSi($y, 2, 0, '');
 }
 
 $graph = new Graph($vars['width'], $vars['height'], $graph_data['graph_name']);

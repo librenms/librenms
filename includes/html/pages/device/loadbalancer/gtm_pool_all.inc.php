@@ -89,7 +89,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, ['type' => 'gtm_pool', 'subtype' => 'gtm_pool_det']); ?>gtmpoolid='+row['gtmpoolid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'gtm_pool', 'subtype' => 'gtm_pool_det']); ?>gtmpoolid='+row['gtmpoolid'];
             window.location.href = link;
         });
     </script>

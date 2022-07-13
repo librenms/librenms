@@ -18,13 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Fping;
+use LibreNMS\Data\Source\Fping;
 use Symfony\Component\Process\Process;
 
 class FpingTest extends TestCase
@@ -47,7 +48,15 @@ class FpingTest extends TestCase
 
         $actual = app()->make(Fping::class)->ping('192.168.1.3');
 
-        $this->assertSame($expected, $actual);
+        $this->assertTrue($actual->success());
+        $this->assertEquals(3, $actual->transmitted);
+        $this->assertEquals(3, $actual->received);
+        $this->assertEquals(0, $actual->loss);
+        $this->assertEquals(0.62, $actual->min_latency);
+        $this->assertEquals(0.93, $actual->max_latency);
+        $this->assertEquals(0.71, $actual->avg_latency);
+        $this->assertEquals(0, $actual->duplicates);
+        $this->assertEquals(0, $actual->exit_code);
     }
 
     public function testPartialDownPing()
@@ -55,20 +64,17 @@ class FpingTest extends TestCase
         $output = "192.168.1.7 : xmt/rcv/%loss = 5/3/40%, min/avg/max = 0.13/0.23/0.32\n";
         $this->mockFpingProcess($output, 0);
 
-        $expected = [
-            'xmt' => 5,
-            'rcv' => 3,
-            'loss' => 40,
-            'min' => 0.13,
-            'max' => 0.32,
-            'avg' => 0.23,
-            'dup' => 0,
-            'exitcode' => 0,
-        ];
-
         $actual = app()->make(Fping::class)->ping('192.168.1.7');
 
-        $this->assertSame($expected, $actual);
+        $this->assertTrue($actual->success());
+        $this->assertEquals(5, $actual->transmitted);
+        $this->assertEquals(3, $actual->received);
+        $this->assertEquals(40, $actual->loss);
+        $this->assertEquals(0.13, $actual->min_latency);
+        $this->assertEquals(0.32, $actual->max_latency);
+        $this->assertEquals(0.23, $actual->avg_latency);
+        $this->assertEquals(0, $actual->duplicates);
+        $this->assertEquals(0, $actual->exit_code);
     }
 
     public function testDownPing()
@@ -76,20 +82,17 @@ class FpingTest extends TestCase
         $output = "192.168.53.1 : xmt/rcv/%loss = 3/0/100%\n";
         $this->mockFpingProcess($output, 1);
 
-        $expected = [
-            'xmt' => 3,
-            'rcv' => 0,
-            'loss' => 100,
-            'min' => 0.0,
-            'max' => 0.0,
-            'avg' => 0.0,
-            'dup' => 0,
-            'exitcode' => 1,
-        ];
-
         $actual = app()->make(Fping::class)->ping('192.168.53.1');
 
-        $this->assertSame($expected, $actual);
+        $this->assertFalse($actual->success());
+        $this->assertEquals(3, $actual->transmitted);
+        $this->assertEquals(0, $actual->received);
+        $this->assertEquals(100, $actual->loss);
+        $this->assertEquals(0.0, $actual->min_latency);
+        $this->assertEquals(0.0, $actual->max_latency);
+        $this->assertEquals(0.0, $actual->avg_latency);
+        $this->assertEquals(0, $actual->duplicates);
+        $this->assertEquals(1, $actual->exit_code);
     }
 
     public function testDuplicatePing()
@@ -102,20 +105,17 @@ OUT;
 
         $this->mockFpingProcess($output, 1);
 
-        $expected = [
-            'xmt' => 3,
-            'rcv' => 3,
-            'loss' => 0,
-            'min' => 0.68,
-            'max' => 0.91,
-            'avg' => 0.79,
-            'dup' => 2,
-            'exitcode' => 1,
-        ];
-
         $actual = app()->make(Fping::class)->ping('192.168.1.2');
 
-        $this->assertSame($expected, $actual);
+        $this->assertFalse($actual->success());
+        $this->assertEquals(3, $actual->transmitted);
+        $this->assertEquals(3, $actual->received);
+        $this->assertEquals(0, $actual->loss);
+        $this->assertEquals(0.68, $actual->min_latency);
+        $this->assertEquals(0.91, $actual->max_latency);
+        $this->assertEquals(0.79, $actual->avg_latency);
+        $this->assertEquals(2, $actual->duplicates);
+        $this->assertEquals(1, $actual->exit_code);
     }
 
     private function mockFpingProcess($output, $exitCode)

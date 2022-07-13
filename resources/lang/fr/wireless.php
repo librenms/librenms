@@ -54,7 +54,7 @@ return [
     'distance' => [
         'short' => 'Distance',
         'long' => 'Distance',
-        'unit' => 'km',
+        'unit' => 'm',
     ],
     'mse' => [
         'short' => 'MSE',
@@ -106,5 +106,14 @@ return [
         'long' => 'Interférence polaire croisée',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => 'Cellule',
+        'long' => 'Cellule',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => 'Canal',
+        'long' => 'Canal',
+        'unit' => '',
+    ],
 ];

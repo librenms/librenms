@@ -3,7 +3,7 @@
 --
 -- June 1995, Fei Xu
 --
--- Copyright (c) 1995-2007 by cisco Systems, Inc.
+-- Copyright (c) 1995-2012, 2014 by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
 --
@@ -32,7 +32,7 @@ IMPORTS
                 FROM CISCO-VTP-MIB;
 
 ciscoStackMIB MODULE-IDENTITY
-        LAST-UPDATED        "200712120000Z"
+        LAST-UPDATED        "201403030000Z"
         ORGANIZATION        "Cisco Systems, Inc."
         CONTACT-INFO
                 "       Cisco Systems
@@ -50,6 +50,76 @@ ciscoStackMIB MODULE-IDENTITY
         DESCRIPTION
                 "This MIB provides configuration and runtime status for
                  chassis, modules, ports, etc. on the Catalyst systems."
+
+        REVISION        "201403030000Z"
+        DESCRIPTION
+                 "Modified chassisSysType for new hardwares:
+                 'c6880xle', 'c6807xl', 'c6880x'.
+ 
+                 Modified chassisComponentType for new hardwares:
+                 'c6880xFan', 'c6807xlFan', 'c6800xl33vcon'.
+                 
+                 Modified chassisPs1Type and chassisPs2Type to include:
+                 'c6880x3kwac', 'c6880x3kwdc', 'c6800xl3kwac'.
+
+                 Modified moduleType to include new hardwares:
+                 'c6800ia48td', 'c6800ia48fpd',
+                 'c6880x16p10g', 'c6880x', 'c6880xle16p10g', 'c6880xle'.
+
+                 Modified moduleSubType to include new hardwares:
+                 'c6880xpfc', 'c6880xlepfc', 'c6880xdfc', 'c6880xledfc'.
+
+                 Modified portType to include:
+                 'e10GBaseDwdm3347', 'e10GBaseDwdm3740',
+                 'e10GBaseDwdm4135', 'e10GBaseDwdm4532',
+                 'e10GBaseDwdm4932', 'e10GBaseDwdm5333',
+                 'e10GBaseDwdm5736', 'e10GBaseDwdm6141', 
+                 'e10GBaseACU7M', 'e10GBaseACU10M',
+                 'e1000BaseEXSMD', 'e1000BaseZXSMD',
+                 'e1000BaseTE', 'e1000BaseSXMMD',
+                 'e1000BaseLHSMD', 'e100BaseFXGE'."
+
+                
+
+        REVISION "201206160000Z"
+        DESCRIPTION
+                 "Modified moduleType to include:
+                 'c7600Es4Tg3cxl', 'c7600Es2Tg3cxl', 'c76EsXt4Tg3cxl',
+                 'c76EsXt2Tg3cxl', 'c7600Es4Tg3c', 'c7600Es2Tg3c',
+                 'c76EsXt4Tg3c', 'c76EsXt2Tg3c', 'wsSvcWism2k9',
+                 'wsSvcAsaSm1', 'wsSvcNam3k9', 'wsSvcAsaSm1k7',
+                 'wsSvcVse1k9', 'vssup2t10g', 'wsx6148ege45at',
+                 'wsx690810g', 'wsx690440g', 'wsx6148egetx',
+                 'wsx6848tx', 'wsx6848sfp', 'wsx6824sfp',
+                 'wsx681610ge', 'wsx681610t'.
+
+                 Modified moduleSubType to include new hardwares:
+                 'vsf6kpfc4', 'wsf6kdfc4exl', 'c7600Es3cxl',
+                 'c7600Es3c', 'wsf6kdfc4e', 'vsf6kpfc4xl',
+                 'wsf6kdfc4axl', 'wsf6kdfc4a'.
+
+                 Modified moduleSubType2 to include new hardwares:
+                 'aceModExpnDc', 'wsSvcAppProc1', 'c7600Es4Tg',
+                 'c7600Es2Tg', 'c7600EsItu4TgLk', 'c7600EsItu2TgLk',
+                 'vsf6kmsfc5'.
+
+                 Modified portType to include:
+                 'e40GBaseEmpty', 'e10GBaseCU1M', 'e10GBaseCU3M',
+                 'e10GBaseCU5M', 'e10GBaseCU7M', 'e10GBaseCUdot3M',
+                 'e10GBaseCU2M', 'e10GBaseCU4M', 'e10GBaseCU6M',
+                 'e10GBaseUSR', 'e10GBaseLRMSM', 'e1000BaseDwdm3346',
+                 'e1000BaseDwdm3739', 'e1000BaseDwdm4134',
+                 'e1000BaseDwdm4532', 'e1000BaseDwdm4931',
+                 'e1000BaseDwdm5332', 'e1000BaseDwdm5736',
+                 'e1000BaseDwdm6141', 'e40GBaseLR', 'e40GBaseSR',
+                 'e40GBaseUnapproved'
+
+                 Rename 'e10GBaseT' to 'e10GBaseTPluggable'."
+
+        REVISION "201002010000Z"
+        DESCRIPTION
+                 "Modified moduleType to include:
+                 'wsx6708a10ge', 'wsx671610t'."
 
         REVISION "200712120000Z"
         DESCRIPTION
@@ -1961,7 +2031,11 @@ chassisSysType OBJECT-TYPE
                       mec6524gs8s(45), -- closed 1 slot switch
                       mec6524gt8s(48), -- closed 1 slot switch
                       wsc6509ve(51),   -- 9 slot Chassis
-                      cisco7603s(52)   -- 3 slot Chassis
+                      cisco7603s(52),  -- 3 slot Chassis
+                      c6880xle(54),    -- 5 slot Chassis
+                      c6807xl(55),     -- 7 slot Chassis
+                      c6880x(56)       -- 5 slot Chassis
+
                                 }
         MAX-ACCESS    read-only
         STATUS        current
@@ -2049,7 +2123,11 @@ chassisPs1Type OBJECT-TYPE
                                 pwr400dc(63),     -- 400 watt supply DC
                                 pwr400ac(64),     -- 400 watt supply AC
                                 pwr6000dc(105),   -- 6000 watt supply DC
-                                pwr1500dc(106)    -- 1500 watt supply DC
+                                pwr1500dc(106),   -- 1500 watt supply DC
+                                c6880x3kwac(150), -- 3000 watt supply AC
+                                c6880x3kwdc(151), -- 3000 watt supply DC
+                                c6800xl3kwac(152) -- 3000 watt supply AC
+
                                 }
         MAX-ACCESS    read-only
         STATUS        current
@@ -2143,7 +2221,11 @@ chassisPs2Type OBJECT-TYPE
                                 pwr400dc(63),     -- 400 watt supply DC
                                 pwr400ac(64),     -- 400 watt supply AC
                                 pwr6000dc(105),   -- 6000 watt supply DC
-                                pwr1500dc(106)    -- 1500 watt supply DC
+                                pwr1500dc(106),   -- 1500 watt supply DC
+                                c6880x3kwac(150), -- 3000 watt supply AC
+                                c6880x3kwdc(151), -- 3000 watt supply DC
+                                c6800xl3kwac(152) -- 3000 watt supply AC
+
                                 }
         MAX-ACCESS    read-only
         STATUS        current
@@ -2338,7 +2420,11 @@ chassisComponentType OBJECT-TYPE
                         fanMod9Shs(18),  -- 9-slot FAN for CISCO7609-S
                         fanMod9St(19),   -- 9-slot FAN for CISCO7609-S
                         wsc6509veFan(20),-- Fan Tray for WS-C6509-V-E
-                        fanMod3Hs(21)    -- Fan Tray for CISCO7603-S
+                        fanMod3Hs(21),   -- Fan Tray for CISCO7603-S
+                        c6880xFan(25),    -- Fan Tray for C6880-X
+                        c6807xlFan(26),   -- Fan Tray for C6807-XL
+                        c6800xl33vcon(27) -- PS Converter for C6807-XL
+
                       }
         MAX-ACCESS    read-only
         STATUS        deprecated
@@ -2833,6 +2919,18 @@ moduleType OBJECT-TYPE
                 osm8oc3PosSLPlus(615),  -- 8 port OC3 POS SL
                 osm8oc3PosSIPlus(616),  -- 8 port OC3 POS SI
                 osm4oc12PosSIPlus(617), -- 4 port OC12 POS SI
+                c7600Es4Tg3cxl(618),   -- 4x10GE with Pluggable optics
+                                       -- 3C XL
+                c7600Es2Tg3cxl(620),   -- 2x10GE with Pluggable optics
+                                       -- 3C XL
+                c76EsXt4Tg3cxl(625),   -- 4x10G ITU 3C XL
+                c76EsXt2Tg3cxl(626),   -- 2x10GE ITU 3C XL
+                c7600Es4Tg3c(627),     -- 4x10GE with Pluggable optics
+                                       -- 3C
+                c7600Es2Tg3c(629),     -- 2x10GE with Pluggable optics
+                                       -- 3C
+                c76EsXt4Tg3c(633),     -- 4x10G ITU 3C
+                c76EsXt2Tg3c(634),     -- 2x10GE ITU 3C
 
                 wsSvcIpSec1(903),    -- VPN security blade module
                 wsSvcMwam1(910),     -- Mobile Wireless Application
@@ -2861,6 +2959,15 @@ moduleType OBJECT-TYPE
                                      -- 4G Service Module
                 wsSvcSamiBb(940),    -- Service and Application Module
                                      -- for IP
+                wsSvcWism2k9(946),   -- Wireless Extensions Services
+                                     -- Module
+                wsSvcAsaSm1(947),    -- Adaptive Security Appliance (ASA)
+                                     -- Service Module
+                wsSvcNam3k9(949),    -- Network Analysis Module
+                wsSvcAsaSm1k7(950),  -- Adaptive Security Appliance (ASA)
+                                     -- Service Module
+                wsSvcVse1k9(951),    -- Virtual Services Engine (VSE)
+                                     -- Service Module
                 wssup720(1001),      -- Supervisor Mod 720 CPU board
                                      -- (moduleSubType2)
                 wssup720base(1002),  -- Supervisor Mod 720 base board
@@ -2872,7 +2979,22 @@ moduleType OBJECT-TYPE
                 wsx6724sfp(1010),    -- 24 port 1000Base FX (SFP GBIC)
                 wsx670810ge(1016),   -- 8 port X2 10 GE with DFC
                 vss72010g(1021),     -- Supervisor Mod 720 10G
+                wsx6708a10ge(1023),  -- 8 port X2 10 GE
                 wsx671610ge(1027),   -- 16 port 10 GE
+                vssup2t10g(1031),    -- Supervisor 2T baseboard
+                wsx6148ege45at(1032), -- 48-port IEEE802.3at compliant
+                                     -- Power over Ethernet Plus (PoEP)
+                                     -- with VDB
+                wsx671610t(1033),    -- 16 port 10G RJ-45
+                wsx690810g(1034),    -- 8 port 10GE with CTS
+                wsx690440g(1035),    -- 4-port 40-GE CFP
+                wsx6148egetx(1036),  -- 48-port IEEE802.3at compliant
+                                     -- Power over Ethernet Plus (PoEP)
+                wsx6848tx(1037),     -- 48 port 10/100/1000 (RJ-45)
+                wsx6848sfp(1039),    -- 48 port 1000Base FX (SFP GBIC)
+                wsx6824sfp(1040),    -- 24 port 1000Base FX (SFP GBIC)
+                wsx681610ge(1042),   -- 16 port 10 GE
+                wsx681610t(1043),    -- 16 port 10G RJ-45
 
                 -- constellation 2 WAN module
                 wsx65822pa(1101),    -- Enhanced FlexWAN Module
@@ -2883,6 +3005,16 @@ moduleType OBJECT-TYPE
                 c7600ssc400(1104),   -- SPA Jacket card
                 c7600ssc600(1105),   -- IPSEC-VPN SPA jacket card
                 esm2x10ge(1106),     -- 2x10G CWAN
+
+                -- the following modules are for FEX
+                c6800ia48td(1301),         -- 48 port GE FEX
+                c6800ia48fpd(1304),        -- 48 port GE POE FEX
+
+                -- the following modules are for Catalyst 6800
+                c6880x16p10g(1400),       -- 16 ports 10G/1G SFP+
+                c6880x(1401),             -- C6880x supervisor
+                c6880xle16p10g(1402),     -- 16 ports 10G/1G SFP+ Lite
+                c6880xle(1403),           -- C6880x supervisor Lite
 
                 -- 7600 only module
                 rsp720(1800),        -- MSFC3 Daughterboard
@@ -3137,8 +3269,43 @@ moduleSubType OBJECT-TYPE
                                 c7600esmdfc3cxl(228),
                                        -- Distributed forwarding card
                                        -- 3C XL
-                                c7600esmdfc3c(230)
+                                vsf6kpfc4(229),
+                                       -- Policy feature card 4
+                                c7600esmdfc3c(230),
                                        -- Distributed forwarding card 3C
+                                wsf6kdfc4exl(231),
+                                       -- Distributed forwarding card
+                                       -- 4E XL
+                                c7600Es3cxl(232),
+                                       -- Distributed forwarding card
+                                       -- 3C XL
+                                c7600Es3c(233),
+                                       -- Distributed forwarding card
+                                       -- 3C
+                                wsf6kdfc4e(234),
+                                       -- Distributed forwarding card
+                                       -- 4E
+                                vsf6kpfc4xl(235),
+                                       -- Policy feature card 4 XL
+                                wsf6kdfc4axl(236),
+                                       -- Distributed forwarding card
+                                       -- 4A XL
+                                wsf6kdfc4a(237),
+                                       -- Distributed forwarding card
+                                       -- 4A
+                                c6880xpfc(238),
+                                       -- Policy feature card
+                                       -- XXL Ultra
+                                c6880xlepfc(239),
+                                       -- Policy feature card
+                                       -- Lite
+                                c6880xdfc(240),
+                                       -- Distributed forwarding card
+                                       -- XXL Ultra
+                                c6880xledfc(241)
+                                       -- Distributed forwarding card
+                                       -- Lite
+
                                 }
         MAX-ACCESS    read-only
         STATUS        current
@@ -3250,14 +3417,22 @@ moduleSubType2 OBJECT-TYPE
                 wssvccmm24fxs(405), -- 24 FXS port adapter
                 wssvccmmact(406),   -- ad-hoc conferencing and
                                     -- transcoding port adapter
+                aceModExpnDc(410),  -- general purpose L4-L7 Processor
+                                    -- DB Lite
+                wsSvcAppProc1(411), -- Service Module Application
+                                    -- Processor 1
                 wssvcpisa32(597),   -- PISA card (Multilayer switch &
                                     -- service feature card)
                 me6524msfc2a(598),  -- Multilayer switch feature
                                     -- card II A
                 wsf6kmsfc2a(599), -- Multilayer switch feature card II A
+                c7600Es4Tg(618),   -- Fixed 4x10GE with Pluggable Optics
+                c7600Es2Tg(620),   -- Fixed 2x10GE with Pluggable Optics
+                c7600EsItu4TgLk(625),  -- 4x10G ITU
+                c7600EsItu2TgLk(626),  -- 2x10GE ITU
 
-                -- sub module 2 type for sup 720
                 wssup720(1001),     -- Supervisor Mod 720 CPU board
+                vsf6kmsfc5(1005),   -- SUP-2T CPU board
                 vsf6kmsfc3(1026),   -- Supervisor Mod 720 10G CPU board
 
                 -- 7600 only module
@@ -3585,6 +3760,8 @@ portType OBJECT-TYPE
                             intrusionProtect(109), -- intrusion protection
                             e1000BaseSvc(110), -- Service Module Giga Ethernet
                             e10GBaseSvc(111),  -- Service Module 10G Ethernet
+                            e40GBaseEmpty(113), -- 40G Ethernet not installed
+
                             e1000BaseUnknown(1000),
                                              -- Unknown Giga Ethernet
                             e10GBaseUnknown(1001),    -- Unknown 10G
@@ -3749,8 +3926,92 @@ portType OBJECT-TYPE
                                  -- Extended Reach Fiber Fast Ethernet
                             e10GBaseLRM(1080),
                                  -- 10GE Laser 300m over 50um Multi Mode Fiber
-                            e10GBaseT(1081)
-                                 -- 10GE Laser twisted pair
+                            e10GBaseTPluggable(1081),
+                                 -- 10GE twisted pair on Transceiver
+                            e10GBaseCU1M(1082),
+                                 -- 10GE 1-m Twinax cable assembly
+                            e10GBaseCU3M(1083),
+                                 -- 10GE 3-m Twinax cable assembly
+                            e10GBaseCU5M(1084),
+                                 -- 10GE 5-m Twinax cable assembly
+                            e10GBaseCU7M(1085),
+                                 -- 10GE 7-m Twinax cable assembly
+                            e10GBaseCUdot3M(1086),
+                                 -- 10GE .3-m Twinax cable assembly
+                            e10GBaseCU2M(1087),
+                                 -- 10GE 2-m Twinax cable assembly
+                            e10GBaseCU4M(1088),
+                                 -- 10GE 4-m Twinax cable assembly
+                            e10GBaseCU6M(1089),
+                                 -- 10GE 6-m Twinax cable assembly
+                            e10GBaseUSR(1090),
+                                 -- 10GE Laser Ultra Short Reach
+                                 -- Multi Mode Fiber
+                            e10GBaseLRMSM(1091),
+                                 -- 10GE Laser 300m over 50um Single Mode Fiber
+                            e1000BaseDwdm3346(1092),
+                                 -- DWDM 3346 Giga Ethernet
+                            e1000BaseDwdm3739(1093),
+                                 -- DWDM 3739 Giga Ethernet
+                            e1000BaseDwdm4134(1094),
+                                 -- DWDM 4134 Giga Ethernet
+                            e1000BaseDwdm4532(1095),
+                                 -- DWDM 4532 Giga Ethernet
+                            e1000BaseDwdm4931(1096),
+                                 -- DWDM 4931 Giga Ethernet
+                            e1000BaseDwdm5332(1097),
+                                 -- DWDM 5332 Giga Ethernet
+                            e1000BaseDwdm5736(1098),
+                                 -- DWDM 5736 Giga Ethernet
+                            e1000BaseDwdm6141(1099),
+                                 -- DWDM 6141 Giga Ethernet
+                            e40GBaseLR(1100),
+                                 -- 40G Ethernet LR
+                            e40GBaseSR(1101),
+                                 -- 40G Ethernet SR
+                            e40GBaseUnapproved(1102),
+                                 -- Unapproved 40G Ethernet
+                            e10GBaseDwdm3347(1104),
+                                 -- DWDM 10G 3347 Laser
+                            e10GBaseDwdm3740(1105),
+                                 -- DWDM 10G 3740 Laser
+                            e10GBaseDwdm4135(1106),
+                                 -- DWDM 10G 4135 Laser
+                            e10GBaseDwdm4532(1107),
+                                 -- DWDM 10G 4532 Laser
+                            e10GBaseDwdm4932(1108),
+                                 -- DWDM 10G 4932 Laser
+                            e10GBaseDwdm5333(1109),
+                                 -- DWDM 10G 5333 Laser
+                            e10GBaseDwdm5736(1110),
+                                 -- DWDM 10G 5736 Laser
+                            e10GBaseDwdm6141(1111),
+                                 -- DWDM 10G 6141 Laser
+                            e10GBaseACU7M(1112),
+                                 -- 10GE active 7 meter Twinax cable
+                                 -- assembly
+                            e10GBaseACU10M(1113),
+                                 -- 10GE active 10 meter Twinax cable
+                                 -- assembly
+                            e1000BaseEXSMD(1114),
+                                 -- GE SMF, 1310-nm wavelength
+                                 -- extended operating temp range
+                            e1000BaseZXSMD(1115),
+                                 -- GE SMF, 1550-nm wavelength
+                                 -- extended operating temp range
+                            e1000BaseTE(1116),
+                                 -- GE Copper
+                                 -- extended operating temp range
+                            e1000BaseSXMMD(1117),
+                                 -- GE MMF, 850-nm wavelength
+                                 -- extended operating temp range
+                            e1000BaseLHSMD(1118),
+                                 -- GE MMF and SMF, 1300-nm wavelength
+                                 -- extended operating temp range
+                            e100BaseFXGE(1119)
+                                 -- Fiber Fast Ethernet MMF gor GE
+                                 -- 1310-nm wavelength
+
                                 }
         MAX-ACCESS    read-only
         STATUS        current
@@ -7425,32 +7686,32 @@ ipPermitTelnetConnectLimit OBJECT-TYPE
                         zero means no limit will be applied for telnet 
                         connections.
  
-       			Setting this object to a non-zero value will
-		        turn on the 'telnet' bit in the corresponding 
-		        ipPermitAccessType. Turnning off the 'telnet' 
-		        bit in the corresponding ipPermitAccessType will
-		        reset this ipPermitTelnetConnectLimit value to
-		        zero."
+                        Setting this object to a non-zero value will
+                        turn on the 'telnet' bit in the corresponding 
+                        ipPermitAccessType. Turnning off the 'telnet' 
+                        bit in the corresponding ipPermitAccessType will
+                        reset this ipPermitTelnetConnectLimit value to
+                        zero."
         DEFVAL          { 0 }
-    	::= { ipPermitListEntry 5 }
+        ::= { ipPermitListEntry 5 }
         
 ipPermitSshConnectLimit OBJECT-TYPE
         SYNTAX          Unsigned32
         MAX-ACCESS      read-create
         STATUS          current
         DESCRIPTION     "Indicates the ssh connection limit that will 
-       			be applied when accepting new ssh connections 
-       			for a specific host. A value of zero means no 
-       			limit will be applied for ssh connections.
+                        be applied when accepting new ssh connections 
+                        for a specific host. A value of zero means no 
+                        limit will be applied for ssh connections.
  
-       			Setting this object to a non-zero value will
-		        turn on the 'ssh' bit in the corresponding 
-		        ipPermitAccessType. Turnning off the 'ssh' bit 
-		        in the corresponding ipPermitAccessType will
-		        reset this ipPermitSshConnectLimit value to
-		        zero."
+                        Setting this object to a non-zero value will
+                        turn on the 'ssh' bit in the corresponding 
+                        ipPermitAccessType. Turnning off the 'ssh' bit 
+                        in the corresponding ipPermitAccessType will
+                        reset this ipPermitSshConnectLimit value to
+                        zero."
         DEFVAL          { 0 }
-    	::= { ipPermitListEntry 6 }
+        ::= { ipPermitListEntry 6 }
 
 ipPermitDeniedListTable OBJECT-TYPE
         SYNTAX        SEQUENCE OF IpPermitDeniedListEntry
@@ -13041,5 +13302,64 @@ ipPermitGroup3 OBJECT-GROUP
                         specific host."
         ::= { ciscoStackMIBGroups 78 }         
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1,6 +1,3 @@
-source: Support/Performance.md
-path: blob/master/doc/
-
 # Performance optimisations
 
 This document will give you some guidance on optimising your setup.
@@ -111,13 +108,13 @@ quick the icmp packet is returned.
 
 ## Optimise poller-wrapper
 
-The default 16 threads that `poller-wrapper.py` runs as isn't
-necessarily the optimal number. A general rule of thumb is 2 threads
-per core but we suggest that you play around with lowering /
-increasing the number until you get the optimal value. **Note** KEEP
-in MIND that this doesn't always help, it depends on your system and
-CPU. So be careful. This can be changed by going to the cron job for
-librenms. Usually in `/etc/cron.d/librenms` and changing the "16"
+`poller-wrapper.py` defaults to using 16 threads, this isn't necessarily
+optimal. A general rule of thumb is 2 threads per core but we suggest 
+that you play around with lowering / increasing the number until you 
+get the optimal value. **Note** KEEP in MIND that this doesn't 
+always help, it depends on your system and CPU. So be careful. 
+This can be changed by going to the cron job for librenms. 
+Usually in `/etc/cron.d/librenms` and changing the "16"
 
 ```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
@@ -141,7 +138,7 @@ quick. However for devices with a lot of ports and good % of those are
 either deleted or disabled then this approach isn't optimal. So to
 counter this you can enable 'selected port polling' per device within
 the edit device -> misc section or by globally enabling it (**not
-recommended**): `$config['polling']['selected_ports'] = true;`. 
+recommended**): `$config['polling']['selected_ports'] = true;`.  
 This is truly not recommended, as it has been proven to affect cpu
 usage of your poller negatively. You can also set it for a specific OS:
 `$config['os']['ios']['polling']['selected_ports'] = true;`.
@@ -158,10 +155,10 @@ is run. There are a number of options:
 -e <percentage>                              Enable/disable selected ports polling for devices which would benefit <percentage> from a change
 ```
 If you want to run this script to have it set selected port polling
-on devices where a change of **10% or more is evaluated**, run it with 
-`./scripts/collect-port-polling.php -e 10`. But note: it will not 
+on devices where a change of **10% or more is evaluated**, run it with
+`./scripts/collect-port-polling.php -e 10`. But note: it will not
 blindly use only the 10%. There is a second condition that the change
-has to be more than one second in polling time. 
+has to be more than one second in polling time.
 
 ## Web interface
 
@@ -173,11 +170,11 @@ whatever web server you use:
 For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443
 ssl http2;` in the Virtualhost config.
 
-For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.
+For Apache (2.4.17 and above) set `Protocols h2 http/1.1` in the Virtualhost config.
 
 ## PHP-opcache
 
-A lot of performance can be gained from setting up `php-opcache` correctly. 
+A lot of performance can be gained from setting up `php-opcache` correctly.
 
 **Note: Memory based caching with PHP cli will increase memory usage and slow things down. File based caching is not as fast as memory based and is more likely to have stale cache issues.**
 
@@ -185,7 +182,7 @@ Some distributions allow separate cli, mod_php and php-fpm configurations, we ca
 
 ### For web servers using mod_php and php-fpm
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache
@@ -200,7 +197,7 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini` 
+Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache.so
@@ -212,6 +209,6 @@ opcache.file_cache_consistency_checks=1
 opcache.memory_consumption=256
 ```
 
-If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`. 
+If you are having caching issues, you can clear the file based opcache with `rm -rf /tmp/cache`.
 
 

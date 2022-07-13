@@ -1,7 +1,7 @@
 <?php
 
 $hostname = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unkown');
-$rrd_filename = rrd_name($device['hostname'], ['app', 'shoutcast', $app['app_id'], $hostname]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'shoutcast', $app['app_id'], $hostname]);
 
 require 'includes/html/graphs/common.inc.php';
 

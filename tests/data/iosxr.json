@@ -22,7 +22,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -44,7 +45,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -66,7 +68,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -88,7 +91,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -110,7 +114,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -132,7 +137,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -154,7 +160,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -176,7 +183,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -198,7 +206,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -220,7 +229,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -242,7 +252,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -264,7 +275,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -286,7 +298,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -308,7 +321,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -330,7 +344,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -352,7 +367,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -374,7 +390,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -396,7 +413,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -418,7 +436,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -440,7 +459,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -462,7 +482,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -484,7 +505,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -506,7 +528,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -528,7 +551,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -550,7 +574,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -572,7 +597,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -594,7 +620,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -616,7 +643,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -638,7 +666,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -660,7 +689,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -682,7 +712,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -704,7 +735,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -726,7 +758,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -748,7 +781,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -1520,7 +1554,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 2,
-                    "bgpPeerLastErrorText": "administrative shutdown"
+                    "bgpPeerLastErrorText": "administrative shutdown",
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1542,7 +1577,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1564,7 +1600,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1586,7 +1623,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1608,7 +1646,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1630,7 +1669,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1652,7 +1692,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1674,7 +1715,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1696,7 +1738,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1718,7 +1761,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1740,7 +1784,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1762,7 +1807,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1784,7 +1830,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1806,7 +1853,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1828,7 +1876,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1850,7 +1899,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1872,7 +1922,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1894,7 +1945,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1916,7 +1968,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1938,7 +1991,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1960,7 +2014,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1982,7 +2037,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2004,7 +2060,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2026,7 +2083,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2048,7 +2106,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2070,7 +2129,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2092,7 +2152,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2114,7 +2175,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2136,7 +2198,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2158,7 +2221,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2180,7 +2244,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2202,7 +2267,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2224,7 +2290,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2246,7 +2313,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -3141,8 +3209,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3248,8 +3314,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3355,8 +3419,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3462,8 +3524,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3569,8 +3629,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3676,8 +3734,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3783,8 +3839,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3890,8 +3944,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -3997,8 +4049,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4104,8 +4154,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4211,8 +4259,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4318,8 +4364,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4425,8 +4469,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4532,8 +4574,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4639,8 +4679,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4746,8 +4784,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4853,8 +4889,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -4960,8 +4994,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5067,8 +5099,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5174,8 +5204,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5281,8 +5309,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5388,8 +5414,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5495,8 +5519,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5602,8 +5624,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5709,8 +5729,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5816,8 +5834,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -5923,8 +5939,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6030,8 +6044,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6137,8 +6149,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6244,8 +6254,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6351,8 +6359,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6458,8 +6464,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6565,8 +6569,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6672,8 +6674,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6779,8 +6779,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6886,8 +6884,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -6993,8 +6989,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7100,8 +7094,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7207,8 +7199,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7314,8 +7304,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7421,8 +7409,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7528,8 +7514,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7635,8 +7619,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7742,8 +7724,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7849,8 +7829,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -7956,8 +7934,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8063,8 +8039,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8170,8 +8144,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8277,8 +8249,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8384,8 +8354,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8491,8 +8459,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8598,8 +8564,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8705,8 +8669,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8812,8 +8774,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -8919,8 +8879,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9026,8 +8984,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9133,8 +9089,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9240,8 +9194,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9347,8 +9299,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9454,8 +9404,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9561,8 +9509,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9668,8 +9614,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9775,8 +9719,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9882,8 +9824,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -9989,8 +9929,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -10096,8 +10034,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -10203,8 +10139,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -10314,8 +10248,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -10421,8 +10353,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 100,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -10528,8 +10458,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 1000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -10635,8 +10563,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 100,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -10742,8 +10668,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -10849,8 +10773,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -10956,8 +10878,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11063,8 +10983,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11170,8 +11088,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11277,8 +11193,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11384,8 +11298,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11491,8 +11403,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11598,8 +11508,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11705,8 +11613,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11812,8 +11718,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -11919,8 +11823,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12026,8 +11928,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12133,8 +12033,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12240,8 +12138,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12347,8 +12243,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12454,8 +12348,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12561,8 +12453,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12668,8 +12558,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12775,8 +12663,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12882,8 +12768,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -12989,8 +12873,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13096,8 +12978,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13203,8 +13083,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13310,8 +13188,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13417,8 +13293,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13524,8 +13398,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13631,8 +13503,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13738,8 +13608,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13845,8 +13713,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -13952,8 +13818,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -14059,8 +13923,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14166,8 +14028,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14273,8 +14133,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14380,8 +14238,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14487,8 +14343,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14594,8 +14448,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14701,8 +14553,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
@@ -14808,8 +14658,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -14915,8 +14763,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15022,8 +14868,6 @@
                     "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15129,8 +14973,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15236,8 +15078,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15343,8 +15183,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15450,8 +15288,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15557,8 +15393,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15664,8 +15498,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15771,8 +15603,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15878,8 +15708,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -15985,8 +15813,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16092,8 +15918,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16199,8 +16023,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16306,8 +16128,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 50,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16413,8 +16233,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16520,8 +16338,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16627,8 +16443,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16734,8 +16548,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16841,8 +16653,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -16948,8 +16758,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -17055,8 +16863,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -17162,8 +16968,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 20000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -17269,8 +17073,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -17376,8 +17178,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 40000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -28768,7 +28568,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1018",
-                    "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\nCopyright (c) 2017 by Cisco Systems, Inc.",
+                    "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\r\nCopyright (c) 2017 by Cisco Systems, Inc.",
                     "sysContact": "<private>",
                     "version": "5.3.4",
                     "hardware": "ASR9K Series",

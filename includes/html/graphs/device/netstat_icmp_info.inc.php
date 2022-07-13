@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'netstats-icmp');
+$rrd_filename = Rrd::name($device['hostname'], 'netstats-icmp');
 
 $stats = [
     'icmpInSrcQuenchs'    => [],

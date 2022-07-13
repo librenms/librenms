@@ -26,9 +26,9 @@ $rrd_additions = '';
 $count = 0;
 foreach ($components as $id => $array) {
     if ($array['otvtype'] == 'endpoint') {
-        $rrd_filename = rrd_name($device['hostname'], ['cisco', 'otv', $array['endpoint'], 'mac']);
+        $rrd_filename = Rrd::name($device['hostname'], ['cisco', 'otv', $array['endpoint'], 'mac']);
 
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
+        if (Rrd::checkRrdExists($rrd_filename)) {
             // Stack the area on the second and subsequent DS's
             $stack = '';
             if ($count != 0) {

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -53,13 +54,13 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
             'mempool_perc_warn' => 90,
         ]);
 
-        if ($data['memoryAllocated.0']) {
+        if (! empty($data['memoryAllocated.0'])) {
             $mempool->mempool_used_oid = YamlDiscovery::oidToNumeric('memoryAllocated.0', $this->getDeviceArray(), $mib);
         } else {
             $mempool->mempool_free_oid = YamlDiscovery::oidToNumeric('memoryFreed.0', $this->getDeviceArray(), $mib);
         }
 
-        $mempool->fillUsage($data['memoryAllocated.0'], $data['memoryTotal.0'], $data['memoryFreed.0']);
+        $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);
 
         return collect([$mempool]);
     }
@@ -69,7 +70,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $mib = $this->findMib();
         $data = snmp_get_multi($this->getDeviceArray(), ['swOpCodeVer.1', 'swProdName.0', 'swSerialNumber.1', 'swHardwareVer.1'], '-OQUs', $mib);
 
-        $device->version = trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) ?: null;
+        $device->version = isset($data[1]['swHardwareVer'], $data[1]['swOpCodeVer']) ? trim($data[1]['swHardwareVer'] . ' ' . $data[1]['swOpCodeVer']) : null;
         $device->hardware = $data[0]['swProdName'] ?? null;
         $device->serial = $data[1]['swSerialNumber'] ?? null;
     }
@@ -120,6 +121,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
     /**
      * Find the MIB based on sysObjectID
+     *
      * @return string
      */
     protected function findMib(): ?string

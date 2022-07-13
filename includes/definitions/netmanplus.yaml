@@ -1,7 +1,7 @@
 os: netmanplus
 text: 'NetMan Plus'
 group: ups
-nobulk: true
+snmp_bulk: false
 type: power
 rfc1628_compat: true
 over:

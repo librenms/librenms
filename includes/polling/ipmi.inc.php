@@ -8,16 +8,23 @@ $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_t
 if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
-    if ($ipmi['host'] = $attribs['ipmi_hostname']) {
-        $ipmi['user'] = $attribs['ipmi_username'];
-        $ipmi['password'] = $attribs['ipmi_password'];
-        $ipmi['type'] = $attribs['ipmi_type'];
+    if (isset($device['attribs']['ipmi_hostname'])) {
+        $ipmi['host'] = $device['attribs']['ipmi_hostname'];
+        $ipmi['port'] = filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623';
+        $ipmi['user'] = $device['attribs']['ipmi_username'];
+        $ipmi['password'] = $device['attribs']['ipmi_password'];
+        $ipmi['kg_key'] = $device['attribs']['ipmi_kg_key'];
+        $ipmi['type'] = $device['attribs']['ipmi_type'];
 
         echo 'Fetching IPMI sensor data...';
 
         $cmd = [Config::get('ipmitool', 'ipmitool')];
         if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
-            array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
+            if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
+                array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port']);
+            } else {
+                array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port'], '-y', $ipmi['kg_key']);
+            }
         }
 
         // Check to see if we know which IPMI interface to use
@@ -35,6 +42,13 @@ if (is_array($ipmi_rows)) {
             [$desc, $value, $type, $status] = explode(',', $row);
             $desc = trim($desc, ' ');
             $ipmi_unit_type = Config::get("ipmi_unit.$type");
+
+            // SDR records can include hexadecimal values, identified by an h
+            // suffix (like "93h" for 0x93). Convert them to decimal.
+            if (preg_match('/^([0-9A-Fa-f]+)h$/', $value, $matches)) {
+                $value = hexdec($matches[1]);
+            }
+
             $ipmi_sensor[$desc][$ipmi_unit_type]['value'] = $value;
             $ipmi_sensor[$desc][$ipmi_unit_type]['unit'] = $type;
         }

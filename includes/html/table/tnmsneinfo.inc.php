@@ -35,7 +35,7 @@ if (isset($vars['device_id'])) {
 
     // all columns are searchable - search across them
     if (isset($searchPhrase) && ! empty($searchPhrase)) {
-        $searchsql = implode(' OR ', array_map('search_phrase_column', array_map('mres', $columns)));
+        $searchsql = implode(' OR ', array_map('search_phrase_column', $columns));
         $wheresql .= " AND ( $searchsql )";
     }
     $sql .= $wheresql;
@@ -48,7 +48,7 @@ if (isset($vars['device_id'])) {
 
     // set up default sort
     if (! isset($sort) || empty($sort)) {
-        $sort = implode(', ', array_map('mres', array_slice($columns, 0, $sortcolumns)));
+        $sort = implode(', ', array_slice($columns, 0, $sortcolumns));
     }
     $sql .= " ORDER BY $sort";
 
@@ -106,5 +106,5 @@ if (isset($vars['device_id'])) {
         'rows'     => $response,
         'total'    => $total,
     ];
-    echo _json_encode($output);
+    echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 }

@@ -11,7 +11,7 @@ if ($nototal) {
     $unitlen += '2';
 }
 
-$rrd_options .= " COMMENT:'" . rrdtool_escape($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
+$rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
 $unitlen = '10';
 if ($nototal) {
@@ -34,7 +34,7 @@ foreach ($rrd_list as $i => $rrd) {
         $colour_iter++;
     }
 
-    $descr = rrdtool_escape($rrd['descr'], $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
@@ -94,7 +94,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= ' GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $float_precision . 'lf%s GPRINT:' . $t_defname . $i . ":AVERAGE:'%5." . $float_precision . "lf%s\\n'";
 
     if (! $nototal) {
-        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . "lf%s'" . rrdtool_escape($total_units) . "'";
+        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . "lf%s'" . \Rrd::safeDescr($total_units) . "'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";

@@ -15,12 +15,13 @@
 
 /**
  * Custom Frontpage
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  */
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
@@ -84,6 +85,7 @@ var greenMarker = L.AwesomeMarkers.icon({
         $sql = "SELECT DISTINCT(`device_id`),`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                 LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
         $param = $show_status;
@@ -95,6 +97,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                 FROM `devices`
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
                 ' AND `status` IN ' . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
@@ -122,7 +125,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                 $z_offset = 10000;  // move marker to foreground
             }
         }
-        $temp_output .= "var title = '<a href=\"" . generate_device_url($map_devices) . '"><img src="' . getIcon($map_devices) . '" width="32" height="32" alt=""> ' . format_hostname($map_devices) . "</a>';
+        $temp_output .= "var title = '<a href=\"" . \LibreNMS\Util\Url::deviceUrl((int) $map_devices['device_id']) . '"><img src="' . getIcon($map_devices) . '" width="32" height="32" alt=""> ' . format_hostname($map_devices) . "</a>';
 var tooltip = '" . format_hostname($map_devices) . "';
 var marker = L.marker(new L.LatLng(" . $map_devices['lat'] . ', ' . $map_devices['lng'] . "), {title: tooltip, icon: $icon, zIndexOffset: $z_offset});
 marker.bindPopup(title);
@@ -132,14 +135,14 @@ marker.bindPopup(title);
     if (Config::get('network_map_show_on_worldmap')) {
         if (Auth::user()->hasGlobalRead()) {
             $sql = "
-            SELECT 
+            SELECT
               ll.id AS left_id,
               ll.lat AS left_lat,
               ll.lng AS left_lng,
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -151,9 +154,9 @@ marker.bindPopup(title);
               ports as lp
             WHERE
               l.local_device_id = ld.device_id
-              AND l.remote_device_id = rd.device_id 
+              AND l.remote_device_id = rd.device_id
               AND ld.location_id != rd.location_id
-              AND ld.location_id = ll.id 
+              AND ld.location_id = ll.id
               AND rd.location_id = rl.id
               AND lp.device_id = ld.device_id
               AND lp.port_id = l.local_port_id
@@ -178,14 +181,14 @@ marker.bindPopup(title);
         } else {
             $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
             $sql = "
-            SELECT 
+            SELECT
               ll.id AS left_id,
               ll.lat AS left_lat,
               ll.lng AS left_lng,
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -197,9 +200,9 @@ marker.bindPopup(title);
               ports as lp
             WHERE
               l.local_device_id = ld.device_id
-              AND l.remote_device_id = rd.device_id 
+              AND l.remote_device_id = rd.device_id
               AND ld.location_id != rd.location_id
-              AND ld.location_id = ll.id 
+              AND ld.location_id = ll.id
               AND rd.location_id = rl.id
               AND lp.device_id = ld.device_id
               AND lp.port_id = l.local_port_id
@@ -229,7 +232,7 @@ marker.bindPopup(title);
             $icon = 'greenMarker';
             $z_offset = 0;
 
-            $speed = $link['link_capacity'] / 1000;
+            $speed = $link['link_capacity'] / 1000000000;
             if ($speed > 500000) {
                 $width = 20;
             } else {
@@ -263,7 +266,7 @@ $(document).ready(function(){
     $("#leaflet-map").on("click", function(event) {
         map.scrollWheelZoom.enable();
     });
-    $("#leaflet-map").mouseleave(function(event) {
+    $("#leaflet-map").on("mouseleave", function(event) {
         map.scrollWheelZoom.disable();
     });
 });

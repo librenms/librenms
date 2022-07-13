@@ -1,6 +1,6 @@
 <?php
 
-$mdadm_arrays = get_arrays_with_application($device, $app['app_id'], 'mdadm');
+$mdadm_arrays = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'mdadm');
 
 print_optionbar_start();
 
@@ -17,7 +17,7 @@ foreach ($mdadm_arrays as $label) {
     $array = $label;
 
     if ($vars['array'] == $array) {
-        $label = sprintf('⚫ %s', $label);
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($array_list, generate_link($label, $link_array, ['array' => $array]));

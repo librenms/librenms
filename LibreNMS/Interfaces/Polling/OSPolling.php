@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,5 +31,5 @@ interface OSPolling
      * Poll additional OS data.
      * Data must be manually saved within this method.
      */
-    public function pollOS();
+    public function pollOS(): void;
 }

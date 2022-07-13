@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
@@ -73,7 +74,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
         }
 
         // convert to integer
-        $lindex = $lindex + 0;
+        $lindex = cast_number($lindex);
 
         $port_stats[$lindex]['ifName'] = $descr;
         $port_stats[$lindex]['ifDescr'] = $descr;

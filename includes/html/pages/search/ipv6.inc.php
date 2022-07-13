@@ -7,8 +7,8 @@
             <tr>
                 <th data-column-id="hostname">Device</th>
                 <th data-column-id="interface">Interface</th>
-                <th data-column-id="address" data-sortable="false">Address</th>
-                <th data-column-id="description" data-sortable="false">Description</th>
+                <th data-column-id="address" data-sortable="false" data-formatter="tooltip">Address</th>
+                <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th>
             </tr>
         <thead>
     </table>
@@ -28,7 +28,7 @@ var grid = $("#ipv6-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName`, `display` FROM `devices`';
 $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
@@ -45,7 +45,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected"+';
     }
 
-    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                 "</select>"+
@@ -86,11 +86,17 @@ if ($_POST['interface'] == 'Vlan%') {
             id: "address-search",
             search_type: "ipv6",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            interface: '<?php echo mres($_POST['interface']); ?>',
-            address: '<?php echo mres($_POST['address']); ?>'
+            interface: '<?php echo $_POST['interface']; ?>',
+            address: '<?php echo $_POST['address']; ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax_table.php",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
 });
 
 </script>

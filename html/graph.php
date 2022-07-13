@@ -8,7 +8,9 @@
  */
 
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
+$auth = false;
 $start = microtime(true);
 
 $init_modules = ['web', 'graphs', 'auth'];
@@ -22,15 +24,15 @@ if (! Auth::check()) {
     }
 }
 
-set_debug(isset($_GET['debug']));
+Debug::set(isset($_GET['debug']));
 
 require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
 Datastore::terminate();
 
-if ($debug) {
+if (Debug::isEnabled()) {
     echo '<br />';
     printf('Runtime %.3fs', microtime(true) - $start);
     echo '<br />';
-    printStats();
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }

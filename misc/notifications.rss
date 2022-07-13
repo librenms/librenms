@@ -73,5 +73,15 @@
     <description>Cisco WLC is now classified as type "Wireless" instead of "Network".  Update any alert rules you may have.</description>
     <pubDate>Wed, 18 Dec 2019 00:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>nobulk is now called snmp_bulk</title>
+    <description>The config option "nobulk" is now called "snmp_bulk" to align better with other options.  Update any local configs you might have.  See https://github.com/librenms/librenms/pull/13098 for more information</description>
+    <pubDate>Wed, 01 Sep 2021 18:00:00 +0000</pubDate>
+  </item>
+  <item>
+    <title>Mikrotik routeros wireless changes</title>
+    <description>Improvements to routeros wireless polling will lose historical data for 60GHz rate, frequency, and distance wireless sensors. See https://github.com/librenms/librenms/pull/12976 for more information.</description>
+    <pubDate>Wed, 19 Oct 2021 18:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

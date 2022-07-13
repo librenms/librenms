@@ -1,0 +1,493 @@
+-- ******************************************************************************************
+-- *
+-- * Description:   Implements definitions for a HMS based network element
+-- *
+-- * Copyright 2014 by BKtel communications GmbH
+-- *
+-- * V.1.0  04.10.2006  M. Heldmann - created this "bkhmsne.mib" file based on BKtel systems "ahmsne.mib" file
+-- *                                - marked all parameters that are not used by NMS implementation of BKtel communications GmbH
+-- *                                - removed the 'ne' OID definition here and added 'ne' to IMPORTS
+-- *                                  because the 'ne' is defined in root mib too
+-- * V.1.1  12.05.2014  M. Heldmann - marked all obsolete parameters as 'obsolete' - they may be no more supported by future NEC types and NEC software versions
+-- *                                - expanded neModulTable by full inventory information
+-- *                                - a couple of renamings
+-- *                                - changed name neModulType to neModuleModelName with SYNTAX DisplayString
+-- ******************************************************************************************
+
+
+    BKTEL-HFC862-HMSNE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE
+            FROM RFC-1212
+        TRAP-TYPE
+            FROM RFC-1215
+        ne, DisplayString, TruthValue, NESlotValue, PerceivedSeverityValue
+            FROM BKTEL-HFC862-BASE-MIB
+    ;
+
+
+    neCommon OBJECT IDENTIFIER ::= { ne 1 }
+
+    neType OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Type of NE"
+    ::= { neCommon 1 }
+
+    neDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The description of the NE."
+    ::= { neCommon 2 }
+
+    neLocationStreet OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Location Street of Network Element.
+             Writable size depends on net element controller, default 32"
+    ::= { neCommon 3 }
+
+    neLocationCity OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Location City of Network Element.
+             Writable size depends on net element controller, default 32"
+    ::= { neCommon 4 }
+
+    neObsolete_UsingAPS OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 5 }
+
+    neObsolete_APSMode OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 6 }
+
+    -- #####+1 Space reserved
+
+    neObsolete_CommonSubrackWidth OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete.
+             (The width of the Subracks)"
+    ::= { neCommon 8 }
+
+    neObsolete_CommonSubrackNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete.
+             (The number of Subracks)"
+    ::= { neCommon 9 }
+
+    neObsolete_NumberModul OBJECT-TYPE
+        SYNTAX INTEGER (1..61)
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete.
+             (Current number of entries in the Modul table)"
+    ::= { neCommon 10 }
+
+    neObsolete_UsingRevertiveMode OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 11 }
+
+    neObsolete_RevertiveMode OBJECT-TYPE
+        SYNTAX INTEGER (0..300)
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 12 }
+
+    neObsolete_InitPhase OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 13 }
+
+    neObsolete_PredecessorRedundantPath OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 14 }
+
+    neObsolete_PredecessorNominalPath OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neCommon 15 }
+
+    neModuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF NeModuleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Table containing information about each Module."
+    ::= { neCommon 16 }
+
+    neModuleEntry OBJECT-TYPE
+        SYNTAX NeModuleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "List of information about each Module."
+        INDEX { neModuleNESlot }
+    ::= { neModuleTable 1 }
+
+    NeModuleEntry ::= SEQUENCE
+    {
+        neModuleNESlot                  NESlotValue,
+        neModuleSubrack                 INTEGER,
+        neModuleModelName               DisplayString,
+        neModuleMibLink                 OBJECT IDENTIFIER,
+        neModuleSubrackSlot             INTEGER,
+        neModuleSlotUnitsUsed           INTEGER,
+        neModuleSlotRackDetection       INTEGER,
+        neModuleHousingType             INTEGER,
+        neModuleFirmwareVersion         DisplayString,
+        neModuleHardwareVersion         DisplayString,
+        neModuleDateOfProduction        DisplayString,
+        neModuleSerialNumber            DisplayString,
+        neModuleArticleNumber           DisplayString,
+        neModuleCustomerCode            DisplayString,
+        neModuleAliasName               DisplayString,
+        neModuleUserdata                DisplayString,
+        neModuleReset                   TruthValue,
+        neModuleLedBlink                TruthValue
+    }
+
+    neModuleNESlot OBJECT-TYPE      -- former neNESlot
+        SYNTAX NESlotValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Slot number 
+             IMPORTANT NOTE:
+                this is a not a physical slot within a module rack, 
+                but an assigned slot ID that uniquely identifies each module
+                including non subrack based modules as 19 inch modules"
+    ::= { neModuleEntry 1 }
+
+    neModuleSubrack OBJECT-TYPE     -- former neSubrack
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Subrack number in which the module is equiped (1 .. N).
+             A value of 0 means: No subrack number"
+    ::= { neModuleEntry 2 }
+
+    neModuleModelName OBJECT-TYPE   -- former neModulType
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Module model name"
+    ::= { neModuleEntry 3 }
+
+    neModuleMibLink OBJECT-TYPE     -- former neModulMibLink
+        SYNTAX OBJECT IDENTIFIER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Defines the link to the OID of the equiped module"
+    ::= { neModuleEntry 4 }
+
+    -- Expansions, 12.05.2014
+
+    neModuleSubrackSlot OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Slot number within subrack in which the module is equiped (1 .. N).
+             A value of 0 means: No slot number"
+    ::= { neModuleEntry 5 }
+
+    neModuleSlotUnitsUsed OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "For modules of type 'housing19inch(4)' this parameter specfifies the number of 19 inch height units used. 
+             For all other module types the number of slots within subrack which the module occupies."
+    ::= { neModuleEntry 6 }
+
+    neModuleSlotRackDetection OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSupported(1),
+            supported(2),
+            detectionError(3)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Reports the state of modules slot and rack hardware detection."
+    ::= { neModuleEntry 7 }
+
+    neModuleHousingType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            housingUnknownOrDefault(1),
+            housingBk(2),
+            housing2G6(3),
+            housing19inch(4)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "Module housing type"
+    ::= { neModuleEntry 8 }
+
+    neModuleFirmwareVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module firmware version"
+    ::= { neModuleEntry 9 }
+
+    neModuleHardwareVersion OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module hardware version"
+    ::= { neModuleEntry 10 }
+
+    neModuleDateOfProduction OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module date of production, possible formats:
+            - empty string -> no data defined
+            - YYYY         -> only the year of production is defined
+            - YYYY-MM-DD   -> full date of production is defined"
+    ::= { neModuleEntry 11 }
+
+    neModuleSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module serial number"
+    ::= { neModuleEntry 12 }
+
+    neModuleArticleNumber OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Module article number"
+    ::= { neModuleEntry 13 }
+
+    neModuleCustomerCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Customer specific article code"
+    ::= { neModuleEntry 14 }
+
+    neModuleAliasName OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Module alias name"
+    ::= { neModuleEntry 15 }
+
+    neModuleUserdata OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Module user data"
+    ::= { neModuleEntry 16 }
+
+    neModuleReset OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Resets the module if this parameter is written to true(1)."
+    ::= { neModuleEntry 17 }
+
+    neModuleLedBlink OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "Writing this variable to true(1) lets the device's
+        modul LED blink green for 10 seconds.
+        Writing this variable to false(2) stops blinking at once.
+        This variable always returns false(2) on read requests"
+    ::= { neModuleEntry 18 }
+
+    neStates OBJECT IDENTIFIER ::= { ne 2 }
+
+    neStatesObsolete_TrapDisable OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 1 }
+
+    neStatesObsolete_TerminalConnected OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 2 }
+
+    -- #####+1 Space reserved
+
+    neStatesObsolete_Isolated OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 4 }
+
+    neStatesObsolete_ResetModullist OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 5 }
+
+    neStatesObsolete_Redundant OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 6 }
+
+    neStatesObsolete_ActivateRedundantPath OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 7 }
+
+    neStatesObsolete_AutoOff OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neStates 8 }
+
+    neConfig OBJECT IDENTIFIER ::= { ne 3 }
+
+    neConfigObsolete_NEtype OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neConfig 1 }
+
+    neConfigObsolete_IPaddress OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neConfig 2 }
+
+
+    neConfigObsolete_Alarmdelay OBJECT-TYPE
+        SYNTAX INTEGER (3..60)
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neConfig 3 }
+
+
+    neConfigDeprecated_MinTrapInterval OBJECT-TYPE
+        SYNTAX INTEGER (0..10)
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "This parameter is deprecated.
+             (The minimum waiting time between two traps.
+              Only used for HMS070 over RS232 interface)"
+    ::= { neConfig 4 }
+
+    neConfigDeprecated_MaxTrapLifetime OBJECT-TYPE
+        SYNTAX INTEGER (30..300)
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "This parameter is deprecated.
+             (The maximum lifetime of a trap.
+              Only used for HMS070 over RS232 interface)"
+    ::= { neConfig 5 }
+
+
+
+    neControl OBJECT IDENTIFIER ::= { ne 4 }
+
+    neControlTrapDisable OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "All traps and notifications for the whole NE are disabled: true(1) or enabled: false(2)"
+    ::= { neControl 1 }
+
+    neControlResetModullist OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "This command removes all disconnected (not responding) modules from the module list."
+    ::= { neControl 2 }
+
+    neControlObsolete_SetDefaultAPS OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This parameter is obsolete."
+    ::= { neControl 3 }
+
+
+
+
+    -- This trap is obsolete and no more supported by new (2014) NECxE 
+    neSynchronizeEvent TRAP-TYPE
+    ENTERPRISE ne
+    DESCRIPTION "The SNMP trap that is generated when data on LMT must get actualized."
+    ::= 1
+
+
+    END

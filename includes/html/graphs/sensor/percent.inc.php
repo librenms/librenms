@@ -4,7 +4,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                      Min    Last    Max\\n'";
 
-$sensor['sensor_descr_fixed'] = rrdtool_escape($sensor['sensor_descr'], 15);
+$sensor['sensor_descr_fixed'] = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 15);
 
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";

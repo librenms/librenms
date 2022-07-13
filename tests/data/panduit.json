@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -148,8 +146,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "7",
@@ -751,8 +747,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

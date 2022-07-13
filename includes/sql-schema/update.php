@@ -20,6 +20,7 @@
  * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,7 +39,7 @@ if (config('cache.default') == 'database' && ! \Schema::hasTable('cache_locks'))
 
 $schemaLock = Cache::lock('schema', 86000);
 if (! empty($skip_schema_lock) || $schemaLock->get()) {
-    $db_rev = get_db_schema();
+    $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
 
@@ -90,11 +91,10 @@ if (! empty($skip_schema_lock) || $schemaLock->get()) {
 
         echo "-- Done\n";
         // end legacy update
-        $db_rev = get_db_schema();
+        $db_rev = \LibreNMS\DB\Schema::getLegacySchema();
     }
 
     if ($db_rev == 1000) {
-        Artisan::call('db:seed', ['--force' => true, '--ansi' => true, '--class' => DefaultWidgetSeeder::class]);
         $return = Artisan::call('migrate', $migrate_opts);
         echo Artisan::output();
     }

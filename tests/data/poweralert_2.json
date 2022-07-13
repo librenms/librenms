@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "poweralert-01234.local",
+                    "sysName": "device 1",
                     "sysObjectID": ".1.3.6.1.4.1.850.1",
                     "sysDescr": "POWERALERT 12",
                     "sysContact": null,
@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "poweralert-01234.local",
-                    "sysObjectID": ".1.3.6.1.4.1.850.1",
-                    "sysDescr": "POWERALERT 12",
-                    "sysContact": null,
-                    "version": "12.06.0069",
-                    "hardware": "SMART1500RMXL2UA",
-                    "features": "Envirosense",
-                    "os": "poweralert",
-                    "type": "power",
-                    "serial": "snmpcardserialnum",
-                    "icon": "tripplite.svg",
-                    "location": "location1"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -54,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -161,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -272,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -379,8 +356,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",

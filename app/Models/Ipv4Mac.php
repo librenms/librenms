@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class Ipv4Mac extends PortRelatedModel
 {
     protected $table = 'ipv4_mac';
@@ -9,7 +11,7 @@ class Ipv4Mac extends PortRelatedModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }

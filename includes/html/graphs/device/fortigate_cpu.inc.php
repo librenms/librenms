@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'fortigate_cpu');
+$rrd_filename = Rrd::name($device['hostname'], 'fortigate_cpu');
 
 require 'includes/html/graphs/common.inc.php';
 

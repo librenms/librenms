@@ -24,6 +24,7 @@ $page_title = 'Alerts';
 
     <?php
     $device['device_id'] = '-1';
+    require_once 'includes/html/modal/alert_details.php';
     require_once 'includes/html/modal/alert_notes.inc.php';
     require_once 'includes/html/modal/alert_ack.inc.php';
     require_once 'includes/html/common/alerts.inc.php';
@@ -31,5 +32,3 @@ $page_title = 'Alerts';
     unset($device['device_id']);
     ?>
 </div>
-
-

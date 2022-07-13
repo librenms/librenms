@@ -13,7 +13,7 @@ IMPORTS
     switch001                                            FROM CISCOSB-MIB;
 
 rlErrdisableRecovery  MODULE-IDENTITY
-       LAST-UPDATED "200711070000Z"
+       LAST-UPDATED "200711070001Z"
        ORGANIZATION "Cisco Systems, Inc."
 
        CONTACT-INFO
@@ -44,7 +44,9 @@ RlErrdisableRecoveryCauseType::= TEXTUAL-CONVENTION
         stp-bpdu-guard(5),
         stp-loopback-guard(6),
         pcb-overheat(7),
-        udld(8)
+        udld(8),
+        storm-control(9),
+        link-flapping(10)
     }
 
 
@@ -122,8 +124,9 @@ rlErrdisableRecoveryIfEntry OBJECT-TYPE
     ::= { rlErrdisableRecoveryIfTable 1 }
 
 RlErrdisableRecoveryIfEntry::= SEQUENCE {
-    rlErrdisableRecoveryIfReason RlErrdisableRecoveryCauseType,
-    rlErrdisableRecoveryIfEnable TruthValue
+    rlErrdisableRecoveryIfReason        RlErrdisableRecoveryCauseType,
+    rlErrdisableRecoveryIfEnable        TruthValue,
+    rlErrdisableRecoveryIfTimeToRecover INTEGER
    }
 
 
@@ -143,7 +146,15 @@ rlErrdisableRecoveryIfEnable OBJECT-TYPE
         "Enable/Disable automatic recovery status."
     ::= { rlErrdisableRecoveryIfEntry 2 }
 
-
+rlErrdisableRecoveryIfTimeToRecover OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time in seconds left for automatic activation of an interface after shutdown,
+         calculated as (rlErrdisableRecoveryInterval - (port in down state time interval))"
+    ::= { rlErrdisableRecoveryIfEntry 3 }
 
 END
 

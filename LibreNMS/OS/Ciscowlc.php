@@ -18,21 +18,122 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Models\AccessPoint;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\RRD\RrdDefinition;
 
 class Ciscowlc extends Cisco implements
+    OSPolling,
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
+    public function pollOS(): void
+    {
+        $device = $this->getDeviceArray();
+        $apNames = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPName')->table(1);
+        $radios = \SnmpQuery::enumStrings()->walk('AIRESPACE-WIRELESS-MIB::bsnAPIfTable')->table(2);
+        \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization')->table(2, $radios);
+        $interferences = \SnmpQuery::walk('AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower')->table(3);
+
+        $numAccessPoints = count($apNames);
+        $numClients = 0;
+
+        foreach ($radios as $radio) {
+            foreach ($radio as $slot) {
+                $numClients += $slot['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'];
+            }
+        }
+
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
+            ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
+
+        $fields = [
+            'NUMAPS'     => $numAccessPoints,
+            'NUMCLIENTS' => $numClients,
+        ];
+
+        $tags = compact('rrd_def');
+        data_update($device, 'ciscowlc', $tags, $fields);
+
+        $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();
+        $valid_ap_ids = [];
+
+        foreach ($radios as $mac => $radio) {
+            foreach ($radio as $slot => $value) {
+                $channel = str_replace('ch', '', $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyChannelNumber'] ?? '');
+
+                $ap = new AccessPoint([
+                    'device_id' => $this->getDeviceId(),
+                    'name' => $apNames[$mac]['AIRESPACE-WIRELESS-MIB::bsnAPName'] ?? '',
+                    'radio_number' => $slot,
+                    'type' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfType'] ?? '',
+                    'mac_addr' => $mac,
+                    'channel' => $channel,
+                    'txpow' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyTxPowerLevel'] ?? 0,
+                    'radioutil' => $value['AIRESPACE-WIRELESS-MIB::bsnAPIfLoadChannelUtilization'] ?? 0,
+                    'numasoclients' => $value['AIRESPACE-WIRELESS-MIB::bsnApIfNoOfUsers'] ?? 0,
+                    'nummonclients' => 0,
+                    'nummonbssid' => 0,
+                    'interference' => 128 + ($interferences[$mac][$slot][$channel]['AIRESPACE-WIRELESS-MIB::bsnAPIfInterferencePower'] ?? -128), // why are we adding 128?
+                ]);
+
+                d_echo($ap->toArray());
+
+                // if there is a numeric channel, assume the rest of the data is valid, I guess
+                if (! is_numeric($ap->channel)) {
+                    continue;
+                }
+
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('channel', 'GAUGE', 0, 200)
+                    ->addDataset('txpow', 'GAUGE', 0, 200)
+                    ->addDataset('radioutil', 'GAUGE', 0, 100)
+                    ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                    ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                    ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                    ->addDataset('interference', 'GAUGE', 0, 2000);
+
+                data_update($device, 'arubaap', [
+                    'name' => $ap->name,
+                    'radionum' => $ap->radio_number,
+                    'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
+                    'rrd_dev' => $rrd_def,
+                ], $ap->only([
+                    'channel',
+                    'txpow',
+                    'radioutil',
+                    'nummonclients',
+                    'nummonbssid',
+                    'numasoclients',
+                    'interference',
+                ]));
+
+                /** @var AccessPoint $db_ap */
+                if ($db_ap = $db_aps->get($ap->getCompositeKey())) {
+                    $ap = $db_ap->fill($ap->getAttributes());
+                }
+
+                $ap->save(); // persist ap
+                $valid_ap_ids[] = $ap->accesspoint_id;
+            }
+        }
+
+        // delete invalid aps
+        $this->getDevice()->accessPoints->whereNotIn('accesspoint_id', $valid_ap_ids)->each->delete();
+    }
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered

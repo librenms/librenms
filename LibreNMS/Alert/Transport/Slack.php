@@ -15,6 +15,7 @@
 
 /**
  * API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -23,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Slack extends Transport
 {
@@ -38,26 +40,26 @@ class Slack extends Transport
     {
         $host = $api['url'];
         $curl = curl_init();
-        $slack_msg = strip_tags($obj['msg']);
+        $slack_msg = html_entity_decode(strip_tags($obj['msg'] ?? ''), ENT_QUOTES);
         $color = self::getColorForState($obj['state']);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $slack_msg,
                     'color' => $color,
-                    'title' => $obj['title'],
+                    'title' => $obj['title'] ?? null,
                     'text' => $slack_msg,
                     'mrkdwn_in' => ['text', 'fallback'],
-                    'author_name' => $api['author_name'],
+                    'author_name' => $api['author_name'] ?? null,
                 ],
             ],
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_emoji' => ':' . $api['icon_emoji'] . ':',
+            'channel' => $api['channel'] ?? null,
+            'username' => $api['username'] ?? null,
+            'icon_emoji' => isset($api['icon_emoji']) ? ':' . $api['icon_emoji'] . ':' : null,
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $host);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);

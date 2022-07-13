@@ -19,6 +19,7 @@ $type_text['netscaler_vsvr'] = 'VServers';
 $type_text['bgp'] = 'BGP';
 $type_text['cef'] = 'CEF';
 $type_text['ospf'] = 'OSPF';
+$type_text['isis'] = 'ISIS';
 $type_text['vrf'] = 'VRFs';
 $type_text['routes'] = 'Routing Table';
 $type_text['cisco-otv'] = 'OTV';

@@ -14,7 +14,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
     use ActiveDirectoryCommon;
 
-    protected static $CAN_UPDATE_PASSWORDS = 0;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
@@ -91,7 +91,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $group_dn = addcslashes($result[0]['dn'], '()');
+        $group_dn = addcslashes($result[0]['dn'], '()#');
 
         $search = ldap_search(
             $connection,
@@ -205,6 +205,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+        $starttls = Config::get('auth_ad_starttls');
+        if ($starttls == 'optional' || $starttls == 'required') {
+            $tls = ldap_start_tls($this->ldap_connection);
+            if ($starttls == 'required' && $tls === false) {
+                throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
+            }
+        }
     }
 
     public function bind($credentials = [])

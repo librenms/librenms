@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -50,16 +51,16 @@ if ($override_query === 'on') {
     $query = QueryBuilderParser::fromJson($builder_json)->toSql();
 }
 $rule_id = $_POST['rule_id'];
-$count = mres($_POST['count']);
-$delay = mres($_POST['delay']);
-$interval = mres($_POST['interval']);
-$mute = mres(isset($_POST['mute']) ? $_POST['mute'] : null);
-$invert = mres(isset($_POST['invert']) ? $_POST['invert'] : null);
-$name = mres($_POST['name']);
-$proc = mres($_POST['proc']);
+$count = $_POST['count'];
+$delay = $_POST['delay'];
+$interval = $_POST['interval'];
+$mute = isset($_POST['mute']) ? $_POST['mute'] : null;
+$invert = isset($_POST['invert']) ? $_POST['invert'] : null;
+$name = strip_tags($_POST['name']);
+$proc = $_POST['proc'];
 $recovery = ($vars['recovery']);
-$invert_map = mres(isset($_POST['invert_map']) ? $_POST['invert_map'] : null);
-$severity = mres($_POST['severity']);
+$invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;
+$severity = $_POST['severity'];
 
 if (! is_numeric($count)) {
     $count = '-1';

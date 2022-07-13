@@ -14,7 +14,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
     $status = 'error';
     $message = 'ERROR: You need to be admin to reload Oxidized node list';
 } else {
-    oxidized_reload_nodes();
+    (new \App\ApiClients\Oxidized())->reloadNodes();
     $status = 'ok';
     $message = 'Oxidized node list was reloaded';
 }
@@ -23,4 +23,4 @@ $output = [
     'message' => $message,
 ];
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

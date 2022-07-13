@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,13 +40,11 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
             'sda410C' => '5',
             'sta410C' => '6',
             'saa410C' => '7',
-            'sdi410C' => '8',
             'sti410C' => '9',
             'sai410C' => '10',
             'ttd440' => '14',
             'ttx410C' => '15',
             'tdx410C' => '16',
-            'sdi480' => '17',
             'sti440' => '18',
         ];
 

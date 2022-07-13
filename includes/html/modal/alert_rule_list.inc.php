@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -61,7 +62,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                             echo "
                                 <tr>
                                     <td>{$rule['name']}</td>
-                                    <td><i>" . htmlentities($rule_display) . "</i></td>
+                                    <td><i>" . htmlentities(strip_tags($rule_display)) . "</i></td>
                                     <td>{$rule['severity']}</td>
                                     <td>{$rule['id']}</td>
                                 </tr>
@@ -92,8 +93,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                                     success: function (data) {
                                         if (data.status == 'ok') {
                                             $("#search_alert_rule_modal").one('hidden.bs.modal', function(event) {
-                                                loadRule(data);
                                                 $('#create-alert').modal('show');
+                                                loadRule(data);
                                             });
                                             $("#search_alert_rule_modal").modal('hide');
                                         } else {

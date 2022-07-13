@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'ib_dhcp_messages');
+$rrd_filename = Rrd::name($device['hostname'], 'ib_dhcp_messages');
 $rrd_options .= " --vertical-label='Messages per minute'";
 
 $stats = [

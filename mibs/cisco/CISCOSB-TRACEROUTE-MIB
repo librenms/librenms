@@ -10,7 +10,7 @@ IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI;
 
 rlTraceRoute MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "200701020001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
@@ -35,5 +35,13 @@ rlTraceRouteMibVersion OBJECT-TYPE
     DESCRIPTION
         "MIB's version, the current version is 1."
     ::= { rlTraceRoute 1 }
+
+rlTraceRouteWebLastTestName OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The last index of Traceroute WEB requests. Used to configure traceRouteCtlTestName by WEB user."
+    ::= { rlTraceRoute 2 }
 
 END

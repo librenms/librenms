@@ -9,13 +9,13 @@ $unit_text = 'Events';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'events']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'events']);
 $array = [
     'success',
     'failure',
     'total',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

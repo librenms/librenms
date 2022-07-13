@@ -27,7 +27,7 @@ if ($entry['type'] == 'interface') {
     $entry['link'] = '<b>' . generate_port_link(cleanPort(getifbyid($entry['reference']))) . '</b>';
 }
 
-echo '<td style="white-space: nowrap;">' . $entry['link'] . '</td>';
+echo '<td style="white-space: nowrap;max-width: 100px;overflow: hidden;text-overflow: ellipsis;">' . $entry['link'] . '</td>';
 echo '<td>' . htmlspecialchars($entry['message']) . '</td>';
 
 echo '</tr>';

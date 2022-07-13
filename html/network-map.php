@@ -9,6 +9,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 
 $links = 1;
 
@@ -21,7 +22,7 @@ if (! Auth::check()) {
 
 $options = getopt('d::');
 
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']), false)) {
     echo "DEBUG!\n";
 }
 
@@ -67,7 +68,7 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
                     }
                     $loc_id = $locations[$device['location']];
 
-                    $map .= '"' . $device['hostname'] . '" [fontsize=20, fillcolor="lightblue", group=' . $loc_id . ' URL="' . Config::get('base_url') . '/device/device=' . $device['device_id'] . "/tab=neighbours/selection=map/\" shape=box3d]\n";
+                    $map .= '"' . $device['hostname'] . '" [fontsize=20, fillcolor="lightblue", group=' . $loc_id . ' URL="' . Config::get('base_url') . 'device/device=' . $device['device_id'] . "/tab=neighbours/selection=map/\" shape=box3d]\n";
                 }
 
                 foreach ($links as $link) {
@@ -128,24 +129,24 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
                             }
                             $ifdone[$src][$sif['port_id']] = 1;
                         } else {
-                            $map .= '"' . $sif['port_id'] . '" [label="' . $sif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . '/device/device=' . $device['device_id'] . "/tab=port/port=$local_port_id/\"]\n";
+                            $map .= '"' . $sif['port_id'] . '" [label="' . $sif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . 'device/device=' . $device['device_id'] . "/tab=port/port=$local_port_id/\"]\n";
                             if (! $ifdone[$src][$sif['port_id']]) {
                                 $map .= "\"$src\" -> \"" . $sif['port_id'] . "\" [weight=500000, arrowsize=0, len=0];\n";
                                 $ifdone[$src][$sif['port_id']] = 1;
                             }
 
                             if ($dst_host) {
-                                $map .= "\"$dst\" [URL=\"" . Config::get('base_url') . "/device/device=$dst_host/tab=neighbours/selection=map/\", fontsize=20, shape=box3d]\n";
+                                $map .= "\"$dst\" [URL=\"" . Config::get('base_url') . "device/device=$dst_host/tab=neighbours/selection=map/\", fontsize=20, shape=box3d]\n";
                             } else {
                                 $map .= "\"$dst\" [ fontsize=20 shape=box3d]\n";
                             }
 
                             if ($dst_host == $device['device_id'] || $where == '') {
-                                $map .= '"' . $dif['port_id'] . '" [label="' . $dif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"]\n";
+                                $map .= '"' . $dif['port_id'] . '" [label="' . $dif['label'] . '", fontsize=12, fillcolor=lightblue, URL="' . Config::get('base_url') . "device/device=$dst_host/tab=port/port=$remote_port_id/\"]\n";
                             } else {
                                 $map .= '"' . $dif['port_id'] . '" [label="' . $dif['label'] . ' ", fontsize=12, fillcolor=lightgray';
                                 if ($dst_host) {
-                                    $map .= ', URL="' . Config::get('base_url') . "/device/device=$dst_host/tab=port/port=$remote_port_id/\"";
+                                    $map .= ', URL="' . Config::get('base_url') . "device/device=$dst_host/tab=port/port=$remote_port_id/\"";
                                 }
                                 $map .= "]\n";
                             }
@@ -222,7 +223,7 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
     if (Auth::check()) {
         // FIXME level 10 only?
         echo '<center>
-                  <object width=1200 height=1000 data="' . Config::get('base_url') . '/network-map.php?format=svg" type="image/svg+xml"></object>
+                  <object width=1200 height=1000 data="' . Config::get('base_url') . 'network-map.php?format=svg" type="image/svg+xml"></object>
               </center>
         ';
     }

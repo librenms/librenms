@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,8 +30,6 @@ use LibreNMS\RRD\RrdDefinition;
 $data = '';
 $name = 'powerdns-recursor';
 $app_id = $app['app_id'];
-
-echo ' ' . $name;
 
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], [$type, $subtype]);
+$rrd_filename = Rrd::name($device['hostname'], [$type, $subtype]);
 
 require 'includes/html/graphs/common.inc.php';
 

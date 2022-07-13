@@ -1,6 +1,3 @@
-source: Extensions/Smokeping.md
-path: blob/master/doc/
-
 # Smokeping integration
 
 [SmokePing](https://oss.oetiker.ch/smokeping/) is a tool which lets us keep
@@ -186,14 +183,25 @@ You should be able to load the Smokeping web interface at `http://yourhost/cgi-b
 This section assumes you have configured LibreNMS with Nginx as
 specified in [Configure Nginx](../Installation/Installation-Ubuntu-1804-Nginx.md).
 
+Note, you need to install fcgiwrap for CGI wrapper interact with Nginx
+
+```
+apt install fcgiwrap
+```
+Then configure Nginx with the default configuration
+
+```
+cp /usr/share/doc/fcgiwrap/examples/nginx.conf /etc/nginx/fcgiwrap.conf
+```
+
 Add the following configuration to your `/etc/nginx/conf.d/librenms` config file.
 
 The following will configure Nginx to respond to `http://yourlibrenms/smokeping`:
 
 ```
-#Browsing to `http://librenms.xxx/smokeping/` should bring up the smokeping web interface
+# Browsing to `http://yourlibrenms/smokeping/` should bring up the smokeping web interface
 
- location = /smokeping/ {
+location = /smokeping/ {
         fastcgi_intercept_errors on;
 
         fastcgi_param   SCRIPT_FILENAME         /usr/lib/cgi-bin/smokeping.cgi;
@@ -217,17 +225,17 @@ The following will configure Nginx to respond to `http://yourlibrenms/smokeping`
         fastcgi_pass unix:/var/run/fcgiwrap.socket;
 }
 
-        location ^~ /smokeping/ {
-                alias /usr/share/smokeping/www/;
-                index smokeping.cgi;
-                gzip off;
-        }
+location ^~ /smokeping/ {
+        alias /usr/share/smokeping/www/;
+        index smokeping.cgi;
+        gzip off;
+}
 ```
 
 After saving the configuration file, verify your Nginx configuration file syntax
 is OK with `sudo nginx -t`, then restart Nginx with `sudo systemctl restart nginx`
 
-You should be able to load the Smokeping web interface at `http://yourhost/smokeping`
+You should be able to load the Smokeping web interface at `http://yourlibrenms/smokeping`
 
 #### Nginx Password Authentication
 

@@ -7,11 +7,12 @@ require __DIR__ . '/../includes/init.php';
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Template;
+use LibreNMS\Util\Debug;
 
 $options = getopt('t:h:r:p:s:d::');
 
 if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
-    set_debug(isset($options['d']));
+    Debug::set(isset($options['d']));
     $runAlerts = new RunAlerts();
 
     $template_id = $options['t'];

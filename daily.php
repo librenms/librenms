@@ -11,18 +11,40 @@ use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
+use LibreNMS\Util\Debug;
 use LibreNMS\Validations\Php;
-
-$init_modules = ['alerts'];
-require __DIR__ . '/includes/init.php';
-include_once __DIR__ . '/includes/notifications.php';
 
 $options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
-    $debug = true;
+    Debug::set();
 }
+
+/**
+ * Scripts without dependencies
+ */
+if ($options['f'] === 'composer_get_plugins') {
+    $output = [];
+
+    $plugins = is_file('composer.plugins.json') ?
+        json_decode(file_get_contents('composer.plugins.json')) : [];
+
+    foreach ($plugins->require ?? [] as $package => $version) {
+        $output[] = "$package:$version";
+    }
+
+    echo implode(' ', $output);
+
+    return;
+}
+
+/**
+ * Scripts with dependencies
+ */
+$init_modules = ['alerts'];
+require __DIR__ . '/includes/init.php';
+include_once __DIR__ . '/includes/notifications.php';
 
 if ($options['f'] === 'update') {
     if (! Config::get('update')) {
@@ -282,7 +304,7 @@ if ($options['f'] === 'purgeusers') {
         if ($purge > 0) {
             $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
                 ->distinct()->pluck('user')
-                ->merge(\App\Models\User::has('apiToken')->pluck('username')) // don't purge users with api tokens
+                ->merge(\App\Models\User::has('apiTokens')->pluck('username')) // don't purge users with api tokens
                 ->unique();
 
             if (\App\Models\User::thisAuth()->whereNotIn('username', $users)->delete()) {
@@ -345,6 +367,15 @@ if ($options['f'] === 'peeringdb') {
     }
 }
 
+if ($options['f'] === 'mac_oui') {
+    $lock = Cache::lock('macouidb', 86000);
+    if ($lock->get()) {
+        $res = cache_mac_oui();
+        $lock->release();
+        exit($res);
+    }
+}
+
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
     unlink(Config::get('install_dir') . '/cache/os_defs.cache');
@@ -355,8 +386,6 @@ if ($options['f'] === 'recalculate_device_dependencies') {
 
     $lock = Cache::lock('recalculate_device_dependencies', 86000);
     if ($lock->get()) {
-        \LibreNMS\DB\Eloquent::boot();
-
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
             // anonymous recursive function

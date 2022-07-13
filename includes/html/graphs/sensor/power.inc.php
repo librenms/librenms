@@ -15,9 +15,9 @@ $rrd_options .= ' AREA:sensor_max#c5c5c5';
 $rrd_options .= ' AREA:sensor_min#ffffffff';
 
 if ($sensor['poller_type'] == 'ipmi') {
-    $rrd_options .= " LINE1.5:sensor#cc0000:'" . rrdtool_escape(ipmiSensorName($device['hardware'], $sensor['sensor_descr']), 21) . "'";
+    $rrd_options .= " LINE1.5:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr(ipmiSensorName($device['hardware'], $sensor['sensor_descr']), 21) . "'";
 } else {
-    $rrd_options .= " LINE1.5:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'], 21) . "'";
+    $rrd_options .= " LINE1.5:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 21) . "'";
 }
 
 $rrd_options .= ' GPRINT:sensor:LAST:%6.2lfW';

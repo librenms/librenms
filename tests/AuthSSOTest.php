@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -118,13 +119,14 @@ class AuthSSOTest extends DBTestCase
 
         // Retrieve it and validate
         $dbuser = $a->getUser($a->getUserid($user));
-        $this->assertNull($dbuser);
+        $this->assertFalse($dbuser);
     }
 
     // Excercise general auth flow with creation enabled
     public function testValidAuthCreateOnly()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         Config::set('sso.create_users', true);
@@ -158,6 +160,7 @@ class AuthSSOTest extends DBTestCase
     public function testValidAuthUpdate()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         // Create a random username and store it with the defaults
@@ -182,6 +185,7 @@ class AuthSSOTest extends DBTestCase
     public function testBadAuth()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
@@ -201,6 +205,7 @@ class AuthSSOTest extends DBTestCase
     public function testNoAttribute()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
@@ -221,11 +226,10 @@ class AuthSSOTest extends DBTestCase
     {
         $a = LegacyAuth::reset();
 
-        $this->assertTrue($a->canUpdatePasswords() === 0);
-        $this->assertTrue($a->changePassword(null, null) === 0);
-        $this->assertTrue($a->canManageUsers() === 1);
-        $this->assertTrue($a->canUpdateUsers() === 1);
-        $this->assertTrue($a->authIsExternal() === 1);
+        $this->assertFalse($a->canUpdatePasswords());
+        $this->assertTrue($a->canManageUsers());
+        $this->assertTrue($a->canUpdateUsers());
+        $this->assertTrue($a->authIsExternal());
     }
 
     /* Everything from here comprises of targeted tests to excercise single methods */
@@ -233,6 +237,7 @@ class AuthSSOTest extends DBTestCase
     public function testGetExternalUserName()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
@@ -266,6 +271,7 @@ class AuthSSOTest extends DBTestCase
 
     public function testGetAttr()
     {
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         $_SERVER['HTTP_VALID_ATTR'] = 'string';
@@ -288,6 +294,7 @@ class AuthSSOTest extends DBTestCase
 
     public function testTrustedProxies()
     {
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         Config::set('sso.trusted_proxies', ['127.0.0.1', '::1', '2001:630:50::/48', '8.8.8.0/25']);
@@ -340,6 +347,7 @@ class AuthSSOTest extends DBTestCase
 
     public function testLevelCaulculationFromAttr()
     {
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         Config::set('sso.mode', 'env');
@@ -383,10 +391,12 @@ class AuthSSOTest extends DBTestCase
     public function testGroupParsing()
     {
         $this->basicConfig();
+        /** @var \LibreNMS\Authentication\SSOAuthorizer */
         $a = LegacyAuth::reset();
 
         $this->basicEnvironmentEnv();
 
+        Config::set('sso.static_level', 0);
         Config::set('sso.group_strategy', 'map');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_attr', 'member');
@@ -407,6 +417,11 @@ class AuthSSOTest extends DBTestCase
         // Empty
         $_SERVER['member'] = '';
         $this->assertTrue($a->authSSOParseGroups() === 0);
+
+        // Empty with default access level
+        Config::set('sso.static_level', 5);
+        $this->assertTrue($a->authSSOParseGroups() === 5);
+        Config::forget('sso.static_level');
 
         // Null
         $_SERVER['member'] = null;

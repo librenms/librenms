@@ -1,0 +1,81 @@
+   TPLINK-DDMMANAGE-MIB DEFINITIONS ::= BEGIN
+
+         IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE
+          	  	        FROM SNMPv2-SMI
+          	ifIndex
+						FROM RFC1213-MIB
+			DisplayString
+						FROM SNMPv2-TC
+            tplinkMgmt
+						FROM TPLINK-MIB; 
+						
+				tplinkDdmManageMIB MODULE-IDENTITY
+					LAST-UPDATED    "200908270000Z"
+					ORGANIZATION    "TPLINK"
+					CONTACT-INFO    "www.tplink.com"
+					DESCRIPTION	    "Private MIB for DDM configuration."
+					REVISION        "200908270000Z"
+					DESCRIPTION
+					"Initial version of this MIB module."
+				::= { tplinkMgmt 96 }
+				
+				tplinkDdmManageMIBObjects		OBJECT IDENTIFIER	::= { tplinkDdmManageMIB 1 }
+				tplinkDdmManageNotifications	OBJECT IDENTIFIER	::= { tplinkDdmManageMIB 2 }
+			 												
+				tempExceedThreshold NOTIFICATION-TYPE    
+					OBJECTS
+					{
+						ifIndex		
+					}
+					STATUS          current
+					DESCRIPTION
+					"A tempExceedThreshold notification is sent when the 
+					value of temperature exceeds the threshold. "
+					::= { tplinkDdmManageNotifications 1 }
+
+				volExceedThreshold NOTIFICATION-TYPE    
+					OBJECTS
+					{
+						ifIndex		
+					}
+					STATUS          current
+					DESCRIPTION
+					"A volExceedThreshold notification is sent when the 
+					value of voltage exceeds the threshold. "
+					::= { tplinkDdmManageNotifications 2 }
+
+				biasCurExceedThreshold NOTIFICATION-TYPE    
+					OBJECTS
+					{
+						ifIndex		
+					}
+					STATUS          current
+					DESCRIPTION
+					"A biasCurExceedThreshold notification is sent when the 
+					value of bias current exceeds the threshold. "
+					::= { tplinkDdmManageNotifications 3 }  
+
+				txPowExceedThreshold NOTIFICATION-TYPE    
+					OBJECTS
+					{
+						ifIndex		
+					}
+					STATUS          current
+					DESCRIPTION
+					"A txPowExceedThreshold notification is sent when the 
+					value of Tx power exceeds the threshold. "
+					::= { tplinkDdmManageNotifications 4 }        
+
+				rxPowExceedThreshold NOTIFICATION-TYPE    
+					OBJECTS
+					{
+						ifIndex		
+					}
+					STATUS          current
+					DESCRIPTION
+					"A rxPowExceedThreshold notification is sent when the 
+					value of Rx power exceeds the threshold. "
+					::= { tplinkDdmManageNotifications 5 }
+
+END

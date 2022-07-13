@@ -17,7 +17,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $graph_array['type'] = 'device_bits';
     $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['legend'] = 'no';
-    $graph = generate_lazy_graph_tag($graph_array);
+    $graph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
     //Generate tooltip
     $graph_array['width'] = 210;
@@ -25,14 +25,14 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width']);
-    $link = generate_url($link_array);
+    $link = \LibreNMS\Util\Url::generate($link_array);
 
     $graph_array['width'] = '210';
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
     echo '<tr>
           <td colspan="4">';
-    echo overlib_link($link, $graph, $overlib_content, null);
+    echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
     echo '  </td>
         </tr>';
 
@@ -50,7 +50,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
 
     $ifsep = '';
 
-    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0", [$device['device_id']]) as $data) {
+    foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
         $data = cleanPort($data);
         $data = array_merge($data, $device);
         echo "$ifsep" . generate_port_link($data, makeshortif(strtolower($data['label'])));

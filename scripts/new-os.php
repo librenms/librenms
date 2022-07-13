@@ -3,6 +3,7 @@
 
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 
 $init_modules = [''];
 require __DIR__ . '/../includes/init.php';
@@ -12,7 +13,7 @@ $options = getopt('h:o:t:v:d::');
 if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $type = $options['t'];
     $vendor = $options['v'];
-    set_debug(isset($options['d']));
+    Debug::set(isset($options['d']));
 
     $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
     $device = device_by_id_cache($device_id);
@@ -34,7 +35,7 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = Core::detectOS($device);
+        $os = Core::detectOS(new \App\Models\Device($device));
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");

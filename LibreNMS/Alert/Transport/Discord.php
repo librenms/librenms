@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  * @contributer f0o, sdef2
@@ -28,10 +29,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Discord extends Transport
 {
-    const ALERT_FIELDS_TO_DISCORD_FIELDS = [
+    public const ALERT_FIELDS_TO_DISCORD_FIELDS = [
         'timestamp' => 'Timestamp',
         'severity' => 'Severity',
         'hostname' => 'Hostname',
@@ -79,7 +81,7 @@ class Discord extends Transport
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $host);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);

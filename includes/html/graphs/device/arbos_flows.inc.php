@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'arbos_flows');
+$rrd_filename = Rrd::name($device['hostname'], 'arbos_flows');
 
 require 'includes/html/graphs/common.inc.php';
 

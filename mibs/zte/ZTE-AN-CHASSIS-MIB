@@ -1,0 +1,1404 @@
+
+ZTE-AN-CHASSIS-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS     
+        RowStatus                         FROM SNMPv2-TC
+        DisplayString                     FROM SNMPv2-TC
+        TruthValue                        FROM SNMPv2-TC
+        DateAndTime                       FROM SNMPv2-TC
+        MODULE-IDENTITY                   FROM SNMPv2-SMI
+        OBJECT-TYPE                       FROM SNMPv2-SMI 
+        Integer32                         FROM SNMPv2-SMI
+        NOTIFICATION-TYPE                 FROM SNMPv2-SMI                    
+        zxAccessNode                      FROM ZTE-AN-SMI
+        zxAnEquipment                     FROM ZTE-AN-SMI
+        MODULE-COMPLIANCE                 FROM SNMPv2-CONF
+        OBJECT-GROUP                      FROM SNMPv2-CONF
+        NOTIFICATION-GROUP                FROM SNMPv2-CONF;
+
+    zxAnChassisMib    MODULE-IDENTITY
+        LAST-UPDATED    "201405220000Z"
+        ORGANIZATION    "ZTE Corporation"
+        CONTACT-INFO    "Dai YiDong      ZTE Corporation
+                         Mail: dai.yidong1@zte.com.cn
+                         Tel : +86-21-68897315"
+        DESCRIPTION     "This MIB defines zte Access Node chassis managed objects."
+        
+        REVISION        "201405220000Z"
+        DESCRIPTION
+        "Add the 'unauthorized' status of the card and the power saving 
+        enabling of the card."
+        REVISION        "201405140000Z"
+        DESCRIPTION
+        "Add the last startup time of the card."
+        REVISION        "201105260000Z"
+        DESCRIPTION
+        "Initial version of this MIB module."
+        ::=  {  zxAnEquipment  1  }  
+    
+-------------------------------------------------------------------------------
+-- Following management objects are defined.
+-- 1. Chassis Global Objects
+-- 2. Rack Properties Table
+-- 3. Shelf Properties Table
+-- 4. Card Properties Table
+-- 5. Subcard Properties Table
+-- 6. Card CPU Properties Table
+-- 7. Storage Device Properties Table
+
+-- Following notification objects are defined.
+-- 21. zxAnChassisSysTraps
+-- 22. zxAnChassisCardTraps
+-- 23. zxAnChassisSubcardTraps
+
+-- Following conformance information is defined.
+-- 31. zxAnChassisConformance
+-------------------------------------------------------------------------------
+
+    zxAnChassisGlobalObjects  OBJECT IDENTIFIER   ::=  {  zxAnChassisMib   1  }
+    zxAnChassisObjects        OBJECT IDENTIFIER   ::=  {  zxAnChassisMib   2  }
+    zxAnChassisNotifications  OBJECT IDENTIFIER   ::=  {  zxAnChassisMib   3  }
+
+    zxAnChassisSysTraps  OBJECT IDENTIFIER ::= {  zxAnChassisNotifications 1  }
+    zxAnChassisCardTraps OBJECT IDENTIFIER ::= {  zxAnChassisNotifications 2  }
+    zxAnChassisSubcardTraps OBJECT IDENTIFIER ::= { zxAnChassisNotifications 3 }
+    
+-------------------------------------------------------------------------------
+-- 1. Chassis Global
+-------------------------------------------------------------------------------
+    zxAnChassisSysReboot    OBJECT-TYPE 
+       SYNTAX             INTEGER  
+          { 
+              rebootSystem (1)
+          } 
+       MAX-ACCESS       read-write
+       STATUS           current
+       DESCRIPTION      "Reboot system."
+       ::=  {  zxAnChassisGlobalObjects  1  }
+
+    zxAnChassisSysLastRebootReason    OBJECT-TYPE 
+       SYNTAX             INTEGER  
+          { 
+              byCli(1),
+              byNms(2),
+              byWatchdog(3),
+              byPowerOff(4),
+              bySoftwareRestart(5),
+              byProcessSuspended(6), 
+              unknown (99)
+          } 
+       MAX-ACCESS       read-only
+       STATUS           current
+       DESCRIPTION      "It indicates device coldstart or warmstart reason
+                         byCli(1)       warmstart by command,
+                         byNms(2)       warmstart by network management,
+                         byWatchdog(3)  warmstart by watchdog,
+                         byPowerOff(4)  coldstart by poweroff,
+                         byProcessSuspended(6)  warmstart by process suspended,
+                         unknown (99)   restart by other reason."
+       ::=  {  zxAnChassisGlobalObjects  2  }
+
+    zxAnChassisSysLastSwapReason  OBJECT-TYPE 
+        SYNTAX      INTEGER
+            {
+            forced(1),
+            cardOffline(2),
+            reset(3),
+            cardDown(99)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Last swap request,such as force,plug-out or others.
+                     forced(1)       swap by command or network management,
+                     cardOffline(2)  swap by the main control board poweroff 
+                                     or pull out,
+                     reset(3)        swap by the main control board reset self,
+                     cardDown(99)    swap by other reason."
+        ::=  {  zxAnChassisGlobalObjects  3  }          
+
+   zxAnChassisPnpMode  OBJECT-TYPE 
+        SYNTAX      INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "config Ne card PNP mode,PNP mode means when card on shelf,
+                    then this card can use without add it"
+        ::=  {  zxAnChassisGlobalObjects  4  }
+       
+-------------------------------------------------------------------------------
+-- 2.Rack properties table
+-------------------------------------------------------------------------------
+    zxAnRackTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnRackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the enable or disable plug and play of 
+                    the rack."
+        ::=  { zxAnChassisObjects  2 }
+
+    zxAnRackEntry   OBJECT-TYPE
+        SYNTAX      ZxAnRackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnRackTable."
+        INDEX       {  zxAnRack  }
+        ::=  { zxAnRackTable 1 }
+
+    ZxAnRackEntry  ::=  SEQUENCE {
+        zxAnRack            Integer32,
+        zxAnRackActualType   Integer32,
+        zxAnRackConfType       Integer32,
+        zxAnRackInvSn         DisplayString,
+        zxAnRackRowStatus     RowStatus
+        }
+
+    zxAnRack          OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The range of zxAnRack is 1~1 for DT"
+        ::=  {  zxAnRackEntry  1  }
+
+    zxAnRackActualType     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for actual rack type."
+        ::=  {  zxAnRackEntry  2  }
+
+    zxAnRackConfType     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for configged rack type."
+        ::=  {  zxAnRackEntry  3  }
+
+
+    zxAnRackInvSn     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for serial number of this rack.
+              it is used by inventroy management."
+        ::=  {  zxAnRackEntry  4  }
+
+
+    zxAnRackRowStatus  OBJECT-TYPE 
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The status of this conceptual row.
+
+             To create a row in this table, a manager must
+             set this object to createAndGo(4).
+          
+             In particular, a newly created row cannot be created
+             until the corresponding zxAnRackConfType have been set.
+             
+             To delete a row in this table, a manager must
+             set this object to destroy(6). "
+        ::=  {  zxAnRackEntry  50  }   
+
+
+-------------------------------------------------------------------------------
+-- 2.Shelf properties table
+-------------------------------------------------------------------------------
+    zxAnShelfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnShelfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the enable or disable plug and play of 
+                    the shelf."
+        ::=  { zxAnChassisObjects  3 }
+
+    zxAnShelfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnShelfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnShelfTable."
+        INDEX       {  zxAnRack,zxAnShelf  }
+        ::=  { zxAnShelfTable 1 }
+
+    ZxAnShelfEntry  ::=  SEQUENCE {
+        zxAnShelf             Integer32,
+        zxAnShelfHardwareVersion             DisplayString,
+        zxAnShelfActualType        Integer32,
+        zxAnShelfConfType       Integer32,
+        zxAnShelfInvSn          DisplayString,
+        zxAnShelfCleiCode       DisplayString,
+        zxAnLogicShelfNo        Integer32,
+        zxAnShelfRowStatus      RowStatus
+        }
+        
+    zxAnShelf         OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The range of zxAnShelf is 1~1 for DT"
+        ::=  {  zxAnShelfEntry  1  } 
+    
+    zxAnShelfHardwareVersion OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The hard driver on the shelf."
+        ::=  {  zxAnShelfEntry  2  }
+
+    zxAnShelfActualType    OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actual shelf type."
+        ::=  {  zxAnShelfEntry  3  }
+
+    zxAnShelfConfType    OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The configuration shelf type."
+        ::=  {  zxAnShelfEntry  4  }
+
+
+    zxAnShelfInvSn     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The serial number of this shelf.
+                        it is used by inventroy management."
+        ::=  {  zxAnShelfEntry  5  }
+
+
+    zxAnShelfCleiCode     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The CLEI code of this Shelf.
+                         it is used by inventroy management.Please reference 
+                        http://www.commonlanguage.com to get knowledge about 
+                        CLEI code. 
+                        "
+        REFERENCE "http://www.commonlanguage.com"              
+        ::=  {  zxAnShelfEntry  6  }
+    
+    zxAnLogicShelfNo     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The logic Shelf number"
+        ::=  {  zxAnShelfEntry  7  }    
+        
+    zxAnShelfRowStatus  OBJECT-TYPE 
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The status of this conceptual row.
+
+             To create a row in this table, a manager must
+             set this object to createAndGo(4).
+          
+             In particular, a newly created row cannot be created
+             until the corresponding zxAnShelfConfType have been set.
+             
+             To delete a row in this table, a manager must
+             set this object to destroy(6). "
+        ::=  {  zxAnShelfEntry  50  }   
+
+
+-------------------------------------------------------------------------------
+-- 3.Card properties table
+-------------------------------------------------------------------------------
+    zxAnCardTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnCardEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the enable or disable plug and play of 
+                    the Card."
+        ::=  { zxAnChassisObjects  4 }
+
+    zxAnCardEntry   OBJECT-TYPE
+        SYNTAX      ZxAnCardEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnCardTable."
+        INDEX       {  zxAnRack, zxAnShelf, zxAnSlot  }
+        ::=  { zxAnCardTable 1 }
+
+     ZxAnCardEntry  ::=  SEQUENCE {
+        zxAnSlot                      Integer32,
+        zxAnCardConfMainType          Integer32,
+        zxAnCardActualMainType        Integer32,
+        zxAnCardActualType            DisplayString,
+        zxAnCardOperStatus            INTEGER,
+        zxAnCardAdminStatus           INTEGER,     
+        zxAnCardPortNums              Integer32,
+        zxAnCardActivePortNums        Integer32,
+        zxAnCardCpuLoad               Integer32,
+        zxAnCardCpuLoadThreshold      Integer32,
+        zxAnCardMemUsage              Integer32,
+        zxAnCardMemUsageThreshold     Integer32,
+        zxAnCardStandbyStatus         INTEGER,
+        zxAnCardInvSn                 DisplayString,
+        zxAnCardCleiCode              DisplayString,
+        zxAnCardAccessoriesType       DisplayString,
+        zxAnCardAccessoriesOperStatus INTEGER,
+        zxAnCardMemSize               Integer32,
+        zxAnCardAvailableStorageSize  Integer32,
+        zxAnCardTotalStorageSize      Integer32,
+        zxAnCardHardwareVersion       DisplayString,
+        zxAnCardPowerSavingEnable     INTEGER,
+        zxAnCardLastStartupTime       DateAndTime,
+        zxAnCardCpldVersion           DisplayString,
+        zxAnCardFirmwareVersion       DisplayString,
+        zxAnCardOtherFirmwareVersions DisplayString,
+        zxAnCardRowStatus             RowStatus
+        }
+
+    zxAnSlot                    OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The range of zxAnSlot is 0~20 for DT IEC-SHELF,
+                         and  the range of zxAnSlot is 0~22 for DT ETSI-SHELF
+                        "
+        ::=  {  zxAnCardEntry  1  }
+
+
+    zxAnCardConfMainType        OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The main card type to config on the slot. Main card 
+                        type indicates the category of hardware, such as 
+                        64-ports adsl card,4-ports ethernet card."
+        ::=  {  zxAnCardEntry  2  }
+
+
+    zxAnCardActualMainType      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actually main card type on the slot."
+        ::=  {  zxAnCardEntry  3  }
+
+
+    zxAnCardActualType          OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actually card type on the  slot. Card type 
+                        indicates the type of detailed hardware,such as ATUGA
+                        and ATUGB, they'er all 32-ports Adsl card and they all 
+                        provide general Adsl service,but they have different 
+                        chips.
+                      
+           NOTE: The value of this variable MUST abide by ZTE'S  
+                 discipline for card naming.And It MUST capital letters. 
+           "
+        ::=  {  zxAnCardEntry  4  }
+
+
+    zxAnCardOperStatus          OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+             inService   (1),
+             notInService(2),
+             hwOnline(3),
+             hwOffline(4),
+             configuring(5),
+             configFailed(6),
+             typeMismatch(7),
+             deactived(8),
+             faulty(9),
+             invalid(10),
+             noPower(11),
+             unauthorized(12),
+             powerSaving(34)             
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for the card status.
+
+          inService(1)   --  card plugged in,running normally and service is 
+                             being provided normally.
+          notInService(2)--  card plugged in,running normally but service is 
+                             stopped.
+          hwOnline(3)    --  card plugged in and card communication is ok, but 
+                             software isn't running now.
+          hwOffline(4)   --  card is pulled out or card not plugged in, but 
+                             added to agent's database only.
+          configuring(5) --  card plugged in, but it is configuring.
+          configFailed(6)--  card plugged in, but configuration failed.
+          typeMismatch(7)--  card plugged in, but it's type is mismatch.
+          deactived(8)   --  card plugged in, but it is deactivated by a 
+                             manager.
+          faulty(9)      --  fault occurs when card is running normally
+          invalid(10)    --  invalid card instance, such as adding card failed.
+          noPower(11)    --  power card plugged in, but no power input.
+          unauthorized(12) --  card plugged in, but it's bugsell and the 
+                               software of the card doesn't run now.
+          powerSaving(34)  --  card plugged in, but it's power saving status.          
+        "
+        ::=  {  zxAnCardEntry  5  }
+
+    zxAnCardAdminStatus         OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+                reset(1),
+                switch(2),
+                stopService(3),
+                active(4),
+                deactive(5)
+            }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for the card admin status on the 
+                         card. For example:reset(1),switch(2)
+                         
+                         reset(1)    -- reset the card.
+                         switch(2)   -- switch card between master and slave
+                                        status.
+                         stopService(3) -- stop service normally.
+                         active(4)   -- activate this card and enable the 
+                                        service.
+                         deactive(5) -- deactivate this card and disable the 
+                                        service forcedly.
+                         "
+        ::=  {  zxAnCardEntry  6  }
+
+    zxAnCardPortNums            OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The numbers of physical port which contained 
+                        in this board.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnCardEntry  7  }
+
+    zxAnCardActivePortNums      OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The numbers of actived physical port which contained 
+                        in this board.
+                        If the board has no this attribute,it should be 0."
+                    
+        ::=  {  zxAnCardEntry  8  }
+
+    zxAnCardCpuLoad             OBJECT-TYPE 
+        SYNTAX          Integer32 (0..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current CPU load of this board.If this board has
+                        more than one CPU,the average value is allowed.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnCardEntry  9  }
+
+
+    zxAnCardCpuLoadThreshold    OBJECT-TYPE 
+        SYNTAX          Integer32 (1..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The CPU load threshold of this board.When 
+                        zxAnCardCpuLoad  is  higher than 
+                        zxAnCardCpuLoadThreshold,zxAnChassisCardCpuOverloadAlm 
+                        trap should be generated by agent."
+        ::=  {  zxAnCardEntry  10  }
+
+
+    zxAnCardMemUsage            OBJECT-TYPE 
+        SYNTAX          Integer32 (0..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current memory usage of this board.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnCardEntry  11  }
+
+
+    zxAnCardMemUsageThreshold   OBJECT-TYPE 
+        SYNTAX          Integer32 (1..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The memory usage threshold of this board. When 
+                        zxAnCardMemUsage is higher than 
+                        zxAnCardMemUsageThreshold,zxAnChassisCardMemOverloadAlm
+                        trap should be generated by agent."
+        ::=  {  zxAnCardEntry  12  }
+                
+    zxAnCardStandbyStatus       OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+             main(1),
+             standby(2),
+             unknown(15)             
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The card operation status on the card."
+        ::=  {  zxAnCardEntry  13  }
+
+    zxAnCardInvSn               OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The serial number of this card.
+                        it is used by inventroy management."
+        ::=  {  zxAnCardEntry  14  }
+
+
+    zxAnCardCleiCode            OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The CLEI code of this card.
+                        it is used by inventroy management.Please reference 
+                        http://www.commonlanguage.com to get knowledge about
+                        CLEI code."
+        REFERENCE "http://www.commonlanguage.com"              
+        ::=  {  zxAnCardEntry  15  }
+
+
+    zxAnCardAccessoriesType     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The accessories type of this card, such as splitter 
+                        of DSLAM,the value of this variable should be the type 
+                        of hardware, eg. PNVTA,PNVNP,PNVNA of ZXDSL9800's 
+                        splitter."
+        ::=  {  zxAnCardEntry  16  }
+
+
+    zxAnCardAccessoriesOperStatus       OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+             up(1),
+             down(2),
+             testing(3),
+             unknow(4)
+            }        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The operational status of the card accessories."
+        ::=  {  zxAnCardEntry  17  }
+
+
+    zxAnCardMemSize             OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "MB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current memory size of this board.
+                    If the board has no this attribute,it should be 0."
+        ::=  {  zxAnCardEntry  19  }
+
+
+   zxAnCardAvailableStorageSize OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "KB"        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The available storage space size in this card."
+        ::=  {  zxAnCardEntry  21 }             
+
+
+   zxAnCardTotalStorageSize     OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "KB"        
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The total storage space size in this card."
+        ::=  {  zxAnCardEntry  22 }      
+    
+    zxAnCardHardwareVersion     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The hard version in this card."
+        ::=  {  zxAnCardEntry  23  }
+        
+    zxAnCardPowerSavingEnable  OBJECT-TYPE 
+        SYNTAX          INTEGER {
+            enabled(1),
+            disabled(2)
+        }         
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Enable or disable the power saving of the card."
+        DEFVAL  { disabled }
+        ::=  {  zxAnCardEntry  24  }    
+
+    zxAnCardLastStartupTime     OBJECT-TYPE 
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The last startup time of the card."
+        ::=  {  zxAnCardEntry  25  }
+        
+    zxAnCardCpldVersion    OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The CPLD version in this card."
+        ::=  {  zxAnCardEntry  26  }
+        
+    zxAnCardFirmwareVersion    OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The firmware version in this card."
+        ::=  {  zxAnCardEntry  27  }
+
+    zxAnCardOtherFirmwareVersions    OBJECT-TYPE
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The other firmware versions in this card."
+        ::=  {  zxAnCardEntry  28  }
+        
+    zxAnCardRowStatus   OBJECT-TYPE 
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The status of this conceptual row.
+
+                        To create a row in this table, a manager must
+                        set this object to createAndGo(4).
+                       
+                        In particular, a newly created row cannot be created
+                        until the corresponding zxAnExampleFunc2Xxx1Var1
+                        and zxAnExampleFunc2Xxx1Var2 have been set.
+                        
+                        To delete a row in this table, a manager must
+                        sets this object to destroy(6). "
+        ::=  {  zxAnCardEntry  50  }     
+
+-------------------------------------------------------------------------------
+-- 4.Subcard properties table
+-------------------------------------------------------------------------------
+    zxAnSubcardTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnSubcardEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the enable or disable plug and play of 
+                    the subcard."
+        ::=  { zxAnChassisObjects  5 }
+
+    zxAnSubcardEntry   OBJECT-TYPE
+        SYNTAX      ZxAnSubcardEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnSubcardTable."
+        INDEX       {  zxAnRack,zxAnShelf,zxAnSlot,zxAnSubcard  }
+        ::=  { zxAnSubcardTable 1 }
+
+    ZxAnSubcardEntry  ::=  SEQUENCE {
+        zxAnSubcard                Integer32,        
+        zxAnSubcardConfMainType    Integer32,
+        zxAnSubcardActualMainType  Integer32,
+        zxAnSubcardActualType      DisplayString,
+        zxAnSubcardOperStatus      INTEGER,
+        zxAnSubcardAdminStatus     INTEGER,
+        zxAnSubcardPortNums        Integer32,
+        zxAnSubcardActivePortNums  Integer32,
+        zxAnSubcardCpuLoad         Integer32,
+        zxAnSubcardMemUsage        Integer32,   
+        zxAnSubcardInvSn           DisplayString,
+        zxAnSubcardCleiCode        DisplayString,
+        zxAnSubcardMemSize         Integer32,
+        zxAnSubcardHardwareVersion  DisplayString,
+        zxAnSubcardRowStatus       RowStatus
+        }
+
+    zxAnSubcard         OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     ""
+        ::=  {  zxAnSubcardEntry  1  }
+        
+
+    zxAnSubcardConfMainType         OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The main subcard type to config on the slot.  Main 
+                        subcard type indicates the category of hardware,such
+                        as 4-ports ethernet subcard."
+        ::=  {  zxAnSubcardEntry  2  }
+
+
+    zxAnSubcardActualMainType     OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actually main subcard type on the slot."
+        ::=  {  zxAnSubcardEntry  3  }
+
+
+    zxAnSubcardActualType     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The actually subcard type on the slot. It indicates 
+                        the type of detailed hardware.
+           
+                        NOTE: The value of this variable MUST abide by ZTE'S  
+                        discipline for card naming.And It MUST capital letters. 
+                        "
+        ::=  {  zxAnSubcardEntry  4  }
+
+
+    zxAnSubcardOperStatus  OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+             inService   (1),
+             notInService(2),
+             hwOnline(3),
+             hwOffline(4),
+             configuring(5),
+             configFailed(6),
+             typeMismatch(7),
+             deactived(8),
+             faulty(9),
+             invalid(10)             
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for the sub card status on the 
+                        card.
+
+          inService(1)   --  card pluged in,running normally and service is 
+                             being provided normally.
+          notInService(2)--  card pluged in,running normally but service is 
+                             stopped.
+          hwOffline(3)   --  card not pluged in,but added to agent's database 
+                             only
+          hwOnline(4)    --  card pluged in,but software isn't running now.
+          configuring(5) --  card pluged in,but it is configuring
+          configFailed(6)--  card pluged in,but configuration failed
+          typeMismatch(7)--  card pluged in,but it's type is mismatch
+          deactived(8)   --  card pluged in,but it is deactivated by a manager
+          faulty(9)      --  fault occurs when card is running normally
+          invalid(10)    --  invalid card instance,such as adding card failed.    
+        "
+        ::=  {  zxAnSubcardEntry  5  }
+
+    zxAnSubcardAdminStatus    OBJECT-TYPE 
+        SYNTAX          INTEGER
+            {
+                reset(1),
+                switch(2),
+                stopService(3),
+                active(4),
+                deactive(5)
+            }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This MIB is defined for the card admin status on the 
+                         card. For example:reset(1),switch(2)
+                         
+                         reset(1)    -- reset the card.
+                         switch(2)   -- switch card between master and slave 
+                                        status.
+                         stopService(3) -- stop service normally.
+                         active(4)   -- activate this card and enable the 
+                                        service.
+                         deactive(5) -- deactivate this card and disable the 
+                                        service forcedly.
+                         "
+       ::=  {  zxAnSubcardEntry  6  }  
+
+
+
+    zxAnSubcardPortNums OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The numbers of physical port which contained in this
+                        board.
+                    If the board has no this attribute,it should be 0."
+        ::=  {  zxAnSubcardEntry  7  }
+
+    zxAnSubcardActivePortNums   OBJECT-TYPE 
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The numbers of actived physical port which contained 
+                        in this board.
+                        If the board has no this attribute,it should be 0."
+                    
+        ::=  {  zxAnSubcardEntry  8  }
+
+    zxAnSubcardCpuLoad  OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current CPU load of this board.If this board has
+                        more than one CPU,the average value is allowed.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnSubcardEntry  9  }
+
+    zxAnSubcardMemUsage OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current memory usage of this board.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnSubcardEntry  10  }
+
+
+    zxAnSubcardInvSn     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The serial number of this subcard.
+                        it is used by inventroy management."
+        ::=  {  zxAnSubcardEntry  11  }
+
+
+    zxAnSubcardCleiCode     OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The CLEI code of this card.
+                        it is used by inventroy management.Please reference 
+                        http://www.commonlanguage.com to get knowledge about 
+                        CLEI code."
+        REFERENCE "http://www.commonlanguage.com"              
+        ::=  {  zxAnSubcardEntry  12  }
+
+
+    zxAnSubcardMemSize OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "MB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current memory size of this sub card.
+                        If the board has no this attribute,it should be 0."
+        ::=  {  zxAnSubcardEntry  13  }
+
+    zxAnSubcardHardwareVersion OBJECT-TYPE 
+        SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The hard version in this sub card."
+        ::=  {  zxAnSubcardEntry  14  }
+        
+    zxAnSubcardRowStatus  OBJECT-TYPE 
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The row status of this entry."
+        ::=  {  zxAnSubcardEntry  50  }
+
+-------------------------------------------------------------------------------
+-- 5. PNP mode
+-------------------------------------------------------------------------------
+           
+-------------------------------------------------------------------------------
+-- 6. Card CPU Properties Table
+-------------------------------------------------------------------------------
+    zxAnCardCpuTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnCardCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the CPU information of the card."
+        ::=  { zxAnChassisObjects  6 }
+
+    zxAnCardCpuEntry   OBJECT-TYPE
+        SYNTAX      ZxAnCardCpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in zxAnCardCpuTable."
+        INDEX   { zxAnRack, 
+                  zxAnShelf,
+                  zxAnSlot,
+                  zxAnCardCpuId
+                }
+        ::=  { zxAnCardCpuTable 1 }
+
+    ZxAnCardCpuEntry  ::=  SEQUENCE {
+        zxAnCardCpuId      Integer32,
+        zxAnCardCpuUsage   Integer32
+        }
+
+    zxAnCardCpuId   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION     
+            "The CPU ID of the card."
+        ::= { zxAnCardCpuEntry 1 }
+
+    zxAnCardCpuUsage   OBJECT-TYPE
+        SYNTAX          Integer32(0..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "The CPU usage of the zxAnCardCpuId."
+        ::= { zxAnCardCpuEntry  2  }
+
+-------------------------------------------------------------------------------
+-- 7. Storage Device Properties Table
+-------------------------------------------------------------------------------
+    zxAnStorageDeviceTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnStorageDeviceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes file storage devices information."
+        ::=  { zxAnChassisObjects 7 }
+
+    zxAnStorageDeviceEntry   OBJECT-TYPE
+        SYNTAX      ZxAnStorageDeviceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnStorageDeviceTable."
+        INDEX   {zxAnRack, 
+                 zxAnShelf,
+                 zxAnSlot,
+                 zxAnStorageDeviceId}
+        ::=  { zxAnStorageDeviceTable 1 }
+
+    ZxAnStorageDeviceEntry  ::=  SEQUENCE {    
+        zxAnStorageDeviceId                  Integer32,
+        zxAnStorageDeviceAccessEnable        INTEGER,
+        zxAnStorageDeviceOperStatus          INTEGER,
+        zxAnStorageDeviceAccessStatus        INTEGER,
+        zxAnStorageDeviceTotalSpace          Integer32,
+        zxAnStorageDeviceAvailableSpace      Integer32
+    }
+
+    zxAnStorageDeviceId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "The ID of the storage device. 
+             The numbering rule is:
+             1: Flash1,
+             2: SD card,
+             3: RAM card,
+             4: Flash2,
+             ...
+            "
+        ::= { zxAnStorageDeviceEntry 1 }
+
+    zxAnStorageDeviceAccessEnable  OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION  
+            "Enables and disables the access permissions to the storage device.
+             If the storage device is disabled, the storage device can't be read
+             or written."
+        ::= { zxAnStorageDeviceEntry 2 }
+
+    zxAnStorageDeviceOperStatus  OBJECT-TYPE 
+        SYNTAX      INTEGER{
+            online(1),
+            offline(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  
+            "The operational status of the storage device."
+        ::= { zxAnStorageDeviceEntry 3 }
+    
+    zxAnStorageDeviceAccessStatus  OBJECT-TYPE
+        SYNTAX      INTEGER{
+            idle(1),
+            busy(2),
+            locked(3),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The access status of the storage device.
+             idle(1):      the storage device can be read or written.
+             busy(2):      the storage device is being read or written. 
+             locked(3):    the storage device can be read, but can't be written.
+             unknown(255): unknown."
+        ::= { zxAnStorageDeviceEntry 4 }
+
+    zxAnStorageDeviceTotalSpace  OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "MB"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total space of the storage device."
+        ::= { zxAnStorageDeviceEntry 5 }
+
+    zxAnStorageDeviceAvailableSpace  OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "MB"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The available space of the storage device."
+        ::= { zxAnStorageDeviceEntry 6 }
+
+-------------------------------------------------------------------------------
+-- 21 zxAnChassisSysTraps
+-------------------------------------------------------------------------------
+
+    zxAnChassisCtrlCardSwappedAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardOperStatus,zxAnChassisSysLastSwapReason }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCtrlCardSwappedAlm trap indicates that the main 
+            control card has swapped to slave card."
+        ::= { zxAnChassisSysTraps 2 }
+
+    zxAnChassisCtrlCardSwappedClr NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCtrlCardSwappedClr trap indicates that the main
+            control card swapped trap has cleared."
+        ::= { zxAnChassisSysTraps 3 }           
+
+
+--------------------------------------------------------------------------------
+-- 22 zxAnChassisCardTraps
+--------------------------------------------------------------------------------
+
+       
+    zxAnChassisCardOffline NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, 
+                  zxAnCardOperStatus,zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardOffline trap is sent when the agent
+             has detected that the configured card has plugged out."
+       ::= { zxAnChassisCardTraps 1 }
+       
+    zxAnChassisCardOnline NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType, zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardOnline trap is sent when the agent
+             has detected that the configured card has plugged in."
+       ::= { zxAnChassisCardTraps 2 }
+
+
+    zxAnChassisCardTypeMismatchAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardTypeMismatchAlm trap is sent when the agent
+             has detected that the card has plugged in ,but 
+             zxAnCardConfMainType is not same as zxAnCardActualType."
+       ::= { zxAnChassisCardTraps 3 }
+       
+    zxAnChassisCardTypeMismatchClr NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardTypeMismatchClr trap is sent when the agent
+             has detected that the card has plugged in and 
+             zxAnCardConfMainType is same as zxAnCardActualType.
+            "
+       ::= { zxAnChassisCardTraps 4 }
+                      
+
+    zxAnChassisCardNotRunningAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardNotRunningAlm trap is sent when the agent has 
+            detected that the card has plugged in and configured, but it is not
+            running."
+       ::= { zxAnChassisCardTraps 5 }
+       
+    zxAnChassisCardNotRunningClr NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardNotRunningClr trap is sent when the agent
+             has detected that the card is inservice.
+            "
+       ::= { zxAnChassisCardTraps 6 }
+
+
+    zxAnChassisCardNotConfiguredAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+           "A zxAnEquipCardNotConfigured trap is sent when the agent
+             has detected that the card has plugged in but 
+             not configured."
+       ::= { zxAnChassisCardTraps 7 }
+       
+    zxAnChassisCardNotConfiguredClr NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType,zxAnCardActualMainType,
+                  zxAnCardActualType,zxAnCardAdminStatus, zxAnCardOperStatus,
+                  zxAnCardInvSn }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardNotConfiguredClr trap is sent when the agent
+             has detected that the card has plugged in and 
+              configured.
+            "
+       ::= { zxAnChassisCardTraps 8 }
+       
+                      
+    zxAnChassisCardCpuOverloadAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardCpuLoad, zxAnCardCpuLoadThreshold }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+            zxAnChassisCardCPULoad object of one card has exceeded the 
+            configured threshhold value of zxAnCardCpuLoadThreshhold."
+       ::= { zxAnChassisCardTraps 20 }
+    
+    
+    zxAnChassisCardCpuOverloadClr NOTIFICATION-TYPE
+        OBJECTS { zxAnCardCpuLoad, zxAnCardCpuLoadThreshold }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+            zxAnChassisCardCPULoad object of one card has less than the 
+            configured threshhold value of zxAnCardCpuLoadThreshhold."
+       ::= { zxAnChassisCardTraps 21 }
+              
+    zxAnChassisCardMemOverloadAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnCardMemUsage, zxAnCardMemUsageThreshold }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+            zxAnChassisCardMemUsage object of one card has exceeded the 
+            configured threshhold value of zxAnCardMemUsageThreshhold."
+       ::= { zxAnChassisCardTraps 22 }
+    
+    zxAnChassisCardMemOverloadClr NOTIFICATION-TYPE
+        OBJECTS { zxAnCardMemUsage, zxAnCardMemUsageThreshold }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+            zxAnChassisCardMemUsage object of one card has less than the 
+            configured threshhold value of zxAnCardMemUsageThreshhold."
+       ::= { zxAnChassisCardTraps 23 }  
+
+    zxAnChassisCardResourceAdded NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType, 
+                  zxAnCardActualMainType,
+                  zxAnCardPortNums,
+                  zxAnSwCardVersion,
+                  zxAnCardHardwareVersion
+                }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardResourceAdded trap is sent when the agent has 
+             detected that the card has come into inService status."
+       ::= { zxAnChassisCardTraps 24 } 
+       
+    zxAnChassisCardResourceDeleted NOTIFICATION-TYPE
+        OBJECTS { zxAnCardConfMainType, 
+                  zxAnCardActualMainType,
+                  zxAnCardPortNums,
+                  zxAnSwCardVersion,
+                  zxAnCardHardwareVersion
+                }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnChassisCardResourceDeleted trap is sent when the agent has
+             detected that the card has been deleted."
+       ::= { zxAnChassisCardTraps 25 } 
+
+--------------------------------------------------------------------------------
+-- 23. zxAnChassisSubcardTraps
+--------------------------------------------------------------------------------
+    
+    zxAnChassisSubcardDown NOTIFICATION-TYPE
+        OBJECTS { zxAnSubcardConfMainType, zxAnSubcardActualMainType, 
+                  zxAnSubcardOperStatus }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             subcard operational status is abnormal."
+   ::= { zxAnChassisSubcardTraps 1 }
+
+    zxAnChassisSubcardUp NOTIFICATION-TYPE
+        OBJECTS { zxAnSubcardConfMainType,zxAnSubcardActualMainType, 
+                  zxAnSubcardOperStatus }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that the agent has detected that the
+             subcard has been online and come into inservice status."
+       ::= { zxAnChassisSubcardTraps 2 }
+
+-------------------------------------------------------------------------------
+-- 31. zxAnChassisConformance
+-------------------------------------------------------------------------------
+    zxAnChassisConformance  OBJECT IDENTIFIER ::= { zxAnChassisMib         4  }
+                                                    
+    zxAnChassisCompliances  OBJECT IDENTIFIER ::= { zxAnChassisConformance 1  }
+    zxAnChassisGroups       OBJECT IDENTIFIER ::= { zxAnChassisConformance 2  }
+    
+    zxAnChassisCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for SNMP entities which implement the
+            ZTE-AN-CHASSIS-MIB."
+        MODULE -- this module
+        
+            MANDATORY-GROUPS { 
+                  zxAnChassisSysMgmtGroup,
+                  zxAnChassisRackMgmtGroup,
+                  zxAnChassisShelfMgmtGroup,
+                  zxAnChassisCardMgmtGroup,
+                  zxAnChassisSubCardMgmtGroup,
+                  zxAnChassisSysTrapsGroup,
+                  zxAnChassisCardTrapsGroup
+                }
+        ::= { zxAnChassisCompliances 1 }
+
+    zxAnChassisSysMgmtGroup OBJECT-GROUP
+        OBJECTS { zxAnChassisSysReboot,
+                  zxAnChassisSysLastRebootReason,
+                  zxAnChassisSysLastSwapReason,
+                  zxAnChassisPnpMode
+        }
+        STATUS current
+        DESCRIPTION 
+            "The notifications which indicate reboot,set-pnp and last reboot or 
+            swap reason."
+        ::= { zxAnChassisGroups 1 }  
+
+    zxAnChassisRackMgmtGroup OBJECT-GROUP
+        OBJECTS { zxAnRackActualType, 
+                  zxAnRackConfType, 
+                  zxAnRackInvSn, 
+                  zxAnRackRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent rack 
+            information and to manage rack."
+        ::= { zxAnChassisGroups 2 }
+
+    zxAnChassisShelfMgmtGroup OBJECT-GROUP
+        OBJECTS { zxAnShelfHardwareVersion, 
+                  zxAnShelfActualType, 
+                  zxAnShelfConfType,
+                  zxAnShelfInvSn, 
+                  zxAnShelfCleiCode, 
+                  zxAnLogicShelfNo, 
+                  zxAnShelfRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent shelf 
+            information and to manage shelf."
+        ::= { zxAnChassisGroups 3 }
+        
+    zxAnChassisCardMgmtGroup OBJECT-GROUP
+        OBJECTS { zxAnCardConfMainType, 
+                  zxAnCardActualMainType,
+                  zxAnCardActualType, 
+                  zxAnCardOperStatus,
+                  zxAnCardAdminStatus, 
+                  zxAnCardPortNums, 
+                  zxAnCardActivePortNums, 
+                  zxAnCardCpuLoad,
+                  zxAnCardCpuLoadThreshold, 
+                  zxAnCardMemUsage, 
+                  zxAnCardMemUsageThreshold,
+                  zxAnCardStandbyStatus, 
+                  zxAnCardInvSn, 
+                  zxAnCardCleiCode, 
+                  zxAnCardAccessoriesType,
+                  zxAnCardAccessoriesOperStatus, 
+                  zxAnCardMemSize,
+                  zxAnCardAvailableStorageSize, 
+                  zxAnCardTotalStorageSize,
+                  zxAnCardHardwareVersion, 
+                  zxAnCardRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent card 
+            information and to manage card."
+        ::= { zxAnChassisGroups 4 }
+        
+    zxAnChassisSubCardMgmtGroup OBJECT-GROUP
+        OBJECTS { zxAnSubcardConfMainType,
+                  zxAnSubcardActualMainType,
+                  zxAnSubcardActualType,
+                  zxAnSubcardOperStatus,
+                  zxAnSubcardAdminStatus,
+                  zxAnSubcardPortNums,
+                  zxAnSubcardActivePortNums,
+                  zxAnSubcardCpuLoad,
+                  zxAnSubcardMemUsage,   
+                  zxAnSubcardInvSn,
+                  zxAnSubcardCleiCode,
+                  zxAnSubcardMemSize,
+                  zxAnSubcardHardwareVersion,
+                  zxAnSubcardRowStatus
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of objects which are used to represent subcard 
+            information and to manage subcard."
+        ::= { zxAnChassisGroups 5 }  
+            
+    zxAnChassisSysTrapsGroup OBJECT-GROUP
+        OBJECTS { zxAnChassisCtrlCardSwappedAlm,
+                  zxAnChassisCtrlCardSwappedClr
+        }
+        STATUS current
+        DESCRIPTION 
+            "The notifications which indicate swap information."
+        ::= { zxAnChassisGroups 6 }   
+                                
+    zxAnChassisCardTrapsGroup OBJECT-GROUP
+        OBJECTS { zxAnChassisCardOffline,
+                  zxAnChassisCardOnline,
+                  zxAnChassisCardTypeMismatchAlm,
+                  zxAnChassisCardTypeMismatchClr,
+                  zxAnChassisCardNotConfiguredAlm,
+                  zxAnChassisCardNotConfiguredClr,
+                  zxAnChassisCardNotRunningAlm,
+                  zxAnChassisCardNotRunningClr,
+                  zxAnChassisCardCpuOverloadAlm,
+                  zxAnChassisCardCpuOverloadClr,
+                  zxAnChassisCardMemOverloadAlm,
+                  zxAnChassisCardMemOverloadClr,
+                  zxAnChassisCardResourceAdded,
+                  zxAnChassisCardResourceDeleted
+        }
+        STATUS current
+        DESCRIPTION 
+            "The notifications which indicate specific changes, include card 
+            status,  card cpu load status and memory load status."
+        ::= { zxAnChassisGroups 7 }   
+     
+END

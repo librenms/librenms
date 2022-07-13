@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'panos-sessions-icmp');
+$rrd_filename = Rrd::name($device['hostname'], 'panos-sessions-icmp');
 
 $ds = 'sessions_icmp';
 

@@ -69,12 +69,25 @@ ospf:
         excluded_fields: [id, device_id]
     ospf_nbrs:
         excluded_fields: [id, device_id]
+isis:
+    isis_adjacencies:
+        excluded_fields: [id, device_id, port_id]
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+cipsec-tunnels:
+    ipsec_tunnels:
+        excluded_fields: [tunnel_id, device_id]
+        order_by: peer_addr
+cisco-pw:
+    pseudowires:
+        excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
+        joins:
+            - { left: excluded_fields.port_id, right: ports.port_id, select: [ ifIndex ] }
+        order_by: cpwVcID, ifIndex
 route:
     route:
         excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
@@ -107,14 +120,27 @@ sensors:
             - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
         order_by: state_indexes.state_name, state_translations.state_value
         custom_where: ''
+slas:
+    slas:
+        excluded_fields: [device_id, sla_id]
+        order_by: sla_nr
 storage:
     storage:
         excluded_fields: [device_id, storage_id]
         order_by: storage_index, storage_type
-toner:
-    toner:
-        excluded_fields: [device_id, toner_id]
-        order_by: toner_oid, toner_index
+stp:
+    stp:
+        excluded_fields: [stp_id, device_id]
+        order_by: bridgeAddress
+    ports_stp:
+        excluded_fields: [port_stp_id, device_id, port_id]
+        order_by: port_index
+        joins:
+            - { left: ports_stp.port_id, right: ports.port_id, select: [ ifIndex ] }
+printer-supplies:
+    printer_supplies:
+        excluded_fields: [device_id, supply_id]
+        order_by: supply_oid, supply_index
 vlans:
     vlans:
         excluded_fields: [vlan_id, device_id]

@@ -18,7 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-$pre_cache['serverscheck_control'] = snmpwalk_group($device, 'control', 'SERVERSCHECK-MIB');
+$pre_cache['serverscheck_control'] = snmpwalk_group($device, 'control', 'ServersCheck');

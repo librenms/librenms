@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -144,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -255,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -362,8 +356,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -457,18 +449,6 @@
                 }
             ]
         }
-    },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -2408,18 +2388,6 @@
                     "state_generic_value": 2
                 }
             ]
-        },
-        "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": []
-        },
-        "poller": "matches discovery"
-    },
-    "wireless": {
-        "discovery": {
-            "wireless_sensors": []
         },
         "poller": "matches discovery"
     }

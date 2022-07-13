@@ -11,7 +11,7 @@ IMPORTS
 
 
  rlDot3adAgg   MODULE-IDENTITY
-          LAST-UPDATED "200612020000Z"
+          LAST-UPDATED "200612020001Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -509,7 +509,13 @@ rlDot3adAggLacpMembershipRestrictionsIndividualAggregator OBJECT-TYPE
     DEFVAL { false }
     ::= { rlDot3adAggLacpMembershipRestrictionsEntry 5 }
 
-
+rlDot3adAggLacpSystemPriority OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "indicates the system priority value of ports and trunk in LACP."
+    ::= { rlDot3adAgg 11 }
 
 END
 

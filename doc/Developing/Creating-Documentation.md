@@ -1,6 +1,3 @@
-source: Developing/Creating-Documentation.md  
-path: blob/master/doc/
-
 # Creating Documentation
 
 One of the goals of the LibreNMS project is to enable users to get all of the
@@ -32,9 +29,12 @@ least put a placeholder in asking for contributions.
   - Ensure you use the correct formatting for `commands` and `code blocks` by
     wrapping one liners in backticks or blocks in ```.
   - Put content into sub-headings where possible to organise the content.
-- If you rename a file, please add a redirect in for the old file by using
-  `<meta http-equiv="refresh" content="0; url=/NewLocation/" />` within the old
-file name.
+- If you rename a file, please add a redirect for the old file in `mkdocs.yml` like so:
+```yaml
+  - redirects:
+      redirect_maps:
+        'old/page.md': 'new/page.md'
+```
 
 Please ensure you add the document to the relevant section within `pages` of
 `mkdocs.yml` so that it's in the correct menu and is built.  Forgetting this
@@ -63,13 +63,13 @@ This means you can use:
 
 ## Building docs
 
-This is achieved with `mkdocs`, a python package. 
+This is achieved with `mkdocs`, a python package.
 
-1. Install the required packages. 
+1. Install the required packages.
 
 ```
 pip install mkdocs mkdocs-exclude mkdocs-material mkdocs-macros-plugin
-``` 
+```
 If you encounter permissions issues, these might be reoslved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`
 
@@ -92,9 +92,9 @@ This will output all the documentation in html format to `/opt/librenms/out`
 
 ## Viewing docs
 
-mkdocs includes it's own light-weight webserver for this purpose. 
+mkdocs includes it's own light-weight webserver for this purpose.
 
-Viewing is as simple as running the following command: 
+Viewing is as simple as running the following command:
 
 ```
 $ mkdocs serve
@@ -105,7 +105,7 @@ INFO    -  Documentation built in 12.54 seconds
 INFO    -  Serving on http://127.0.0.1:8000
 <..>
 INFO    -  Start watching changes
-``` 
+```
 
 Now you will find the complete set of LibreNMS documentation by opening your
 browser to `localhost:8000`.
@@ -121,7 +121,7 @@ If you are building on a different machine you can use the following directive
 to listen on all interfaces:
 
 ```
-mkdocs serve --dev-addr=http://0.0.0.0:8000
+mkdocs serve --dev-addr=0.0.0.0:8000
 ```
 
 WARNING: this is not a secure webserver, do this at your own risk, with

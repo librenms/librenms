@@ -18,11 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AlertTemplateMap extends BaseModel
 {
@@ -31,7 +34,7 @@ class AlertTemplateMap extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function template()
+    public function template(): BelongsTo
     {
         return $this->belongsTo(\App\Models\AlertTemplate::class, 'alert_templates_id');
     }

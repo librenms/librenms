@@ -54,7 +54,7 @@ return [
     'distance' => [
         'short' => 'Distanz',
         'long' => 'Distanz',
-        'unit' => 'km',
+        'unit' => 'm',
     ],
     'mse' => [
         'short' => 'MSE',
@@ -106,5 +106,14 @@ return [
         'long' => 'Kreuzpolarisation Interferenz',
         'unit' => 'dB',
     ],
-
+    'cell' => [
+        'short' => 'Zell',
+        'long' => 'Zell',
+        'unit' => '',
+    ],
+    'channel' => [
+        'short' => 'Kanall',
+        'long' => 'Kanall',
+        'unit' => '',
+    ],
 ];

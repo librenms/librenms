@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +59,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#pollertype").val(pollertype);
         });
 
-        $('#poller-removal').click('', function (e) {
+        $('#poller-removal').on("click", function (e) {
             e.preventDefault();
             var id = $("#id").val();
             var pollertype = $("#pollertype").val();

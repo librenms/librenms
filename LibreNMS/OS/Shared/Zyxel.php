@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  * @copyright  2020 Tony Murray
@@ -53,8 +54,8 @@ class Zyxel extends OS
         ];
         $data = snmp_get_multi_oid($this->getDeviceArray(), $oids, '-OUQnt');
 
-        $device->hardware = $data['.1.3.6.1.4.1.890.1.15.3.1.11.0'];
-        [$device->version,] = explode(' | ', $data['.1.3.6.1.4.1.890.1.15.3.1.6.0']);
-        $device->serial = $data['.1.3.6.1.4.1.890.1.15.3.1.12.0'];
+        $device->hardware = $data['.1.3.6.1.4.1.890.1.15.3.1.11.0'] ?? null;
+        [$device->version,] = explode(' | ', $data['.1.3.6.1.4.1.890.1.15.3.1.6.0'] ?? null);
+        $device->serial = $data['.1.3.6.1.4.1.890.1.15.3.1.12.0'] ?? null;
     }
 }

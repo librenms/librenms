@@ -92,21 +92,21 @@ trait YamlMempoolsDiscovery
 
     private function getData($field, $index, $yaml)
     {
-        $oid = $yaml[$field];
-        if (isset($this->mempoolsData[$index][$oid])) {
-            return $this->mempoolsData[$index][$oid];
+        $data = $yaml[$field] ?? null;
+        if (isset($this->mempoolsData[$index][$data])) {
+            return $this->mempoolsData[$index][$data];
         }
 
-        if (isset($this->mempoolsPrefetch[$index][$oid])) {
-            return $this->mempoolsPrefetch[$index][$oid];
+        if (isset($this->mempoolsPrefetch[$index][$data])) {
+            return $this->mempoolsPrefetch[$index][$data];
         }
 
-        return is_numeric($yaml[$field]) ? $yaml[$field] : null;  // hard coded number
+        return is_numeric($data) ? $data : null;  // hard coded number
     }
 
     private function getOid($field, $index, $yaml)
     {
-        if (YamlDiscovery::oidIsNumeric($yaml[$field])) {
+        if (YamlDiscovery::oidIsNumeric($yaml[$field] ?? '')) {
             return $yaml[$field];
         }
 
@@ -118,8 +118,9 @@ trait YamlMempoolsDiscovery
     }
 
     /**
-     * @param array $yaml item yaml definition
-     * @param string $mib
+     * @param  array  $yaml  item yaml definition
+     * @param  string  $mib
+     *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     private function fetchData($yaml, $mib)
@@ -133,8 +134,8 @@ trait YamlMempoolsDiscovery
         }
 
         foreach ($this->mempoolsFields as $field) {
-            $oid = $yaml[$field];
-            if (isset($oid) && ! is_numeric($oid)) { // allow for hard-coded values
+            if (isset($yaml[$field]) && ! is_numeric($yaml[$field])) { // allow for hard-coded values
+                $oid = $yaml[$field];
                 if (YamlDiscovery::oidIsNumeric($oid)) { // if numeric oid, it is not a table, just fetch it
                     $this->mempoolsData[0][$oid] = snmp_get($this->getDeviceArray(), $oid, '-Oqv');
                     continue;

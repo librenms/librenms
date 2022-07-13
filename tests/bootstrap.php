@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,14 +30,10 @@ $install_dir = realpath(__DIR__ . '/..');
 
 $init_modules = ['web', 'discovery', 'polling', 'nodb'];
 
-if (! getenv('SNMPSIM')) {
-    $init_modules[] = 'mocksnmp';
-}
-
 require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
-ini_set('display_errors', 1);
+ini_set('display_errors', '1');
 //error_reporting(E_ALL & ~E_WARNING);
 
 $snmpsim = new Snmpsim('127.1.6.2', 1162, null);
@@ -55,7 +52,7 @@ if (getenv('DBTEST')) {
     // create testing table if needed
     $db_config = \config('database.connections.testing');
     $connection = new PDO("mysql:host={$db_config['host']};port={$db_config['port']}", $db_config['username'], $db_config['password']);
-    $result = $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    $result = $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
     if ($connection->errorCode() == '42000') {
         echo implode(' ', $connection->errorInfo()) . PHP_EOL;
         echo "Either create database {$db_config['database']} or populate DB_TEST_USERNAME and DB_TEST_PASSWORD in your .env with credentials that can" . PHP_EOL;

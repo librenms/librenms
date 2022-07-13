@@ -8,7 +8,7 @@ ExecReload=/bin/kill -HUP $MAINPID
 WorkingDirectory=/opt/librenms
 User=librenms
 Group=librenms
-RestartSec=2
+RestartSec=10
 Restart=always
 
 [Install]

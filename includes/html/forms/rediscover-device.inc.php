@@ -17,7 +17,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -39,7 +39,7 @@ if (isset($_POST['device_id'])) {
         $status = 'error';
         $message = 'Invalid device group id ' . $_POST['device_group_id'];
     } else {
-        $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id`=' . $_POST['device_group_id']);
+        $device_ids = dbFetchColumn('SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?', [$_POST['device_group_id']]);
         $update = 0;
         foreach ($device_ids as $device_id) {
             $result = device_discovery_trigger($device_id);
@@ -48,10 +48,10 @@ if (isset($_POST['device_id'])) {
 
         if (! empty($update) || $update == '0') {
             $status = 'ok';
-            $message = 'Devices of group ' . $_POST['device_group_id'] . ' will be rediscovered';
+            $message = 'Devices of group ' . htmlspecialchars($_POST['device_group_id']) . ' will be rediscovered';
         } else {
             $status = 'error';
-            $message = 'Error rediscovering devices of group ' . $_POST['device_group_id'];
+            $message = 'Error rediscovering devices of group ' . htmlspecialchars($_POST['device_group_id']);
         }
     }
 } else {
@@ -65,4 +65,4 @@ $output = [
 ];
 
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

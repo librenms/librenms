@@ -43,7 +43,7 @@ class Zxdsl extends \LibreNMS\OS
         $variant = ' ';
         $parts = explode('.', trim($oid, '.'));
         foreach ($parts as $part) {
-            $variant .= chr(64 + $part);
+            $variant .= chr(64 + (int) $part);
         }
 
         return trim($variant);

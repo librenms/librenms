@@ -5,12 +5,13 @@ namespace LibreNMS\Authentication;
 use Dapphp\Radius\Radius;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Util\Debug;
 
 class RadiusAuthorizer extends MysqlAuthorizer
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     /** @var Radius */
     protected $radius;
@@ -22,13 +23,11 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
     public function authenticate($credentials)
     {
-        global $debug;
-
         if (empty($credentials['username'])) {
             throw new AuthenticationException('Username is required');
         }
 
-        if ($debug) {
+        if (Debug::isEnabled()) {
             $this->radius->setDebug(true);
         }
 

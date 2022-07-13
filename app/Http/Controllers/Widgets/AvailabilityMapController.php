@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -81,7 +82,7 @@ class AvailabilityMapController extends WidgetController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     private function getDevices(Request $request)
@@ -99,43 +100,47 @@ class AvailabilityMapController extends WidgetController
             $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
-        $devices = $device_query->select('devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id')->get();
+        $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
+        $data = [];
+
         foreach ($devices as $device) {
+            $row = ['device' => $device];
             if ($device->disabled) {
                 $totals['disabled']++;
-                $device->stateName = 'disabled';
-                $device->labelClass = 'blackbg';
+                $row['stateName'] = 'disabled';
+                $row['labelClass'] = 'blackbg';
             } elseif ($device->disable_notify) {
                 $totals['ignored']++;
-                $device->stateName = 'alert-dis';
-                $device->labelClass = 'label-default';
+                $row['stateName'] = 'alert-dis';
+                $row['labelClass'] = 'label-default';
             } elseif ($device->status == 1) {
                 if (($device->uptime < $uptime_warn) && ($device->uptime != 0)) {
                     $totals['warn']++;
-                    $device->stateName = 'warn';
-                    $device->labelClass = 'label-warning';
+                    $row['stateName'] = 'warn';
+                    $row['labelClass'] = 'label-warning';
                 } else {
                     $totals['up']++;
-                    $device->stateName = 'up';
-                    $device->labelClass = 'label-success';
+                    $row['stateName'] = 'up';
+                    $row['labelClass'] = 'label-success';
                 }
             } else {
                 $totals['down']++;
-                $device->stateName = 'down';
-                $device->labelClass = 'label-danger';
+                $row['stateName'] = 'down';
+                $row['labelClass'] = 'label-danger';
             }
 
             if ($device->isUnderMaintenance()) {
-                $device->labelClass = 'label-default';
+                $row['labelClass'] = 'label-default';
                 $totals['maintenance']++;
             }
+            $data[] = $row;
         }
 
-        return [$devices, $totals];
+        return [$data, $totals];
     }
 
     private function getServices($request)
@@ -155,27 +160,30 @@ class AvailabilityMapController extends WidgetController
             $services_query->leftJoin('devices', 'services.device_id', 'devices.device_id')->orderBy('hostname')->orderBy('service_type');
         }
         $services = $services_query->with(['device' => function ($query) {
-            $query->select('devices.device_id', 'hostname', 'sysName');
-        }])->select('service_id', 'services.device_id', 'service_type', 'service_desc', 'service_status')->get();
+            $query->select(['devices.device_id', 'hostname', 'sysName']);
+        }])->select(['service_id', 'services.device_id', 'service_type', 'service_desc', 'service_status'])->get();
 
         // process status
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0];
+        $data = [];
         foreach ($services as $service) {
+            $row = ['service' => $service];
             if ($service->service_status == 0) {
-                $service->labelClass = 'label-success';
-                $service->stateName = 'up';
+                $row['labelClass'] = 'label-success';
+                $row['stateName'] = 'up';
                 $totals['up']++;
             } elseif ($service->service_status == 1) {
-                $service->labelClass = 'label-warning';
-                $service->stateName = 'warn';
+                $row['labelClass'] = 'label-warning';
+                $row['stateName'] = 'warn';
                 $totals['warn']++;
             } else {
-                $service->labelClass = 'label-danger';
-                $service->stateName = 'down';
+                $row['labelClass'] = 'label-danger';
+                $row['stateName'] = 'down';
                 $totals['down']++;
             }
+            $data[] = $row;
         }
 
-        return [$services, $totals];
+        return [$data, $totals];
     }
 }

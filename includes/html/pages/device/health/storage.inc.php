@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 $graph_type = 'storage_usage';
 
 $row = 1;
@@ -14,10 +16,10 @@ foreach (dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY stora
     $total = $drive['storage_size'];
     $used = $drive['storage_used'];
     $free = $drive['storage_free'];
-    $perc = round($drive['storage_perc'], 0);
-    $used = formatStorage($used);
-    $total = formatStorage($total);
-    $free = formatStorage($free);
+    $perc = round($drive['storage_perc']);
+    $used = Number::formatBi($used);
+    $total = Number::formatBi($total);
+    $free = Number::formatBi($free);
     $storage_descr = $drive['storage_descr'];
 
     $fs_url = 'graphs/id=' . $drive['storage_id'] . '/type=storage_usage/';

@@ -18,9 +18,11 @@
 */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\CheckStatus;
+use LibreNMS\Enum\SyslogSeverity;
 
-$filter_hostname = mres($vars['hostname']);
-$filter_range = mres($vars['range']);
+$filter_hostname = $vars['hostname'];
+$filter_range = $vars['range'];
 
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $query = 'message:"' . $searchPhrase . '"';
@@ -67,6 +69,12 @@ $context = stream_context_create([
 ]);
 
 $messages = json_decode(file_get_contents($graylog_url, false, $context), true);
+$labels = [
+    CheckStatus::OK => 'label-info',
+    CheckStatus::UNKNOWN => 'label-default',
+    CheckStatus::WARNING => 'label-warning',
+    CheckStatus::ERROR => 'label-danger',
+];
 
 foreach ($messages['messages'] as $message) {
     if (Config::has('graylog.timezone')) {
@@ -81,9 +89,12 @@ foreach ($messages['messages'] as $message) {
         $displayTime = $message['message']['timestamp'];
     }
 
+    $color = $labels[SyslogSeverity::STATUS[$message['message']['level']] ?? CheckStatus::UNKNOWN];
+    $label = "<span class=\"alert-status $color\" style=\"margin-right:8px;float:left;\"></span>";
+
     $response[] = [
-        'timestamp' => graylog_severity_label($message['message']['level']) . $displayTime,
-        'source'    => '<a href="' . generate_url(['page'=>'device', 'device'=>$message['message']['source']]) . '">' . $message['message']['source'] . '</a>',
+        'timestamp' => $label . $displayTime,
+        'source'    => '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $message['message']['source']]) . '">' . $message['message']['source'] . '</a>',
         'message'    => $message['message']['message'],
         'facility'  => $message['message']['facility'],
         'level'     => $message['message']['level'],
@@ -97,4 +108,4 @@ if (empty($messages['total_results'])) {
 }
 
 $output = ['current'=>$current, 'rowCount'=>$rowCount, 'rows'=>$response, 'total'=>$total];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

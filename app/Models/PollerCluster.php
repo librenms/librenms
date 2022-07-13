@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -25,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
@@ -57,8 +59,9 @@ class PollerCluster extends Model
     /**
      * Get the value of a setting (falls back to the global value if not set on this node)
      *
-     * @param string $name
+     * @param  string  $name
      * @return mixed
+     *
      * @throws \LibreNMS\Exceptions\InvalidNameException
      */
     public function getSettingValue(string $name)
@@ -77,7 +80,7 @@ class PollerCluster extends Model
     /**
      * Get the frontend config definition for this poller
      *
-     * @param \Illuminate\Support\Collection|bool|null $groups optionally supply full list of poller groups to avoid fetching multiple times
+     * @param  \Illuminate\Support\Collection|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
     public function configDefinition($groups = null)
@@ -260,7 +263,7 @@ class PollerCluster extends Model
 
     // ---- Relationships ----
 
-    public function stats()
+    public function stats(): HasMany
     {
         return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');
     }

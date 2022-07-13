@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -42,8 +43,8 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to this exception
      *
-     * @param \Exception $exception
-     * @return static
+     * @param  \Exception  $exception
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -61,7 +62,6 @@ class UnserializableRouteCache extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

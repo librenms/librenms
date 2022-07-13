@@ -1,0 +1,70 @@
+-- =========================================================================
+-- Copyright (c) 2008-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB is designed to get Firewall' statistic information.
+-- Reference:
+-- Version: V1.1
+-- History:
+--  V1.0 2008-01-17 created by ZhangBo 05309
+--       Initial version.
+--  V1.1 2012/12/01 Modified by y05947
+--       Add hh3cFWConnRate node.
+-- =========================================================================
+HH3C-FIREWALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Unsigned32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+    FROM SNMPv2-SMI;
+
+
+hh3cFireWall MODULE-IDENTITY
+    LAST-UPDATED "200801171450Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "The MIB is designed to manage Firewall products."
+    ::= { hh3cCommon 88 }
+
+
+--
+-- Node definitions
+--
+
+hh3cFirewallobject OBJECT IDENTIFIER ::= { hh3cFireWall 1 }
+
+hh3cFirewallSpecs OBJECT IDENTIFIER ::= { hh3cFirewallobject 1 }
+
+hh3cFWMaxConnNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max connection number of system."
+    ::= { hh3cFirewallSpecs 1 }
+
+hh3cFirewallGlobalStats OBJECT IDENTIFIER ::= { hh3cFirewallobject 2 }
+
+hh3cFWConnNumCurr OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of connections that currently exist."
+    ::= { hh3cFirewallGlobalStats 1 }
+
+hh3cFWConnRate OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connection establishment rate."
+    ::= { hh3cFirewallGlobalStats 2 }
+
+END

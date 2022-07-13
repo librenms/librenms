@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -76,11 +77,19 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     private function writeEnvFile()
     {
-        return EnvHelper::writeEnv(
+        $env = EnvHelper::writeEnv(
             $this->envVars(),
             ['INSTALL'],
             base_path('.env')
         );
+
+        // make sure the new env is reflected live
+        \Artisan::call('config:clear');
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        return $env;
     }
 
     private function envVars()
@@ -148,6 +157,6 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-check';
+        return 'fa-solid fa-check';
     }
 }

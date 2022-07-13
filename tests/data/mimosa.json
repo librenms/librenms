@@ -16,8 +16,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -127,8 +125,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -244,12 +240,6 @@
         },
         "poller": "matches discovery"
     },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
     "sensors": {
         "discovery": {
             "sensors": [
@@ -318,12 +308,6 @@
                     "state_generic_value": 2
                 }
             ]
-        },
-        "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": []
         },
         "poller": "matches discovery"
     },

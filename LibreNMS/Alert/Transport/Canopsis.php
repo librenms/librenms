@@ -3,6 +3,9 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Exchange\AMQPExchangeType;
+use PhpAmqpLib\Message\AMQPMessage;
 
 class Canopsis extends Transport
 {
@@ -30,12 +33,12 @@ class Canopsis extends Transport
         $exchange = 'canopsis.events';
 
         // Connection
-        $conn = new \PhpAmqpLib\Connection\AMQPConnection($host, $port, $user, $pass, $vhost);
+        $conn = new AMQPStreamConnection($host, $port, $user, $pass, $vhost);
         $ch = $conn->channel();
 
         // Declare exchange (if not exist)
         // exchange_declare($exchange, $type, $passive=false, $durable=false, $auto_delete=true, $internal=false, $nowait=false, $arguments=null, $ticket=null)
-        $ch->exchange_declare($exchange, 'topic', false, true, false);
+        $ch->exchange_declare($exchange, AMQPExchangeType::TOPIC, false, true, false);
 
         // Create Canopsis event, see: https://github.com/capensis/canopsis/wiki/Event-specification
         switch ($obj['severity']) {
@@ -66,14 +69,12 @@ class Canopsis extends Transport
         $msg_raw = json_encode($msg_body);
 
         // Build routing key
-        if ($msg_body['source_type'] == 'resource') {
-            $msg_rk = $msg_rk . '.' . $msg_body['resource'];
-        } else {
-            $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
-        }
+        $msg_rk = '.' . $msg_body['resource'];
+        // non-resource key example
+        // $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
 
         // Publish Event
-        $msg = new \PhpAmqpLib\Message\AMQPMessage($msg_raw, ['content_type' => 'application/json', 'delivery_mode' => 2]);
+        $msg = new AMQPMessage($msg_raw, ['content_type' => 'application/json', 'delivery_mode' => 2]);
         $ch->basic_publish($msg, $exchange, $msg_rk);
 
         // Close connection

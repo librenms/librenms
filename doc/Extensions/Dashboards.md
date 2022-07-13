@@ -1,6 +1,3 @@
-source: Extensions/Dashboards.md
-path: blob/master/doc/
-
 # Dashboards
 
 Create customised dashboards in LibreNMS per user. You can share
@@ -16,7 +13,7 @@ LibreNMS has a whole list of Widgets to select from.
 
 - Alerts Widget: Displays all alert notifications.
 - Availability Map: Displays all devices with colored tiles, green up,
-  yellow for warning (device has been restarted in last 24 hours),red
+  yellow for warning (device has been restarted in last 24 hours), red
   for down. You can also list all services and ignored/disabled
   devices in this widget.
 - Components Status: List all components Ok state, Warning state, Critical state.
@@ -42,8 +39,8 @@ LibreNMS has a whole list of Widgets to select from.
   from override sysLocation.
 
 List of Widgets:
-![List of Widgets][image of widgets]
 
+![List of Widgets][image of widgets]  
 [image of widgets]: /img/list-widgets.png "List of the widgets"
 
 ## Dashboard Permissions
@@ -62,7 +59,7 @@ on what you want the users access to change.
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings
 and set the global default dashboard.
 
-## Setting embeded webpage
+## Setting embedded webpage
 
 Using the Notes Widget.
 
@@ -74,15 +71,15 @@ Using the Notes Widget.
 
 Note you may need to play with the width and height and also size your widget properly.
 
-``` src="url" ``` needs to be URL to webpage your linking to.
-Also some web pages may not support html embeded or iframe.
+``` src="url" ``` needs to be URL to webpage you are linking to.
+Also some web pages may not support html embedded or iframe.
 ![Example embed webpage](/img/example-embed-website.png)
 
 ## How to create ports graph
 
 In the dashboard, you want to create an interface graph select the widget called
 
-'Graph' then select "Port" "Bits"
+'Graph' then select "Port" -> "Bits"
 ![port-bits-graph](/img/port-bits-graph.png)
 
 Note: you can map the port by description or the alias or by port

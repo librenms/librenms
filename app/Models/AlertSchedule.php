@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,9 +31,13 @@ use Date;
 use DB;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 
+/**
+ * @method static \Database\Factories\AlertScheduleFactory factory(...$parameters)
+ */
 class AlertSchedule extends Model
 {
     use HasFactory;
@@ -202,17 +207,17 @@ class AlertSchedule extends Model
 
     // ---- Define Relationships ----
 
-    public function devices()
+    public function devices(): MorphToMany
     {
         return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
-    public function deviceGroups()
+    public function deviceGroups(): MorphToMany
     {
         return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
-    public function locations()
+    public function locations(): MorphToMany
     {
         return $this->morphedByMany(\App\Models\Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }

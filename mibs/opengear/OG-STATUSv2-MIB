@@ -2,7 +2,7 @@
 -- == OG-STATUSv2-MIB:                                                  ==
 -- == Opengear status Management Information Base                    ==
 -- ==                                                                 ==
--- == (c) Copyright 2013-2017 Opengear Inc.                                ==
+-- == (c) Copyright 2013-2020 Opengear Inc.                                ==
 -- =====================================================================
 
 OG-STATUSv2-MIB DEFINITIONS ::= BEGIN
@@ -20,13 +20,16 @@ IMPORTS
 		FROM SNMPv2-TC;
 
 ogStatus2 MODULE-IDENTITY
-	LAST-UPDATED "201702030000Z"
+	LAST-UPDATED "202011100000Z"
 	ORGANIZATION "Opengear Inc."
 	CONTACT-INFO
 		"Opengear Inc.
 		 630 West 9560 South, Suite A,
 		 Sandy, UT 84070
 		 support@opengear.com"
+	DESCRIPTION
+		"Extended network interface status for failover"
+	REVISION "202011100000Z"
 	DESCRIPTION
 		"Opengear extended status and alert MIB"
 	REVISION "201702030000Z"
@@ -1043,7 +1046,8 @@ NetInterfaceEntry ::= SEQUENCE {
         ogNetInterfaceIndex Integer32,
         ogNetInterfaceName  DisplayString,
         ogNetInterfaceType  INTEGER,
-        ogNetInterfaceState INTEGER
+        ogNetInterfaceState INTEGER,
+        ogNetInterfaceFailoverState INTEGER
 }
 
 ogNetInterfaceIndex OBJECT-TYPE
@@ -1090,6 +1094,21 @@ ogNetInterfaceState OBJECT-TYPE
 	DESCRIPTION
 		"The current status of this network interface entry."
 	::= { ogNetInterfaceEntry 4 }
+
+ogNetInterfaceFailoverState OBJECT-TYPE
+	SYNTAX INTEGER {
+		active(1),
+		failed(2),
+		dormant(3),
+		standby(4)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The failover status of this interface.
+		 The primary interface is either active or failed.
+		 The secondary interface is either standby, dormant or active."
+	::= { ogNetInterfaceEntry 5 }
 
 ogPowerSupplyTable OBJECT-TYPE
 	SYNTAX  SEQUENCE OF PowerSupplyEntry
@@ -3927,6 +3946,7 @@ ogBasicStatusGroup OBJECT-GROUP
 	ogNetInterfaceName,
 	ogNetInterfaceType,
 	ogNetInterfaceState,
+	ogNetInterfaceFailoverState,
 	ogPowerSupplyName,
 	ogPowerSupplyInputVoltage,
 	ogPowerSupplyOutputCurrent,

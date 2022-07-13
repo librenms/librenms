@@ -32,6 +32,7 @@ $rancid_map['edgeos'] = 'edgerouter';
 $rancid_map['edgeswitch'] = 'edgemax';
 $rancid_map['f5'] = 'f5';
 $rancid_map['fortigate'] = 'fortigate';
+$rancid_map['fortiswitch'] = 'fortigate';
 $rancid_map['ftos'] = 'force10';
 $rancid_map['ios'] = 'cisco';
 $rancid_map['iosxe'] = 'cisco';
@@ -51,6 +52,9 @@ $rancid_map['radlan'] = 'at';
 $rancid_map['ciscowlc'] = 'cisco-wlc8';
 $rancid_map['comware'] = 'h3c';
 $rancid_map['panos'] = 'paloalto';
+$rancid_map['fs-switch'] = 'cisco';
+$rancid_map['vyos'] = 'vyos';
+$rancid_map['mrv-od'] = 'mrv';
 
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
     if (isset($rancid_map[$devices['os']])) {

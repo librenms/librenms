@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,7 +41,7 @@ class NetCommand extends Controller
             'query' => 'ip_or_hostname',
         ]);
 
-        ini_set('allow_url_fopen', 0);
+        ini_set('allow_url_fopen', '0');
 
         switch ($request->get('cmd')) {
             case 'whois':

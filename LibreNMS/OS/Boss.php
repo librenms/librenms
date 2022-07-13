@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,10 +41,10 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         $version = $version_matches[1] ?? null;
 
         if (empty($version)) {
-            $version = explode(' on', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2272.1.1.7.0', '-Oqvn'))[0] ?? null;
+            $version = explode(' on', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.2272.1.1.7.0', '-Oqvn'))[0] ?: null;
         }
         if (empty($version)) {
-            $version = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.4.2.1.10.0', '-Oqvn') ?? null;
+            $version = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.4.2.1.10.0', '-Oqvn') ?: null;
         }
         $device->version = $version;
 
@@ -53,7 +54,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
         // Make boss devices hardware string compact
         $details = str_replace('Ethernet Routing Switch ', 'ERS-', $details);
         $details = str_replace('Virtual Services Platform ', 'VSP-', $details);
-        $device->hardware = explode(' ', $details, 2)[0] ?? null;
+        $device->hardware = explode(' ', $details, 2)[0] ?: null;
 
         // Is this a 5500 series or 5600 series stack?
         $stack = snmp_walk($this->getDeviceArray(), '.1.3.6.1.4.1.45.1.6.3.3.1.1.6.8', '-OsqnU');

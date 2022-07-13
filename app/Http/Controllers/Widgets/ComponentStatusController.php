@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,7 +38,7 @@ class ComponentStatusController extends WidgetController
     ];
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)
@@ -63,7 +64,7 @@ class ComponentStatusController extends WidgetController
             ->groupBy('status')
             ->where('disabled', '!=', 0)
             ->when($data['device_group'], function ($query) use ($data) {
-                $query->inDeviceGroup($data['device_group']);
+                return $query->inDeviceGroup($data['device_group']);
             })
             ->get()->pluck('total', 'status')->toArray();
 

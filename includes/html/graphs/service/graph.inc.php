@@ -32,7 +32,7 @@ if (isset($vars['id'])) {
 }
 
 // We know our service. build the filename.
-$rrd_filename = rrd_name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
 
 // if we have a script for this check, use it.
 $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
@@ -68,7 +68,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
     $ds = $vars['ds'];
     $label = $graphinfo[$vars['ds']];
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         if (isset($check_graph)) {
             // We have a graph definition, use it.
             $rrd_additions .= $check_graph[$ds];

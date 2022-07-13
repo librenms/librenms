@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -25,6 +26,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Telegram extends Transport
 {
@@ -40,7 +42,7 @@ class Telegram extends Transport
     public static function contactTelegram($obj, $data)
     {
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         $text = urlencode($obj['msg']);
         $format = '';
         if ($data['format']) {
@@ -54,8 +56,7 @@ class Telegram extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $api); //FIXME: propper debuging
+            var_dump('Telegram returned Error'); //FIXME: propper debuging
             var_dump('Return: ' . $ret); //FIXME: propper debuging
 
             return 'HTTP Status code ' . $code . ', Body ' . $ret;

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -99,7 +100,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
                     'mempool_descr' => $entity_name[$index],
                     'mempool_precision' => 1,
                     'mempool_perc_oid' => ".1.3.6.1.4.1.25506.2.6.1.1.1.1.8.$index",
-                ]))->fillUsage(null, $entry['hh3cEntityExtMemSize'], null, $entry['hh3cEntityExtMemUsage']));
+                ]))->fillUsage(null, $entry['hh3cEntityExtMemSize'] ?? null, null, $entry['hh3cEntityExtMemUsage'] ?? null));
             }
         }
 

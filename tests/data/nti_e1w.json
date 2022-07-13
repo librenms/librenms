@@ -1,0 +1,126 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.3699.1.1.12",
+                    "sysDescr": "ENVIROMUX-MICRO",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "nti",
+                    "type": "environment",
+                    "serial": null,
+                    "icon": "nti.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "humidity",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.2",
+                    "sensor_index": "extSensorValue.2",
+                    "sensor_type": "nti",
+                    "sensor_descr": "Luftfuktighet Skrivbord",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 21.9,
+                    "sensor_limit": 70,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 30,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.1",
+                    "sensor_index": "extSensorValue.1",
+                    "sensor_type": "nti",
+                    "sensor_descr": "Temp Skrivbord",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20.6,
+                    "sensor_limit": 40.6,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 10.6,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.3",
+                    "sensor_index": "extSensorValue.3",
+                    "sensor_type": "nti",
+                    "sensor_descr": "Daggpunkt Skrivbord",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -1.8,
+                    "sensor_limit": 18.2,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": -11.8,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.4",
+                    "sensor_index": "extSensorValue.4",
+                    "sensor_type": "nti",
+                    "sensor_descr": "Extra Temp Skrivbord",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20.3,
+                    "sensor_limit": 40.3,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 10.3,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -29,7 +29,7 @@ if ($device['os'] === 'boss') {
 
         $ers_sensors = [];
         foreach ($oid as $key => $value) {
-            if ($key['s5ChasComGrpIndx'] == 4 || $key['s5ChasComGrpIndx'] == 5 || $key['s5ChasComGrpIndx'] == 6) {
+            if ($value['s5ChasComGrpIndx'] == 4 || $value['s5ChasComGrpIndx'] == 5 || $value['s5ChasComGrpIndx'] == 6) {
                 $ers_sensors[$key] = $value;
             }
         }

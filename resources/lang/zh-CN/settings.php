@@ -15,45 +15,45 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => '一般警报设定',
-            'email' => '电子邮件设定',
+            'general' => ['name' => '一般警报设定'],
+            'email' => ['name' => '电子邮件设定'],
         ],
         'auth' => [
-            'general' => '一般验证设定',
-            'ad' => 'Active Directory 设定',
-            'ldap' => 'LDAP 设定',
+            'general' => ['name' => '一般验证设定'],
+            'ad' => ['name' => 'Active Directory 设定'],
+            'ldap' => ['name' => 'LDAP 设定'],
         ],
         'discovery' => [
-            'general' => '一般探索设定',
-            'route' => '路由探索模块',
+            'general' => ['name' => '一般探索设定'],
+            'route' => ['name' => '路由探索模块'],
         ],
         'external' => [
-            'binaries' => '执行文件位置',
-            'location' => '位置信息设定',
-            'graylog' => 'Graylog 整合',
-            'oxidized' => 'Oxidized 整合',
-            'peeringdb' => 'PeeringDB 整合',
-            'nfsen' => 'NfSen 整合',
-            'unix-agent' => 'Unix-Agent 整合',
+            'binaries' => ['name' => '执行文件位置'],
+            'location' => ['name' => '位置信息设定'],
+            'graylog' => ['name' => 'Graylog 整合'],
+            'oxidized' => ['name' => 'Oxidized 整合'],
+            'peeringdb' => ['name' => 'PeeringDB 整合'],
+            'nfsen' => ['name' => 'NfSen 整合'],
+            'unix-agent' => ['name' => 'Unix-Agent 整合'],
         ],
         'poller' => [
-            'distributed' => '分布式轮询器',
-            'ping' => 'Ping',
-            'rrdtool' => 'RRDTool 设定',
-            'snmp' => 'SNMP',
+            'distributed' => ['name' => '分布式轮询器'],
+            'ping' => ['name' => 'Ping'],
+            'rrdtool' => ['name' => 'RRDTool 设定'],
+            'snmp' => ['name' => 'SNMP'],
         ],
         'system' => [
-            'cleanup' => '清理',
-            'proxy' => 'Proxy',
-            'updates' => '更新',
-            'server' => '服务器',
+            'cleanup' => ['name' => '清理'],
+            'proxy' => ['name' => 'Proxy'],
+            'updates' => ['name' => '更新'],
+            'server' => ['name' => '服务器'],
         ],
         'webui' => [
-            'availability-map' => '可用性地图设定',
-            'graph' => '图表设定',
-            'dashboard' => '信息广告牌设定',
-            'search' => '搜寻设定',
-            'style' => '样式',
+            'availability-map' => ['name' => '可用性地图设定'],
+            'graph' => ['name' => '图表设定'],
+            'dashboard' => ['name' => '信息广告牌设定'],
+            'search' => ['name' => '搜寻设定'],
+            'style' => ['name' => '样式'],
         ],
     ],
     'settings' => [
@@ -211,6 +211,15 @@ return [
             'description' => '系结使用者名称',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => '使用 STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => '停用',
+                'optional' => '选用',
+                'required' => '必要',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP 快取有效期',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -309,7 +318,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => '验证记录项目大于 (天)',
+            'description' => '验证记录项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -317,7 +326,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => '装置效能项目大于 (天)',
+            'description' => '装置效能项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
@@ -394,7 +403,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => '事件记录大于 (天)',
+            'description' => '事件记录大于',
             'help' => '由 daily.sh 进行清理作业',
         ],
         'favicon' => [
@@ -593,7 +602,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '连接埠大于 (天)',
+            'description' => '连接埠大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'public_status' => [
@@ -605,7 +614,7 @@ return [
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
         ],
         'route_purge' => [
-            'description' => '路由记录大于 (天)',
+            'description' => '路由记录大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -621,7 +630,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD 档案项目大于 (天)',
+            'description' => 'RRD 档案项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -715,7 +724,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog 项目大于 (天)',
+            'description' => 'Syslog 项目大于',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [
@@ -724,9 +733,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'traceroute 路径',
-        ],
-        'traceroute6' => [
-            'description' => 'traceroute6 路径',
         ],
         'unix-agent' => [
             'connection-timeout' => [

@@ -27,7 +27,7 @@ $colours = 'mixed';
 $unit_text = 'Satellites';
 $nototal = 1;
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
 $array = [
     'satellites' => ['descr' => 'Visible', 'area' => true],
     'satellites_used' => ['descr' => 'Used', 'area' => true],
@@ -35,7 +35,7 @@ $array = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -116,6 +117,6 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-key';
+        return 'fa-solid fa-key';
     }
 }

@@ -27,7 +27,7 @@ IMPORTS
 
 
 rlIPv6  MODULE-IDENTITY
-        LAST-UPDATED "200809250000Z"
+        LAST-UPDATED "200809250001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -796,7 +796,9 @@ RlInetStaticRouteEntry ::= SEQUENCE {
         rlInetStaticRouteType                  INTEGER,
         rlInetStaticRouteOwner                 INTEGER,
         rlInetStaticRouteRowStatus             RowStatus,
-        rlInetStaticRouteForwardingStatus      INTEGER
+        rlInetStaticRouteForwardingStatus      INTEGER,
+        rlInetStaticRouteTrackObject           Unsigned32,
+        rlInetStaticRouteTrackStatus		   INTEGER
     }
 
 
@@ -955,6 +957,27 @@ rlInetStaticRouteForwardingStatus OBJECT-TYPE
        (Note: ip interface down may be for two reason - its admin status or
        the L2 interface , on which the ip interface is configured, status"
     ::= { rlInetStaticRouteEntry 11 }
+
+rlInetStaticRouteTrackObject OBJECT-TYPE
+    SYNTAX       Unsigned32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Track object number"
+    DEFVAL { 0 }
+    ::= { rlInetStaticRouteEntry 12 }
+
+rlInetStaticRouteTrackStatus OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     up(0),
+                     down(1)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Track status"
+	DEFVAL { 0 }
+    ::= { rlInetStaticRouteEntry 13 }
 
 
 --- Clear entries from ipNetToPhysicalTable
@@ -1578,8 +1601,7 @@ rlInternInetStaticRoutePathCost OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "Path cost for this static route."
-    DEFVAL { 1 }
+       "Path cost for this static route. Value of 0 signs default value metric"
     ::= { rlInternInetStaticRouteEntry 7 }
 
 
@@ -1945,5 +1967,71 @@ rlIpv6DefaultUP OBJECT-TYPE
       field in the 802.1q VLAN tag of IPv4 frames sent by the
       CPU."
     ::= { rlIPv6 17 }
-    
+
+rlIpv6MtuSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "Sets the maximum transmission unit (MTU) size in bytes of IPv6 packets (payload)."
+    ::= { rlIPv6 18 }
+
+--- IPv6 Auxulary Mapping Table
+
+
+rlInetStaticRouteAuxMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlInetStaticRouteAuxMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entity's IPv6 auxulary mapping table. Serves to map nexthop ipv6 address to on-link prefix ifindex"
+    ::= { rlIPv6 19 }
+
+
+rlInetStaticRouteAuxMappingEntry OBJECT-TYPE
+    SYNTAX      RlInetStaticRouteAuxMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "An Auxulary Mapping table to find onlink prefix ifindex for ipv6 static route."
+    INDEX {
+        rlInetStaticRouteAuxMappingNextHopType,
+		rlInetStaticRouteAuxMappingNextHop
+    }
+    ::= { rlInetStaticRouteAuxMappingTable 1 }
+
+
+RlInetStaticRouteAuxMappingEntry ::= SEQUENCE {
+        rlInetStaticRouteAuxMappingNextHopType           InetAddressType,
+        rlInetStaticRouteAuxMappingNextHop               InetAddress,
+        rlInetStaticRouteAuxMappingNextHopIfIndex        InterfaceIndexOrZero
+    }
+
+rlInetStaticRouteAuxMappingNextHopType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The type of the address used as the next-hop address
+        for this route."
+   ::= { rlInetStaticRouteAuxMappingEntry 1 }
+
+
+rlInetStaticRouteAuxMappingNextHop OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The next-hop IP address"
+   ::= { rlInetStaticRouteAuxMappingEntry 2 }
+
+
+rlInetStaticRouteAuxMappingNextHopIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The ifIndex mapped to specified necthop address"
+    ::= { rlInetStaticRouteAuxMappingEntry 3 }
+
 END

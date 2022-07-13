@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
-use LibreNMS\Util\Colors;
+use LibreNMS\Util\Color;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -23,7 +23,7 @@ if ($mempools->isNotEmpty()) {
         <div class="panel-heading">
         ';
     echo '<a href="' . $mempools_url . '">';
-    echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
+    echo '<i class="fas fa-memory fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">
@@ -51,13 +51,13 @@ if ($mempools->isNotEmpty()) {
             $buffers = $mempools->firstWhere('mempool_class', '=', 'buffers');
             $cached = $mempools->firstWhere('mempool_class', '=', 'cached');
 
-            $available_used_all = round(($mempool->mempool_used + $buffers->mempool_used + $cached->mempool_used) / $mempool->mempool_total * 100);
+            $available_used_all = $mempool->mempool_total ? round(($mempool->mempool_used + $buffers->mempool_used + $cached->mempool_used) / $mempool->mempool_total * 100) : 0;
         }
 
         $total = Number::formatBi($mempool->mempool_total);
         $used = Number::formatBi($mempool->mempool_used);
         $free = Number::formatBi($mempool->mempool_free);
-        $percent_colors = Colors::percentage($mempool->mempool_perc, $mempool->mempool_perc_warn ?: null);
+        $percent_colors = Color::percentage($mempool->mempool_perc, $mempool->mempool_perc_warn ?: null);
 
         $graph_array = [
             'type' => 'mempool_usage',
@@ -76,15 +76,15 @@ if ($mempools->isNotEmpty()) {
         $graph_array['height'] = 20;
         $graph_array['bg'] = 'ffffff00';
         // the 00 at the end makes the area transparent.
-        $minigraph = generate_lazy_graph_tag($graph_array);
+        $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         $percentageBar = $available_used_all
             ? Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", "$available_used_all%", $mempool->mempool_perc_warn, $available_used_all)
             : Html::percentageBar(200, 20, $mempool->mempool_perc, "$mempool->mempool_perc%", '', $mempool->mempool_perc_warn);
         echo '<tr>
-            <td class="col-md-4">' . overlib_link($link, $mempool->mempool_descr, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . overlib_link($link, $percentageBar, $overlib_content) . '
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $mempool->mempool_descr, $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $percentageBar, $overlib_content) . '
             </a></td>
             </tr>';
     }//end foreach

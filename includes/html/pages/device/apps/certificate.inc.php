@@ -1,6 +1,6 @@
 <?php
 
-$domain_list = get_arrays_with_application($device, $app['app_id'], 'certificate');
+$domain_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'certificate');
 
 print_optionbar_start();
 
@@ -17,7 +17,7 @@ foreach ($domain_list as $label) {
     $cert_name = $label;
 
     if ($vars['cert_name'] == $cert_name) {
-        $label = sprintf('⚫ %s', $label);
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($cert_name_list, generate_link($label, $link_array, ['cert_name' => $cert_name]));

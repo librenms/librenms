@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'mysql', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
 $array = [
     'SFJn'  => 'Full Join',
@@ -13,7 +13,7 @@ $array = [
 ];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($var)) {

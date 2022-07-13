@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-jitter');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-jitter');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:jitter=' . $rrdfilename . ':jitter:AVERAGE ';
     $rrd_options .= " AREA:jitter#3333cc:'Jitter       ' ";

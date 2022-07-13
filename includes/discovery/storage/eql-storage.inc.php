@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'equalogic') {
+if ($device['os'] == 'equallogic') {
     $eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
     if (is_array($eql_storage)) {
@@ -28,7 +28,7 @@ if ($device['os'] == 'equalogic') {
             } else {
                 // Trying to search the last '.' and take something after it as index
                 $arrindex = explode('.', $index);
-                $newindex = (int) (end($arrindex)) + 0;
+                $newindex = (int) cast_number(end($arrindex));
                 if (is_int($newindex)) {
                     discover_storage($valid_storage, $device, $newindex, $fstype, 'eql-storage', $descr, $size, $units, $used);
                 }

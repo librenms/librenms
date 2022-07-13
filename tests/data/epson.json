@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -148,8 +146,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -339,44 +335,44 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer-supplies": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "ink",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Ink Supply Unit T9441/T945",
-                    "toner_capacity": 100,
-                    "toner_current": 1,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "ink",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Ink Supply Unit T9441/T9451/T9461",
+                    "supply_capacity": 100,
+                    "supply_current": 1,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "ink",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Ink Supply Unit T9442/T9452",
-                    "toner_capacity": 100,
-                    "toner_current": 1,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "ink",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Ink Supply Unit T9442/T9452",
+                    "supply_capacity": 100,
+                    "supply_current": 1,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "ink",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Ink Supply Unit T9443/T9",
-                    "toner_capacity": 100,
-                    "toner_current": 1,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "ink",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Ink Supply Unit T9443/T9453",
+                    "supply_capacity": 100,
+                    "supply_current": 1,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "ink",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Ink Supply Unit T9444/T94",
-                    "toner_capacity": 100,
-                    "toner_current": 1,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "ink",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Ink Supply Unit T9444/T9454",
+                    "supply_capacity": 100,
+                    "supply_current": 1,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 }
             ]
         },

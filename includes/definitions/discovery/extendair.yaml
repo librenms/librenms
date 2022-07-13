@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: ExaltComProducts::serialNumber.0
+    version: ExaltComProducts::firmwareVersion.0

@@ -31,6 +31,7 @@
             disabled: Boolean,
             required: Boolean,
             pattern: String,
+            "update-status": String,
             options: {}
         }
     }

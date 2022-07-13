@@ -58,6 +58,9 @@ $graphs['powerdns-recursor'] = [
     'cache_performance',
     'outqueries',
 ];
+$graphs['powermon'] = [
+    'consumption',
+];
 $graphs['pureftpd'] = [
     'bitrate',
     'connections',
@@ -306,6 +309,18 @@ $graphs['freeradius'] = [
     'proxy_acct',
     'queue',
 ];
+$graphs['suricata'] = [
+    'alert',
+    'packets',
+    'nasty_delta',
+    'nasty_percent',
+    'dec_proto',
+    'flow_proto',
+    'app_flows',
+    'app_tx',
+    'bytes',
+    'mem_use',
+];
 $graphs['zfs'] = [
     'arc_misc',
     'arc_size',
@@ -356,6 +371,22 @@ $graphs['voip-monitor'] = [
     'cpuload',
     'memoryusage',
     'openfiles',
+];
+$graphs['docker'] = [
+    'cpu_usage',
+    'pids',
+    'mem_limit',
+    'mem_used',
+    'mem_perc',
+];
+$graphs['supervisord'] = [
+    'totals',
+    'uptime',
+];
+$graphs['chronyd'] = [
+    'time',
+    'frequency',
+    'root',
 ];
 
 echo '<div class="panel panel-default">';

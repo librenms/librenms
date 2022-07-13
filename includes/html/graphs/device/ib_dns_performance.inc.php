@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'ib_dns_performance');
+$rrd_filename = Rrd::name($device['hostname'], 'ib_dns_performance');
 $rrd_options .= " --vertical-label='Answer time in milliseconds'";
 $rrd_options .= " --lower-limit='0'";
 

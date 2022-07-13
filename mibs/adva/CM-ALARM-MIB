@@ -19,22 +19,117 @@ IMPORTS
 
 
 cmAlarmMIB MODULE-IDENTITY
-    LAST-UPDATED    "201512210000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202003010000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Alarm Monitoring MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201512210000Z"
+             Copyright (C) ADVA."
+    REVISION        "202003010000Z"
     DESCRIPTION
             "
+            Notes from release 202003010000Z
+               (1) Added new literal to CmAlarmEntityType
+                   l3ptpport(234)
+		   
+            Notes from release 202002200000Z
+               (1) added new TEXTUAL-CONVENTION to CmConditionType
+                   - invalid-syscfg
+                   
+            Notes from release 202001300000Z
+               (1) Added new literals to CmConditionType
+                   - spoofing-pps
+                   - spoofing-loc
+           
+            Notes from release 202001140000Z
+               (1) Added new literals to CmConditionType
+                   - jamming
+                   - spoofing
+           
+            Notes from release 201911240000Z
+               (1) Added new literals to CmConditionType
+                    invalidsymkeypeering(401),                           
+                    auto-asymmetry-delay-fail(402),    
+                    no-certificate(403),              
+                    certificate-expired-soon(404),    
+                    bpvc(405),                        
+                    crcf(406),                        
+                    oofc(407),                        
+                    psuinputfail1(408),               
+                    psuinputfail2(409)                
+
+
+            Notes from release 201909130000Z
+               (1) Added new literals to CmAlarmEntityType
+                   - irig-card
+                   - irg-port-group
+            Notes from release 201908140000Z
+               (1) add ed new literals to CmAlarmEntityType.
+                   - oneru-xg120pro-sh-shelf,
+                   - eth-xg-120pro-sh-card
+
+            Notes from release 201907080000Z,
+               (1) Added new TEXTUAL-CONVENTION to CmConditionType
+                   - jamming, spoofing
+		   
+	    Notes from release 201903070000Z
+               (1) Added new literals to CmAlarmEntityType.
+                   - oneru-xg118proac-sh-shelf,
+                   - eth-xg-118proac-sh-card
+
+                   
+            Notes from release 201903050000Z
+               (1) Added new literals to CmAlarmEntityType.
+                   - ntp-clock
+               (2) Added new literals to CmConditionType
+                   local-cooling-fail
+
+            Notes from release 201809240000Z
+               (1) Added new literals to CmAlarmEntityType.
+                   - oneru-xg118pro-sh-shelf,
+                   - eth-xg-118pro-sh-card
+
+            Notes from release 201804190000Z
+               (1) Added new literals to CmAlarmEntityType.
+                   - oneru-xg116pro-h-shelf,
+                   - eth-xg-116pro-h-card
+
+            Notes from release 201802020000Z
+               (1) Added new literals to CmConditionType.
+               (2) Added new literals to CmAlarmEntityType.
+                   
+            Notes from release 201708220000Z
+               (1) CmAlarmEntityType: Added literals 
+                   oneru-osa5430-shelf, eth-csm-card, threeru-osa5440-shelf
+                   
+            Notes from release 201703170000Z
+               (1) CmConditionType: Added literals gatewayNotReachable, pdop-mask-cross
+               
+            Notes from release 201703080000Z
+               (1) CmConditionType: Added literals pps-not-generated, min-sat-1-thrshld-crossed, min-sat-2-thrshld-crossed
+               
+             Notes from release 201612190000Z
+
+               (1) CmConditionType: Added literals bmcaError, freeze, gpsFwUpgrade           
+               (2) CmAlarmEntityType: Added literals osa-ge-4s, elpgroup
+
+             Notes from release 201605240000Z
+               (1) added ge112proVm device (selves and cards) to CmAlarmEntityType 
+
+             Notes from release 201603150000Z
+               (1) added ge114proVm devices (H/CH/SCH/ selves and cards) to CmAlarmEntityType 
+               (2) added server-card to CmAlarmEntityType
+
              Notes from release 201512210000Z
                (1) Added new literal to CmConditionType (Release 8.1CC - XG210),
                    erpRingSegmentation
@@ -556,8 +651,72 @@ CmConditionType ::= TEXTUAL-CONVENTION
                  sjmaxtethrshld(354),
                  trafficArpTableFull(355),
                  erpRingSegmentation(356), -- ERP Interconnect Ring Segmentation Alarm
+                 gpsrcvrfail(357),
+                 noActiveRoute(358),
+                 vxlanDMac2DIPTableFull(359),
+                 bwExceedLagMemberPortSpeed(360),
+                 greRemoteUnreachable(361),
                  bweexceedsportspeed(362),
-                 servicediscarded(363)
+                 servicediscarded(363),
+                 bmcaError(364),
+                 freeze(365),                     
+                 gpsFwUpgrade(366),               
+                 storageWearout(367),             
+                 pps-not-generated(368),          
+                 min-sat-1-thrshld-crossed(369),  
+                 min-sat-2-thrshld-crossed(370),  
+                 gatewayNotReachable(371),        
+                 pdop-mask-cross(372),            
+                 nc-initInProgress(373),          
+                 primaryNtpSvr-auth-failed(374),  
+                 backupNtpSvr-auth-failed(375),   
+                 clock-class-mismatch(376),       
+                 hpg-switch-force(377),           
+                 hpg-switch-lockout(378),         
+                 hpg-switch-to-3gpp-path(379),    
+                 hpg-switch-to-fixed-path(380),   
+                 bgp-linkdown(381),               
+                 ospf-neighbour-lost(382),        
+                 traffic-ndptable-full(383),      
+                 dup-link-local-address(384),     
+                 dup-unicast-address(385),        
+                 ztp-failed(386),                 
+                 ztp-in-progress(387),            
+                 nc-runningConfigLocked(388),     
+                 pwrnoinput2(389), 
+                 keyExchangeStopped(390),
+                 security-error(391),
+                 pppoe-connection-failed(392),
+                 no-ipv6route-resource(393),
+                 sfp-firmware-revision-mismatch(394),
+                 vrrp-new-master(395),
+                 nontpkeys(396),                  
+                 timesrcunavailable(397),           
+                 syncsrcunavailable(398),
+                 local-cooling-fail(399),  
+                 jamming(400),
+                 spoofing(401),
+                 httpsSslCertExpiryPending(402),
+                 httpsSslCertExpired(403),
+                 srgb-collision(404),
+                 sid-collision(405),
+                 sr-index-out-of-range(406),
+                 novalidsymkeybroadcast(407), 
+                 patch-panel-mismatch(408),       
+                 fan-fail(409),
+                 invalidsymkeypeering(410),
+                 auto-asymmetry-delay-fail(411),
+                 no-certificate(412),
+                 certificate-expired-soon(413),
+                 bpvc(414),
+                 crcf(415),
+                 oofc(416),
+                 psuinputfail1(417),
+                 psuinputfail2(418),
+                 time-clock-degraded-system-time(419),
+                 spoofing-pps(420),
+                 spoofing-loc(421),
+                 invalid-syscfg(422)
                }
 
 
@@ -734,19 +893,96 @@ CmAlarmEntityType ::= TEXTUAL-CONVENTION
                  oneru-osa5421-shelf(145),
                  eth-osa5421-card(146),
                  mci(147),
-                 bits-x16(148),	 
+                 bits-x16(148),
                  bfdSession(149),
                  eomplsPw(150),
                  oneru-ge114g-shelf(151),
                  eth-ge-114g-card(152),
                  wifidongleport(153),
+                 oneru-ge114proVm-h-shelf(154),
+                 eth-ge-114proVm-h-card(155),
+                 oneru-ge114proVm-ch-shelf(156),
+                 eth-ge-114proVm-ch-card(157),
+                 oneru-ge114proVm-csh-shelf(158),
+                 eth-ge-114proVm-csh-card(159),
+                 server-card(160),
                  oneru-xg116pro-shelf(161),
                  eth-xg-116pro-card(162),
                  oneru-xg120pro-shelf(163),
-                 eth-xg-120pro-card(164)
-               }
-
-CmCondEffectType ::= TEXTUAL-CONVENTION
+                 eth-xg-120pro-card(164),
+                 pps-x16(165),
+                 clk-x16(166),
+                 todandpps-x16(167),
+                 vxlanSegment(168),
+                 vtep(169),
+                 ge101pro-shelf(170),
+                 eth-ge-101pro-card(171),
+                 greTunnel(172),
+                 go102pro-s-shelf(173),
+                 go102pro-sp-shelf(174),
+                 onru-cx101pro-30a-shelf(175),
+                 onru-cx102pro-30a-shelf(176),
+                 eth-go102pro-s-card(177),
+                 eth-go102pro-sp-card(178),
+                 eth-cx101pro-30a-card(179),
+                 eth-cx102pro-30a-card(180),
+                 osa-ge-4s(181),
+                 elpgroup(182),
+                 oneru-ge112proVm-shelf(183),
+                 eth-ge-112proVm-card(184),
+                 --oneru-osa5430-shelf(185),
+                 --eth-csm-card(186),
+                 --threeru-osa5440-shelf(187),
+                 --aux-osa(188),
+                 --bits-x16-enhanced(189),
+                 --osa-ge-4s-protected(190),
+                 hybrid-path-group(191),
+                 ge102pro-h-shelf(192),
+                 eth-ge-102pro-h-card(193),
+                 ge102pro-efmh-shelf(194),
+                 eth-ge-102pro-efmh-card(195),
+                 traffic-bgprouter-peer(196),
+                 traffic-ipv6-interface(197),
+                 oneru-xg116pro-h-shelf(198),
+                 eth-xg-116pro-h-card(199),
+                 go102pro-sm-shelf(200),
+                 eth-go102pro-sm-card(201),
+                 vrrp-router(202),
+                 ru1-osa5430-shelf(203),
+                 eth-csm-osa-card(204), 
+                 ru3-osa5440-shelf(205),  
+                 eth-osa5440-card(206), 
+                 aux-osa(207),
+                 bits-x16-enhanced(208),      
+                 osa-ge-4s-protected(209), 
+                 syncprotectiongroup(210),
+                 timeclockprotectiongroup(211),
+                 mciprotectiongroup(212),       
+                 oneru-xg118pro-sh-shelf(213),  
+                 eth-xg-118pro-sh-card(214),    
+                 ntp-clock(215),
+		 oneru-xg118proac-sh-shelf(216),
+                 eth-xg-118proac-sh-card(217),
+                 oneru-ge114proVm-sh-shelf(218),
+                 eth-ge-114proVm-sh-card(219),
+                 oneru-ge104-shelf(220),
+                 eth-ge-104-card(221),
+                 segment-routing(222),
+                 oneru-xg120pro-sh-shelf(223),
+                 eth-xg-120pro-sh-card(224),
+                 irig-card(225),                      
+                 irig-port-group(226),                
+                 nci(227),
+                 ru1-osa5422-shelf(228), 
+                 ru1-softsync-shelf(229),
+                 eth-osa5422-card(230),
+                 eth-softsync-card(231),
+                 mb-gnss-card(232),
+                 composite-clock-card(233),
+                 l3ptpport(234)
+               }                                
+                                                
+CmCondEffectType ::= TEXTUAL-CONVENTION         
     STATUS     current
     DESCRIPTION
         "Identifies the type of condition effect types."
@@ -1123,7 +1359,7 @@ cmSysCondAdditionalInfoObject OBJECT-TYPE
      ::= { cmSysCondEntry 12 }
 
 cmSysCondAdditionalInfoName OBJECT-TYPE
-    SYNTAX     DisplayString (SIZE (0..64))
+    SYNTAX     DisplayString (SIZE (0..256))
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION

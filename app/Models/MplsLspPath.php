@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class MplsLspPath extends Model implements Keyable
@@ -36,6 +37,7 @@ class MplsLspPath extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
+     *
      * @return string
      */
     public function getCompositeKey()
@@ -45,7 +47,7 @@ class MplsLspPath extends Model implements Keyable
 
     // ---- Define Relationships ----
 
-    public function lsp()
+    public function lsp(): BelongsTo
     {
         return $this->belongsTo(\App\Models\MplsLsp::class, 'lsp_id');
     }

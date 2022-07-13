@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-errorCount');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-errorCount');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:fecInErrorsCount=' . $rrdfilename . ':fecInErrorsCount:AVERAGE ';
     $rrd_options .= ' DEF:fecOutErrorsCount=' . $rrdfilename . ':fecOutErrorsCount:AVERAGE ';

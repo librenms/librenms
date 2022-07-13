@@ -170,7 +170,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`display`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (! Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
@@ -217,13 +217,13 @@ if (defined('SHOW_SETTINGS')) {
                     $deviceLabelOld = 'availability-map-oldview-box-up';
                     $host_up_count++;
                 }
-                $updowntime = ($device['uptime'] ? ' - ' : '') . formatUptime($device['uptime']);
+                $updowntime = ($device['uptime'] ? ' - ' : '') . \LibreNMS\Util\Time::formatInterval($device['uptime']);
             } else {
                 $deviceState = 'down';
                 $deviceLabel = 'label-danger';
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
-                $updowntime = ($device['last_polled'] ? ' - ' . formatUptime(time() - strtotime($device['last_polled'])) : '');
+                $updowntime = ($device['last_polled'] ? ' - ' . \LibreNMS\Util\Time::formatInterval(time() - strtotime($device['last_polled'])) : '');
             }
 
             if (AlertUtil::isMaintenance($device['device_id'])) {
@@ -237,7 +237,7 @@ if (defined('SHOW_SETTINGS')) {
                 if ($directpage == 'yes') {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
-                    <a href="' . generate_device_url($device) . '" title="' . $device_system_name . $updowntime . '">
+                    <a href="' . \LibreNMS\Util\Url::deviceUrl((int) $device['device_id']) . '" title="' . $device_system_name . $updowntime . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
@@ -250,12 +250,12 @@ if (defined('SHOW_SETTINGS')) {
                         $deviceLabel .= ' widget-availability-fixed';
                     }
                     $temp_output[] = '
-                    <a href="' . generate_device_url($device) . '" title="' . $device_system_name . $updowntime . '">
+                    <a href="' . \LibreNMS\Util\Url::deviceUrl((int) $device['device_id']) . '" title="' . $device_system_name . $updowntime . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
                     </a>';
                 }
             } else {
-                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device_system_name . $updowntime . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                $temp_output[] = "<a href='" . \LibreNMS\Util\Url::deviceUrl((int) $device['device_id']) . "' title='" . $device_system_name . $updowntime . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
             }
         }
     }
@@ -293,7 +293,7 @@ if (defined('SHOW_SETTINGS')) {
                     if ($directpage == 'yes') {
                         $deviceIcon = getIconTag($service);
                         $temp_output[] = '
-                        <a href="' . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . '" title="' . $service_system_name . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . $service_system_name . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
                             <div class="service-availability ' . $serviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                                 <span class="service-name-label label ' . $serviceLabel . ' label-font-border">' . $service['service_type'] . '</span>
                                 <span class="availability-label label ' . $serviceLabel . ' label-font-border">' . $serviceState . '</span>
@@ -308,12 +308,12 @@ if (defined('SHOW_SETTINGS')) {
                             $serviceLabel .= ' widget-availability-fixed';
                         }
                         $temp_output[] = '
-                        <a href="' . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . '" title="' . shorthost($service_system_name) . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
+                        <a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . '" title="' . shorthost($service_system_name) . ' - ' . $service['service_type'] . ' - ' . $service['service_desc'] . '">
                             <span class="label ' . $serviceLabel . ' widget-availability label-font-border">' . $serviceText . '</span>
                         </a>';
                     }
                 } else {
-                    $temp_output[] = "<a href='" . generate_url(['page' => 'device', 'tab' => 'services', 'device' => $service['device_id']]) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                    $temp_output[] = "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $service['device_id'], 'tab' => 'services']) . "' title='${service_system_name} - ${service['service_type']} - ${service['service_desc']}'><div class='" . $serviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
                 }
             }
         } else {

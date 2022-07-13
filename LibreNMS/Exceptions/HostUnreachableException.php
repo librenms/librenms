@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,15 +41,27 @@ class HostUnreachableException extends \Exception
 
     /**
      * Add additional reasons
-     * @param $message
+     *
+     * @param  string  $snmpVersion
+     * @param  string  $credentials
      */
-    public function addReason($message)
+    public function addReason(string $snmpVersion, string $credentials)
     {
-        $this->reasons[] = $message;
+        $vars = [
+            'version' => $snmpVersion,
+            'credentials' => $credentials,
+        ];
+
+        if ($snmpVersion == 'v3') {
+            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_credentials', $vars);
+        } else {
+            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_community', $vars);
+        }
     }
 
     /**
      * Get the reasons
+     *
      * @return array
      */
     public function getReasons()

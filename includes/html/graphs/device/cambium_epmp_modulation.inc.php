@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-modulation');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-epmp-modulation');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:uplinkMCSMode=' . $rrdfilename . ':uplinkMCSMode:AVERAGE ';
     $rrd_options .= ' DEF:downlinkMCSMode=' . $rrdfilename . ':downlinkMCSMode:AVERAGE ';

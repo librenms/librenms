@@ -1,0 +1,131 @@
+CISCOSB-ROUTEMAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                       FROM CISCOSB-MIB
+    InetAddressType,InetAddress,InetAddressIPv6     FROM INET-ADDRESS-MIB -- RFC2851
+    TEXTUAL-CONVENTION, DisplayString, RowStatus    FROM SNMPv2-TC
+    InterfaceIndexOrZero, InterfaceIndex            FROM IF-MIB              -- [RFC2863]
+    OBJECT-TYPE, Unsigned32                         FROM SNMPv2-SMI;
+
+
+rlRouteMap   MODULE-IDENTITY
+        LAST-UPDATED "201506080000A"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Route Map distribution mechanism."
+        REVISION "201506080000A"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 227 }
+
+
+-- ============================================================
+--                     rlRouteMapPbrTable
+-- ============================================================
+
+RlRouteMapInetType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The inet type of a route map"
+     SYNTAX INTEGER {
+            ipv4(1),
+            ipv6(2)
+     }
+
+rlRouteMapPbrTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlRouteMapPbrEntry
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION        "Main table serving as container for route map table definition."
+   ::= { rlRouteMap 1 }
+
+rlRouteMapPbrEntry OBJECT-TYPE
+    SYNTAX  RlRouteMapPbrEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The row definition for this table."
+    INDEX { rlRouteMapPbrRouteMapName,
+            rlRouteMapPbrRouteMapSectionId,
+	    rlRouteMapPbrInetType }
+    ::= { rlRouteMapPbrTable 1 }
+
+RlRouteMapPbrEntry ::= SEQUENCE {
+    rlRouteMapPbrRouteMapName                  DisplayString,
+    rlRouteMapPbrRouteMapSectionId             Unsigned32,
+    rlRouteMapPbrInetType                      RlRouteMapInetType,
+    rlRouteMapPbrMatchAccessListName           DisplayString,
+    rlRouteMapPbrActionNexthopInetAddressType  InetAddressType,
+    rlRouteMapPbrActionNexthopInetAddress      InetAddress,
+    rlRouteMapPbrActionNexthopIfIndex          InterfaceIndexOrZero,
+    rlRouteMapPbrRowStatus                     RowStatus
+}
+
+rlRouteMapPbrRouteMapName OBJECT-TYPE
+   SYNTAX       DisplayString(SIZE(1..32))
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "Name (identifier) of the route map."
+   ::= { rlRouteMapPbrEntry 1 }
+
+rlRouteMapPbrRouteMapSectionId OBJECT-TYPE
+   SYNTAX       Unsigned32 (1..4294967295)
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION  "Identifier of single section the route map."
+   ::= { rlRouteMapPbrEntry 2 }
+
+rlRouteMapPbrInetType OBJECT-TYPE
+   SYNTAX       RlRouteMapInetType
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "Inet type of this route-map."
+   ::= { rlRouteMapPbrEntry 3 }
+
+rlRouteMapPbrMatchAccessListName OBJECT-TYPE
+   SYNTAX       DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "Identifier of access list, if used for matching."
+   DEFVAL       { "" }
+   ::= { rlRouteMapPbrEntry 4 }
+   
+rlRouteMapPbrActionNexthopInetAddressType OBJECT-TYPE
+   SYNTAX       InetAddressType
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "The inet type of rlRouteMapPbrActionNexthopInetAddress"
+   ::= { rlRouteMapPbrEntry 5 }
+
+rlRouteMapPbrActionNexthopInetAddress OBJECT-TYPE
+   SYNTAX       InetAddress
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "Inet address of nexthop, if used for action."
+   ::= { rlRouteMapPbrEntry 6 }
+
+rlRouteMapPbrActionNexthopIfIndex OBJECT-TYPE
+   SYNTAX       InterfaceIndexOrZero
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "Inet address of nexthop, if used for action."
+   ::= { rlRouteMapPbrEntry 7 }
+
+rlRouteMapPbrRowStatus OBJECT-TYPE
+   SYNTAX       RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION  "The row status of this entry."
+   ::= { rlRouteMapPbrEntry 8 }
+
+END
+

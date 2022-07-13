@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -25,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Component extends DeviceRelatedModel
 {
@@ -53,12 +55,12 @@ class Component extends DeviceRelatedModel
 
     // ---- Define Relationships ----
 
-    public function logs()
+    public function logs(): HasMany
     {
         return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
     }
 
-    public function prefs()
+    public function prefs(): HasMany
     {
         return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
     }

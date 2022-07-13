@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'netstats-ip_forward');
+$rrd_filename = Rrd::name($device['hostname'], 'netstats-ip_forward');
 
 $stats = ['ipCidrRouteNumber' => []];
 

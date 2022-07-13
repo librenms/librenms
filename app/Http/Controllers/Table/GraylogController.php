@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -117,8 +118,8 @@ class GraylogController extends SimpleTableController
         return [
             'severity'  => $this->severityLabel($level),
             'timestamp' => $displayTime,
-            'source'    => $device ? Url::deviceLink($device) : $message['message']['source'],
-            'message'   => $message['message']['message'] ?? '',
+            'source'    => $device ? Url::deviceLink($device) : htmlspecialchars($message['message']['source']),
+            'message'   => htmlspecialchars($message['message']['message'] ?? ''),
             'facility'  => is_numeric($facility) ? "($facility) " . __("syslog.facility.$facility") : $facility,
             'level'     => (is_numeric($level) && $level >= 0) ? "($level) " . __("syslog.severity.$level") : $level,
         ];
@@ -144,7 +145,8 @@ class GraylogController extends SimpleTableController
 
     /**
      * Cache device lookups so we don't lookup for every entry
-     * @param $source
+     *
+     * @param  mixed  $source
      * @return mixed
      */
     private function deviceFromSource($source)

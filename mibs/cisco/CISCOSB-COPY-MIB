@@ -11,7 +11,7 @@ IMPORTS
     RlSecSdAccessType                       FROM CISCOSB-SECSD-MIB; -- RFC2851
 
  rlCopy   MODULE-IDENTITY
-          LAST-UPDATED "201005110000Z"
+          LAST-UPDATED "202105170000Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -92,7 +92,9 @@ RlCopyFileType ::= TEXTUAL-CONVENTION
         null(10),
         logging(11),
         mirrorConfig(12),
-        usb(13)
+        usb(13),        
+        findit-tech-support(14),
+        language(15)        
 }
 RlCopySecSdAccessType ::= TEXTUAL-CONVENTION
     STATUS  current
@@ -631,7 +633,7 @@ rlCopySWToUnits NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity, rlCopyUnitsList }
     STATUS  current
     DESCRIPTION
-        "A trap indicating to master unit that remote units have finished
+        "A trap indicating to controller unit that remote units have finished
          a copy operation of image successfully."
     ::= { rndNotifications 212 }
 
@@ -939,7 +941,8 @@ RlCopyHistoryInetEntry ::= SEQUENCE {
     rlCopyHistoryInetRowStatus                     RowStatus,
     rlCopyHistoryInetErrorMessage                  DisplayString,
     rlCopyHistoryInetDestinationUnitList           INTEGER,
-    rlCopyHistoryInetUnitStatusList                INTEGER
+    rlCopyHistoryInetUnitStatusList                INTEGER,
+    rlCopyHistoryInetTotalFileSize		   INTEGER
 }
 
 rlCopyHistoryInetHistoryIndex OBJECT-TYPE
@@ -1133,6 +1136,13 @@ rlCopyHistoryInetUnitStatusList OBJECT-TYPE
         "A bitmap of copy operation status for each unit."
     ::= { rlCopyHistoryInetEntry 22 }
 
+rlCopyHistoryInetTotalFileSize  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total length of image/static file"
+    ::= {  rlCopyHistoryInetEntry 23 }
 
 rlCopyUnitsList OBJECT-TYPE
     SYNTAX     INTEGER
@@ -1171,8 +1181,10 @@ rlCopyOptionsEntry OBJECT-TYPE
     ::= { rlCopyOptionsTable  1 }
 
 RlCopyOptionsEntry ::= SEQUENCE {
-    rlCopyOptionsIndex               Unsigned32,
-    rlCopyOptionsRequestedSsdAccess  RlCopySecSdAccessType
+    rlCopyOptionsIndex               		Unsigned32,
+    rlCopyOptionsRequestedSsdAccess  		RlCopySecSdAccessType,
+    rlCopyOptionsCheckFilePermission 		TruthValue,
+    rlCopyOptionsCheckSystemReservedStorage 	TruthValue
 }
 
 rlCopyOptionsIndex OBJECT-TYPE
@@ -1192,6 +1204,24 @@ rlCopyOptionsRequestedSsdAccess  OBJECT-TYPE
     DEFVAL { default }
     ::= { rlCopyOptionsEntry 2 }
 
+rlCopyOptionsCheckFilePermission  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Controls whether to check file permissions during copy."
+    DEFVAL { true }
+    ::= { rlCopyOptionsEntry 3 }
+	
+rlCopyOptionsCheckSystemReservedStorage  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Controls whether to check system reserved storage during copy."
+    DEFVAL { true }
+    ::= { rlCopyOptionsEntry 4 }
+	
 rlCopyMirror OBJECT IDENTIFIER ::= { rlCopy 13 }
 
 rlCopyMirrorEnable  OBJECT-TYPE
@@ -1218,6 +1248,7 @@ rlCopyStaticDowngradeStatus  OBJECT-TYPE
     ::= { rlCopy 14 }
 
 
+	
 
 
 END

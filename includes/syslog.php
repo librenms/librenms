@@ -1,8 +1,5 @@
 <?php
 
-// FIXME : use db functions properly
-// $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
-// $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.port_id = A.port_id");
 use LibreNMS\Config;
 
 function get_cache($host, $value)
@@ -56,8 +53,9 @@ function process_syslog($entry, $update)
     }
 
     $entry['host'] = preg_replace('/^::ffff:/', '', $entry['host']);
-    if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
-        $entry['host'] = $new_host;
+    $syslog_xlate = Config::get('syslog_xlate');
+    if (! empty($syslog_xlate[$entry['host']])) {
+        $entry['host'] = $syslog_xlate[$entry['host']];
     }
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {

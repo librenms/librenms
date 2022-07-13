@@ -28,13 +28,14 @@
  */
 
 use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');
 
-if (set_debug(isset($options['d']))) {
+if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 

@@ -62,12 +62,14 @@ if (in_array('mac', Config::get('network_map_items'))) {
                              `D1`.`os` AS `local_os`,
                              `D1`.`hostname` AS `local_hostname`,
                              `D1`.`sysName` AS `local_sysName`,
+                             `D1`.`display` AS `local_display`,
                              `D2`.`status` AS `remote_status`,
                              `D2`.`device_id` AS `remote_device_id`,
                              `D2`.`disabled` AS `remote_disabled`,
                              `D2`.`os` AS `remote_os`,
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
+                             `D2`.`display` AS `remote_display`,
                              `P1`.`port_id` AS `local_port_id`,
                              `P1`.`device_id` AS `local_port_device_id`,
                              `P1`.`ifName` AS `local_ifname`,
@@ -111,12 +113,14 @@ if (in_array('xdp', Config::get('network_map_items'))) {
                              `D1`.`disabled` AS `local_disabled`,
                              `D1`.`hostname` AS `local_hostname`,
                              `D1`.`sysName` AS `local_sysName`,
+                             `D1`.`display` AS `local_display`,
                              `D2`.`status` AS `remote_status`,
                              `D2`.`device_id` AS `remote_device_id`,
                              `D2`.`disabled` AS `remote_disabled`,
                              `D2`.`os` AS `remote_os`,
                              `D2`.`hostname` AS `remote_hostname`,
                              `D2`.`sysName` AS `remote_sysName`,
+                             `D2`.`display` AS `remote_display`,
                              `P1`.`port_id` AS `local_port_id`,
                              `P1`.`device_id` AS `local_port_device_id`,
                              `P1`.`ifName` AS `local_ifname`,
@@ -206,11 +210,15 @@ foreach ($list as $items) {
         'device_id'=>$items['local_device_id'],
         'os'=>$items['local_os'],
         'hostname'=>$items['local_hostname'],
+        'sysName' => $items['local_sysName'],
+        'display' => $items['local_display'],
     ];
     $remote_device = [
         'device_id'=>$items['remote_device_id'],
         'os'=>$items['remote_os'],
         'hostname'=>$items['remote_hostname'],
+        'sysName' => $items['remote_sysName'],
+        'display' => $items['remote_display'],
     ];
     $local_port = [
         'port_id'=>$items['local_port_id'],
@@ -231,10 +239,9 @@ foreach ($list as $items) {
 
     $local_device_id = $items['local_device_id'];
     if (! array_key_exists($local_device_id, $devices_by_id)) {
-        $items['sysName'] = $items['local_sysName'];
         $devices_by_id[$local_device_id] = [
             'id'=>$local_device_id,
-            'label'=>shorthost(format_hostname($items, $items['local_hostname']), 1),
+            'label'=>shorthost(format_hostname($local_device), 1),
             'title'=>generate_device_link($local_device, '', [], '', '', '', 0),
             'shape'=>'box',
         ];
@@ -251,8 +258,7 @@ foreach ($list as $items) {
 
     $remote_device_id = $items['remote_device_id'];
     if (! array_key_exists($remote_device_id, $devices_by_id)) {
-        $items['sysName'] = $items['remote_sysName'];
-        $devices_by_id[$remote_device_id] = ['id'=>$remote_device_id, 'label'=>shorthost(format_hostname($items, $items['remote_hostname']), 1), 'title'=>generate_device_link($remote_device, '', [], '', '', '', 0), 'shape'=>'box'];
+        $devices_by_id[$remote_device_id] = ['id'=>$remote_device_id, 'label'=>shorthost(format_hostname($remote_device), 1), 'title'=>generate_device_link($remote_device, '', [], '', '', '', 0), 'shape'=>'box'];
         if ($items['remote_disabled'] != '0') {
             $devices_by_id[$remote_device_id] = array_merge($devices_by_id[$remote_device_id], $node_disabled_style);
         } elseif ($items['remote_status'] == '0') {
@@ -270,8 +276,8 @@ foreach ($list as $items) {
     } else {
         $width = round(0.77 * pow($speed, 0.25));
     }
-    $link_in_used = ($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
-    $link_out_used = ($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100;
+    $link_in_used = $items['local_ifspeed'] ? (($items['local_ifinoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
+    $link_out_used = $items['local_ifspeed'] ? (($items['local_ifoutoctets_rate'] * 8) / $items['local_ifspeed'] * 100) : 0;
     if ($link_in_used > $link_out_used) {
         $link_used = $link_in_used;
     } else {
@@ -321,7 +327,7 @@ foreach ($list as $items) {
             [
                 'from'=>$items['local_device_id'],
                 'to'=>$items['remote_device_id'],
-                'label'=>shorten_interface_type($local_port['ifName']) . ' > ' . shorten_interface_type($remote_port['ifName']),
+                'label'=> \LibreNMS\Util\Rewrite::shortenIfType($local_port['ifName']) . ' > ' . \LibreNMS\Util\Rewrite::shortenIfType($remote_port['ifName']),
                 'title' => generate_port_link($local_port, "<img src='graph.php?type=port_bits&amp;id=" . $items['local_port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>\n", '', 0, 1),
                 'width'=>$width,
             ],

@@ -23,11 +23,19 @@ IMPORTS
             FROM DELLEMC-OS10-SMI-MIB;
 
 os10TextualConventionsMib MODULE-IDENTITY
-        LAST-UPDATED "201805151200Z"
+        LAST-UPDATED "201907031200Z"
         ORGANIZATION "Dell EMC"
         CONTACT-INFO "http://www.dell.com/support"
         DESCRIPTION
             "The Textual Convention of Dell EMC Networking  OS10 MIB."
+
+        REVISION     "201907031200Z"
+        DESCRIPTION
+            "Add N3248TE and Mt. Evans products." 
+
+        REVISION     "201903071200Z"
+        DESCRIPTION
+            "Add Z9332F and Mt. Echo products." 
 
         REVISION     "201805151200Z"
         DESCRIPTION
@@ -93,6 +101,8 @@ os10TextualConventionsMib MODULE-IDENTITY
                 s5232Fon(25),      -- Dell EMC Networking OS10 S5232F-ON access switch
                 s5248Fon(26),      -- Dell EMC Networking OS10 S5248F-ON access switch
                 s5296Fon(27),      -- Dell EMC Networking OS10 S5296F-ON access switch
+                z9332Fon(28),      -- Dell EMC Networking OS10 Z9332F-ON access switch
+                n3248TEon(29),     -- Dell EMC Networking OS10 N3248TE-ON access switch
                 unknown(9999)
 		    }
 
@@ -149,6 +159,8 @@ os10TextualConventionsMib MODULE-IDENTITY
                 s5232Fon(25),      -- S5232F-ON 32x100GbE QSFP28, 2x10GbE SFP28 Interface Module
                 s5248Fon(26),      -- S5248F-ON 48x100GbE SFP28, 4x100GbE QSFP28, 2x200GbE QSFP-DD Interface Module
                 s5296Fon(27),      -- S5296F-ON 96x25GbE SFP28, 8x100GbE QSFP28 Interface Module
+                z9332Fon(28),      -- Z9332F-ON Tomahawk 3 32x400G, 2x10Gbe Interface Module
+                n3248TEon(29),     -- N3248TE-ON 48x1G, 4x10G, SFP+ Interface Module
                 unknown(9999)      -- unknown line card
             }
 

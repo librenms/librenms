@@ -1,4 +1,3 @@
-<h3> Applications </h3>
 <?php
 
 use LibreNMS\Config;
@@ -23,7 +22,7 @@ $enabled_apps = array_reduce(dbFetchRows(
 echo '<ul class="list-group row">';
 foreach ($applications as $app) {
     $modifiers = '';
-    $app_text = nicecase($app);
+    $app_text = \LibreNMS\Util\StringHelpers::niceCase($app);
     // check if the app exists in the enable apps array and check if it was automatically enabled
     if (isset($enabled_apps[$app])) {
         $modifiers = ' checked';

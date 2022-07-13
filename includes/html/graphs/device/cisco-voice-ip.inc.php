@@ -14,8 +14,8 @@
 
 include 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = rrd_name($device['hostname'], 'cisco-voice-ip');
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+$rrd_filename = Rrd::name($device['hostname'], 'cisco-voice-ip');
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                             Cur  Min  Max\\n'";
     $rrd_options .= ' DEF:sip=' . $rrd_filename . ':sip:AVERAGE ';
     $rrd_options .= ' DEF:sip_max=' . $rrd_filename . ':sip:MAX';

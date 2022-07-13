@@ -27,7 +27,9 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Device;
 use App\Models\Location;
+use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
+use LibreNMS\Util\StringHelpers;
 use Log;
 
 trait YamlOSDiscovery
@@ -65,6 +67,7 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml OS data:', $data);
 
+        $template_data = array_merge($this->getDevice()->only($this->osFields), $data);
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
                 // extract via regex if requested
@@ -74,10 +77,12 @@ trait YamlOSDiscovery
                 }
 
                 $device->$field = isset($os_yaml["{$field}_template"])
-                    ? $this->parseTemplate($os_yaml["{$field}_template"], $data)
+                    ? trim(SimpleTemplate::parse($os_yaml["{$field}_template"], $template_data))
                     : $value;
             }
         }
+
+        $this->replaceStringsInFields($device, $os_yaml);
     }
 
     public function fetchLocation(): Location
@@ -93,8 +98,10 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml location data:', $data);
 
+        $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+
         return new Location([
-            'location' => $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv'),
+            'location' => StringHelpers::inferEncoding($location),
             'lat' => $this->findFirst($data, $lat, $numeric),
             'lng' => $this->findFirst($data, $lng, $numeric),
         ]);
@@ -128,13 +135,6 @@ trait YamlOSDiscovery
         }
     }
 
-    private function parseTemplate($template, $data)
-    {
-        return trim(preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
-            return $data[$matches[1]] ?? '';
-        }, $template));
-    }
-
     private function translateSysObjectID($mib, $regex)
     {
         $device = $this->getDevice();
@@ -159,5 +159,18 @@ trait YamlOSDiscovery
         }
 
         return false;
+    }
+
+    private function replaceStringsInFields(Device $device, array $os_yaml): void
+    {
+        foreach ($this->osFields as $field) {
+            foreach ($os_yaml["{$field}_replace"] ?? [] as $replacements) {
+                if (is_array($replacements) && count($replacements) == 2) {
+                    $device->$field = str_replace($replacements[0], $replacements[1], $device->$field);
+                } elseif (is_string($replacements)) {
+                    $device->$field = str_replace($replacements, '', $device->$field);
+                }
+            }
+        }
     }
 }

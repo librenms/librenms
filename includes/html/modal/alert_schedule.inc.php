@@ -39,32 +39,32 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="title" class="col-sm-4 control-label">Title <exp>*</exp>: </label>
+                        <label for="title" class="col-sm-4 control-label">Title <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" id="title" name="title" placeholder="Maintenance title">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="notes" class="col-sm-4 control-label">Notes: </label>
+                        <label for="notes" class="col-sm-4 control-label">Notes </label>
                         <div class="col-sm-8">
                             <textarea class="form-control" id="notes" name="notes" placeholder="Maintenance notes"></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong>: </label>
+                        <label for="recurring" class="col-sm-4 control-label">Recurring <strong class="text-danger">*</strong> </label>
                         <div class="col-sm-8">
                             <input type="checkbox" id="recurring" name="recurring" data-size="small" data-on-text="Yes" data-off-text="No" onChange="recurring_switch();" value=0 />
                         </div>
                     </div>
                     <div id="norecurringgroup">
                         <div class="form-group">
-                            <label for="start" class="col-sm-4 control-label">Start <exp>*</exp>: </label>
+                            <label for="start" class="col-sm-4 control-label">Start <exp>*</exp> </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="start" name="start" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="end" class="col-sm-4 control-label">End <exp>*</exp>: </label>
+                            <label for="end" class="col-sm-4 control-label">End <exp>*</exp> </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="end" name="end" value="" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
@@ -72,31 +72,31 @@ if (\Auth::user()->hasGlobalAdmin()) {
                     </div>
                     <div id="recurringgroup" style="display:none;">
                         <div class="form-group">
-                            <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp>: </label>
+                            <label for="start_recurring_dt" class="col-sm-4 control-label">Start date <exp>*</exp> </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="start_recurring_dt" name="start_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="end_recurring_dt" class="col-sm-4 control-label">End date: </label>
+                            <label for="end_recurring_dt" class="col-sm-4 control-label">End date </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="end_recurring_dt" name="end_recurring_dt" value="" data-date-format="YYYY-MM-DD">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
+                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp> </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
+                            <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp> </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="recurring_day" class="col-sm-4 control-label">Only on weekday: </label>
+                            <label for="recurring_day" class="col-sm-4 control-label">Only on weekday </label>
                             <div class="col-sm-8">
                                 <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="1" />Mo</label></div>
                                 <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="2" />Tu</label></div>
@@ -109,7 +109,7 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         </div>
                     </div>
                     <div class="form-group">
-                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp>: </label>
+                         <label for='maps' class='col-sm-4 control-label'>Map To <exp>*</exp> </label>
                         <div class="col-sm-8">
                             <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                         </div>
@@ -254,7 +254,7 @@ function recurring_switch() {
     }
 }
 
-$('#sched-submit').click('', function(e) {
+$('#sched-submit').on("click", function(e) {
     e.preventDefault();
     // parse start/end to ISO8601
     var formData = $('form.schedule-maintenance-form').serializeArray();

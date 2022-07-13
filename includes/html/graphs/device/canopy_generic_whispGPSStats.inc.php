@@ -12,8 +12,8 @@
 $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-whispGPSStats');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-whispGPSStats');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Value    1 = Synched   2 = Lost Sync    3 = Generating   \\n'";
     $rrd_options .= ' DEF:whispGPSStats=' . $rrdfilename . ':whispGPSStats:AVERAGE ';
     $rrd_options .= ' -l 1 ';

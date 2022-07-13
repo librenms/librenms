@@ -26,24 +26,6 @@
                     "sysDescr": "Cambium ePMP",
                     "sysContact": "<private>",
                     "version": "4.5.6",
-                    "hardware": null,
-                    "features": null,
-                    "os": "epmp",
-                    "type": "wireless",
-                    "serial": "E2NF3572D8XT",
-                    "icon": "cambium.svg",
-                    "location": "<private>"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.17713.21",
-                    "sysDescr": "Cambium ePMP",
-                    "sysContact": "<private>",
-                    "version": "4.5.6",
                     "hardware": "ePTP Master",
                     "features": null,
                     "os": "epmp",
@@ -53,7 +35,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -72,8 +55,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -179,8 +160,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -290,8 +269,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 1000000000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -397,8 +374,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 220000000,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",

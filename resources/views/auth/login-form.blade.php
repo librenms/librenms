@@ -14,7 +14,7 @@
             {{ csrf_field() }}
             <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
                 <div class="col-md-12">
-                    <input type="text" name="username" id="username" value="{{ old('username') }}" class="form-control" placeholder="@lang('Username')" required autofocus />
+                    <input type="text" name="username" id="username" value="{{ old('username') }}" class="form-control" placeholder="{{ __('Username') }}" required autofocus />
                     @if ($errors->has('email'))
                         <span class="help-block">
                                     <strong>{{ $errors->first('username') }}</strong>
@@ -24,7 +24,7 @@
             </div>
             <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                 <div class="col-md-12">
-                    <input type="password" name="password" id="password" class="form-control" placeholder="@lang('Password')" />
+                    <input type="password" name="password" id="password" autocomplete="off" class="form-control" placeholder="{{ __('Password') }}" />
                     @if ($errors->has('password'))
                         <span class="help-block">
                                     <strong>{{ $errors->first('password') }}</strong>
@@ -36,7 +36,7 @@
                 <div class="col-md-12">
                     <div class="checkbox">
                         <label>
-                            <input type="checkbox" name="remember" id="remember" /> @lang('Remember Me')
+                            <input type="checkbox" name="remember" id="remember" /> {{ __('Remember Me') }}
                         </label>
                     </div>
                 </div>
@@ -44,10 +44,20 @@
             <div class="form-group">
                 <div class="col-md-12">
                     <button type="submit" id="login" class="btn btn-primary btn-block" name="submit">
-                        <i class="fa fa-btn fa-sign-in"></i> @lang('Login')
+                        <i class="fa fa-btn fa-sign-in"></i> {{ __('Login') }}
                     </button>
+        </form>
+
+                    @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+                    <br>
+                    <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
+                        {{ csrf_field() }}
+                        <button type="submit" id="login" class="btn btn-success btn-block">
+                            <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}
+                        </button>
+                    </form>
+                    @endforeach
                 </div>
             </div>
-        </form>
     </div>
 </x-panel>

@@ -15,6 +15,7 @@
 
 /**
  * IRC Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -27,6 +28,8 @@ use LibreNMS\Config;
 
 class Irc extends Transport
 {
+    protected $name = 'IRC';
+
     public function deliverAlert($obj, $opts)
     {
         return $this->contactIrc($obj, $opts);

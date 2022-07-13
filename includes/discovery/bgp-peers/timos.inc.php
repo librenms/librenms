@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 LibreNMS Contributors
  * @author     LibreNMS Contributors
  */
@@ -42,6 +43,7 @@ if (Config::get('enable_bgp')) {
 
         foreach ($bgpPeers as $vrfOid => $vrf) {
             $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
+            d_echo($vrfId);
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
 
@@ -79,11 +81,15 @@ if (Config::get('enable_bgp')) {
         $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier`, `vrf_oid` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
+            $checkVrf = ' AND vrf_id = ? ';
+            if (empty($vrfId)) {
+                $checkVrf = ' AND `vrf_id` IS NULL ';
+            }
             $vrfOid = $value['vrf_oid'];
             $address = $value['bgpPeerIdentifier'];
 
             if (empty($bgpPeers[$vrfOid][$address])) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]);
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;

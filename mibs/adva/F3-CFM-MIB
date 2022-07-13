@@ -8,9 +8,9 @@ IMPORTS
         TEXTUAL-CONVENTION 
                 FROM SNMPv2-TC
         dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier,
-        dot1agCfmMepEntry, Dot1agCfmMepId, Dot1agCfmMDLevel, dot1agCfmMaCompEntry
+        dot1agCfmMepEntry, Dot1agCfmMepId, Dot1agCfmMDLevel, dot1agCfmMaCompEntry, dot1agCfmMaNetEntry
                 FROM IEEE8021-CFM-MIB
-        MacAddress, RowStatus, TruthValue, VariablePointer, StorageType
+        DisplayString, MacAddress, RowStatus, TruthValue, VariablePointer, StorageType
                 FROM SNMPv2-TC
         InterfaceIndex
                 FROM IF-MIB
@@ -26,22 +26,29 @@ IMPORTS
 
 
 f3CfmMIB MODULE-IDENTITY
-    LAST-UPDATED    "201111220000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202101280000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the CFM (8021AG) Extension MIB definitions 
              used by the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201111220000Z"
+             Copyright (C) ADVA."
+    REVISION        "202101280000Z"
     DESCRIPTION
          "
+         Notes from release 201706220000Z,
+         (1) Added TEXTUAL-CONVENTION CfmPduVersionType
+         (2) Added object cfmMepVersion
+ 
          Notes from release 201302130000Z,
          (i)Added TEXTUAL-CONVENTION CfmSignalFailTriggers 
          (ii)Added scalar cfmSignalFailTriggers 
@@ -171,6 +178,17 @@ CfmSlmEnabledTypes ::= TEXTUAL-CONVENTION
                 cos7(7)
                }
 
+CfmPduVersionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the version of the Y.1731 OAM PDUs.
+          y1731-2008  -- Indicates the PDU formats defined in Y.1731-2008.
+          y1731-2011  -- Indicates the PDU formats defined in Y.1731-2011."
+    SYNTAX INTEGER {
+                notApplicable(0),
+                y1731-2008(1),
+                y1731-2011(2)
+               }
 
 --Scalars
 cfmExtScalars  OBJECT IDENTIFIER ::= {cfmExtSvcObjects 1}
@@ -284,7 +302,16 @@ CfmMepEntry ::= SEQUENCE {
     cfmMepOperationalState                   OperationalState,
     cfmMepSecondaryState                     SecondaryState,
     cfmMepSlmEnabled                         CfmSlmEnabledTypes,
-    cfmMepAssociatedObject                   VariablePointer
+    cfmMepAssociatedObject                   VariablePointer,
+    cfmMepPduVersion                         CfmPduVersionType,
+
+    -- LLC Params
+    cfmMepLlbResponderEnabled              TruthValue,
+    cfmMepLlbPortLLEnabled                 TruthValue, 
+    cfmMepLlbVidList                       DisplayString,
+
+    -- Interface Status TLV in CCM
+    cfmMepCcmInterfaceStatusTLVControl       TruthValue
 }
 
 cfmMepAdminState OBJECT-TYPE
@@ -518,6 +545,56 @@ cfmMepAssociatedObject OBJECT-TYPE
             "This object represents the associated port, it could be port, flow or flow point." 
     ::= { cfmMepEntry 23 }
 
+cfmMepPduVersion OBJECT-TYPE
+    SYNTAX      CfmPduVersionType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the version of the Y.1731 OAM PDUs"
+    ::= { cfmMepEntry 24 }
+
+cfmMepLlbResponderEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This attribute specifies whether Latching Loopback Responder
+         function is enabled."
+    ::= { cfmMepEntry 25 }
+
+cfmMepLlbPortLLEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute enables port loopback. In MEF 46 loopback is based
+         on LLFS (Latching Loopback Frame Set) which is untagged or tagged.
+         MEF 46 does not have the notion of port loopback. If this attribute
+         is true a port loopback will be activated instead of loopback for
+         untagged frames when LLFS is untagged."
+   ::= { cfmMepEntry 26 }
+
+cfmMepLlbVidList OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..512))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is a list of VIDs on which Latching Loopback is allowed.
+         An empty list indicates it is allowed on any VID. This list is
+         shall allow combination of individual VIDs and or ranges.
+         VIDs or VID ranges are comma separated. VID ranges are of the
+         form X1:X2 (range of VIDs from X1 to X2)."
+    ::= { cfmMepEntry 27 }
+
+cfmMepCcmInterfaceStatusTLVControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute controls MEP option of the insertion of the Interface 
+         Status TLV in CCM messages."
+   ::= { cfmMepEntry 28 }
+    
 --
 -- CFM QOS Shapers for Down MEPs on Access Port
 --
@@ -1018,6 +1095,165 @@ cfmMaCompEntity OBJECT-TYPE
     ::= { cfmMaCompEntry 2 }
 
 --
+-- extension table for manet
+--
+cfmMaNetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmMaNetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A additional list of MA."
+    ::= { cfmExtSvcObjects 10 }
+
+cfmMaNetEntry OBJECT-TYPE
+    SYNTAX     CfmMaNetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of additional maNetEntry."
+    AUGMENTS { dot1agCfmMaNetEntry }
+    ::= { cfmMaNetTable 1 }
+
+CfmMaNetEntry ::= SEQUENCE {
+    cfmMaNetRemoteMepAutoDiscovery              TruthValue,
+    cfmMaNetMepNumbers                          Unsigned32
+}
+
+cfmMaNetRemoteMepAutoDiscovery OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents whether learn remote mep automatically." 
+    ::= { cfmMaNetEntry 1 }
+
+cfmMaNetMepNumbers OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the max number of meps per MA." 
+    ::= { cfmMaNetEntry 2 }
+
+--
+-- CFM QOS Shapers for Down MEPs on Ethernet Traffic Port
+--
+cfmTrafficPortQosShaperTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmTrafficPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of configurable entries for CFM QoS Shapers for Traffic Ports."
+    ::= { cfmExtSvcObjects 11 }
+
+cfmTrafficPortQosShaperEntry OBJECT-TYPE
+    SYNTAX     CfmTrafficPortQosShaperEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of parameters that set up the CFM QoS Queue profiles.
+         This shaper is created automatically when the first Down MEP
+         is created on a Traffic Port."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetTrafficPortIndex, 
+            cfmTrafficPortQosShaperIndex }
+    ::= { cfmTrafficPortQosShaperTable 1 }
+
+CfmTrafficPortQosShaperEntry ::= SEQUENCE {
+    cfmTrafficPortQosShaperIndex       Integer32,
+    cfmTrafficPortQosShaperCIR         Unsigned32,
+    cfmTrafficPortQosShaperBufSize     Unsigned32,
+    cfmTrafficPortQosShaperAdminState  AdminState
+}
+
+cfmTrafficPortQosShaperIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A unique index associated with the type of Traffic Port Based Shaper.
+         Index 1 refers to the Shaper associated with PORT-based Down MEPs,
+         Index 2 refers to the Shaper associated with the VID-based Down MEPs."
+    ::= { cfmTrafficPortQosShaperEntry 1 }
+
+cfmTrafficPortQosShaperCIR OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue CIR."
+     ::= { cfmTrafficPortQosShaperEntry 2 }
+
+cfmTrafficPortQosShaperBufSize OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the queue buffer size."
+     ::= { cfmTrafficPortQosShaperEntry 3 }
+
+cfmTrafficPortQosShaperAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows the management of the Shaper Administrative State.
+          Only 'in-service' and 'management' states are allowed."
+     ::= { cfmTrafficPortQosShaperEntry 4 }
+
+--
+-- extension table for LLB MAC Address list
+--
+cfmMepLlbMacAddressTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CfmLlbMacAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A additional list of MAC Addresses."
+    ::= { cfmExtSvcObjects 12 }
+
+cfmLlbMacAddressEntry OBJECT-TYPE
+    SYNTAX     CfmLlbMacAddressEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the cfmMepLlbMacAddressTable."
+    INDEX { dot1agCfmMdIndex, dot1agCfmMaIndex, dot1agCfmMepIdentifier, cfmLlbMacAddress}
+    ::= { cfmMepLlbMacAddressTable 1 }
+
+CfmLlbMacAddressEntry ::= SEQUENCE {
+    cfmLlbMacAddress                 MacAddress,
+    cfmLlbMacAddressRowStatus        RowStatus
+}
+
+cfmLlbMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Latching Loopback MAC Addresses." 
+    ::= { cfmLlbMacAddressEntry 1 }
+
+cfmLlbMacAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "The status of this row.
+ 	        An entry MUST NOT exist in the active state unless all
+ 	        objects in the entry have an appropriate value, as described
+ 	        in the description clause for each writable object.
+ 	        
+ 	        The values of cfmLlbMacAddressRowStatus supported are
+ 	        createAndGo(4) and destroy(6).  All mandatory attributes
+ 	        must be specified in a single SNMP SET request with
+ 	        cfmLlbMacAddressRowStatus value as createAndGo(4).
+ 	        Upon successful row creation, this object has a
+ 	        value of active(1).
+ 	        
+ 	        The cfmLlbMacAddressRowStatus object may be modified if
+ 	        the associated instance of this object is equal to active(1)."
+    ::= { cfmLlbMacAddressEntry 2 }
+--
 -- Conformance Section
 --
 cfmExtSvcCompliances OBJECT IDENTIFIER ::= {cfmExtSvcConformance 1}
@@ -1087,7 +1323,8 @@ cfmMepGroup OBJECT-GROUP
         cfmMepOperationalState, cfmMepSecondaryState, cfmMepSlmEnabled, 
         cfmMepExcludedMepListIdentifier, cfmMepExcludedMepListRowStatus,
         cfmMepLbrMacAddress, cfmMepLbrMepId, cfmMepLbrInOrder, cfmMepLbrOutOfOder,
-        cfmMepAssociatedObject
+        cfmMepAssociatedObject, cfmMepPduVersion, cfmMepLlbResponderEnabled, 
+        cfmMepLlbPortLLEnabled, cfmMepLlbVidList, cfmLlbMacAddress, cfmMepCcmInterfaceStatusTLVControl
     }
     STATUS  current
     DESCRIPTION

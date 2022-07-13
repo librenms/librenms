@@ -1,6 +1,3 @@
-source: Extensions/RRDTune.md
-path: blob/master/doc/
-
 # RRDTune
 
 When we create rrd files for ports, we currently do so with a max

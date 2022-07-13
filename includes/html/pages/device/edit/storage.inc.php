@@ -13,9 +13,6 @@
  */
 
 ?>
-
-<h3>Storage Settings</h3>
-
 <div class="table-responsive">
     <table id="storage" class="table table-hover table-condensed storage">
         <thead>
@@ -51,7 +48,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".storage").blur(function(event) {
+        grid.find(".storage").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var storage_id = $(this).data("storage_id");

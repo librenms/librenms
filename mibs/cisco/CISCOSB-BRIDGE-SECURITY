@@ -13,7 +13,7 @@ IMPORTS
     switch001                                       FROM CISCOSB-MIB;
 
 rlBridgeSecurity MODULE-IDENTITY
-        LAST-UPDATED "200604020000Z"
+        LAST-UPDATED "200604020001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -36,6 +36,10 @@ rlIpSourceGuard OBJECT IDENTIFIER ::= { rlBridgeSecurity  2}
 rlIpArpInspect OBJECT IDENTIFIER ::= { rlBridgeSecurity  3}
 
 rlProtocolFiltering OBJECT IDENTIFIER ::= { rlBridgeSecurity  4}
+
+rlIpDhcpOpt82 OBJECT IDENTIFIER ::= { rlBridgeSecurity  5}
+
+
 --
 -- DHCP Snoop
 --
@@ -900,6 +904,274 @@ rlProtocolFilteringRowStatus       OBJECT-TYPE
    DESCRIPTION
      "A status can be destroy, active or createAndGo"
   ::= { rlProtocolFilteringEntry 2 }
+
+
+--
+-- DHCP Option82
+--
+rlIpDhcpOpt82ConfigEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION       "Specifies a DHCP option 82 configurable state."
+   ::= { rlIpDhcpOpt82 1 }
+
+
+rlIpDhcpOpt82SuboptionConfigTable  OBJECT-TYPE
+  SYNTAX  SEQUENCE OF RlIpDhcpOpt82SuboptionConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Protocol filter configuration entry"
+  ::= { rlIpDhcpOpt82 2 }
+
+rlIpDhcpOpt82SuboptionConfigEntry OBJECT-TYPE
+   SYNTAX      RlIpDhcpOpt82SuboptionConfigEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION        "The row definition for this table."
+   INDEX {rlIpDhcpOpt82SuboptionConfigIndex}
+::= { rlIpDhcpOpt82SuboptionConfigTable  1 }
+
+RlIpDhcpOpt82SuboptionConfigEntry::= SEQUENCE {
+   rlIpDhcpOpt82SuboptionConfigIndex                  INTEGER,
+   rlIpDhcpOpt82SuboptionConfigCircuitIdPayloadLength INTEGER,
+   rlIpDhcpOpt82SuboptionConfigCircuitIdFormat        DisplayString,
+   rlIpDhcpOpt82SuboptionConfigRemoteIdPayloadLength  INTEGER,
+   rlIpDhcpOpt82SuboptionConfigRemoteIdFormat         DisplayString,
+   rlIpDhcpOpt82SuboptionConfigNumericTokenFormat     INTEGER,
+   rlIpDhcpOpt82SuboptionConfigCircuitIdAuxFailFlag   TruthValue
+}
+
+rlIpDhcpOpt82SuboptionConfigIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry index. Must be 1"
+    ::= { rlIpDhcpOpt82SuboptionConfigEntry 1 }
+
+rlIpDhcpOpt82SuboptionConfigCircuitIdPayloadLength  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns CircuitId payload length."
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 2 }
+
+rlIpDhcpOpt82SuboptionConfigCircuitIdFormat       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..160))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the CircuitId format. Default is an empty string. Empty string means that CircuitId is added in a default format.
+        Non-empty string AND true value of rlIpDhcpOpt82SuboptionConfigCircuitIdSupported Scalar means that CircuitId is added in configured format"
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 3 }
+
+ rlIpDhcpOpt82SuboptionConfigRemoteIdPayloadLength       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Returns RemoteId payload length."
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 4 }
+
+rlIpDhcpOpt82SuboptionConfigRemoteIdFormat       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..160))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the RemoteId format. Default is an empty string. Empty string means that RemoteId is added in a default format.
+        Non-empty string AND true value of rlIpDhcpOpt82SuboptionConfigRemoteIdSupported Scalar means that RemoteId is added in configured format"
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 5 }
+
+rlIpDhcpOpt82SuboptionConfigNumericTokenFormat       OBJECT-TYPE
+    SYNTAX INTEGER{
+       hex(1),
+       ascii(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines the format of numeric tokens included in the Circuit-id and Remote-ID sub-options string."
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 6 }
+
+rlIpDhcpOpt82SuboptionConfigCircuitIdAuxFailFlag       OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Defines whatever to fail the CircuitId Suboption configuration"
+  ::= { rlIpDhcpOpt82SuboptionConfigEntry 7 }
+
+
+ --------------------------------------------------------------
+ -- rlIpDhcpOpt82SuboptionContentTable (Read Only)
+ --------------------------------------------------------------
+
+ rlIpDhcpOpt82SuboptionContentTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIpDhcpOpt82SuboptionContentEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION  "The table specifies option 82 content."
+    ::= { rlIpDhcpOpt82 3 }
+
+ rlIpDhcpOpt82SuboptionContentEntry OBJECT-TYPE
+    SYNTAX  RlIpDhcpOpt82SuboptionContentEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION   "The row definition for this table."
+    INDEX { rlIpDhcpOpt82SuboptionContentIfIndex,
+            rlIpDhcpOpt82SuboptionContentVlanTag }
+    ::= { rlIpDhcpOpt82SuboptionContentTable 1 }
+
+ RlIpDhcpOpt82SuboptionContentEntry ::= SEQUENCE {
+    rlIpDhcpOpt82SuboptionContentIfIndex               InterfaceIndex,
+    rlIpDhcpOpt82SuboptionContentVlanTag               VlanId,
+    rlIpDhcpOpt82SuboptionContentCircuitIdHeader       OCTET STRING,
+    rlIpDhcpOpt82SuboptionContentCircuitIdPayload160   OCTET STRING,
+    rlIpDhcpOpt82SuboptionContentCircuitIdPayload320   OCTET STRING,
+    rlIpDhcpOpt82SuboptionContentRemoteIdHeader        OCTET STRING,
+    rlIpDhcpOpt82SuboptionContentRemoteIdPayload160    OCTET STRING,
+    rlIpDhcpOpt82SuboptionContentRemoteIdPayload320    OCTET STRING
+    }
+
+ rlIpDhcpOpt82SuboptionContentIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The port's interface index."
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 1 }
+
+ rlIpDhcpOpt82SuboptionContentVlanTag OBJECT-TYPE
+    SYNTAX VlanId
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN identifier."
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 2 }
+
+ rlIpDhcpOpt82SuboptionContentCircuitIdHeader OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies option 82 CircuitId suboption header content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 3 }
+
+ rlIpDhcpOpt82SuboptionContentCircuitIdPayload160 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies option 82 CircuitId suboption payload first 160 bytes content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 4 }
+
+ rlIpDhcpOpt82SuboptionContentCircuitIdPayload320 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies option 82 CircuitId suboption payload second 160 bytes content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 5 }
+
+ rlIpDhcpOpt82SuboptionContentRemoteIdHeader OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "Specifies option 82 RemoteId suboption header content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 6 }
+
+ rlIpDhcpOpt82SuboptionContentRemoteIdPayload160 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies option 82 RemoteId suboption payload first 160 bytes content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 7 }
+
+ rlIpDhcpOpt82SuboptionContentRemoteIdPayload320 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies option 82 RemoteId suboption payload second 160 bytes content per interface/port"
+    ::= { rlIpDhcpOpt82SuboptionContentEntry 8 }
+
+
+ --------------------------------------------------------------
+ -- rlIpDhcpOpt82SuboptionTokenTable (Read Only)
+ --------------------------------------------------------------
+
+ rlIpDhcpOpt82SuboptionTokenTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIpDhcpOpt82SuboptionTokenEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION  "The table specifies option 82 content."
+    ::= { rlIpDhcpOpt82 4 }
+
+ rlIpDhcpOpt82SuboptionTokenEntry OBJECT-TYPE
+    SYNTAX  RlIpDhcpOpt82SuboptionTokenEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION   "The row definition for this table."
+    INDEX { rlIpDhcpOpt82SuboptionTokenName}
+    ::= { rlIpDhcpOpt82SuboptionTokenTable 1 }
+
+ RlIpDhcpOpt82SuboptionTokenEntry ::= SEQUENCE {
+    rlIpDhcpOpt82SuboptionTokenName                 DisplayString,
+    rlIpDhcpOpt82SuboptionTokenValue                DisplayString,
+    rlIpDhcpOpt82SuboptionTokenFormat               INTEGER,
+    rlIpDhcpOpt82SuboptionTokenReservedLength       INTEGER,
+    rlIpDhcpOpt82SuboptionTokenHexaLength           INTEGER
+    }
+
+ rlIpDhcpOpt82SuboptionTokenName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Token have meaningful and pre-determined names based on the information they represent. A $ symbol is placed before and after the Token name ($token-name$)."
+    ::= { rlIpDhcpOpt82SuboptionTokenEntry 1 }
+
+ rlIpDhcpOpt82SuboptionTokenValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Token description."
+    ::= { rlIpDhcpOpt82SuboptionTokenEntry 2 }
+
+ rlIpDhcpOpt82SuboptionTokenFormat OBJECT-TYPE
+    SYNTAX INTEGER{
+       hex(1),
+       ascii(2),
+       config(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Token format."
+    ::= { rlIpDhcpOpt82SuboptionTokenEntry 3 }
+
+ rlIpDhcpOpt82SuboptionTokenReservedLength OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Token reserved length."
+    ::= { rlIpDhcpOpt82SuboptionTokenEntry 4 }
+
+ rlIpDhcpOpt82SuboptionTokenHexaLength OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "If format is config, the hexa length is returned. Otherwise 0."
+    ::= { rlIpDhcpOpt82SuboptionTokenEntry 5 }
 
 END
 

@@ -14,9 +14,12 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Util\Proxy;
 
 class Osticket extends Transport
 {
+    protected $name = 'osTicket';
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {
@@ -31,6 +34,7 @@ class Osticket extends Transport
     {
         $url = $opts['url'];
         $token = $opts['token'];
+        $email = '';
 
         foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
             $email = $from_name . ' <' . $from . '>';
@@ -46,7 +50,7 @@ class Osticket extends Transport
             'attachments' => [],
         ];
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [

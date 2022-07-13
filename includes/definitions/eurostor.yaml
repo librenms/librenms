@@ -1,0 +1,8 @@
+os: eurostor
+text: 'EUROstor RAID Subsystem'
+icon: eurostor
+type: appliance
+mib_dir: proware
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.14752.1.3

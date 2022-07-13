@@ -14,6 +14,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Util\Proxy;
 
 class Kayako extends Transport
 {
@@ -39,7 +40,7 @@ class Kayako extends Transport
         $ticket_type = 1;
         $ticket_status = 1;
         $ticket_prio = 1;
-        $salt = mt_rand();
+        $salt = bin2hex(random_bytes(20));
         $signature = base64_encode(hash_hmac('sha256', $salt, $secret, true));
 
         $protocol = [
@@ -60,6 +61,7 @@ class Kayako extends Transport
         $post_data = http_build_query($protocol, '', '&');
 
         $curl = curl_init();
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

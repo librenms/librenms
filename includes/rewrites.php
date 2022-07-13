@@ -1,17 +1,6 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Util\Rewrite;
-
-function rewrite_location($location)
-{
-    return \LibreNMS\Util\Rewrite::location($location);
-}
-
-function formatMac($mac)
-{
-    return \LibreNMS\Util\Rewrite::readableMac($mac);
-}
 
 function rewrite_entity_descr($descr)
 {
@@ -43,15 +32,18 @@ function rewrite_entity_descr($descr)
  * Clean port values for html display
  * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
  *
- * @param array $interface
- * @param null|array $device
+ * @param  array  $interface
+ * @param  null|array  $device
  * @return mixed
  */
 function cleanPort($interface, $device = null)
 {
-    $interface['ifAlias'] = display($interface['ifAlias']);
-    $interface['ifName'] = display($interface['ifName']);
-    $interface['ifDescr'] = display($interface['ifDescr']);
+    if (! $interface) {
+        return $interface;
+    }
+    $interface['ifAlias'] = htmlentities($interface['ifAlias']);
+    $interface['ifName'] = htmlentities($interface['ifName']);
+    $interface['ifDescr'] = htmlentities($interface['ifDescr']);
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
@@ -97,40 +89,6 @@ function cleanPort($interface, $device = null)
     return $interface;
 }
 
-function translate_ifOperStatus($ifOperStatus)
-{
-    $translate_ifOperStatus = [
-        '1' => 'up',
-        '2' => 'down',
-        '3' => 'testing',
-        '4' => 'unknown',
-        '5' => 'dormant',
-        '6' => 'notPresent',
-        '7' => 'lowerLayerDown',
-    ];
-
-    if (isset($translate_ifOperStatus[$ifOperStatus])) {
-        $ifOperStatus = $translate_ifOperStatus[$ifOperStatus];
-    }
-
-    return $ifOperStatus;
-}
-
-function translate_ifAdminStatus($ifAdminStatus)
-{
-    $translate_ifAdminStatus = [
-        '1' => 'up',
-        '2' => 'down',
-        '3' => 'testing',
-    ];
-
-    if (isset($translate_ifAdminStatus[$ifAdminStatus])) {
-        $ifAdminStatus = $translate_ifAdminStatus[$ifAdminStatus];
-    }
-
-    return $ifAdminStatus;
-}
-
 // Specific rewrite functions
 
 function makeshortif($if)
@@ -156,70 +114,11 @@ function makeshortif($if)
         'bundle-ether'        => 'BE',
     ];
 
-    $if = fixifName($if);
+    $if = \LibreNMS\Util\Rewrite::normalizeIfName($if);
     $if = strtolower($if);
-    $if = array_str_replace($rewrite_shortif, $if);
+    $if = str_replace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $if);
 
     return $if;
-}
-
-function rewrite_ios_features($features)
-{
-    $rewrite_ios_features = [
-        'PK9S'                => 'IP w/SSH LAN Only',
-        'LANBASEK9'           => 'Lan Base Crypto',
-        'LANBASE'             => 'Lan Base',
-        'ADVENTERPRISEK9_IVS' => 'Advanced Enterprise Crypto Voice',
-        'ADVENTERPRISEK9'     => 'Advanced Enterprise Crypto',
-        'ADVSECURITYK9'       => 'Advanced Security Crypto',
-        'K91P'                => 'Provider Crypto',
-        'K4P'                 => 'Provider Crypto',
-        'ADVIPSERVICESK9'     => 'Adv IP Services Crypto',
-        'ADVIPSERVICES'       => 'Adv IP Services',
-        'IK9P'                => 'IP Plus Crypto',
-        'K9O3SY7'             => 'IP ADSL FW IDS Plus IPSEC 3DES',
-        'SPSERVICESK9'        => 'SP Services Crypto',
-        'PK9SV'               => 'IP MPLS/IPV6 W/SSH + BGP',
-        'IS'                  => 'IP Plus',
-        'IPSERVICESK9'        => 'IP Services Crypto',
-        'BROADBAND'           => 'Broadband',
-        'IPBASE'              => 'IP Base',
-        'IPSERVICE'           => 'IP Services',
-        'P'                   => 'Service Provider',
-        'P11'                 => 'Broadband Router',
-        'G4P5'                => 'NRP',
-        'JK9S'                => 'Enterprise Plus Crypto',
-        'IK9S'                => 'IP Plus Crypto',
-        'JK'                  => 'Enterprise Plus',
-        'I6Q4L2'              => 'Layer 2',
-        'I6K2L2Q4'            => 'Layer 2 Crypto',
-        'C3H2S'               => 'Layer 2 SI/EI',
-        '_WAN'                => ' + WAN',
-    ];
-
-    $type = array_preg_replace($rewrite_ios_features, $features);
-
-    return $features;
-}
-
-function rewrite_junose_hardware($hardware)
-{
-    $rewrite_junose_hardware = [
-        'juniErx1400' => 'ERX-1400',
-        'juniErx700'  => 'ERX-700',
-        'juniErx1440' => 'ERX-1440',
-        'juniErx705'  => 'ERX-705',
-        'juniErx310'  => 'ERX-310',
-        'juniE320'    => 'E320',
-        'juniE120'    => 'E120',
-        'juniSsx1400' => 'SSX-1400',
-        'juniSsx700'  => 'SSX-700',
-        'juniSsx1440' => 'SSX-1440',
-    ];
-
-    $hardware = array_str_replace($rewrite_junose_hardware, $hardware);
-
-    return $hardware;
 }
 
 function rewrite_generic_hardware($hardware)
@@ -230,17 +129,7 @@ function rewrite_generic_hardware($hardware)
         ' Inc.'                 => '',
     ];
 
-    return array_str_replace($rewrite_GenericHW, $hardware);
-}
-
-function fixiftype($type)
-{
-    return Rewrite::normalizeIfType($type);
-}
-
-function fixifName($inf)
-{
-    return Rewrite::normalizeIfName($inf);
+    return str_replace(array_keys($rewrite_GenericHW), array_values($rewrite_GenericHW), $hardware);
 }
 
 function short_hrDeviceDescr($dev)
@@ -254,7 +143,7 @@ function short_hrDeviceDescr($dev)
         '  '            => ' ',
     ];
 
-    $dev = array_str_replace($rewrite_hrDevice, $dev);
+    $dev = str_replace(array_keys($rewrite_hrDevice), array_values($rewrite_hrDevice), $dev);
     $dev = preg_replace('/\ +/', ' ', $dev);
     $dev = trim($dev);
 
@@ -271,25 +160,6 @@ function short_port_descr($desc)
     $desc = trim($desc);
 
     return $desc;
-}
-
-// Underlying rewrite functions
-function array_str_replace($array, $string)
-{
-    foreach ($array as $search => $replace) {
-        $string = str_replace($search, $replace, $string);
-    }
-
-    return $string;
-}
-
-function array_preg_replace($array, $string)
-{
-    foreach ($array as $search => $replace) {
-        $string = preg_replace($search, $replace, $string);
-    }
-
-    return $string;
 }
 
 function rewrite_adslLineType($adslLineType)

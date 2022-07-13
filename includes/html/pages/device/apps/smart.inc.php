@@ -1,6 +1,6 @@
 <?php
 
-$disks = get_arrays_with_application($device, $app['app_id'], 'smart');
+$disks = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'smart');
 
 print_optionbar_start();
 
@@ -17,7 +17,7 @@ foreach ($disks as $label) {
     $disk = $label;
 
     if ($vars['disk'] == $disk) {
-        $label = sprintf('⚫ %s', $label);
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]));

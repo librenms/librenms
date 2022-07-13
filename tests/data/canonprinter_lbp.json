@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -144,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -255,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -362,8 +356,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -485,17 +477,17 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer-supplies": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "markerSupply",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Canon Cartridge 719/719H",
-                    "toner_capacity": 100,
-                    "toner_current": 70,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "markerSupply",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Canon Cartridge 719/719H",
+                    "supply_capacity": 100,
+                    "supply_current": 70,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 }
             ]
         },

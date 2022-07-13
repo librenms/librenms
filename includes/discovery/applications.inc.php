@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -45,6 +46,7 @@ if ($results) {
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
     $applications['postfixdetailed'] = 'postfix';
+    $applications['suricata-stats'] = 'suricata';
 }
 
 d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_EOL);

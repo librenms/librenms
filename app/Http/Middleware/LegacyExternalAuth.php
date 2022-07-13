@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Models\User;
-use Auth;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Authentication\LegacyAuth;
 
 class LegacyExternalAuth

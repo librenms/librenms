@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,7 +31,7 @@ $params = [];
 
 if (! empty($_REQUEST['search'])) {
     $query .= ' WHERE `name` LIKE ?';
-    $params[] = '%' . mres($_REQUEST['search']) . '%';
+    $params[] = '%' . $_REQUEST['search'] . '%';
 }
 
 $total = dbFetchCell("SELECT COUNT(*) FROM `device_groups` $query", $params);

@@ -31,8 +31,7 @@
                     "app_status": "",
                     "app_instance": ""
                 }
-            ],
-            "application_metrics": []
+            ]
         },
         "poller": {
             "applications": [

@@ -31,6 +31,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 $order_by = '';
                 if (isset($_POST['sort']) && is_array($_REQUEST['sort'])) {
                     foreach ($_REQUEST['sort'] as $key => $value) {
+                        $key = preg_replace('/[^A-Za-z0-9_]/', '', $key); // only allow plain columns
+                        $value = strtolower($value) == 'desc' ? 'DESC' : 'ASC';
+
                         $order_by .= " $key $value";
                     }
                 } else {
@@ -51,7 +54,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($_POST['format']) && ! empty($_POST['searchPhrase'])) {
-                $searchphrase = '%' . mres($_POST['searchPhrase']) . '%';
+                $searchphrase = '%' . $_POST['searchPhrase'] . '%';
                 $search_arr = [$searchphrase, $searchphrase, $searchphrase];
                 $device_deps = dbFetchRows($deps_query, $search_arr);
                 $rec_count = dbFetchCell($count_query, $search_arr);
@@ -108,4 +111,4 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

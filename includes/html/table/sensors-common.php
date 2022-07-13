@@ -17,14 +17,14 @@
 
 use LibreNMS\Config;
 
-$graph_type = mres($vars['graph_type']);
-$unit = mres($vars['unit']);
-$class = mres($vars['class']);
+$graph_type = $vars['graph_type'];
+$unit = $vars['unit'];
+$class = $vars['class'];
 
 $sql = " FROM `$table` AS S, `devices` AS D";
 
 $sql .= ' WHERE S.sensor_class=? AND S.device_id = D.device_id ';
-$param[] = mres($vars['class']);
+$param[] = $vars['class'];
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -90,9 +90,9 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
-    $link_graph = generate_url($link_array);
+    $link_graph = \LibreNMS\Util\Url::generate($link_array);
 
-    $link = generate_url(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => $group, 'metric' => $sensor['sensor_class']]);
+    $link = \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $sensor['device_id'], 'tab' => $group, 'metric' => $sensor['sensor_class']]);
 
     $overlib_content = '<div style="width: 580px;"><span class="overlib-text">' . $sensor['hostname'] . ' - ' . $sensor['sensor_descr'] . '</span>';
     $even = true;
@@ -101,7 +101,7 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
         if ($even) {
             $overlib_content .= '<br>';
         }
-        $overlib_content .= str_replace('"', "\\'", generate_graph_tag($graph_array));
+        $overlib_content .= str_replace('"', "\\'", \LibreNMS\Util\Url::graphTag($graph_array));
         $even = ! $even;
     }
 
@@ -112,21 +112,21 @@ foreach (dbFetchRows($sql, $param) as $sensor) {
     $graph_array['bg'] = 'ffffff00';
     // the 00 at the end makes the area transparent.
     $graph_array['from'] = Config::get('time.day');
-    $sensor_minigraph = generate_lazy_graph_tag($graph_array);
+    $sensor_minigraph = \LibreNMS\Util\Url::graphTag($graph_array);
 
     $sensor['sensor_descr'] = substr($sensor['sensor_descr'], 0, 48);
 
     $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor, $translations);
     $response[] = [
         'hostname'         => generate_device_link($sensor),
-        'sensor_descr'     => overlib_link($link, $sensor['sensor_descr'], $overlib_content, null),
-        'graph'            => overlib_link($link_graph, $sensor_minigraph, $overlib_content, null),
+        'sensor_descr'     => \LibreNMS\Util\Url::overlibLink($link, $sensor['sensor_descr'], $overlib_content),
+        'graph'            => \LibreNMS\Util\Url::overlibLink($link_graph, $sensor_minigraph, $overlib_content),
         'alert'            => $alert,
         'sensor_current'   => $sensor_current,
         'sensor_limit_low' => is_null($sensor['sensor_limit_low']) ? '-' :
-            '<span class=\'label label-default\'>' . trim(format_si($sensor['sensor_limit_low']) . $unit) . '</span>',
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit_low'], 2, 3, '') . $unit) . '</span>',
         'sensor_limit'     => is_null($sensor['sensor_limit']) ? '-' :
-            '<span class=\'label label-default\'>' . trim(format_si($sensor['sensor_limit']) . $unit) . '</span>',
+            '<span class=\'label label-default\'>' . trim(\LibreNMS\Util\Number::formatSi($sensor['sensor_limit'], 2, 3, '') . $unit) . '</span>',
     ];
 
     if ($vars['view'] == 'graphs') {
@@ -163,4 +163,4 @@ $output = [
     'rows'     => $response,
     'total'    => $count,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

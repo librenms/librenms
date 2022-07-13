@@ -2,7 +2,7 @@ os: airos
 text: 'Ubiquiti AirOS'
 type: wireless
 icon: ubiquiti
-nobulk: true
+snmp_bulk: false
 mib_dir: ubnt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -14,3 +14,7 @@ discovery:
             - .1.3.6.1.4.1.10002.1
             - .1.3.6.1.4.1.41112.1.4
         sysDescr: Linux
+        snmpget:
+          oid: UI-AF60-MIB::af60Role.1
+          op: '='
+          value: false

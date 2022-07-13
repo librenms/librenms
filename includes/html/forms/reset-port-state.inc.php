@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -30,14 +31,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
 if (isset($_POST['device_id'])) {
     if (! is_numeric($_POST['device_id'])) {
         $status = 'error';
-        $message = 'Invalid device id ' . $_POST['device_id'];
+        $message = 'Invalid device id ' . htmlspecialchars($_POST['device_id']);
     } else {
         $device = Device::find($_POST['device_id']);
 
@@ -46,7 +47,6 @@ if (isset($_POST['device_id'])) {
         try {
             foreach ($device->ports()->get() as $port) {
                 $port->ifSpeed_prev = null;
-                $port->ifHighSpeed_prev = null;
                 $port->ifOperStatus_prev = null;
                 $port->ifAdminStatus_prev = null;
 
@@ -70,4 +70,4 @@ $output = [
 ];
 
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

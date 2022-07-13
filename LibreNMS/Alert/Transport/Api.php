@@ -15,6 +15,7 @@
 
 /**
  * API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @author PipoCanaja (github.com/PipoCanaja)
  * @copyright 2014 f0o, LibreNMS
@@ -23,10 +24,14 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\View\SimpleTemplate;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Api extends Transport
 {
+    protected $name = 'API';
+
     public function deliverAlert($obj, $opts)
     {
         $url = $this->config['api-url'];
@@ -42,34 +47,17 @@ class Api extends Transport
     private function contactAPI($obj, $api, $options, $method, $auth, $headers, $body)
     {
         $request_opts = [];
-        $request_heads = [];
-        $query = [];
 
         $method = strtolower($method);
         $host = explode('?', $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Headers;
-        foreach (preg_split('/\\r\\n|\\r|\\n/', $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            [$u_key, $u_val] = explode('=', $current_line, 2);
-            foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace('{{ $' . $p_key . ' }}', $p_val, $u_val);
-            }
-            //store the parameter in the array for HTTP headers
-            $request_heads[$u_key] = $u_val;
-        }
+        $request_heads = $this->parseUserOptions($headers, $obj);
         //get each line of key-values and process the variables for Options;
-        foreach (preg_split('/\\r\\n|\\r|\\n/', $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            [$u_key, $u_val] = explode('=', $current_line, 2);
-            // Replace the values
-            foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace('{{ $' . $p_key . ' }}', $p_val, $u_val);
-            }
-            //store the parameter in the array for HTTP query
-            $query[$u_key] = $u_val;
-        }
+        $query = $this->parseUserOptions($options, $obj);
 
-        $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $client = app(\GuzzleHttp\Client::class);
+        $request_opts['proxy'] = Proxy::forGuzzle();
         if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
@@ -84,7 +72,8 @@ class Api extends Transport
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-            $request_opts['form_params'] = $query;
+            $request_opts['query'] = $query;
+            $request_opts['body'] = SimpleTemplate::parse($body, $obj);
             $res = $client->request('POST', $host, $request_opts);
         }
 
@@ -139,7 +128,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
+                    'descr' => 'Enter the body (only used by PUT/POST method, discarded GET)',
                     'type' => 'textarea',
                 ],
                 [

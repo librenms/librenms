@@ -8,17 +8,17 @@
 
 <x-panel id="manage-authlog-panel">
     <x-slot name="title">
-        <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> @lang('Authlog')
+        <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> {{ __('Authlog') }}
     </x-slot>
 
     <div class="table-responsive">
         <table id="authlog" class="table table-hover table-condensed table-striped" style="display: none;">
             <thead>
             <tr>
-                <th data-column-id='timestamp'>@lang('Timestamp')</th>
-                <th data-column-id='user'>@lang('User')</th>
-                <th data-column-id='ip'>@lang('IP Address')</th>
-                <th data-column-id='authres'>@lang('Result')</th>
+                <th data-column-id='timestamp'>{{ __('Timestamp') }}</th>
+                <th data-column-id='user'>{{ __('User') }}</th>
+                <th data-column-id='ip'>{{ __('IP Address') }}</th>
+                <th data-column-id='authres'>{{ __('Result') }}</th>
             </tr>
             </thead>
             <tbody id="authlog_rows">

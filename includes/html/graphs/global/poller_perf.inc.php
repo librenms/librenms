@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,8 +35,8 @@ $cdefX = [];
 $suffixX = '';
 
 foreach (Device::pluck('hostname') as $index => $hostname) {
-    $rrd_filename = rrd_name($hostname, 'poller-perf');
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    $rrd_filename = Rrd::name($hostname, 'poller-perf');
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_options .= " DEF:pollerRaw$index=$rrd_filename:poller:AVERAGE";
         // change undefined to 0
         $rrd_options .= " CDEF:poller$index=pollerRaw$index,UN,0,pollerRaw$index,IF";

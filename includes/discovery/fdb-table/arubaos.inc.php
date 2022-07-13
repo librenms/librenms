@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 LibreNMS
  * @author     Ken Lui <tmpest1@yahoo.com>
  */
@@ -46,7 +47,9 @@ if (! empty($fdbPort_table)) {
 
     foreach ($fdbPort_table as $vlan => $data) {
         d_echo("VLAN: $vlan\n");
-        $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB', 1, $dot1dBasePortIfIndex, null, $vlan);
+        $dot1dBasePortIfIndex = SnmpQuery::context($vlan, 'vlan-')
+            ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')
+            ->table(1, $dot1dBasePortIfIndex);
     }
 
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {

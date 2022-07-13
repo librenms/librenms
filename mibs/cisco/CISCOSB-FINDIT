@@ -1,0 +1,197 @@
+CISCOSB-FINDIT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch001                                   	FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32,IpAddress                            FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, MacAddress,
+    DisplayString, TruthValue                       FROM SNMPv2-TC
+	SnmpAdminString                                 FROM SNMP-FRAMEWORK-MIB
+    InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB;
+
+rlFindit   MODULE-IDENTITY
+		LAST-UPDATED "202105190000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+	          
+	 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for Findit Agent."
+		REVISION "202105190000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 235 }
+
+rlFinditState   OBJECT-TYPE
+    SYNTAX      INTEGER{enabled(1), disabled(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The value represents the admin state of the findit Probe feature."
+    DEFVAL{ 1 }		  
+    ::= { rlFindit 1 }
+        
+rlFinditOperState   OBJECT-TYPE
+    SYNTAX      INTEGER{active(1), inactive(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The value represents the operational state of the findit Probe feature."
+    DEFVAL{ 2 } 
+    ::= { rlFindit 2 }       
+        
+--rlFinditTableEntry definition.
+--currently supports one application.
+--in case there is a need for additional applications,
+--please add appropriate support for it.
+
+rlFinditTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF RlFinditTableEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The (conceptual) table listing the Findit group Entry."
+    ::= {rlFindit  3}
+
+rlFinditTableEntry OBJECT-TYPE
+    SYNTAX     RlFinditTableEntry
+    MAX-ACCESS     not-accessible
+    STATUS current
+    DESCRIPTION "The (conceptual) table listing the Findit entry."
+    INDEX      { rlApplication}   
+    ::= { rlFinditTable 1 }
+
+RlFinditTableEntry::=SEQUENCE {
+    rlApplication                         INTEGER,
+    rlFinditOrganization                  DisplayString,
+    rlFinditNetwork                       DisplayString,
+    rlFinditInetAddress                   InetAddress,
+    rlFinditManagerPort                   INTEGER,
+    rlFinditManagerKeyId                  DisplayString,
+    rlFinditManagerSecret                 DisplayString,
+    rlFinditVersion                       DisplayString,
+    rlFinditManagerConnection             INTEGER
+}
+
+rlApplication   OBJECT-TYPE
+    SYNTAX      INTEGER (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Entry index for Findit application.
+                 currently supports one application.
+                 in case there is a need for additional applications,
+                 please add appropriate support for it."
+    ::= { rlFinditTableEntry 1 }
+
+
+rlFinditOrganization    OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The Organization name of the FindIT Probe."
+    ::= { rlFinditTableEntry 2 }
+
+rlFinditNetwork    OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The Network name of the FindIT Probe."
+    ::= { rlFinditTableEntry 3 }
+        
+    
+rlFinditInetAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS     read-write
+    STATUS current
+    DESCRIPTION
+        "The Inet address of the Findit manager (server)
+        referred to in this table entry."
+    ::= { rlFinditTableEntry 4 }
+
+rlFinditManagerPort OBJECT-TYPE
+        SYNTAX   INTEGER (1..65535)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Specifies the TCP port used to connect to Manager 1-65535"
+      ::= { rlFinditTableEntry 5 }
+    
+rlFinditManagerKeyId  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..24))
+    MAX-ACCESS          read-write
+    STATUS current
+    DESCRIPTION
+        "Key for initial authentication between the FindIT 
+        Probe running on the device and the FindIT Manager."
+    ::= { rlFinditTableEntry 6 }
+
+rlFinditManagerSecret  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..160))
+    MAX-ACCESS          read-write
+    STATUS current
+    DESCRIPTION
+        "encrypted-secret-string"
+    ::= { rlFinditTableEntry 7 }
+    
+	
+rlFinditVersion  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS 		current
+    DESCRIPTION
+        "Findit current version."
+    ::= { rlFinditTableEntry 8 }
+
+rlFinditManagerConnection  OBJECT-TYPE
+    SYNTAX      INTEGER{enabled(1), disabled(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Findit Manager connection configuration state."
+    ::= { rlFinditTableEntry 9 }
+
+   
+rlFinditManagerReconnect  OBJECT-TYPE
+    SYNTAX      INTEGER{none(0), renew(1)}
+    MAX-ACCESS          read-write
+    STATUS              current
+    DESCRIPTION    
+      "reconnect to manager using the
+      configured key and secret for
+      authentication with the manager"
+    ::= {rlFindit  4}
+    
+rlFinditManagerConnectionOpertional   OBJECT-TYPE
+    SYNTAX      INTEGER{enabled(1), disabled(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "The value represents the operational state of the findit Manager connection state."
+    DEFVAL{ 2 } 
+    ::= { rlFindit 5 }       
+
+rlFinditProbeErrorReportAction   OBJECT-TYPE
+    SYNTAX      INTEGER {
+		nothing(0), 
+		disableAndSyslog(1)
+		}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Action MIB based on FindIT Probe agent error detected."
+    ::= { rlFindit 6 }
+        
+rlFinditProbeMemoryClear   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Action MIB to trigger FindIT Probe agent memory clear."
+    ::= { rlFindit 7 }       
+        
+    
+END
+

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -55,17 +56,18 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     /**
      * Processor constructor.
-     * @param string $type
-     * @param int $device_id
-     * @param string $oid
-     * @param int|string $index
-     * @param string $description
-     * @param int $precision The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
-     * @param int $current_usage
-     * @param int $warn_percent
-     * @param int $entPhysicalIndex
-     * @param int $hrDeviceIndex
-     * @return Processor
+     *
+     * @param  string  $type
+     * @param  int  $device_id
+     * @param  string  $oid
+     * @param  int|string  $index
+     * @param  string  $description
+     * @param  int  $precision  The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
+     * @param  int  $current_usage
+     * @param  int  $warn_percent
+     * @param  int  $entPhysicalIndex
+     * @param  int  $hrDeviceIndex
+     * @return static
      */
     public static function discover(
         $type,
@@ -249,14 +251,15 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function processYaml(OS $os)
     {
-        $device = $os->getDeviceArray();
-        if (empty($device['dynamic_discovery']['modules']['processors'])) {
+        $discovery = $os->getDiscovery('processors');
+
+        if (empty($discovery)) {
             d_echo("No YAML Discovery data.\n");
 
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $device['dynamic_discovery']['modules']['processors']);
+        return YamlDiscovery::discover($os, get_class(), $discovery);
     }
 
     /**
@@ -273,7 +276,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     /**
      * Get an array of this sensor with fields that line up with the database.
      *
-     * @param array $exclude exclude columns
+     * @param  array  $exclude  exclude columns
      * @return array
      */
     public function toArray($exclude = [])
@@ -295,6 +298,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         return array_diff_key($array, array_flip($exclude));
     }
 
+    /**
+     * @param  Processor  $processor
+     */
     public static function onCreate($processor)
     {
         $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
@@ -303,6 +309,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         parent::onCreate($processor);
     }
 
+    /**
+     * @param  Processor  $processor
+     */
     public static function onDelete($processor)
     {
         $message = "Processor Removed: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";

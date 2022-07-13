@@ -23,7 +23,7 @@ if ($width > '500') {
 $c_i = 0;
 $dbq = dbFetchRows('SELECT * FROM `munin_plugins_ds` WHERE `mplug_id` = ?', [$mplug['mplug_id']]);
 foreach ($dbq as $ds) {
-    $ds_filename = rrd_name($device['hostname'], 'munin/' . $mplug['mplug_type'] . '_' . $ds['ds_name']);
+    $ds_filename = Rrd::name($device['hostname'], 'munin/' . $mplug['mplug_type'] . '_' . $ds['ds_name']);
     $ds_name = $ds['ds_name'];
 
     $cmd_def .= ' DEF:' . $ds['ds_name'] . '=' . $ds_filename . ':val:AVERAGE';
@@ -47,7 +47,7 @@ foreach ($dbq as $ds) {
             $colour = $ds['colour'];
         }
 
-        $descr = rrdtool_escape($ds['ds_label'], $descr_len);
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds['ds_label'], $descr_len);
 
         $cmd_graph .= ' ' . $ds['ds_draw'] . ':' . $ds_name . '#' . $colour . ":'" . $descr . "'";
         $cmd_graph .= ' GPRINT:' . $ds_name . ':LAST:"%6.2lf%s"';

@@ -2,6 +2,7 @@
 /* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
  * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
  * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
+ * Copyright (C) 2022 Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,13 +55,17 @@ foreach ($dbRoute as $dbRow) {
     }
 }
 
+if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php";
+}
+
 //Not a single route will be discovered if the amount is over maximum
 // To prevent any bad behaviour on routers holding the full internet table
 
 //if the device does not support IP-FORWARD-MIB, we can still discover the ipv4 (only)
 //routes using RFC1213 but no way to limit the amount of routes here !!
 
-if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
+if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'routeros') {
     //RFC1213-MIB
     $mib = 'RFC1213-MIB';
     $tableRoute = [];
@@ -145,7 +150,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     unset($entry['inetCidrRouteStatus']);
                     $entryPerType[$inetCidrRouteDestType]++;
                     $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
-                    if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+                    if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
                         //we already have a row in DB
                         $entry['route_id'] = $current['db']['route_id'];
                         $update_row[] = $entry;
@@ -153,7 +158,6 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                         d_echo(isset($current));
                         d_echo(isset($current['db']));
                         d_echo($current['db']);
-                        d_echo(count($current['db']));
                         d_echo($delete_row[$current['db']['route_id']]);
                         $entry['created_at'] = ['NOW()'];
                         $create_row[] = $entry;
@@ -174,9 +178,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
 if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRouteNumber'] > $ipForwardNb['0']['inetCidrRouteNumber'] && $ipForwardNb['0']['ipCidrRouteNumber'] < $max_routes) {
     //device uses only ipCidrRoute and not inetCidrRoute
     d_echo('IP FORWARD MIB (without inetCidr support)');
-    $mib = 'IP-FORWARD-MIB';
-    $oid = '.1.3.6.1.2.1.4.24.4.1';
-    $ipCidrTable = snmpwalk_group($device, $oid, $mib, 6, []);
+    $ipCidrTable = SnmpQuery::walk('IP-FORWARD-MIB::ipCidrRouteTable')->table(6);
     echo 'ipCidrRouteTable ';
     // we need to translate the values to inetCidr structure;
     //d_echo($ipCidrTable);
@@ -187,16 +189,16 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     unset($entryClean);
                     $entryClean['inetCidrRouteDestType'] = 'ipv4';
                     $entryClean['inetCidrRouteDest'] = $inetCidrRouteDest;
-                    $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['ipCidrRouteMask']); //CONVERT
+                    $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['IP-FORWARD-MIB::ipCidrRouteMask']); //CONVERT
                     $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
-                    $entryClean['inetCidrRoutePolicy'] = $entry['ipCidrRouteInfo'];
+                    $entryClean['inetCidrRoutePolicy'] = $entry['IP-FORWARD-MIB::ipCidrRouteInfo'];
                     $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
                     $entryClean['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
-                    $entryClean['inetCidrRouteMetric1'] = $entry['ipCidrRouteMetric1'];
-                    $entryClean['inetCidrRouteProto'] = $entry['ipCidrRouteProto'];
-                    $entryClean['inetCidrRouteType'] = $entry['ipCidrRouteType'];
-                    $entryClean['inetCidrRouteIfIndex'] = $entry['ipCidrRouteIfIndex'];
-                    $entryClean['inetCidrRouteNextHopAS'] = $entry['ipCidrRouteNextHopAS'];
+                    $entryClean['inetCidrRouteMetric1'] = $entry['IP-FORWARD-MIB::ipCidrRouteMetric1'];
+                    $entryClean['inetCidrRouteProto'] = $entry['IP-FORWARD-MIB::ipCidrRouteProto'];
+                    $entryClean['inetCidrRouteType'] = $entry['IP-FORWARD-MIB::ipCidrRouteType'];
+                    $entryClean['inetCidrRouteIfIndex'] = $entry['IP-FORWARD-MIB::ipCidrRouteIfIndex'];
+                    $entryClean['inetCidrRouteNextHopAS'] = $entry['IP-FORWARD-MIB::ipCidrRouteNextHopAS'];
                     $entryClean['context_name'] = '';
                     $entryClean['device_id'] = $device['device_id'];
                     $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
@@ -283,7 +285,7 @@ if ($mpls_skip != 1) {
                             d_echo(isset($current));
                             d_echo(isset($current['db']));
                             d_echo($current['db']);
-                            d_echo(count($current['db']));
+                            d_echo(count($current['db'] ?? []));
                             d_echo($delete_row[$current['db']['route_id']]);
                             $entry['created_at'] = ['NOW()'];
                             $create_row[] = $entry;

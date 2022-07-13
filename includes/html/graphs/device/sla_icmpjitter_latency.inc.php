@@ -15,9 +15,9 @@ $sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
-$rrd_filename = rrd_name($device['hostname'], ['sla', $sla['sla_nr'], 'icmpjitter']);
+$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'icmpjitter']);
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                          Cur    Min    Max    Avg\\n'";
 
     $rrd_options .= ' DEF:SD=' . $rrd_filename . ':LatencyOWAvgSD:AVERAGE ';

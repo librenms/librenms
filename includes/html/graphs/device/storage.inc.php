@@ -33,8 +33,8 @@ foreach ($storages as $storage) {
         $iter = '0';
     }
 
-    $descr = rrdtool_escape($storage['storage_descr'], 16);
-    $rrd = rrd_name($device['hostname'], ['storage', $storage['storage_mib'], $storage['storage_descr']]);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($storage['storage_descr'], 16);
+    $rrd = Rrd::name($device['hostname'], ['storage', $storage['storage_mib'], $storage['storage_descr']]);
     $rrd_options .= " DEF:{$storage['storage_id']}used=$rrd:used:AVERAGE";
     $rrd_options .= " DEF:{$storage['storage_id']}free=$rrd:free:AVERAGE";
     $rrd_options .= " CDEF:{$storage['storage_id']}size={$storage['storage_id']}used,{$storage['storage_id']}free,+";

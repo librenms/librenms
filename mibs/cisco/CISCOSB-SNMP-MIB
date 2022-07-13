@@ -2,16 +2,16 @@ CISCOSB-SNMP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     switch001                                   FROM CISCOSB-MIB
-    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks     FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, DisplayString           FROM SNMPv2-TC
-    RowStatus, TruthValue                       FROM SNMPv2-TC
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Integer32     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, AutonomousType      FROM SNMPv2-TC
+    RowStatus, TruthValue, TimeInterval                    FROM SNMPv2-TC
     InetAddressType, InetAddress                FROM INET-ADDRESS-MIB
     snmpTargetAddrExtEntry                      FROM SNMP-COMMUNITY-MIB
-    SnmpEngineID                                FROM SNMP-FRAMEWORK-MIB
+    SnmpEngineID, SnmpAdminString                          FROM SNMP-FRAMEWORK-MIB
     usmUserEntry                                FROM SNMP-USER-BASED-SM-MIB;
 
 rlSNMP MODULE-IDENTITY
-          LAST-UPDATED "200709100000Z"
+          LAST-UPDATED "202105190000Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -24,7 +24,7 @@ rlSNMP MODULE-IDENTITY
 
           DESCRIPTION
                   "Private MIB module for SNMP support in CISCOSB devices."
-          REVISION "201102110000Z"
+          REVISION "202105190000Z"
           DESCRIPTION
                   "Added support in usmUserTable augment for authentication and
                    privacy passwords saving."
@@ -801,5 +801,144 @@ rlUsmUserPrivPassword OBJECT-TYPE
      Setting the field in any other case will cause no effect."
    DEFVAL  { "" }
      ::=  { rlUsmUserExtEntry 2 }
+
+
+rlSnmpClient OBJECT IDENTIFIER ::= { rlSNMP 8 }
+
+rlSnmpClientAgentsTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSnmpClientAgentsEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table maintains the user agents to which the SNMP client will send requests"
+     ::= { rlSnmpClient 1 }
+
+rlSnmpClientAgentsEntry  OBJECT-TYPE
+   SYNTAX RlSnmpClientAgentsEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSnmpClientAgentsAddressType, rlSnmpClientAgentsAddress }
+   ::= { rlSnmpClientAgentsTable 1 }
+
+RlSnmpClientAgentsEntry ::= SEQUENCE {      
+       rlSnmpClientAgentsAddressType   InetAddressType,
+       rlSnmpClientAgentsAddress       InetAddress,
+       rlSnmpClientAgentsCommunity     OCTET STRING,
+       rlSnmpClientAgentsUsername      SnmpAdminString,
+       rlSnmpClientAgentsAuthProtocol  AutonomousType,
+       rlSnmpClientAgentsPrivProtocol  AutonomousType,
+       rlSnmpClientAgentsAuthKey       OCTET STRING, 
+       rlSnmpClientAgentsPrivKey       OCTET STRING, 
+       rlSnmpClientAgentsTimeout       TimeInterval,
+       rlSnmpClientAgentsRetries       Integer32,
+       rlSnmpClientAgentsStatus        RowStatus
+}
+
+rlSnmpClientAgentsAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Type of Remote Agent IP address."
+     ::=  { rlSnmpClientAgentsEntry 1 }
+
+rlSnmpClientAgentsAddress OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "Remote Agent IP address."
+     ::=  { rlSnmpClientAgentsEntry 2 }
+
+rlSnmpClientAgentsCommunity OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv1/v2 community string. Either this field or rlSnmpClientAgentsUsername
+     must be configured to a non-empty string."
+   DEFVAL  { "" }
+     ::=  { rlSnmpClientAgentsEntry 3 }
+
+rlSnmpClientAgentsUsername OBJECT-TYPE
+   SYNTAX SnmpAdminString (SIZE(0..32)) 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv3 username string."
+   DEFVAL  { "" }
+     ::=  { rlSnmpClientAgentsEntry 4 }
+
+rlSnmpClientAgentsAuthProtocol OBJECT-TYPE
+   SYNTAX AutonomousType  
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv3 authentication protocol."
+   DEFVAL      { usmNoAuthProtocol } 
+     ::=  { rlSnmpClientAgentsEntry 5 }
+
+rlSnmpClientAgentsPrivProtocol OBJECT-TYPE
+   SYNTAX AutonomousType 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv3 privacy protocol."
+   DEFVAL      { usmNoPrivProtocol } 
+     ::=  { rlSnmpClientAgentsEntry 6 }
+
+rlSnmpClientAgentsAuthKey OBJECT-TYPE
+   SYNTAX OCTET STRING 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv3 authentication key. The key size should be consistent 
+     with the chosen authentication protocol."
+   DEFVAL  { "" }
+     ::=  { rlSnmpClientAgentsEntry 7 }
+
+rlSnmpClientAgentsPrivKey OBJECT-TYPE
+   SYNTAX OCTET STRING 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "Remote Agent SNMPv3 privacy key. The key size should be consistent 
+     with the chosen privacy protocol." 
+   DEFVAL  { "" }
+     ::=  { rlSnmpClientAgentsEntry 8 }
+
+rlSnmpClientAgentsTimeout OBJECT-TYPE
+   SYNTAX TimeInterval 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The default timeout between 2 successive retries of sending SNMP requests to
+     the agent. An application using the SNMP client may provide its own timeout
+     value." 
+   DEFVAL  { 1500 }
+     ::=  { rlSnmpClientAgentsEntry 9 }
+
+rlSnmpClientAgentsRetries OBJECT-TYPE
+   SYNTAX Integer32 (0..255)
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The default number of retries the SNMP client should preform, in case no
+     response is received from the agent. An application using the SNMP client
+     may provide its own retries value. " 
+   DEFVAL  { 3 }
+     ::=  { rlSnmpClientAgentsEntry 10 }
+
+rlSnmpClientAgentsStatus OBJECT-TYPE
+   SYNTAX RowStatus 
+   MAX-ACCESS read-create
+   STATUS current
+   DESCRIPTION
+    "The management control for this table."
+   DEFVAL  { createAndGo }
+     ::=  { rlSnmpClientAgentsEntry 11 }
+
 
 END

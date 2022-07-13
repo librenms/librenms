@@ -33,6 +33,9 @@ $alert_severities = [
     'warning only' => 5,
     'critical only' => 6,
 ];
+if (Auth::user()->hasGlobalAdmin()) {
+    $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
+}
 
 //if( defined('SHOW_SETTINGS') || empty($widget_settings) ) {
 if (defined('SHOW_SETTINGS')) {
@@ -161,6 +164,7 @@ if (defined('SHOW_SETTINGS')) {
 </form>
 ';
 } else {
+    $alert_id = $vars['alert_id'] ?? 0;
     $device_id = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
     $fired = $widget_settings['fired'];
@@ -232,7 +236,8 @@ if (defined('SHOW_SETTINGS')) {
                 <th data-column-id="hostname">Hostname</th>
                 <th data-column-id="location">Location</th>
                 <th data-column-id="ack_ico" data-sortable="false">ACK</th>
-                <th data-column-id="notes" data-sortable="false">Notes</th>';
+                <th data-column-id="notes" data-sortable="false">Notes</th>
+                ' . $admin_verbose_details . '';
 
     if ($proc == '1') {
         $common_output[] = '<th data-column-id="proc" data-sortable="false">URL</th>';
@@ -251,6 +256,9 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         return {
             id: "alerts",
 ';
+    if (is_numeric($alert_id)) {
+        $common_output[] = "alert_id: '$alert_id',\n";
+    }
 
     if (is_numeric($acknowledged)) {
         $common_output[] = "acknowledged: '$acknowledged',\n";
@@ -272,7 +280,7 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         $common_output[] = "proc: '$proc',\n";
     }
 
-    if (isset($sort) && sort != '') {
+    if (isset($sort) && $sort != '') {
         $common_output[] = "sort: '$sort',\n";
     }
 
@@ -314,6 +322,12 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         var alert_id = $(this).data(\'alert_id\');
         $(\'#alert_id\').val(alert_id);
         $("#alert_notes_modal").modal(\'show\');
+    });
+    alerts_grid.find(".command-alert-details").on("click", function(e) {
+      e.preventDefault();
+      var alert_log_id = $(this).data(\'alert_log_id\');
+      $(\'#alert_log_id\').val(alert_log_id);
+      $("#alert_details_modal").modal(\'show\');
     });
 });
 </script>';

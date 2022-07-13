@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -148,8 +146,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -254,7 +250,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.5040.1.2.9.1.4.1.1.2",
                     "sensor_index": "wtWebGraphThermHygroSensorNo.2",
                     "sensor_type": "wut",
-                    "sensor_descr": "rel. Feuchte",
+                    "sensor_descr": "Environment",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -278,7 +274,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.5040.1.2.9.1.4.1.1.1",
                     "sensor_index": "wtWebGraphThermHygroSensorNo.1",
                     "sensor_type": "wut",
-                    "sensor_descr": "Temperatur",
+                    "sensor_descr": "Environment",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -295,8 +291,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

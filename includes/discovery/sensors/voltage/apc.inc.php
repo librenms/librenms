@@ -2,17 +2,26 @@
 
 // Battery Bus Voltage
 
-$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.8.0', '-OsqnU');
+// upsHighPrecBatteryActualVoltage
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.3.4.0', '-OsqnU');
+$divisor = 10;
+$index = '2.3.4.0';
 d_echo($oids . "\n");
+
+if (! $oids) {
+    // upsAdvBatteryActualVoltage, used in case high precision is not available
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.8.0', '-OsqnU', '');
+    d_echo($oids . "\n");
+    $divisor = 1;
+    $index = '2.2.8.0';
+}
 
 if ($oids) {
     echo ' Battery Bus ';
     [$oid,$current] = explode(' ', $oids);
-    $divisor = 1;
     $type = 'apc';
-    $index = '2.2.8.0';
     $descr = 'Battery Bus';
-    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+    discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
 }
 unset($oids);
 
@@ -91,27 +100,43 @@ if ($phasecount > 1) {
             }
         }
     }
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.2.1.0', '-OsqnU');
+    // upsHighPrecInputLineVoltage
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.3.1.0', '-OsqnU');
     d_echo($oids . "\n");
+    $divisor = 10;
+    $index = '3.3.1.0';
+    if (! $oids) {
+        // upsAdvInputLineVoltage, used in case high precision is not available
+        $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.3.2.1.0', '-OsqnU', '');
+        d_echo($oids . "\n");
+        $divisor = 1;
+        $index = '3.2.1.0';
+    }
     if ($oids) {
         echo ' APC In ';
         [$oid,$current] = explode(' ', $oids);
-        $divisor = 1;
         $type = 'apc';
-        $index = '3.2.1.0';
         $descr = 'Input';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
     }
-    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.2.1.0', '-OsqnU');
+    // upsHighPrecOutputVoltage
+    $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.3.1.0', '-OsqnU');
     d_echo($oids . "\n");
+    $divisor = 10;
+    $index = '4.3.1.0';
+    if (! $oids) {
+        // upsAdvOutputVoltage, used in case high precision is not available
+        $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.4.2.1.0', '-OsqnU', '');
+        d_echo($oids . "\n");
+        $divisor = 1;
+        $index = '4.2.1.0';
+    }
     if ($oids) {
         echo ' APC Out ';
         [$oid,$current] = explode(' ', $oids);
-        $divisor = 1;
         $type = 'apc';
-        $index = '4.2.1.0';
         $descr = 'Output';
-        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
+        discover_sensor($valid['sensor'], 'voltage', $device, $oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current / $divisor);
     }
     // rPDUIdentDeviceLinetoLineVoltage
     $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.12.1.15.0', '-OsqnU');

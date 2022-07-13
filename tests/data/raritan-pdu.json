@@ -30,7 +30,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.1",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -390,7 +390,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.5",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -791,8 +791,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": {
             "sensors": [
@@ -803,7 +802,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.1",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -1163,7 +1162,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.1.5",
                     "sensor_index": "1",
                     "sensor_type": "raritan",
-                    "sensor_descr": "OUTLET1",
+                    "sensor_descr": "Outlet 1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1564,8 +1563,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         }
     }
 }

@@ -26,11 +26,17 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Fortinet;
 use LibreNMS\RRD\RrdDefinition;
 
-class Fortigate extends Fortinet implements OSPolling
+class Fortigate extends Fortinet implements
+        OSPolling,
+        WirelessClientsDiscovery,
+        WirelessApCountDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -39,7 +45,7 @@ class Fortigate extends Fortinet implements OSPolling
         $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $sessions = snmp_get($this->getDeviceArray(), 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
         if (is_numeric($sessions)) {
@@ -68,5 +74,23 @@ class Fortigate extends Fortinet implements OSPolling
             app()->make('Datastore')->put($this->getDeviceArray(), 'fortigate_cpu', $tags, $fields);
             $this->enableGraph('fortigate_cpu');
         }
+    }
+
+    public function discoverWirelessClients()
+    {
+        $oid = '.1.3.6.1.4.1.12356.101.14.2.7.0';
+
+        return [
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'fortigate', 1, 'Clients: Total'),
+        ];
+    }
+
+    public function discoverWirelessApCount()
+    {
+        $oid = '.1.3.6.1.4.1.12356.101.14.2.5.0';
+
+        return [
+            new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'fortigate', 1, 'Connected APs'),
+        ];
     }
 }

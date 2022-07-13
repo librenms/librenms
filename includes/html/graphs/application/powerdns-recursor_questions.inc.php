@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,7 +27,7 @@ include 'powerdns-recursor.inc.php';
 $colours = 'mixed';
 $unit_text = 'Questions/sec';
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,

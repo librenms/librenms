@@ -31,6 +31,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
         });
+
+        $this->app->bind(\App\Models\Device::class, function () {
+            /** @var \LibreNMS\Cache\Device $cache */
+            $cache = $this->app->make('device-cache');
+
+            return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
     }
 
     /**
@@ -41,9 +48,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         \Illuminate\Pagination\Paginator::useBootstrap();
-
-        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
-        $this->app->booted('\LibreNMS\Config::load');
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
@@ -63,16 +67,8 @@ class AppServiceProvider extends ServiceProvider
             return auth()->check() && auth()->user()->isAdmin();
         });
 
-        Blade::directive('deviceLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
-        });
-
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
-        });
-
-        Blade::directive('portLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
         });
     }
 
@@ -130,7 +126,10 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Package::observe(\App\Observers\PackageObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
+        \App\Models\Stp::observe(\App\Observers\StpObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
     }
 
     private function bootCustomValidators()
@@ -143,20 +142,51 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
 
             return IP::isValid($ip) || Validate::hostname($value);
-        }, __('The :attribute must a valid IP address/network or hostname.'));
+        });
 
         Validator::extend('is_regex', function ($attribute, $value) {
-            return @preg_match($value, null) !== false;
-        }, __(':attribute is not a valid regular expression'));
+            return @preg_match($value, '') !== false;
+        });
+
+        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
+            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
+
+            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
+                return str_replace(
+                    [':extra', ':values'],
+                    [implode(',', $extra_keys), implode(',', $parameters)],
+                    $message);
+            });
+
+            return is_array($value) && empty($extra_keys);
+        });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
-            if ($value === 0) {
+            if ($value === 0 || $value === '0') {
                 return true;
             }
 
             $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
 
             return $validator->passes();
-        }, __('validation.exists'));
+        }, trans('validation.exists'));
+
+        Validator::extend('url_or_xml', function ($attribute, $value): bool {
+            if (! is_string($value)) {
+                return false;
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
+                return true;
+            }
+
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($value);
+            if ($xml !== false) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }

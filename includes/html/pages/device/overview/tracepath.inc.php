@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -25,8 +26,7 @@
 use App\Models\DevicePerf;
 
 $perf_info = DevicePerf::where('device_id', $device['device_id'])->latest('timestamp')->first();
-$perf_debug = json_decode($perf_info['debug'], true);
-if ($perf_debug['traceroute']) {
+if ($perf_info['debug']['traceroute']) {
     echo "
 <div class='row'>
      <div class='col-md-12'>
@@ -35,7 +35,7 @@ if ($perf_debug['traceroute']) {
                  <h3 class='panel-title'>Traceroute ({$perf_info['timestamp']})</h3>
              </div>
              <div class='panel-body'>
-                 <pre>{$perf_debug['traceroute']}</pre>
+                 <pre>{$perf_info['debug']['traceroute']}</pre>
             </div>
          </div>
      </div>

@@ -37,7 +37,7 @@ if ($vars['search_type'] == 'ipv4') {
     }
 } elseif ($vars['search_type'] == 'mac') {
     $sql = ' FROM `ports` AS I, `devices` AS D';
-    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%" . str_replace([':', ' ', '-', '.', '0x'], '', mres($vars['address'])) . "%' $where ";
+    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE '%" . trim(str_replace([':', ' ', '-', '.', '0x'], '', $vars['address'])) . "%' $where ";
 }//end if
 if (is_numeric($vars['device_id'])) {
     $sql .= ' AND I.device_id = ?';
@@ -80,13 +80,14 @@ if ($rowCount != -1) {
 $sql = "SELECT *,`I`.`ifDescr` AS `interface` $sql";
 
 foreach (dbFetchRows($sql, $param) as $interface) {
-    $speed = humanspeed($interface['ifSpeed']);
-    $type = humanmedia($interface['ifType']);
+    $speed = \LibreNMS\Util\Number::formatSi($interface['ifSpeed'], 2, 3, 'bps');
+    $type = \LibreNMS\Util\Rewrite::normalizeIfType($interface['ifType']);
 
     if ($vars['search_type'] == 'ipv6') {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($vars['search_type'] == 'mac') {
-        $address = formatMac($interface['ifPhysAddress']);
+        $address = \LibreNMS\Util\Rewrite::readableMac($interface['ifPhysAddress']);
+        $mac_oui = \LibreNMS\Util\Rewrite::readableOUI($interface['ifPhysAddress']);
     } else {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }
@@ -99,12 +100,16 @@ foreach (dbFetchRows($sql, $param) as $interface) {
 
     if (port_permitted($interface['port_id'])) {
         $interface = cleanPort($interface, $interface);
-        $response[] = [
+        $row = [
             'hostname'    => generate_device_link($interface),
             'interface'   => generate_port_link($interface) . ' ' . $error_img,
             'address'     => $address,
             'description' => $interface['ifAlias'],
         ];
+        if ($vars['search_type'] == 'mac') {
+            $row['mac_oui'] = $mac_oui;
+        }
+        $response[] = $row;
     }
 }//end foreach
 
@@ -114,4 +119,4 @@ $output = [
     'rows'     => $response,
     'total'    => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

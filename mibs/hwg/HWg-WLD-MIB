@@ -1,0 +1,162 @@
+--	HWg-WLD MIB 1.01
+--		History:
+--
+--      1.00	 27.11.2009 Marek Hummel  - Created
+--      1.01	 2.8.2010   Marek Hummel  - Mib validation, add wldValue
+--      1.01-bis 12.5.2021  ChangeOID to avoid collisions with STE-MIB
+--
+
+HWg-WLD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	OBJECT-TYPE				FROM RFC-1212
+	Gauge, enterprises		FROM RFC1155-SMI
+	DisplayString, sysName	FROM RFC1213-MIB
+	TRAP-TYPE				FROM RFC-1215;
+
+
+--
+-- Type Definitions
+--
+PositiveInteger ::= INTEGER (1..2147483647)	-- 0x7FFF FFFF
+
+
+SensorState ::= INTEGER {
+		invalid (0),
+		normal (1),
+		alarm (3)
+	}
+
+SensorValue ::= INTEGER {
+		normal (0),
+		flooded (1),
+		disconnect (2),
+		invalid (3)
+	}
+
+SensorSN ::= DisplayString (SIZE (0..16))
+SensorName ::= DisplayString (SIZE (0..16))
+SensorID ::= INTEGER
+
+--
+-- Node Definitions
+--
+
+hwgroup		OBJECT IDENTIFIER ::= { enterprises 21796 }
+x390		OBJECT IDENTIFIER ::= { hwgroup 4 }
+hwgwld		OBJECT IDENTIFIER ::= { x390 5 }
+
+-- Application Info ------------------------------------------------------------
+
+info		OBJECT IDENTIFIER ::= { hwgwld 70 }
+
+infoAddressMAC OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..17))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"MAC address in text form.
+		It is here to distinguish devices in trap messages."
+	::= { info 1 }
+
+-- Sensors ---------------------------------------------------------------------
+
+wldTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF WldEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of sensor table entries. The number
+		of entries corresponds with number of detected sensors."
+	::= { hwgwld 4 }
+
+wldEntry OBJECT-TYPE
+	SYNTAX	WldEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry containing information applicable to a
+		particular sensor."
+	INDEX { wldIndex }
+	::= { wldTable 1 }
+
+WldEntry ::= SEQUENCE {
+	wldIndex	PositiveInteger,
+	wldName		SensorName,
+	wldState	SensorState,
+	wldSN		SensorSN,
+	wldID		SensorID,
+	wldValue	SensorValue
+}
+
+wldIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor index."
+	::= { wldEntry 1 }
+
+wldName OBJECT-TYPE
+	SYNTAX	SensorName
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor name."
+	::= { wldEntry 2 }
+
+wldState OBJECT-TYPE
+	SYNTAX	SensorState
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor state."
+	::= { wldEntry 3 }
+
+wldSN OBJECT-TYPE
+	SYNTAX	SensorSN
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor Serial number."
+	::= { wldEntry 4 }
+
+wldID OBJECT-TYPE
+	SYNTAX	SensorID
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor ID."
+	::= { wldEntry 5 }
+
+wldValue OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor value."
+	::= { wldEntry 6 }
+
+-- Trap Definitions ------------------------------------------------------------
+
+wldStateToAlarm	TRAP-TYPE
+	ENTERPRISE	hwgwld
+	VARIABLES	{ sysName, infoAddressMAC, wldIndex, wldName, wldState, wldSN, wldID, wldValue }
+	DESCRIPTION
+		"Sensor n changed to Alarm state."
+	::= 1
+
+wldStateToNormal	TRAP-TYPE
+	ENTERPRISE	hwgwld
+	VARIABLES	{ sysName, infoAddressMAC, wldIndex, wldName, wldState, wldSN, wldID, wldValue }
+	DESCRIPTION
+		"Sensor n changed to Normal state."
+	::= 2
+
+wldPeriodicAlarm	TRAP-TYPE
+	ENTERPRISE	hwgwld
+	VARIABLES	{ sysName, infoAddressMAC, wldIndex, wldName, wldState, wldSN, wldID, wldValue }
+	DESCRIPTION
+		"Sensor n periodic Alarm."
+	::= 3
+
+END

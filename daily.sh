@@ -30,7 +30,7 @@ COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
-# shellcheck source=/opt/librenms/.env
+# shellcheck source=.env.example
 source "${LIBRENMS_DIR}/.env"
 LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
@@ -74,7 +74,7 @@ status_run() {
         if [[ "${arg_option}" == "update" ]]; then
             php "${LIBRENMS_DIR}/daily.php" -f notify -o "${tmp}"
         fi
-        if [[ ! -z "${tmp}" ]]; then
+        if [[ -n "${tmp}" ]]; then
             # print output in case of failure
             echo "${tmp}"
         fi
@@ -278,7 +278,7 @@ main () {
     if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
-            ${DAILY_SCRIPT} no-code-update
+            "${DAILY_SCRIPT}" no-code-update
             set_notifiable_result update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
@@ -286,8 +286,8 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
-        # make sure the vendor directory is clean
-        git checkout vendor/ --quiet > /dev/null 2>&1
+        # Restore composer files if user installed plugins
+        git checkout --quiet -- composer.json composer.lock
 
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
@@ -333,25 +333,26 @@ main () {
         fi
 
         # Call ourself again in case above pull changed or added something to daily.sh
-        ${DAILY_SCRIPT} post-pull "${old_ver}" "${new_ver}"
+        "${DAILY_SCRIPT}" post-pull "${old_ver}" "${new_ver}"
     else
         case $arg in
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
             ;;
             post-pull)
                 # re-check dependencies after pull with the new code
                 check_dependencies
 
-                # Check for missing vendor dir
-                if [ ! -f vendor/autoload.php ]; then
-                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
-                    git reset HEAD vendor/  # don't add vendor directory to the index
-                fi
+                # Insert user installed plugins before calling composer install
 
+                PLUGINS=$(call_daily_php "composer_get_plugins")
+                if [ -n "$PLUGINS" ]; then
+                    # shellcheck disable=SC2086
+                    FORCE=1 ${COMPOSER} require --update-no-dev --no-install $PLUGINS
+                fi
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
 
                 # Check if we need to revert (Must be in post pull so we can update it)
@@ -369,6 +370,7 @@ main () {
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
                 status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
+                status_run 'Caching Mac OUI data' "$DAILY_SCRIPT mac_oui"
             ;;
             cleanup)
                 # Cleanups
@@ -404,6 +406,9 @@ main () {
                 options=("peeringdb")
                 call_daily_php "${options[@]}"
             ;;
+            mac_oui)
+                options=("mac_oui")
+                call_daily_php "${options[@]}"
         esac
     fi
 }

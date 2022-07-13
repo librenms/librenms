@@ -14,7 +14,7 @@ IMPORTS
 
 
 rlLbd  MODULE-IDENTITY
-       LAST-UPDATED "200711070000Z"
+       LAST-UPDATED "200711070001Z"
                        ORGANIZATION "Cisco Systems, Inc."
 
                        CONTACT-INFO
@@ -44,7 +44,7 @@ rlLbdEnable OBJECT-TYPE
 
 -------------------------------------------------------------------------------
 rlLbdDetectionInterval OBJECT-TYPE
-    SYNTAX      INTEGER(10..60)
+    SYNTAX      INTEGER(5..60)
     UNITS       "seconds"
     MAX-ACCESS  read-write
     STATUS      current
@@ -59,7 +59,9 @@ rlLbdMode OBJECT-TYPE
     SYNTAX  INTEGER {
         source-mac-addr (1),
         base-mac-addr (2),
-        broadcast-mac-addr (3)
+        broadcast-mac-addr (3),
+	predefined-multicast-mac-addr (4),
+	user-defined-mac-addr (5)
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -103,8 +105,7 @@ rlLbdPortAdminStatus OBJECT-TYPE
     MAX-ACCESS       read-write
     STATUS           current
     DESCRIPTION
-        "Enable/Disable Loopback Detection on port"
-    DEFVAL { disabled }
+        "Enable/Disable Loopback Detection on port"    
     ::= { rlLbdPortEntry 1 }
 
 rlLbdPortOperStatus OBJECT-TYPE

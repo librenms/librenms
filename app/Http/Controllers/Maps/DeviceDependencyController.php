@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -154,7 +155,8 @@ class DeviceDependencyController extends MapController
             $devices_by_id = $this->highlightDevices($devices_by_id, $this->parentDeviceIds);
         }
 
-        array_multisort(array_column($device_list, 'label'), SORT_ASC, $device_list);
+        $device_list_labels = array_column($device_list, 'label');
+        array_multisort($device_list_labels, SORT_ASC, $device_list);
 
         $group_name = DeviceGroup::where('id', '=', $group_id)->first('name');
         if (! empty($group_name)) {

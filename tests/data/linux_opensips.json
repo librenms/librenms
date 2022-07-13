@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -144,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -255,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 10,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -358,12 +352,10 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
-                    "ifHighSpeed": 0,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -742,8 +734,7 @@
                     "app_status": "",
                     "app_instance": ""
                 }
-            ],
-            "application_metrics": []
+            ]
         },
         "poller": {
             "applications": [
@@ -1181,6 +1172,12 @@
                 },
                 {
                     "metric": "SFRJn",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mysql"
+                },
+                {
+                    "metric": "SlLa",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "mysql"

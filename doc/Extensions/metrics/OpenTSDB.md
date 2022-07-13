@@ -1,17 +1,14 @@
-source: Extensions/metrics/OpenTSDB.md
-path: blob/master/doc/
-
 # Enabling support for OpenTSDB
 
 This module sends all metrics to OpenTSDB server. You need something
 like Grafana for graphing.
 
-# Requirements
+## Requirements
 
 - OpenTSDB
 - Grafana
 
-# What you don't get
+## What you don't get
 
  Pretty graphs, this is why at present you need Grafana. You need to
  build your own graphs within Grafana.
@@ -21,7 +18,7 @@ continue to function normally.
 
 You can add the following to `config.php`.
 
-# Configuration
+## Configuration
 
 ```php
 // OpenTSDB default configuration

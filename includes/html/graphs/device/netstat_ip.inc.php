@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'netstats-ip');
+$rrd_filename = Rrd::name($device['hostname'], 'netstats-ip');
 
 $stats = [
     'ipForwDatagrams' => [],

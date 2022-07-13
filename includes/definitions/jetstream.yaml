@@ -6,11 +6,30 @@ mib_dir: tplink
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.11863.5.28
-            - .1.3.6.1.4.1.11863.5.29
-            - .1.3.6.1.4.1.11863.5.31
-            - .1.3.6.1.4.1.11863.5.34
-            - .1.3.6.1.4.1.11863.5.86
+            - .1.3.6.1.4.1.11863.5.
     -
         sysDescr:
             - JetStream
+oids:
+    no_bulk:
+        - TPLINK-DDMSTATUS-MIB::ddmStatusTable
+        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowAlarm
+        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowWarn
+        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighAlarm
+        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighWarn
+        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowAlarm
+        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowWarn
+        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighAlarm
+        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighWarn
+        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowAlarm
+        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowWarn
+        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighAlarm
+        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighWarn
+        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowAlarm
+        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowWarn
+        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighAlarm
+        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighWarn
+        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowAlarm
+        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowWarn
+        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighAlarm
+        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighWarn

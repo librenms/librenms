@@ -13,7 +13,7 @@ IMPORTS
 
 rlGreenEth MODULE-IDENTITY  -- August 15, 2008
 
-        LAST-UPDATED  "200808150000Z"
+        LAST-UPDATED  "200808150001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -135,6 +135,19 @@ NonOperReasonType ::= TEXTUAL-CONVENTION
         unknown(8)
     }
 
+CableLengthRange ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION
+		"cable length calculated when link is up
+		Relevant only for SR"
+	SYNTAX INTEGER {
+		lengthUnknown(0),
+		lengthLessThan50M(1),
+		length50MTo80M(2), 
+		length80MTo110M(3), 
+		length110MTo140M(4), 
+		lengthMoreThan140M(5)
+	}
 
 rlGreenEthPortTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlGreenEthPortEntry
@@ -160,7 +173,8 @@ RlGreenEthPortEntry ::= SEQUENCE {
     rlGreenEthPortSavingTypeValue         RlGreenSavingType,
     rlGreenEthPortAdminState              TruthValue,
     rlGreenEthPortOperState               TruthValue,
-    rlGreenEthPortNonOperReason           NonOperReasonType
+    rlGreenEthPortNonOperReason           NonOperReasonType,
+	rlGreenEthPortCableLength			  CableLengthRange
 }
 
 rlGreenEthPortSavingTypeValue OBJECT-TYPE
@@ -196,6 +210,14 @@ rlGreenEthPortNonOperReason OBJECT-TYPE
         "Reason why saving mode is not activated"
     ::= { rlGreenEthPortEntry 4 }
 
+rlGreenEthPortCableLength OBJECT-TYPE
+    SYNTAX      CableLengthRange
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "cable length calculated when link is up"
+    ::= { rlGreenEthPortEntry 5 }
+	
 rlGreenEthForceShortReachIfIndexList OBJECT-TYPE
     SYNTAX           PortList
     MAX-ACCESS       read-write

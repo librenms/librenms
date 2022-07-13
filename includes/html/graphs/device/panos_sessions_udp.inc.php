@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'panos-sessions-udp');
+$rrd_filename = Rrd::name($device['hostname'], 'panos-sessions-udp');
 
 $ds = 'sessions_udp';
 

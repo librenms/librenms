@@ -18,22 +18,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ipv6Network extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_network_id';
+    protected $fillable = [
+        'ipv6_network',
+        'context_name',
+    ];
 
     // ---- Define Relationships ----
 
-    public function ipv6()
+    public function ipv6(): HasMany
     {
         return $this->hasMany(\App\Models\Ipv6Address::class, 'ipv6_network_id');
     }

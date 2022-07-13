@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,6 +29,7 @@ use DB;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
+use PDOException;
 use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
 
@@ -90,7 +92,7 @@ class Schema
     /**
      * Get the primary key column(s) for a table
      *
-     * @param string $table
+     * @param  string  $table
      * @return string if a single column just the name is returned, otherwise the first column listed will be returned
      */
     public function getPrimaryKey($table)
@@ -112,6 +114,25 @@ class Schema
     }
 
     /**
+     * Get the schema version from the previous schema system
+     */
+    public static function getLegacySchema(): int
+    {
+        try {
+            $db = \LibreNMS\DB\Eloquent::DB();
+            if ($db) {
+                return (int) $db->table('dbSchema')
+                    ->orderBy('version', 'DESC')
+                    ->value('version');
+            }
+        } catch (PDOException $e) {
+            // return default
+        }
+
+        return 0;
+    }
+
+    /**
      * Get a list of all tables.
      *
      * @return array
@@ -124,7 +145,7 @@ class Schema
     /**
      * Return all columns for the given table
      *
-     * @param $table
+     * @param  string  $table
      * @return array
      */
     public function getColumns($table)
@@ -138,12 +159,13 @@ class Schema
      * Get all relationship paths.
      * Caches the data after the first call as long as the schema hasn't changed
      *
-     * @param string $base
+     * @param  string  $base
      * @return mixed
      */
     public function getAllRelationshipPaths($base = 'devices')
     {
         $update_cache = true;
+        $cache = [];
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->database();
 
@@ -181,8 +203,8 @@ class Schema
     /**
      * Find the relationship path from $start to $target
      *
-     * @param string $target
-     * @param string $start Default: devices
+     * @param  string  $target
+     * @param  string  $start  Default: devices
      * @return array|false list of tables in path order, or false if no path is found
      */
     public function findRelationshipPath($target, $start = 'devices')
@@ -317,7 +339,7 @@ class Schema
      * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
      * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
      *
-     * @param string $connection use a specific connection
+     * @param  string  $connection  use a specific connection
      * @return array
      */
     public static function dump($connection = null)
@@ -325,9 +347,11 @@ class Schema
         $output = [];
         $db_name = DB::connection($connection)->getDatabaseName();
 
+        DB::statement("SET TIME_ZONE='+00:00'"); // set timezone to UTC to avoid timezone issues
+
         foreach (DB::connection($connection)->select(DB::raw("SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$db_name' ORDER BY TABLE_NAME;")) as $table) {
             $table = $table->TABLE_NAME;
-            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
+            foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")) as $data) {
                 $def = [
                     'Field' => $data->COLUMN_NAME,
                     'Type' => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
@@ -382,6 +406,8 @@ class Schema
                 }
             }
         }
+
+        DB::statement('SET TIME_ZONE=@@global.time_zone'); // restore session timezone
 
         return $output;
     }

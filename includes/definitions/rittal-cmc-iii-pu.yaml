@@ -17,3 +17,4 @@ discovery:
         sysDescr_regex:
             - '/^Rittal CMC III PU/'
             - '/^Rittal CMC III PU Compact/'
+            - '/^Rittal PDU/'

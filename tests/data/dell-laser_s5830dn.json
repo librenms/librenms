@@ -37,8 +37,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -144,8 +142,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
@@ -255,8 +251,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -362,8 +356,6 @@
                     "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
@@ -672,80 +664,80 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer-supplies": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Toner",
-                    "toner_capacity": 45000,
-                    "toner_current": 49,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Toner",
+                    "supply_capacity": 45000,
+                    "supply_current": 49,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "opc",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Imaging Unit",
-                    "toner_capacity": 100000,
-                    "toner_current": 72,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "opc",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Imaging Unit",
+                    "supply_capacity": 100000,
+                    "supply_current": 72,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "other",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Maintenance Kit",
-                    "toner_capacity": 200000,
-                    "toner_current": 83,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "other",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Maintenance Kit",
+                    "supply_capacity": 200000,
+                    "supply_current": 83,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "other",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Roller Kit",
-                    "toner_capacity": 300000,
-                    "toner_current": 89,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "other",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Roller Kit",
+                    "supply_capacity": 300000,
+                    "supply_current": 89,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_index": 1,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
-                    "toner_descr": "Tray 1",
-                    "toner_capacity": 550,
-                    "toner_current": 100,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
+                    "supply_index": 1,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.1",
+                    "supply_descr": "Tray 1",
+                    "supply_capacity": 550,
+                    "supply_current": 100,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "toner_descr": "Manual Envelope",
-                    "toner_capacity": 1,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "Manual Envelope",
+                    "supply_capacity": 1,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
-                    "toner_descr": "Manual Paper",
-                    "toner_capacity": 1,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
+                    "supply_index": 3,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.3",
+                    "supply_descr": "Manual Paper",
+                    "supply_capacity": 1,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.4",
-                    "toner_descr": "MP Tray",
-                    "toner_capacity": 100,
-                    "toner_current": 0,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.4"
+                    "supply_index": 4,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.4",
+                    "supply_descr": "MP Tray",
+                    "supply_capacity": 100,
+                    "supply_current": 0,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.4"
                 }
             ]
         },

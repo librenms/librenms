@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,23 +41,24 @@ abstract class SimpleTableController extends Controller
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  array $rules
-     * @param  array $messages
-     * @param  array $customAttributes
-     * @return void
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
     {
         $full_rules = array_replace(self::$base_rules, $rules);
-        parent::validate($request, $full_rules, $messages, $customAttributes);
+
+        return parent::validate($request, $full_rules, $messages, $customAttributes);
     }
 
     /**
-     * @param array|Collection $rows
-     * @param int $page
-     * @param int $currentCount
-     * @param int $total
+     * @param  array|Collection  $rows
+     * @param  int  $page
+     * @param  int  $currentCount
+     * @param  int  $total
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($rows, $page, $currentCount, $total)

@@ -5,8 +5,10 @@ $(function () {
 </script>
 <?php
 
+use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Number;
 
 // This file prints a table row for each interface
 $port['device_id'] = $device['device_id'];
@@ -72,15 +74,19 @@ if ($port_details) {
 
 echo '</span>';
 
+$port_group_name_list = Port::find($port['port_id'])->groups->pluck('name')->toArray() ?: ['Default'];
+
+echo '</td><td width=100>';
+echo implode('<br>', $port_group_name_list);
 echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 
 if ($port_details) {
     $port['graph_type'] = 'port_bits';
-    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
     $port['graph_type'] = 'port_upkts';
-    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_upkts&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
     $port['graph_type'] = 'port_errors';
-    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>");
+    echo generate_port_link($port, "<img src='graph.php?type=port_errors&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
 }
 
 echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
@@ -88,17 +94,17 @@ echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) .
 if ($port['ifOperStatus'] == 'up') {
     $port['in_rate'] = ($port['ifInOctets_rate'] * 8);
     $port['out_rate'] = ($port['ifOutOctets_rate'] * 8);
-    $in_perc = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $out_perc = @round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    echo "<i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i> <span style='color: " . percent_colour($in_perc) . "'>" . formatRates($port['in_rate']) . "<br />
-        <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i> <span style='color: " . percent_colour($out_perc) . "'>" . formatRates($port['out_rate']) . "<br />
-        <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i> " . format_bi($port['ifInUcastPkts_rate']) . "pps</span><br />
-        <i class='fa fa-long-arrow-right fa-lg' style='color:darkorange' aria-hidden='true'></i> " . format_bi($port['ifOutUcastPkts_rate']) . 'pps</span>';
+    $in_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $out_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    echo "<i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i> <span style='color: " . percent_colour($in_perc) . "'>" . Number::formatSi($port['in_rate'], 2, 3, 'bps') . "<br />
+        <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i> <span style='color: " . percent_colour($out_perc) . "'>" . Number::formatSi($port['out_rate'], 2, 3, 'bps') . "<br />
+        <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i> " . Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps') . "</span><br />
+        <i class='fa fa-long-arrow-right fa-lg' style='color:darkorange' aria-hidden='true'></i> " . Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, 'pps') . '</span>';
 }
 
 echo "</td><td width=75 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 if ($port['ifSpeed']) {
-    echo '<span class=box-desc>' . humanspeed($port['ifSpeed']) . '</span>';
+    echo '<span class=box-desc>' . \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps') . '</span>';
 }
 
 echo '<br />';
@@ -118,7 +124,7 @@ $vlan_count = count($vlans);
 
 if ($vlan_count > 1) {
     echo '<p class=box-desc><span class=purple><a href="';
-    echo generate_device_url($device, ['tab' => 'vlans']);
+    echo \LibreNMS\Util\Url::deviceUrl((int) $device['device_id'], ['tab' => 'vlans']);
     echo '" title="';
     echo implode(', ', $vlans);
     echo '">VLANs: ';
@@ -139,12 +145,12 @@ if ($port_adsl['adslLineCoding']) {
     echo '<br />';
     // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
     // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
-    echo 'Sync:' . formatRates($port_adsl['adslAtucChanCurrTxRate']) . '/' . formatRates($port_adsl['adslAturChanCurrTxRate']);
+    echo 'Sync:' . Number::formatSi($port_adsl['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAturChanCurrTxRate'], 2, 3, 'bps');
     echo '<br />';
     // This is the Receive Max AttainableRate, so :
     //    adslAturCurrAttainableRate is DownloadMaxRate
     //    adslAtucCurrAttainableRate is UploadMaxRate
-    echo 'Max:' . formatRates($port_adsl['adslAturCurrAttainableRate']) . '/' . formatRates($port_adsl['adslAtucCurrAttainableRate']);
+    echo 'Max:' . Number::formatSi($port_adsl['adslAturCurrAttainableRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAtucCurrAttainableRate'], 2, 3, 'bps');
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
     echo '<br />';
@@ -152,7 +158,7 @@ if ($port_adsl['adslLineCoding']) {
 } else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
-        echo '<span class=box-desc>' . fixiftype($port['ifType']) . '</span>';
+        echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']) . '</span>';
     } else {
         echo '-';
     }
@@ -166,7 +172,7 @@ if ($port_adsl['adslLineCoding']) {
 
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != '') {
-        echo '<span class=box-desc>' . formatMac($port['ifPhysAddress']) . '</span>';
+        echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::readableMac($port['ifPhysAddress']) . '</span>';
     } else {
         echo '-';
     }
@@ -184,6 +190,7 @@ echo '<td width=375 valign=top class="interface-desc">';
 
 $neighborsCount = 0;
 $nbLinks = 0;
+$int_links = [];
 if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', [$if_id]) as $link) {
         $int_links[$link['port_id']] = $link['port_id'];
@@ -210,7 +217,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
                 $this_ifid = $new['port_id'];
                 $this_hostid = $new['device_id'];
                 $this_hostname = $new['hostname'];
-                $this_ifname = fixifName($new['label']);
+                $this_ifname = \LibreNMS\Util\Rewrite::normalizeIfName($new['label']);
                 $int_links[$this_ifid] = $this_ifid;
                 $int_links_v4[$this_ifid] = 1;
             }
@@ -232,7 +239,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
                 $this_ifid = $new['port_id'];
                 $this_hostid = $new['device_id'];
                 $this_hostname = $new['hostname'];
-                $this_ifname = fixifName($new['label']);
+                $this_ifname = \LibreNMS\Util\Rewrite::normalizeIfName($new['label']);
                 $int_links[$this_ifid] = $this_ifid;
                 $int_links_v6[$this_ifid] = 1;
             }
@@ -262,7 +269,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
                 echo "<i class='fa fa-arrow-right fa-lg' style='color:green' aria-hidden='true'></i> ";
             }
 
-            echo '<b>' . generate_port_link($link_if, makeshortif($link_if['label'])) . ' on ' . generate_device_link($link_if, shorthost($link_if['hostname']));
+            echo '<b>' . generate_port_link($link_if, makeshortif($link_if['label'])) . ' on ' . generate_device_link($link_if);
 
             if ($int_links_v6[$int_link]) {
                 echo " <b style='color: #a10000;'>v6</b>";
@@ -286,7 +293,7 @@ if ($port_details && Config::get('enable_port_relationship') === true && port_pe
         $pw_peer_int = dbFetchRow('SELECT * FROM `ports` AS I, pseudowires AS P WHERE I.device_id = ? AND P.cpwVcID = ? AND P.port_id = I.port_id', [$pseudowire['peer_device_id'], $pseudowire['cpwVcID']]);
 
         $pw_peer_int = cleanPort($pw_peer_int);
-        echo "$br<i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) . ' on ' . generate_device_link($pw_peer_dev, shorthost($pw_peer_dev['hostname'])) . '</b>';
+        echo "$br<i class='fa fa-cube fa-lg' style='color:green' aria-hidden='true'></i><b> " . generate_port_link($pw_peer_int, makeshortif($pw_peer_int['label'])) . ' on ' . generate_device_link($pw_peer_dev) . '</b>';
         $br = '<br />';
     }
 

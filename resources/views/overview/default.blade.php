@@ -23,7 +23,7 @@
                     @forelse ($user_dashboards as $dash)
                         @if($dash->dashboard_id != $dashboard->dashboard_id)
                         <li>
-                            <a href="{{ url("?dashboard=$dash->dashboard_id") }}">{{ $dash->dashboard_name }}</a>
+                            <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">{{ $dash->dashboard_name }}</a>
                         </li>
                         @endif
                     @empty
@@ -36,7 +36,7 @@
                         @foreach ($shared_dashboards as $dash)
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
-                                <a href="{{ url("?dashboard=$dash->dashboard_id") }}">
+                                <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
                                 {{ ($dash->user->username ?? __('Deleted User')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
                             </li>
                             @endif
@@ -99,8 +99,8 @@
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
                             <option value="-1" selected> Copy Dashboard to </option>
-                        @foreach ($user_list as $user)
-                            <option value="{{ $user->user_id }}">{{ $user->username }}</option>
+                        @foreach ($user_list as $user_id => $username)
+                            <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
                         </div>
@@ -124,9 +124,9 @@
                                 </span>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @foreach ($widgets as $widget)
+                                    @foreach ($widgets as $type => $title)
                                     <li>
-                                        <a href="#" onsubmit="return false;" class="place_widget" data-widget_id="{{ $widget->widget_id }}">{{ $widget->widget_title }}</a>
+                                        <a href="#" onsubmit="return false;" class="place_widget" data-widget_type="{{ $type }}">{{ $title }}</a>
                                     </li>
                                     @endforeach
                                 </ul>
@@ -166,14 +166,16 @@
 @endsection
 
 @section('javascript')
-<script type="text/javascript" src="js/jquery.gridster.min.js"></script>
+<script src="{{ asset('js/jquery.gridster.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/raphael.min.js?ver=05072021') }}"></script>
+<script src="{{ asset('js/justgage.min.js?ver=05072021') }}"></script>
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
     var gridster;
 
-    var serialization = {!! $dash_config !!};
+    var serialization = @json($dash_config);
 
     serialization = Gridster.sort_by_row_and_col_asc(serialization);
     var gridster_state = 0;
@@ -242,16 +244,10 @@
     });
 
     $(document).on('click','#clear_widgets', function() {
-        var widget_id = $(this).data('widget-id');
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {
-                    type: "update-dashboard-config",
-                    sub_type: 'remove-all',
-                    dashboard_id: dashboard_id
-                },
+                type: 'DELETE',
+                url: '{{ route('dashboard.widget.clear', '?') }}'.replace('?', dashboard_id),
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -270,21 +266,18 @@
     });
 
     $('.place_widget').on('click',  function(event, state) {
-        var widget_id = $(this).data('widget_id');
+        var widget_type = $(this).data('widget_type');
         event.preventDefault();
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('dashboard.widget.add', '?') }}'.replace('?', dashboard_id),
                 data: {
-                    type: "update-dashboard-config",
-                    sub_type: 'add',
-                    widget_id: widget_id,
-                    dashboard_id: dashboard_id
+                    widget_type: widget_type
                 },
                 dataType: "json",
                 success: function (data) {
-                    if (data.status == 'ok') {
+                    if (data.status === 'ok') {
                         widget_dom(data.extra);
                         updatePos(gridster);
                         toastr.success(data.message);
@@ -303,14 +296,8 @@
     $(document).on( "click", ".close-widget", function() {
         var widget_id = $(this).data('widget-id');
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {
-                type: "update-dashboard-config",
-                sub_type: 'remove',
-                widget_id: widget_id,
-                dashboard_id: dashboard_id
-            },
+            type: 'DELETE',
+            url: '{{ route('dashboard.widget.remove', '?') }}'.replace('?', widget_id),
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
@@ -342,8 +329,6 @@
 
 
     function updatePos(gridster) {
-        var s = JSON.stringify(gridster.serialize());
-
         @if ($dashboard->dashboard_id > 0)
             var dashboard_id = {{ $dashboard->dashboard_id }};
         @else
@@ -352,13 +337,9 @@
 
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {
-                    type: "update-dashboard-config",
-                    data: s,
-                    dashboard_id: dashboard_id
-                },
+                type: 'PUT',
+                url: '{{ route('dashboard.widget.update', '?') }}'.replace('?', dashboard_id),
+                data: {data: JSON.stringify(gridster.serialize())},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -394,18 +375,14 @@
 
     function dashboard_delete(data) {
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {
-                type: 'delete-dashboard',
-                dashboard_id: $(data).data('dashboard')
-            },
+            type: 'DELETE',
+            url: '{{ route('dashboard.destroy', '?') }}'.replace('?', $(data).data('dashboard')),
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = "{{ url('/') }}";
+                        window.location.href = "{{ route('home') }}";
                     }, 500);
 
                 } else {
@@ -431,12 +408,10 @@
         }
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
+                type: 'PUT',
+                url: '{{ route('dashboard.update', '?') }}'.replace('?', dashboard_id),
                 data: {
-                    type: 'edit-dashboard',
                     dashboard_name: data['dashboard_name'],
-                    dashboard_id: dashboard_id,
                     access: data['access']
                 },
                 dataType: "json",
@@ -444,7 +419,7 @@
                     if (data.status == "ok") {
                         toastr.success(data.message);
                         setTimeout(function (){
-                            window.location.href = "{{ url('/?dashboard=') }}" + dashboard_id;
+                            window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', dashboard_id);
                         }, 500);
                     }
                     else {
@@ -466,14 +441,14 @@
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: 'add-dashboard', dashboard_name: data['dashboard_name']},
+            url: '{{ route('dashboard.store') }}',
+            data: {dashboard_name: data['dashboard_name']},
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = "{{ url('/?dashboard=') }}" + data.dashboard_id;
+                        window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', data.dashboard_id);
                     }, 500);
                 }
                 else {
@@ -509,8 +484,8 @@
 
             $.ajax({
                 type: 'POST',
-                url: '{{ url('/ajax/form/copy-dashboard') }}',
-                data: {target_user_id: target_user_id, dashboard_id: dashboard_id},
+                url: '{{ route('dashboard.copy', '?') }}'.replace('?', dashboard_id),
+                data: {target_user_id: target_user_id},
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
@@ -532,7 +507,7 @@
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
-              '</span>'+
+              '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit pull-right">'+
 
                 @if (
@@ -565,7 +540,7 @@
         var datas = $(data).serializeArray();
         for( var field in datas ) {
             var name = datas[field].name;
-            if (name.endsWith('[]')) {
+            if (name.substring(name.length - 2, name.length) === '[]') {
                 name = name.slice(0, -2);
                 if (widget_settings[name]) {
                     widget_settings[name].push(datas[field].value);
@@ -581,18 +556,18 @@
             if(this.contains(data)) {
                 widget_id = $(this).parent().attr('id');
                 widget_type = $(this).parent().data('type');
-                $(this).parent().data('settings','0');
+                $(this).parent().data('settings', '0');
             }
         });
-        if( widget_id > 0 && widget_settings != {} ) {
+        if(widget_id > 0 && widget_settings != {}) {
             $.ajax({
                 type: 'PUT',
-                url: '{{ url('/ajax/form/widget-settings/') }}/' + widget_id,
-                data: {settings: widget_settings},
+                url: '{{ route('dashboard.widget.settings', '?') }}/'.replace('?', widget_id),
+                data: { settings: widget_settings },
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
-                        widget_reload(widget_id, widget_type);
+                        widget_reload(widget_id, widget_type, true);
                         toastr.success(data.message);
                     }
                     else {
@@ -607,57 +582,54 @@
     return false;
     }
 
-    function widget_reload(id, data_type) {
-        $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
-        $("#widget_body_"+id+" *").off();
-        var $widget_body = $("#widget_body_"+id);
-        if ($widget_body.parent().data('settings') == 1 ) {
-            settings = 1;
-        } else {
-            settings = 0;
+    function widget_reload(id, data_type, forceDomInject) {
+        const $widget_body = $('#widget_body_' + id);
+        const $widget_bootgrid = $('#widget_body_' + id + ' .bootgrid-table');
+        const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
+
+        if (settings === 1 || forceDomInject) {
+            $widget_bootgrid.bootgrid('destroy');
+            $('#widget_body_' + id + ' *').off();
+        } else if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
+            // Check to see if a bootgrid already exists and has ajax reloading enabled.
+            // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
+            return $widget_bootgrid.bootgrid('reload');
         }
+
         $.ajax({
             type: 'POST',
             url: ajax_url + '/dash/' + data_type,
             data: {
                 id: id,
-                dimensions: {x:$widget_body.width(), y:$widget_body.height()},
-                settings:settings
+                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                settings: settings
             },
-            dataType: "json",
+            dataType: 'json',
             success: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
                 if (data.status === 'ok') {
-                    $("#widget_title_"+id).html(data.title);
-                    $widget_body.html(data.html).parent().data('settings', data.show_settings);
-                    $widget_body.html(data.html).parent().data('refresh', data.settings.refresh);
+                    $('#widget_title_' + id).html(data.title);
+                    $widget_body.html(data.html);
+                    $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
             error: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
-                if (data.responseJSON.error) {
-                    $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
-                } else {
-                    $widget_body.html('<div class="alert alert-info">{{ __('Problem with backend') }}</div>');
-                }
+                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
             }
         });
     }
 
     function grab_data(id, data_type) {
-        var parent = $("#widget_body_"+id).parent();
+        const $parent = $('#widget_body_' + id).parent();
 
-        if( parent.data('settings') == 0 ) {
+        if($parent.data('settings') == 0) {
             widget_reload(id, data_type);
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             grab_data(id, data_type);
-        }, (parent.data('refresh') > 0 ? parent.data('refresh') : 60) * 1000);
+        }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
     }
 
     $('#new-widget').popover();

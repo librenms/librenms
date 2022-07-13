@@ -25,9 +25,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Hipchat extends Transport
 {
+    protected $name = 'HipChat';
+
     public function deliverAlert($obj, $opts)
     {
         $hipchat_opts = $this->parseUserOptions($this->config['hipchat-options']);
@@ -50,9 +53,7 @@ class Hipchat extends Transport
         if ($version == 2) {
             $url .= '/' . urlencode($option['room_id']) . '/notification?auth_token=' . urlencode($option['auth_token']);
         }
-        foreach ($obj as $key => $value) {
-            $api = str_replace('%' . $key, $method == 'get' ? urlencode($value) : $value, $api);
-        }
+
         $curl = curl_init();
 
         if (empty($obj['msg'])) {
@@ -87,7 +88,7 @@ class Hipchat extends Transport
         $data[] = 'message_format=' . urlencode($option['message_format']);
 
         $data = implode('&', $data);
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);
@@ -100,7 +101,7 @@ class Hipchat extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 200 && $code != 204) {
             var_dump("API '$url' returned Error");
-            var_dump('Params: ' . $message);
+            //var_dump('Params: ' . $message);
             var_dump('Return: ' . $ret);
 
             return 'HTTP Status code ' . $code;

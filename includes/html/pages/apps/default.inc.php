@@ -44,7 +44,7 @@ foreach ($apps as $app) {
         $link = Url::generate(['page' => 'device', 'device' => $app->device_id, 'tab' => 'apps', 'app' => $app->app_type]);
 
         echo '<div class="pull-left">';
-        echo Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom), null);
+        echo Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom));
         echo '</div>';
     }
 
@@ -52,5 +52,3 @@ foreach ($apps as $app) {
     echo '</div>';
     echo '</div>';
 }//end foreach
-
-echo '</table>';

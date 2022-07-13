@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 KanREN, Inc.
  * @author     Neil Kahle <nkahle@kanren.net>
  */
@@ -35,8 +36,8 @@ class JnxLdpSesDown implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -47,7 +48,7 @@ class JnxLdpSesDown implements SnmptrapHandler
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
 
         if (! $port) {
-            Log::warning("Snmptrap LdpSesDown: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+            Log::warning("Snmptrap LdpSesDown: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
 
             return;
         }

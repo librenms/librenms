@@ -25,6 +25,8 @@ CISCOSB-Physicaldescription-MIB DEFINITIONS ::= BEGIN
 --             Renamed file appolo.txt to ralan-mib.mib
 -- 23-Jul-2012 IdanS: Add rlPhdUnitGenParamRegistrationDone and rlPhdUnitGenParamRegistrationSuppressed to RlPhdUnitGenParamEntry
 -- 09-Oct-2012 yahal: Add rlPhdUnitEnvParamMonitorAutoRecoveryEnable & rlPhdUnitEnvParamMonitorTemperatureStatus & rlPhdUnitEnvParamMonitorTemperatureStatus
+-- 08-Jan-2015 YoramSu: Add rlPhdUnitEnvParamTempSensorWarningThresholdValue and rlPhdUnitEnvParamTempSensorCriticalThresholdValue to rlPhdUnitEnvParamEntry
+-- 25-Aug-2016 YoramSu: Add rlPhdPhyLedTimeRemaining scalar
 
 IMPORTS
     OBJECT-TYPE, MODULE-IDENTITY, TimeTicks,
@@ -38,7 +40,7 @@ IMPORTS
     rndErrorDesc, rndErrorSeverity                          FROM CISCOSB-DEVICEPARAMS-MIB;
 
 rlPhysicalDescription  MODULE-IDENTITY
-                       LAST-UPDATED "200602120000Z"
+                       LAST-UPDATED "202105190000Z"
                        ORGANIZATION "Cisco Systems, Inc."
 
                        CONTACT-INFO
@@ -52,7 +54,7 @@ rlPhysicalDescription  MODULE-IDENTITY
                        DESCRIPTION
                             "The private MIB module definition for physical
                              device configuration."
-                       REVISION "200602120000Z"
+                       REVISION "202105190000Z"
                        DESCRIPTION
                             "Removed TRAP-TYPE from IMPORTS."
                        REVISION "200310180000Z"
@@ -69,23 +71,23 @@ CascadePortState ::= INTEGER {
 }
 
 CascadePortSpeed ::= INTEGER {
-   port-speed-10M                     (0),
+   port-speed-unknown                 (0),
    port-speed-100M                    (1),
    port-speed-1G                      (2),
    port-speed-10G                     (3),
-   port-speed-12G                     (4),
-   port-speed-2500M                   (5),
    port-speed-5G                      (6),
-   port-speed-13600M                  (7),
    port-speed-20G                     (8),
    port-speed-40G                     (9),
-   port-speed-16G                     (10),
-   port-speed-15G                     (11),
-   port-speed-75G                     (12),
    port-speed-100G                    (13),
-   unknown                            (14)
+   port-speed-auto                    (14)
 }
 
+LedLocatorPattern ::= INTEGER {
+   pattern-unknown                 (0),
+   pattern-blink                   (1),
+   pattern-alternating             (2),
+   pattern-system                  (3)
+}
 
 
 rlPhdMibVersion OBJECT-TYPE
@@ -104,7 +106,7 @@ rlPhdMibVersion OBJECT-TYPE
                  rlPhdMaxNumberOfUnits
          3: a. new field rlPhdModuleRole of rlPhdModuleTable
             b. new scalars
-                 rlPhdForceMasterUnit
+                 rlPhdForceControllerUnit
          4: a. new fields rlPhdModuleConnect1 and rlPhdModuleConnect2
                of rlPhdModuleTable.
          5: a. Prefix rlPhD were replaced by prefix rlPhd
@@ -211,9 +213,9 @@ rlPhdModuleColumn OBJECT-TYPE
 rlPhdModuleRole OBJECT-TYPE
     SYNTAX INTEGER {
         standalone(1),
-        master(2),
+        controller(2),
         backup(3),
-        slave(4)
+        member(4)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -416,7 +418,7 @@ rlPhdStackSofrwareVer OBJECT-TYPE
     ::= { rlPhdStackEntry 5 }
 
 rlPhdStackProductID OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (1..20))
+    SYNTAX      DisplayString (SIZE (1..40))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -588,12 +590,12 @@ rlPhdMaxNumberOfUnits OBJECT-TYPE
         "Shows the maximum number of units in the stack."
    ::= { rlPhysicalDescription 9 }
 
-rlPhdForceMasterUnit OBJECT-TYPE
+rlPhdForceControllerUnit OBJECT-TYPE
     SYNTAX INTEGER
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Force unit to be master."
+        "Force unit to be controller."
     ::= { rlPhysicalDescription 10 }
 
 -- The following scalar isn't suported and will be removed
@@ -660,7 +662,8 @@ RlPhdUnitGenParamEntry ::= SEQUENCE {
     rlPhdUnitGenParamMd5ChksumImage1 DisplayString,
     rlPhdUnitGenParamMd5ChksumImage2 DisplayString,
     rlPhdUnitGenParamRegistrationDone          TruthValue,
-    rlPhdUnitGenParamRegistrationSuppressed    TruthValue
+    rlPhdUnitGenParamRegistrationSuppressed    TruthValue,
+	rlPhdUnitGenParamCpldVersion	 DisplayString
 }
 
 rlPhdUnitGenParamStackUnit OBJECT-TYPE
@@ -775,6 +778,16 @@ rlPhdUnitGenParamRegistrationSuppressed OBJECT-TYPE
        DESCRIPTION "Registration Suppressed."
        ::= { rlPhdUnitGenParamEntry 16 }
 
+rlPhdUnitGenParamCpldVersion OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION "CPLD version"
+       ::= { rlPhdUnitGenParamEntry 17 }
+
+
+	   
+
 rlPhdUnitEnvParamTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RlPhdUnitEnvParamEntry
     MAX-ACCESS  not-accessible
@@ -802,12 +815,21 @@ RlPhdUnitEnvParamEntry ::= SEQUENCE {
     rlPhdUnitEnvParamFan3Status                                    RlEnvMonState,
     rlPhdUnitEnvParamFan4Status                                    RlEnvMonState,
     rlPhdUnitEnvParamFan5Status                                    RlEnvMonState,
+    rlPhdUnitEnvParamFan6Status                                    RlEnvMonState,
     rlPhdUnitEnvParamTempSensorValue                               EntitySensorValue,
     rlPhdUnitEnvParamTempSensorStatus                              EntitySensorStatus,
+    rlPhdUnitEnvParamTempSensorWarningThresholdValue               EntitySensorValue,
+    rlPhdUnitEnvParamTempSensorCriticalThresholdValue              EntitySensorValue,
     rlPhdUnitEnvParamUpTime                                        TimeTicks,
     rlPhdUnitEnvParamMonitorAutoRecoveryEnable                     TruthValue,
     rlPhdUnitEnvParamMonitorTemperatureStatus                      INTEGER,
-    rlPhdUnitEnvParamMonitorOperStatus                             TruthValue
+    rlPhdUnitEnvParamMonitorOperStatus                             TruthValue,
+    rlPhdUnitEnvParamFan1Speed                                     Unsigned32,
+    rlPhdUnitEnvParamFan2Speed                                     Unsigned32,
+    rlPhdUnitEnvParamFan3Speed                                     Unsigned32,
+    rlPhdUnitEnvParamFan4Speed                                     Unsigned32,
+    rlPhdUnitEnvParamFan5Speed                                     Unsigned32,
+    rlPhdUnitEnvParamFan6Speed                                     Unsigned32
 }
 
 rlPhdUnitEnvParamStackUnit OBJECT-TYPE
@@ -875,13 +897,21 @@ rlPhdUnitEnvParamFan5Status OBJECT-TYPE
                 "The mandatory  state of the FAN 5 being instrumented."
         ::= { rlPhdUnitEnvParamEntry 8 }
 
+rlPhdUnitEnvParamFan6Status OBJECT-TYPE
+        SYNTAX     RlEnvMonState
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The mandatory  state of the FAN 6 being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 9 }
+
 rlPhdUnitEnvParamTempSensorValue OBJECT-TYPE
         SYNTAX     EntitySensorValue
         MAX-ACCESS read-only
         STATUS     current
         DESCRIPTION
                 "Current value for the Sensor being instrumented."
-        ::= { rlPhdUnitEnvParamEntry 9 }
+        ::= { rlPhdUnitEnvParamEntry 10 }
 
 rlPhdUnitEnvParamTempSensorStatus OBJECT-TYPE
         SYNTAX     EntitySensorStatus
@@ -889,7 +919,23 @@ rlPhdUnitEnvParamTempSensorStatus OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                "Status value for the Sensor being instrumented."
-        ::= { rlPhdUnitEnvParamEntry 10 }
+        ::= { rlPhdUnitEnvParamEntry 11 }
+
+rlPhdUnitEnvParamTempSensorWarningThresholdValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Temperature warning threshold value for the Sensor being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 12 }
+
+rlPhdUnitEnvParamTempSensorCriticalThresholdValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Temperature critical threshold value for the Sensor being instrumented."
+        ::= { rlPhdUnitEnvParamEntry 13 }
 
 rlPhdUnitEnvParamUpTime OBJECT-TYPE
         SYNTAX     TimeTicks
@@ -897,7 +943,7 @@ rlPhdUnitEnvParamUpTime OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                "Up time of the unit in 100th of second (sec/100)."
-        ::= { rlPhdUnitEnvParamEntry 11 }
+        ::= { rlPhdUnitEnvParamEntry 14 }
 
 rlPhdUnitEnvParamMonitorAutoRecoveryEnable OBJECT-TYPE
         SYNTAX     TruthValue
@@ -905,7 +951,7 @@ rlPhdUnitEnvParamMonitorAutoRecoveryEnable OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                "Disable environment automatic recovery option"
-        ::= { rlPhdUnitEnvParamEntry 12 }
+        ::= { rlPhdUnitEnvParamEntry 15 }
 
 rlPhdUnitEnvParamMonitorTemperatureStatus OBJECT-TYPE
     SYNTAX  INTEGER {
@@ -917,7 +963,7 @@ rlPhdUnitEnvParamMonitorTemperatureStatus OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                "Display environment monitoring chassis temperature status"
-        ::= { rlPhdUnitEnvParamEntry 13 }
+        ::= { rlPhdUnitEnvParamEntry 16 }
 
 rlPhdUnitEnvParamMonitorOperStatus OBJECT-TYPE
         SYNTAX     TruthValue
@@ -925,7 +971,55 @@ rlPhdUnitEnvParamMonitorOperStatus OBJECT-TYPE
         STATUS     current
         DESCRIPTION
                "Display environment automatic recovery current status (active/not active)"
-        ::= { rlPhdUnitEnvParamEntry 14 }
+        ::= { rlPhdUnitEnvParamEntry 17 }
+
+rlPhdUnitEnvParamFan1Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 1 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 18 }
+
+rlPhdUnitEnvParamFan2Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 2 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 19 }
+
+rlPhdUnitEnvParamFan3Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 3 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 20 }
+
+rlPhdUnitEnvParamFan4Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 4 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 21 }
+
+rlPhdUnitEnvParamFan5Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 5 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 22 }
+
+rlPhdUnitEnvParamFan6Speed OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+               "Rotation speed of FAN 6 in RPM. Value 4294967295 means the measurement of speed is not supported."
+        ::= { rlPhdUnitEnvParamEntry 23 }
 
 rlPhdStackOrderTopUnit OBJECT-TYPE
     SYNTAX      INTEGER
@@ -1043,8 +1137,8 @@ RlCascadeEntry ::= SEQUENCE {
     rlCascadeNeighborUnit              INTEGER,
     rlCascadeTrunkId                   INTEGER,
     rlCascadeUnitId                    INTEGER,
-    rlCascadePortSpeed                 CascadePortSpeed,
-    rlCascadePortState                 CascadePortState
+        rlCascadePortSpeed                        CascadePortSpeed,
+        rlCascadePortState                           CascadePortState
 }
 
 rlCascadeNeighborIfIndex OBJECT-TYPE
@@ -1098,53 +1192,56 @@ rlCascadePortState OBJECT-TYPE
         "Port state according to cascade LAG state machine"
     ::= { rlCascadeEntry 6 }
 
-rlCascadeAfterResetTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF RlCascadeAfterResetEntry
+-- rlCascadeAdminTable --
+
+rlCascadeAdminTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlCascadeAdminEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "For each cascaded port for stacking unit there is an entry describing it in this table after reset"
+        "For each unit there is an entry describing its cascade ports and speed after reset"
     ::= { rlPhysicalDescription 24 }
 
-rlCascadeAfterResetEntry OBJECT-TYPE
-    SYNTAX      RlCascadeAfterResetEntry
+rlCascadeAdminEntry OBJECT-TYPE
+    SYNTAX      RlCascadeAdminEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "A entry of this table specifies a cascaded port information in a unit after reset"
-    INDEX  { rlCascadeIfIndexAfterReset }
-    ::= { rlCascadeAfterResetTable 1 }
+        "An entry of this table specifies a cascaded information in a unit after reset"
+    INDEX  { rlCascadeAdminUnitId }
+    ::= { rlCascadeAdminTable 1 }
 
-RlCascadeAfterResetEntry ::= SEQUENCE {
-    rlCascadeIfIndexAfterReset          InterfaceIndex,
-    rlCascadeTrunkIdAfterReset          INTEGER,
-    rlCascadeRowStatus                  RowStatus
+RlCascadeAdminEntry ::= SEQUENCE {
+    rlCascadeAdminUnitId                INTEGER,
+    rlCascadeAdminIndexList             OCTET STRING,
+    rlCascadeAdminSpeed                 CascadePortSpeed
 }
 
-rlCascadeIfIndexAfterReset OBJECT-TYPE
-    SYNTAX      InterfaceIndex
-    MAX-ACCESS  read-only
+rlCascadeAdminUnitId OBJECT-TYPE
+    SYNTAX      INTEGER (0|1..8)
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The ifIndex of a stacking port  after reset."
-    ::= { rlCascadeAfterResetEntry 1 }
+        "The active unit number. Unit id 0 means configure all units."
+    ::= { rlCascadeAdminEntry 1 }
 
-rlCascadeTrunkIdAfterReset OBJECT-TYPE
-    SYNTAX      INTEGER
+rlCascadeAdminIndexList OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..16))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The Id of the trunk, the stacking port will be member after reset,
-         zero if the port is not member of trunk."
-    ::= { rlCascadeAfterResetEntry 2 }
+        "Indicates the stack ports indexes list.
+         A set of indexes that are identified by a bit-map, in which
+         each index is represented as a bit."
+    ::= { rlCascadeAdminEntry 2 }
 
-rlCascadeRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
+rlCascadeAdminSpeed OBJECT-TYPE
+    SYNTAX      CascadePortSpeed
+    MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION        "This object indicates the status of this entry."
-    ::= { rlCascadeAfterResetEntry 3 }
-
+    DESCRIPTION
+        "Cascade port speed"
+    ::= { rlCascadeAdminEntry  3 }
 
 -- Stack MIB Trap Definitions
 
@@ -1172,11 +1269,11 @@ rlStackBackupUnitRemoved NOTIFICATION-TYPE
         "Trap indicating that the backup unit was removed from the stack."
     ::= { rndNotifications 188 }
 
-rlStackMasterSwitchover NOTIFICATION-TYPE
+rlStackControllerSwitchover NOTIFICATION-TYPE
     OBJECTS   { rndErrorDesc, rndErrorSeverity }
     STATUS  current
     DESCRIPTION
-        "Trap indicating that a new master was elected.
+        "Trap indicating that a new controller was elected.
          The old maste is the backup now. "
     ::= { rndNotifications 189 }
 
@@ -1185,7 +1282,7 @@ rlStackUnitDifferentSwVersion NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
         "Trap indicating that the new unit added to the stack has
-         different software version than the master."
+         different software version than the controller."
     ::= { rndNotifications 190 }
 
 rlStackDuplicateUnitNotJoin NOTIFICATION-TYPE
@@ -1296,5 +1393,61 @@ rlPhdUnitStackPortColumn OBJECT-TYPE
          number assigned to the rightmost column) this actual/candidate cascade
              port resides within the chassis of its stack unit."
     ::= { rlPhdUnitStackPortEntry 5 }
+
+
+rlPhdUnitIfsMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlPhdUnitIfsMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unit Interface Mapping description table."
+    ::= { rlPhysicalDescription 26 }
+
+rlPhdUnitIfsMappingEntry OBJECT-TYPE
+    SYNTAX      RlPhdUnitIfsMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unit Interface Mapping description entry"
+    INDEX  { rlPhdUnitIfsMappingUnitId}
+    ::= { rlPhdUnitIfsMappingTable 1 }
+
+RlPhdUnitIfsMappingEntry ::= SEQUENCE {
+    rlPhdUnitIfsMappingUnitId                                     INTEGER,                 
+    rlPhdUnitIfsMappingUnitType                                   INTEGER
+}
+
+rlPhdUnitIfsMappingUnitId OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION "Unit Id"
+       ::= { rlPhdUnitIfsMappingEntry 1 }
+
+rlPhdUnitIfsMappingUnitType OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Actual unit type used for interface mapping."
+        ::= { rlPhdUnitIfsMappingEntry 2 }
+
+rlPhdPhyLedTimeRemaining OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the time remaining for the stack light command timout to expire.
+         May be in the range 0..300 seconds, if the timeout = 0
+         - stack light command timeour expired."
+    ::= { rlPhysicalDescription 27 }
+
+rlPhdPhyLedPattern OBJECT-TYPE
+    SYNTAX      LedLocatorPattern
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar mib holds the pattern configuration required for the stack light command."
+    ::= { rlPhysicalDescription 28 }
 
 END

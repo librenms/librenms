@@ -3,7 +3,7 @@
 --   
 -- April 1994, Jeffrey T. Johnson
 --   
--- Copyright (c) 1994-1997, 2001, 2009, 2012 by cisco Systems Inc.
+-- Copyright (c) 1994-1997, 2001, 2009, 2012, 2016 by cisco Systems Inc.
 -- All rights reserved.
 --   
 -- ****************************************************************
@@ -18,7 +18,7 @@ IMPORTS
 
 
 cisco MODULE-IDENTITY
-    LAST-UPDATED    "201208290000Z"
+    LAST-UPDATED    "201601150000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -34,6 +34,9 @@ cisco MODULE-IDENTITY
     DESCRIPTION
         "The Structure of Management Information for the
         Cisco enterprise."
+    REVISION        "201601150000Z"
+    DESCRIPTION
+        "Added ciscoLDAP under cisco"
     REVISION        "201208290000Z"
     DESCRIPTION
         "Added ciscoSMB under otherEnterprises"
@@ -329,6 +332,15 @@ ciscoPKI OBJECT-IDENTITY
         "ciscoPKI is the root of cisco-assigned OID subtree for PKI
         Certificate Policies and Certificate Extensions."
     ::= { cisco 21 }
+
+
+ciscoLDAP OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "ciscoLDAP is the root of the Cisco-assigned OID
+        subtree for assignment to LDAP (Lightweight Directory
+        Access Protocol) modules."
+    ::= { cisco 22 }
 
 
 -- ciscoAdmin assignments follow

@@ -99,7 +99,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
             echo "<tr valign=top bgcolor='$bg_colour'>";
             echo '<td width=240>';
-            echo '<a class=list-large href=' . generate_url($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
+            echo '<a class=list-large href=' . \LibreNMS\Util\Url::generate($vars, ['view' => 'detail', 'vrf' => $vrf['vrf_name']]) . '>';
             echo $vrf['vrf_name'] . '</a><br />';
             echo '<span class=box-desc>' . $vrf['mplsVpnVrfDescription'] . '</span></td>';
             echo '<td width=100 class=box-desc>' . $vrf['mplsVpnVrfRouteDistinguisher'] . '</td>';
@@ -121,10 +121,7 @@ if (! Auth::user()->hasGlobalRead()) {
                 }
 
                 echo "<tr bgcolor='$dev_colour'><td width=150><a href='";
-                echo generate_url(
-                    ['page' => 'device'],
-                    ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']
-                );
+                echo \LibreNMS\Util\Url::generate(['page' => 'device'], ['device' => $device['device_id'], 'tab' => 'routing', 'view' => 'basic', 'proto' => 'vrf']);
                 echo "'>" . $device['hostname'] . '</a> ';
 
                 if ($device['vrf_name'] != $vrf['vrf_name']) {

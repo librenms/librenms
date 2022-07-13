@@ -90,19 +90,19 @@ foreach (dbFetchRows('SELECT * FROM `cef_switching` WHERE `device_id` = ?  ORDER
     }
 
     echo '</td>';
-    echo '<td>' . format_si($cef['drop']);
+    echo '<td>' . \LibreNMS\Util\Number::formatSi($cef['drop'], 2, 3, '');
     if ($cef['drop'] > $cef['drop_prev']) {
         echo " <span style='color:red;'>(" . round((($cef['drop'] - $cef['drop_prev']) / $interval), 2) . '/sec)</span>';
     }
 
     echo '</td>';
-    echo '<td>' . format_si($cef['punt']);
+    echo '<td>' . \LibreNMS\Util\Number::formatSi($cef['punt'], 2, 3, '');
     if ($cef['punt'] > $cef['punt_prev']) {
         echo " <span style='color:red;'>(" . round((($cef['punt'] - $cef['punt_prev']) / $interval), 2) . '/sec)</span>';
     }
 
     echo '</td>';
-    echo '<td>' . format_si($cef['punt2host']);
+    echo '<td>' . \LibreNMS\Util\Number::formatSi($cef['punt2host'], 2, 3, '');
     if ($cef['punt2host'] > $cef['punt2host_prev']) {
         echo " <span style='color:red;'>(" . round((($cef['punt2host'] - $cef['punt2host_prev']) / $interval), 2) . '/sec)</span>';
     }

@@ -29,6 +29,12 @@ class LdapAuthorizer extends AuthorizerBase
                 if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
                     $this->bind();
                 }
+
+                if (Config::get('auth_ldap_require_groupmembership') === false) {
+                    // skip group check if the server does not support ldap_compare (hint: google gsuite ldap)
+                    return true;
+                }
+
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
                     // no groups, don't check membership
@@ -76,7 +82,7 @@ class LdapAuthorizer extends AuthorizerBase
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
-                return 1;
+                return true;
             }
         } catch (AuthenticationException $e) {
             if ($throw_exception) {
@@ -92,7 +98,7 @@ class LdapAuthorizer extends AuthorizerBase
             }
         }
 
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -234,7 +240,7 @@ class LdapAuthorizer extends AuthorizerBase
             return $user;
         }
 
-        return 0;
+        return false;
     }
 
     protected function getMembername($username)
@@ -279,6 +285,7 @@ class LdapAuthorizer extends AuthorizerBase
 
     /**
      * Get the full dn with auth_ldap_prefix and auth_ldap_suffix
+     *
      * @internal
      *
      * @return string
@@ -291,6 +298,7 @@ class LdapAuthorizer extends AuthorizerBase
     /**
      * Set auth_ldap_suffix ou according to $username dn
      * useful if Config::get('auth_ldap_wildcard_ou) is set
+     *
      * @internal
      *
      * @return false|true
@@ -318,10 +326,12 @@ class LdapAuthorizer extends AuthorizerBase
 
     /**
      * Get the ldap connection. If it hasn't been established yet, connect and try to bind.
+     *
      * @internal
      *
-     * @param bool $skip_bind do not attempt to bind on connection
+     * @param  bool  $skip_bind  do not attempt to bind on connection
      * @return false|resource
+     *
      * @throws AuthenticationException
      */
     protected function getLdapConnection($skip_bind = false)
@@ -340,7 +350,7 @@ class LdapAuthorizer extends AuthorizerBase
     }
 
     /**
-     * @param array $entry ldap entry array
+     * @param  array  $entry  ldap entry array
      * @return array
      */
     private function ldapToUser($entry)
@@ -375,9 +385,9 @@ class LdapAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
 
         $use_tls = Config::get('auth_ldap_starttls');
-        if ($use_tls == 'optional' || $use_tls == 'require') {
+        if ($use_tls == 'optional' || $use_tls == 'required') {
             $tls_success = ldap_start_tls($this->ldap_connection);
-            if ($use_tls == 'require' && $tls_success === false) {
+            if ($use_tls == 'required' && $tls_success === false) {
                 $error = ldap_error($this->ldap_connection);
                 throw new AuthenticationException("Fatal error: LDAP TLS required but not successfully negotiated: $error");
             }

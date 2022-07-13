@@ -16,7 +16,7 @@ IMPORTS
     InetAddressType,InetAddress             FROM INET-ADDRESS-MIB; -- RFC2851
 
 rlMngInf MODULE-IDENTITY
-         LAST-UPDATED "200309210000Z"
+         LAST-UPDATED "200309210001Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -106,7 +106,8 @@ RlMngInfListEntry ::= SEQUENCE {
     rlMngInfListIpNetMask       IpAddress,
     rlMngInfListService         RlMngInfServiceType,
     rlMngInfListAction          RlMngInfActionType,
-    rlMngInfListRowStatus       RowStatus
+    rlMngInfListRowStatus       RowStatus,
+    rlMngInfListPortIfIndex     Unsigned32
 }
 
 rlMngInfListName OBJECT-TYPE
@@ -176,6 +177,14 @@ rlMngInfListRowStatus OBJECT-TYPE
          row installation and removal conventions."
     ::= { rlMngInfListEntry 8}
 
+rlMngInfListPortIfIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Physical Port IfIndex value. The IfIndex can be configured to be 0, which means don't care value."
+    ::= { rlMngInfListEntry 9}
+
 ---         Management Interface auditing control (SysLog)
 
 rlMngInfAuditingEnable  OBJECT-TYPE
@@ -216,7 +225,8 @@ RlMngInfListInetEntry ::= SEQUENCE {
     rlMngInfListInetService          RlMngInfServiceType,
     rlMngInfListInetAction           RlMngInfActionType,
     rlMngInfListInetRowStatus        RowStatus,
-    rlMngInfListInetIPv6PrefixLength INTEGER
+    rlMngInfListInetIPv6PrefixLength INTEGER,
+    rlMngInfListInetPortIfIndex      Unsigned32
 }
 
 rlMngInfListInetName OBJECT-TYPE
@@ -305,5 +315,20 @@ rlMngInfListInetIPv6PrefixLength OBJECT-TYPE
         DEFVAL      { 128 }
         ::= { rlMngInfListInetEntry 10}
 
+rlMngInfListInetPortIfIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The Physical Port IfIndex value. The IfIndex can be configured to be 0, which means don't care value."
+    ::= { rlMngInfListInetEntry 11}
+
+rlMngInfDefaultListName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The default Management ACL name"
+    ::= {rlMngInf 7}
 END
 

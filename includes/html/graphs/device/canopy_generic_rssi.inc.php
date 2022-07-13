@@ -10,8 +10,8 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'canopy-generic-rssi');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'canopy-generic-rssi');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rssi=' . $rrdfilename . ':rssi:AVERAGE ';
     $rrd_options .= " AREA:rssi#FF0000:'RSSI       ' ";

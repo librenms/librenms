@@ -6,7 +6,7 @@
 -- November 2002, Patrick Gili
 -- October  2005, Jayakumar Kadirvelu
 --   
--- Copyright (c) 2002-2010 by Cisco Systems, Inc.
+-- Copyright (c) 2002-2010, 2016 by Cisco Systems Inc.
 -- All rights reserved.
 -- ****************************************************************
 
@@ -52,7 +52,7 @@ IMPORTS
 
 
 ciscoEntityDiagMIB MODULE-IDENTITY
-    LAST-UPDATED    "201005260000Z"
+    LAST-UPDATED    "201603110000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -128,6 +128,10 @@ ciscoEntityDiagMIB MODULE-IDENTITY
         Diagnostic Job - Consists of a diagnostic suite 
         (i.e., a collection of tests) to be executed by a physical
         entity."
+    REVISION        "201603110000Z"
+    DESCRIPTION
+        "Added one new enumaration value disruptive(15)
+        to ceDiagTestAttributes"
     REVISION        "201005260000Z"
     DESCRIPTION
         "Added ceDiagHMTestThreshWindowGroup."
@@ -267,7 +271,8 @@ ceDiagTestAttributes OBJECT-TYPE
                         proxy(11),
                         activeToStandby(12),
                         offline(13),
-                        perDevice(14)
+                        perDevice(14),
+                        disruptive(15)
                     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -333,7 +338,12 @@ ceDiagTestAttributes OBJECT-TYPE
         'offline'         - indicates that this test will not get a user
                             confirmation when it is run.
 
-        'perDevice'       - indicates that this test is a per device test." 
+        'perDevice'       - indicates that this test is a per device test.
+
+        'disruptive'      - indicates that this test can be executed with
+                            disrupting the physical entity's normal
+                            operation. This test is also included in 
+                            the disruptive test suites." 
     ::= { ceDiagTestInfoEntry 3 }
  
 
@@ -1824,7 +1834,7 @@ ciscoEntityDiagMIBComplianceRev4 MODULE-COMPLIANCE
     GROUP           ceDiagTestPerfLastTestMethodGroup
     DESCRIPTION
         "This group is mandatory for devices which support sliding
-         history window parameters for Health Monitor diagnostic test."
+        history window parameters for Health Monitor diagnostic test."
 
     GROUP           ceDiagHMTestThreshWindowGroup
     DESCRIPTION
@@ -2203,9 +2213,6 @@ ceDiagHMTestThreshWindowGroup OBJECT-GROUP
     ::= { ciscoEntityDiagMIBGroups 15 }
 
 END
-
-
-
 
 
 

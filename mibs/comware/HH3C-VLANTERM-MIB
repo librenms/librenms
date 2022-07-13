@@ -1,0 +1,217 @@
+-- =========================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  Eth vlan termination mib
+-- Reference:
+-- Version: V1.0
+-- History:
+--     V1.0 Initial version 2020-09-01   by zhangxing
+-- =========================================================================
+HH3C-VLANTERM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cVlanTerm MODULE-IDENTITY
+    LAST-UPDATED "202009011638Z"        -- September 01, 2020 at 16:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+         "The VLAN Terminaion MIB."
+    REVISION  "202009011638Z"        -- September 01, 2020 at 16:00 GMT
+    DESCRIPTION "Creation Date."
+    ::= { hh3cCommon 193 }
+
+hh3cVlanTermObjects       OBJECT IDENTIFIER ::= { hh3cVlanTerm 1 }
+
+-- ---------------------------------------------------------- --
+-- The vlan dot1q termination Table
+-- ---------------------------------------------------------- --
+
+hh3cVlanTermDot1qTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVlanTermDot1qEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cVlanTermDot1qTable."
+    ::= { hh3cVlanTermObjects 1 }
+
+hh3cVlanTermDot1qEntry OBJECT-TYPE
+    SYNTAX Hh3cVlanTermDot1qEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents the parameters of an interface."
+    INDEX { hh3cVlanTermDot1qIfIndex,
+            hh3cVlanTermDot1qVidStart
+          }
+    ::= { hh3cVlanTermDot1qTable 1 }
+
+Hh3cVlanTermDot1qEntry ::=
+    SEQUENCE {
+        hh3cVlanTermDot1qIfIndex           InterfaceIndex,
+        hh3cVlanTermDot1qVidStart          Unsigned32,
+        hh3cVlanTermDot1qVidEnd            Unsigned32,
+        hh3cVlanTermDot1qEncapFlag         INTEGER,
+        hh3cVlanTermDot1qIsUserVlanMode    TruthValue
+        }
+
+hh3cVlanTermDot1qIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subinterface index."
+    ::= { hh3cVlanTermDot1qEntry 1 }
+
+hh3cVlanTermDot1qVidStart OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Start outermost VLAN ID."
+    ::= { hh3cVlanTermDot1qEntry 2 }
+
+hh3cVlanTermDot1qVidEnd OBJECT-TYPE
+    SYNTAX    Unsigned32 (1..4094)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "End outermost VLAN ID."
+    ::= { hh3cVlanTermDot1qEntry 3 }
+
+hh3cVlanTermDot1qEncapFlag OBJECT-TYPE
+    SYNTAX    INTEGER {
+                         strict(0),
+                         loose(1)
+                      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A subinterface to receive and terminate packets
+         that include two or more layers of VLAN tags."
+    ::= { hh3cVlanTermDot1qEntry 4 }
+
+hh3cVlanTermDot1qIsUserVlanMode OBJECT-TYPE
+    SYNTAX    TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN termination mode.
+         true : user-vlan
+         false : vlan-type"
+    ::= { hh3cVlanTermDot1qEntry 5 }
+
+-- ---------------------------------------------------------- --
+-- The vlan qinq termination Table
+-- ---------------------------------------------------------- --
+
+hh3cVlanTermQinqTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cVlanTermQinqEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cVlanTermQinqTable."
+    ::= { hh3cVlanTermObjects 2 }
+
+hh3cVlanTermQinqEntry OBJECT-TYPE
+    SYNTAX Hh3cVlanTermQinqEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents the parameters of an interface."
+    INDEX { hh3cVlanTermQinQIfIndex,
+            hh3cVlanTermQinQFirstVlan,
+            hh3cVlanTermQinQSecondVlanStart
+          }
+    ::= { hh3cVlanTermQinqTable 1 }
+
+Hh3cVlanTermQinqEntry ::=
+    SEQUENCE {
+        hh3cVlanTermQinQIfIndex          InterfaceIndex,
+        hh3cVlanTermQinQFirstVlan        Unsigned32,
+        hh3cVlanTermQinQSecondVlanStart  Unsigned32,
+        hh3cVlanTermQinQSecondVlanEnd    Unsigned32,
+        hh3cVlanTermQinQQinqAny          TruthValue,
+        hh3cVlanTermQinQEncapFlag        INTEGER,
+        hh3cVlanTermQinQIsUserVlanMode   TruthValue
+        }
+
+hh3cVlanTermQinQIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Subinterface index."
+    ::= { hh3cVlanTermQinqEntry 1 }
+
+hh3cVlanTermQinQFirstVlan OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The outermost VLAN ID."
+    ::= { hh3cVlanTermQinqEntry 2 }
+
+hh3cVlanTermQinQSecondVlanStart OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4095)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Start innermost VLAN ID.
+         When it is 4095, only hh3cVlanTermQinQQinqAny is true."
+    ::= { hh3cVlanTermQinqEntry 3 }
+
+hh3cVlanTermQinQSecondVlanEnd OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4095)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "End innermost vlan ID.
+         When it is 4095, only hh3cVlanTermQinQQinqAny is true."
+    ::= { hh3cVlanTermQinqEntry 4 }
+
+hh3cVlanTermQinQQinqAny OBJECT-TYPE
+    SYNTAX    TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "true : Specifies all values between 1 and 4094."
+    ::= { hh3cVlanTermQinqEntry 5 }
+
+hh3cVlanTermQinQEncapFlag OBJECT-TYPE
+    SYNTAX    INTEGER {
+                         strict(0),
+                         loose(1)
+                      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A subinterface to receive and terminate packets
+         that include two or more layers of VLAN tags."
+    ::= { hh3cVlanTermQinqEntry 6 }
+
+hh3cVlanTermQinQIsUserVlanMode OBJECT-TYPE
+    SYNTAX    TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN termination mode.
+         true : user-vlan
+         false : vlan-type"
+    ::= { hh3cVlanTermQinqEntry 7 }
+
+END

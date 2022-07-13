@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,8 +35,8 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
-     * @return static
+     * @param  \Exception  $exception
+     * @return static|null
      */
     public static function upgrade($exception)
     {
@@ -62,7 +63,6 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
@@ -75,13 +75,11 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
         $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
 
-        return SymfonyResponse::create($content);
+        return new SymfonyResponse($content);
     }
 
     /**
-     * @param \Illuminate\Config\Repository $user
-     * @param \Illuminate\Config\Repository $group
-     * @param $log_file
+     * @param  string  $log_file
      * @return array
      */
     private function generateCommands($log_file): array
@@ -116,7 +114,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         }
 
         // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
+        $commands[] = "sudo chown -R $user:$group '$install_dir'";
         $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
         $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
 

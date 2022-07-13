@@ -18,28 +18,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Tests\Traits\MockGuzzleClient;
 
 /**
  * @group datastores
  */
 class PrometheusStoreTest extends TestCase
 {
+    use MockGuzzleClient;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -50,13 +50,12 @@ class PrometheusStoreTest extends TestCase
 
     public function testFailWrite()
     {
-        $stack = HandlerStack::create(new MockHandler([
+        $this->mockGuzzleClient([
             new Response(422, [], 'Bad response'),
             new RequestException('Exception thrown', new Request('POST', 'test')),
-        ]));
+        ]);
 
-        $client = new Client(['handler' => $stack]);
-        $prometheus = new Prometheus($client);
+        $prometheus = app(Prometheus::class);
 
         \Log::shouldReceive('debug');
         \Log::shouldReceive('error')->once()->with("Prometheus Exception: Client error: `POST http://fake:9999/metrics/job/librenms/instance/test/measurement/none` resulted in a `422 Unprocessable Entity` response:\nBad response\n");
@@ -67,16 +66,11 @@ class PrometheusStoreTest extends TestCase
 
     public function testSimpleWrite()
     {
-        $stack = HandlerStack::create(new MockHandler([
+        $this->mockGuzzleClient([
             new Response(200),
-        ]));
+        ]);
 
-        $container = [];
-        $history = Middleware::history($container);
-
-        $stack->push($history);
-        $client = new Client(['handler' => $stack]);
-        $prometheus = new Prometheus($client);
+        $prometheus = app(Prometheus::class);
 
         $device = ['hostname' => 'testhost'];
         $measurement = 'testmeasure';
@@ -88,15 +82,12 @@ class PrometheusStoreTest extends TestCase
 
         $prometheus->put($device, $measurement, $tags, $fields);
 
-        $this->assertCount(1, $container, 'Did not receive the expected number of requests');
-
-        /** @var Request $request */
-        $request = $container[0]['request'];
-
-        $this->assertEquals('POST', $request->getMethod());
-        $this->assertEquals('/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype', $request->getUri()->getPath());
-        $this->assertEquals('fake', $request->getUri()->getHost());
-        $this->assertEquals(9999, $request->getUri()->getPort());
-        $this->assertEquals("ifIn 234234\nifOut 53453\n", (string) $request->getBody());
+        $history = $this->guzzleRequestHistory();
+        $this->assertCount(1, $history, 'Did not receive the expected number of requests');
+        $this->assertEquals('POST', $history[0]->getMethod());
+        $this->assertEquals('/metrics/job/librenms/instance/testhost/measurement/testmeasure/ifName/testifname/type/testtype', $history[0]->getUri()->getPath());
+        $this->assertEquals('fake', $history[0]->getUri()->getHost());
+        $this->assertEquals(9999, $history[0]->getUri()->getPort());
+        $this->assertEquals("ifIn 234234\nifOut 53453\n", (string) $history[0]->getBody());
     }
 }

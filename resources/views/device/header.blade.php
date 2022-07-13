@@ -2,13 +2,13 @@
     <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}" class="device-icon-header pull-left" style="max-height: 100px">
     <div class="pull-left" style="margin-top: 5px;">
         @if($parent_id)
-            <a href="{{ route('device', $parent_id) }}" title="@lang('VM Host')"><i class="fa fa-server fa-fw fa-lg"></i></a>
+            <a href="{{ route('device', $parent_id) }}" title="{{ __('VM Host') }}"><i class="fa fa-server fa-fw fa-lg"></i></a>
         @endif
         @if($device->isUnderMaintenance())
-            <span title="@lang('Scheduled Maintenance')" class="fa fa-wrench fa-fw fa-lg"></span>
+            <span title="{{ __('Scheduled Maintenance') }}" class="fa fa-wrench fa-fw fa-lg"></span>
         @endif
-        <span style="font-size: 20px;">@deviceLink($device)</span><br/>
-        <a href="{{ url('/devices/location=' . $device->location) }}">{{ $device->location }}</a>
+        <span style="font-size: 20px;"><x-device-link :device="$device" /></span><br/>
+        <a href="{{ url('/devices/location=' . urlencode($device->location)) }}">{{ $device->location }}</a>
     </div>
     <div class="pull-right">
         @foreach($overview_graphs as $graph)

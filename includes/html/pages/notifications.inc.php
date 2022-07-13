@@ -15,6 +15,7 @@
 
 /**
  * Notification Page
+ *
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
@@ -99,7 +100,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     <div class="row">
       <div class="col-md-12">
         <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo display($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
@@ -138,7 +139,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     <div class="row">
       <div class="col-md-12">
           <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo display($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>
@@ -178,7 +179,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
     <div class="row">
       <div class="col-md-12">
           <blockquote<?php echo $notif['severity'] == 2 ? ' style="border-color: darkred;"' : '' ?>>
-          <p><?php echo display($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
+          <p><?php echo \LibreNMS\Util\Clean::html($notif['body'], ['HTML.Allowed' => 'br']); ?></p>
           <footer><?php echo $notif['datetime']; ?> | Source: <code><?php echo $notif['source']; ?></code></footer>
         </blockquote>
       </div>

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @copyright  2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk/fa>
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,10 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
 use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class InfluxDB extends BaseDatastore
@@ -70,11 +71,11 @@ class InfluxDB extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param array $device
-     * @param string $measurement Name of this measurement
-     * @param array $tags tags for the data (or to control rrdtool)
-     * @param array|mixed $fields The data to update in an associative array, the order must be consistent with rrd_def,
-     *                            single values are allowed and will be paired with $measurement
+     * @param  array  $device
+     * @param  string  $measurement  Name of this measurement
+     * @param  array  $tags  tags for the data (or to control rrdtool)
+     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
+     *                               single values are allowed and will be paired with $measurement
      */
     public function put($device, $measurement, $tags, $fields)
     {
@@ -121,7 +122,7 @@ class InfluxDB extends BaseDatastore
 
             $this->connection->writePoints($points);
             $this->recordStatistic($stat->end());
-        } catch (\Exception $e) {
+        } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB exception: ' . $e->getMessage());
             Log::debug($e->getTraceAsString());
         }
@@ -159,18 +160,10 @@ class InfluxDB extends BaseDatastore
          * therefore may cause breakages on inserts.
          * Just setting every number to a float gets around this, but may introduce
          * inefficiencies.
-         * I've left the detection statement in there for a possible change in future,
-         * but currently everything just gets set to a float.
          */
 
         if (is_numeric($data)) {
-            // If it is an Integer
-            if (ctype_digit($data)) {
-                return floatval($data);
-            // Else it is a float
-            } else {
-                return floatval($data);
-            }
+            return floatval($data);
         }
 
         return $data === 'U' ? null : $data;

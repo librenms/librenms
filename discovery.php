@@ -8,10 +8,14 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use LibreNMS\Util\Debug;
+
 $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
 $start = microtime(true);
+Log::setDefaultDriver('console');
 $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
@@ -38,7 +42,7 @@ if (isset($options['h'])) {
             $where = "AND `device_id` = '" . $options['h'] . "'";
             $doing = $options['h'];
         } else {
-            $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+            $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
             $doing = $options['h'];
         }
     }//end if
@@ -59,7 +63,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
     $doing = $options['n'] . '/' . $options['i'];
 }
 
-if (set_debug(isset($options['d'])) || isset($options['v'])) {
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -75,9 +79,7 @@ SNMP: {$versions['netsnmp_ver']}
 EOH;
 
     echo "DEBUG!\n";
-    if (isset($options['v'])) {
-        $vdebug = true;
-    }
+    Debug::setVerbose(isset($options['v']));
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
@@ -111,7 +113,7 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     DeviceCache::setPrimary($device['device_id']);
     $discovered_devices += (int) discover_device($device, $module_override);
 }
@@ -119,13 +121,6 @@ foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 
 $end = microtime(true);
 $run = ($end - $start);
 $proctime = substr($run, 0, 5);
-
-if ($discovered_devices) {
-    if ($doing === 'new') {
-        // We have added a new device by this point so we might want to do some other work
-        oxidized_reload_nodes();
-    }
-}
 
 if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
@@ -135,7 +130,8 @@ $string = $argv[0] . " $doing " . date(\LibreNMS\Config::get('dateformat.compact
 d_echo("$string\n");
 
 if (! isset($options['q'])) {
-    printStats();
+    echo PHP_EOL;
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }
 
 logfile($string);

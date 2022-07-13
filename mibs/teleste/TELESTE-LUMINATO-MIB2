@@ -287,6 +287,19 @@
  		"The SNMP trap that is generated when an alarm event with id 11 - 'Services passthrough - duplicated SID from input stream not passed through' is found."
  		::= { specific 11 }
 
+ extendedEcmStreamCannotBeAttachedToIncompatibleCwgAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 13 - 'ECM stream cannot be attached to incompatible CWG' is found."
+ 		::= { specific 13 }
+
  extendedPsigTableInsertionFailedAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -300,6 +313,422 @@
  		"The SNMP trap that is generated when an alarm event with id 15 - 'Psig table insertion failed' is found."
  		::= { specific 15 }
 
+ extendedPsiTableCaptureFailureAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 17 - 'PSI table capture failure' is found."
+ 		::= { specific 17 }
+
+ extendedSignalMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 18 - 'Signal missing' is found."
+ 		::= { specific 18 }
+
+ extendedNoTsSyncAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 19 - 'No TS sync' is found."
+ 		::= { specific 19 }
+
+ extendedTsRxErrorsAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 20 - 'TS RX errors' is found."
+ 		::= { specific 20 }
+
+ extendedTsInputBufferOverflowAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 21 - 'TS input buffer overflow' is found."
+ 		::= { specific 21 }
+
+ extendedAsiLinkDownAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 22 - 'ASI link down' is found."
+ 		::= { specific 22 }
+
+ extendedForbiddenNetworkAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 23 - 'Forbidden network' is found."
+ 		::= { specific 23 }
+
+ extendedSidConflictAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 24 - 'SID conflict' is found."
+ 		::= { specific 24 }
+
+ extendedLinkMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 25 - 'Link missing' is found."
+ 		::= { specific 25 }
+
+ extendedEcmMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 26 - 'ECM missing' is found."
+ 		::= { specific 26 }
+
+ extendedScramblingConflictInSharedComponentAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 27 - 'Scrambling conflict in shared component' is found."
+ 		::= { specific 27 }
+
+ extendedScrambledSharedComponentAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 28 - 'Scrambled shared component' is found."
+ 		::= { specific 28 }
+
+ extendedUsedInputIsNotSptsAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 29 - 'Used input is not SPTS' is found."
+ 		::= { specific 29 }
+
+ extendedConfigurationErrorAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 30 - 'Configuration error' is found."
+ 		::= { specific 30 }
+
+ extendedDescramblingFailedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 31 - 'Descrambling failed' is found."
+ 		::= { specific 31 }
+
+ extendedCwGroupConflictAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 32 - 'CW group conflict' is found."
+ 		::= { specific 32 }
+
+ extendedInvalidSdtTemplateAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 33 - 'Invalid SDT template' is found."
+ 		::= { specific 33 }
+
+ extendedCannotDescrambleDueToCamRoutingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 34 - 'Cannot descramble due to CAM routing' is found."
+ 		::= { specific 34 }
+
+ extendedRedundancyActivatedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 35 - 'Redundancy activated' is found."
+ 		::= { specific 35 }
+
+ extendedRtpInputPacketSequenceAnomaliesDetectedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 36 - 'RTP input packet sequence anomalies detected' is found."
+ 		::= { specific 36 }
+
+ extendedRtpInputErrorsDroppedPacketsAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 37 - 'RTP input errors, dropped packets' is found."
+ 		::= { specific 37 }
+
+ extendedFecHasCorrectedPacketsAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 38 - 'FEC has corrected packets' is found."
+ 		::= { specific 38 }
+
+ extendedFecInputAnomaliesDetectedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 39 - 'FEC input anomalies detected' is found."
+ 		::= { specific 39 }
+
+ extendedFecErrorCorrectionCapacityExceededAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 40 - 'FEC error correction capacity exceeded' is found."
+ 		::= { specific 40 }
+
+ extendedTooManyServicesAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 42 - 'Too many services' is found."
+ 		::= { specific 42 }
+
+ extendedLowSignalLevelAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 43 - 'Low signal level' is found."
+ 		::= { specific 43 }
+
+ extendedSignalMutedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 44 - 'Signal muted' is found."
+ 		::= { specific 44 }
+
+ extendedProidiomScramblingDisabledAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 45 - 'Pro:Idiom scrambling disabled' is found."
+ 		::= { specific 45 }
+
+ extendedVmxConnectionLostAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 46 - 'VMX connection lost' is found."
+ 		::= { specific 46 }
+
+ extendedControlWordErrorAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 47 - 'Control word error' is found."
+ 		::= { specific 47 }
+
+ extendedOutputServiceCapacityExceededAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 48 - 'Output service capacity exceeded' is found."
+ 		::= { specific 48 }
+
+ extendedLowSignalQualityAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 49 - 'Low signal quality' is found."
+ 		::= { specific 49 }
+
  extendedModuleOffAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -312,84 +741,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4096 - 'Off' is found."
  		::= { specific 4096 }
-
- extendedSignalMissingAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4097 - 'Signal missing' is found."
- 		::= { specific 4097 }
-
- extendedNoTsSyncAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4098 - 'No TS sync' is found."
- 		::= { specific 4098 }
-
- extendedTsRxErrorsAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4099 - 'TS RX errors' is found."
- 		::= { specific 4099 }
-
- extendedTsInputBufferOverflowAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4100 - 'TS input buffer overflow' is found."
- 		::= { specific 4100 }
-
- extendedAsiLinkDownAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4102 - 'ASI link down' is found."
- 		::= { specific 4102 }
-
- extendedForbiddenNetworkAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4103 - 'Forbidden network' is found."
- 		::= { specific 4103 }
 
  extendedPidCapacityExceededAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -832,19 +1183,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4160 - 'Cannot resolve table version: using default' is found."
  		::= { specific 4160 }
-
- extendedSidConflictAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4173 - 'SID conflict' is found."
- 		::= { specific 4173 }
 
  extendedUnsupportedConfigurationAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -1366,19 +1704,6 @@
  		"The SNMP trap that is generated when an alarm event with id 4221 - 'User from group monitor is using CLI' is found."
  		::= { specific 4221 }
 
- extendedRedundancyActivatedAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4222 - 'Redundancy activated' is found."
- 		::= { specific 4222 }
-
  extendedExtIoSignaledAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -1417,19 +1742,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4225 - 'EXT IO Intrusion detected' is found."
  		::= { specific 4225 }
-
- extendedLinkMissingAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4226 - 'Link missing' is found."
- 		::= { specific 4226 }
 
  extendedRedundancyFailedAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -1561,19 +1873,6 @@
  		"The SNMP trap that is generated when an alarm event with id 4236 - 'CBR output oversubscription, packets discarded' is found."
  		::= { specific 4236 }
 
- extendedDescramblingFailedAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4237 - 'Descrambling failed' is found."
- 		::= { specific 4237 }
-
  extendedIpInputCapacityExceededAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -1599,32 +1898,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4239 - 'EIT reinsert capacity exceeded' is found."
  		::= { specific 4239 }
-
- extendedRtpInputErrorsDroppedPacketsAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4241 - 'RTP input errors, dropped packets' is found."
- 		::= { specific 4241 }
-
- extendedRtpInputPacketSequenceAnomaliesDetectedAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4242 - 'RTP input packet sequence anomalies detected' is found."
- 		::= { specific 4242 }
 
  extendedDvbTimeMissingAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -1717,45 +1990,6 @@
  		"The SNMP trap that is generated when an alarm event with id 4249 - 'Hierarchy HP selected for non-hierarchical transmission' is found."
  		::= { specific 4249 }
 
- extendedEcmMissingAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4250 - 'ECM missing' is found."
- 		::= { specific 4250 }
-
- extendedScramblingConflictInSharedComponentAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4251 - 'Scrambling conflict in shared component' is found."
- 		::= { specific 4251 }
-
- extendedScrambledSharedComponentAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4252 - 'Scrambled shared component' is found."
- 		::= { specific 4252 }
-
  extendedBackupVoltageTooHighAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -1781,19 +2015,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4254 - 'Backup voltage too low' is found."
  		::= { specific 4254 }
-
- extendedInvalidSdtTemplateAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4255 - 'Invalid SDT template' is found."
- 		::= { specific 4255 }
 
  extendedCamFailureActionTakenRestartingDescramblingAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -1833,19 +2054,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4258 - 'CA menu is open' is found."
  		::= { specific 4258 }
-
- extendedCannotDescrambleDueToCamRoutingAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4259 - 'Cannot descramble due to CAM routing' is found."
- 		::= { specific 4259 }
 
  extendedNitSidConflictAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -1924,45 +2132,6 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4265 - 'Media packets discarded. Module bitrate too high.' is found."
  		::= { specific 4265 }
-
- extendedFecHasCorrectedPacketsAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4266 - 'FEC has corrected packets' is found."
- 		::= { specific 4266 }
-
- extendedFecInputAnomaliesDetectedAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4267 - 'FEC input anomalies detected' is found."
- 		::= { specific 4267 }
-
- extendedFecErrorCorrectionCapacityExceededAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4268 - 'FEC error correction capacity exceeded' is found."
- 		::= { specific 4268 }
 
  extendedSfpLinkDownAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
@@ -2250,19 +2419,6 @@
  		"The SNMP trap that is generated when an alarm event with id 4295 - 'Inserted into the chassis' is found."
  		::= { specific 4295 }
 
- extendedUsedInputIsNotSptsAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4296 - 'Used input is not SPTS' is found."
- 		::= { specific 4296 }
-
  extendedPacketsDiscardedInIpMirrorOutputsAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -2315,19 +2471,6 @@
  		"The SNMP trap that is generated when an alarm event with id 4300 - 'ECM responses delayed' is found."
  		::= { specific 4300 }
 
- extendedCwGroupConflictAlarmEvent NOTIFICATION-TYPE
- OBJECTS { 
-     severity, 
-     module,   
-     reason,
-     description,
-     paramTable
- }
- STATUS  current
- DESCRIPTION
- 		"The SNMP trap that is generated when an alarm event with id 4301 - 'CW group conflict' is found."
- 		::= { specific 4301 }
-
  extendedDisconnectedHostInMultichassisGroupAlarmEvent NOTIFICATION-TYPE
  OBJECTS { 
      severity, 
@@ -2379,6 +2522,292 @@
  DESCRIPTION
  		"The SNMP trap that is generated when an alarm event with id 4305 - 'SW version mismatch (module %6%)' is found."
  		::= { specific 4305 }
+
+ extendedEmergencySignalActivatedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4307 - 'Emergency signal activated' is found."
+ 		::= { specific 4307 }
+
+ extendedEmergencySignalMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4308 - 'Emergency signal missing' is found."
+ 		::= { specific 4308 }
+
+ extendedUnableToAddEmergencySignalAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4309 - 'Unable to add emergency signal' is found."
+ 		::= { specific 4309 }
+
+ extendedNetworkInformationTableNeedsToBeUpdatedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4310 - 'Network information table needs to be updated' is found."
+ 		::= { specific 4310 }
+
+ extendedNfsMountFailureAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4311 - 'NFS mount failure' is found."
+ 		::= { specific 4311 }
+
+ extendedEthernetInputBufferOverflowAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4312 - 'Ethernet input buffer overflow' is found."
+ 		::= { specific 4312 }
+
+ extendedDvbAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4313 - 'DVB-Multi license missing' is found."
+ 		::= { specific 4313 }
+
+ extendedPoweredOffAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4315 - 'Powered off' is found."
+ 		::= { specific 4315 }
+
+ extendedPsu1NoModuleAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4316 - 'PSU 1: No module' is found."
+ 		::= { specific 4316 }
+
+ extendedPsu2NoModuleAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4317 - 'PSU 2: No module' is found."
+ 		::= { specific 4317 }
+
+ extendedPsu1VoltageMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4318 - 'PSU 1: Voltage missing' is found."
+ 		::= { specific 4318 }
+
+ extendedPsu2VoltageMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4319 - 'PSU 2: Voltage missing' is found."
+ 		::= { specific 4319 }
+
+ extendedPsu1VoltageLowAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4320 - 'PSU 1: Voltage low' is found."
+ 		::= { specific 4320 }
+
+ extendedPsu2VoltageLowAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4321 - 'PSU 2: Voltage low' is found."
+ 		::= { specific 4321 }
+
+ extendedPsu1FanFailureAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4322 - 'PSU 1: Fan failure (fan %6%)' is found."
+ 		::= { specific 4322 }
+
+ extendedPsu2FanFailureAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4323 - 'PSU 2: Fan failure (fan %6%)' is found."
+ 		::= { specific 4323 }
+
+ extendedBackupCableIsNotConnectedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4324 - 'Backup: Cable is not connected' is found."
+ 		::= { specific 4324 }
+
+ extendedUnableToAddMacAddressMappingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4325 - 'Unable to add MAC address mapping' is found."
+ 		::= { specific 4325 }
+
+ extendedFpgaPllNotLockedAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4327 - 'FPGA PLL not locked' is found."
+ 		::= { specific 4327 }
+
+ extendedFpgaRegisterMissmatchAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4328 - 'FPGA register missmatch' is found."
+ 		::= { specific 4328 }
+
+ extendedDepiLicenseMissingAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4329 - 'DEPI license missing' is found."
+ 		::= { specific 4329 }
+
+ extendedXfiPortOverflowAlarmEvent NOTIFICATION-TYPE
+ OBJECTS { 
+     severity, 
+     module,   
+     reason,
+     description,
+     paramTable
+ }
+ STATUS  current
+ DESCRIPTION
+ 		"The SNMP trap that is generated when an alarm event with id 4330 - 'XFI port overflow' is found."
+ 		::= { specific 4330 }
 -- %END_DEFINE_TRAPS%
 
 	END

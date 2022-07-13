@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,4 +27,17 @@ namespace LibreNMS\Exceptions;
 
 class HostUnreachableSnmpException extends HostUnreachableException
 {
+    /**
+     * @var string
+     */
+    public $hostname;
+
+    public function __construct(string $hostname)
+    {
+        $this->hostname = $hostname;
+        $message = trans('exceptions.host_unreachable.unsnmpable', [
+            'hostname' => $hostname,
+        ]);
+        parent::__construct($message);
+    }
 }

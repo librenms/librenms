@@ -51,12 +51,12 @@ foreach ($rrd_list as $rrd) {
     $colour_out = \LibreNMS\Config::get("graph_colours.$colours_out.$iter");
 
     if (isset($rrd['descr_in'])) {
-        $descr = rrdtool_escape($rrd['descr_in'], $descr_len) . '  In';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'], $descr_len) . '  In';
     } else {
-        $descr = rrdtool_escape($rrd['descr'], $descr_len) . '  In';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len) . '  In';
     }
 
-    $descr_out = rrdtool_escape($rrd['descr_out'], $descr_len) . ' Out';
+    $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'], $descr_len) . ' Out';
 
     $rrd_options .= ' DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE ';
     $rrd_options .= ' DEF:' . $out . $i . '=' . $rrd['filename'] . ':' . $ds_out . ':AVERAGE ';
@@ -65,7 +65,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $in_thing .= $seperator . $in . $i . ',UN,0,' . $in . $i . ',IF';
         $out_thing .= $seperator . $out . $i . ',UN,0,' . $out . $i . ',IF';
         $pluses .= $plus;

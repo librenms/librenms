@@ -1,5 +1,9 @@
-mib: TPLINK-SYSMONITOR-MIB
+mib: TPLINK-SYSINFO-MIB:TPLINK-SYSMONITOR-MIB:TPLINK-DDMSTATUS-MIB:TPLINK-DDMBIASCURTHRESHOLD-MIB:TPLINK-DDMTEMPTHRESHOLD-MIB:TPLINK-DDMVOLTHRESHOLD-MIB:TPLINK-DDMRXPOWTHRESHOLD-MIB:TPLINK-DDMTXPOWTHRESHOLD-MIB:TPLINK-POWER-OVER-ETHERNET-MIB
 modules:
+    os:
+        hardware: TPLINK-SYSINFO-MIB::tpSysInfoHwVersion.0
+        serial: TPLINK-SYSINFO-MIB::tpSysInfoSerialNum.0
+        version: TPLINK-SYSINFO-MIB::tpSysInfoSwVersion.0
     mempools:
         data:
             -
@@ -10,5 +14,174 @@ modules:
             -
                 oid: tpSysMonitorCpu5Seconds
                 num_oid: '.1.3.6.1.4.1.11863.6.4.1.1.1.1.2.{{ $index }}'
-                index:  '{{ $index }}'
+                index: '{{ $index }}'
                 descr: 'Proc #{{ $index }}'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowAlarm
+                        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowWarn
+                        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighAlarm
+                        - TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighWarn
+                        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowAlarm
+                        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowWarn
+                        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighAlarm
+                        - TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighWarn
+                        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowAlarm
+                        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowWarn
+                        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighAlarm
+                        - TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighWarn
+                        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowAlarm
+                        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowWarn
+                        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighAlarm
+                        - TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighWarn
+                        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowAlarm
+                        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowWarn
+                        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighAlarm
+                        - TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighWarn
+        current:
+            data:
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.4.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusBiasCurrent
+                    descr: 'DDM Bias Current {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusBiasCurrent.{{ $index }}'
+                    low_limit: TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowAlarm
+                    low_warn_limit: TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdLowWarn
+                    high_limit: TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighAlarm
+                    warn_limit: TPLINK-DDMBIASCURTHRESHOLD-MIB::ddmBiasCurThresholdHighWarn
+        dbm:
+            data:
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.5.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusTxPow
+                    descr: 'DDM TX Power {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusTxPow.{{ $index }}'
+                    user_func: mw_to_dbm
+                    low_limit: TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowAlarm
+                    low_warn_limit: TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdLowWarn
+                    high_limit: TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighAlarm
+                    warn_limit: TPLINK-DDMTXPOWTHRESHOLD-MIB::ddmTxPowThresholdHighWarn
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.6.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusRxPow
+                    descr: 'DDM RX Power {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusRxPow.{{ $index }}'
+                    user_func: mw_to_dbm
+                    low_limit: TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowAlarm
+                    low_warn_limit: TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdLowWarn
+                    high_limit: TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighAlarm
+                    warn_limit: TPLINK-DDMRXPOWTHRESHOLD-MIB::ddmRxPowThresholdHighWarn
+        power:
+            data:
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.3.{{ $index }}'
+                    value: tpSystemPowerConsumption
+                    descr: 'Power Consumption'
+                    divisor: 10
+                    index: tpSystemPowerConsumption
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.4.{{ $index }}'
+                    value: tpSystemPowerRemain
+                    descr: 'Power Remaining'
+                    divisor: 10
+                    index: tpSystemPowerRemain
+                    group: PoE
+                -
+                    oid: tpPoeGlobal
+                    num_oid: '.1.3.6.1.4.1.11863.6.56.1.1.1.1.{{ $index }}'
+                    value: tpSystemPowerLimit
+                    descr: 'Power Limit'
+                    divisor: 10
+                    index: tpSystemPowerLimit
+                    group: PoE
+        state:
+            data:
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.7.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusDataReady
+                    descr: 'DDM Data Ready {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: &ddm_states
+                        - {value: 0, generic: 0, graph: 0, descr: 'False'}
+                        - {value: 1, generic: 2, graph: 1, descr: 'True'}
+                        - {value: 2, generic: 2, graph: 2, descr: N/A}
+                    state_name: ddmStatusDataReady
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.8.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusLossSignal
+                    descr: 'DDM Loss of Signal {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: *ddm_states
+                    state_name: ddmStatusLossSignal
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.9.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusTxFault
+                    descr: 'DDM TX Fault {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: '{{ $index }}'
+                    skip_values: 2
+                    states: *ddm_states
+                    state_name: ddmStatusTxFault
+        temperature:
+            data:
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.2.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusTemperature
+                    descr: 'DDM Temperature {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusTemperature.{{ $index }}'
+                    low_limit: TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowAlarm
+                    low_warn_limit: TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdLowWarn
+                    high_limit: TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighAlarm
+                    warn_limit: TPLINK-DDMTEMPTHRESHOLD-MIB::ddmTempThresholdHighWarn
+        voltage:
+            data:
+                -
+                    oid: TPLINK-DDMSTATUS-MIB::ddmStatusTable
+                    num_oid: '.1.3.6.1.4.1.11863.6.96.1.7.1.1.3.{{ $index }}'
+                    value: TPLINK-DDMSTATUS-MIB::ddmStatusVoltage
+                    descr: 'DDM Voltage {{ $TPLINK-DDMSTATUS-MIB::ddmStatusPort }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    group: SFPs
+                    index: 'ddmStatusVoltage.{{ $index }}'
+                    low_limit: TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowAlarm
+                    low_warn_limit: TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdLowWarn
+                    high_limit: TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighAlarm
+                    warn_limit: TPLINK-DDMVOLTHRESHOLD-MIB::ddmVolThresholdHighWarn

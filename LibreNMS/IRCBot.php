@@ -23,9 +23,16 @@ namespace LibreNMS;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Number;
+use LibreNMS\Util\Time;
+use Permissions;
 
 class IRCBot
 {
+    private $config;
+
+    private $user;
+
     private $last_activity = 0;
 
     private $data = '';
@@ -74,6 +81,14 @@ class IRCBot
     private $socket = [];
 
     private $floodcount = 0;
+
+    private $max_retry = 5;
+
+    private $nickwait;
+
+    private $buff;
+
+    private $tokens;
 
     public function __construct()
     {
@@ -587,7 +602,7 @@ class IRCBot
     {
         if (! Eloquent::isConnected()) {
             try {
-                Eloquent::boot();
+                Eloquent::DB()->statement('SELECT VERSION()');
             } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
 
@@ -631,7 +646,7 @@ class IRCBot
                     $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
                 }
                 if (preg_match("/$host/", $this->getUserHost($this->data))) {
-                    $user_id = LegacyAuth::get()->getUserid(mres($nms_user));
+                    $user_id = LegacyAuth::get()->getUserid($nms_user);
                     $user = LegacyAuth::get()->getUser($user_id);
                     $this->user['name'] = $user['username'];
                     $this->user['id'] = $user_id;
@@ -682,7 +697,7 @@ class IRCBot
                 return $this->respond('Nope.');
             }
         } else {
-            $user_id = LegacyAuth::get()->getUserid(mres($params[0]));
+            $user_id = LegacyAuth::get()->getUserid($params[0]);
             $user = LegacyAuth::get()->getUser($user_id);
             if ($user['email'] && $user['username'] == $params[0]) {
                 $token = hash('gost', openssl_random_pseudo_bytes(1024));
@@ -702,8 +717,6 @@ class IRCBot
                 return $this->respond('Who are you again?');
             }
         }//end if
-
-        return false;
     }
 
     //end _auth()
@@ -719,7 +732,9 @@ class IRCBot
             $new_config = Config::load();
             $this->respond('Reloading configuration & defaults');
             if ($new_config != $this->config) {
-                return $this->__construct();
+                $this->__construct();
+
+                return;
             }
         } else {
             return $this->respond('Permission denied.');
@@ -797,7 +812,7 @@ class IRCBot
 
         foreach ($tmp as $logline) {
             $response = $logline['datetime'] . ' ';
-            $response .= $this->_color($hostid['hostname'], null, null, 'bold') . ' ';
+            $response .= $this->_color($logline['hostname'], null, null, 'bold') . ' ';
             if ($this->config['irc_alert_utf8']) {
                 if (preg_match('/critical alert/', $logline['message'])) {
                     $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline['message']) . ' ';
@@ -844,6 +859,7 @@ class IRCBot
             $tmp = dbFetchRows('SELECT `hostname` FROM `devices` WHERE status=0');
         }
 
+        $msg = '';
         foreach ($tmp as $db) {
             if ($db['hostname']) {
                 $msg .= ', ' . $db['hostname'];
@@ -871,7 +887,7 @@ class IRCBot
             return $this->respond('Error: Permission denied.');
         }
 
-        $status = $device['status'] ? 'Up ' . formatUptime($device['uptime']) : 'Down';
+        $status = $device['status'] ? 'Up ' . Time::formatInterval($device['uptime']) : 'Down';
         $status .= $device['ignore'] ? '*Ignored*' : '';
         $status .= $device['disabled'] ? '*Disabled*' : '';
 
@@ -895,12 +911,12 @@ class IRCBot
             return $this->respond('Error: Permission denied.');
         }
 
-        $bps_in = formatRates($port['ifInOctets_rate'] * 8);
-        $bps_out = formatRates($port['ifOutOctets_rate'] * 8);
-        $pps_in = format_bi($port['ifInUcastPkts_rate']);
-        $pps_out = format_bi($port['ifOutUcastPkts_rate']);
+        $bps_in = Number::formatSi($port['ifInOctets_rate'] * 8, 2, 3, 'bps');
+        $bps_out = Number::formatSi($port['ifOutOctets_rate'] * 8, 2, 3, 'bps');
+        $pps_in = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps');
+        $pps_out = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, 'pps');
 
-        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . 'pps > PPS > ' . $pps_out . 'pps');
+        return $this->respond($port['ifAdminStatus'] . '/' . $port['ifOperStatus'] . ' ' . $bps_in . ' > bps > ' . $bps_out . ' | ' . $pps_in . ' > PPS > ' . $pps_out);
     }
 
     //end _port()
@@ -913,6 +929,7 @@ class IRCBot
             $tmp = dbFetchRows('SELECT `hostname` FROM `devices`');
         }
 
+        $msg = '';
         foreach ($tmp as $device) {
             $msg .= ', ' . $device['hostname'];
         }
@@ -929,6 +946,11 @@ class IRCBot
     {
         $params = explode(' ', $params);
         $statustype = $params[0];
+
+        $d_w = '';
+        $d_a = '';
+        $p_w = '';
+        $p_a = '';
         if ($this->user['level'] < 5) {
             $d_w = ' WHERE device_id IN (' . implode(',', $this->user['devices']) . ')';
             $d_a = ' AND   device_id IN (' . implode(',', $this->user['devices']) . ')';

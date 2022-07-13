@@ -20,6 +20,7 @@
  * Tests Ruckus Wireless SmartZone cluster state trap handlers..
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -34,8 +35,7 @@ class RuckusSzClusterStateTest extends SnmpTrapTestCase
 {
     public function testClusterInMaintenance()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -55,8 +55,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName.0 \"$device->hostname\"";
 
     public function testClusterInService()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24

@@ -1,6 +1,3 @@
-source: Alerting/Entities.md
-path: blob/master/doc/
-
 # Entities
 
 Entities as described earlier are based on the table and column names
@@ -50,7 +47,7 @@ Entity | Description
 ## Memory pools
 
 Entity | Description
----|---
+|---|---|
 `mempools.mempool_type` | The memory pool type such as hrstorage, cmp and cemp
 `mempools.mempool_descr` | The description of the pool such as Physical memory, Virtual memory and System memory
 `mempools.mempool_perc` | The used percentage of the memory pool.
@@ -66,7 +63,7 @@ Entity | Description
 `ports.ifOperStatus` | The operational status of the port (up or down)
 `ports.ifAdminStatus` | The administrative status of the port (up or down)
 `ports.ifDuplex` | Duplex setting of the port
-`ports.ifMtu` | The MTU setting of the port.`
+`ports.ifMtu` | The MTU setting of the port.
 
 ## Processors
 

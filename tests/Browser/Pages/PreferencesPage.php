@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -41,7 +42,7 @@ class PreferencesPage extends Page
     /**
      * Assert that the browser is on the page.
      *
-     * @param  Browser $browser
+     * @param  Browser  $browser
      * @return void
      */
     public function assert(Browser $browser)

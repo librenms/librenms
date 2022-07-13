@@ -1,6 +1,3 @@
-source: API/DeviceGroups.md
-path: blob/master/doc/
-
 ### `get_devicegroups`
 
 List all device groups.
@@ -61,11 +58,15 @@ Dynamic Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -d '{"name": "New Device Group", \
-       "desc": "A very fancy dynamic group", \
-       "type": "dynamic",
-       "rules": "{\"condition\":\"AND\",\"rules\":[{\"id\":\"access_points.name\",\"field\":\"access_points.name\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"accesspoint1\"}],\"valid\":true}"}' \
-  https://librenms.org/api/v0/devicegroups
+  -X POST https://librenms.org/api/v0/devicegroups \
+  --data-raw '
+{
+ "name": "New Device Group", 
+ "desc": "A very fancy dynamic group",
+ "type": "dynamic", 
+ "rules": "{\"condition\":\"AND\",\"rules\":[{\"id\":\"access_points.name\",\"field\":\"access_points.name\",\"type\":\"string\",\"input\":\"text\",\"operator\":\"equal\",\"value\":\"accesspoint1\"}],\"valid\":true}"
+}
+'
 ```
 
 Output:
@@ -82,9 +83,8 @@ Static Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST \
-  -d '{"name":"New Device Group","type":"static","devices":[261,271]}' \
-  https://librenms.org/api/v0/devicegroups
+  -X POST https://librenms.org/api/v0/devicegroups \
+  -d '{"name":"New Device Group","type":"static","devices":[261,271]}'
 ```
 
 Output:
@@ -140,4 +140,32 @@ Output:
          ]
      }
 ]
+```
+
+### `maintenance_devicegroup`
+
+Set a device group into maintenance mode.
+
+Route: `/api/v0/devicesgroups/:name/maintenance`
+
+Input (JSON):
+
+- title: Some title for the Maintenance
+- notes: Some description for the Maintenance
+- start: Start time of Maintenance in format H:m
+- duration: Duration of Maintenance in format H:m
+
+Example:
+
+```curl
+curl -X POST -d '{"title":"Device group Maintenance","notes":"A 2 hour Maintenance triggered via API","start":"04:30","duration":"2:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device group Cisco switches (2) will begin maintenance mode at 5:00 for 2:00 h"
+}
 ```

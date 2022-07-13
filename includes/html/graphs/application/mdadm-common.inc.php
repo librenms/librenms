@@ -12,15 +12,16 @@ $scale_min = 0;
 if (isset($vars['array'])) {
     $arrays = [$vars['array']];
 } else {
-    $arrays = get_arrays_with_application($device, $app_id, $name);
+    $arrays = Rrd::getRrdApplicationArrays($device, $app_id, $name);
 }
 
 $int = 0;
+$rrd_list = [];
 while (isset($arrays[$int])) {
     $array = $arrays[$int];
-    $rrd_filename = rrd_name($device['hostname'], ['app', $name, $app_id, $array]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id, $array]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr'    => $array,

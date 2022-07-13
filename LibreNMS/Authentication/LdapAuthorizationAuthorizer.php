@@ -16,6 +16,7 @@
 
 /**
  * libreNMS HTTP-Authentication and LDAP Authorization Library
+ *
  * @author Maximilian Wilhelm <max@rfc2324.org>
  * @copyright 2016 LibreNMS, Barbarossa
  * @license GPL
@@ -33,7 +34,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     use LdapSessionCache;
 
     protected $ldap_connection;
-    protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $AUTH_IS_EXTERNAL = true;
 
     public function __construct()
     {
@@ -52,10 +53,21 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version'));
         }
 
-        if (Config::get('auth_ldap_starttls') && (Config::get('auth_ldap_starttls') == 'optional' || Config::get('auth_ldap_starttls') == 'require')) {
+        if (Config::get('auth_ldap_starttls') && (Config::get('auth_ldap_starttls') == 'optional' || Config::get('auth_ldap_starttls') == 'required')) {
             $tls = ldap_start_tls($this->ldap_connection);
-            if (Config::get('auth_ldap_starttls') == 'require' && $tls === false) {
+            if (Config::get('auth_ldap_starttls') == 'required' && $tls === false) {
                 throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
+            }
+        }
+        if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+            if (Config::get('auth_ldap_binddn') == null) {
+                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            }
+            $username = Config::get('auth_ldap_binddn');
+            $password = Config::get('auth_ldap_bindpassword');
+            $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            if (! $bind_result) {
+                throw new AuthenticationException('Fatal error: LDAP bind configured but not successfully authenticated:' . ldap_error($this->ldap_connection));
             }
         }
     }
@@ -77,7 +89,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     public function userExists($username, $throw_exception = false)
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
-            return 1;
+            return true;
         }
 
         $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
@@ -90,7 +102,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
          */
             $this->authLdapSessionCacheSet('user_exists', 1);
 
-            return 1;
+            return true;
         }
 
         /*
@@ -98,7 +110,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
          * on some end and the user will be happy if it "just works" after the user
          * has been added to LDAP.
          */
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -166,7 +178,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $userlist = [];
 
         $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -209,7 +223,19 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             }
         }
 
-        return 0;
+        return false;
+    }
+
+    /**
+     * Get the full dn with auth_ldap_prefix and auth_ldap_suffix
+     *
+     * @internal
+     *
+     * @return string
+     */
+    protected function getFullDn(string $username)
+    {
+        return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
 
     protected function getMembername($username)

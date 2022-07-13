@@ -12,7 +12,7 @@ IMPORTS
     TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
 
 rlSsl MODULE-IDENTITY
-        LAST-UPDATED "200309210000Z"
+        LAST-UPDATED "200309210001Z"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -68,7 +68,8 @@ RlSslCertificateGenerationEntry ::= SEQUENCE {
   rlSslCertificateGenerationValidDays               INTEGER,
   rlSslCertificateGenerationRsaKeyLength            INTEGER,
   rlSslCertificateGenerationPassphrase              DisplayString,
-  rlSslCertificateGenerationAction                  INTEGER
+  rlSslCertificateGenerationAction                  INTEGER,
+  rlSslCertificateGenerationEcKeyCurve	            INTEGER
 }
 
 rlSslCertificateGenerationIndex   OBJECT-TYPE
@@ -159,7 +160,7 @@ rlSslCertificateGenerationValidDays OBJECT-TYPE
     ::= { rlSslCertificateGenerationEntry   9 }
 
 rlSslCertificateGenerationRsaKeyLength OBJECT-TYPE
-    SYNTAX  INTEGER (512..2048)
+    SYNTAX  INTEGER (512..3072)
     MAX-ACCESS      read-write
     STATUS      current
     DESCRIPTION
@@ -180,13 +181,13 @@ rlSslCertificateGenerationPassphrase OBJECT-TYPE
         passphrase once a key was generated."
     ::= { rlSslCertificateGenerationEntry   11 }
 
-
 rlSslCertificateGenerationAction OBJECT-TYPE
     SYNTAX  INTEGER {
        generateRsaKeyAndSelfSignedCertificate(1),
        generateSelfSignedCertificate(2),
        generatePkcs12(3),
-       generateCertificateRequest(4)
+       generateCertificateRequest(4),
+       generateEcKeyAndSelfSignedCertificate(5)
      }
     MAX-ACCESS      read-write
     STATUS      current
@@ -195,8 +196,14 @@ rlSslCertificateGenerationAction OBJECT-TYPE
         generated and to be used for all new sessions."
     ::= { rlSslCertificateGenerationEntry   12 }
 
-
-
+rlSslCertificateGenerationEcKeyCurve OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting the EC key curve that will be created when a new key is generated -
+         generateEcKeyAndSelfSignedCertificate"
+    ::= { rlSslCertificateGenerationEntry   13 }
 
 rlSslCertificateExportTable OBJECT-TYPE
    SYNTAX SEQUENCE OF RlSslCertificateExportEntry
@@ -250,7 +257,7 @@ rlSslCertificateExportFragmentId   OBJECT-TYPE
    MAX-ACCESS   read-only
    STATUS current
    DESCRIPTION
-    "Identifies the index of this fragment in the certificate request."
+    "Identifies the index of this fragment in the CA certificate."
      ::=  { rlSslCertificateExportEntry  3 }
 
 rlSslCertificateExportFragmentText    OBJECT-TYPE
@@ -260,7 +267,6 @@ rlSslCertificateExportFragmentText    OBJECT-TYPE
    DESCRIPTION
     "A part of the readable text entry for the certificate request."
      ::=  { rlSslCertificateExportEntry  4 }
-
 
 
 rlSslCertificateSave OBJECT-TYPE
@@ -397,7 +403,9 @@ RlSslPublicKeyAlgorithm ::= TEXTUAL-CONVENTION
 
     SYNTAX  INTEGER {
         rsa(1),
-        dsa(2)
+        dsa(2),
+        ec(3),
+        ecdsa(4)
     }
 
 
@@ -557,9 +565,398 @@ rlSslisCertificate2Default OBJECT-TYPE
     ::= { rlSsl  11 }
 
 
+--  MIB TABLE rlCaCertificateInstallEntry
 
+RlCaCertificateInstallType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ca Certificate type enumeration."
+   SYNTAX INTEGER {
+        signer(1),
+        static(2),
+        dynamic(3)
+    }
+
+RlCaCertificateDisplayNonValidReason  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "Ca Certificate NON valid reason enumeration."
+   SYNTAX INTEGER {
+        noReason(0),
+        premature(1),
+        expired(2),
+        revoked(3),
+        timeNotSet(4),
+        unknown(5)
+    }
+
+rlCaCertificateInstallTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlCaCertificateInstallEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for installing a CA certificate to the device"
+    ::= { rlSsl 12 }
+
+rlCaCertificateInstallEntry  OBJECT-TYPE
+   SYNTAX RlCaCertificateInstallEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlCaCertificateInstallType,
+           rlCaCertificateInstallOwner,
+           rlCaCertificateInstallName,
+           rlCaCertificateInstallFragmentId}
+   ::= { rlCaCertificateInstallTable 1 }
+
+RlCaCertificateInstallEntry ::= SEQUENCE {
+  rlCaCertificateInstallType            RlCaCertificateInstallType,
+  rlCaCertificateInstallOwner           DisplayString,
+  rlCaCertificateInstallName            DisplayString,
+  rlCaCertificateInstallFragmentId      INTEGER,
+  rlCaCertificateInstallFragmentPEMText OCTET STRING,
+  rlCaCertificateInstallFragmentStatus  RowStatus,
+  rlCaCertificateInstallIsLastFragment  TruthValue
+}
+
+rlCaCertificateInstallType OBJECT-TYPE
+    SYNTAX RlCaCertificateInstallType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ca Certificate type"
+     ::= { rlCaCertificateInstallEntry 1 }
+
+rlCaCertificateInstallOwner   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Owner - application name."
+     ::=  { rlCaCertificateInstallEntry 2 }
+     
+rlCaCertificateInstallName   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Name."
+     ::=  { rlCaCertificateInstallEntry 3 }
+
+rlCaCertificateInstallFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the CA certificate."
+     ::=  { rlCaCertificateInstallEntry 4 }
+
+
+rlCaCertificateInstallFragmentPEMText    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "A part of the readable text entry for the CA certificate."
+     ::=  { rlCaCertificateInstallEntry 5 }
+
+
+rlCaCertificateInstallFragmentStatus    OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    ""
+     ::=  { rlCaCertificateInstallEntry 6 }
+
+ rlCaCertificateInstallIsLastFragment    OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "Has a true value in case of passing a last fragment"
+     ::=  { rlCaCertificateInstallEntry 7 }
+
+--  MIB TABLE rlCaCertificateDisplayEntry
+
+rlCaCertificateDisplayTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlCaCertificateDisplayEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for displaying a CA certificate to the device"
+    ::= { rlSsl 13 }
+
+rlCaCertificateDisplayEntry  OBJECT-TYPE
+   SYNTAX RlCaCertificateDisplayEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlCaCertificateDisplayType,
+           rlCaCertificateDisplayOwner,
+           rlCaCertificateDisplayName}
+   ::= { rlCaCertificateDisplayTable 1 }
+
+RlCaCertificateDisplayEntry ::= SEQUENCE {
+  rlCaCertificateDisplayType                  RlCaCertificateInstallType,
+  rlCaCertificateDisplayOwner                 DisplayString,
+  rlCaCertificateDisplayName                  DisplayString, 
+  rlCaCertificateDisplayVersion               DisplayString,
+  rlCaCertificateDisplaySerialNumber          OCTET STRING,
+  rlCaCertificateDisplayIssuerName            DisplayString,
+  rlCaCertificateDisplaySubjectName           DisplayString,
+  rlCaCertificateDisplayNotBefore             DisplayString,
+  rlCaCertificateDisplayNotAfter              DisplayString,
+  rlCaCertificateDisplayValid                 TruthValue,
+  rlCaCertificateDisplayNonValidReason        RlCaCertificateDisplayNonValidReason,
+  rlCaCertificateDisplaySignatureAlgorithm    DisplayString,
+  rlCaCertificateDisplayPublicKeyAlgorithm    DisplayString,
+  rlCaCertificateDisplayFingerprintAlgorithm  DisplayString,
+  rlCaCertificateDisplayFingerprint           OCTET STRING,
+  rlCaCertificateDisplayPublicKeySize         INTEGER
+}
+
+rlCaCertificateDisplayType OBJECT-TYPE
+    SYNTAX RlCaCertificateInstallType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Ca Certificate type"
+     ::= { rlCaCertificateDisplayEntry 1 }
+
+rlCaCertificateDisplayOwner   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Owner - application name."
+     ::=  { rlCaCertificateDisplayEntry 2 }
+     
+ rlCaCertificateDisplayName   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  not-accessible
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Name."
+     ::=  { rlCaCertificateDisplayEntry 3 }
+
+rlCaCertificateDisplayVersion   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Version."
+     ::=  { rlCaCertificateDisplayEntry 4 }
+
+rlCaCertificateDisplaySerialNumber   OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Serial Number."
+     ::=  { rlCaCertificateDisplayEntry 5 }
+
+rlCaCertificateDisplayIssuerName   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Issuer Name."
+     ::=  { rlCaCertificateDisplayEntry 6 }
+
+rlCaCertificateDisplaySubjectName   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Subject Name."
+     ::=  { rlCaCertificateDisplayEntry 7 }
+
+rlCaCertificateDisplayNotBefore   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Not before time."
+     ::=  { rlCaCertificateDisplayEntry 8 }
+
+rlCaCertificateDisplayNotAfter   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Not after time."
+     ::=  { rlCaCertificateDisplayEntry 9 }
+
+rlCaCertificateDisplayValid OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "true -  Certificate is VALID, dates validity and not revoked
+         false - Certificate is INVALID, dates validity is faled or revoked"
+    DEFVAL { true }
+    ::= { rlCaCertificateDisplayEntry 10 }
+
+rlCaCertificateDisplayNonValidReason OBJECT-TYPE
+    SYNTAX RlCaCertificateDisplayNonValidReason
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Ca Certificate reason for non validity"
+     ::= { rlCaCertificateDisplayEntry 11 }
+
+rlCaCertificateDisplaySignatureAlgorithm   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Signature Algorithm."
+     ::=  { rlCaCertificateDisplayEntry 12 }
+
+rlCaCertificateDisplayPublicKeyAlgorithm   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate PublicKey Algorithm."
+     ::=  { rlCaCertificateDisplayEntry 13 }
+
+rlCaCertificateDisplayFingerprintAlgorithm   OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Fingerprint Algorithm."
+     ::=  { rlCaCertificateDisplayEntry 14 }
+
+rlCaCertificateDisplayFingerprint   OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Fingerprint."
+     ::=  { rlCaCertificateDisplayEntry 15 }
+
+rlCaCertificateDisplayPublicKeySize   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "The CA certificate PublicKey size."
+     ::=  { rlCaCertificateDisplayEntry 16 }
+
+
+--  MIB TABLE rlCaCertificateRevocationEntry
+
+rlCaCertificateRevocationTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlCaCertificateRevocationEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for revocation a CA certificate to the device"
+    ::= { rlSsl 14 }
+
+rlCaCertificateRevocationEntry  OBJECT-TYPE
+   SYNTAX RlCaCertificateRevocationEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlCaCertificateRevocationIssuerName,
+           rlCaCertificateRevocationSerialNumber}
+   ::= { rlCaCertificateRevocationTable 1 }
+
+RlCaCertificateRevocationEntry ::= SEQUENCE {
+  rlCaCertificateRevocationIssuerName            DisplayString,
+  rlCaCertificateRevocationSerialNumber          OCTET STRING,
+  rlCaCertificateRevocationRowStatus             RowStatus
+}
+
+rlCaCertificateRevocationIssuerName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Ca Certificate Issuer Name"
+     ::= { rlCaCertificateRevocationEntry 1 }
+
+rlCaCertificateRevocationSerialNumber   OBJECT-TYPE
+   SYNTAX OCTET STRING (SIZE(1..20))
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    "The CA certificate Serial Number."
+     ::=  { rlCaCertificateRevocationEntry 2 }
+     
+rlCaCertificateRevocationRowStatus    OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS current
+   DESCRIPTION
+    ""
+     ::=  { rlCaCertificateRevocationEntry 3 }
+
+--  MIB TABLE rlCaCertificateDisplayExtEntry
+
+RlCaCertificateDisplayExtType  ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION    "CA Certificate property type enumeration."
+   SYNTAX INTEGER {
+        publicKey(0),
+        signature(1)
+    }
+
+rlCaCertificateDisplayExtTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlCaCertificateDisplayExtEntry
+   MAX-ACCESS     not-accessible
+   STATUS     current
+   DESCRIPTION
+    "This table is used for displaying certain information of a CA certificate"
+    ::= { rlSsl 15 }
+
+rlCaCertificateDisplayExtEntry  OBJECT-TYPE
+   SYNTAX RlCaCertificateDisplayExtEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlCaCertificateDisplayType,
+           rlCaCertificateDisplayOwner,
+           rlCaCertificateDisplayName,
+	   rlCaCetrificateDisplayExtType,
+	   rlCaCertificateDisplayExtFragmentId}
+   ::= { rlCaCertificateDisplayExtTable 1 }
+
+RlCaCertificateDisplayExtEntry ::= SEQUENCE {
+  rlCaCetrificateDisplayExtType               RlCaCertificateDisplayExtType,
+  rlCaCertificateDisplayExtFragmentId         INTEGER,
+  rlCaCertificateDisplayExtFragmentData       OCTET STRING
+}
+
+rlCaCetrificateDisplayExtType OBJECT-TYPE
+    SYNTAX RlCaCertificateDisplayExtType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "CA Certificate property type"
+     ::= { rlCaCertificateDisplayExtEntry 1 }
+
+rlCaCertificateDisplayExtFragmentId   OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   not-accessible
+   STATUS current
+   DESCRIPTION
+    "Identifies the index of this fragment in the CA certificate property."
+     ::=  { rlCaCertificateDisplayExtEntry 2 }
+     
+rlCaCertificateDisplayExtFragmentData    OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-only
+   STATUS current
+   DESCRIPTION
+    "A fragment of the property to display from a CA certificate."
+     ::=  { rlCaCertificateDisplayExtEntry 3 }
 
 END
-
-
 

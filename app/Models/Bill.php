@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +27,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Bill extends Model
 {
@@ -48,7 +50,7 @@ class Bill extends Model
 
     // ---- Define Relationships ----
 
-    public function ports()
+    public function ports(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Port::class, 'bill_ports', 'bill_id', 'bill_id');
     }

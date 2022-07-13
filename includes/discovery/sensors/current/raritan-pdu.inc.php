@@ -66,7 +66,10 @@ if ($outlet_oids) {
             $outletsuffix = "$outlet_index";
             $outlet_insert_index = $outlet_index;
             $outlet_oid = ".1.3.6.1.4.1.13742.6.5.4.3.1.4.1.$outletsuffix.1";
-            $outlet_descr = snmp_get($device, ".1.3.6.1.4.1.13742.6.3.5.3.1.3.1.$outletsuffix", '-Ovq');
+            $outlet_descr = snmp_get($device, "outletName.1.$outletsuffix", '-Ovq', 'PDU2-MIB');
+            if (! $outlet_descr) {
+                $outlet_descr = 'Outlet ' . $outletsuffix;
+            }
             $outlet_low_warn_limit = snmp_get($device, "outletSensorSignedLowerWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
             $outlet_low_limit = snmp_get($device, "outletSensorSignedLowerCriticalThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
             $outlet_high_warn_limit = snmp_get($device, "outletSensorSignedUpperWarningThreshold.1.$outlet_index.rmsCurrent", '-Ovq', 'PDU2-MIB');
@@ -99,6 +102,7 @@ if ($outlet_oids) {
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */

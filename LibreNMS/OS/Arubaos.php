@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -49,14 +50,14 @@ class Arubaos extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $aruba_info = snmp_get_multi($this->getDeviceArray(), [
-            'wlsxSwitchRole.0',
-            'wlsxSwitchMasterIp.0',
-            'wlsxSwitchLicenseSerialNumber.0',
-        ], '-OQUs', 'WLSX-SWITCH-MIB');
+        $aruba_info = \SnmpQuery::get([
+            'WLSX-SWITCH-MIB::wlsxSwitchRole.0',
+            'WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0',
+            'WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0',
+        ])->values();
 
-        $device->features = $aruba_info[0]['wlsxSwitchRole'] == 'master' ? 'Master Controller' : "Local Controller for {$aruba_info[0]['wlsxSwitchMasterIp']}";
-        $device->serial = $aruba_info[0]['wlsxSwitchLicenseSerialNumber'];
+        $device->features = ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchRole.0'] ?? null) == 'master' ? 'Master Controller' : 'Local Controller for ' . ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0'] ?? null);
+        $device->serial = $aruba_info['WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0'] ?? null;
     }
 
     /**
@@ -87,7 +88,7 @@ class Arubaos extends OS implements
         $sensors = [];
 
         foreach ($data as $key => $value) {
-            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($mib . '::' . $key, 'ALL', 'arubaos', '-On');
             $value = intval($value);
 
             $low_warn_const = 1; // Default warning threshold = 1 down AP
@@ -160,7 +161,7 @@ class Arubaos extends OS implements
 
     protected function decodeChannel($channel)
     {
-        return $channel & 255; // mask off the channel width information
+        return cast_number($channel) & 255; // mask off the channel width information
     }
 
     private function discoverInstantRadio($type, $oid, $desc = 'Radio %s')
@@ -206,7 +207,7 @@ class Arubaos extends OS implements
      * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessFrequency(array $sensors)

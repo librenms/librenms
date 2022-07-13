@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +27,9 @@ namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\Validate;
 
 class CommonFunctionsTest extends TestCase
 {
@@ -71,7 +75,7 @@ class CommonFunctionsTest extends TestCase
     public function testRrdDescriptions()
     {
         $data = 'Toner, S/N:CR_UM-16021314488.';
-        $this->assertEquals('Toner, S/N CR_UM-16021314488.', safedescr($data));
+        $this->assertEquals('Toner, S/N CR_UM-16021314488.', \LibreNMS\Data\Store\Rrd::safeDescr($data));
     }
 
     public function testSetNull()
@@ -87,8 +91,8 @@ class CommonFunctionsTest extends TestCase
 
     public function testDisplay()
     {
-        $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', display('<html>string</html>'));
-        $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', display('<script>alert("test")</script>'));
+        $this->assertEquals('&lt;html&gt;string&lt;/html&gt;', Clean::html('<html>string</html>', []));
+        $this->assertEquals('&lt;script&gt;alert("test")&lt;/script&gt;', Clean::html('<script>alert("test")</script>', []));
 
         $tmp_config = [
             'HTML.Allowed'    => 'b,iframe,i,ul,li,h1,h2,h3,h4,br,p',
@@ -96,8 +100,8 @@ class CommonFunctionsTest extends TestCase
             'HTML.SafeIframe' => true,
         ];
 
-        $this->assertEquals('<b>Bold</b>', display('<b>Bold</b>', $tmp_config));
-        $this->assertEquals('', display('<script>alert("test")</script>', $tmp_config));
+        $this->assertEquals('<b>Bold</b>', Clean::html('<b>Bold</b>', $tmp_config));
+        $this->assertEquals('', Clean::html('<script>alert("test")</script>', $tmp_config));
     }
 
     public function testStringToClass()
@@ -111,31 +115,31 @@ class CommonFunctionsTest extends TestCase
 
     public function testIsValidHostname()
     {
-        $this->assertTrue(is_valid_hostname('a'), 'a');
-        $this->assertTrue(is_valid_hostname('a.'), 'a.');
-        $this->assertTrue(is_valid_hostname('0'), '0');
-        $this->assertTrue(is_valid_hostname('a.b'), 'a.b');
-        $this->assertTrue(is_valid_hostname('localhost'), 'localhost');
-        $this->assertTrue(is_valid_hostname('google.com'), 'google.com');
-        $this->assertTrue(is_valid_hostname('news.google.co.uk'), 'news.google.co.uk');
-        $this->assertTrue(is_valid_hostname('xn--fsqu00a.xn--0zwm56d'), 'xn--fsqu00a.xn--0zwm56d');
-        $this->assertTrue(is_valid_hostname('www.averylargedomainthatdoesnotreallyexist.com'), 'www.averylargedomainthatdoesnotreallyexist.com');
-        $this->assertTrue(is_valid_hostname('cont-ains.h-yph-en-s.com'), 'cont-ains.h-yph-en-s.com');
-        $this->assertTrue(is_valid_hostname('cisco-3750x'), 'cisco-3750x');
-        $this->assertFalse(is_valid_hostname('cisco_3750x'), 'cisco_3750x');
-        $this->assertFalse(is_valid_hostname('goo gle.com'), 'goo gle.com');
-        $this->assertFalse(is_valid_hostname('google..com'), 'google..com');
-        $this->assertFalse(is_valid_hostname('google.com '), 'google.com ');
-        $this->assertFalse(is_valid_hostname('google-.com'), 'google-.com');
-        $this->assertFalse(is_valid_hostname('.google.com'), '.google.com');
-        $this->assertFalse(is_valid_hostname('..google.com'), '..google.com');
-        $this->assertFalse(is_valid_hostname('<script'), '<script');
-        $this->assertFalse(is_valid_hostname('alert('), 'alert(');
-        $this->assertFalse(is_valid_hostname('.'), '.');
-        $this->assertFalse(is_valid_hostname('..'), '..');
-        $this->assertFalse(is_valid_hostname(' '), 'Just a space');
-        $this->assertFalse(is_valid_hostname('-'), '-');
-        $this->assertFalse(is_valid_hostname(''), 'Empty string');
+        $this->assertTrue(Validate::hostname('a'), 'a');
+        $this->assertTrue(Validate::hostname('a.'), 'a.');
+        $this->assertTrue(Validate::hostname('0'), '0');
+        $this->assertTrue(Validate::hostname('a.b'), 'a.b');
+        $this->assertTrue(Validate::hostname('localhost'), 'localhost');
+        $this->assertTrue(Validate::hostname('google.com'), 'google.com');
+        $this->assertTrue(Validate::hostname('news.google.co.uk'), 'news.google.co.uk');
+        $this->assertTrue(Validate::hostname('xn--fsqu00a.xn--0zwm56d'), 'xn--fsqu00a.xn--0zwm56d');
+        $this->assertTrue(Validate::hostname('www.averylargedomainthatdoesnotreallyexist.com'), 'www.averylargedomainthatdoesnotreallyexist.com');
+        $this->assertTrue(Validate::hostname('cont-ains.h-yph-en-s.com'), 'cont-ains.h-yph-en-s.com');
+        $this->assertTrue(Validate::hostname('cisco-3750x'), 'cisco-3750x');
+        $this->assertFalse(Validate::hostname('cisco_3750x'), 'cisco_3750x');
+        $this->assertFalse(Validate::hostname('goo gle.com'), 'goo gle.com');
+        $this->assertFalse(Validate::hostname('google..com'), 'google..com');
+        $this->assertFalse(Validate::hostname('google.com '), 'google.com ');
+        $this->assertFalse(Validate::hostname('google-.com'), 'google-.com');
+        $this->assertFalse(Validate::hostname('.google.com'), '.google.com');
+        $this->assertFalse(Validate::hostname('..google.com'), '..google.com');
+        $this->assertFalse(Validate::hostname('<script'), '<script');
+        $this->assertFalse(Validate::hostname('alert('), 'alert(');
+        $this->assertFalse(Validate::hostname('.'), '.');
+        $this->assertFalse(Validate::hostname('..'), '..');
+        $this->assertFalse(Validate::hostname(' '), 'Just a space');
+        $this->assertFalse(Validate::hostname('-'), '-');
+        $this->assertFalse(Validate::hostname(''), 'Empty string');
     }
 
     public function testResolveGlues()
@@ -169,50 +173,55 @@ class CommonFunctionsTest extends TestCase
             'hostname' => 'test.librenms.org',
             'sysName' => 'Testing DNS',
         ];
+        $invalid_dns = [
+            'hostname' => 'Not DNS',
+            'sysName' => 'Testing Invalid DNS',
+        ];
         $device_ip = [
             'hostname' => '192.168.1.2',
             'sysName' => 'Testing IP',
         ];
+        $invalid_ip = [
+            'hostname' => '256.168.1.2',
+            'sysName' => 'Testing Invalid IP',
+        ];
+        $custom_display = [
+            'hostname' => 'test.librenms.org',
+            'sysName' => 'sysName',
+            'display' => 'Custom Display ({{ $hostname }} {{ $sysName }})',
+        ];
 
-        // both false
-        Config::set('force_ip_to_sysname', false);
-        Config::set('force_hostname_to_sysname', false);
+        // default {{ $hostname }}
+        Config::set('device_display_default', null);
         $this->assertEquals('test.librenms.org', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
-        $this->assertEquals('192.168.5.5', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('Not DNS', format_hostname($invalid_dns));
         $this->assertEquals('192.168.1.2', format_hostname($device_ip));
-        $this->assertEquals('hostname.like', format_hostname($device_ip, 'hostname.like'));
-        $this->assertEquals('10.10.10.10', format_hostname($device_ip, '10.10.10.10'));
+        $this->assertEquals('256.168.1.2', format_hostname($invalid_ip));
+        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
 
         // ip to sysname
-        Config::set('force_ip_to_sysname', true);
-        Config::set('force_hostname_to_sysname', false);
+        Config::set('device_display_default', '{{ $sysName_fallback }}');
         $this->assertEquals('test.librenms.org', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
-        $this->assertEquals('Testing DNS', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('Not DNS', format_hostname($invalid_dns));
         $this->assertEquals('Testing IP', format_hostname($device_ip));
-        $this->assertEquals('hostname.like', format_hostname($device_ip, 'hostname.like'));
-        $this->assertEquals('Testing IP', format_hostname($device_ip, '10.10.10.10'));
+        $this->assertEquals('256.168.1.2', format_hostname($invalid_ip));
+        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
 
-        // dns to sysname
-        Config::set('force_ip_to_sysname', false);
-        Config::set('force_hostname_to_sysname', true);
+        // sysname
+        Config::set('device_display_default', '{{ $sysName }}');
         $this->assertEquals('Testing DNS', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
-        $this->assertEquals('192.168.5.5', format_hostname($device_dns, '192.168.5.5'));
-        $this->assertEquals('192.168.1.2', format_hostname($device_ip));
-        $this->assertEquals('Testing IP', format_hostname($device_ip, 'hostname.like'));
-        $this->assertEquals('10.10.10.10', format_hostname($device_ip, '10.10.10.10'));
-
-        // both true
-        Config::set('force_ip_to_sysname', true);
-        Config::set('force_hostname_to_sysname', true);
-        $this->assertEquals('Testing DNS', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($device_dns, 'Not DNS'));
-        $this->assertEquals('Testing DNS', format_hostname($device_dns, '192.168.5.5'));
+        $this->assertEquals('Testing Invalid DNS', format_hostname($invalid_dns));
         $this->assertEquals('Testing IP', format_hostname($device_ip));
-        $this->assertEquals('Testing IP', format_hostname($device_ip, 'hostname.like'));
-        $this->assertEquals('Testing IP', format_hostname($device_ip, '10.10.10.10'));
+        $this->assertEquals('Testing Invalid IP', format_hostname($invalid_ip));
+        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
+
+        // custom
+        $custom_ip = ['display' => 'IP: {{ $ip }}', 'hostname' => '1.1.1.1', 'ip' => '2.2.2.2'];
+        $this->assertEquals('IP: 1.1.1.1', format_hostname($custom_ip));
+        $custom_ip['hostname'] = 'not_ip';
+        $this->assertEquals('IP: 2.2.2.2', format_hostname($custom_ip));
+        $custom_ip['overwrite_ip'] = '3.3.3.3';
+        $this->assertEquals('IP: 3.3.3.3', format_hostname($custom_ip));
     }
 
     public function testPortAssociation()
@@ -224,10 +233,10 @@ class CommonFunctionsTest extends TestCase
             4 => 'ifAlias',
         ];
 
-        $this->assertEquals($modes, get_port_assoc_modes());
-        $this->assertEquals('ifIndex', get_port_assoc_mode_name(1));
-        $this->assertEquals(1, get_port_assoc_mode_id('ifIndex'));
-        $this->assertFalse(get_port_assoc_mode_name(666));
-        $this->assertFalse(get_port_assoc_mode_id('lucifer'));
+        $this->assertEquals($modes, PortAssociationMode::getModes());
+        $this->assertEquals('ifIndex', PortAssociationMode::getName(1));
+        $this->assertEquals(1, PortAssociationMode::getId('ifIndex'));
+        $this->assertNull(PortAssociationMode::getName(666));
+        $this->assertNull(PortAssociationMode::getId('lucifer'));
     }
 }

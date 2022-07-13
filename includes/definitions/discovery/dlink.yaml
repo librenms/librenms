@@ -26,11 +26,11 @@ modules:
         data:
             -
                 oid: AGENT-GENERAL-MIB::agentCPUutilizationIn5sec
-                value: agentCPUutilizationIn5sec
+                value: AGENT-GENERAL-MIB::agentCPUutilizationIn5sec
                 num_oid: '.1.3.6.1.4.1.171.12.1.1.6.1.{{ $index }}'
             -
                 oid: DLINKSW-ENTITY-EXT-MIB::dEntityExtCpuUtilOneMinute
-                value: dEntityExtCpuUtilOneMinute
+                value: DLINKSW-ENTITY-EXT-MIB::dEntityExtCpuUtilOneMinute
                 num_oid: '.1.3.6.1.4.1.171.14.5.1.7.1.4.{{ $index }}'
     sensors:
         temperature:

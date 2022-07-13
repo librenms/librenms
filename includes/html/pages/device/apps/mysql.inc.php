@@ -2,7 +2,7 @@
 
 print_optionbar_start();
 
-echo "<span style='font-weight: bold;'>" . nicecase($app['app_type']) . '</span> &#187; ';
+echo "<span style='font-weight: bold;'>" . \LibreNMS\Util\StringHelpers::niceCase($app['app_type']) . '</span> &#187; ';
 
 $app_sections = [
     'system'  => 'System',

@@ -97,7 +97,7 @@ StatisticsCntrType  ::= TEXTUAL-CONVENTION
 }
 
  rlPolicy MODULE-IDENTITY
-          LAST-UPDATED "200606260000Z"
+          LAST-UPDATED "200606260001Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -3418,7 +3418,8 @@ rlPolicyDscpRemarkEntry OBJECT-TYPE
 RlPolicyDscpRemarkEntry::= SEQUENCE {
         rlPolicyRmOldDscp                INTEGER,
         rlPolicyRmNewDscp                INTEGER,
-        rlPolicyDscpRemarkStatus        RowStatus
+        rlPolicyDscpRemarkStatus         RowStatus,
+        rlPolicyRmNewExceedDscp          INTEGER
     }
 
 rlPolicyRmOldDscp OBJECT-TYPE
@@ -3434,7 +3435,7 @@ rlPolicyRmNewDscp OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "New DSCP."
+        "New DSCP for the violation action."
     ::= { rlPolicyDscpRemarkEntry 2 }
 
 
@@ -3446,6 +3447,15 @@ rlPolicyDscpRemarkStatus OBJECT-TYPE
        "The status of a table entry.
         It is used to delete/Add an entry from this table."
     ::= { rlPolicyDscpRemarkEntry 3 }
+    
+    
+rlPolicyRmNewExceedDscp OBJECT-TYPE
+    SYNTAX INTEGER(0..63)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "New DSCP for the exceed action."
+    ::= { rlPolicyDscpRemarkEntry 4 }    
 
 
 -- Policy DSCP Mutation Table

@@ -21,8 +21,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $ok = '';
 $error = '';
 $group_id = $_POST['group_id'];
-$group_name = mres($_POST['group_name']);
-$descr = mres($_POST['descr']);
+$group_name = $_POST['group_name'];
+$descr = $_POST['descr'];
 if (! empty($group_name)) {
     if (is_numeric($group_id)) {
         if (dbUpdate(['group_name' => $group_name, 'descr' => $descr], 'poller_groups', 'id = ?', [$group_id]) >= 0) {
@@ -44,5 +44,5 @@ if (! empty($group_name)) {
 if (! empty($ok)) {
     exit("$ok");
 } else {
-    exit("ERROR: $error");
+    exit('ERROR: ' . htmlspecialchars($error));
 }

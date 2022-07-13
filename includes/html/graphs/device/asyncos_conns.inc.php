@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'asyncos_conns');
+$rrd_filename = Rrd::name($device['hostname'], 'asyncos_conns');
 
 require 'includes/html/graphs/common.inc.php';
 

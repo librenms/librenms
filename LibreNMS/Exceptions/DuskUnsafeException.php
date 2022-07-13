@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +32,7 @@ class DuskUnsafeException extends \Exception implements UpgradeableException
     /**
      * Try to convert the given Exception to this exception
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static
      */
     public static function upgrade($exception)
@@ -44,7 +45,6 @@ class DuskUnsafeException extends \Exception implements UpgradeableException
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)

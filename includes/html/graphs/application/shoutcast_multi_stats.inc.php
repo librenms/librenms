@@ -8,7 +8,7 @@ $total_text = 'Total of all ShoutCast Servers';
 $nototal = 0;
 
 $rrd_list = [];
-$rrd_filenames = glob(rrd_name($device['hostname'], ['app', 'shoutcast', $app['app_id']], '*.rrd'));
+$rrd_filenames = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app['app_id']], '*.rrd'));
 foreach ($rrd_filenames as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);
@@ -38,7 +38,7 @@ if ($width > '500') {
 foreach ($rrd_list as $rrd) {
     $colours = (isset($rrd['colour']) ? $rrd['colour'] : 'default');
     $strlen = ((strlen($rrd['descr']) < $descr_len) ? ($descr_len - strlen($rrd['descr'])) : '0');
-    $descr = (isset($rrd['descr']) ? rrdtool_escape($rrd['descr'], ($desc_len + $strlen)) : 'Unknown');
+    $descr = (isset($rrd['descr']) ? \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], ($desc_len + $strlen)) : 'Unknown');
     for ($z = 0; $z < $strlen; $z++) {
         $descr .= ' ';
     }
@@ -70,7 +70,7 @@ foreach ($rrd_list as $rrd) {
 
 if (! $nototal) {
     $strlen = ((strlen($total_text) < $descr_len) ? ($descr_len - strlen($total_text)) : '0');
-    $descr = (isset($total_text) ? rrdtool_escape($total_text, ($desc_len + $strlen)) : 'Total');
+    $descr = (isset($total_text) ? \LibreNMS\Data\Store\Rrd::fixedSafeDescr($total_text, ($desc_len + $strlen)) : 'Total');
     $colour = \LibreNMS\Config::get("graph_colours.$colours.$x");
     for ($z = 0; $z < $strlen; $z++) {
         $descr .= ' ';

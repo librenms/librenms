@@ -1,8 +1,11 @@
 <?php
 
 use App\Models\Device;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Clean;
+use LibreNMS\Util\IP;
 
 function get_service_status($device = null)
 {
@@ -109,7 +112,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+        log_event('Autodiscovered service: type ' . $service, $device, 'service', 2);
         echo '+';
     }
     echo "$service ";
@@ -119,6 +122,10 @@ function poll_service($service)
 {
     $update = [];
     $old_status = $service['service_status'];
+    $service['service_type'] = Clean::fileName($service['service_type']);
+    $service['service_ip'] = IP::isValid($service['service_ip']) ? $service['service_ip'] : Clean::fileName($service['service_ip']);
+    $service['hostname'] = IP::isValid($service['hostname']) ? $service['hostname'] : Clean::fileName($service['hostname']);
+    $service['overwrite_ip'] = IP::isValid($service['overwrite_ip']) ? $service['overwrite_ip'] : Clean::fileName($service['overwrite_ip']);
     $check_cmd = '';
 
     // if we have a script for this check, use it.
@@ -129,7 +136,7 @@ function poll_service($service)
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == '') {
-        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
         $check_cmd .= ' ' . $service['service_param'];
     }
 
@@ -150,7 +157,7 @@ function poll_service($service)
         foreach ($perf as $k => $v) {
             $DS[$k] = $v['uom'];
         }
-        d_echo('Service DS: ' . _json_encode($DS) . "\n");
+        d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
         if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
             $update['service_ds'] = json_encode($DS);
         }
@@ -196,6 +203,10 @@ function poll_service($service)
             4,
             $service['service_id']
         );
+
+        // Run alert rules due to status changed
+        $rules = new AlertRules;
+        $rules->runRules($service['device_id']);
     }
 
     if ($service['service_message'] != $msg) {

@@ -18,36 +18,27 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 use LibreNMS\Config;
 
-if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
-    $vrfs_lite_cisco = [['context_name'=>'']];
-}
-
-foreach ($vrfs_lite_cisco as $vrf) {
-    $context = $vrf['context_name'];
-    $device['context_name'] = $context;
-
+foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
     } else {
-        $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
-        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+        $arp_data = SnmpQuery::context($context_name)->walk('IP-MIB::ipNetToPhysicalPhysAddress')->table(1);
+        SnmpQuery::context($context_name)->walk('IP-MIB::ipNetToMediaPhysAddress')->table(1, $arp_data);
     }
 
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
-    $existing_data = dbFetchRows($sql, [$device['device_id'], $context]);
+    $existing_data = dbFetchRows($sql, [$device['device_id'], $context_name]);
 
     $ipv4_addresses = array_map(function ($data) {
         return $data['ipv4_address'];
     }, $existing_data);
-
     $arp_table = [];
     $insert_data = [];
     foreach ($arp_data as $ifIndex => $data) {
@@ -55,8 +46,8 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $port_id = $interface['port_id'];
 
         $port_arp = array_merge(
-            (array) $data['ipNetToMediaPhysAddress'],
-            (array) $data['ipNetToPhysicalPhysAddress']['ipv4']
+            (array) $data['IP-MIB::ipNetToMediaPhysAddress'],
+            is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
         );
 
         echo "{$interface['ifName']}: \n";
@@ -73,8 +64,8 @@ foreach ($vrfs_lite_cisco as $vrf) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {
                     d_echo("Changed mac address for $ip from $old_mac to $mac\n");
-                    log_event("MAC change: $ip : " . mac_clean_to_readable($old_mac) . ' -> ' . mac_clean_to_readable($mac), $device, 'interface', 4, $port_id);
-                    dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context]);
+                    log_event("MAC change: $ip : " . \LibreNMS\Util\Rewrite::readableMac($old_mac) . ' -> ' . \LibreNMS\Util\Rewrite::readableMac($mac), $device, 'interface', 4, $port_id);
+                    dbUpdate(['mac_address' => $mac], 'ipv4_mac', 'port_id=? AND ipv4_address=? AND context_name=?', [$port_id, $ip, $context_name]);
                 }
                 d_echo("$raw_mac => $ip\n", '.');
             } elseif (isset($interface['port_id'])) {
@@ -84,7 +75,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
                     'device_id'    => $device['device_id'],
                     'mac_address'  => $mac,
                     'ipv4_address' => $ip,
-                    'context_name' => (string) $context,
+                    'context_name' => (string) $context_name,
                 ];
             }
         }
@@ -109,7 +100,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $entry_if = $entry['port_id'];
         $entry_ip = $entry['ipv4_address'];
         if ($arp_table[$entry_if][$entry_ip] != $entry_mac) {
-            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $context]);
+            dbDelete('ipv4_mac', '`port_id` = ? AND `mac_address`=? AND `ipv4_address`=? AND `context_name`=?', [$entry_if, $entry_mac, $entry_ip, $context_name]);
             d_echo(null, '-');
         }
     }
@@ -124,9 +115,6 @@ foreach ($vrfs_lite_cisco as $vrf) {
         $insert_data,
         $sql,
         $params,
-        $context,
-        $entry,
-        $device['context_name']
+        $entry
     );
 }
-unset($vrfs_lite_cisco);

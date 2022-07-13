@@ -26,6 +26,11 @@ $alert_states = [
 
 $show_recovered = false;
 
+if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
+    $where .= ' AND `alerts`.`id` = ?';
+    $param[] = $vars['alert_id'];
+}
+
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
@@ -37,6 +42,11 @@ if (is_numeric($vars['acknowledged'])) {
 
 if (is_numeric($vars['fired'])) {
     $where .= ' AND `alerts`.`alerted`=' . $alert_states['alerted'];
+}
+
+if (is_numeric($vars['unreachable'])) {
+    // Sub-select to flag if at least one parent is set, and all parents are offline
+    $where .= ' AND (SELECT IF(COUNT(`dr`.`parent_device_id`) > 0 AND COUNT(`dr`.`parent_device_id`)=count(`d`.`device_id`),1,0) FROM `device_relationships` `dr` LEFT JOIN `devices` `d` ON `dr`.`parent_device_id`=`d`.`device_id` AND `d`.`status`=0 WHERE `dr`.`child_device_id`=`devices`.`device_id`)=' . $vars['unreachable'];
 }
 
 if (is_numeric($vars['state'])) {
@@ -103,13 +113,14 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+$sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
 
 $rulei = 0;
 $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
-    $fault_detail = alert_details($log);
+    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
+    [$fault_detail, $max_row_length] = alert_details($log);
     $info = json_decode($alert['info'], true);
 
     $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
@@ -134,7 +145,13 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . ($alert['id']) . '"';
+    if (is_numeric($vars['uncollapse_key_count'])) {
+        $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
+    } else {
+        $hostname .= ' class="collapse"';
+    }
+    $hostname .= '>' . $fault_detail . '</div></div>';
 
     $severity = $alert['severity'];
     $severity_ico = '<span class="alert-status label-' . alert_layout($severity)['background_color'] . '">&nbsp;</span>';
@@ -168,8 +185,9 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = [
         'id' => $rulei++,
-        'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
+        'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($alert['id']) . '" data-parent="#alerts"></a>',
+        'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
         'hostname' => $hostname,
         'location' => generate_link($alert['location'], ['page' => 'devices', 'location' => $alert['location']]),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
@@ -188,4 +206,4 @@ $output = [
     'rows' => $response,
     'total' => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

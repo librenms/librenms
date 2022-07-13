@@ -1,12 +1,12 @@
 /*!
- * Vue.js v2.6.12
- * (c) 2014-2020 Evan You
+ * Vue.js v2.6.14
+ * (c) 2014-2021 Evan You
  * Released under the MIT License.
  */
 
 /*!
- * vue-i18n v8.22.2 
- * (c) 2020 kazuya kawaguchi
+ * vue-i18n v8.26.8 
+ * (c) 2021 kazuya kawaguchi
  * Released under the MIT License.
  */
 

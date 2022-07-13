@@ -1,17 +1,17 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>@lang('install.title')</title>
+    <title>{{ __('install.title') }}</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('css/bootstrap4.min.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('css/fontawesome.min.css') }}" rel="stylesheet">
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
-    <style type="text/css">
+    <style>
         body {
             background-color: #046C8B;
         }
@@ -105,9 +105,9 @@
                            class="install-step btn btn-circle
                            @if($step === $name) btn-outline-info @else btn-info @endif
                            @if(!$controller->enabled()) disabled @endif"
-                           title="@lang("install.$name.title")"
+                           title="{{ __("install.$name.title") }}"
                         >
-                            <i class="fa fa-lg {{ $controller->icon() }}"></i>
+                            <i class="{{ $controller->icon() }}"></i>
                         </a>
                     </div>
                     <div id="progress-{{ $name }}-bar" class="install-progress loop @if($controller->complete() || $step == 'finish') complete @endif"></div>
@@ -117,7 +117,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 id="step-title">@lang("install.$step.title")</h2>
+                    <h2 id="step-title">{{ __("install.$step.title") }}</h2>
                 </div>
             </div>
             <div class="row">
@@ -137,7 +137,7 @@
     var step = '{{ $step }}';
     function checkStepStatus(callback) {
         $.ajax('{{ route('install.action.steps') }}')
-            .success(function (data) {
+            .done(function (data) {
                 var primary;
                 Object.keys(data).forEach(function (key) {
                     var classes = 'btn btn-circle';

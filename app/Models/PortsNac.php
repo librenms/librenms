@@ -18,11 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
+
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PortsNac extends PortRelatedModel
 {
@@ -50,7 +53,7 @@ class PortsNac extends PortRelatedModel
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }

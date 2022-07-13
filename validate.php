@@ -68,7 +68,6 @@ if (! file_exists('vendor/autoload.php')) {
 require_once 'vendor/autoload.php';
 require_once 'includes/common.php';
 require_once 'includes/functions.php';
-require_once 'includes/dbFacile.php';
 
 // Buffer output
 ob_start();
@@ -135,7 +134,7 @@ if (\LibreNMS\DB\Eloquent::isConnected()) {
 }
 
 $precheck_complete = true; // disable shutdown function
-print_header($validator->getVersions());
+print_header(version_info());
 
 if (isset($options['g'])) {
     $modules = explode(',', $options['g']);
@@ -173,13 +172,13 @@ EOF;
 // output matches that of ValidationResult
 function print_fail($msg, $fix = null)
 {
-    c_echo("[%RFAIL%n]  $msg");
+    echo "[\033[31;1mFAIL\033[0m]  $msg";
     if ($fix && strlen($msg) > 72) {
         echo PHP_EOL . '       ';
     }
 
     if (! empty($fix)) {
-        c_echo(" [%BFIX%n] %B$fix%n");
+        echo " [\033[34;1mFIX\033[0m] \033[34;1m$fix\033[0m";
     }
     echo PHP_EOL;
 }

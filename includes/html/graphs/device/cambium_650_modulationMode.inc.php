@@ -11,8 +11,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'cambium-650-modulationMode');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-650-modulationMode');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'Mode                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rxModulation=' . $rrdfilename . ':rxModulation:AVERAGE ';
     $rrd_options .= ' DEF:txModulation=' . $rrdfilename . ':txModulation:AVERAGE ';

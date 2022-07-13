@@ -30,8 +30,7 @@ class NetgearFailedUserLoginTest extends SnmpTrapTestCase
 {
     public function testManagedSeries()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 0:6:11:31.55
@@ -46,8 +45,7 @@ SNMPv2-MIB::snmpTrapOID.0 NETGEAR-SWITCHING-MIB::failedUserLoginTrap";
 
     public function testSmartSeries()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:1026->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 30:22:57:58.00
