@@ -36,7 +36,7 @@ class Disk extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Disk space and permission checks
         $temp_dir = Config::get('temp_dir');

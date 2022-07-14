@@ -24,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Mattermost extends Transport
 {
@@ -62,9 +63,7 @@ class Mattermost extends Transport
             'icon_url' => $api['icon'],
         ];
 
-        $device = device_by_id_cache($obj['device_id']);
-
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
 
         $httpheaders = ['Accept: application/json', 'Content-Type: application/json'];
         $alert_payload = json_encode($data);
@@ -82,7 +81,7 @@ class Mattermost extends Transport
 
             return 'HTTP Status code ' . $code;
         } else {
-            d_echo('Mattermost message sent for ' . $device);
+            d_echo('Mattermost message sent for ' . $obj['hostname']);
 
             return true;
         }

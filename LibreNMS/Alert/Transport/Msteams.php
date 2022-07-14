@@ -13,9 +13,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Msteams extends Transport
 {
+    protected $name = 'Microsoft Teams';
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {
@@ -32,9 +35,10 @@ class Msteams extends Transport
             'title' => $obj['title'],
             'themeColor' => self::getColorForState($obj['state']),
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'summary' => $obj['title'],
         ];
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [

@@ -40,8 +40,6 @@ if (! $ups_nut) {
 }
 //print_r(array_values(explode("\n", $ups_nut)));
 
-echo ' ' . $name;
-
 // (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
 [
     $charge,
@@ -82,7 +80,7 @@ $rrd_def = RrdDefinition::make()
 $fields = [
     'charge' => $charge,
     'battery_low' => $battery_low,
-    'time_remaining' => $remaining / 60,
+    'time_remaining' => (int) $remaining / 60,
     'battery_voltage' => $bat_volt,
     'battery_nominal' => $bat_nom,
     'line_nominal' => $line_nom,

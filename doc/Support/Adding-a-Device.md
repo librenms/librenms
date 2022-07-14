@@ -1,47 +1,9 @@
-source: Support/Adding-a-Device.md
-path: blob/master/doc/
-
 # Adding Device
 
 You have two options for adding a new device into LibreNMS. You can
 add a device via the `cli` or by using the `WebUI`.
 
-## CLI
-
-Using the command line via ssh you can add a new device by changing to
-the directory of your LibreNMS install and typing (be sure to put the
-correct details).
-
-Preferred method:
-```bash
-./lnms device:add [--v1|--v2c] [-c yourSNMPcommunity] yourhostname
-```
-
-You can use `./lnms device:add --help` for a list of available options and defaults.
-
-Alternative:
-```bash
-./addhost.php yourhostname [community] [v1|v2c] [port] [udp|udp6|tcp|tcp6]
-```
-
-As an example, if your device with the name `mydevice.example.com` is
-configured to use the community `my_company` using snmp `v2c` then you
-would enter:
-
-Preferred method:
-```bash
-./lnms device:add --v2c -c my_company mydevice.example.com
-```
-
-Alternative:
-```bash
-./addhost.php mydevice.example.com my_company v2c
-```
-
-> Please note that if the community contains special characters such
-> as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
-
-## WebUI
+## Via WebUI
 
 Using the web interface, go to Devices and click Add Device. Enter the
 details required for the device that you want to add and then click
@@ -54,6 +16,29 @@ to get polling Device data via a specific IP-Address (e.g. Management IP)
 fill out the optional field `Overwrite IP` with it's IP-Address.
 
 ![Add device](/img/webui_add_device.png)
+
+## Via CLI
+
+Using the command line via ssh you can add a new device by changing to
+the directory of your LibreNMS install and typing (be sure to put the
+correct details).
+
+```bash
+./lnms device:add yourhostname [--v1|--v2c] [-c yourSNMPcommunity]
+```
+
+You can use `./lnms device:add --help` for a list of available options and defaults.
+
+As an example, if your device with the name `mydevice.example.com` is
+configured to use the community `my_company` using snmp `v2c` then you
+would enter:
+
+```bash
+./lnms device:add --v2c -c my_company mydevice.example.com
+```
+
+> Please note that if the community contains special characters such
+> as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
 
 ## Ping Only Device
 

@@ -210,6 +210,15 @@ return [
             'description' => 'Active Directory Benutzername',
             'help' => 'Benutzt zum durchsuchen des AD Server wenn kein Nutzer eingeloggt ist in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Benutze STARTTLS',
+            'help' => 'Benutze STARTTLS um Verbindungen abzusichern.  Alternative zu LDAPS.',
+            'options' => [
+                'disabled' => 'Deaktiviert',
+                'optional' => 'Optional',
+                'required' => 'Benötigt',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP Cache Gültigkeit',
             'help' => 'Speichert temporär LDAP Suchergebnisse.  Erhöht die Geschwindigkeit, aber die Daten können veraltet sein.',
@@ -709,9 +718,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Pfad zu  traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Pfad zu traceroute6',
         ],
         'unix-agent' => [
             'connection-timeout' => [

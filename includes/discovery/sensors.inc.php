@@ -25,6 +25,10 @@ if ($device['os'] == 'openbsd') {
     include 'includes/discovery/sensors/openbsd.inc.php';
 }
 
+if ($device['os'] == 'linux') {
+    include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
+}
+
 if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
@@ -39,10 +43,6 @@ if (strstr($device['hardware'], 'ProLiant')) {
 
 if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
-}
-
-if ($device['os_group'] == 'printer') {
-    include 'includes/discovery/sensors/state/printer.inc.php';
 }
 
 $run_sensors = [
@@ -64,6 +64,7 @@ $run_sensors = [
     'count',
     'temperature',
     'tv_signal',
+    'bitrate',
     'voltage',
     'snr',
     'pressure',
@@ -80,7 +81,7 @@ $run_sensors = [
 // filter submodules
 $run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
 
-sensors($run_sensors, $device, $valid, $pre_cache);
+sensors($run_sensors, $os, $valid, $pre_cache);
 unset(
     $pre_cache,
     $run_sensors,

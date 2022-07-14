@@ -1,5 +1,10 @@
 mib: ZXR10-MIB
 modules:
+    os:
+        sysDescr_regex:
+            - '/ZXR10 (?<hardware>.*),( ZTE ZXR10 Software)? Version: (?<version>.*)/'
+            - '/ZXR10 (?<hardware>.*) Software, 5900 Version: (?<version>.*),/'
+            - '/ZXR10_(?<hardware>.*) Software, Version ZXR10 5900 (?<version>\S*) /'
     mempools:
         data:
             -

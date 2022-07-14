@@ -1,5 +1,8 @@
 mib: Argus-Power-System-MIB
 modules:
+    os:
+        hardware: Argus-Power-System-MIB::upsIdentProductCode.0
+        version: Argus-Power-System-MIB::upsIdentUPSSoftwareVersion.0
     sensors:
         voltage:
             options:

@@ -9,7 +9,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
 
-            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, $vars['name']);
+            $service_id = add_service($vars['device'], $vars['type'], strip_tags($vars['descr']), $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, strip_tags($vars['name']));
             if ($service_id) {
                 $message .= $message_break . 'Service added (' . $service_id . ')!';
                 $message_break .= '<br />';

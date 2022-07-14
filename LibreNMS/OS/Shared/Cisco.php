@@ -31,11 +31,13 @@ use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -43,7 +45,14 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling, SlaPolling
+class Cisco extends OS implements
+    OSDiscovery,
+    SlaDiscovery,
+    StpInstanceDiscovery,
+    ProcessorDiscovery,
+    MempoolsDiscovery,
+    NacPolling,
+    SlaPolling
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -130,8 +139,8 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
                 [$entPhysicalIndex] = explode('.', $index);
-                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entPhysicalIndex];
-                $descr = ucwords($entPhysicalName . ' - ' . $entry['cempMemPoolName']);
+                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
                 $mempools->push((new Mempool([
@@ -180,7 +189,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         $count = 0;
         foreach (Arr::wrap($cpm) as $index => $entry) {
             $count++;
-            if (is_numeric($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
+            if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
                 $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
                 $mempools->push((new Mempool([
@@ -336,7 +345,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         return $slas;
     }
 
-    private function getSlaTag($data)
+    private function getSlaTag($data): string
     {
         if (! empty($data['rttMonCtrlAdminTag'])) {
             return $data['rttMonCtrlAdminTag'];
@@ -344,11 +353,11 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         switch ($data['rttMonCtrlAdminRttType']) {
             case 'http':
-                return $data['rttMonEchoAdminURL'];
+                return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
-                return $data['rttMonEchoAdminTargetAddressString'];
+                return $data['rttMonEchoAdminTargetAddressString'] ?? '';
             case 'echo':
-                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true);
+                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
                 $tag = IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) . ':' . $data['rttMonEchoAdminTargetPort'];
                 if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
@@ -411,6 +420,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
         $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonEchoAdminNumPackets', 'CISCO-RTTMON-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 
@@ -472,6 +482,16 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                     data_update($device, 'sla', $tags, $jitter);
                     $fields = array_merge($fields, $jitter);
+                    // Additional rrd for total number packet in sla
+                    $numPackets = [
+                        'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
+                    ];
+                    $rrd_name = ['sla', $sla_nr, 'NumPackets'];
+                    $rrd_def = RrdDefinition::make()
+                        ->addDataset('NumPackets', 'GAUGE', 0);
+                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    data_update($device, 'sla', $tags, $numPackets);
+                    $fields = array_merge($fields, $numPackets);
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [
@@ -507,6 +527,20 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
+    }
+
+    public function discoverStpInstances(?string $vlan = null): Collection
+    {
+        $vlans = $this->getDevice()->vlans;
+        $instances = new Collection;
+
+        // attempt to discover context based vlan instances
+        foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
+            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
+            $instances = $instances->merge(parent::discoverStpInstances($vlan));
+        }
+
+        return $instances;
     }
 
     protected function getMainSerial()

@@ -1,6 +1,3 @@
-source: Extensions/Services.md
-path: blob/master/doc/
-
 # Nagios Plugins - Services
 
 Services within LibreNMS provides the ability to leverage Nagios plugins to

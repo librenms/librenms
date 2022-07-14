@@ -11,7 +11,7 @@ IMPORTS
     TruthValue, DisplayString, RowStatus    FROM SNMPv2-TC;
 
 rlEmbWeb MODULE-IDENTITY
-         LAST-UPDATED "200607030000Z"
+         LAST-UPDATED "200607030001Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO

@@ -22,11 +22,13 @@
             ...request,
             id: "alerts",
             acknowledged: '{{ $acknowledged }}',
+            unreachable: '{{ $unreachable }}',
             fired: '{{ $fired }}',
             min_severity: '{{ $min_severity }}',
             group: '{{ $device_group }}',
             proc: '{{ $proc }}',
             sort: '{{ $sort }}',
+            uncollapse_key_count: '{{ $uncollapse_key_count }}',
             device_id: '{{ $device }}'
         }),
         responseHandler: response => {

@@ -7,8 +7,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'fail2ban';
 $app_id = $app['app_id'];
 
-echo $name;
-
 try {
     $f2b = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {

@@ -1,6 +1,3 @@
-source: Carel-pCOweb-Devices.md
-path: blob/master/doc/
-
 # Carel pCOweb Devices
 
 The pCOWeb card is used to interface the pCO system to networks that

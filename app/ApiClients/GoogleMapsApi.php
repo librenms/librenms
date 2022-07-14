@@ -26,6 +26,7 @@
 namespace App\ApiClients;
 
 use Exception;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
@@ -89,15 +90,9 @@ class GoogleMapsApi extends BaseApi implements Geocoder
 
     /**
      * Checks if the request was a success
-     *
-     * @param  \Psr\Http\Message\ResponseInterface  $response
-     * @param  array  $data  decoded response data
-     * @return bool
-     *
-     * @throws Exception you may throw an Exception if validation fails
      */
-    protected function checkResponse($response, $data)
+    protected function checkResponse(Response $response, array $data): bool
     {
-        return $response->getStatusCode() == 200 && $data['status'] == 'OK';
+        return $response->successful() && $data['status'] == 'OK';
     }
 }

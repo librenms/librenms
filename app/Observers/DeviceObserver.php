@@ -2,32 +2,77 @@
 
 namespace App\Observers;
 
+use App;
+use App\ApiClients\Oxidized;
 use App\Models\Device;
+use File;
+use Log;
 
 class DeviceObserver
 {
+    /**
+     * Handle the device "created" event.
+     *
+     * @param  \App\Models\Device  $device
+     * @return void
+     */
+    public function created(Device $device): void
+    {
+        Log::event("Device $device->hostname has been created", $device, 'system', 3);
+        (new Oxidized)->reloadNodes();
+    }
+
     /**
      * Handle the device "updated" event.
      *
      * @param  \App\Models\Device  $device
      * @return void
      */
-    public function updated(Device $device)
+    public function updated(Device $device): void
     {
         // handle device dependency updates
         if ($device->isDirty('max_depth')) {
             $device->children->each->updateMaxDepth();
         }
 
+        // log up/down status changes
+        if ($device->isDirty(['status', 'status_reason'])) {
+            $type = $device->status ? 'up' : 'down';
+            $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
+            Log::event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+        }
+
         // key attribute changes
-        foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type'] as $attribute) {
+        foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type', 'ip'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                \Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
+                Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
             }
         }
         if ($device->isDirty('location_id')) {
-            \Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
+            Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
         }
+    }
+
+    /**
+     * Handle the device "deleted" event.
+     */
+    public function deleted(Device $device): void
+    {
+        // delete rrd files
+        $host_dir = \Rrd::dirFromHost($device->hostname);
+        try {
+            $result = File::deleteDirectory($host_dir);
+
+            if (! $result) {
+                Log::debug("Could not delete RRD files for: $device->hostname");
+            }
+        } catch (\Exception $e) {
+            Log::error("Could not delete RRD files for: $device->hostname", [$e]);
+        }
+
+        Log::event("Device $device->hostname has been removed", 0, 'system', 3);
+
+        (new Oxidized)->reloadNodes();
     }
 
     /**
@@ -36,13 +81,95 @@ class DeviceObserver
      * @param  \App\Models\Device  $device
      * @return void
      */
-    public function deleting(Device $device)
+    public function deleting(Device $device): void
     {
+        // prevent abort from the webserver
+        if (App::runningInConsole() === false) {
+            ignore_user_abort(true);
+            set_time_limit(0);
+        }
+
         // delete related data
-        $device->ports()->delete();
-        $device->syslogs()->delete();
-        $device->eventlogs()->delete();
+        $device->accessPoints()->delete();
+        $device->alerts()->delete();
+        \DB::table('alert_device_map')->where('device_id', $device->device_id)->delete();
+        $device->alertLogs()->delete();
         $device->applications()->delete();
+        $device->attribs()->delete();
+        $device->availability()->delete();
+        $device->bgppeers()->delete();
+        \DB::table('bgpPeers_cbgp')->where('device_id', $device->device_id)->delete();
+        $device->cefSwitching()->delete();
+        \DB::table('ciscoASA')->where('device_id', $device->device_id)->delete();
+        $device->components()->delete();
+        \DB::table('customoids')->where('device_id', $device->device_id)->delete();
+        \DB::table('devices_perms')->where('device_id', $device->device_id)->delete();
+        $device->graphs()->delete();
+        \DB::table('device_group_device')->where('device_id', $device->device_id)->delete();
+        $device->diskIo()->delete();
+        $device->entityState()->delete();
+        $device->entityPhysical()->delete();
+        \DB::table('entPhysical_state')->where('device_id', $device->device_id)->delete();
+        $device->eventlogs()->delete();
+        $device->hostResources()->delete();
+        $device->hostResourceValues()->delete();
+        $device->ipsecTunnels()->delete();
+        $device->ipv4()->delete();
+        $device->ipv6()->delete();
+        $device->isisAdjacencies()->delete();
+        $device->isisAdjacencies()->delete();
+        $device->macs()->delete();
+        $device->mefInfo()->delete();
+        $device->mempools()->delete();
+        $device->mplsLsps()->delete();
+        $device->mplsLspPaths()->delete();
+        $device->mplsSaps()->delete();
+        $device->mplsSdps()->delete();
+        $device->mplsSdpBinds()->delete();
+        $device->mplsServices()->delete();
+        $device->mplsTunnelArHops()->delete();
+        $device->mplsTunnelCHops()->delete();
+        $device->muninPlugins()->delete();
+        \DB::table('netscaler_vservers')->where('device_id', $device->device_id)->delete();
+        $device->ospfAreas()->delete();
+        $device->ospfInstances()->delete();
+        $device->ospfNbrs()->delete();
+        $device->ospfPorts()->delete();
+        $device->outages()->delete();
+        $device->packages()->delete();
+        $device->perf()->delete();
+        $device->portsFdb()->delete();
+        $device->portsNac()->delete();
+        \DB::table('ports_stack')->where('device_id', $device->device_id)->delete();
+        $device->portsStp()->delete();
+        $device->portsVlan()->delete();
+        $device->printerSupplies()->delete();
+        $device->processes()->delete();
+        $device->processors()->delete();
+        $device->pseudowires()->delete();
+        $device->routes()->delete();
+        $device->rServers()->delete();
+        $device->sensors()->delete();  // delete sensor state indexes first?
+        $device->services()->delete();
+        \DB::table('service_templates_device')->where('device_id', $device->device_id)->delete();
+        $device->storage()->delete();
+        $device->stpInstances()->delete();
+        $device->syslogs()->delete();
+        $device->tnmsNeInfo()->delete();
+        $device->vlans()->delete();
+        $device->vminfo()->delete();
+        $device->vrfs()->delete();
+        $device->vrfLites()->delete();
+        $device->vServers()->delete();
+        $device->wirelessSensors()->delete();
+
+        $device->ports()
+            ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
+            ->chunk(100, function ($ports) {
+                foreach ($ports as $port) {
+                    $port->delete();
+                }
+            });
 
         // handle device dependency updates
         $device->children->each->updateMaxDepth($device->device_id);
@@ -63,7 +190,7 @@ class DeviceObserver
             // a parent attached to this device
 
             // update the parent's max depth incase it used to be standalone
-            Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
+            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->validateStandalone();
 
             // make sure this device's max depth is updated
             $device->updateMaxDepth();
@@ -74,7 +201,7 @@ class DeviceObserver
             $device->validateStandalone();
 
             // make sure the child's max depth is updated
-            Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
+            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->updateMaxDepth();
         }
     }
 

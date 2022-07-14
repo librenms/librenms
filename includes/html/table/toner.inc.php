@@ -70,7 +70,7 @@ foreach (dbFetchRows($sql, $param) as $toner) {
         $graph_array_zoom['width'] = '400';
         $link = 'graphs/id=' . $graph_array['id'] . '/type=' . $graph_array['type'] . '/from=' . $graph_array['from'] . '/to=' . $graph_array['to'] . '/';
         $mini_graph = \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Url::graphTag($graph_array), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
-        $background = \LibreNMS\Util\Colors::percentage(100 - $perc, null);
+        $background = \LibreNMS\Util\Color::percentage(100 - $perc, null);
         $bar_link = print_percentage_bar(400, 20, $perc, "$perc%", 'ffffff', $background['left'], $free, 'ffffff', $background['right']);
 
         $response[] = [

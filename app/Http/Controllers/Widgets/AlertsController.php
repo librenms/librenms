@@ -42,6 +42,8 @@ class AlertsController extends WidgetController
         'location' => 1,
         'sort' => 1,
         'hidenavigation' => 0,
+        'uncollapse_key_count' => 1,
+        'unreachable' => null,
     ];
 
     public function getView(Request $request)

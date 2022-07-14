@@ -1,6 +1,3 @@
-source: Extensions/Rancid.md
-path: blob/master/doc/
-
 # Rancid
 
 Librenms can generate a list of hosts that can be monitored by

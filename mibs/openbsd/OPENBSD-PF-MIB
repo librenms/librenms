@@ -1,4 +1,4 @@
--- $OpenBSD: OPENBSD-PF-MIB.txt,v 1.5 2015/06/10 10:03:59 mikeb Exp $
+-- $OpenBSD: OPENBSD-PF-MIB.txt,v 1.7 2021/03/23 19:37:51 sthen Exp $
 --
 -- Copyright (c) 2004-2013 Joel Knight <knight.joel@gmail.com>
 -- 
@@ -23,9 +23,12 @@ IMPORTS
 	TimeTicks, enterprises
 		FROM SNMPv2-SMI
 
-	TruthValue
+	TruthValue, DisplayString
 		FROM SNMPv2-TC
-		
+
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+
 	openBSD
 		FROM OPENBSD-BASE-MIB
 	
@@ -33,7 +36,7 @@ IMPORTS
 		FROM SNMPv2-CONF;
 
 pfMIBObjects MODULE-IDENTITY
-    LAST-UPDATED "201506091728Z"
+    LAST-UPDATED "202103231933Z"
     ORGANIZATION "OpenBSD"
     CONTACT-INFO "
                   Author:     Joel Knight
@@ -43,6 +46,8 @@ pfMIBObjects MODULE-IDENTITY
     DESCRIPTION "The MIB module for gathering information from
 		OpenBSD's packet filter.
                 "
+    REVISION "202103231933Z"
+    DESCRIPTION "Use DisplayString/SnmpAdminString not OCTET STRING where appropriate"
     REVISION "201506091728Z"
     DESCRIPTION "Add separate counter for failed 'route-to' applications"
     REVISION "201308310446Z"
@@ -197,7 +202,7 @@ pfCntProtoCksum OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-	"The number of packets that were dropped due to memory limitations."
+	"The number of packets that were dropped due to TCP checksum failures."
     ::= { pfCounters 10 }
 
 pfCntStateMismatch OBJECT-TYPE
@@ -300,7 +305,7 @@ pfStateRemovals OBJECT-TYPE
 -- pfLogInterface
 
 pfLogIfName OBJECT-TYPE
-    SYNTAX      OCTET STRING
+    SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -683,7 +688,7 @@ pfIfEntry OBJECT-TYPE
 PfIfEntry ::=
 	SEQUENCE {
 		pfIfIndex		Integer32,
-		pfIfDescr		OCTET STRING,
+		pfIfDescr		DisplayString,
 		pfIfType		INTEGER,
 		pfIfRefs		Unsigned32,
 		pfIfRules		Unsigned32,
@@ -719,7 +724,7 @@ pfIfIndex OBJECT-TYPE
 	::= { pfIfEntry 1 }
 
 pfIfDescr OBJECT-TYPE
-	SYNTAX		OCTET STRING
+	SYNTAX		DisplayString
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
@@ -913,7 +918,7 @@ pfTblEntry OBJECT-TYPE
 TblEntry ::=
 	SEQUENCE {
 		pfTblIndex		Integer32,
-		pfTblName		OCTET STRING,
+		pfTblName		SnmpAdminString,
 		pfTblAddresses		Integer32,
 		pfTblAnchorRefs		Integer32,
 		pfTblRuleRefs		Integer32,
@@ -947,7 +952,7 @@ pfTblIndex OBJECT-TYPE
 	::= { pfTblEntry 1 }
 
 pfTblName OBJECT-TYPE
-	SYNTAX		OCTET STRING
+	SYNTAX		SnmpAdminString
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION
@@ -1363,7 +1368,7 @@ pfLabelEntry OBJECT-TYPE
 PfLabelEntry ::=
 	SEQUENCE {
 		pfLabelIndex		Integer32,
-		pfLabelName		OCTET STRING,
+		pfLabelName		SnmpAdminString,
 		pfLabelEvals		Counter64,
 		pfLabelPkts		Counter64,
 		pfLabelBytes		Counter64,
@@ -1383,7 +1388,7 @@ pfLabelIndex OBJECT-TYPE
 	::= { pfLabelEntry 1 }
 
 pfLabelName OBJECT-TYPE
-	SYNTAX		OCTET STRING
+	SYNTAX		SnmpAdminString
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION

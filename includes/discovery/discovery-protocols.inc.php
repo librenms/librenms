@@ -299,6 +299,12 @@ if (($device['os'] == 'routeros')) {
                 if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2) { // 6=ifName 2=ifAlias
                     $remote_port_name = $lldp['lldpRemChassisId'];
                 }
+                // Linksys / Cisco SRW2016/24/48 all have lldpRemSysDesc Ethernet Interface, which makes all lldp mappings go to port g1.
+                // ex:
+                //     'lldpRemSysDesc' => '16-Port 10/100/1000 Gigabit Switch w/WebView',
+                if (str_ends_with($lldp['lldpRemSysDesc'], 'Gigabit Switch w/WebView')) {
+                    $lldp['lldpRemPortDesc'] = '';
+                }
 
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 
@@ -339,6 +345,18 @@ if (($device['os'] == 'routeros')) {
                         $n_port = (int) $slot_port[0];
                     }
                     $remote_port_name = (string) ($n_slot * 1000 + $n_port);
+                }
+
+                if ($remote_device['os'] == 'netgear' &&
+                    $remote_device['sysDescr'] == 'GS108T' &&
+                    $lldp['lldpRemSysDesc'] == 'Smart Switch') {
+                    // Some netgear switches, as Netgear GS108Tv1 presents it's port name over snmp as
+                    // "Port 1 Gigabit Ethernet" but as 'lldpRemPortId' => 'g1' and
+                    // 'lldpRemPortDesc' => 'Port #1' over lldp.
+                    // So remap g1 to 1 so it matches ifIndex
+                    if (preg_match("/^g(\d+)$/", $lldp['lldpRemPortId'], $matches)) {
+                        $remote_port_name = $matches[1];
+                    }
                 }
 
                 $remote_port_id = find_port_id(

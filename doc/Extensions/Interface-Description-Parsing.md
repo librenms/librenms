@@ -1,6 +1,3 @@
-source: Extensions/Interface-Description-Parsing.md
-path: blob/master/doc/
-
 # Interface Description Parsing
 
 Librenms can interpret, display and group certain additional information on ports.
@@ -72,7 +69,7 @@ $config['port_descr_parser'] = "includes/custom/my-port-descr-parser.inc.php";
 ### Setup
 
 For Unix / Linux based systems, you need to run an additional script
-to support the parsing of interface infor.
+to support the parsing of interface information.
 
 - Add `ifAlias` from `/opt/librenms/scripts/` or download it from
   [here](https://github.com/librenms/librenms/blob/master/scripts/ifAlias)

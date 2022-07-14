@@ -4,9 +4,26 @@ type: network
 icon: teleste
 group: luminato
 mib_dir: teleste
+bad_snmpEngineTime: true
+bad_hrSystemUptime: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.3715
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    ports-stack: false
+    mempools: false
+    discovery-protocols: false
+    wireless: false
+poller_modules:
+    bgp-peers: false
+    services: false
+    mempools: false
+    wireless: false

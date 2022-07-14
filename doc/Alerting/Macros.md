@@ -1,6 +1,3 @@
-source: Alerting/Macros.md
-path: blob/master/doc/
-
 # Macros
 
 Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.
@@ -86,7 +83,9 @@ Entity: `macros.port_usage_perc`
 
 Description: Return port-usage (max value of in and out) in percent.
 
-Source: `((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100`
+Source: `((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate,
+ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) /
+ports.ifSpeed)*100`
 
 ## Time
 

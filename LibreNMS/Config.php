@@ -30,8 +30,9 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Eloquent;
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Version;
 use Log;
 
 class Config
@@ -202,29 +203,32 @@ class Config
      * Removes any duplicates.
      * When the arrays have keys, os settings take precedence over global settings
      *
-     * @param  string  $os  The os name
+     * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
+     * @param  string  $global_prefix  prefix for global setting
      * @param  array  $default  optional array to return if the setting is not set
      * @return array
      */
-    public static function getCombined($os, $key, $default = [])
+    public static function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
-        if (! self::has($key)) {
-            return self::getOsSetting($os, $key, $default);
-        }
+        $global_key = $global_prefix . $key;
 
         if (! isset(self::$config['os'][$os][$key])) {
-            if (! Str::contains($key, '.')) {
-                return self::get($key, $default);
+            if (! Str::contains($global_key, '.')) {
+                return (array) self::get($global_key, $default);
             }
             if (! self::has("os.$os.$key")) {
-                return self::get($key, $default);
+                return (array) self::get($global_key, $default);
             }
+        }
+
+        if (! self::has("os.$os.$key")) {
+            return (array) self::get($global_key, $default);
         }
 
         return array_unique(array_merge(
-            (array) self::get($key, $default),
-            (array) self::getOsSetting($os, $key, $default)
+            (array) self::get($global_key),
+            (array) self::getOsSetting($os, $key)
         ));
     }
 
@@ -249,11 +253,11 @@ class Config
     public static function persist($key, $value)
     {
         try {
+            Arr::set(self::$config, $key, $value);
             \App\Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
             ]);
-            Arr::set(self::$config, $key, $value);
 
             // delete any children (there should not be any unless it is legacy)
             \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
@@ -333,10 +337,6 @@ class Config
      */
     private static function loadDB()
     {
-        if (! Eloquent::isConnected()) {
-            return;
-        }
-
         try {
             \App\Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) {
@@ -445,16 +445,30 @@ class Config
         self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
-        $persist = Eloquent::isConnected();
-        // make sure we have full path to binaries in case PATH isn't set
-        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {
-            if (! is_executable(self::get($bin))) {
-                if ($persist) {
-                    self::persist($bin, self::locateBinary($bin));
-                } else {
-                    self::set($bin, self::locateBinary($bin));
-                }
+        // migrate device display
+        if (! self::has('device_display_default')) {
+            $display_value = '{{ $hostname }}';
+            if (self::get('force_hostname_to_sysname')) {
+                $display_value = '{{ $sysName }}';
+            } elseif (self::get('force_ip_to_sysname')) {
+                $display_value = '{{ $sysName_fallback }}';
             }
+
+            self::persist('device_display_default', $display_value);
+        }
+
+        // make sure we have full path to binaries in case PATH isn't set
+        foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute'] as $bin) {
+            if (! is_executable(self::get($bin))) {
+                self::persist($bin, self::locateBinary($bin));
+            }
+        }
+
+        if (! self::has('rrdtool_version')) {
+            self::persist('rrdtool_version', Rrd::version());
+        }
+        if (! self::has('snmp.unescape')) {
+            self::persist('snmp.unescape', version_compare(Version::get()->netSnmp(), '5.8.0', '<'));
         }
 
         self::populateTime();

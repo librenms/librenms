@@ -31,6 +31,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
         });
+
+        $this->app->bind(\App\Models\Device::class, function () {
+            /** @var \LibreNMS\Cache\Device $cache */
+            $cache = $this->app->make('device-cache');
+
+            return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
     }
 
     /**
@@ -41,9 +48,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         \Illuminate\Pagination\Paginator::useBootstrap();
-
-        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
-        $this->app->booted('\LibreNMS\Config::load');
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
@@ -122,7 +126,10 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Package::observe(\App\Observers\PackageObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
+        \App\Models\Stp::observe(\App\Observers\StpObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
     }
 
     private function bootCustomValidators()
@@ -163,5 +170,23 @@ class AppServiceProvider extends ServiceProvider
 
             return $validator->passes();
         }, trans('validation.exists'));
+
+        Validator::extend('url_or_xml', function ($attribute, $value): bool {
+            if (! is_string($value)) {
+                return false;
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
+                return true;
+            }
+
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($value);
+            if ($xml !== false) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }

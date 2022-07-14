@@ -33,6 +33,7 @@ class AlertlogController extends WidgetController
     protected $defaults = [
         'title' => null,
         'device_id' => '',
+        'device_group' => null,
         'state' => -1,
         'min_severity' => null,
         'hidenavigation' => 0,

@@ -1,5 +1,8 @@
 mib: EES-POWER-MIB
 modules:
+    os:
+        serial: EES-POWER-MIB::identControllerSerialNumber.0
+        version: EES-POWER-MIB::identControllerFirmwareVersion.0
     sensors:
         temperature:
             data:

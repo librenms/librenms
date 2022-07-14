@@ -21,7 +21,7 @@ if ($device['os'] == 'junos') {
          $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
          'chassis',                                      // entPhysicalClass
          $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
-         'Instant Virutal Controller Cluster',           // entPhysicalModelName
+         'Instant Virtual Controller Cluster',           // entPhysicalModelName
          $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
          '0',                                            // entPhysicalContainedIn
          'Aruba',                                        // entPhysicalMfgName

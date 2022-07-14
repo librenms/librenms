@@ -30,10 +30,6 @@ $install_dir = realpath(__DIR__ . '/..');
 
 $init_modules = ['web', 'discovery', 'polling', 'nodb'];
 
-if (! getenv('SNMPSIM')) {
-    $init_modules[] = 'mocksnmp';
-}
-
 require $install_dir . '/includes/init.php';
 chdir($install_dir);
 

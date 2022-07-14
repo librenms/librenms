@@ -5447,8 +5447,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     },
@@ -5475,7 +5474,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -5497,7 +5497,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -5573,7 +5574,8 @@
                     "bgpPeerInUpdateElapsedTime": 4,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -5595,7 +5597,8 @@
                     "bgpPeerInUpdateElapsedTime": 17,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -8502,8 +8505,8 @@
                     "ifName": "Management1",
                     "portName": null,
                     "ifIndex": 999001,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -8712,8 +8715,8 @@
                     "ifName": "Vlan13",
                     "portName": null,
                     "ifIndex": 2000013,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -9046,56 +9049,56 @@
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
-                    "vlan_name": "Inet_FTTH_Estudio",
+                    "vlan_name": "\\Inet_FTTH_Estudio\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
-                    "vlan_name": "Red_Backbone",
+                    "vlan_name": "\\Red_Backbone\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
-                    "vlan_name": "LAN_COR",
+                    "vlan_name": "\\LAN_COR\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 13,
                     "vlan_domain": 1,
-                    "vlan_name": "Red_Gestion",
+                    "vlan_name": "\\Red_Gestion\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
-                    "vlan_name": "LAN_Oficina",
+                    "vlan_name": "\\LAN_Oficina\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 31,
                     "vlan_domain": 1,
-                    "vlan_name": "RED_Estudio",
+                    "vlan_name": "\\RED_Estudio\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
-                    "vlan_name": "Multicast_Emision",
+                    "vlan_name": "\\Multicast_Emision\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
-                    "vlan_name": "NFS_Storage",
+                    "vlan_name": "\\NFS_Storage\\",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

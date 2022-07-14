@@ -47,4 +47,6 @@ foreach ($walk as $index => $data) {
         null,
         $data['prtMarkerPowerOnCount'],
     );
+
+    break; // only discover the first ones, others mostly duplicate
 }

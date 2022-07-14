@@ -501,8 +501,7 @@
                     "user_func": "fahrenheit_to_celsius",
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

@@ -77,11 +77,19 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     private function writeEnvFile()
     {
-        return EnvHelper::writeEnv(
+        $env = EnvHelper::writeEnv(
             $this->envVars(),
             ['INSTALL'],
             base_path('.env')
         );
+
+        // make sure the new env is reflected live
+        \Artisan::call('config:clear');
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+
+        return $env;
     }
 
     private function envVars()
@@ -149,6 +157,6 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-check';
+        return 'fa-solid fa-check';
     }
 }

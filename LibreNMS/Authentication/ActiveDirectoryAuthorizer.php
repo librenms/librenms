@@ -205,6 +205,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+        $starttls = Config::get('auth_ad_starttls');
+        if ($starttls == 'optional' || $starttls == 'required') {
+            $tls = ldap_start_tls($this->ldap_connection);
+            if ($starttls == 'required' && $tls === false) {
+                throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
+            }
+        }
     }
 
     public function bind($credentials = [])

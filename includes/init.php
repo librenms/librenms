@@ -30,6 +30,7 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Laravel;
 
 global $vars, $console_color;
 
@@ -60,11 +61,7 @@ require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
-if (module_selected('mocksnmp', $init_modules)) {
-    require_once $install_dir . '/tests/mocks/mock.snmp.inc.php';
-} elseif (! in_array($install_dir . '/tests/mocks/mock.snmp.inc.php', get_included_files())) {
-    require_once $install_dir . '/includes/snmp.inc.php';
-}
+require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
@@ -81,22 +78,18 @@ if (module_selected('polling', $init_modules)) {
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
-if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/LibreNMS/Alert/RunAlerts.php';
-}
+Debug::set($debug ?? false); // disable debug initially
 
 // Boot Laravel
 if (module_selected('web', $init_modules)) {
-    \LibreNMS\Util\Laravel::bootWeb(module_selected('auth', $init_modules));
+    Laravel::bootWeb(module_selected('auth', $init_modules));
 } else {
-    \LibreNMS\Util\Laravel::bootCli();
+    Laravel::bootCli();
 }
-
-Debug::set(false); // disable debug initially (hides legacy errors too)
+Debug::set($debug ?? false); // override laravel configured settings (hides legacy errors too)
+restore_error_handler(); // disable Laravel error handler
 
 if (! module_selected('nodb', $init_modules)) {
-    \LibreNMS\DB\Eloquent::boot();
-
     if (! \LibreNMS\DB\Eloquent::isConnected()) {
         echo "Could not connect to database, check logs/librenms.log.\n";
 
@@ -108,18 +101,7 @@ if (! module_selected('nodb', $init_modules)) {
         exit;
     }
 }
-
-// Display config.php errors instead of http 500
-$display_bak = ini_get('display_errors');
-ini_set('display_errors', 1);
-
-// Load config if not already loaded (which is the case if inside Laravel)
-if (! Config::has('install_dir')) {
-    Config::load();
-}
-
-// set display_errors back
-ini_set('display_errors', $display_bak);
+\LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
 
 if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
     ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
@@ -133,15 +115,9 @@ try {
     exit();
 }
 
-if (module_selected('discovery', $init_modules) && ! \LibreNMS\Util\OS::updateCache(false)) {
-    // OS::loadAllDefinitions() is called by update_os_cache() if updated, no need to call twice
-    \LibreNMS\Util\OS::loadAllDefinitions(false, true);
-} elseif (module_selected('web', $init_modules)) {
-    \LibreNMS\Util\OS::loadAllDefinitions(! module_selected('nodb', $init_modules), true);
-}
-
 if (module_selected('web', $init_modules)) {
     require $install_dir . '/includes/html/vars.inc.php';
+    \LibreNMS\Util\OS::loadAllDefinitions(! module_selected('nodb', $init_modules), true);
 }
 
 $console_color = new Console_Color2();

@@ -1,6 +1,3 @@
-source: Support/Remote-Monitoring-VPN.md
-path: blob/master/doc/
-
 # Remote monitoring using tinc VPN
 
 This article describes how to use tinc to connect several remote sites

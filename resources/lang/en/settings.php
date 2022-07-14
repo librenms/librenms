@@ -30,6 +30,7 @@ return [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
             'ldap' => ['name' => 'LDAP Settings'],
+            'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -188,6 +189,10 @@ return [
             'description' => 'Alert log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'discovery_on_reboot' => [
+            'description' => 'Discovery on Reboot',
+            'help' => 'Do a Discovery on a rebooted Device',
+        ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
             'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',
@@ -254,6 +259,20 @@ return [
         'astext' => [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
+        'auth' => [
+            'socialite' => [
+                'redirect' => [
+                    'description' => 'Redirect Login page',
+                    'help' => 'Login page should redirect immediately to the first defined provider.<br><br>TIPS: You can prevent it by appending ?redirect=0 in the url',
+                ],
+                'register' => [
+                    'description' => 'Allow registration via provider',
+                ],
+                'configs' => [
+                    'description' => 'Provider configs',
+                ],
+            ],
+        ],
         'auth_ad_base_dn' => [
             'description' => 'Base DN',
             'help' => 'groups and users must be under this dn. Example: dc=example,dc=com',
@@ -312,6 +331,15 @@ return [
             'description' => 'Bind username',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Use STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => 'Disabled',
+                'optional' => 'Optional',
+                'required' => 'Required',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP cache expiration',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -345,6 +373,10 @@ return [
         'auth_ldap_groups' => [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
+        ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
         ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
@@ -778,6 +810,10 @@ return [
                 ],
             ],
         ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
+        ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.',
@@ -1008,6 +1044,10 @@ return [
         'ping' => [
             'description' => 'Path to ping',
         ],
+        'ping_rrd_step' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',
@@ -1132,9 +1172,6 @@ return [
             'applications' => [
                 'description' => 'Applications',
             ],
-            'mib' => [
-                'description' => 'MIB',
-            ],
             'stp' => [
                 'description' => 'STP',
             ],
@@ -1238,6 +1275,94 @@ return [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
         ],
+        'rrdtool_version' => [
+            'description' => 'Sets the version of rrdtool on your server',
+            'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
+        ],
+        'service_poller_enabled' => [
+            'description' => 'Enable Polling',
+            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        ],
+        'service_poller_workers' => [
+            'description' => 'Poller Workers',
+            'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency (Warning!)',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+        ],
+        'service_poller_down_retry' => [
+            'description' => 'Device Down Retry',
+            'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
+        ],
+        'service_discovery_enabled' => [
+            'description' => 'Discovery Enabled',
+            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
+        ],
+        'service_discovery_workers' => [
+            'description' => 'Discovery Workers',
+            'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
+        ],
+        'service_discovery_frequency' => [
+            'description' => 'Discovery Frequency',
+            'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
+        ],
+        'service_services_enabled' => [
+            'description' => 'Services Enabled',
+            'help' => 'Enable services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_workers' => [
+            'description' => 'Services Workers',
+            'help' => 'Amount of services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_frequency' => [
+            'description' => 'Services Frequency',
+            'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_billing_enabled' => [
+            'description' => 'Billing Enabled',
+            'help' => 'Enable billing workers. Sets the default value for all nodes.',
+        ],
+        'service_billing_frequency' => [
+            'description' => 'Billing Frequency',
+            'help' => 'How often to collect billing data. Sets the default value for all nodes.',
+        ],
+        'service_billing_calculate_frequency' => [
+            'description' => 'Billing Calculate Frequency',
+            'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
+        ],
+        'service_alerting_enabled' => [
+            'description' => 'Alerting Enabled',
+            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
+        ],
+        'service_alerting_frequency' => [
+            'description' => 'Alerting Frequency',
+            'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_ping_enabled' => [
+            'description' => 'Fast Ping Enabled',
+            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Daily Maintenance Enabled',
+            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards. Sets the default value for all nodes.',
+        ],
+        'service_update_frequency' => [
+            'description' => 'Maintenance Frequency',
+            'help' => 'How often to run daily maintenance. Default is 1 Day. It is highly suggested not to change this. Sets the default value for all nodes.',
+        ],
+        'service_loglevel' => [
+            'description' => 'Log Level',
+            'help' => 'Log level of the dispatch service. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_enabled' => [
+            'description' => 'Watchdog Enabled',
+            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_log' => [
+            'description' => 'Log File to Watch',
+            'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+        ],
         'sfdp' => [
             'description' => 'Path to sfdp',
         ],
@@ -1270,6 +1395,16 @@ return [
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
+            ],
+            'oids' => [
+                'no_bulk' => [
+                    'description' => 'Disable snmp bulk for OIDs',
+                    'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
+                'unordered' => [
+                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
             ],
             'port' => [
                 'description' => 'Port',
@@ -1341,9 +1476,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',
@@ -1428,17 +1560,19 @@ return [
                 'help' => 'Minimum Graph Height (default: 300)',
             ],
         ],
+        'device_display_default' => [
+            'description' => 'Default device display name template',
+            'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+            'options' => [
+                'hostname' => 'Hostname / IP',
+                'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
+                'sysName' => 'sysName',
+                'ip' => 'IP (from hostname IP or resolved)',
+            ],
+        ],
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
-        ],
-        'force_hostname_to_sysname' => [
-            'description' => 'show SysName instead of Hostname',
-            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device',
-        ],
-        'force_ip_to_sysname' => [
-            'description' => 'show SysName instead of IP Address',
-            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices',
         ],
         'whois' => [
             'description' => 'Path to whois',
@@ -1473,6 +1607,7 @@ return [
         'boolean' => ':value is not a valid boolean',
         'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
+        'float' => ':value is not an float',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
         'select' => ':value is not an allowed value',

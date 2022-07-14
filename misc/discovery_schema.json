@@ -120,7 +120,11 @@
                         },
                         "location_template": {
                             "type": "string"
-                        }
+                        },
+                        "version_replace": {"$ref": "#/definitions/os_replacements"},
+                        "hardware_replace": {"$ref": "#/definitions/os_replacements"},
+                        "features_replace": {"$ref": "#/definitions/os_replacements"},
+                        "serial_replace": {"$ref": "#/definitions/os_replacements"}
                     },
                     "additionalProperties": false
                 },
@@ -229,6 +233,9 @@
                                                     "integer",
                                                     "string"
                                                 ]
+                                            },
+                                            "user_func": {
+                                                "type": "string"
                                             },
                                             "states": {
                                                 "type": "array",
@@ -466,6 +473,24 @@
                 "data"
             ]
         },
+        "os_replacements": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            }
+        },
         "skip_values": {
             "anyOf": [
                 {
@@ -484,6 +509,16 @@
                                     "oid": {
                                         "type": "string"
                                     },
+                                    "device": {
+                                        "enum": [
+                                            "sysName",
+                                            "sysObjectID",
+                                            "sysDescr",
+                                            "version",
+                                            "hardware",
+                                            "features"
+                                        ]
+                                    },
                                     "op": {
                                         "$ref": "#/definitions/comparison"
                                     },
@@ -496,10 +531,11 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "oid",
                                     "op",
                                     "value"
-                                ]
+                                ],
+                                "minProperties": 3,
+                                "maxProperties": 3
                             }
                         ]
                     }

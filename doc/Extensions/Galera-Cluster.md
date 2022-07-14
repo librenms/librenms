@@ -1,6 +1,3 @@
-source: Extensions/Galera-Cluster.md
-path: blob/master/doc/
-
 # MariaDB Galera Cluster
 
 This is currently being tested, use at your own risk.
@@ -20,16 +17,16 @@ For more information see
  * It's recommended that all servers be similar in hardware performance, cluster performance can be affected by the slowest server in the cluster. 
  * Backup the database before starting, and backing up the database regularly is still recommended even in a working cluster environment.
 
-# Install and Configure Galera
+## Install and Configure Galera
 
-## Install Galera4 and MariaDB Server
+### Install Galera4 and MariaDB Server
 
 These can be obtained from your OS package manager. For example in Ubuntu.
 ```bash
 sudo apt-get install mariadb-server mariadb-client galera-4
 ```
 
-## Create Galera Config
+### Create Galera Config
 
 Create a new file /etc/mysql/conf.d/galera.conf on each node
 
@@ -61,7 +58,7 @@ Change the following values for your environment.
 * wsrep_node_address - IP address of this node.
 * wsrep_node_name - Name of this node.
 
-## Edit LibreNMS .env
+### Edit LibreNMS .env
 
 LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node. 
 The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too. 
@@ -98,7 +95,7 @@ The above .env on a librenms installation/poller would communicate to each galer
 * 192.168.1.38 - Read Only
 * 192.168.1.39 - Read Only
 
-## Starting Galera Cluster for the first time.
+### Starting Galera Cluster for the first time.
 
 1) Shutdown MariaDB server on ALL nodes.
 	```bash
@@ -113,7 +110,7 @@ The above .env on a librenms installation/poller would communicate to each galer
 	sudo systemctl start mariadb-server
 	```
 
-## Galera Cluster Status
+### Galera Cluster Status
 
 To see some stats on how the Galera cluster is preforming run the following.
 
@@ -135,7 +132,7 @@ SHOW GLOBAL STATUS LIKE 'wsrep_%';
 
 
 
-## Restarting the Entire Cluster
+### Restarting the Entire Cluster
 
 In a cluster environment, steps should be taken to ensure that ALL nodes are not offline at the same time. Failed nodes can recover without issue as long as one node remains online.
 In the event that ALL nodes are offline, the following should be done to ensure you are starting the cluster with the most up-to-date database. To do this login to each node and running the following

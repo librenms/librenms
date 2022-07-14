@@ -1,6 +1,3 @@
-source: Extensions/Weathermap.md
-path: blob/master/doc/
-
 # Network-WeatherMap with LibreNMS
 
 Integrating LibreNMS with [Network-Weathermap](https://network-weathermap.com/), allows you to build network
@@ -25,7 +22,11 @@ git clone https://github.com/librenms-plugins/Weathermap.git
 ### Step 2
 
 Inside the html/plugins directory, change the ownership of the
-Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
+Weathermap directory by typing
+
+```bash
+chown -R librenms:librenms Weathermap/
+```
 
 Make the configs directory writeable.
 

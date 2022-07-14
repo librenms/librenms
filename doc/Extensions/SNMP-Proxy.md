@@ -1,6 +1,3 @@
-source: Extensions/SNMP-Proxy.md
-path: blob/master/doc/
-
 # SNMP Proxy
 
 If you have machines that you want to monitor but are not reachable

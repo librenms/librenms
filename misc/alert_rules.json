@@ -314,30 +314,6 @@
     "name": "Palo Alto Networks passive firewall changed to active"
   },
   {
-    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.15.1.4.1\"",
-    "name": "Dell Server Raid Battery Failed/Degraded"
-  },
-  {
-    "rule": "sensors.sensor_current = \"2\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.1100.32.1.5\"",
-    "name": "Dell Server CPU Status Critical"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.1.1.5\"",
-    "name": "Dell Server Disk Controller State Failed/Degraded"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[2|5]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.130.4.1.4\"",
-    "name": "Dell Server Disk Array State Failed/Degraded"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.1.600.12.1.5\"",
-    "name": "Dell Server PSU State Critical/NonRecvoverable"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[2|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10893.1.20.140.1.1.4\"",
-    "name": "Dell Server Virtual Disk Failed/Degraded"
-  },
-  {
     "rule": "sensors.sensor_current = \"2\" && sensors.sensor_oid = \".1.3.6.1.4.1.25506.8.35.9.1.1.1.2\"",
     "name": "Comware Fan Status failed"
   },
@@ -354,36 +330,12 @@
     "name": "Cisco PSU status failed"
   },
   {
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*Power Supply.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PEM.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PSU.*"}]},{"condition":"OR","rules":[{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"boolean","input":"radio","operator":"equal","value":"1"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"boolean","input":"radio","operator":"equal","value":"1"}]}],"valid":true},
+    "name": "Generic PSU status failed"
+  },
+  {
     "rule": "sensors.sensor_current = \"3\" && sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
     "name": "UBNT EdgeSwitch Chassis state failed"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[3|4]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4\"",
-    "name": "Dell iDRAC Virtual Disk Failed/Degraded"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"5\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.30.1.5\"",
-    "name": "Dell iDRAC Processor Status Critical"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"5\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.1100.50.1.5\"",
-    "name": "Dell iDRAC Memory Status Critical"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.20.1.5\"",
-    "name": "Dell iDRAC Voltage Probe Status Failed"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.30.1.5\"",
-    "name": "Dell iDRAC Amperage Probe Status Failed"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"10\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.5.4.600.50.1.5\"",
-    "name": "Dell iDRAC Battery Status Failed"
-  },
-  {
-    "rule": "sensors.sensor_current ~ \"[5|6]\" && sensors.sensor_oid = \".1.3.6.1.4.1.674.10892.2.2.1\"",
-    "name": "Dell iDRAC Global System Status Critical/NonRecoverable"
   },
   {
     "rule": "devices.os = \"Netscaler\" && sensors.sensor_type = \"sysHighAvailabilityMode\" && sensors.sensor_current != `sensors.sensor_prev` && sensors.lastupdate < \"DATE_SUB(NOW(),INTERVAL 5 MINUTE)\" && macros.device_up = \"1\"",
@@ -433,7 +385,7 @@
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
   },
- {
+  {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over limit"
   },
@@ -522,5 +474,73 @@
   {
     "rule": "eventlog.message ~ \"Deleted\" && eventlog.datetime >= `DATE_SUB(NOW(),INTERVAL 12 Hour)`",
     "name": "A Device sensor has been deleted"
+  },
+  {
+    "name": "Unpolled Devices",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.last_polled","field":"devices.last_polled","type":"datetime","input":"text","operator":"less","value":"`DATE_SUB(NOW(), INTERVAL 6 MINUTE)`"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"greater","value":"0"},{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"less","value":"`ports.ifSpeed_prev`"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"begins_with","value":"ifSpeed:"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_10m`"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`eventlog.reference`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"ports.disabled","field":"ports.disabled","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Port Speed Degraded"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \"alert\" && application_metrics.value = \"1\"",
+    "name": "Suricata has a WARNING alert",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \"alert\" && application_metrics.value = \"2\"",
+    "name": "Suricata has a CRITICAL alert",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \"alert\" && application_metrics.value = \"3\"",
+    "name": "Suricata has a UNKNOWN alert",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_drop_percent\" && application_metrics.value >= \"1\"",
+    "name": "Suricata Packet Drop > 1%",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_drop_percent\" && application_metrics.value >= \"2\"",
+    "name": "Suricata Packet Drop > 2%",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_ifdrop_percent\" && application_metrics.value >= \"1\"",
+    "name": "Suricata Packet If Drop > 1%",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_ifdrop_percent\" && application_metrics.value >= \"2\"",
+    "name": "Suricata Packet If Drop > 2%",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_error_delta\" && application_metrics.value >= \"1\"",
+    "name": "Suricata Packet Error >= 1%",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"suricata\" && application_metrics.metric = \".total_error_delta\" && application_metrics.value >= \"2\"",
+    "name": "Suricata Packet Error >= 2%",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"mysql\" && applications.app_state != \"OK\"",
+    "name": "MySQL Server not responding",
+    "severity":"critical"
+  },
+  {
+    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 90 AND storage.storage_perc < 95",
+    "name": "Space on / is >= 90% and < 95% in use",
+    "severity":"warning"
+  },
+  {
+    "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
+    "name": "Space on / is >= 95% in use",
+    "severity":"critical"
   }
 ]

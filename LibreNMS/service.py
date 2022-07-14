@@ -1,10 +1,12 @@
-import LibreNMS
 import logging
 import os
-import pymysql
-import threading
 import sys
+import threading
 import time
+
+import pymysql
+
+import LibreNMS
 
 try:
     import psutil
@@ -16,13 +18,21 @@ from datetime import datetime
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_DFL
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD
 from uuid import uuid1
 
 try:
     from systemd.daemon import notify
 except ImportError:
     pass
+
+try:
+    from redis.exceptions import ConnectionError as RedisConnectionError
+except ImportError:
+
+    class RedisConnectionError(Exception):
+        pass
+
 
 logger = logging.getLogger(__name__)
 
@@ -367,7 +377,7 @@ class Service:
         return time.time() - self.start_time
 
     def attach_signals(self):
-        logger.info(
+        logger.debug(
             "Attaching signal handlers on thread %s", threading.current_thread().name
         )
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
@@ -423,22 +433,17 @@ class Service:
         self.queue_managers["poller"] = self.poller_manager
         self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
         self.queue_managers["discovery"] = self.discovery_manager
-        if self.config.alerting.enabled:
-            self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
-                self.config, self._lm
-            )
-        if self.config.services.enabled:
-            self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
-                self.config, self._lm
-            )
-        if self.config.billing.enabled:
-            self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
-                self.config, self._lm
-            )
-        if self.config.ping.enabled:
-            self.queue_managers["ping"] = LibreNMS.PingQueueManager(
-                self.config, self._lm
-            )
+        self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
+
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
@@ -454,6 +459,23 @@ class Service:
                 "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
             )
         )
+        logger.info(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
+                "enabled" if self.config.alerting.enabled else "disabled",
+                "enabled" if self.config.billing.enabled else "disabled",
+                "enabled" if self.config.ping.enabled else "disabled",
+            )
+        )
+
         if self.config.update_enabled:
             logger.info(
                 "Maintenance tasks will be run every {}".format(
@@ -549,14 +571,14 @@ class Service:
             result = self._db.query(
                 """SELECT `device_id`,
                   `poller_group`,
-                  COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND), 1) AS `poll`,
-                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND), 1))) AS `discover`
+                  COALESCE(`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND), 1) AS `poll`,
+                  IF(snmp_disable=1 OR status=0, 0, IF (%s < `last_discovered_timetaken` * 1.25, 0, COALESCE(`last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND), 1))) AS `discover`
                 FROM `devices`
                 WHERE `disabled` = 0 AND (
                     `last_polled` IS NULL OR
                     `last_discovered` IS NULL OR
-                    `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_polled_timetaken` SECOND) OR
-                    `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL `last_discovered_timetaken` SECOND)
+                    `last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND) OR
+                    `last_discovered` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -%s SECOND), INTERVAL COALESCE(`last_discovered_timetaken`, 0) SECOND)
                 )
                 ORDER BY `last_polled_timetaken` DESC""",
                 (
@@ -792,13 +814,12 @@ class Service:
         try:
             # Report on the poller instance as a whole
             self._db.query(
-                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
-                'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
+                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, last_report, master) "
+                'values("{0}", "{1}", "{2}", NOW(), {3}) '
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={3}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
-                    ",".join(str(g) for g in self.config.group),
                     1 if self.is_master else 0,
                 )
             )
@@ -831,7 +852,7 @@ class Service:
                         getattr(self.config, worker_type).frequency,
                     )
                 )
-        except pymysql.err.Error:
+        except (pymysql.err.Error, ConnectionResetError, RedisConnectionError):
             logger.critical(
                 "Unable to log performance statistics - is the database still online?",
                 exc_info=True,

@@ -8,7 +8,7 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that should not be reported.
+     * A list of the exception types that are not reported.
      *
      * @var array
      */
@@ -22,7 +22,7 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * A list of the exceptions that can be upgraded. Checked in order.
+     * A list of the inputs that are never flashed for validation exceptions.
      *
      * @var array
      */
@@ -49,8 +49,12 @@ class Handler extends ExceptionHandler
 
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
+            if ($exception instanceof \Illuminate\View\ViewException || $exception instanceof \Facade\Ignition\Exceptions\ViewException) {
+                $base = $exception->getPrevious(); // get real exception
+            }
+
             foreach ($this->upgradable as $class) {
-                if ($new = $class::upgrade($exception)) {
+                if ($new = $class::upgrade($base ?? $exception)) {
                     return parent::render($request, $new);
                 }
             }

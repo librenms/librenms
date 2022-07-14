@@ -1,4 +1,28 @@
 <?php
+/**
+ * q-bridge-mib.inc.php
+ *
+ * LibreNMS vlan discovery module for Q-BRIDGE-MIB
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @author     peca.nesovanovic@sattrakt.com
+ */
+
+use App\Models\Vlan;
 
 echo 'IEEE8021-Q-BRIDGE-MIB VLANs: ';
 
@@ -8,63 +32,58 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     echo "ver $vlanversion ";
 
     $vtpdomain_id = '1';
-    $vlans = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', [], 'Q-BRIDGE-MIB');
-    $tagoruntag = snmpwalk_cache_oid($device, 'dot1qVlanCurrentEgressPorts', [], 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
-    $untag = snmpwalk_cache_oid($device, 'dot1qVlanCurrentUntaggedPorts', [], 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
 
-    if ($tagoruntag == $null && $untag == $null) {
-        // if dot1qVlanCurrentTable doesn't exist then use the dot1qVlanStaticTable
-        $untaggedports = 'dot1qVlanStaticUntaggedPorts';
-        $tagoruntagports = 'dot1qVlanStaticEgressPorts';
-        $untag = snmpwalk_cache_oid($device, $untaggedports, [], 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
-        $tagoruntag = snmpwalk_cache_oid($device, $tagoruntagports, [], 'Q-BRIDGE-MIB', null, ['-OQUs', '--hexOutputLength=0']);
+    // fetch vlan data
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts')->table(2);
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts')->table(2, $vlans);
+    if (empty($vlans)) {
+        // fall back to static
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1, $vlans);
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1, $vlans);
     } else {
-        $untaggedports = 'dot1qVlanCurrentUntaggedPorts';
-        $tagoruntagports = 'dot1qVlanCurrentEgressPorts';
-
-        // drop dot1qVlanTimeMark, we don't care about it
-        $tagoruntag = array_reduce(array_keys($tagoruntag), function ($result, $key) use ($tagoruntag) {
-            [, $new_key] = explode('.', $key);
-            $result[$new_key] = $tagoruntag[$key];
-
-            return $result;
-        }, []);
-        $untag = array_reduce(array_keys($untag), function ($result, $key) use ($untag) {
-            [, $new_key] = explode('.', $key);
-            $result[$new_key] = $untag[$key];
+        // collapse timefilter from dot1qVlanCurrentTable results to only the newest
+        $vlans = array_reduce($vlans, function ($result, $time_data) {
+            foreach ($time_data as $vlan_id => $vlan_data) {
+                $result[$vlan_id] = isset($result[$vlan_id]) ? array_merge($result[$vlan_id], $vlan_data) : $vlan_data;
+            }
 
             return $result;
         }, []);
     }
 
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')->table(1, $vlans);
+
     foreach ($vlans as $vlan_id => $vlan) {
-        d_echo(" $vlan_id");
-        if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
-            $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
-            if ($vlan_data['vlan_name'] != $vlan['dot1qVlanStaticName']) {
-                $vlan_upd['vlan_name'] = $vlan['dot1qVlanStaticName'];
-                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
-                log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> {$vlan['dot1qVlanStaticName']} ", $device, 'vlan', 3, $vlan_data['vlan_id']);
-                echo 'U';
-            } else {
-                echo '.';
-            }
-        } else {
-            dbInsert([
-                'device_id' => $device['device_id'],
-                'vlan_domain' => $vtpdomain_id,
-                'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan['dot1qVlanStaticName'],
-                'vlan_type' => ['NULL'],
-            ], 'vlans');
-            echo '+';
+        d_echo('Processing vlan ID: ' . $vlan_id);
+        $vlan_name = empty($vlan['Q-BRIDGE-MIB::dot1qVlanStaticName']) ? "VLAN $vlan_id" : $vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'];
+
+        //try to get existing data from DB
+        $vlanDB = Vlan::firstOrNew([
+            'device_id' => $device['device_id'],
+            'vlan_vlan' => $vlan_id,
+        ], [
+            'vlan_domain' => $vtpdomain_id,
+            'vlan_name' => $vlan_name,
+        ]);
+
+        //vlan does not exist
+        if (! $vlanDB->exists) {
+            Log::event("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
         }
 
-        $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id;
+        if ($vlanDB->vlan_name != $vlan_name) {
+            $vlanDB->vlan_name = $vlan_name;
+            Log::event("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+        }
 
-        $untagged_ids = q_bridge_bits2indices($untag[$vlan_id][$untaggedports]);
-        $egress_ids = q_bridge_bits2indices($tagoruntag[$vlan_id][$tagoruntagports]);
+        $vlanDB->save();
 
+        $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id; //populate device['vlans'] with ID's
+
+        //portmap for untagged ports
+        $untagged_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts']);
+        //portmap for members ports (might be tagged)
+        $egress_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts']);
         foreach ($egress_ids as $port_id) {
             if (isset($base_to_index[$port_id])) {
                 $ifIndex = $base_to_index[$port_id];

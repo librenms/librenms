@@ -1,7 +1,7 @@
 @extends('layouts.librenmsv1')
 
 @section('title')
-    @lang('Public Devices')
+    {{ __('Public Devices') }}
 @append
 
 @section('content')
@@ -11,8 +11,8 @@
 
     <div id="public-status">
         <div class="well">
-            <div class="status-header">@lang('System Status')
-            <button class="btn btn-default pull-right" type="submit" id="ToggleLogon">@lang('Logon')</button>
+            <div class="status-header">{{ __('System Status') }}
+            <button class="btn btn-default pull-right" type="submit" id="ToggleLogon">{{ __('Logon') }}</button>
             </div>
         </div>
         <x-panel>
@@ -21,9 +21,9 @@
                     <tr>
                         <th></th>
                         <th id="icon-header"></th>
-                        <th>@lang('Device')</th>
-                        <th>@lang('Platform')</th>
-                        <th>@lang('Uptime')/@lang('Location')</th>
+                        <th>{{ __('Device') }}</th>
+                        <th>{{ __('Platform') }}</th>
+                        <th>{{ __('Uptime') }}/{{ __('Location') }}</th>
                     </tr>
 
                     @foreach($devices as $device)
@@ -42,8 +42,8 @@
 
     <div id="public-logon" style="display:none;">
         <div class="well">
-            <div class="status-header">@lang('Logon')
-                <button class="btn btn-default pull-right" type="submit" id="ToggleStatus">@lang('Status')</button>
+            <div class="status-header">{{ __('Logon') }}
+                <button class="btn btn-default pull-right" type="submit" id="ToggleStatus">{{ __('Status') }}</button>
             </div>
         </div>
         <div class="row">

@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
@@ -168,7 +168,7 @@ class Rrd extends BaseDatastore
             $fields = array_filter($fields, function ($key) use ($rrd_def) {
                 $valid = $rrd_def->isValidDataset($key);
                 if (! $valid) {
-                    Log::warning("RRD warning: unused data sent $key");
+                    Log::debug("RRD warning: unused data sent $key");
                 }
 
                 return $valid;
@@ -460,7 +460,7 @@ class Rrd extends BaseDatastore
     public function getRrdFiles($device)
     {
         if ($this->rrdcached) {
-            $filename = sprintf('/%s', $device['hostname']);
+            $filename = sprintf('/%s', self::safename($device['hostname']));
             $rrd_files = $this->command('list', $filename, '');
             // Command output is an array, create new array with each filename as a item in array.
             $rrd_files_array = explode("\n", trim($rrd_files[0]));
@@ -659,6 +659,20 @@ class Rrd extends BaseDatastore
         $result = str_replace(':', '\:', $result);          // escape colons
 
         return $result . ' ';
+    }
+
+    /**
+     * Run rrdtool and parse the version from the output.
+     *
+     * @return string
+     */
+    public static function version(): ?string
+    {
+        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $proc->run();
+        $parts = explode(' ', $proc->getOutput(), 3);
+
+        return $proc->isSuccessful() && isset($parts[1]) ? str_replace('1.7.01.7.0', '1.7.0', $parts[1]) : null;
     }
 
     /**

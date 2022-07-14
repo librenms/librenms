@@ -1,6 +1,3 @@
-source: Extensions/NFSen.md
-path: blob/master/doc/
-
 # NFSen
 
 > The installation of NFSen is out of scope for this document / LibreNMS

@@ -8,7 +8,7 @@
                     "sysDescr": "HP J9146A E2910al-24G-PoE Switch, revision W.15.08.0012, ROM W.14.06 (/ws/swbuildm/W_rel_galt_qaoff/code/build/sbm(W_rel_galt_qaoff)) (Formerly ProCurve)",
                     "sysContact": "<private>",
                     "version": "W.15.08.0012",
-                    "hardware": "E2910al-24G-PoE",
+                    "hardware": "J9146A E2910al-24G-PoE",
                     "features": null,
                     "os": "procurve",
                     "type": "network",
@@ -8727,8 +8727,133 @@
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "000000000000",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "6397552",
+                    "topChanges": 1,
+                    "designatedRoot": "000000000000",
+                    "rootCost": 44000,
+                    "rootPort": 54,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 6,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 3,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 3,
+                    "forwardTransitions": 2,
+                    "ifIndex": 3
+                },
+                {
+                    "vlan": null,
+                    "port_index": 5,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 5,
+                    "forwardTransitions": 2,
+                    "ifIndex": 5
+                },
+                {
+                    "vlan": null,
+                    "port_index": 10,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 10,
+                    "forwardTransitions": 2,
+                    "ifIndex": 10
+                },
+                {
+                    "vlan": null,
+                    "port_index": 11,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 11,
+                    "forwardTransitions": 2,
+                    "ifIndex": 11
+                },
+                {
+                    "vlan": null,
+                    "port_index": 12,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 12,
+                    "forwardTransitions": 12,
+                    "ifIndex": 12
+                },
+                {
+                    "vlan": null,
+                    "port_index": 13,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 44000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 13,
+                    "forwardTransitions": 5,
+                    "ifIndex": 13
+                },
+                {
+                    "vlan": null,
+                    "port_index": 54,
+                    "priority": 64,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 24000,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 10,
+                    "forwardTransitions": 1,
+                    "ifIndex": 54
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

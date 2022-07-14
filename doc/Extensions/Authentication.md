@@ -1,6 +1,3 @@
-source: Extensions/Authentication.md
-path: blob/master/doc/
-
 # Authentication Options
 
 LibreNMS supports multiple authentication modules along with [Two Factor Auth](Two-Factor-Auth.md).
@@ -191,7 +188,11 @@ $config['auth_ldap_starttls'] = True;               // Enable TLS on port 389
 $config['auth_ldap_prefix'] = 'uid=';               // prepended to usernames
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com'; // generic group with level 0
 $config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see if a user is a member of a group
+$config['auth_ldap_groupmembertype'] = 'username';  // username type to find group members by, either username (default), fulldn or puredn
 $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
+$config['auth_ldap_timeout'] = 5;                   // time to wait before giving up (or trying the next server)
+$config['auth_ldap_emailattr'] = 'mail';            // attribute for email address
+$config['auth_ldap_attr.uid'] = 'uid';              // attribute to check username against
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 $config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
 $config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
@@ -338,13 +339,49 @@ will use LDAP to determine and assign the userlevel of a user. The
 userlevel will be calculated by using LDAP group membership
 information as the ___ldap___ module does.
 
-The configuration is the same as for the ___ldap___ module with one extra option: auth_ldap_cache_ttl.
+The configuration is similar to the ___ldap___ module with one extra option: auth_ldap_cache_ttl.
 This option allows to control how long user information (user_exists, userid, userlevel) are cached within the PHP Session.
 The default value is 300 seconds.
 To disabled this caching (highly discourage) set this option to 0.
 
+#### Standard config
+
 ```php
+$config['auth_mechanism'] = 'ldap-authorization';
+$config['auth_ldap_server'] = 'ldap.example.com';               // Set server(s), space separated. Prefix with ldaps:// for ssl
+$config['auth_ldap_suffix'] = ',ou=People,dc=example,dc=com';   // appended to usernames
+$config['auth_ldap_groupbase'] = 'ou=groups,dc=example,dc=com'; // all groups must be inside this
+$config['auth_ldap_groups']['admin']['level'] = 10;             // set admin group to admin level
+$config['auth_ldap_groups']['pfy']['level'] = 5;                // set pfy group to global read only level
+$config['auth_ldap_groups']['support']['level'] = 1;            // set support group as a normal user
+```
+
+#### Additional options (usually not needed)
+
+```php
+$config['auth_ldap_version'] = 3; # v2 or v3
+$config['auth_ldap_port'] = 389;                    // 389 or 636 for ssl
+$config['auth_ldap_starttls'] = True;               // Enable TLS on port 389
+$config['auth_ldap_prefix'] = 'uid=';               // prepended to usernames
+$config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com'; // generic group with level 0
+$config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see if a user is a member of a group
+$config['auth_ldap_groupmembertype'] = 'username';  // username type to find group members by, either username (default), fulldn or puredn
+$config['auth_ldap_emailattr'] = 'mail';            // attribute for email address
+$config['auth_ldap_attr.uid'] = 'uid';              // attribute to check username against
+$config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
 $config['auth_ldap_cache_ttl'] = 300;
+```
+
+#### LDAP bind user (optional)
+
+If your ldap server does not allow anonymous bind, it is highly
+suggested to create a bind user, otherwise "remember me", alerting
+users, and the API will not work.
+
+```php
+$config['auth_ldap_binduser'] = 'ldapbind'; // will use auth_ldap_prefix and auth_ldap_suffix
+#$config['auth_ldap_binddn'] = 'CN=John.Smith,CN=Users,DC=MyDomain,DC=com'; // overrides binduser
+$config['auth_ldap_bindpassword'] = 'password';
 ```
 
 ## View/embedded graphs without being logged into LibreNMS
@@ -499,14 +536,20 @@ $config['sso']['group_level_map'] = ['librenms-admins' => 10, 'librenms-readers'
 $config['sso']['group_delimiter'] = ';';
 ```
 
-The mechanism expects to find a delimited list of groups within the
+This mechanism expects to find a delimited list of groups within the
 attribute that ___sso\_group\_attr___ points to. This should be an
-associative array of group name keys, with  privilege levels as
+associative array of group name keys, with privilege levels as
 values. The mechanism will scan the list and find the ___highest___
 privilege level that the user is entitled to, and assign that value to
 the user.
 
-This format may be specific to Shibboleth; other relying party
+If there are no matches between the user's groups and the
+___sso\_group\_level\_map___, the user will be assigned the privilege level
+specified in the ___sso\_static\_level___ variable, with a default of 0 (no access).
+This feature can be used to provide a default access level (such as read-only)
+to all authenticated users.
+
+Additionally, this format may be specific to Shibboleth; other relying party
 software may need changes to the mechanism (e.g. ___mod\_auth\_mellon___
 may create pseudo arrays).
 
@@ -527,7 +570,11 @@ If your Relying Party has a magic URL that needs to be called to end a
 session, you can configure LibreNMS to direct the user to it:
 
 ```php
-$config['post_logout_action'] = '/Shibboleth.sso/Logout';
+# Example for Shibboleth
+$config['auth_logout_handler'] = '/Shibboleth.sso/Logout';
+
+# Example for oauth2-proxy
+$config['auth_logout_handler'] = '/oauth2/sign_out';
 ```
 
 This option functions independently of the Single Sign-on mechanism.

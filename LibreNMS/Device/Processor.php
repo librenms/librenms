@@ -251,14 +251,15 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function processYaml(OS $os)
     {
-        $device = $os->getDeviceArray();
-        if (empty($device['dynamic_discovery']['modules']['processors'])) {
+        $discovery = $os->getDiscovery('processors');
+
+        if (empty($discovery)) {
             d_echo("No YAML Discovery data.\n");
 
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $device['dynamic_discovery']['modules']['processors']);
+        return YamlDiscovery::discover($os, get_class(), $discovery);
     }
 
     /**

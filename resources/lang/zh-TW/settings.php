@@ -265,6 +265,15 @@ return [
             'description' => '繫結使用者名稱',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => '使用 STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => '停用',
+                'optional' => '選用',
+                'required' => '必要',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP 快取有效期',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -890,9 +899,6 @@ return [
         'traceroute' => [
             'description' => 'traceroute 路徑',
         ],
-        'traceroute6' => [
-            'description' => 'traceroute6 路徑',
-        ],
         'twofactor' => [
             'description' => '雙因素驗證',
             'help' => '允許使用者啟用基於時間 (TOTP) 或基於雜湊訊息驗證 (HOTP) 的一次性密碼 (OTP)',
@@ -979,14 +985,6 @@ return [
         'device_location_map_open' => [
             'description' => '開啟位置圖',
             'help' => 'Location Map is shown by default',
-        ],
-        'force_hostname_to_sysname' => [
-            'description' => '將 Hostname 改以 SysName 顯示',
-            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device',
-        ],
-        'force_ip_to_sysname' => [
-            'description' => '將 IP 位址改以 SysName 顯示',
-            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices',
         ],
         'whois' => [
             'description' => 'whois 路徑',

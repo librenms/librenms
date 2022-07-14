@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
@@ -33,7 +34,7 @@ if ($_POST['editing']) {
                 $update['retries'] = ['NULL'];
             }
 
-            if ($snmpver != 'v3') {
+            if ($snmpver != 'v3' && $_POST['community'] != '********') {
                 $community = $_POST['community'];
                 $update['community'] = $community;
             }
@@ -178,40 +179,35 @@ $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$device['
 $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
 
-echo '<h3> SNMP Settings </h3>';
-
-// use Toastr to print normal (success) messages, similar to Device Settings
+// use PHP Flasher to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
-    $toastr_options = [];
-
     if (is_array($update_message)) {
         foreach ($update_message as $message) {
-            Toastr::success($message, null, $toastr_options);
+            flash()->addSuccess($message);
         }
     }
 
     if (is_string($update_message)) {
-        Toastr::success($update_message, null, $toastr_options);
+        flash()->addSuccess($update_message);
     }
 
-    unset($message, $toastr_options, $update_message);
+    unset($message, $update_message);
 }
 
-// use Toastr:error to call attention to the problem; don't let it time out
+// use flash()->addError to call attention to the problem; don't let it time out
 if (isset($update_failed_message)) {
-    $toastr_options = [];
-    $toastr_options['closeButton'] = true;
-    $toastr_options['extendedTimeOut'] = 0;
-    $toastr_options['timeOut'] = 0;
-
     if (is_array($update_failed_message)) {
         foreach ($update_failed_message as $error) {
-            Toastr::error($error, null, $toastr_options);
+            flash()
+                ->option('timeout', 30000)
+                ->addError($error);
         }
     }
 
     if (is_string($update_failed_message)) {
-        Toastr::error($update_failed_message, null, $toastr_options);
+        flash()
+            ->option('timeout', 30000)
+            ->addError($update_failed_message);
     }
 
     unset($error, $update_failed_message);
@@ -291,7 +287,7 @@ echo "      </select>
         <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
-foreach (get_port_assoc_modes() as $pam_id => $pam) {
+foreach (PortAssociationMode::getModes() as $pam_id => $pam) {
     echo "           <option value='$pam_id'";
 
     if ($pam_id == $device['port_association_mode']) {
@@ -323,7 +319,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='" . htmlspecialchars($device['community']) . "'/>
+    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value==\"********\" ? decodeURIComponent(\"" . rawurlencode($device['community']) . "\") : this.value);'/>
     </div>
     </div>
     </div>

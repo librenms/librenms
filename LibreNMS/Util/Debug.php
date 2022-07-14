@@ -26,14 +26,16 @@
 namespace LibreNMS\Util;
 
 use App;
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\DB\Eloquent;
 use Log;
 
 class Debug
 {
+    /** @var bool */
     private static $debug = false;
+    /** @var bool */
     private static $verbose = false;
+    /** @var bool */
+    private static $sql_debug_enabled = false;
 
     /**
      * Enable/disable debug output
@@ -46,23 +48,13 @@ class Debug
     {
         self::$debug = (bool) $debug;
 
-        restore_error_handler(); // disable Laravel error handler
-
         if (self::$debug) {
-            ini_set('display_errors', '1');
-            ini_set('display_startup_errors', '1');
-            ini_set('log_errors', '0');
-            error_reporting(E_ALL & ~E_NOTICE);
-
+            self::enableErrorReporting();
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            ini_set('display_errors', '0');
-            ini_set('display_startup_errors', '0');
-            ini_set('log_errors', '1');
-            error_reporting($silence ? 0 : E_ERROR);
-
-            self::disableCliDebugOutput();
+            self::disableErrorReporting($silence);
+            self::disableCliDebugOutput($silence);
             self::disableQueryDebug();
         }
 
@@ -92,53 +84,56 @@ class Debug
         return self::$verbose;
     }
 
-    public static function disableQueryDebug()
+    public static function disableQueryDebug(): void
     {
-        $db = Eloquent::DB();
-
-        if ($db) {
-            // remove all query executed event handlers
-            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
-        }
+        self::$sql_debug_enabled = false;
     }
 
-    public static function enableCliDebugOutput()
+    public static function enableCliDebugOutput(): void
     {
         if (Laravel::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console');
+            Log::setDefaultDriver('console_debug');
+        } else {
+            putenv('LOG_CHANNEL=console_debug');
         }
     }
 
-    public static function disableCliDebugOutput()
+    public static function disableCliDebugOutput(bool $silence): void
     {
-        if (Laravel::isBooted()) {
-            Log::setDefaultDriver('stack');
+        if (Laravel::isBooted() && Log::getDefaultDriver() !== 'stack') {
+            Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
         }
     }
 
-    public static function enableQueryDebug()
+    public static function enableQueryDebug(): void
     {
-        static $sql_debug_enabled;
-        $db = Eloquent::DB();
+        self::$sql_debug_enabled = true;
+    }
 
-        if ($db && ! $sql_debug_enabled) {
-            $db->listen(function (QueryExecuted $query) {
-                // collect bindings and make them a little more readable
-                $bindings = collect($query->bindings)->map(function ($item) {
-                    if ($item instanceof \Carbon\Carbon) {
-                        return $item->toDateTimeString();
-                    }
+    public static function queryDebugIsEnabled(): bool
+    {
+        return self::$sql_debug_enabled;
+    }
 
-                    return $item;
-                })->toJson();
+    /**
+     * Disable error reporting, do not use with new code
+     */
+    public static function disableErrorReporting(bool $silence = false): void
+    {
+        ini_set('display_errors', '0');
+        ini_set('display_startup_errors', '0');
+        ini_set('log_errors', '1');
+        error_reporting($silence ? 0 : E_ERROR);
+    }
 
-                if (Laravel::isBooted()) {
-                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-                } else {
-                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-                }
-            });
-            $sql_debug_enabled = true;
-        }
+    /**
+     * Enable error reporting. Please call after disabling for legacy code
+     */
+    public static function enableErrorReporting(): void
+    {
+        ini_set('display_errors', '1');
+        ini_set('display_startup_errors', '1');
+        ini_set('log_errors', '0');
+        error_reporting(E_ALL & ~E_NOTICE);
     }
 }
