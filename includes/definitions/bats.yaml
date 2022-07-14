@@ -9,8 +9,3 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.37069
 mib_dir: bats
-discovery_modules:
-    bgp-table: false
-    ospf: false
-    storage: false
-    mempools: false
