@@ -1,0 +1,1298 @@
+
+AATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, enterprises
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, OBJECT-GROUP
+		FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+;
+
+aats MODULE-IDENTITY
+	LAST-UPDATED "202102241815Z"
+	ORGANIZATION "Broadband Antenna Tracking systems"
+
+	CONTACT-INFO
+		"E-mail: support@batswireless.com"
+	DESCRIPTION
+		"The MIB Module for BATS Software."
+	REVISION "202102241815Z"
+	DESCRIPTION
+		"Updated on 202102241815."
+	::= { enterprises 37069 }
+
+--
+-- top level structure
+--
+
+aatsDot1 OBJECT IDENTIFIER ::= { aats 1 }
+system OBJECT IDENTIFIER ::= { aatsDot1 1 }
+radio OBJECT IDENTIFIER ::= { aatsDot1 2 }
+linkStatus OBJECT IDENTIFIER ::= { radio 3 }
+rssi OBJECT IDENTIFIER ::= { radio 4 }
+snr OBJECT IDENTIFIER ::= { radio 5 }
+linkDistance OBJECT IDENTIFIER ::= { radio 6 }
+remote OBJECT IDENTIFIER ::= { radio 7 }
+positioner OBJECT IDENTIFIER ::= { aatsDot1 3 }
+positionerDot1 OBJECT IDENTIFIER ::= { positioner 1 }
+azimuth OBJECT IDENTIFIER ::= { positionerDot1 3 }
+elevation OBJECT IDENTIFIER ::= { positionerDot1 4 }
+antennaHeading OBJECT IDENTIFIER ::= { positionerDot1 5 }
+currentGPSHdgAcl OBJECT IDENTIFIER ::= { aatsDot1 4 }
+currentGPSStatus OBJECT IDENTIFIER ::= { currentGPSHdgAcl 2 }
+currentGPSTimestamp OBJECT IDENTIFIER ::= { currentGPSHdgAcl 3 }
+currentGPSLatitude OBJECT IDENTIFIER ::= { currentGPSHdgAcl 4 }
+currentGPSLongitude OBJECT IDENTIFIER ::= { currentGPSHdgAcl 5 }
+currentGPSAltitude OBJECT IDENTIFIER ::= { currentGPSHdgAcl 6 }
+currentHeadingSection OBJECT IDENTIFIER ::= { currentGPSHdgAcl 7 }
+currentHeadingStatus OBJECT IDENTIFIER ::= { currentHeadingSection 1 }
+currentHeading OBJECT IDENTIFIER ::= { currentHeadingSection 2 }
+currentAccel OBJECT IDENTIFIER ::= { currentGPSHdgAcl 8 }
+currentPitch OBJECT IDENTIFIER ::= { currentAccel 1 }
+currentRoll OBJECT IDENTIFIER ::= { currentAccel 2 }
+localGPSHdgAcl OBJECT IDENTIFIER ::= { aatsDot1 5 }
+localGPSStatus OBJECT IDENTIFIER ::= { localGPSHdgAcl 2 }
+localGPSTimestamp OBJECT IDENTIFIER ::= { localGPSHdgAcl 3 }
+localGPSLatitude OBJECT IDENTIFIER ::= { localGPSHdgAcl 4 }
+localGPSLongitude OBJECT IDENTIFIER ::= { localGPSHdgAcl 5 }
+localGPSAltitude OBJECT IDENTIFIER ::= { localGPSHdgAcl 6 }
+localHeadingSection OBJECT IDENTIFIER ::= { localGPSHdgAcl 7 }
+localHeadingStatus OBJECT IDENTIFIER ::= { localHeadingSection 1 }
+localHeading OBJECT IDENTIFIER ::= { localHeadingSection 2 }
+localAccel OBJECT IDENTIFIER ::= { localGPSHdgAcl 8 }
+localPitch OBJECT IDENTIFIER ::= { localAccel 1 }
+localRoll OBJECT IDENTIFIER ::= { localAccel 2 }
+networkGPSHdgAcl OBJECT IDENTIFIER ::= { aatsDot1 6 }
+networkGPSStatus OBJECT IDENTIFIER ::= { networkGPSHdgAcl 2 }
+networkGPSTimestamp OBJECT IDENTIFIER ::= { networkGPSHdgAcl 3 }
+networkGPSLatitude OBJECT IDENTIFIER ::= { networkGPSHdgAcl 4 }
+networkGPSLongitude OBJECT IDENTIFIER ::= { networkGPSHdgAcl 5 }
+networkGPSAltitude OBJECT IDENTIFIER ::= { networkGPSHdgAcl 6 }
+networkHeadingSection OBJECT IDENTIFIER ::= { networkGPSHdgAcl 7 }
+networkHeadingStatus OBJECT IDENTIFIER ::= { networkHeadingSection 1 }
+networkHeading OBJECT IDENTIFIER ::= { networkHeadingSection 2 }
+networkAccel OBJECT IDENTIFIER ::= { networkGPSHdgAcl 8 }
+networkPitch OBJECT IDENTIFIER ::= { networkAccel 1 }
+networkRoll OBJECT IDENTIFIER ::= { networkAccel 2 }
+
+status OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current system status"
+	::= { system 1 }
+
+active OBJECT-TYPE
+	SYNTAX		INTEGER { inactive(0), active(1) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the system is currently active. When an integer 1 is set, the system will restart the scan sequence. When an integer 0 is set, the system will stop"
+	::= { system 2 }
+
+stowed OBJECT-TYPE
+	SYNTAX		INTEGER { unstowed(0), stowed(1) }
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the system is currently stowed. When an integer 1 is set, the system will begin stowing. When an integer 0 is set, the system will begin unstowing. (Additional license is required)"
+	::= { system 3 }
+
+cpuTemp OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the cpu temperature in celsius (-1000 if n/a)"
+	::= { system 4 }
+
+radioName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Specifies the current radio name"
+	::= { radio 1 }
+
+radioConnected OBJECT-TYPE
+	SYNTAX		INTEGER { disconnected(0), connected(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the radio is currently connected"
+	::= { radio 2 }
+
+linkStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify Link Status"
+	::= { linkStatus 1 }
+
+linkStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { disconnected(0), marginal(1), connected(2) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current link status from the radio 0 = Disconnected, 1 = Marginal, 2 = Connected"
+	::= { linkStatus 2 }
+
+linkStatusVal OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current link status from the radio Disconnected, Marginal, or Connected"
+	::= { linkStatus 3 }
+
+rssiString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify RSSI"
+	::= { rssi 1 }
+
+rssiInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current rssi from the radio, divde by 100 to get actual value"
+	::= { rssi 2 }
+
+rssiFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current rssi from the radio"
+	::= { rssi 3 }
+
+snrString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify SNR"
+	::= { snr 1 }
+
+snrInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current snr from the radio, divde by 100 to get actual value"
+	::= { snr 2 }
+
+snrFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current snr from the radio"
+	::= { snr 3 }
+
+linkDistanceString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify Link Distance"
+	::= { linkDistance 1 }
+
+linkDistanceMeters OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current calculated link distance from the radio in meters"
+	::= { linkDistance 2 }
+
+linkDistanceMiles OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current calculated link distance from the radio in miles"
+	::= { linkDistance 3 }
+
+remoteString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify Remote"
+	::= { remote 1 }
+
+remoteIP OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The IP address of the remote radio reported from the local radio. NOTE: Not available on all radios"
+	::= { remote 2 }
+
+remoteMAC OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The MAC address of the remote radio reported from the local radio. NOTE: Not available on all radios"
+	::= { remote 3 }
+
+positionerConnected OBJECT-TYPE
+	SYNTAX		INTEGER { disconnected(0), connected(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the positioner is currently connected"
+	::= { positionerDot1 1 }
+
+positionerMoving OBJECT-TYPE
+	SYNTAX		INTEGER { stopped(0), moving(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"Specifies if the positioner is currently moving"
+	::= { positionerDot1 2 }
+
+azimuthString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify azimuth"
+	::= { azimuth 1 }
+
+azimuthInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current azimuth from the positioner in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { azimuth 2 }
+
+azimuthFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current azimuth from the positioner in degrees (-180 - 180)"
+	::= { azimuth 3 }
+
+azimuth360ScaleInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current azimuth from the positioner in degrees (0 - 360), divde by 100 to get actual value"
+	::= { azimuth 4 }
+
+azimuth360ScaleFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current azimuth from the positioner in degrees (0 - 360)"
+	::= { azimuth 5 }
+
+elevationString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify elevation"
+	::= { elevation 1 }
+
+elevationInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current elevation from the positioner in degrees, divde by 100 to get actual value"
+	::= { elevation 2 }
+
+elevationFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current elevation from the positioner in degrees"
+	::= { elevation 3 }
+
+antennaHeadingString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify Antenna Heading"
+	::= { antennaHeading 1 }
+
+antennaHeadingInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current antenna heading in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { antennaHeading 2 }
+
+antennaHeadingFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current antenna heading in degrees (-180 - 180)"
+	::= { antennaHeading 3 }
+
+antennaHeading360ScaleInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current antenna heading in degrees (0 - 360), divde by 100 to get actual value"
+	::= { antennaHeading 4 }
+
+antennaHeading360ScaleFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current antenna heading in degrees (0 - 360)"
+	::= { antennaHeading 5 }
+
+currentGPSHdgAclString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS/Heading/Accel"
+	::= { currentGPSHdgAcl 1 }
+
+currentGPSStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS Status"
+	::= { currentGPSStatus 1 }
+
+currentGPSStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Status"
+	::= { currentGPSStatus 2 }
+
+currentGPSStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Status"
+	::= { currentGPSStatus 3 }
+
+currentGPSTimestampString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS Timestamp"
+	::= { currentGPSTimestamp 1 }
+
+currentGPSTimestampInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Timestamp, divde by 1000 to get actual value"
+	::= { currentGPSTimestamp 2 }
+
+currentGPSTimestampValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Timestamp"
+	::= { currentGPSTimestamp 3 }
+
+currentGPSLatitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS Latitude"
+	::= { currentGPSLatitude 1 }
+
+currentGPSLatitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Latitude, divde by 10000 to get actual value"
+	::= { currentGPSLatitude 2 }
+
+currentGPSLatitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Latitude"
+	::= { currentGPSLatitude 3 }
+
+currentGPSLongitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS Longitude"
+	::= { currentGPSLongitude 1 }
+
+currentGPSLongitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Longitude, divde by 10000 to get actual value"
+	::= { currentGPSLongitude 2 }
+
+currentGPSLongitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Longitude"
+	::= { currentGPSLongitude 3 }
+
+currentGPSAltitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current GPS Altitude"
+	::= { currentGPSAltitude 1 }
+
+currentGPSAltitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Altitude in meters, divde by 100 to get actual value"
+	::= { currentGPSAltitude 2 }
+
+currentGPSAltitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Altitude in meters, divde by 100 to get actual value"
+	::= { currentGPSAltitude 3 }
+
+currentGPSAltitudeFeetInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Altitude in feet, divde by 100 to get actual value"
+	::= { currentGPSAltitude 4 }
+
+currentGPSAltitudeFeetFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current GPS Altitude in feet"
+	::= { currentGPSAltitude 5 }
+
+currentHeadingStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current Heading Status"
+	::= { currentHeadingStatus 1 }
+
+currentHeadingStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current Heading Status"
+	::= { currentHeadingStatus 2 }
+
+currentHeadingStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current Heading Status"
+	::= { currentHeadingStatus 3 }
+
+currentHeadingString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current Heading"
+	::= { currentHeading 1 }
+
+currentHeadingInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current heading in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { currentHeading 2 }
+
+currentHeadingFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current heading in degrees (-180 - 180)"
+	::= { currentHeading 3 }
+
+currentHeading360ScaleInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current heading in degrees (0 - 360), divde by 100 to get actual value"
+	::= { currentHeading 4 }
+
+currentHeading360ScaleFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current heading in degrees (0 - 360)"
+	::= { currentHeading 5 }
+
+currentPitchString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current pitch"
+	::= { currentPitch 1 }
+
+currentPitchInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current pitch in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { currentPitch 2 }
+
+currentPitchFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current pitch in degrees (-180 - 180)"
+	::= { currentPitch 3 }
+
+currentRollString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify current roll"
+	::= { currentRoll 1 }
+
+currentRollInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current roll in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { currentRoll 2 }
+
+currentRollFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The current roll in degrees (-180 - 180)"
+	::= { currentRoll 3 }
+
+localGPSHdgAclString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS/Heading/Accel"
+	::= { localGPSHdgAcl 1 }
+
+localGPSStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS Status"
+	::= { localGPSStatus 1 }
+
+localGPSStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Status"
+	::= { localGPSStatus 2 }
+
+localGPSStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Status"
+	::= { localGPSStatus 3 }
+
+localGPSTimestampString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS Timestamp"
+	::= { localGPSTimestamp 1 }
+
+localGPSTimestampInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Timestamp, divde by 1000 to get actual value"
+	::= { localGPSTimestamp 2 }
+
+localGPSTimestampValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Timestamp"
+	::= { localGPSTimestamp 3 }
+
+localGPSLatitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS Latitude"
+	::= { localGPSLatitude 1 }
+
+localGPSLatitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Latitude, divde by 10000 to get actual value"
+	::= { localGPSLatitude 2 }
+
+localGPSLatitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Latitude"
+	::= { localGPSLatitude 3 }
+
+localGPSLongitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS Longitude"
+	::= { localGPSLongitude 1 }
+
+localGPSLongitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Longitude, divde by 10000 to get actual value"
+	::= { localGPSLongitude 2 }
+
+localGPSLongitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Longitude"
+	::= { localGPSLongitude 3 }
+
+localGPSAltitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local GPS Altitude"
+	::= { localGPSAltitude 1 }
+
+localGPSAltitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Altitude in meters, divde by 100 to get actual value"
+	::= { localGPSAltitude 2 }
+
+localGPSAltitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Altitude in meters, divde by 100 to get actual value"
+	::= { localGPSAltitude 3 }
+
+localGPSAltitudeFeetInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Altitude in feet, divde by 100 to get actual value"
+	::= { localGPSAltitude 4 }
+
+localGPSAltitudeFeetFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local GPS Altitude in feet"
+	::= { localGPSAltitude 5 }
+
+localHeadingStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local Heading Status"
+	::= { localHeadingStatus 1 }
+
+localHeadingStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local Heading Status"
+	::= { localHeadingStatus 2 }
+
+localHeadingStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local Heading Status"
+	::= { localHeadingStatus 3 }
+
+localHeadingString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local Heading"
+	::= { localHeading 1 }
+
+localHeadingInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local heading in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { localHeading 2 }
+
+localHeadingFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local heading in degrees (-180 - 180)"
+	::= { localHeading 3 }
+
+localHeading360ScaleInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local heading in degrees (0 - 360), divde by 100 to get actual value"
+	::= { localHeading 4 }
+
+localHeading360ScaleFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local heading in degrees (0 - 360)"
+	::= { localHeading 5 }
+
+localPitchString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local pitch"
+	::= { localPitch 1 }
+
+localPitchInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local pitch in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { localPitch 2 }
+
+localPitchFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local pitch in degrees (-180 - 180)"
+	::= { localPitch 3 }
+
+localRollString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify local roll"
+	::= { localRoll 1 }
+
+localRollInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local roll in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { localRoll 2 }
+
+localRollFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The local roll in degrees (-180 - 180)"
+	::= { localRoll 3 }
+
+networkGPSHdgAclString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS/Heading/Accel"
+	::= { networkGPSHdgAcl 1 }
+
+networkGPSStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS Status"
+	::= { networkGPSStatus 1 }
+
+networkGPSStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Status"
+	::= { networkGPSStatus 2 }
+
+networkGPSStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Status"
+	::= { networkGPSStatus 3 }
+
+networkGPSTimestampString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS Timestamp"
+	::= { networkGPSTimestamp 1 }
+
+networkGPSTimestampInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Timestamp, divde by 1000 to get actual value"
+	::= { networkGPSTimestamp 2 }
+
+networkGPSTimestampValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Timestamp"
+	::= { networkGPSTimestamp 3 }
+
+networkGPSLatitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS Latitude"
+	::= { networkGPSLatitude 1 }
+
+networkGPSLatitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Latitude, divde by 10000 to get actual value"
+	::= { networkGPSLatitude 2 }
+
+networkGPSLatitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Latitude"
+	::= { networkGPSLatitude 3 }
+
+networkGPSLongitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS Longitude"
+	::= { networkGPSLongitude 1 }
+
+networkGPSLongitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Longitude, divde by 10000 to get actual value"
+	::= { networkGPSLongitude 2 }
+
+networkGPSLongitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Longitude"
+	::= { networkGPSLongitude 3 }
+
+networkGPSAltitudeString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network GPS Altitude"
+	::= { networkGPSAltitude 1 }
+
+networkGPSAltitudeInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Altitude in meters, divde by 100 to get actual value"
+	::= { networkGPSAltitude 2 }
+
+networkGPSAltitudeFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Altitude in meters, divde by 100 to get actual value"
+	::= { networkGPSAltitude 3 }
+
+networkGPSAltitudeFeetInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Altitude in feet, divde by 100 to get actual value"
+	::= { networkGPSAltitude 4 }
+
+networkGPSAltitudeFeetFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network GPS Altitude in feet"
+	::= { networkGPSAltitude 5 }
+
+networkHeadingStatusString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network Heading Status"
+	::= { networkHeadingStatus 1 }
+
+networkHeadingStatusInt OBJECT-TYPE
+	SYNTAX		INTEGER { invalid(0), valid(1) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network Heading Status"
+	::= { networkHeadingStatus 2 }
+
+networkHeadingStatusValue OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network Heading Status"
+	::= { networkHeadingStatus 3 }
+
+networkHeadingString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network Heading"
+	::= { networkHeading 1 }
+
+networkHeadingInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network heading in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { networkHeading 2 }
+
+networkHeadingFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network heading in degrees (-180 - 180)"
+	::= { networkHeading 3 }
+
+networkHeading360ScaleInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network heading in degrees (0 - 360), divde by 100 to get actual value"
+	::= { networkHeading 4 }
+
+networkHeading360ScaleFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network heading in degrees (0 - 360)"
+	::= { networkHeading 5 }
+
+networkPitchString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network pitch"
+	::= { networkPitch 1 }
+
+networkPitchInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network pitch in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { networkPitch 2 }
+
+networkPitchFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network pitch in degrees (-180 - 180)"
+	::= { networkPitch 3 }
+
+networkRollString OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The string used to identify network roll"
+	::= { networkRoll 1 }
+
+networkRollInt OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network roll in degrees (-180 - 180), divde by 100 to get actual value"
+	::= { networkRoll 2 }
+
+networkRollFloat OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+	"The network roll in degrees (-180 - 180)"
+	::= { networkRoll 3 }
+
+
+-- conformance information
+
+aatsMIBConformance OBJECT IDENTIFIER ::= { aats 97 }
+aatsMIBCompliances OBJECT IDENTIFIER ::= { aatsMIBConformance 1 }
+aatsMIBGroups OBJECT IDENTIFIER ::= { aatsMIBConformance 2 }
+
+-- compliance statements
+aatsBasicCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for the AATS MIB"
+    MODULE  -- this module
+        MANDATORY-GROUPS { aatsSnmpGroup }
+
+		GROUP   aatsSnmpGroup
+        DESCRIPTION
+            "The aats object groups."
+
+	::= { aatsMIBCompliances 2 }
+
+-- units of conformance
+aatsSnmpGroup OBJECT-GROUP
+    OBJECTS {
+		status,
+		active,
+		stowed,
+		cpuTemp,
+		radioName,
+		radioConnected,
+		linkStatusString,
+		linkStatusInt,
+		linkStatusVal,
+		rssiString,
+		rssiInt,
+		rssiFloat,
+		snrString,
+		snrInt,
+		snrFloat,
+		linkDistanceString,
+		linkDistanceMeters,
+		linkDistanceMiles,
+		remoteString,
+		remoteIP,
+		remoteMAC,
+		positionerConnected,
+		positionerMoving,
+		azimuthString,
+		azimuthInt,
+		azimuthFloat,
+		azimuth360ScaleInt,
+		azimuth360ScaleFloat,
+		elevationString,
+		elevationInt,
+		elevationFloat,
+		antennaHeadingString,
+		antennaHeadingInt,
+		antennaHeadingFloat,
+		antennaHeading360ScaleInt,
+		antennaHeading360ScaleFloat,
+		currentGPSHdgAclString,
+		currentGPSStatusString,
+		currentGPSStatusInt,
+		currentGPSStatusValue,
+		currentGPSTimestampString,
+		currentGPSTimestampInt,
+		currentGPSTimestampValue,
+		currentGPSLatitudeString,
+		currentGPSLatitudeInt,
+		currentGPSLatitudeFloat,
+		currentGPSLongitudeString,
+		currentGPSLongitudeInt,
+		currentGPSLongitudeFloat,
+		currentGPSAltitudeString,
+		currentGPSAltitudeInt,
+		currentGPSAltitudeFloat,
+		currentGPSAltitudeFeetInt,
+		currentGPSAltitudeFeetFloat,
+		currentHeadingStatusString,
+		currentHeadingStatusInt,
+		currentHeadingStatusValue,
+		currentHeadingString,
+		currentHeadingInt,
+		currentHeadingFloat,
+		currentHeading360ScaleInt,
+		currentHeading360ScaleFloat,
+		currentPitchString,
+		currentPitchInt,
+		currentPitchFloat,
+		currentRollString,
+		currentRollInt,
+		currentRollFloat,
+		localGPSHdgAclString,
+		localGPSStatusString,
+		localGPSStatusInt,
+		localGPSStatusValue,
+		localGPSTimestampString,
+		localGPSTimestampInt,
+		localGPSTimestampValue,
+		localGPSLatitudeString,
+		localGPSLatitudeInt,
+		localGPSLatitudeFloat,
+		localGPSLongitudeString,
+		localGPSLongitudeInt,
+		localGPSLongitudeFloat,
+		localGPSAltitudeString,
+		localGPSAltitudeInt,
+		localGPSAltitudeFloat,
+		localGPSAltitudeFeetInt,
+		localGPSAltitudeFeetFloat,
+		localHeadingStatusString,
+		localHeadingStatusInt,
+		localHeadingStatusValue,
+		localHeadingString,
+		localHeadingInt,
+		localHeadingFloat,
+		localHeading360ScaleInt,
+		localHeading360ScaleFloat,
+		localPitchString,
+		localPitchInt,
+		localPitchFloat,
+		localRollString,
+		localRollInt,
+		localRollFloat,
+		networkGPSHdgAclString,
+		networkGPSStatusString,
+		networkGPSStatusInt,
+		networkGPSStatusValue,
+		networkGPSTimestampString,
+		networkGPSTimestampInt,
+		networkGPSTimestampValue,
+		networkGPSLatitudeString,
+		networkGPSLatitudeInt,
+		networkGPSLatitudeFloat,
+		networkGPSLongitudeString,
+		networkGPSLongitudeInt,
+		networkGPSLongitudeFloat,
+		networkGPSAltitudeString,
+		networkGPSAltitudeInt,
+		networkGPSAltitudeFloat,
+		networkGPSAltitudeFeetInt,
+		networkGPSAltitudeFeetFloat,
+		networkHeadingStatusString,
+		networkHeadingStatusInt,
+		networkHeadingStatusValue,
+		networkHeadingString,
+		networkHeadingInt,
+		networkHeadingFloat,
+		networkHeading360ScaleInt,
+		networkHeading360ScaleFloat,
+		networkPitchString,
+		networkPitchInt,
+		networkPitchFloat,
+		networkRollString,
+		networkRollInt,
+		networkRollFloat
+}
+    STATUS  current
+    DESCRIPTION
+    "The aats object group"
+	::= { aatsMIBGroups 8 }
+END
+
