@@ -40,6 +40,7 @@ class Bats extends OS implements
         $location = parent::fetchLocation();
         print_r('BBAATTSS');
         print_r($location);
+
         return new Location([
             'location' => snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysName.0', '-Oqv') . ' - ' . snmp_get($this->getDeviceArray(), 'AATS-MIB::status.0', '-Oqv'),
             'lat' => snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLatitudeFloat.0', '-Oqv'),
