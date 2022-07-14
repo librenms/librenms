@@ -24,13 +24,11 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use App\Models\Location;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Bats extends OS implements
@@ -47,24 +45,26 @@ class Bats extends OS implements
         return new Location([
             'location' => snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysName.0', '-Oqv') . ' - ' . snmp_get($this->getDeviceArray(), 'AATS-MIB::status.0', '-Oqv'),
             'lat' => snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLatitudeFloat.0', '-Oqv'),
-            'lng' => snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLongitudeFloat.0', '-Oqv')
+            'lng' => snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLongitudeFloat.0', '-Oqv'),
         ]);
     }
 
     public function discoverWirelessSnr()
-            {
-                        $oid = '.1.3.6.1.4.1.37069.1.2.5.3.0';
-                                return array(
-                                                new WirelessSensor('snr', $this->getDeviceId(), $oid, 'bats', 0, 'SNR')
-                                                        );
-                            }
+    {
+        $oid = '.1.3.6.1.4.1.37069.1.2.5.3.0';
+
+        return [
+            new WirelessSensor('snr', $this->getDeviceId(), $oid, 'bats', 0, 'SNR'),
+        ];
+    }
 
     public function discoverWirelessRssi()
-            {
-                        $oid = '.1.3.6.1.4.1.37069.1.2.4.3.0';
-                                return array(
-                                                new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'bats', 0, 'RSSI')
-                                                        );
-                            }
+    {
+        $oid = '.1.3.6.1.4.1.37069.1.2.4.3.0';
+
+        return [
+            new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'bats', 0, 'RSSI'),
+        ];
+    }
 
 }

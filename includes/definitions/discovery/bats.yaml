@@ -153,8 +153,4 @@ modules:
                         - { value:  1, generic: 0, graph: 0, descr: Valid }
     os:
         sysDescr_regex: '/ radio;(?<hardware>.*) v(?<version>[0-9.]*);.*;SN: (?<serial>[0-9]+);/'
-        features: ''
-        hardware: ''
-        serial: ''
-        version: ''
 
