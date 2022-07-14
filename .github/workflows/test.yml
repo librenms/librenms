@@ -26,12 +26,17 @@ jobs:
       matrix:
         include:
           -
+            php-version: 8.1
+            name: Unit
+            skip-web-check: 1
+            database: mariadb:10.7
+          -
             php-version: 8.0
             name: Unit
             skip-web-check: 1
             database: mariadb:10.5
           -
-            php-version: 8.0
+            php-version: 8.1
             name: Web
             skip-unit-check: 1
             database: mysql:5.7
