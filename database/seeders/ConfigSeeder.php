@@ -90,7 +90,7 @@ class ConfigSeeder extends Seeder
         Config::persist('config_seeded', true);
 
         if ($skipped_existing) {
-            echo 'Skipped overwritting existing config settings.  To overwrite them, run: REAPPLY_YAML_CONFIG=1 lnms db:seed' . PHP_EOL;
+            echo 'Skipped overwriting existing config settings.  To overwrite them, run: REAPPLY_YAML_CONFIG=1 lnms db:seed' . PHP_EOL;
         }
     }
 }
