@@ -41,6 +41,7 @@ class Bats extends OS implements
         $lat = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLatitudeFloat.0', '-Oqv');
         $lng = snmp_get($this->getDeviceArray(), 'AATS-MIB::networkGPSLongitudeFloat.0', '-Oqv');
         $pointing = snmp_get($this->getDeviceArray(), 'AATS-MIB::status.0', '-Oqv');
+
         return new Location([
             'location' => 'At ' . (string) $lat . ', ' . (string) $lng . '. ' . $pointing,
             'lat' => $lat,
