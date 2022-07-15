@@ -55,9 +55,9 @@ foreach ($docker_data as $data) {
     $fields = [
         'cpu_usage' => (float) $data['cpu'],
         'pids' => $data['pids'],
-        'mem_limit' => convertToBytes($data['memory']['limit']),
-        'mem_used' => convertToBytes($data['memory']['used']),
         'mem_perc' => (float) $data['memory']['perc'],
+        'mem_used' => convertToBytes($data['memory']['used']),
+        'mem_limit' => convertToBytes($data['memory']['limit']),
     ];
 
     $metrics[$container] = $fields;
