@@ -18,6 +18,9 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     if (is_numeric($rawdata)) {
         $os->enableGraph('customoid');
         $oid_value = $rawdata;
+    } elseif (isHexString($rawdata) && is_numeric(string_to_float(snmp_hexstring($rawdata)))) {
+        $os->enableGraph('customoid');
+       $oid_value = string_to_float(snmp_hexstring($rawdata));
     } elseif (
         $customoid['customoid_unit'] &&
         str_i_contains($rawdata, $customoid['customoid_unit']) &&
