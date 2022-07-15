@@ -29,7 +29,7 @@ jobs:
             php-version: 8.1
             name: Unit
             skip-web-check: 1
-            database: mariadb:10.7
+            database: mariadb:10.8
           -
             php-version: 8.0
             name: Unit
