@@ -33,6 +33,6 @@ class NsBsd extends \LibreNMS\OS
     {
         parent::discoverOS($device); // yaml
 
-        $device->sysName = \SnmpQuery::get('STORMSHIELD-PROPERTY-MIB::nsSystemName.0')->value() ?: $device->sysName;
+        $device->sysName = \SnmpQuery::get('STORMSHIELD-PROPERTY-MIB::snsSystemName.0')->value() ?: $device->sysName;
     }
 }
