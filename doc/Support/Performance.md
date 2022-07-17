@@ -108,13 +108,13 @@ quick the icmp packet is returned.
 
 ## Optimise poller-wrapper
 
-The default 16 threads that `poller-wrapper.py` runs as isn't
-necessarily the optimal number. A general rule of thumb is 2 threads
-per core but we suggest that you play around with lowering /
-increasing the number until you get the optimal value. **Note** KEEP
-in MIND that this doesn't always help, it depends on your system and
-CPU. So be careful. This can be changed by going to the cron job for
-librenms. Usually in `/etc/cron.d/librenms` and changing the "16"
+`poller-wrapper.py` defaults to using 16 threads, this isn't necessarily
+optimal. A general rule of thumb is 2 threads per core but we suggest 
+that you play around with lowering / increasing the number until you 
+get the optimal value. **Note** KEEP in MIND that this doesn't 
+always help, it depends on your system and CPU. So be careful. 
+This can be changed by going to the cron job for librenms. 
+Usually in `/etc/cron.d/librenms` and changing the "16"
 
 ```
 */5  *    * * *   librenms    /opt/librenms/cronic /opt/librenms/poller-wrapper.py 16
@@ -170,7 +170,7 @@ whatever web server you use:
 For Nginx (1.9.5 and above) change `listen 443 ssl;` to `listen 443
 ssl http2;` in the Virtualhost config.
 
-For Apache (2.4.17 an above) set `Protocols h2 http/1.1` in the Virtualhost config.
+For Apache (2.4.17 and above) set `Protocols h2 http/1.1` in the Virtualhost config.
 
 ## PHP-opcache
 

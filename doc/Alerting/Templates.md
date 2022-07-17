@@ -294,7 +294,7 @@ $config['allow_unauth_graphs'] = true;
 
 ## Using models for optional data
 
-If some value does not exist withing the `$faults[]`-array, you may
+If some value does not exist within the `$faults[]`-array, you may
 query fields from the database using Laravel models. You may use
 models to query additional values and use them on the template by
 placing the model and the value to search for within the braces. For
