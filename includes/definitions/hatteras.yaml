@@ -1,0 +1,58 @@
+os: hatteras 
+text: 'Hatteras Overdue DSLAM'
+type: dslam
+icon: hatteras
+
+empty_ifdescr: true
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysDescr:
+            - HN4000-I
+            - HN4000-E 
+bad_if:
+  - notPresent
+  - serConsole
+good_if: 
+  - ras #all interfaces has 'Hatteras' in it...
+discovery_modules:
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    ipmi: false
+    bgp-peers: false
+    services: false
+    vlans: false
+    arp-table: false
+    mef: false
+    cisco-vrf-lite: false
+    storage: false
+    fdb-table: false
+    wireless: false
+    discovery-protocols: false
+    hr-device: false
+    ipv4-addresses: false
+    ipv6-addresses: false
+    processors: false
+    mempools: false
+    ports-stack: false
+    ports: true
+poller_modules:
+    ntp: false
+    ospf: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    ipmi: false
+    bgp-peers: false
+    services: false
+    libvirt-vminfo: false
+    vmware-vminfo: false
+    vlans: false
+    arp-table: false
+    mef: false
+    cisco-vrf-lite: false
+    storage: false
