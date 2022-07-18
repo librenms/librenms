@@ -17,12 +17,12 @@ if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) 
     exit;
 }
 
+$init_modules = [];
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 if (isset($options['d'])) {
     Debug::set();
 }
-
-$init_modules = [];
-require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (isset($options['v'])) {
     // Enable debug mode for auth methods that have it
