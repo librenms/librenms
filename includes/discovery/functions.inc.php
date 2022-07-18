@@ -45,7 +45,7 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
             }
         }
         if (Config::get('discovery_remove_domain', true)) {
-            if (str_contains($hostname,".") ) $hostname = substr($hostname,0,strpos($hostname,".") );
+            if (str_contains($hostname, '.')) $hostname = substr($hostname, 0 , strpos($hostname, '.'));
         }
 
         $ip = gethostbyname($hostname);
