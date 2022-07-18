@@ -1,13 +1,15 @@
 os: netmanplus
 text: 'NetMan Plus'
+type: power
+icon: riello
+mib_dir: riello
 group: ups
 snmp_bulk: false
-type: power
 rfc1628_compat: true
 over:
     - { graph: device_current, text: Current }
 discovery:
     -
-        sysObjectID: .1.3.6.1.4.1.5491.6
+        sysObjectID: .1.3.6.1.4.1.5491.
     -
         sysDescr_regex: '/^NetMan.*plus/'
