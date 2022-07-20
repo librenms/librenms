@@ -8,6 +8,7 @@ if (isset($_POST['config'])) {
         $oxidized_cfg = Yaml::parse($_POST['config']);
         $validate_cfg = validate_oxidized_cfg($oxidized_cfg);
         foreach ($validate_cfg as $error) {
+            $error = htmlspecialchars($error);
             echo "<div class='alert alert-danger'>$error</div>";
         }
         if (empty($validate_cfg)) {
