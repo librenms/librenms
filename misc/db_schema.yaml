@@ -1356,6 +1356,7 @@ plugins:
     - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [plugin_id], Unique: true, Type: BTREE }
+    plugins_version_plugin_name_unique: { Name: plugins_version_plugin_name_unique, Columns: [version, plugin_name], Unique: true, Type: BTREE }
 pollers:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
