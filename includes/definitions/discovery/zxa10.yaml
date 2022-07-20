@@ -45,6 +45,8 @@ modules:
                     value: zxAnCardTemp
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2.{{ $index }}'
                     descr: "Temp Card {{ $zxAnCardActualType }} ({{ subindex2 }})"
+                    low_limit: 0
+                    skip_value_lt: 1
         fanspeed:
             data:
                 -
@@ -76,7 +78,7 @@ modules:
                     value: zxAnOpticalIfRxPwrCurrValue
                     num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.2.{{ $index }}'
                     index: 'zxAnOpticalIfRxPwrCurrValue.{{ $index }}'
-                    descr: "Rx {{ $ifName }}"
+                    descr: "Rx {{ $index }}"
                     group: OLT Interfaces
                     skip_values:
                         -
@@ -89,7 +91,7 @@ modules:
                     value: zxAnPonRxOpticalPower
                     num_oid: '.1.3.6.1.4.1.3902.1082.500.1.2.4.2.1.2.{{ $index }}'
                     index: 'zxAnPonRxOpticalPower.{{ $index }}'
-                    descr: 'ONU Rx {{ $ifName:0 }}:{{ $subindex1 }}'
+                    descr: 'ONU Rx {{ $subindex0 }}:{{ $subindex1 }}'
                     group: ONUs or ONTs
                     skip_values:
                         -
@@ -129,9 +131,9 @@ modules:
                     group: Fans
                     state_name: zxAnEnvFanOperStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'up' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'down' }
-                        - { value: 3, generic: 2, graph: 0, descr: 'unknown' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'up' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'down' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'unknown' }
                 -
                     oid: zxAnEnvFanTable
                     value: zxAnEnvFanOnlineStatus
@@ -141,9 +143,9 @@ modules:
                     group: Fans
                     state_name: zxAnEnvFanOnlineStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'online' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'offline' }
-                        - { value: 3, generic: 2, graph: 0, descr: 'unknown' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'online' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'offline' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'unknown' }
                 -
                     oid: zxAnPowerSupplyTable
                     value: zxAnPowerSupplyInVoltageStatus
@@ -153,7 +155,7 @@ modules:
                     group: Power
                     state_name: zxAnPowerSupplyInVoltageStatus
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'overVoltage' }
-                        - { value: 3, generic: 1, graph: 0, descr: 'underVoltage' }
-                        - { value: 4, generic: 2, graph: 0, descr: 'off' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'normal' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'overVoltage' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'underVoltage' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'off' }

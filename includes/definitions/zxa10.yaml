@@ -6,6 +6,7 @@ mib_dir: zte
 bad_snmpEngineTime: true
 empty_ifdescr: true
 ifname: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
