@@ -74,7 +74,7 @@ if (isset($device['device_id']) && $device['device_id'] > 0) {
 
 $count = dbFetchCell("SELECT COUNT(*) $query $where", $param);
 if (isset($_POST['page_num']) && $_POST['page_num'] > 0 && $_POST['page_num'] <= $count) {
-    $page_num = $_POST['page_num'];
+    $page_num = intval($_POST['page_num']);
 } else {
     $page_num = 1;
 }
