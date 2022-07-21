@@ -483,7 +483,8 @@ function maintenance_device(Illuminate\Http\Request $request)
             ->format('Y-m-d H:i:00');
     }
 
-    $device->alertSchedules()->save($alert_schedule);
+    $alert_schedule->save();
+    $alert_schedule->devices()->attach($device);
 
     if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
         $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
@@ -2166,7 +2167,8 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
             ->format('Y-m-d H:i:00');
     }
 
-    $device_group->alertSchedules()->save($alert_schedule);
+    $alert_schedule->save();
+    $alert_schedule->deviceGroups()->attach($device_group);
 
     return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
 }
