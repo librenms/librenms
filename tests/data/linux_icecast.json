@@ -919,10 +919,10 @@
                     "app_type": "icecast",
                     "app_state": "OK",
                     "discovered": 1,
-                    "app_state_prev": "UNKNOWN",
+                    "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
-                    "data": "[]"
+                    "data": null
                 }
             ],
             "application_metrics": [

@@ -19,7 +19,7 @@
                     "app_type": "chronyd",
                     "app_state": "OK",
                     "discovered": 1,
-                    "app_state_prev": "UNKNOWN",
+                    "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
                     "data": "{\"sources\":[\"PPS\",\"GPS\"]}"
