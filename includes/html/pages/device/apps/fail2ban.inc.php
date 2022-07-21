@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Application;
-
-$jails = Application::find($app['app_id'])->data['jails'];
+$jails =  json_decode($app['data'], true)['jails'];
 
 sort($jails);
 

@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Application;
-
-$pools = Application::find($app['app_id'])->data['pools'];
+$pools =  json_decode($app['data'], true)['pools'];
 
 sort($pools);
 

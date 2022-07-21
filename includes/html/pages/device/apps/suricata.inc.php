@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Application;
-
-$suricata_instances = Application::find($app['app_id'])->data['instances'];
+$suricata_instances =  json_decode($app['data'], true)['instances'];
 
 sort($suricata_instances);
 

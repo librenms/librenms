@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Application;
-
-$databases = Application::find($app['app_id'])->data['databases'];
+$databases =  json_decode($app['data'], true)['databases'];
 
 sort($databases);
 
