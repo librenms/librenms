@@ -744,7 +744,7 @@
                     "app_type": "mysql",
                     "app_state": "OK",
                     "discovered": 1,
-                    "app_state_prev": null,
+                    "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
                     "data": null
@@ -753,7 +753,7 @@
                     "app_type": "opensips",
                     "app_state": "OK",
                     "discovered": 1,
-                    "app_state_prev": null,
+                    "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
                     "data": null
