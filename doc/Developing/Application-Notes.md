@@ -2,12 +2,12 @@
 
 ## LibreNMS JSON SNMP Extends
 
-The polling funtion `json_app_get` makes it easy to poll complex data
+The polling function `json_app_get` makes it easy to poll complex data
 using SNMP extends and JSON.
 
 The following exceptions are provided by it.
 
-It takes three paramters, in order in the list below.
+It takes three parameters, in order in the list below.
 
 - Integer :: Device ID to fetch it for.
 - String :: The extend name. For example, if 'zfs' is passed it will
@@ -68,10 +68,15 @@ use App\Models\Application;
 $app = Application::find($app_id);
 
 // set the varaible data to $foo
-$app->data = $foo;
+$app->data = [
+    'item_A' => 123,
+    'item_B' => 4.5,
+    'type' => 'foo',
+    'other_items' => [ 'a', 'b', 'c' ],
+];
 
 // save the change
-$app->save
+$app->save()
 
 // var_dump the contents of the variable
 var_dump($app->data);
