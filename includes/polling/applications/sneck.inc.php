@@ -64,13 +64,13 @@ $fields = [
     'errored' => $json_return['data']['errored'],
 ];
 
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, $fields);
+
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key=>$value) {
     $fields['check_' . $key] = $value['exit'];
 }
-
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
 
 $fields['time_to_polling_abs'] = abs($time_to_polling);
 
