@@ -1739,7 +1739,7 @@
                     "app_type": "os-updates",
                     "app_state": "OK",
                     "discovered": 1,
-                    "app_state_prev": null,
+                    "app_state_prev": "UNKNOWN",
                     "app_status": "18",
                     "app_instance": "",
                     "data": null
