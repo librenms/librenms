@@ -1,6 +1,6 @@
 <?php
 
-$pools =  json_decode($app['data'], true)['pools'];
+$pools = json_decode($app['data'], true)['pools'];
 
 sort($pools);
 

@@ -1,6 +1,6 @@
 <?php
 
-$jails =  json_decode($app['data'], true)['jails'];
+$jails = json_decode($app['data'], true)['jails'];
 
 sort($jails);
 

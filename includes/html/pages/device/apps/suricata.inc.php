@@ -1,6 +1,6 @@
 <?php
 
-$suricata_instances =  json_decode($app['data'], true)['instances'];
+$suricata_instances = json_decode($app['data'], true)['instances'];
 
 sort($suricata_instances);
 

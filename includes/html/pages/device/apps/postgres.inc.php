@@ -1,6 +1,6 @@
 <?php
 
-$databases =  json_decode($app['data'], true)['databases'];
+$databases = json_decode($app['data'], true)['databases'];
 
 sort($databases);
 
