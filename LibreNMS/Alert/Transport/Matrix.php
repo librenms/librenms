@@ -54,7 +54,7 @@ class Matrix extends Transport
 
         $message = SimpleTemplate::parse($message, $obj);
 
-        $body = ['body'=>$message, 'msgtype'=>'m.text'];
+        $body = ['body'=>strip_tags($message), 'formatted_body'=>"$message", 'msgtype'=>'m.text', 'format'=>'org.matrix.custom.html'];
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = Proxy::forGuzzle();
@@ -102,7 +102,7 @@ class Matrix extends Transport
                     'title' => 'Message',
                     'name' => 'matrix-message',
                     'descr' => 'Enter the message',
-                    'type' => 'textarea',
+                    'type' => 'text',
                 ],
             ],
             'validation' => [
