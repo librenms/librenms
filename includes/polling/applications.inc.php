@@ -1,7 +1,6 @@
 <?php
 
-$found_apps = \DeviceCache::getPrimary()->applications;
-foreach ($found_apps as $app_model) {
+\DeviceCache::getPrimary()->applications->each(function ($app_model) use ($device) {
         echo 'Application: ' . $app_model->app_type. ', app_id=' . $app_model->app_id;
         $app = [
             'app_id' => $app_model->app_id,
@@ -17,4 +16,4 @@ foreach ($found_apps as $app_model) {
         } else {
             echo 'ERROR: ' . $app_include . ' include file missing!';
         }
-}
+});
