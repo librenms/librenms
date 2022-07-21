@@ -16,5 +16,5 @@
     } else {
         echo 'ERROR: ' . $app_include . ' include file missing!';
     }
-   echo "\n";
+    echo "\n";
 });
