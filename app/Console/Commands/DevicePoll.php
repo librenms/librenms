@@ -81,6 +81,7 @@ class DevicePoll extends LnmsCommand
         }
 
         $this->error(trans('commands.device:poll.errors.none_polled'));
+
         return 1; // failed to poll
     }
 }
