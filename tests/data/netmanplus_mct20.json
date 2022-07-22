@@ -8,7 +8,7 @@
                     "sysDescr": "Netman 204",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Netman 204",
                     "features": null,
                     "os": "netmanplus",
                     "type": "power",
