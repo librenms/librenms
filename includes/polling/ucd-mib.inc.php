@@ -32,87 +32,89 @@ use LibreNMS\RRD\RrdDefinition;
 // UCD-SNMP-MIB::ssCpuRawSteal.0
 
 $ss = snmpwalk_cache_oid($device, 'systemStats', [], 'UCD-SNMP-MIB');
-$ss = $ss[0];
+if (isset($ss[0])) {
+    $ss = $ss[0];
 
-if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) {
-    $rrd_def = RrdDefinition::make()
-        ->addDataset('user', 'COUNTER', 0)
-        ->addDataset('system', 'COUNTER', 0)
-        ->addDataset('nice', 'COUNTER', 0)
-        ->addDataset('idle', 'COUNTER', 0);
-
-    $fields = [
-        'user'    => $ss['ssCpuRawUser'],
-        'system'  => $ss['ssCpuRawSystem'],
-        'nice'    => $ss['ssCpuRawNice'],
-        'idle'    => $ss['ssCpuRawIdle'],
-    ];
-
-    $tags = compact('rrd_def');
-    data_update($device, 'ucd_cpu', $tags, $fields);
-
-    $os->enableGraph('ucd_cpu');
-}
-
-// This is how we'll collect in the future, start now so people don't have zero data.
-$collect_oids = [
-    'ssCpuRawUser',
-    'ssCpuRawNice',
-    'ssCpuRawSystem',
-    'ssCpuRawIdle',
-    'ssCpuRawInterrupt',
-    'ssCpuRawSoftIRQ',
-    'ssCpuRawKernel',
-    'ssCpuRawWait',
-    'ssIORawSent',
-    'ssIORawReceived',
-    'ssRawInterrupts',
-    'ssRawContexts',
-    'ssRawSwapIn',
-    'ssRawSwapOut',
-    'ssCpuRawWait',
-    'ssCpuRawSteal',
-];
-
-foreach ($collect_oids as $oid) {
-    if (is_numeric($ss[$oid])) {
-        $rrd_name = 'ucd_' . $oid;
-        $rrd_def = RrdDefinition::make()->addDataset('value', 'COUNTER', 0);
+    if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_numeric($ss['ssCpuRawSystem']) && is_numeric($ss['ssCpuRawIdle'])) {
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('user', 'COUNTER', 0)
+            ->addDataset('system', 'COUNTER', 0)
+            ->addDataset('nice', 'COUNTER', 0)
+            ->addDataset('idle', 'COUNTER', 0);
 
         $fields = [
-            'value' => $ss[$oid],
+            'user' => $ss['ssCpuRawUser'],
+            'system' => $ss['ssCpuRawSystem'],
+            'nice' => $ss['ssCpuRawNice'],
+            'idle' => $ss['ssCpuRawIdle'],
         ];
 
-        $tags = compact('oid', 'rrd_name', 'rrd_def');
+        $tags = compact('rrd_def');
         data_update($device, 'ucd_cpu', $tags, $fields);
 
         $os->enableGraph('ucd_cpu');
     }
-}
 
-// Set various graphs if we've seen the right OIDs.
-if (is_numeric($ss['ssRawSwapIn'])) {
-    $os->enableGraph('ucd_swap_io');
-}
+    // This is how we'll collect in the future, start now so people don't have zero data.
+    $collect_oids = [
+        'ssCpuRawUser',
+        'ssCpuRawNice',
+        'ssCpuRawSystem',
+        'ssCpuRawIdle',
+        'ssCpuRawInterrupt',
+        'ssCpuRawSoftIRQ',
+        'ssCpuRawKernel',
+        'ssCpuRawWait',
+        'ssIORawSent',
+        'ssIORawReceived',
+        'ssRawInterrupts',
+        'ssRawContexts',
+        'ssRawSwapIn',
+        'ssRawSwapOut',
+        'ssCpuRawWait',
+        'ssCpuRawSteal',
+    ];
 
-if (is_numeric($ss['ssIORawSent'])) {
-    $os->enableGraph('ucd_io');
-}
+    foreach ($collect_oids as $oid) {
+        if (is_numeric($ss[$oid] ?? null)) {
+            $rrd_name = 'ucd_' . $oid;
+            $rrd_def = RrdDefinition::make()->addDataset('value', 'COUNTER', 0);
 
-if (is_numeric($ss['ssRawContexts'])) {
-    $os->enableGraph('ucd_contexts');
-}
+            $fields = [
+                'value' => $ss[$oid],
+            ];
 
-if (is_numeric($ss['ssRawInterrupts'])) {
-    $os->enableGraph('ucd_interrupts');
-}
+            $tags = compact('oid', 'rrd_name', 'rrd_def');
+            data_update($device, 'ucd_cpu', $tags, $fields);
 
-if (is_numeric($ss['ssCpuRawWait'])) {
-    $os->enableGraph('ucd_io_wait');
-}
+            $os->enableGraph('ucd_cpu');
+        }
+    }
 
-if (is_numeric($ss['ssCpuRawSteal'])) {
-    $os->enableGraph('ucd_cpu_steal');
+    // Set various graphs if we've seen the right OIDs.
+    if (is_numeric($ss['ssRawSwapIn'])) {
+        $os->enableGraph('ucd_swap_io');
+    }
+
+    if (is_numeric($ss['ssIORawSent'])) {
+        $os->enableGraph('ucd_io');
+    }
+
+    if (is_numeric($ss['ssRawContexts'])) {
+        $os->enableGraph('ucd_contexts');
+    }
+
+    if (is_numeric($ss['ssRawInterrupts'])) {
+        $os->enableGraph('ucd_interrupts');
+    }
+
+    if (is_numeric($ss['ssCpuRawWait'])) {
+        $os->enableGraph('ucd_io_wait');
+    }
+
+    if (is_numeric($ss['ssCpuRawSteal'] ?? null)) {
+        $os->enableGraph('ucd_cpu_steal');
+    }
 }
 
 //
@@ -123,7 +125,7 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 $load_raw = snmp_get_multi($device, ['laLoadInt.1', 'laLoadInt.2', 'laLoadInt.3'], '-OQUs', 'UCD-SNMP-MIB');
 
 // Check to see that the 5-min OID is actually populated before we make the rrd
-if (is_numeric($load_raw[2]['laLoadInt'])) {
+if (is_numeric($load_raw[2]['laLoadInt'] ?? null)) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('1min', 'GAUGE', 0)
         ->addDataset('5min', 'GAUGE', 0)

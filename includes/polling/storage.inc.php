@@ -42,4 +42,4 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['devi
     echo "\n";
 }//end foreach
 
-unset($storage);
+unset($storage, $storage_cache);

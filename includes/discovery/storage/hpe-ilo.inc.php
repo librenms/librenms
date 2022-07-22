@@ -1,6 +1,6 @@
 <?php
 
-if (in_array($device['os'], ['windows', 'hpe-ilo']) || $device['os_group'] == 'unix') {
+if (in_array($device['os'], ['windows', 'hpe-ilo']) || (isset($device['os_group']) && $device['os_group'] == 'unix')) {
     $ilo_storage = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB', 1, [], 'hp');
     $units = 1024 * 1024;
 

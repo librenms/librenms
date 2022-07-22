@@ -18,6 +18,9 @@ if (Config::get('enable_bgp')) {
 
     foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $device['context_name'] = $context_name;
+        $peer2 = false;
+        $peers_data = '';
+
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
@@ -25,14 +28,12 @@ if (Config::get('enable_bgp')) {
                 echo 'Updated AS ';
             }
 
-            $peer2 = false;
-
-            if ($device['os_group'] === 'arista') {
+            if (isset($device['os_group']) && $device['os_group'] === 'arista') {
                 $peers_data = snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', '-Oq', 'ARISTA-BGP4V2-MIB');
                 $peer2 = true;
             } elseif ($device['os'] == 'junos') {
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
-            } elseif ($device['os_group'] === 'cisco') {
+            } elseif (isset($device['os_group']) && $device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
                 $peer2 = ! empty($peers_data);
             } elseif ($device['os'] === 'cumulus') {
