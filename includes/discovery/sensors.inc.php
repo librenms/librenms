@@ -29,7 +29,7 @@ if ($device['os'] == 'linux') {
     include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
 }
 
-if (strstr($device['hardware'], 'Dell')) {
+if (isset($device['hardware']) && strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
     include 'includes/discovery/sensors/voltage/dell.inc.php';
@@ -37,7 +37,7 @@ if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/temperature/dell.inc.php';
 }
 
-if (strstr($device['hardware'], 'ProLiant')) {
+if (isset($device['hardware']) && strstr($device['hardware'], 'ProLiant')) {
     include 'includes/discovery/sensors/state/hp.inc.php';
 }
 

@@ -1,3 +1,114 @@
+## 22.7.0
+*(2022-07-20)*
+
+A big thank you to the following 21 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (12)
+  - [fbouynot](https://github.com/fbouynot) (4)
+  - [mwobst](https://github.com/mwobst) (3)
+  - [dependabot](https://github.com/apps/dependabot) (2)
+  - [wrongecho](https://github.com/wrongecho) (2)
+  - [ppasserini](https://github.com/ppasserini) (2)
+  - [QuadPiece](https://github.com/QuadPiece) (2)
+  - [Jellyfrog](https://github.com/Jellyfrog) (2)
+  - [enferas](https://github.com/enferas) (1)
+  - [00gh](https://github.com/00gh) (1)
+  - [bennet-esyoil](https://github.com/bennet-esyoil) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [rhinoau](https://github.com/rhinoau) (1)
+  - [prahal](https://github.com/prahal) (1)
+  - [paulgear](https://github.com/paulgear) (1)
+  - [duhow](https://github.com/duhow) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+  - [Mar974](https://github.com/Mar974) (1)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [mostdaysarebaddays](https://github.com/mostdaysarebaddays) (1)
+  - [dagbdagb](https://github.com/dagbdagb) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (19)
+  - [murrant](https://github.com/murrant) (14)
+  - [ottorei](https://github.com/ottorei) (2)
+  - [PipoCanaja](https://github.com/PipoCanaja) (2)
+  - [mpikzink](https://github.com/mpikzink) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+
+#### Security
+* Security fixes XSS in oxidized-cfg-check.inc.php and print-customoid.php ([#14126](https://github.com/librenms/librenms/pull/14126)) - [enferas](https://github.com/enferas)
+
+#### Device
+* Missing "s" in NsBsd.php ([#14067](https://github.com/librenms/librenms/pull/14067)) - [Mar974](https://github.com/Mar974)
+* Add full version of Mikrotik logo ([#14063](https://github.com/librenms/librenms/pull/14063)) - [QuadPiece](https://github.com/QuadPiece)
+* Add apc battery operation time, including display in WebUI ([#14058](https://github.com/librenms/librenms/pull/14058)) - [mwobst](https://github.com/mwobst)
+* Fix the parsing of the temperature unit value (CMCIII devices) ([#14056](https://github.com/librenms/librenms/pull/14056)) - [mwobst](https://github.com/mwobst)
+* Update Mikrotik logo ([#14045](https://github.com/librenms/librenms/pull/14045)) - [QuadPiece](https://github.com/QuadPiece)
+* Aviat WTM reduce snmp load ([#13918](https://github.com/librenms/librenms/pull/13918)) - [murrant](https://github.com/murrant)
+
+#### Webui
+* Fix device filtering false values ([#14103](https://github.com/librenms/librenms/pull/14103)) - [murrant](https://github.com/murrant)
+* Minor visual changes to the apps-overview page ([#14090](https://github.com/librenms/librenms/pull/14090)) - [bennet-esyoil](https://github.com/bennet-esyoil)
+* Search device by MAC via URL ([#14072](https://github.com/librenms/librenms/pull/14072)) - [duhow](https://github.com/duhow)
+* Add BGP description to eventlog BGP Peers messages ([#14061](https://github.com/librenms/librenms/pull/14061)) - [mostdaysarebaddays](https://github.com/mostdaysarebaddays)
+
+#### Alerting
+* Example rules for diskspace on / ([#14082](https://github.com/librenms/librenms/pull/14082)) - [VVelox](https://github.com/VVelox)
+
+#### Graphs
+* Ping perf ([#14117](https://github.com/librenms/librenms/pull/14117)) - [00gh](https://github.com/00gh)
+
+#### Applications
+* Fix app docker ([#14080](https://github.com/librenms/librenms/pull/14080)) - [prahal](https://github.com/prahal)
+
+#### Polling
+* Increase traceroute timeout ([#14084](https://github.com/librenms/librenms/pull/14084)) - [murrant](https://github.com/murrant)
+
+#### Authentication
+* Add option STARTTLS for authentication via AD ([#14051](https://github.com/librenms/librenms/pull/14051)) - [dagbdagb](https://github.com/dagbdagb)
+
+#### Bug
+* Prevent duplicate plugin table entries ([#14120](https://github.com/librenms/librenms/pull/14120)) - [murrant](https://github.com/murrant)
+* Fix auth_test.php debug ([#14118](https://github.com/librenms/librenms/pull/14118)) - [murrant](https://github.com/murrant)
+* Fix config seeder will never run ([#14113](https://github.com/librenms/librenms/pull/14113)) - [murrant](https://github.com/murrant)
+* Reset the opcache after install ([#14098](https://github.com/librenms/librenms/pull/14098)) - [murrant](https://github.com/murrant)
+* Update config cache on install finalize step ([#14097](https://github.com/librenms/librenms/pull/14097)) - [murrant](https://github.com/murrant)
+* Fix more webserver validation issues ([#14096](https://github.com/librenms/librenms/pull/14096)) - [murrant](https://github.com/murrant)
+* Revert "Add apc battery operation time, including display in WebUI" ([#14068](https://github.com/librenms/librenms/pull/14068)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Use --no-patch instead ([#14047](https://github.com/librenms/librenms/pull/14047)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Cleanup
+* Remove mib poller module remnants ([#14077](https://github.com/librenms/librenms/pull/14077)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Small documentation typos ([#14101](https://github.com/librenms/librenms/pull/14101)) - [wrongecho](https://github.com/wrongecho)
+* Documentation typos ([#14099](https://github.com/librenms/librenms/pull/14099)) - [wrongecho](https://github.com/wrongecho)
+* Add SELinux configuration for SNMPd on Centos8 in the documentation ([#14095](https://github.com/librenms/librenms/pull/14095)) - [fbouynot](https://github.com/fbouynot)
+* Add SELinux configuration for LDAP/AD authentication on Centos8 in the documentation ([#14094](https://github.com/librenms/librenms/pull/14094)) - [fbouynot](https://github.com/fbouynot)
+* Add SELinux configuration for Smokeping on Centos8 in the documentation ([#14093](https://github.com/librenms/librenms/pull/14093)) - [fbouynot](https://github.com/fbouynot)
+* Add SELinux configuration for RRDCached on Centos8 in the documentation ([#14092](https://github.com/librenms/librenms/pull/14092)) - [fbouynot](https://github.com/fbouynot)
+* Corrected API devicegroup curl creation examples ([#14081](https://github.com/librenms/librenms/pull/14081)) - [rhinoau](https://github.com/rhinoau)
+* Minor grammar fixes in doc ([#14078](https://github.com/librenms/librenms/pull/14078)) - [paulgear](https://github.com/paulgear)
+* Add documentation for Chrony application monitoring ([#14066](https://github.com/librenms/librenms/pull/14066)) - [ottorei](https://github.com/ottorei)
+
+#### Translation
+* Few more updates to Ita lang ([#14091](https://github.com/librenms/librenms/pull/14091)) - [ppasserini](https://github.com/ppasserini)
+* Italian language update ([#14085](https://github.com/librenms/librenms/pull/14085)) - [ppasserini](https://github.com/ppasserini)
+* Adjustments to german translation ([#14083](https://github.com/librenms/librenms/pull/14083)) - [mwobst](https://github.com/mwobst)
+
+#### Tests
+* Test PHP 8.1 ([#14109](https://github.com/librenms/librenms/pull/14109)) - [murrant](https://github.com/murrant)
+
+#### Misc
+* Allow reapply yaml config via env ([#14100](https://github.com/librenms/librenms/pull/14100)) - [murrant](https://github.com/murrant)
+
+#### Mibs
+* More MIB fixing ([#14018](https://github.com/librenms/librenms/pull/14018)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Dependencies
+* Bump terser from 4.8.0 to 4.8.1 ([#14123](https://github.com/librenms/librenms/pull/14123)) - [dependabot](https://github.com/apps/dependabot)
+* Bump guzzlehttp/guzzle from 7.4.4 to 7.4.5 ([#14059](https://github.com/librenms/librenms/pull/14059)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 22.6.0
 *(2022-06-14)*
 

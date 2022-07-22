@@ -19,6 +19,6 @@ $colour_area_in = 'CDEB8B';
 $colour_area_out = 'C3D9FF';
 
 $hostname = (isset($_GET['hostname']) ? $_GET['hostname'] : 'unknown');
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'shoutcast', $app['app_id'], $hostname]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'shoutcast', $app->app_id, $hostname]);
 
 require 'includes/html/graphs/generic_data.inc.php';

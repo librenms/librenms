@@ -25,7 +25,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-proc4ops', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-proc4ops', $app->app_id]);
 
 $array = [
     // 'v4_op0-unused' => array('descr' => 'v4_op0-unused'),

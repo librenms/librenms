@@ -211,6 +211,15 @@ return [
             'description' => '系结使用者名称',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => '使用 STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => '停用',
+                'optional' => '选用',
+                'required' => '必要',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP 快取有效期',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',

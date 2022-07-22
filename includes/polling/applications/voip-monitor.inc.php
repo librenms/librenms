@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'voip-monitor';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -27,7 +26,7 @@ foreach ($lines as $line) {
 
 unset($lines);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu', 'GAUGE', 0, 100)

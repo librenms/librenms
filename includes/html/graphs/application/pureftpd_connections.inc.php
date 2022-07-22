@@ -15,7 +15,7 @@ $array = [
     'idle'     => 'Idle',
 ];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'pureftpd', $app['app_id'], 'connections']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'pureftpd', $app->app_id, 'connections']);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
