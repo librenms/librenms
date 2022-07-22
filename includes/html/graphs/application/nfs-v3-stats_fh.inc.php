@@ -11,7 +11,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfs-stats-' . $app['app_id'] . '.rrd';
+$rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfs-stats-' . $app->app_id . '.rrd';
 $array = [
     'fh_lookup' => ['descr' => 'lookup', 'colour' => '136421'],
     'fh_anon' => ['descr' => 'anon', 'colour' => 'B2C945'],

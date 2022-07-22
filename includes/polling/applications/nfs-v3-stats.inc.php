@@ -3,12 +3,11 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nfs-v3-stats';
-$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.110.102.115.115.116.97.116';
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
-$rrd_name = ['app', 'nfs-stats', $app_id];
+$rrd_name = ['app', 'nfs-stats', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('rc_hits', 'GAUGE', 0)
     ->addDataset('rc_misses', 'GAUGE', 0)

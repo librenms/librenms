@@ -29,19 +29,12 @@ use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
 {
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
-
-    /**
-     * The primary key column name.
-     *
-     * @var string
-     */
     protected $primaryKey = 'app_id';
+    protected $fillable = ['data'];
+    protected $casts = [
+        'data' => 'array',
+    ];
 
     // ---- Helper Functions ----
 
@@ -52,6 +45,6 @@ class Application extends DeviceRelatedModel
 
     public function getShowNameAttribute()
     {
-        return StringHelpers::niceCase($this->app_type);
+        return $this->displayName();
     }
 }
