@@ -104,7 +104,7 @@ $removed_databases = array_diff($old_databases, $databases);
 
 // if we have any database changes, save and log
 if (count($added_databases) > 0 || count($removed_databases) > 0) {
-    $app->data['databases'] = $databases;
+    $app->data = ['databases' => $databases];
     $log_message = 'Postgres Database Change:';
     if (count($added_databases)) {
         $log_message .= ' Added ' . implode(',', $added_databases);

@@ -178,7 +178,7 @@ $removed_instances = array_diff($old_instances, $instances);
 
 // if we have any source instances, save and log
 if (count($added_instances) > 0 || count($removed_instances) > 0) {
-    $app->data['instances'] = $instances;
+    $app->data = ['instances' => $instances];
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';

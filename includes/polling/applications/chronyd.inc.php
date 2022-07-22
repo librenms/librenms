@@ -101,7 +101,7 @@ $removed_sources = array_diff($old_sources, $sources);
 
 // if we have any source changes, save and log
 if (count($added_sources) > 0 || count($removed_sources) > 0) {
-    $app->data['sources'] = $sources; // save sources
+    $app->data = ['sources' => $sources]; // save sources
     $log_message = 'Chronyd Source Change:';
     $log_message .= count($added_sources) > 0 ? ' Added ' . implode(',', $added_sources) : '';
     $log_message .= count($removed_sources) > 0 ? ' Removed ' . implode(',', $added_sources) : '';

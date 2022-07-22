@@ -181,7 +181,7 @@ $removed_pools = array_diff($old_pools, $pools);
 
 // if we have any source pools, save and log
 if (count($added_pools) > 0 || count($removed_pools) > 0) {
-    $app->data['pools'] = $pools;
+    $app->data = ['pools' => $pools];
     $log_message = 'ZFS Pool Change:';
     $log_message .= count($added_pools) > 0 ? ' Added ' . implode(',', $added_pools) : '';
     $log_message .= count($removed_pools) > 0 ? ' Removed ' . implode(',', $added_pools) : '';

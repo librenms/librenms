@@ -67,7 +67,7 @@ $removed_jails = array_diff($old_jails, $jails);
 
 // if we have any jail changes, save and log
 if (count($added_jails) > 0 || count($removed_jails) > 0) {
-    $app->data['jails'] = $jails; // save jails list
+    $app->data = ['jails' => $jails]; // save jails list
     $log_message = 'Fail2ban Jail Change:';
     $log_message .= count($added_jails) > 0 ? ' Added ' . implode(',', $added_jails) : '';
     $log_message .= count($removed_jails) > 0 ? ' Removed ' . implode(',', $added_jails) : '';

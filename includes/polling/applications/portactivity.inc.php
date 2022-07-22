@@ -125,7 +125,7 @@ $removed_ports = array_diff($old_ports, $ports_keys);
 
 // if we have any source instances, save and log
 if (count($added_ports) > 0 || count($removed_ports) > 0) {
-    $app->data['ports'] = $ports_keys;
+    $app->data = ['ports' => $ports_keys];
     $log_message = 'Portactivity Port Change:';
     $log_message .= count($added_ports) > 0 ? ' Added ' . implode(',', $added_ports) : '';
     $log_message .= count($removed_ports) > 0 ? ' Removed ' . implode(',', $added_ports) : '';
