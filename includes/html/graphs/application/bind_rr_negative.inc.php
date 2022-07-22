@@ -9,7 +9,7 @@ $unit_text = 'RR sets';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'rrnegative']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'rrnegative']);
 $array = [
     'any',
     'a',

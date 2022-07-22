@@ -244,6 +244,7 @@ nav:
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
       - Creating Release: Developing/Creating-Release.md
+      - Applications: Developing/Application-Notes.md
 
   - Miscellaneous:
     - Security information: General/Security.md

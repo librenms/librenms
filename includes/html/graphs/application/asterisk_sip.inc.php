@@ -6,7 +6,7 @@ $scale_min = 0;
 $nototal = 1;
 $descr_len = 21;
 $unit_text = 'SIP Peers';
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'asterisk', 'stats', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'asterisk', 'stats', $app->app_id]);
 
 $astsip_access_array = [
     'sippeers'        => 'Total Peers',

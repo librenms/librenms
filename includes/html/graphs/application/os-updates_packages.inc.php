@@ -2,7 +2,6 @@
 
 require 'includes/html/graphs/common.inc.php';
 $name = 'os-updates';
-$app_id = $app['app_id'];
 $scale_min = 0;
 $colours = 'mixed';
 $unit_text = 'Available updates';
@@ -14,7 +13,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $array = [
     'packages' => ['descr' => 'packages', 'colour' => '2B9220'],

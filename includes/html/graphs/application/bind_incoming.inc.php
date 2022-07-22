@@ -33,7 +33,7 @@ $unit_text = 'query/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id]);
 $array = [
     'any',
     'a',
@@ -58,7 +58,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'incoming']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'incoming']);
 $array = [
     'afsdb',
     'apl',
