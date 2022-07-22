@@ -13,12 +13,12 @@ echo generate_link('Totals', $link_array);
 echo '| Instances:';
 $suricata_instances = $app->data['instances'] ?? [];
 sort($suricata_instances);
-foreach ($suricata_instances as $index => $instance) {
-    $label = $vars['instance'] == $instance
-        ? '<span class="pagemenu-selected">' . $instance . '</span>'
-        : $instance;
+foreach ($suricata_instances as $index => $sinstance) {
+    $label = $vars['sinstance'] == $sinstance
+        ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
+        : $sinstance;
 
-    echo generate_link($label, $link_array, ['instance' => $instance]);
+    echo generate_link($label, $link_array, ['sinstance' => $sinstance]);
 
     if ($index < (count($suricata_instances) - 1)) {
         echo ', ';
@@ -49,8 +49,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
-    if (isset($vars['instance'])) {
-        $graph_array['pool'] = $vars['instance'];  // FIXME pool/instance variable confusion?
+    if (isset($vars['sinstance'])) {
+        $graph_array['sinstance'] = $vars['sinstance'];
     }
 
     echo '<div class="panel panel-default">
