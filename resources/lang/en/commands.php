@@ -119,7 +119,10 @@ return [
         'errors' => [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+            'no_devices' => 'No devices found matching your given device specification.',
+            'none_polled' => 'No devices were polled.',
         ],
+        'polled' => 'Polled :count devices in :time',
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',

@@ -39,6 +39,7 @@ class DevicePoll extends LnmsCommand
         }
 
         try {
+            /** @var \LibreNMS\Poller $poller */
             $poller = app(Poller::class, ['device_spec' => $this->argument('device spec'), 'module_override' => explode(',', $this->option('modules'))]);
             $polled = $poller->poll();
 
@@ -46,13 +47,21 @@ class DevicePoll extends LnmsCommand
                 if (! $this->output->isQuiet()) {
                     if ($polled > 1) {
                         $this->output->newLine();
-                        $this->line(sprintf('Polled %d devices in %0.3fs', $polled, $measurements->getCategory('device')->getSummary('poll')->getDuration()));
+                        $time_spent = sprintf('%0.3fs', $measurements->getCategory('device')->getSummary('poll')->getDuration());
+                        $this->line(trans('commands.device:poll.polled', ['count' => $polled, 'time' => $time_spent]));
                     }
                     $this->output->newLine();
                     $measurements->printStats();
                 }
 
                 return 0;
+            }
+
+            // polled 0 devices, maybe there were none to poll
+            if ($poller->totalDevices() == 0) {
+                $this->error(trans('commands.device:poll.errors.no_devices'));
+
+                return 1;
             }
         } catch (QueryException $e) {
             if ($e->getCode() == 2002) {
@@ -71,6 +80,7 @@ class DevicePoll extends LnmsCommand
             return 1;
         }
 
+        $this->error(trans('commands.device:poll.errors.none_polled'));
         return 1; // failed to poll
     }
 }
