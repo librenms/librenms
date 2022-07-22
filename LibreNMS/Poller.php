@@ -154,6 +154,14 @@ class Poller
         return $polled;
     }
 
+    /**
+     * Get the total number of devices to poll.
+     */
+    public function totalDevices(): int
+    {
+        return $this->buildDeviceQuery()->count();
+    }
+
     private function pollModules(): void
     {
         $this->filterModules();
