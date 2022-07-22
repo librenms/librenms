@@ -1,7 +1,6 @@
 <?php
 
 $name = 'zfs';
-$app_id = $app['app_id'];
 $unit_text = '% of Misses';
 $colours = 'psychedelic';
 $dostack = 0;
@@ -9,7 +8,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {

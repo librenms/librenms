@@ -10,7 +10,7 @@ $bigdescrlen = 20;
 $smalldescrlen = 15;
 $colours = 'mixed';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app['app_id'], 'objects']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'objects']);
 
 $array = [
     'pending' => 'Pending',

@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'bind';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
@@ -24,7 +23,7 @@ if (! empty($agent_data['app'][$name])) {
     $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf] = explode(',', $incoming);
 
 $metrics = [];
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'DERIVE', 0)
     ->addDataset('a', 'DERIVE', 0)
@@ -51,10 +50,10 @@ $fields = [
 ];
 $metrics['queries'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'incoming', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-$rrd_name = ['app', $name, $app_id, 'incoming'];
+$rrd_name = ['app', $name, $app->app_id, 'incoming'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('afsdb', 'DERIVE', 0)
     ->addDataset('apl', 'DERIVE', 0)
@@ -125,7 +124,7 @@ $fields = [
 ];
 $metrics['incoming'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -135,7 +134,7 @@ data_update($device, 'app', $tags, $fields);
     $loc, $mx, $naptr, $ns, $nsec, $nsec3, $nsec3param, $ptr, $rrsig, $rp, $sig, $soa, $srv, $sshfp, $ta, $tkey, $tlsa,
     $tsig, $txt, $uri, $dname, $any, $axfr, $ixfr, $opt, $spf] = explode(',', $outgoing);
 
-$rrd_name = ['app', $name, $app_id, 'outgoing'];
+$rrd_name = ['app', $name, $app->app_id, 'outgoing'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('any', 'DERIVE', 0)
     ->addDataset('a', 'DERIVE', 0)
@@ -226,7 +225,7 @@ $fields = [
 ];
 $metrics['outgoing'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'outgoing', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'outgoing', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -235,7 +234,7 @@ data_update($device, 'app', $tags, $fields);
 [$i4rr, $i6rr, $rwer, $trr, $aqr, $rqr, $rs, $trs, $rwes, $qrisa, $qriaa, $qrinaa, $qrin, $qris, $qrind,
     $qcr, $dqr, $oqf, $uqr, $tqr, $oeor, $qd] = explode(',', $server);
 
-$rrd_name = ['app', $name, $app_id, 'server'];
+$rrd_name = ['app', $name, $app->app_id, 'server'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('i4rr', 'DERIVE', 0)
     ->addDataset('i6rr', 'DERIVE', 0)
@@ -286,7 +285,7 @@ $fields = [
 ];
 $metrics['server'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'server', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'server', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -296,7 +295,7 @@ data_update($device, 'app', $tags, $fields);
     $i4naff, $i6naff, $rttl10, $rtt10t100, $rtt100t500, $rtt500t800, $rtt800t1600, $rttg1600,
     $bs, $rr] = explode(',', $resolver);
 
-$rrd_name = ['app', $name, $app_id, 'resolver'];
+$rrd_name = ['app', $name, $app->app_id, 'resolver'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('i4qs', 'DERIVE', 0)
     ->addDataset('i6qs', 'DERIVE', 0)
@@ -351,7 +350,7 @@ $fields = [
 ];
 $metrics['resolver'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'resolver', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'resolver', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -360,7 +359,7 @@ data_update($device, 'app', $tags, $fields);
 [$ch, $cm, $chfq, $cmfq, $crddtme, $crddtte, $cdn, $cdhb, $ctmt, $ctmiu, $cthmiu,
     $chmt, $chmiu, $chhmiu] = explode(',', $cache);
 
-$rrd_name = ['app', $name, $app_id, 'cache'];
+$rrd_name = ['app', $name, $app->app_id, 'cache'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ch', 'DERIVE', 0)
     ->addDataset('cm', 'DERIVE', 0)
@@ -403,7 +402,7 @@ data_update($device, 'app', $tags, $fields);
 //
 [$ahts, $aiht, $nhts, $niht] = explode(',', $adb);
 
-$rrd_name = ['app', $name, $app_id, 'adb'];
+$rrd_name = ['app', $name, $app->app_id, 'adb'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ahts', 'GAUGE', 0)
     ->addDataset('aiht', 'GAUGE', 0)
@@ -418,7 +417,7 @@ $fields = [
 ];
 $metrics['adb'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'adb', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'adb', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -428,7 +427,7 @@ data_update($device, 'app', $tags, $fields);
     $ui4scf, $ti4scf, $ui6scf, $ti6scf, $ui4ce, $ti4ce, $ui6ce, $ti6ce, $ti4ca, $ti6ca, $ui4se, $ti4se, $ui6se,
     $ti6se, $ui4re, $ti4re, $ui6re, $ti6re, $ui4sa, $ui6sa, $ti4sa, $ti6sa, $rsa] = explode(',', $sockets);
 
-$rrd_name = ['app', $name, $app_id, 'sockets'];
+$rrd_name = ['app', $name, $app->app_id, 'sockets'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ui4so', 'DERIVE', 0)
     ->addDataset('ui6so', 'DERIVE', 0)
@@ -507,7 +506,7 @@ $fields = [
 ];
 $metrics['sockets'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'sockets', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'sockets', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -567,7 +566,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('opt', 'GAUGE', 0);
 
 //first handle the positive
-$rrd_name = ['app', $name, $app_id, 'rrpositive'];
+$rrd_name = ['app', $name, $app->app_id, 'rrpositive'];
 
 $fields = [
     'any'   => $any,
@@ -616,11 +615,11 @@ $fields = [
 ];
 $metrics['rrpositive'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'rrpositive', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrpositive', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // now handle the negative
-$rrd_name = ['app', $name, $app_id, 'rrnegative'];
+$rrd_name = ['app', $name, $app->app_id, 'rrnegative'];
 
 $fields = [
     'any'   => $notany,
@@ -669,6 +668,6 @@ $fields = [
 ];
 $metrics['rrnegative'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'rrnegative', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'type' => 'rrnegative', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $bind, $metrics);

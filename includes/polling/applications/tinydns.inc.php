@@ -27,11 +27,10 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'tinydns';
-$app_id = $app['app_id'];
 
-if (! empty($agent_data['app'][$name]) && $app_id > 0) {
+if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {
     echo ' tinydns';
-    $rrd_name = ['app', $name, $app_id];
+    $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('a', 'COUNTER', 0, 125000000000)
         ->addDataset('ns', 'COUNTER', 0, 125000000000)

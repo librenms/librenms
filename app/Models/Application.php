@@ -45,6 +45,6 @@ class Application extends DeviceRelatedModel
 
     public function getShowNameAttribute()
     {
-        return StringHelpers::niceCase($this->app_type);
+        return $this->displayName();
     }
 }

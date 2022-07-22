@@ -1,7 +1,6 @@
 <?php
 
 $name = 'certificate';
-$app_id = $app['app_id'];
 $colours = 'mega';
 $dostack = 0;
 $printtotal = 0;
@@ -12,14 +11,14 @@ $scale_min = 0;
 if (isset($vars['cert_name'])) {
     $cert_name_list = [$vars['cert_name']];
 } else {
-    $cert_name_list = Rrd::getRrdApplicationArrays($device, $app_id, $name);
+    $cert_name_list = Rrd::getRrdApplicationArrays($device, $app->app_id, $name);
 }
 
 $int = 0;
 $rrd_list = [];
 while (isset($cert_name_list[$int])) {
     $cert_name = $cert_name_list[$int];
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id, $cert_name]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $cert_name]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [

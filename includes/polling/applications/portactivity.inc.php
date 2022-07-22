@@ -4,11 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
-$app_id = $app['app_id'];
-
-if (! is_array($app_data['ports'])) {
-    $app_data['ports'] = [];
-}
 
 try {
     $returned = json_app_get($device, 'portactivity', 1);
@@ -72,7 +67,7 @@ $ports_rrd_def = RrdDefinition::make()
 $ports_keys = array_keys($ports);
 $ports_keys_int = 0;
 while (isset($ports[$ports_keys[$ports_keys_int]])) {
-    $rrd_name = ['app', $name, $app_id, $ports_keys[$ports_keys_int]];
+    $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
     $fields = [
         'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'],
         'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'],
@@ -117,27 +112,23 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
         'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'],
         'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
     ];
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $ports_keys_int++;
 }
-$old_ports = $app_data['ports'];
 
-// save thge found ports
-$app_data['ports'] = $ports_keys;
+// check for added or removed instances
+$old_ports = $app->data['ports'] ?? [];
+$added_ports = array_diff($ports_keys, $old_ports);
+$removed_ports = array_diff($old_ports, $ports_keys);
 
-//check for added ports
-$added_ports = array_values(array_diff($ports_keys, $old_ports));
-
-//check for removed ports
-$removed_ports = array_values(array_diff($old_ports, $ports_keys));
-
-// if we have any port changes, log it
-if (sizeof($added_ports) > 0 or sizeof($removed_ports) > 0) {
+// if we have any source instances, save and log
+if (count($added_ports) > 0 || count($removed_ports) > 0) {
+    $app->data['ports'] = $ports_keys;
     $log_message = 'Portactivity Port Change:';
-    $log_message .= count($added_ports) > 0 ? ' Added ' . json_encode($added_ports) : '';
-    $log_message .= count($removed_ports) > 0 ? ' Removed ' . json_encode($added_ports) : '';
+    $log_message .= count($added_ports) > 0 ? ' Added ' . implode(',', $added_ports) : '';
+    $log_message .= count($removed_ports) > 0 ? ' Removed ' . implode(',', $added_ports) : '';
     log_event($log_message, $device, 'application');
 }
 

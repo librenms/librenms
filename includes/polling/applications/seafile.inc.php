@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'seafile';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 try {
@@ -25,7 +24,7 @@ $client_platform = $seafile_data['devices']['platform'];
 $group_data = $seafile_data['groups'];
 $sysinfo_data = $seafile_data['sysinfo'];
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('enabled', 'GAUGE', 0)
     ->addDataset('libraries', 'GAUGE', 0)
@@ -42,7 +41,7 @@ foreach ($account_data as $data) {
     $trashed_libraries = $data['trash_repos'];
     $size_consumption = $data['usage'];
 
-    $rrd_name = ['app', $name, $app_id, $category, $owner_name];
+    $rrd_name = ['app', $name, $app->app_id, $category, $owner_name];
 
     $fields = [
         'enabled'           => $enabled,
@@ -52,7 +51,7 @@ foreach ($account_data as $data) {
     ];
 
     $metrics[$owner_name . '_' . $category] = $fields;
-    $tags = ['name' => $owner_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $owner_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
@@ -64,14 +63,14 @@ $category = 'grp';
 $group_name = 'groups';
 $group_count = $group_data['count'];
 
-$rrd_name = ['app', $name, $app_id, $category, $group_name];
+$rrd_name = ['app', $name, $app->app_id, $category, $group_name];
 
 $fields = [
     'count' => $group_count,
 ];
 
 $metrics[$group_name . '_' . $category] = $fields;
-$tags = ['name' => $group_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $group_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // handling client version
@@ -83,14 +82,14 @@ foreach ($client_version as $data) {
     $version_name = $data['client_version'];
     $version_count = $data['clients'];
 
-    $rrd_name = ['app', $name, $app_id, $category, $version_name];
+    $rrd_name = ['app', $name, $app->app_id, $category, $version_name];
 
     $fields = [
         'version' => $version_count,
     ];
 
     $metrics[$version_name . '_' . $category] = $fields;
-    $tags = ['name' => $version_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $version_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
@@ -103,14 +102,14 @@ foreach ($client_platform as $data) {
     $os_name = $data['os_name'];
     $os_count = $data['clients'];
 
-    $rrd_name = ['app', $name, $app_id, $category, $os_name];
+    $rrd_name = ['app', $name, $app->app_id, $category, $os_name];
 
     $fields = [
         'platform' => $os_count,
     ];
 
     $metrics[$os_name . '_' . $category] = $fields;
-    $tags = ['name' => $os_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $os_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
@@ -122,14 +121,14 @@ $category = 'sysinfo';
 $sysinfo_name = 'devices';
 $sysinfo_connected_devices = $sysinfo_data['current_connected_devices_count'];
 
-$rrd_name = ['app', $name, $app_id, $category, $sysinfo_name];
+$rrd_name = ['app', $name, $app->app_id, $category, $sysinfo_name];
 
 $fields = [
     'connected' => $sysinfo_connected_devices,
 ];
 
 $metrics[$sysinfo_name . '_' . $category] = $fields;
-$tags = ['name' => $sysinfo_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $sysinfo_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

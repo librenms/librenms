@@ -24,7 +24,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app->app_id]);
 
 $array = [
     'rc_hits' => ['descr' => 'hits', 'colour' => 'B0262D'], // this is bad : retransmitting (red)

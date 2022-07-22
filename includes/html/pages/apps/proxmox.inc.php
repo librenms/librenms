@@ -22,7 +22,7 @@ foreach ($pmxcl as $pmxc) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link(\LibreNMS\Util\StringHelpers::niceCase($pmxc['app_instance']), ['page' => 'apps', 'app' => 'proxmox', 'instance' => $pmxc['app_instance']]);
+    echo generate_link(\LibreNMS\Util\StringHelpers::niceCase($pmxc->app_instance), ['page' => 'apps', 'app' => 'proxmox', 'instance' => $pmxc['app_instance']]);
 
     if (var_eq('instance', $pmxc['app_instance'])) {
         echo '</span>';

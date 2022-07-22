@@ -22,7 +22,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'powerdns-dnsdist';
-$app_id = $app['app_id'];
 $options = '-Oqv';
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."powerdns-dnsdist"
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.16.112.111.119.101.114.100.110.115.45.100.110.115.100.105.115.116';
@@ -32,7 +31,7 @@ $powerdns_dnsdist = snmp_walk($device, $oid, $options);
 if (is_string($powerdns_dnsdist)) {
     [$cache_hits, $cache_miss, $downstream_err, $downstream_timeout, $dynamic_block_size, $dynamic_blocked, $queries_count, $queries_recursive, $queries_empty, $queries_drop_no_policy, $queries_drop_nc, $queries_drop_nc_answer, $queries_self_answer, $queries_serv_fail, $queries_failure, $queries_acl_drop, $rule_drop, $rule_nxdomain, $rule_refused, $latency_100, $latency_1000, $latency_10000, $latency_1000000, $latency_slow, $latency_0_1, $latency_1_10, $latency_10_50, $latency_50_100, $latency_100_1000] = explode("\n", $powerdns_dnsdist);
 
-    $rrd_name = ['app', $name, $app_id];
+    $rrd_name = ['app', $name, $app->app_id];
 
     $rrd_def = RrdDefinition::make()
         ->addDataset('cache_hits', 'COUNTER', 0)
@@ -97,7 +96,7 @@ if (is_string($powerdns_dnsdist)) {
         'latency_100_1000' => $latency_100_1000,
     ];
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
     update_application($app, $powerdns_dnsdist, $fields);
 }

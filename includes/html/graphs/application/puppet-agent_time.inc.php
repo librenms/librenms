@@ -9,7 +9,7 @@ $unit_text = 'Runtime/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'time']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app->app_id, 'time']);
 $array = [
     'catalog_application',
     'config_retrieval',

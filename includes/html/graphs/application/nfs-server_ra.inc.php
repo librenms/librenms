@@ -25,7 +25,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app->app_id]);
 
 $array = [
     'ra_range01' => ['descr' => '0%-10%'],

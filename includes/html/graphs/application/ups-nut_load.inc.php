@@ -28,7 +28,7 @@ $colour_line = 'FF3300';
 $colour_area_max = 'FFEE99';
 $graph_max = 0;
 $unit_text = 'Percent';
-$ups_nut = Rrd::name($device['hostname'], ['app', 'ups-nut', $app['app_id']]);
+$ups_nut = Rrd::name($device['hostname'], ['app', 'ups-nut', $app->app_id]);
 if (Rrd::checkRrdExists($ups_nut)) {
     $rrd_filename = $ups_nut;
 } else {

@@ -32,7 +32,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id]);
 
 $array = [
     'query_a' => ['descr' => 'A Type', 'colour' => '000000'],

@@ -57,9 +57,8 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'gpsd';
-$app_id = $app['app_id'];
 
-if ($app_id > 0) {
+if ($app->app_id > 0) {
     if (! empty($agent_data['app'][$name])) {
         $gpsd = $agent_data['app'][$name];
 
@@ -122,7 +121,7 @@ if ($app_id > 0) {
 
     // Generate RRD Def
 
-    $rrd_name = ['app', $name, $app_id];
+    $rrd_name = ['app', $name, $app->app_id];
     $rrd_def = RrdDefinition::make()
         ->addDataset('mode', 'GAUGE', 0, 4)
         ->addDataset('hdop', 'GAUGE', 0, 100)

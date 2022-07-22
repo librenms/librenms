@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'freeradius';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $rawdata = $agent_data['app'][$name];
@@ -23,7 +22,7 @@ foreach ($lines as $line) {
 }
 
 //FreeRADIUS-Total-Access
-$rrd_name = ['app', $name, 'access', $app_id];
+$rrd_name = ['app', $name, 'access', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -40,7 +39,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Auth
-$rrd_name = ['app', $name, 'auth', $app_id];
+$rrd_name = ['app', $name, 'auth', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -61,7 +60,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Acct
-$rrd_name = ['app', $name, 'acct', $app_id];
+$rrd_name = ['app', $name, 'acct', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -84,7 +83,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Access
-$rrd_name = ['app', $name, 'proxy_access', $app_id];
+$rrd_name = ['app', $name, 'proxy_access', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -101,7 +100,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Auth
-$rrd_name = ['app', $name, 'proxy_auth', $app_id];
+$rrd_name = ['app', $name, 'proxy_auth', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -122,7 +121,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Total-Proxy-Acct
-$rrd_name = ['app', $name, 'proxy_acct', $app_id];
+$rrd_name = ['app', $name, 'proxy_acct', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -145,7 +144,7 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 //FreeRADIUS-Queue
-$rrd_name = ['app', $name, 'queue', $app_id];
+$rrd_name = ['app', $name, 'queue', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('len_internal', 'DERIVE', 0, 125000000000)
     ->addDataset('len_proxy', 'DERIVE', 0, 125000000000)

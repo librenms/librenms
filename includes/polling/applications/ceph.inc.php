@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ceph';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $ceph_data = $agent_data['app'][$name];
@@ -26,7 +25,7 @@ if (! empty($agent_data['app'][$name])) {
                     continue;
                 }
                 [$pool,$ops,$wrbytes,$rbytes] = explode(':', $line);
-                $rrd_name = ['app', $name, $app_id, 'pool', $pool];
+                $rrd_name = ['app', $name, $app->app_id, 'pool', $pool];
 
                 echo "Ceph Pool: $pool, IOPS: $ops, Wr bytes: $wrbytes, R bytes: $rbytes\n";
                 $fields = [
@@ -48,7 +47,7 @@ if (! empty($agent_data['app'][$name])) {
                     continue;
                 }
                 [$osd,$apply,$commit] = explode(':', $line);
-                $rrd_name = ['app', $name, $app_id, 'osd', $osd];
+                $rrd_name = ['app', $name, $app->app_id, 'osd', $osd];
 
                 echo "Ceph OSD: $osd, Apply: $apply, Commit: $commit\n";
                 $fields = [
@@ -70,7 +69,7 @@ if (! empty($agent_data['app'][$name])) {
                     continue;
                 }
                 [$df,$avail,$used,$objects] = explode(':', $line);
-                $rrd_name = ['app', $name, $app_id, 'df', $df];
+                $rrd_name = ['app', $name, $app->app_id, 'df', $df];
 
                 echo "Ceph Pool DF: $df, Avail: $avail, Used: $used, Objects: $objects\n";
                 $fields = [

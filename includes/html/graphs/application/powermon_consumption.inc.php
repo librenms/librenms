@@ -31,9 +31,7 @@ below under LOCAL OPTIONS
 */
 
 $name = 'powermon';
-$app_id = $app['app_id'];
-
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $ds_list[0]['vname'] = 'watts';
 $ds_list[0]['ds'] = 'watts-gauge';

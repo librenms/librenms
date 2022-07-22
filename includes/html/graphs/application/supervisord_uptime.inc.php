@@ -2,7 +2,6 @@
 
 require 'includes/html/graphs/common.inc.php';
 $name = 'supervisord';
-$app_id = $app['app_id'];
 $scale_min = 0;
 $unit_text = 'Process';
 
@@ -18,12 +17,12 @@ $unitlen = 20;
 $bigdescrlen = 25;
 $smalldescrlen = 25;
 
-$processes = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'supervisord');
+$processes = Rrd::getRrdApplicationArrays($device, $app->app_id, 'supervisord');
 
 $int = 0;
 while (isset($processes[$int])) {
     $process_name = $processes[$int];
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id, $process_name]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $process_name]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_list[] = [

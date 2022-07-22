@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'certificate';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 try {
@@ -19,7 +18,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('age', 'GAUGE', 0)
     ->addDataset('remaining_days', 'GAUGE', 0);
@@ -30,7 +29,7 @@ foreach ($certificate_data as $data) {
     $age = $data['age'];
     $remaining_days = $data['remaining_days'];
 
-    $rrd_name = ['app', $name, $app_id, $cert_name];
+    $rrd_name = ['app', $name, $app->app_id, $cert_name];
 
     $fields = [
         'age'            => $age,
@@ -38,7 +37,7 @@ foreach ($certificate_data as $data) {
     ];
 
     $metrics[$cert_name] = $fields;
-    $tags = ['name' => $cert_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $cert_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 

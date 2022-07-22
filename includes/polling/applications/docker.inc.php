@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'docker';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 function convertToBytes(string $from): ?int
@@ -38,7 +37,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('cpu_usage', 'GAUGE', 0, 100)
     ->addDataset('pids', 'GAUGE', 0)
@@ -50,7 +49,7 @@ $metrics = [];
 foreach ($docker_data as $data) {
     $container = $data['container'];
 
-    $rrd_name = ['app', $name, $app_id, $container];
+    $rrd_name = ['app', $name, $app->app_id, $container];
 
     $fields = [
         'cpu_usage' => (float) $data['cpu'],
@@ -61,7 +60,7 @@ foreach ($docker_data as $data) {
     ];
 
     $metrics[$container] = $fields;
-    $tags = ['name' => $container, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $container, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 

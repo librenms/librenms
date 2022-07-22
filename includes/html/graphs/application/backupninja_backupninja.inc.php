@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'backupninja', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'backupninja', $app->app_id]);
 
 $array = [
     'last_actions' => [

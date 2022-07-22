@@ -9,7 +9,7 @@ $unit_text = 'query/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'outgoing']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'outgoing']);
 $array = [
     'any',
     'a',

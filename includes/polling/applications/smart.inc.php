@@ -3,15 +3,13 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'smart';
-$app_id = $app['app_id'];
-
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';
 $output = snmp_walk($device, $oid, $options);
 
 $lines = explode("\n", $output);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id5', 'GAUGE', 0)
     ->addDataset('id10', 'GAUGE', 0)
@@ -45,7 +43,7 @@ while (isset($lines[$int])) {
         $id196, $id197, $id198, $id199, $id231, $id233, $completed, $interrupted, $read_failure,
         $unknown_failure, $extended, $short, $conveyance, $selective] = explode(',', $lines[$int]);
 
-    $rrd_name = ['app', $name, $app_id, $disk];
+    $rrd_name = ['app', $name, $app->app_id, $disk];
 
     $fields = [
         'id5' => is_numeric($id5) ? $id5 : null,
@@ -75,14 +73,14 @@ while (isset($lines[$int])) {
     ];
 
     $metrics[$disk] = $fields;
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $int++;
 }
 
 // smart enhancement id9
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('id9', 'GAUGE', 0);
 
@@ -90,12 +88,12 @@ $int = 0;
 while (isset($lines[$int])) {
     [$disk, , , , , , , , , , , , , , , , , , , , , , , , , $id9] = explode(',', $lines[$int]);
 
-    $rrd_name = ['app', $name . '_id9', $app_id, $disk];
+    $rrd_name = ['app', $name . '_id9', $app->app_id, $disk];
 
     $fields = ['id9' => $id9];
     $metrics[$disk]['id9'] = $id9;
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $int++;

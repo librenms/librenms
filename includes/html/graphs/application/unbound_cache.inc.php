@@ -6,7 +6,7 @@ $i = 0;
 $scale_min = 0;
 $nototal = 1;
 $unit_text = 'Query/s';
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'unbound-cache', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'unbound-cache', $app->app_id]);
 $array = [
     'queries',
     'hits',

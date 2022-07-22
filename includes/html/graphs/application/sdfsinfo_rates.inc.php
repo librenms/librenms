@@ -31,7 +31,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id]);
 $array = [
     'dedup_rate' => ['descr' => 'Dedup rate (%)', 'colour' => '000000'],
     'actual_savings' => ['descr' => 'Savings (%)', 'colour' => '2A7A12'],

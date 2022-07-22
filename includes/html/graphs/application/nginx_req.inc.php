@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app->app_id]);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= ' -b 1000 ';

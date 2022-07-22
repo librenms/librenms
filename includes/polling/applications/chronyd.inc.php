@@ -4,12 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'chronyd';
-$app_id = $app['app_id'];
-
-if (! is_array($app_data['sources'])) {
-    $app_data['sources'] = [];
-}
-
 try {
     $chronyd = json_app_get($device, $name, 1)['data'];
 } catch (JsonAppException $e) {
@@ -19,7 +13,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('stratum', 'GAUGE', 0, 15)
     ->addDataset('reference_time', 'DCOUNTER', 0.0, 10000000000) // good until year 2286
@@ -48,7 +42,7 @@ $fields = [
 ];
 
 // $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // process sources data
@@ -74,7 +68,7 @@ unset($metrics['sources']);
 
 foreach ($chronyd['sources'] as $source) {
     $sources[] = $source['source_name'];
-    $rrd_name = ['app', $name, $app_id, $source['source_name']];
+    $rrd_name = ['app', $name, $app->app_id, $source['source_name']];
     $fields = [
         'stratum'               => $source['stratum'],
         'polling_rate'          => $source['polling_rate'],
@@ -91,7 +85,7 @@ foreach ($chronyd['sources'] as $source) {
         'stddev'                => $source['stddev'],
     ];
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     // insert flattened source metrics into the metrics array
@@ -99,22 +93,18 @@ foreach ($chronyd['sources'] as $source) {
         $metrics['source_' . $source['source_name'] . '_' . $field] = $value;
     }
 }
-$old_sources = $app_data['sources'];
 
-// save thge found sources
-$app_data['sources'] = $sources;
+// check for added or removed sources
+$old_sources = $app->data['sources'] ?? [];
+$added_sources = array_diff($sources, $old_sources);
+$removed_sources = array_diff($old_sources, $sources);
 
-//check for added sources
-$added_sources = array_values(array_diff($sources, $old_sources));
-
-//check for removed sources
-$removed_sources = array_values(array_diff($old_sources, $sources));
-
-// if we have any source changes, log it
-if (sizeof($added_sources) > 0 or sizeof($removed_sources) > 0) {
+// if we have any source changes, save and log
+if (count($added_sources) > 0 || count($removed_sources) > 0) {
+    $app->data['sources'] = $sources; // save sources
     $log_message = 'Chronyd Source Change:';
-    $log_message .= count($added_sources) > 0 ? ' Added ' . json_encode($added_sources) : '';
-    $log_message .= count($removed_sources) > 0 ? ' Removed ' . json_encode($added_sources) : '';
+    $log_message .= count($added_sources) > 0 ? ' Added ' . implode(',', $added_sources) : '';
+    $log_message .= count($removed_sources) > 0 ? ' Removed ' . implode(',', $added_sources) : '';
     log_event($log_message, $device, 'application');
 }
 

@@ -1,9 +1,5 @@
 <?php
 
-$pools = json_decode($app['data'], true)['pools'];
-
-sort($pools);
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -15,23 +11,19 @@ print_optionbar_start();
 
 echo generate_link('ARC', $link_array);
 echo '| Pools:';
-$pool_int = 0;
-while (isset($pools[$pool_int])) {
-    $pool = $pools[$pool_int];
-    $label = $pool;
 
-    if ($vars['pool'] == $pool) {
-        $label = '<span class="pagemenu-selected">' . $pool . '</span>';
+$pools = $app->data['pools'] ?? [];
+sort($pools);
+foreach ($pools as $index => $pool) {
+    $label = $vars['pool'] == $pool
+        ? '<span class="pagemenu-selected">' . $pool . '</span>'
+        : $pool;
+
+    echo generate_link($label, $link_array, ['pool' => $pool]);
+
+    if ($index < (count($pools) - 1)) {
+        echo ', ';
     }
-
-    $pool_int++;
-
-    $append = '';
-    if (isset($pools[$pool_int])) {
-        $append = ', ';
-    }
-
-    echo generate_link($label, $link_array, ['pool'=>$pool]) . $append;
 }
 
 print_optionbar_end();

@@ -31,7 +31,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'ups-nut', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ups-nut', $app->app_id]);
 $array = [
     'input_voltage' => ['descr' => 'Input', 'colour' => '630606'],
     'line_nominal' => ['descr' => 'Nominal', 'colour' => '50C150'],

@@ -133,19 +133,6 @@ function port_permitted($port_id, $device_id = null)
     return \Permissions::canAccessPort($port_id, Auth::id());
 }
 
-function application_permitted($app_id, $device_id = null)
-{
-    if (! is_numeric($app_id)) {
-        return false;
-    }
-
-    if (! $device_id) {
-        $device_id = get_device_id_by_app_id($app_id);
-    }
-
-    return device_permitted($device_id);
-}
-
 function device_permitted($device_id)
 {
     if (Auth::user() && Auth::user()->hasGlobalRead()) {

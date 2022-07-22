@@ -7,7 +7,7 @@ $out_text = 'Write';
 
 $format = 'bytes';
 
-$ceph_pool_rrd = ceph_rrd('pool');
+$ceph_pool_rrd = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'pool', $vars['pool']]);
 
 if (Rrd::checkRrdExists($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;

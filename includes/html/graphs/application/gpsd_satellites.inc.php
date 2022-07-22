@@ -27,7 +27,7 @@ $colours = 'mixed';
 $unit_text = 'Satellites';
 $nototal = 1;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'gpsd', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'gpsd', $app->app_id]);
 $array = [
     'satellites' => ['descr' => 'Visible', 'area' => true],
     'satellites_used' => ['descr' => 'Used', 'area' => true],

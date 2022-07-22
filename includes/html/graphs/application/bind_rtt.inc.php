@@ -1,7 +1,6 @@
 <?php
 
 $name = 'bind';
-$app_id = $app['app_id'];
 $unit_text = 'RTT in ms/sec';
 $colours = 'psychedelic';
 $dostack = 0;
@@ -9,7 +8,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'resolver']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app->app_id, 'resolver']);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {

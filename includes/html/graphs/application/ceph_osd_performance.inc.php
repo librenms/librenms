@@ -6,7 +6,7 @@ $ds_out = 'commit_ms';
 $in_text = 'Apply';
 $out_text = 'Commit';
 
-$ceph_osd_rrd = ceph_rrd('osd');
+$ceph_osd_rrd = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'osd', $vars['osd']]);
 
 if (Rrd::checkRrdExists($ceph_osd_rrd)) {
     $rrd_filename = $ceph_osd_rrd;

@@ -4,12 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'suricata';
-$app_id = $app['app_id'];
-
-if (! is_array($app_data['instances'])) {
-    $app_data['instances'] = [];
-}
-
 try {
     $suricata = json_app_get($device, 'suricata-stats');
 } catch (JsonAppException $e) {
@@ -158,9 +152,9 @@ $field_keys = [
 $instances = [];
 foreach ($suricata['data'] as $instance => $stats) {
     if ($instance == '.total') {
-        $rrd_name = ['app', $name, $app_id];
+        $rrd_name = ['app', $name, $app->app_id];
     } else {
-        $rrd_name = ['app', $name, $app_id, $instance];
+        $rrd_name = ['app', $name, $app->app_id, $instance];
         $instances[] = $instance;
     }
 
@@ -173,25 +167,21 @@ foreach ($suricata['data'] as $instance => $stats) {
         $fields[$field_key] = $stats[$field_key];
     }
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
-$old_instances = $app_data['instances'];
 
-// save thge found instances
-$app_data['instances'] = $instances;
+// check for added or removed instances
+$old_instances = $app->data['instances'] ?? [];
+$added_instances = array_diff($instances, $old_instances);
+$removed_instances = array_diff($old_instances, $instances);
 
-//check for added instances
-$added_instances = array_values(array_diff($instances, $old_instances));
-
-//check for removed instances
-$removed_instances = array_values(array_diff($old_instances, $instances));
-
-// if we have any instance changes, log it
-if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
+// if we have any source instances, save and log
+if (count($added_instances) > 0 || count($removed_instances) > 0) {
+    $app->data['instances'] = $instances;
     $log_message = 'Suricata Instance Change:';
-    $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
-    $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
+    $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
+    $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
     log_event($log_message, $device, 'application');
 }
 

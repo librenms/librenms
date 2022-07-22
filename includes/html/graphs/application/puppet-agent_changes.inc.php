@@ -9,7 +9,7 @@ $unit_text = 'Changes';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'changes']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app->app_id, 'changes']);
 $array = [
     'total',
 ];

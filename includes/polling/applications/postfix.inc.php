@@ -3,8 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postfix';
-$app_id = $app['app_id'];
-
 $options = '-Oqv';
 $queueOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';
 $detailOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.15.112.111.115.116.102.105.120.100.101.116.97.105.108.101.100';
@@ -17,7 +15,7 @@ $detail = snmp_walk($device, $detailOID, $options);
      $bytesd, $senders, $sendinghd, $recipients, $recipienthd, $deferralcr, $deferralhid, $chr, $hcrnfqh, $sardnf,
      $sarnobu, $bu, $raruu, $hcrin, $sarnfqa, $rardnf, $rarnfqa, $iuscp, $sce, $scp, $urr] = explode("\n", $detail);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('incomingq', 'GAUGE', 0)
     ->addDataset('activeq', 'GAUGE', 0)
@@ -93,6 +91,6 @@ $fields = [
     'urr' => $urr,
 ];
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $mailq, $fields);

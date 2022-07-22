@@ -2,7 +2,6 @@
 
 require 'includes/html/graphs/common.inc.php';
 $name = 'dhcp-stats';
-$app_id = $app['app_id'];
 $scale_min = 0;
 $colours = 'mixed';
 $unit_text = 'Leases';
@@ -14,7 +13,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $array = [
     'dhcp_total' => ['descr' => 'Total', 'colour' => '582A72'],

@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nginx';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $nginx = $agent_data['app'][$name];
@@ -16,7 +15,7 @@ $nginx = trim($nginx, '"');
 [$active, $reading, $writing, $waiting, $req] = array_map('rtrim', explode("\n", $nginx));
 d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req\n");
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('Requests', 'DERIVE', 0, 125000000000)
     ->addDataset('Active', 'GAUGE', 0, 125000000000)

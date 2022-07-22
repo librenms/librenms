@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mdadm';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 try {
@@ -19,7 +18,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('level', 'GAUGE', 0)
     ->addDataset('size', 'GAUGE', 0)
@@ -42,7 +41,7 @@ foreach ($mdadm_data as $data) {
     $sync_speed = $data['sync_speed'];
     $sync_completed = $data['sync_completed'];
 
-    $rrd_name = ['app', $name, $app_id, $array_name];
+    $rrd_name = ['app', $name, $app->app_id, $array_name];
 
     $array_level = str_replace('raid', '', $level);
 
@@ -57,7 +56,7 @@ foreach ($mdadm_data as $data) {
     ];
 
     $metrics[$array_name] = $fields;
-    $tags = ['name' => $array_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $array_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 update_application($app, $output, $metrics);

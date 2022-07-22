@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'memcached';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app']['memcached'])) {
     $data = $agent_data['app']['memcached'][$app['app_instance']];
@@ -17,7 +16,7 @@ if (! empty($agent_data['app']['memcached'])) {
 
 echo ' memcached(' . $app['app_instance'] . ')';
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('uptime', 'GAUGE', 0, 125000000000)
     ->addDataset('threads', 'GAUGE', 0, 125000000000)

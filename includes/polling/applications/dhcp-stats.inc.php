@@ -6,7 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $snmp_extend_name = 'dhcpstats';
 $name = 'dhcp-stats';
-$app_id = $app['app_id'];
 $options = '-Oqv';
 $mib = 'NET-SNMP-EXTEND-MIB';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.100.104.99.112.115.116.97.116.115';
@@ -53,7 +52,7 @@ if (intval($version) == 1) {
     $dhcp_free = $lease_data['free'];
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('dhcp_total', 'GAUGE', 0)
     ->addDataset('dhcp_active', 'GAUGE', 0)
@@ -78,7 +77,7 @@ $fields = [
 ];
 $metrics[$name . '_' . $category] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 if ($version == 2) {
@@ -96,7 +95,7 @@ if ($version == 2) {
         $dhcp_max = $data['max'];
         $dhcp_percent = $data['percent'];
 
-        $rrd_name = ['app', $name, $app_id, $category, $dhcp_pool_name];
+        $rrd_name = ['app', $name, $app->app_id, $category, $dhcp_pool_name];
 
         $fields = [
             'current' => $dhcp_current,
@@ -105,7 +104,7 @@ if ($version == 2) {
         ];
 
         $metrics[$dhcp_pool_name . '_' . $category] = $fields;
-        $tags = ['name' => $dhcp_pool_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+        $tags = ['name' => $dhcp_pool_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
     }
 
@@ -123,7 +122,7 @@ if ($version == 2) {
         $dhcp_max = $data['max'];
         $dhcp_percent = $data['percent'] == 'nan' ? '0' : $data['percent'];
 
-        $rrd_name = ['app', $name, $app_id, $category, $dhcp_network_name];
+        $rrd_name = ['app', $name, $app->app_id, $category, $dhcp_network_name];
 
         $fields = [
             'current' => $dhcp_current,
@@ -132,7 +131,7 @@ if ($version == 2) {
         ];
 
         $metrics[$dhcp_network_name . '_' . $category] = $fields;
-        $tags = ['name' => $dhcp_network_name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+        $tags = ['name' => $dhcp_network_name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $fields);
     }
 }

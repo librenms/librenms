@@ -7,7 +7,6 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'powerdns';
-$app_id = $app['app_id'];
 $powerdns = [];
 
 // unused metrics:
@@ -86,7 +85,7 @@ if (isset($legacy)) {
 
 d_echo($powerdns);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make();
 $fields = [];
 foreach ($powerdns_metrics as $ds => $metric) {

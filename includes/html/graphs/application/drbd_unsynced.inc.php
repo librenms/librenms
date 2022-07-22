@@ -4,7 +4,7 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$drbd_rrd = Rrd::name($device['hostname'], ['app', 'drbd', $app['app_instance']]);
+$drbd_rrd = Rrd::name($device['hostname'], ['app', 'drbd', $app->app_instance]);
 
 if (Rrd::checkRrdExists($drbd_rrd)) {
     $rrd_filename = $drbd_rrd;

@@ -4,7 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'supervisord';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 try {
@@ -16,7 +15,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 
 $metrics = [];
 $rrd_def = RrdDefinition::make();
@@ -27,7 +26,7 @@ foreach ($supervisord_data['total'] as $status => $value) {
 $fields = $supervisord_data['total'];
 
 $metrics['total'] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $rrd_def = RrdDefinition::make()
@@ -37,7 +36,7 @@ $rrd_def = RrdDefinition::make()
 foreach ($supervisord_data['processes'] as $data) {
     $process = $data['name'];
 
-    $rrd_name = ['app', $name, $app_id, $process];
+    $rrd_name = ['app', $name, $app->app_id, $process];
 
     $fields = [
         'state' => $data['state'],
@@ -45,7 +44,7 @@ foreach ($supervisord_data['processes'] as $data) {
     ];
 
     $metrics['process_' . $process] = $fields;
-    $tags = ['name' => $process, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $process, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 

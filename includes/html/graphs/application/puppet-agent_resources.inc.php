@@ -9,7 +9,7 @@ $unit_text = 'Resources';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'resources']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app->app_id, 'resources']);
 $array = [
     'changed',
     'corrective_change',

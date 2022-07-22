@@ -12,7 +12,7 @@ It takes three parameters, in order in the list below.
 - Integer :: Device ID to fetch it for.
 - String :: The extend name. For example, if 'zfs' is passed it will
   be converted to 'nsExtendOutputFull.3.122.102.115'.
-- Integer :: Minium expected version of the JSON return.
+- Integer :: Minimum expected version of the JSON return.
 
 The required keys for the returned JSON are as below.
 
@@ -58,15 +58,14 @@ try {
 
 ## Application Data Storage
 
-The variable `data` can be used to store arrays via the Application
-model.
+The `$app` model is supplied for each application poller and graph.
+You may access and update the `$app->data` field to store arrays of data
+the Application model.
+
+When you call update_application() the `$app` model will be saved along with
+any changes to the data field.
 
 ```
-use App\Models\Application;
-
-// find the app in question via it's ID integer
-$app = Application::find($app_id);
-
 // set the varaible data to $foo
 $app->data = [
     'item_A' => 123,
@@ -76,14 +75,8 @@ $app->data = [
 ];
 
 // save the change
-$app->save()
+$app->save();
 
 // var_dump the contents of the variable
 var_dump($app->data);
 ```
-
-When writing app pollers, the Application model for the app in
-question is made available as `$app_model` with the app data made
-available as `$app_data`, which is always be a array, initializing it
-as a array if needed. Any changes to `$app_data` will be saved
-automatically after the poller has returned.
