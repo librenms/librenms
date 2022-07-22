@@ -20,7 +20,7 @@ foreach ($sources as $index => $source) {
 
     echo generate_link($label, $link_array, ['source' => $source]);
 
-    if ($index < (count($source) - 1)) {
+    if ($index < (count($sources) - 1)) {
         echo ', ';
     }
 }

@@ -19,7 +19,7 @@ foreach ($ports as $index => $port) {
 
     echo generate_link($label, $link_array, ['port' => $port]);
 
-    if ($index < (count($port) - 1)) {
+    if ($index < (count($ports) - 1)) {
         echo ', ';
     }
 }
