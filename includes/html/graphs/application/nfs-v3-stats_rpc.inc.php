@@ -11,7 +11,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfs-stats-' . $app['app_id'] . '.rrd';
+$rrd_filename = Rrd::dirFromHost($device['hostname']) . '/app-nfs-stats-' . $app->app_id . '.rrd';
 $array = [
     'rpc_calls' => ['descr' => 'calls', 'colour' => '000000'],
     'rpc_badcalls' => ['descr' => 'bad calls', 'colour' => '600604'],

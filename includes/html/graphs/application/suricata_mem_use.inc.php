@@ -1,7 +1,6 @@
 <?php
 
 $name = 'suricata';
-$app_id = $app['app_id'];
 $unit_text = 'bytes';
 $colours = 'psychedelic';
 $dostack = 0;
@@ -9,10 +8,10 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['pool'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['pool']]);
+if (isset($vars['sinstance'])) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $vars['sinstance']]);
 } else {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
 $rrd_list = [];

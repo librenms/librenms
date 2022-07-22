@@ -20,7 +20,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'powermon';
-$app_id = $app['app_id'];
 
 try {
     $result = json_app_get($device, $name);
@@ -35,7 +34,7 @@ try {
 // should be doing something with error codes/messages returned in the snmp
 // result or will they be caught above?
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('watts-gauge', 'GAUGE', 0)
     ->addDataset('watts-abs', 'ABSOLUTE', 0)

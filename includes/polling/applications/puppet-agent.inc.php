@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'puppet-agent';
-$app_id = $app['app_id'];
 $output = 'OK';
 
 try {
@@ -29,7 +28,7 @@ $metrics = [];
 //
 // Changes Processing
 //
-$rrd_name = ['app', $name, $app_id, 'changes'];
+$rrd_name = ['app', $name, $app->app_id, 'changes'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('total', 'GAUGE', 0);
 
@@ -38,13 +37,13 @@ $fields = [
 ];
 $metrics['changes'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Events Processing
 //
-$rrd_name = ['app', $name, $app_id, 'events'];
+$rrd_name = ['app', $name, $app->app_id, 'events'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('success', 'GAUGE', 0)
     ->addDataset('failure', 'GAUGE', 0)
@@ -57,13 +56,13 @@ $fields = [
 ];
 $metrics['events'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Resources Processing
 //
-$rrd_name = ['app', $name, $app_id, 'resources'];
+$rrd_name = ['app', $name, $app->app_id, 'resources'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('changed', 'GAUGE', 0)
     ->addDataset('corrective_change', 'GAUGE', 0)
@@ -88,13 +87,13 @@ $fields = [
 ];
 $metrics['resources'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Time Processing
 //
-$rrd_name = ['app', $name, $app_id, 'time'];
+$rrd_name = ['app', $name, $app->app_id, 'time'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('catalog_application', 'GAUGE', 0)
     ->addDataset('config_retrieval', 'GAUGE', 0)
@@ -119,13 +118,13 @@ $fields = [
 ];
 $metrics['time'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
 // Last Rung Processing
 //
-$rrd_name = ['app', $name, $app_id, 'last_run'];
+$rrd_name = ['app', $name, $app->app_id, 'last_run'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('last_run', 'GAUGE', 0);
 
@@ -134,7 +133,7 @@ $fields = [
 ];
 $metrics['last_run'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);
