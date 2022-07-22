@@ -58,7 +58,7 @@ modules:
                     -
                         oid: 'pdu3OutletName'
                         op: '=='
-                        value: '00 00 00 00 00 00 00 00'
+                        value: '........'
                 -
                     oid: pdu3InputType
                     value: pdu3InputType
@@ -163,7 +163,7 @@ modules:
                     -
                         oid: 'pdu3OutletName'
                         op: '=='
-                        value: '00 00 00 00 00 00 00 00'
+                        value: '........'
         power:
             data:
                 -
@@ -230,7 +230,7 @@ modules:
                     -
                         oid: 'pdu3OutletName'
                         op: '=='
-                        value: '00 00 00 00 00 00 00 00'
+                        value: '........'
         power_factor:
             data:
                 -
@@ -295,7 +295,7 @@ modules:
                     -
                         oid: 'pdu3OutletName'
                         op: '=='
-                        value: '00 00 00 00 00 00 00 00'
+                        value: '........'
         load:
             data:
                 -
@@ -335,7 +335,7 @@ modules:
                     -
                         oid: 'pdu3OutletName'
                         op: '=='
-                        value: '00 00 00 00 00 00 00 00'
+                        value: '........'
                 -
                     oid: pdu3InputPhaseCurrentPercentLoad
                     value: pdu3InputPhaseCurrentPercentLoad
