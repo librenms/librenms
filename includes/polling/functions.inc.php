@@ -454,7 +454,7 @@ function update_application($app, $response, $metrics = [], $status = '')
 
     $app->app_state = 'UNKNOWN';
     $app->app_status = $status;
-    $app->timestamp = time();
+    $app->timestamp = DB::raw('NOW()');
 
     if ($response != '' && $response !== false) {
         // if the response indicates an error, set it and set app_status to the raw response
