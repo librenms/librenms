@@ -22,7 +22,7 @@ function bulk_sensor_snmpget($device, $sensors)
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
-        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQnte');
+        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);
     }
 
@@ -76,7 +76,7 @@ function poll_sensor($device, $class)
 
             if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
