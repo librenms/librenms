@@ -110,7 +110,7 @@ return [
     'device:poll' => [
         'description' => 'Poll data from device(s) as defined by discovery',
         'arguments' => [
-            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
