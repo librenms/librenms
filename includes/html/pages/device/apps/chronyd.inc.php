@@ -1,11 +1,5 @@
 <?php
 
-use App\Models\Application;
-
-$sources = Application::find($app['app_id'])->data['sources'];
-
-sort($sources);
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -17,23 +11,18 @@ print_optionbar_start();
 
 echo generate_link('Tracking', $link_array);
 echo ' | Sources: ';
-$sources_ctr = 0;
-while (isset($sources[$sources_ctr])) {
-    $source = $sources[$sources_ctr];
-    $label = $source;
+$sources = $app->data['sources'] ?? [];
+sort($sources);
+foreach ($sources as $index => $source) {
+    $label = $vars['source'] == $source
+        ? '<span class="pagemenu-selected">' . $source . '</span>'
+        : $source;
 
-    if ($vars['source'] == $source) {
-        $label = '<span class="pagemenu-selected">' . $source . '</span>';
+    echo generate_link($label, $link_array, ['source' => $source]);
+
+    if ($index < (count($source) - 1)) {
+        echo ', ';
     }
-
-    $sources_ctr++;
-
-    $append = '';
-    if (isset($sources[$sources_ctr])) {
-        $append = ', ';
-    }
-
-    echo generate_link($label, $link_array, ['source'=>$source]) . $append;
 }
 
 print_optionbar_end();
