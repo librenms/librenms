@@ -4,7 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'sagan';
-$app_id = $app['app_id'];
 
 if (! is_array($app_data['instances'])) {
     $app_data['instances'] = [];
@@ -64,9 +63,9 @@ $field_keys = [
 $instances = [];
 foreach ($sagan['data'] as $instance => $stats) {
     if ($instance == '.total') {
-        $rrd_name = ['app', $name, $app_id];
+        $rrd_name = ['app', $name, $app->app_id];
     } else {
-        $rrd_name = ['app', $name, $app_id, $instance];
+        $rrd_name = ['app', $name, $app->app_id, $instance];
         $instances[] = $instance;
     }
 
@@ -76,13 +75,10 @@ foreach ($sagan['data'] as $instance => $stats) {
         $fields[$field_key] = $stats[$field_key];
     }
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
-$old_instances = $app_data['instances'];
-
-// save thge found instances
-$app_data['instances'] = $instances;
+$old_instances = $app->app['instances'];
 
 //check for added instances
 $added_instances = array_values(array_diff($instances, $old_instances));
@@ -92,6 +88,7 @@ $removed_instances = array_values(array_diff($old_instances, $instances));
 
 // if we have any instance changes, log it
 if (sizeof($added_instances) > 0 or sizeof($removed_instances) > 0) {
+    $app->data = ['instances' => $instances];
     $log_message = 'Sagan Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . json_encode($added_instances) : '';
     $log_message .= count($removed_instances) > 0 ? ' Removed ' . json_encode($added_instances) : '';
