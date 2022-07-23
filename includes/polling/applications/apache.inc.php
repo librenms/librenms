@@ -4,7 +4,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'apache';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
@@ -19,7 +18,7 @@ if (! empty($agent_data['app'][$name])) {
     $score_reading, $score_writing, $score_keepalive, $score_dns,
     $score_closing, $score_logging, $score_graceful, $score_idle, $score_open] = explode("\n", $apache);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('access', 'DERIVE', 0, 125000000000)
     ->addDataset('kbyte', 'DERIVE', 0, 125000000000)

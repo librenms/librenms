@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $colours = 'mixed';
 $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Seconds';
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'chronyd', $app->app_id]);
 $array = [
     'system_time'   => ['descr' => 'Clock lag'],
     'last_offset'   => ['descr' => 'Last offset'],

@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postgres';
-$app_id = $app['app_id'];
 
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';
@@ -12,7 +11,7 @@ $postgres = snmp_walk($device, $oid, $options);
 [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
     $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del] = explode("\n", $postgres);
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $metrics = [];
 
 $rrd_def = RrdDefinition::make()
@@ -55,21 +54,21 @@ $fields = [
 ];
 $metrics['none'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //process each database
 $db_lines = explode("\n", $postgres);
 $db_lines_int = 17;
-$found_dbs = [];
+$databases = [];
 
 while (isset($db_lines[$db_lines_int])) {
     [$backends, $commits, $rollbacks, $read, $hit, $idxscan, $idxtupread, $idxtupfetch, $idxblksread,
         $idxblkshit, $seqscan, $seqtupread, $ret, $fetch, $ins, $upd, $del, $dbname] = explode(' ', $db_lines[$db_lines_int]);
 
-    $rrd_name = ['app', $name, $app_id, $dbname];
+    $rrd_name = ['app', $name, $app->app_id, $dbname];
 
-    $found_dbs[] = $dbname;
+    $databases[] = $dbname;
 
     $fields = [
         'backends' => $backends,
@@ -92,47 +91,28 @@ while (isset($db_lines[$db_lines_int])) {
     ];
 
     $metrics[$dbname] = $fields;
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $db_lines_int++;
 }
-update_application($app, $postgres, $metrics);
 
-//
-// component processing for postgres
-//
-$device_id = $device['device_id'];
+// check for added or removed databases
+$old_databases = $app->data['databases'] ?? [];
+$added_databases = array_diff($databases, $old_databases);
+$removed_databases = array_diff($old_databases, $databases);
 
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'postgres'],
-    ],
-];
-
-$component = new LibreNMS\Component();
-$pg_components = $component->getComponents($device_id, $options);
-
-if (empty($found_dbs)) {
-    if (isset($pg_components[$device_id])) {
-        foreach ($pg_components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
+// if we have any database changes, save and log
+if (count($added_databases) > 0 || count($removed_databases) > 0) {
+    $app->data = ['databases' => $databases];
+    $log_message = 'Postgres Database Change:';
+    if (count($added_databases)) {
+        $log_message .= ' Added ' . implode(',', $added_databases);
     }
-} else {
-    if (isset($pg_components[$device_id])) {
-        $pgc = $pg_components[$device_id];
-    } else {
-        $pgc = $component->createComponent($device_id, 'postgres');
+    if (count($removed_databases)) {
+        $log_message .= ' Removed ' . implode(',', $removed_databases);
     }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($found_dbs);
-
-    $id = $component->getFirstComponentID($pgc);
-    $pgc[$id]['label'] = 'Postgres';
-    $pgc[$id]['databases'] = json_encode($found_dbs);
-
-    $component->setComponentPrefs($device_id, $pgc);
+    log_event($log_message, $device, 'application');
 }
+
+update_application($app, $postgres, $metrics);

@@ -466,6 +466,18 @@
             "order": 12,
             "type": "text"
         },
+        "auth_ad_starttls": {
+            "default": "disabled",
+            "group": "auth",
+            "section": "ad",
+            "order": 13,
+            "type": "select",
+            "options": {
+                "disabled": "Disabled",
+                "optional": "Optional",
+                "required": "Required"
+            }
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",

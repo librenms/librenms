@@ -300,6 +300,7 @@ datadir = /opt/librenms/rrd/smokeping
 dyndir = /opt/librenms/rrd/smokeping/__cgi
 ```
 
+If you have SELinux on, see next section before starting smokeping.
 Finally restart the smokeping service:
 
 ```bash
@@ -307,6 +308,38 @@ sudo systemctl start smokeping
 ```
 
 Remember to update *config.php* with the new locations.
+
+#### Configure SELinux to allow smokeping to write in LibreNMS directory on Centos / RHEL
+If you are using RRDCached with the -B switch and smokeping RRD's inside the LibreNMS RRD base directory, you can install this SELinux profile:
+
+```
+cat > smokeping_librenms.te << EOF
+odule smokeping_librenms 1.0;
+ 
+require {
+type httpd_t;
+type smokeping_t;
+type smokeping_var_lib_t;
+type var_run_t;
+type httpd_sys_rw_content_t;
+class dir { add_name create getattr read remove_name search write };
+class file { create getattr ioctl lock open read rename setattr unlink write };
+}
+ 
+#============= httpd_t ==============
+ 
+allow httpd_t smokeping_var_lib_t:dir read;
+allow httpd_t var_run_t:file { read write };
+ 
+#============= smokeping_t ==============
+ 
+allow smokeping_t httpd_sys_rw_content_t:dir { add_name create getattr remove_name search write };
+allow smokeping_t httpd_sys_rw_content_t:file { create getattr ioctl lock open read rename setattr unlink write };
+EOF
+checkmodule -M -m -o smokeping_librenms.mod smokeping_librenms.te
+semodule_package -o smokeping_librenms.pp -m smokeping_librenms.mod
+semodule -i smokeping_librenms.pp
+```
 
 ### Probe FPing missing missing from the probes section
 

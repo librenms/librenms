@@ -9,7 +9,7 @@ $unit_text = 'Minutes';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app['app_id'], 'last_run']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'puppet-agent', $app->app_id, 'last_run']);
 $array = [
     'last_run',
 ];

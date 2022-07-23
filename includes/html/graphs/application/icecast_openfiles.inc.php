@@ -4,7 +4,7 @@ $scale_min = 1000;
 
 require 'includes/html/graphs/common.inc.php';
 
-$icecast_rrd = Rrd::name($device['hostname'], ['app', 'icecast', $app['app_id']]);
+$icecast_rrd = Rrd::name($device['hostname'], ['app', 'icecast', $app->app_id]);
 
 if (Rrd::checkRrdExists($icecast_rrd)) {
     $rrd_filename = $icecast_rrd;
