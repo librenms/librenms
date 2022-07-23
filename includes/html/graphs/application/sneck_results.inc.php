@@ -1,7 +1,6 @@
 <?php
 
 $name = 'sneck';
-$app_id = $app['app_id'];
 $unit_text = 'Results';
 $colours = 'psychedelic';
 $dostack = 0;
@@ -10,7 +9,7 @@ $addarea = 0;
 $transparency = 15;
 $float_precision = 0;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
