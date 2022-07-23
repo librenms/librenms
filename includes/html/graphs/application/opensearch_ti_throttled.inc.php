@@ -1,7 +1,6 @@
 <?php
 
 $name = 'opensearch';
-$app_id = $app['app_id'];
 $unit_text = 'Throttled';
 $colours = 'greens';
 $dostack = 0;
@@ -9,7 +8,7 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
