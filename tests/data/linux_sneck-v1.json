@@ -18,7 +18,7 @@
                 {
                     "app_type": "sneck",
                     "app_state": "OK",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": ""

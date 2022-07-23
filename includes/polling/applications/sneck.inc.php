@@ -8,10 +8,10 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'sneck';
 
 $old_checks = [];
+$old_checks_data=[];
 if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
     $old_checks = array_keys($app->data['data']['checks']);
-} else {
-    $app->data = ['data' => ['checks' => []]];
+    $old_checks_data = $app->data['data']['checks'];
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -29,6 +29,8 @@ try {
 
     return;
 }
+
+$app->data = $json_return;
 
 $new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
@@ -98,7 +100,7 @@ $warned = [];
 $alerted = [];
 $unknowned = [];
 foreach ($new_checks as $check) {
-    if (isset($app->data['data']['checks'][$check]) && isset($app->data['data']['checks'][$check]['exit']) && isset($app->data['data']['checks'][$check]['output'])) {
+    if (isset($old_checks_data[$check]) && isset($old_checks_data[$check]['exit']) && isset($old_checks_data[$check]['output'])) {
         if ($json_return['data']['checks'][$check]['exit'] != $app->data['data']['checks'][$check]['exit']) {
             $check_output = $json_return['data']['checks'][$check]['output'];
             $exit_code = $json_return['data']['checks'][$check]['exit'];
@@ -155,6 +157,3 @@ if (sizeof($unknowned) > 0) {
 
 // update it here as we are done with this mostly
 update_application($app, 'OK', $fields);
-
-// save the json_return to the app data
-$app->data = $json_return;
