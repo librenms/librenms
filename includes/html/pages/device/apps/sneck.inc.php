@@ -45,8 +45,8 @@ if (isset($sneck_data)) {
     print_optionbar_start();
     echo 'Last Return...<br>';
     echo "<b>Alert(s):</b><br>\n";
-    echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>\n";
+    echo str_replace("\n", "<br>\n", $app->data['data']['alertString']) . "<br><br>\n";
     echo "<b>Raw JSON:</b><br>\n";
-    echo "<pre>\n" . json_encode($sneck_data, JSON_PRETTY_PRINT) . "</pre>\n";
+    echo "<pre>\n" . json_encode($app->data, JSON_PRETTY_PRINT) . "</pre>\n";
     print_optionbar_end();
 }
