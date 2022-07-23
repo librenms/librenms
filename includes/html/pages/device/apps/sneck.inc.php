@@ -26,7 +26,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id'] = $app['app_id'];
+    $graph_array['id'] = $app->app_id;
     $graph_array['type'] = 'application_' . $key;
 
     echo '<div class="panel panel-default">
@@ -42,7 +42,7 @@ foreach ($graphs as $key => $text) {
 }
 
 // print any alerts if found
-$sneck_data = Application::find($app['app_id'])->data;
+$sneck_data = $app->app_id;
 if (isset($sneck_data)) {
     print_optionbar_start();
     echo 'Last Return...<br>';
