@@ -10,7 +10,7 @@ IMPORTS
     InterfaceIndex                              FROM IF-MIB;
 
 rlTimeSynchronization MODULE-IDENTITY
-      LAST-UPDATED "200408030024Z"
+      LAST-UPDATED "202105170000Z"
       ORGANIZATION "Cisco Systems, Inc."
 
       CONTACT-INFO

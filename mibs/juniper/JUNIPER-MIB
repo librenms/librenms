@@ -1,7 +1,7 @@
 --
 -- Juniper Enterprise Specific MIB: Chassis MIB
 -- 
--- Copyright (c) 1998-2008, Juniper Networks, Inc.
+-- Copyright (c) 1998-2015, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -21,7 +21,7 @@ IMPORTS
 
 jnxBoxAnatomy MODULE-IDENTITY
 
-    LAST-UPDATED "201010220000Z" -- Fri Oct 22 00:00:00 2008 UTC
+    LAST-UPDATED "201605160000Z"    -- May 16, 2016
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -34,9 +34,6 @@ jnxBoxAnatomy MODULE-IDENTITY
             "The MIB modules representing Juniper Networks'
 	    implementation of enterprise specific MIBs 
 	    supported by a single SNMP agent."
-    REVISION      "201010220000Z"
-    DESCRIPTION
-               "Added load average variables"
     REVISION      "200403230000Z"
     DESCRIPTION
                "Added chassis identification objects."
@@ -68,14 +65,123 @@ jnxBoxAnatomy MODULE-IDENTITY
                "Added new fru type PSD to jnxFruType enumeration and
                 added jcsX chassis IDs to JnxChassisId enumeration."
     REVISION     "200812310000Z"    -- Dec 31, 2008
-    DESCRIPTION "Added nodeX chassis IDs to JnxChassisId enumeration."
+    DESCRIPTION
+               "Added nodeX chassis IDs to JnxChassisId enumeration."
     REVISION     "200901090000Z"    -- Jan 09, 2009
     DESCRIPTION 
                "Added sfcX and lcc4-lcc15 chassis IDs to JnxChassisId
                 enumeration."
+    REVISION     "201010220000Z"    -- Oct 22, 2010
+    DESCRIPTION
+               "Added load average variables"
+    REVISION     "201109090000Z"    -- Sep 09, 2011
+    DESCRIPTION
+               "Added jnxBoxPersonality for MidRangius Boxes
+                namely MX40/MX10/MX5"
+    REVISION     "201202150000Z"    -- Feb 02, 2012
+    DESCRIPTION 
+               "Added new offline reason builtinPicBounce to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201202210000Z"    -- Feb 21, 2012
+    DESCRIPTION
+               "Added new jnxFruType: PDU and PSM,
+                and new traps: jnxFmLinkErr and jnxFmCellDropErr."
+    REVISION     "201208240000Z"    -- Aug 24, 2012
+    DESCRIPTION 
+               "Added new offline reason fruTypeConfigMismatch to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201208240000Z"    -- Aug 24, 2012
+    DESCRIPTION 
+               "Added new offline reason fruTypeConfigMismatch to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201210120000Z"    -- Oct 12, 2012
+    DESCRIPTION 
+               "Added new offline reason fruPICOfflineOnEccErrors to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201211070000Z"    -- Nov 07, 2012
+    DESCRIPTION 
+               "Added new offline reasons fruFpcIncompatible and
+                fruFpcFanTrayPEMIncompatible to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201301070000Z"    -- Jan 07, 2013
+    DESCRIPTION
+               "Added new offline reason openflowConfigChange to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201302280000Z"    -- Feb 28, 2013
+    DESCRIPTION
+               "Added new offline reasons fruFpcScbIncompatible to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201303220000Z"    -- Mar 22, 2013
+    DESCRIPTION
+               "Added new offline reason hwError
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201305220000Z"    -- May 22, 2013
+    DESCRIPTION 
+               "Added new offline reasons fruReUnresponsive to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201307170000Z"    -- Jul 17, 2013
+    DESCRIPTION 
+               "Added new Fabric plane offline/online/check traps
+                to trap fabric plane offline/online/fault events."
+    REVISION     "201309240000Z"    -- Sep 24, 2013
+    DESCRIPTION
+               "Added new offline reason hwError
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201310150000Z"    -- Oct 15, 2013
+    DESCRIPTION
+               "Added new offline reason fruIncompatibleWithPEM,
+                fruIncompatibleWithSIB, and sibIncompatibleWithOtherSIB
+                to jnxFruOfflineReason enumeration."
+    REVISION     "201311190000Z"    -- Nov 19, 2013
+    DESCRIPTION
+               "Added new offline reason fruPfeErrors to
+                jnxFruOfflineReason enumeration."
+    REVISION     "201212100000Z"    -- Dec 10, 2012
+    DESCRIPTION 
+               "Added new OIDs to get control plane memory 
+                allocation (jnxOperatingMemoryCP)
+                and utilization(jnxOperatingBufferCP) in RE."
 
+    REVISION     "201404080000Z"    -- Apr 08, 2014
+    DESCRIPTION
+               "Added new offline reason vpnLocalizationRoleChange to
+                jnxFruOfflineReason enumeration."
 
+    REVISION     "201405200000Z"    -- May 20, 2014
+    DESCRIPTION
+               "Added MIBs for 1, 5 and 15 min average CPU util"
+    
+    REVISION     "201407300000Z"    -- Jul 30, 2014
+    DESCRIPTION
+               "Added new offline reasons fruFpcFanTrayIncompatible &
+                fruFpcPEMIncompatible to jnxFruOfflineReason enumeration."
 
+    REVISION     "201501140000Z"    -- Jan 14, 2015
+    DESCRIPTION
+               "Added new color types for jnxLEDState and jnxLEDStateOrdered."
+
+    REVISION     "201412040000Z"    -- Dec 04, 2014
+    DESCRIPTION
+               "Added new trap: jnxFmAsicErr."
+
+    REVISION     "201504010000Z"    -- Apr 1, 2015
+    DESCRIPTION
+              "Added new FRU Power consumption variable."
+
+    REVISION     "201504280000Z"    -- Apr 28, 2015
+    DESCRIPTION
+              "Added new MIB jnxContentsModel."
+
+    REVISION     "201602020000Z"    -- Feb 02, 2016
+    DESCRIPTION
+               "Added new offline reason fruFpcHFanTrayIncompatible and
+                missing entries mixedSwitchFabric, unsupportedFabric,
+                jamConfigError."
+
+    REVISION     "201605160000Z"    -- May 16, 2016
+    DESCRIPTION
+               "Added new trap: jnxFmHealthChkErr."
+ 
     ::= { jnxMibs 1 }
 
 --
@@ -123,7 +229,21 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      member4       (35),
                      member5       (36),
                      member6       (37),
-                     member7       (38)
+                     member7       (38),
+                     nodeDevice    (39),
+                     interconnectDevice (40),
+                     controlPlaneDevice (41),
+                     directorDevice (42),
+                     gnf1          (43),
+                     gnf2          (44),
+                     gnf3          (45),
+                     gnf4          (46),
+                     gnf5          (47),
+                     gnf6          (48),
+                     gnf7          (49),
+                     gnf8          (50),
+                     gnf9          (51),
+                     gnf10         (52)
                  }
 
 
@@ -362,10 +482,11 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	    jnxContentsSerialNo		DisplayString,
 	    jnxContentsRevision		DisplayString,
 	    jnxContentsInstalled	TimeStamp,
-            jnxContentsPartNo           DisplayString,
-            jnxContentsChassisId        JnxChassisId,
-            jnxContentsChassisDescr     DisplayString,
-            jnxContentsChassisCleiCode  DisplayString
+        jnxContentsPartNo           DisplayString,
+        jnxContentsChassisId        JnxChassisId,
+        jnxContentsChassisDescr     DisplayString,
+        jnxContentsChassisCleiCode  DisplayString,
+        jnxContentsModel            DisplayString
     }
 
     jnxContentsContainerIndex OBJECT-TYPE
@@ -509,6 +630,17 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                  telecommunications industry."
         ::= { jnxContentsEntry 13 }
 
+    jnxContentsModel OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The FRU model name of this subject, blank if unknown
+                 or unavailable."
+        ::= { jnxContentsEntry 14 }
+
+
+
 --
 -- Box LED Indicators Table
 --
@@ -633,7 +765,13 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		yellow(3),    -- alarm, warning, marginally working
 		red(4),	      -- alert, failed, not working
 		blue(5),      -- ok, on-line as an active primary
-		amber(6)      -- alarm, off-line, not running
+		amber(6),     -- alarm, off-line, not running
+		off(7),            -- off-line, not running
+		blinkingGreen(8),  -- entering state of ok, good, normally working
+		blinkingYellow(9), -- entering state of alarm, warning, marginally working
+		blinkingRed(10),   -- entering state of alert, failed, not working
+		blinkingBlue(11),  -- entering state of ok, on-line as an active primary
+		blinkingAmber(12)  -- entering state of alarm, off-line, not running
 	}
 	MAX-ACCESS	read-only
 	STATUS		deprecated
@@ -650,7 +788,13 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		amber(3),     -- alarm, off-line, not running
 		yellow(4),    -- alarm, warning, marginally working
 		red(5),	      -- alert, failed, not working
-		other(6)      -- unknown or unavailable
+		other(6),     -- unknown or unavailable
+		off(7),             -- off-line, not running
+		blinkingBlue(8),    -- entering state of ok, on-line as an active primary
+		blinkingGreen(9),   -- entering state of ok, good, normally working
+		blinkingAmber(10),  -- entering state of alarm, off-line, not running
+		blinkingYellow(11), -- entering state of alarm, warning, marginally working
+		blinkingRed(12)     -- entering state of alert, failed, not working
 	}
 	MAX-ACCESS	read-only
 	STATUS		deprecated
@@ -829,13 +973,19 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 	    jnxOperatingUpTime          TimeInterval,
 	    jnxOperatingLastRestart     TimeStamp,
 	    jnxOperatingMemory          Integer32,
-            jnxOperatingStateOrdered    INTEGER,
-            jnxOperatingChassisId       JnxChassisId,
-            jnxOperatingChassisDescr    DisplayString,
-            jnxOperatingRestartTime     DateAndTime,
-            jnxOperating1MinLoadAvg     Gauge32,
-            jnxOperating5MinLoadAvg     Gauge32,
-            jnxOperating15MinLoadAvg     Gauge32
+        jnxOperatingStateOrdered    INTEGER,
+        jnxOperatingChassisId       JnxChassisId,
+        jnxOperatingChassisDescr    DisplayString,
+        jnxOperatingRestartTime     DateAndTime,
+        jnxOperating1MinLoadAvg     Gauge32,
+        jnxOperating5MinLoadAvg     Gauge32,
+        jnxOperating15MinLoadAvg    Gauge32,
+        jnxOperating1MinAvgCPU      Gauge32,
+        jnxOperating5MinAvgCPU      Gauge32,
+        jnxOperating15MinAvgCPU     Gauge32,
+        jnxOperatingFRUPower        Gauge32,
+             jnxOperatingBufferCP        Gauge32,
+             jnxOperatingMemoryCP        Integer32
     }
 
     jnxOperatingContentsIndex OBJECT-TYPE
@@ -1063,6 +1213,66 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                      Here it will be shown as percentage value
                      Zero if unavailable or inapplicable."
             ::= { jnxOperatingEntry 22 }
+
+    jnxOperating1MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 1 minutes. Zero if
+             unavailable or inapplicable."
+        ::= { jnxOperatingEntry 23 }
+
+    jnxOperating5MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 5 minutes.  Zero if
+             unavailable or inapplicable."
+        ::= { jnxOperatingEntry 24 }
+
+    jnxOperating15MinAvgCPU OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The CPU utilization in percentage of this
+             subject averaged over last 15 minutes.  Zero
+             if unavailable or inapplicable."
+        ::= { jnxOperatingEntry 25 }
+  
+        jnxOperatingFRUPower    OBJECT-TYPE
+            SYNTAX          Gauge32
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION
+                    "The present power of each FRU. Here it will
+                     be shown in terms of voltage. Zero if unavailable
+                     or inapplicable"
+            ::= { jnxOperatingEntry 26 }
+
+    	jnxOperatingBufferCP OBJECT-TYPE
+	    SYNTAX		Gauge32
+	    MAX-ACCESS		read-only
+	    STATUS		current
+	    DESCRIPTION
+	    	    "The buffer pool utilization in percentage
+	    	    of this subject in control plane.  Zero if 
+                    unavailable or inapplicable."
+	    ::= { jnxOperatingEntry 27 }
+	
+    	jnxOperatingMemoryCP OBJECT-TYPE
+	    SYNTAX	    	Integer32	
+	    MAX-ACCESS		read-only
+	    STATUS		current
+	    DESCRIPTION
+		        "The Allocated memory size for control plane
+                        in Megabytes. Zero if unavailable or
+	        	inapplicable."
+	    ::= { jnxOperatingEntry 28 }
 
 --
 -- Box Redundancy Information Table
@@ -1391,7 +1601,11 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		fan(13),                                -- fan
 		lineCardChassis(14),                    -- LCC
                 forwardingEngineBoard(15),              -- FEB
-                protectedSystemDomain(16)               -- PSD
+                protectedSystemDomain(16),              -- PSD
+		powerDistributionUnit(17),              -- PDU
+		powerSupplyModule(18),                  -- PSM
+		switchFabricBoard(19),                  -- SFB
+		adapterCard(20)                         -- ADC
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1512,7 +1726,41 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 psdVersionMismatch(71),          -- PSD version mismatch
                 fruResetThresholdExceeded(72),   -- FRU Reset Threshold Exceeded
                 picBounce(73),                   -- PIC Bounce
-                badVoltage(74)                   -- bad voltage
+                badVoltage(74),                  -- bad voltage
+                fruFPCReducedFabricBW(75),       -- FPC offlined due to Reduced Fabric Bandwidth
+                fruAutoheal(76),                 -- FRU offlined due to software autoheal action
+                builtinPicBounce(77),            -- Builtin PIC Bounce
+                fruFabricDegraded(78),           -- Fabric running in degraded state
+                fruFPCFabricDegradedOffline(79), -- FPC offlined due to degraded fabric action 
+                fruUnsupportedSlot(80),          -- FRU unsupported in the current slot
+                fruRouteLocalizationMisCfg(81),  -- Route Localization - FPC Misconfiguration
+                fruTypeConfigMismatch(82),       -- FRU Type configuration mismatch
+                lccModeChanged(83),              -- LCC mode changed on the SFC
+                hwFault(84),                     -- Hardware fault
+                fruPICOfflineOnEccErrors(85),    -- PIC offlined on ecc errors cross ceratins limit.
+                fruFpcIncompatible(86),          -- FPC imcompatible with other FPCs
+                fruFpcFanTrayPEMIncompatible(87),-- FPC incompatible with FAN-TRAYs ,PEMs
+                fruUnsupportedFirmware(88),      -- Firmware on this FRU not supported
+                openflowConfigChange(89),        -- Openflow config change offlines FPC
+                fruFpcScbIncompatible(90),       -- FPC incompatible with SCB
+                fruReUnresponsive(91),           -- Corresponding slot RE unresponsive
+                hwError(92),                     -- Hardware error
+                fruErrorManagerReqFPCReset(93),  -- Error manager requested FPC reset.
+                fruIncompatibleWithPEM(94),      -- FRU incompatible with power supply
+                fruIncompatibleWithSIB(95),      -- FRU incompatible with SIB
+                sibIncompatibleWithOtherSIB(96), -- FRU incompatible with other SIB
+                fruPfeErrors(97),                -- PIC offlined on PFE Errors cross limit.
+                vpnLocalizationRoleChange(98),   -- VPN localization core-facing-FPC role change
+                fruFpcFanTrayIncompatible(99),   -- FPC incompatible with FAN-TRAYs
+                fruFpcPEMIncompatible(100),      -- FPC incompatible with PEMs
+                mixedSwitchFabric(101),          -- Mixed Switch Fabric error
+                unsupportedFabric(102),          -- unsupported Fabric error
+                jamConfigError(103),             -- JAM configuration error
+                fruFpcHFanTrayIncompatible(104), -- FPC incompatible with Horizontal FAN-TRAYs
+                gnfIsOffline(105),               -- GNF is Offline
+                gnfdisconnected(106),            -- GNF disconnected
+                fruIncompatibleWithVersion(107), -- Incompatibile with BSYS
+                reasonOfflineEnd(108)            -- Unknown
 	}
 	MAX-ACCESS	read-only
 	STATUS		current
@@ -1606,6 +1854,20 @@ JnxChassisId ::= TEXTUAL-CONVENTION
 		"The system domain type of this subject, notApplicable will
 		be returned if this feature is not supported."
 	::= { jnxBoxAnatomy 17 }
+
+
+--
+-- Applicable only for MidRangius Systems (MX5/10/40)
+--
+    jnxBoxPersonality OBJECT-TYPE 
+	SYNTAX          OBJECT IDENTIFIER
+	MAX-ACCESS      read-only
+	STATUS          current
+	DESCRIPTION
+	        "The personality of the box, indicating which product line it is currently acting as
+		 for example, 'MX40'."
+	::= { jnxBoxAnatomy 18 }
+
 
 
 --
@@ -1837,7 +2099,6 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 switched over."
         ::= { jnxChassisTraps 13 }
 
-
     jnxHardDiskFailed NOTIFICATION-TYPE
         OBJECTS         { jnxFruContentsIndex,
                           jnxFruL1Index,
@@ -1887,6 +2148,178 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                  the back up root partition"
          ::= { jnxChassisTraps 16 }     
 
+    jnxFmLinkErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A LinkErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                link errors."
+        ::= { jnxChassisTraps 17 }
+
+    jnxFmCellDropErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A CellDropErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected 
+                cell drop errors."
+        ::= { jnxChassisTraps 18 }
+
+    jnxExtSrcLockLost NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A ExtSrcLockLost trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                a lock for an external clock source has been lost."
+        ::= { jnxChassisTraps 19 }
+    jnxPlaneOffline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot,
+                          jnxFruOfflineReason,
+                          jnxFruLastPowerOff,
+                          jnxFruLastPowerOn }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneOffline trap signifies that the SNMP
+                entity, acting in an agent role, has detected
+                that the specified Fabric plane
+                has gone offline in the chassis."
+        ::= { jnxChassisTraps 20 }
+
+    jnxPlaneOnline NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneOnline trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric Plane has
+                gone online in the chassis."
+        ::= { jnxChassisTraps 21 }
+
+    jnxPlaneCheck NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneCheck trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric plane has
+                encountered some operational errors and gone into
+                check state in the chassis."
+        ::= { jnxChassisTraps 22 }   
+    
+    jnxPlaneFault NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxPlaneCheck trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the specified Fabric plane has
+                encountered some operational errors and gone into
+                fault state in the chassis."
+        ::= { jnxChassisTraps 23 }   
+
+    jnxPowerSupplyInputFailure NOTIFICATION-TYPE
+        OBJECTS         { jnxContentsContainerIndex,
+                          jnxContentsL1Index,
+                          jnxContentsL2Index,
+                          jnxContentsL3Index,
+                          jnxContentsDescr,
+                          jnxOperatingState }
+        STATUS          current
+        DESCRIPTION
+            "A jnxPowerSupplyInputFailure trap signifies that
+            the SNMP entity, acting in an agent role, has
+            detected that the specified power supply's input feed 
+            in the chassis has been in the failure condition."
+        ::= { jnxChassisTraps 24 }
+
+    jnxFmAsicErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxFmAsicErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected 
+                errors in a switching device within the fabric."
+        ::= { jnxChassisTraps 25 }
+    
+    jnxMountVarOffHardDiskFailed NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxMountVarOffHardDiskFailed signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                mount of /var failed off harddisk, emergency /var created."
+        ::= { jnxChassisTraps 26 }
+
+    jnxFmHealthChkErr NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A HealthChkErr trap signifies that the SNMP
+                entity, acting in an agent role, has detected 
+                health check errors."
+        ::= { jnxChassisTraps 27 }
 
     -- Traps for chassis alarm cleared conditions
 
@@ -1954,5 +2387,50 @@ JnxChassisId ::= TEXTUAL-CONVENTION
                 is in ok state in the chassis."
         ::= { jnxChassisOKTraps 4 }
 
+    jnxExtSrcLockAcquired NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A ExtSrcLockAcquired trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                a lock for an external clock source has been acquired."
+        ::= { jnxChassisOKTraps 5 }
+
+    jnxHardDiskOK NOTIFICATION-TYPE
+        OBJECTS         { jnxFruContentsIndex,
+                          jnxFruL1Index,
+                          jnxFruL2Index,
+                          jnxFruL3Index,
+                          jnxFruName,
+                          jnxFruType,
+                          jnxFruSlot }
+        STATUS          current
+        DESCRIPTION
+                "A jnxHardDiskOK trap signifies that the SNMP
+                entity, acting in an agent role, has detected that
+                the Disk in the specified Routing Engine has
+                recovered from the failure condition."
+        ::= { jnxChassisOKTraps 6 }
+
+    jnxPowerSupplyInputOK NOTIFICATION-TYPE
+        OBJECTS     { jnxContentsContainerIndex,
+                      jnxContentsL1Index,
+                      jnxContentsL2Index,
+                      jnxContentsL3Index,
+                      jnxContentsDescr,
+                      jnxOperatingState }
+        STATUS      current
+        DESCRIPTION
+            "A jnxPowerSupplyInputOK trap signifies that the 
+            SNMP entity, acting in an agent role, has detected 
+            that the specified power supply's input feed in the
+            chassis has recovered from the failure condition."
+        ::= { jnxChassisOKTraps 7 }
 
 END

@@ -4,7 +4,7 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$apache_rrd = Rrd::name($device['hostname'], ['app', 'apache', $app['app_id']]);
+$apache_rrd = Rrd::name($device['hostname'], ['app', 'apache', $app->app_id]);
 
 if (Rrd::checkRrdExists($apache_rrd)) {
     $rrd_filename = $apache_rrd;

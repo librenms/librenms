@@ -1,7 +1,5 @@
 <?php
 
-$suricata_instances = get_suricata_instances($device['device_id']);
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -13,23 +11,18 @@ print_optionbar_start();
 
 echo generate_link('Totals', $link_array);
 echo '| Instances:';
-$int_int = 0;
-while (isset($suricata_instances[$int_int])) {
-    $instance = $suricata_instances[$int_int];
-    $label = $instance;
+$suricata_instances = $app->data['instances'] ?? [];
+sort($suricata_instances);
+foreach ($suricata_instances as $index => $sinstance) {
+    $label = $vars['sinstance'] == $sinstance
+        ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
+        : $sinstance;
 
-    if ($vars['instance'] == $instance) {
-        $label = '<span class="pagemenu-selected">' . $instance . '</span>';
+    echo generate_link($label, $link_array, ['sinstance' => $sinstance]);
+
+    if ($index < (count($suricata_instances) - 1)) {
+        echo ', ';
     }
-
-    $int_int++;
-
-    $append = '';
-    if (isset($suricata_instances[$int_int])) {
-        $append = ', ';
-    }
-
-    echo generate_link($label, $link_array, ['pool'=>$instance]) . $append;
 }
 
 print_optionbar_end();
@@ -56,8 +49,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
-    if (isset($vars['pool'])) {
-        $graph_array['pool'] = $vars['pool'];
+    if (isset($vars['sinstance'])) {
+        $graph_array['sinstance'] = $vars['sinstance'];
     }
 
     echo '<div class="panel panel-default">

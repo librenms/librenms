@@ -32,11 +32,11 @@ use LibreNMS\Validator;
 class WebServer extends BaseValidation
 {
     /** @var string */
-    private $http_regex = '#(http://[^:/]+)(?::80)?/#';
+    private $http_regex = '#(http://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::80)?/#';
     /** @var string */
-    private $https_regex = '#(https://[^:/]+)(?::443)?/#';
+    private $https_regex = '#(https://([^:/]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+]))(?::443)?/#';
     /** @var string */
-    private $host_regex = '#://([^/:]+)#';
+    private $host_regex = '#://([^/:\[]+|\[[a-fA-F\d:]+:[a-fA-F\d:]+])#';
 
     /**
      * @inheritDoc
@@ -50,12 +50,13 @@ class WebServer extends BaseValidation
             if ($url !== $expected) {
                 preg_match($this->host_regex, $url, $actual_host_match);
                 preg_match($this->host_regex, $expected, $expected_host_match);
-                $actual_host = $actual_host_match[1];
-                if ($actual_host != $expected_host_match[1]) {
+                $actual_host = $actual_host_match[1] ?? '';
+                $expected_host = $expected_host_match[1] ?? "parse failure ($expected)";
+                if ($actual_host != $expected_host) {
                     $nginx = Str::startsWith(request()->server->get('SERVER_SOFTWARE'), 'nginx');
                     $server_name = $nginx ? 'server_name' : 'ServerName';
                     $fix = $nginx ? "server_name $actual_host;" : "ServerName $actual_host";
-                    $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config. $actual_host $expected_host_match[1]", $fix);
+                    $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config. $actual_host $expected_host", $fix);
                 } else {
                     $correct_base = str_replace('validate/results', '', $url);
                     $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");

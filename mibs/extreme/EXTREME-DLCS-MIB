@@ -1,0 +1,238 @@
+
+-- ===========================================================================
+
+--
+-- Extreme Dynamic-Link Context System (DLCS) reporting
+--
+
+EXTREME-DLCS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, IpAddress, TimeTicks
+                                FROM SNMPv2-SMI
+                TruthValue      FROM SNMPv2-TC
+		DisplayString   FROM RFC1213-MIB
+                extremeAgent
+                                FROM EXTREME-BASE-MIB;
+
+        extremeDlcs MODULE-IDENTITY
+                LAST-UPDATED "9903040000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION 
+                        "Extreme Dynamic-Link Context System (DLCS) status objects"
+        ::= { extremeAgent 8 }
+
+
+--
+-- Enable/disable DLCS
+--
+	extremeDlcsEnable OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will allow the agent to start 
+                        collecting DLCS binding information."
+	::= { extremeDlcs 1 }
+
+	extremeDlcsNetbiosEnable OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will allow the agent to start 
+                        collecting DLCS binding information using the
+                        NetBios protocol."
+	::= { extremeDlcs 2 }
+
+	extremeDlcsKerberos5Enable OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will allow the agent to start 
+                        collecting DLCS binding information using the
+                        Kerberos V5 protocol."
+	::= { extremeDlcs 3 }
+
+	extremeDlcsRsvpEnable OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will allow the agent to start 
+                        collecting DLCS binding information using the RSVP
+                        protocol."
+	::= { extremeDlcs 4 }
+
+	extremeDlcsDnsEnable OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will allow the agent to start 
+                        collecting DLCS binding information using the
+                        DNS protocol."
+	::= { extremeDlcs 5 }
+
+--
+-- DLCS Binding Table
+--
+--
+-- How is this table used?
+-- 
+-- (1) Manager creates extremeSmartTrapRulesEntry with
+-- extremeSmartTrapRulesIndex = XXXX
+-- extremeSmartTrapRulesDesiredOID = extremeDlcsBindingTable
+-- extremeSmartTrapRulesOperation = any
+-- 
+-- (2) Events are reported by agent creating a extremeSmartTrapInstanceEntry with:
+-- 
+-- extremeSmartTrapInstanceRule = XXXX
+-- extremeSmartTrapInstanceChangedOid = extremeDlcsBindingIndex
+-- extremeSmartTrapInstanceActualOperation = add, delete or modify
+-- 
+-- and generating the actual trap.
+-- 
+
+        extremeDlcsBindingTable OBJECT-TYPE
+ 		SYNTAX      SEQUENCE OF ExtremeDlcsBindingEntry
+		MAX-ACCESS  not-accessible
+		STATUS      current
+                DESCRIPTION
+                "Table of DLCS Binding information. Entries are added and deleted
+                by the agent based on information gathered from the local network 
+                environment. Multiple entries may exist for almost identical sets
+                of bindings although the agent will ensure that exactly matching
+                entries are coalesced."
+	::= { extremeDlcs 6 }
+
+        extremeDlcsBindingEntry OBJECT-TYPE
+		SYNTAX  ExtremeDlcsBindingEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+                "Entry in table of DLCS bindings."
+               INDEX { extremeDlcsBindingIndex } 
+	::= { extremeDlcsBindingTable 1 }
+
+        ExtremeDlcsBindingEntry ::= SEQUENCE
+        {
+                extremeDlcsBindingIndex         INTEGER,
+                extremeDlcsBindingType          BITS,
+                extremeDlcsBindingSource        INTEGER,
+                extremeDlcsBindingUser          DisplayString,
+                extremeDlcsBindingGroup         DisplayString,
+                extremeDlcsBindingApplication   DisplayString,
+                extremeDlcsBindingHost          DisplayString,
+                extremeDlcsBindingIpAddress     IpAddress,
+                extremeDlcsBindingPhysPort      INTEGER,
+                extremeDlcsBindingUpdateTime    TimeTicks
+        }
+
+        extremeDlcsBindingIndex  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "An index into this table, chosen by the agent. This has
+                no significance to the manager beyond its uniqueness
+                within this agent."
+	::= { extremeDlcsBindingEntry 1 }
+
+        extremeDlcsBindingType  OBJECT-TYPE
+            SYNTAX  BITS { user2ip(0), user2port(1), ip2port(2), 
+                           application2user(3), application2ip(4), 
+                           host2ip(5), group2ip(6), group2port(7), 
+                           user2group(8) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of binding expressed here. A given bit is set if DLCS
+                has detected that the two relevant items are bound together. 
+                e.g. an entry with application2user(3) set to 1 implies that
+                the username extremeDlcsBindingUser has been seen to be using 
+                the application extremeDlcsBindingApplication. In addition, if
+                this entry also has user2port(1) set to 1 then this user and
+                application have been detected as running on the physical
+                switch port extremeDlcsBindingPhysPort."
+	::= { extremeDlcsBindingEntry 2 }
+
+        extremeDlcsBindingSource  OBJECT-TYPE
+            SYNTAX  INTEGER { other (1), local(2), netbiosquery(3),
+			 netbiosbind (4), dns(5), kerberos5(6), rsvp(7) }
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The source of the information binding."
+	::= { extremeDlcsBindingEntry 3 }
+
+        extremeDlcsBindingUser  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The User name detected by DLCS. A string of length zero
+		 indicates no valid User name has been detected for this
+		 binding."
+	::= { extremeDlcsBindingEntry 4 }
+
+        extremeDlcsBindingGroup  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Group name detected by DLCS. A string of length zero
+                 indicates no valid Group name has been detected for this
+		 binding."
+	::= { extremeDlcsBindingEntry 5 }
+
+        extremeDlcsBindingApplication  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Application name detected by DLCS. A string of length 
+                zero indicates no valid Application name has been detected 
+                for this binding."
+	::= { extremeDlcsBindingEntry 6 }
+
+        extremeDlcsBindingHost  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Host name detected by DLCS. A string of length 
+                zero indicates no valid Host name has been detected 
+                for this binding."
+	::= { extremeDlcsBindingEntry 7 }
+
+        extremeDlcsBindingIpAddress  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address detected by DLCS. A value of 0.0.0.0
+                indicates no valid IP address has been detected 
+                for this binding."
+	::= { extremeDlcsBindingEntry 8 }
+
+        extremeDlcsBindingPhysPort  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The physical port number (ifIndex) detected by DLCS.
+                This is valid in all bindings."
+	::= { extremeDlcsBindingEntry 9 }
+
+        extremeDlcsBindingUpdateTime  OBJECT-TYPE
+            SYNTAX TimeTicks
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of sysUpTime when this entry was last updated."
+	::= { extremeDlcsBindingEntry 10 }
+
+END

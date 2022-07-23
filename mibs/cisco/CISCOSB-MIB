@@ -21,7 +21,7 @@ IMPORTS
     VlanPriority ::= INTEGER (0..7)
 
 switch001 MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "202105170000Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO
