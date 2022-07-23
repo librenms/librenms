@@ -8,7 +8,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'sneck';
 
 $old_checks = [];
-$old_checks_data=[];
+$old_checks_data = [];
 if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
     $old_checks = array_keys($app->data['data']['checks']);
     $old_checks_data = $app->data['data']['checks'];
