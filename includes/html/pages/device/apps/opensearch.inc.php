@@ -10,7 +10,7 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo '<b>Cluster Name:</b> ' . Application::find($app['app_id'])->data['cluster'] . '<br>';
+echo '<b>Cluster Name:</b> ' . $app->data['cluster'] . '<br>';
 echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set'] = 'translog';
@@ -235,7 +235,7 @@ foreach ($graphs as $key => $text) {
     $graph_array['height'] = '100';
     $graph_array['width'] = '215';
     $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['id'] = $app['app_id'];
+    $graph_array['id'] = $app->app_id;
     $graph_array['type'] = 'application_' . $key;
 
     echo '<div class="panel panel-default">

@@ -4,7 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'opensearch';
-$app_id = $app['app_id'];
 
 try {
     $returned = json_app_get($device, 'opensearch');
@@ -101,7 +100,7 @@ $metrics = [
     'tst_res_size' => $data['tst_res_size'],
 ];
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('c_nodes', 'GAUGE', 0)
     ->addDataset('c_data_nodes', 'GAUGE', 0)
@@ -184,18 +183,22 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tst_size', 'GAUGE', 0)
     ->addDataset('tst_res_size', 'GAUGE', 0);
 
-// skip logging initial set, only log changes
-if (isset($app_data['cluster'])) {
-    if ($app_data['cluster'] != $returned['data']['cluster_name']) {
+// save clustername upon changes and log it post initial set
+if (isset($app->data['cluster'])) {
+    if ($app->data['cluster'] != $returned['data']['cluster_name']) {
         log_event('Elastic/Opensearch: Cluster name changed to "' . $returned['data']['cluster_name'] . '"', $device, 'application');
+
+        // save the found cluster name
+        $app->data = ['cluster' => $returned['data']['cluster_name']];
     }
+} else {
+    $app->data = ['cluster' => $returned['data']['cluster_name']];
 }
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
 
-// save thge found cluster name
-$app_data['cluster'] = $returned['data']['cluster_name'];
+
 
 //
 // update the app metrics
