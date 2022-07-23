@@ -6,13 +6,12 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'sneck';
-$app_id = $app['app_id'];
 
 $old_checks = [];
-if (isset($app_data['data']) and isset($app_data['data']['checks'])) {
-    $old_checks = array_keys($app_data['data']['checks']);
+if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
+    $old_checks = array_keys($app->data['data']['checks']);
 } else {
-    $app_data['data'] = ['checks' => []];
+    $app->data = ['data' => ['checks' => []]];
 }
 
 if (Config::has('apps.sneck.polling_time_diff')) {
@@ -36,7 +35,7 @@ if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
     $new_checks = array_keys($json_return['data']['checks']);
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('time', 'DERIVE', 0)
     ->addDataset('time_to_polling', 'GAUGE', 0)
@@ -64,11 +63,11 @@ $fields = [
     'errored' => $json_return['data']['errored'],
 ];
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // save the return status for each alerting possibilities
-foreach ($json_return['data']['checks'] as $key=>$value) {
+foreach ($json_return['data']['checks'] as $key => $value) {
     $fields['check_' . $key] = $value['exit'];
 }
 
@@ -86,7 +85,7 @@ $added_checks = array_values(array_diff($new_checks, $old_checks));
 $removed_checks = array_values(array_diff($old_checks, $new_checks));
 
 // if we have any check changes, log it
-if (sizeof($added_checks) > 0 or sizeof($removed_checks) > 0) {
+if (sizeof($added_checks) > 0 || sizeof($removed_checks) > 0) {
     $log_message = 'Sneck Check Change:';
     $log_message .= count($added_checks) > 0 ? ' Added ' . json_encode($added_checks) : '';
     $log_message .= count($removed_checks) > 0 ? ' Removed ' . json_encode($added_checks) : '';
@@ -99,8 +98,8 @@ $warned = [];
 $alerted = [];
 $unknowned = [];
 foreach ($new_checks as $check) {
-    if (isset($app_data['data']['checks'][$check]) and isset($app_data['data']['checks'][$check]['exit']) and isset($app_data['data']['checks'][$check]['output'])) {
-        if ($json_return['data']['checks'][$check]['exit'] != $app_data['data']['checks'][$check]['exit']) {
+    if (isset($app->data['data']['checks'][$check]) && isset($app->data['data']['checks'][$check]['exit']) && isset($app->data['data']['checks'][$check]['output'])) {
+        if ($json_return['data']['checks'][$check]['exit'] != $app->data['data']['checks'][$check]['exit']) {
             $check_output = $json_return['data']['checks'][$check]['output'];
             $exit_code = $json_return['data']['checks'][$check]['exit'];
 
@@ -115,7 +114,7 @@ foreach ($new_checks as $check) {
             }
         }
     } else {
-        if (isset($json_return['data']['checks'][$check]['exit']) and isset($json_return['data']['checks'][$check]['output'])) {
+        if (isset($json_return['data']['checks'][$check]['exit']) && isset($json_return['data']['checks'][$check]['output'])) {
             $check_output = $json_return['data']['checks'][$check]['output'];
             $exit_code = $json_return['data']['checks'][$check]['exit'];
 
@@ -158,4 +157,4 @@ if (sizeof($unknowned) > 0) {
 update_application($app, 'OK', $fields);
 
 // save the json_return to the app data
-$app_data = $json_return;
+$app->data = $json_return;
