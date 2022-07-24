@@ -629,7 +629,7 @@ function is_port_valid($port, $device)
     $ifName = $port['ifName'];
     $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
-    $ifOperStatus = $port['ifOperStatus'];
+    $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
