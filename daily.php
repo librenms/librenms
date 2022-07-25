@@ -126,7 +126,7 @@ if ($options['f'] === 'authlog') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'includes/callback.php';
+    \LibreNMS\Util\Stats::submit();
 }
 
 if ($options['f'] === 'device_perf') {
