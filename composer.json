@@ -87,7 +87,8 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "nunomaduro/laravel-console-summary"
+                "nunomaduro/laravel-console-summary",
+                "facade/ignition"
             ]
         }
     },

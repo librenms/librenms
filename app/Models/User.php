@@ -40,6 +40,11 @@ class User extends Authenticatable
         'can_modify_passwd' => 'integer',
     ];
 
+    public function toFlare(): array
+    {
+        return [];
+    }
+
     // ---- Helper Functions ----
 
     /**

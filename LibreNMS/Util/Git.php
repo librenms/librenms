@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use Carbon\Carbon;
 use LibreNMS\Config;
+use Symfony\Component\Process\Process;
 
 class Git
 {
@@ -52,5 +53,46 @@ class Git
     public static function localDate(): Carbon
     {
         return \Date::createFromTimestamp(exec("git show --pretty='%ct' -s HEAD"));
+    }
+
+    public static function unchanged(): bool
+    {
+        $process = new Process(['git', 'diff-index', '--quiet', 'HEAD']);
+        $process->disableOutput();
+        $process->run();
+
+        return $process->getExitCode() === 0;
+    }
+
+    /**
+     * Note: It assumes origin/master points to github.com/librenms/librenms for this to work.
+     */
+    public static function officalCommit(?string $hash = null, string $remote = "origin/master"): bool
+    {
+        if ($hash === null) {
+            $process = new Process(['git', 'rev-parse', 'HEAD']);
+            $process->run();
+
+            $hash = trim($process->getOutput());
+        }
+
+        $process = new Process(['git', 'branch', '--remotes', '--contains', $hash, $remote]);
+        $process->run();
+
+        if ($process->isSuccessful()) {
+            if (trim($process->getOutput()) == $remote) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function remoteUrl(string $remote = 'origin'): string
+    {
+        $process = new Process(['git', 'ls-remote', '--get-url', $remote]);
+        $process->run();
+
+        return trim($process->getOutput());
     }
 }

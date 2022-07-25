@@ -3,14 +3,19 @@
 namespace App\Providers;
 
 use App\Models\Sensor;
+use Config;
+use Facade\FlareClient\Report;
+use Facade\Ignition\Facades\Flare;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use LibreNMS\Cache\PermissionsCache;
-use LibreNMS\Config;
+use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
+use LibreNMS\Util\Version;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
@@ -47,12 +52,107 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $this->bootFlare();
+
         \Illuminate\Pagination\Paginator::useBootstrap();
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
+    }
+
+    private function bootFlare(): void
+    {
+
+        // PHPStan (Larastan?) prevents us from skipping loading the service provider at all
+        // Not sure if bug or by design
+        if ($this->app->isProduction() && \LibreNMS\Config::get('reporting.error', false) == true) {
+            Config::set('flare.key', Config::get('librenms.flare_key'));
+        }
+
+        $this->app->register(\Facade\Ignition\IgnitionServiceProvider::class);
+
+        /**
+         * Filter reports based on conditions
+         */
+        Flare::filterReportsUsing(function (Report $report) {
+            // Only run in production
+            if (! $this->app->isProduction()) {
+                return false;
+            }
+
+            // Check if git installation
+            if (! Git::repoPresent()) {
+                return false;
+            }
+
+            // Repo url must be offical one
+            if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
+                return false;
+            }
+
+            // Check if repo is modified
+            if (! Git::unchanged()) {
+                return false;
+            }
+
+            // Check if repo is modified
+            if (! Git::officalCommit()) {
+                return false;
+            }
+
+            return true;
+        });
+
+        Flare::determineVersionUsing(function () {
+            return \LibreNMS\Util\Version::VERSION;
+        });
+
+        Flare::registerMiddleware(function (Report $report, $next) {
+
+            // Filter some extra fields for privacy
+            // Move to header middleware when switching to spatie/laravel-ignition
+            try {
+                $report->setApplicationPath('');
+                $context = $report->allContext();
+
+                if (isset($context['request']['url'])) {
+                    $context['request']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['request']['url']);
+                }
+
+                if (isset($context['session']['_previous']['url'])) {
+                    $context['session']['_previous']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['_previous']['url']);
+                }
+
+                $context['headers']['host'] = null;
+                $context['headers']['referer'] = null;
+
+                $report->userProvidedContext($context);
+            } catch (\Exception $e) {
+            }
+
+            // Add more LibreNMS related info
+            try {
+                $version = Version::get();
+
+                $report->group('LibreNMS', [
+                    'Git version' => $version->local(),
+                    'App version' => Version::VERSION,
+                ]);
+
+                $report->group('Tools', [
+                    'Database' => $version->databaseServer(),
+                    'Net-SNMP' => $version->netSnmp(),
+                    'Python' => $version->python(),
+                    'RRDtool' => $version->rrdtool(),
+
+                ]);
+            } catch (\Exception $e) {
+            }
+
+            return $next($report);
+        });
     }
 
     private function bootCustomBladeDirectives()
@@ -90,7 +190,7 @@ class AppServiceProvider extends ServiceProvider
     private function registerFacades()
     {
         // replace log manager so we can add the event function
-        $this->app->bind('log', function ($app) {
+        $this->app->singleton('log', function ($app) {
             return new \App\Facades\LogManager($app);
         });
     }
@@ -99,7 +199,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->alias(\LibreNMS\Interfaces\Geocoder::class, 'geocoder');
         $this->app->bind(\LibreNMS\Interfaces\Geocoder::class, function ($app) {
-            $engine = Config::get('geoloc.engine');
+            $engine = \LibreNMS\Config::get('geoloc.engine');
 
             switch ($engine) {
                 case 'mapquest':

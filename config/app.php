@@ -178,6 +178,7 @@ return [
         /*
          * LibreNMS Service Providers...
          */
+        App\Providers\ConfigServiceProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
@@ -185,7 +186,6 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        App\Providers\ConfigServiceProvider::class,
         App\Providers\SocialiteListenersServiceProvider::class,
 
         App\Providers\ComposerServiceProvider::class,

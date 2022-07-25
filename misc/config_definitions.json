@@ -5611,6 +5611,10 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
+        },
+        "reporting.error": {
+            "default": false,
+            "type": "boolean"
         }
     }
 }
