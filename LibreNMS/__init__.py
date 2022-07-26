@@ -421,8 +421,8 @@ class ThreadingLock(Lock):
 
 class RedisLock(Lock):
     def __init__(self, namespace="lock", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
@@ -458,7 +458,7 @@ class RedisLock(Lock):
         :param owner: str a unique name for the locking node
         :param expiration: int in seconds, 0 expiration means forever
         """
-        import redis
+        import redis  # pylint: disable=import-error
 
         try:
             if int(expiration) < 1:
@@ -503,8 +503,8 @@ class RedisLock(Lock):
 
 class RedisUniqueQueue(object):
     def __init__(self, name, namespace="queue", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
