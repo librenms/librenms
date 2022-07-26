@@ -2,7 +2,7 @@
 /**
  * Log.php
  *
- * -Description-
+ * check_log
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,10 +23,12 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Services;
+namespace LibreNMS\Services\Checks;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Services\CheckParameter;
+use LibreNMS\Services\DefaultServiceCheck;
 
 class Log extends DefaultServiceCheck
 {

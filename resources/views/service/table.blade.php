@@ -67,7 +67,8 @@
                     </td>
                 </tr>
                 @if($view == 'graphs')
-                    @foreach($service->service_ds ?? [] as $type => $unit)
+                    @php $service_check = \LibreNMS\Services::makeCheck($service) @endphp
+                    @foreach($service_check->serviceDataSets() as $type => $unit)
                         <tr>
                             <td>
                                 <div class="col-sm-12">

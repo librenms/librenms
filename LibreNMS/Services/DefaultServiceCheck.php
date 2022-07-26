@@ -50,13 +50,22 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         ]);
     }
 
+    /**
+     * Get array of stored datasets for graphing
+     */
     public function serviceDataSets(): array
     {
-        return $this->service->service_ds;
+        return $this->service->service_ds ?? [];
     }
 
     public function graphRrdCommands(string $rrd_filename, string $ds): string
     {
+        // use raw service_ds instead of possibly overriden serviceDataSets()
+        if (! isset($this->service->service_ds[$ds])) {
+            return '';
+        }
+        $title = Rrd::fixedSafeDescr(ucfirst($ds) . ($this->service->service_ds[$ds] ? ' (' . $this->service->service_ds[$ds] . ')' : ''), 15);
+
         $tint = preg_match('/loss/i', $ds) ? 'pinks' : 'blues';
         $color_avg = Config::get("graph_colours.$tint.2");
         $color_max = Config::get("graph_colours.$tint.0");
@@ -64,7 +73,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         $rrd_additions = ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
         $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';
         $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
-        $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . Rrd::fixedSafeDescr(ucfirst($ds) . ' (' . ($this->serviceDataSets()[$ds] ?? '') . ')', 15) . "' ";
+        $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . $title . "' ";
         $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
         $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
         $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';

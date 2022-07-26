@@ -72,11 +72,19 @@ class Services
      */
     public static function getCheck(string $check): string
     {
-        $check_class = '\LibreNMS\Services\\' . ucfirst(strtolower($check));
+        $check_class = self::checkToClass($check);
         if (class_exists($check_class) && in_array(ServiceCheck::class, class_implements($check_class))) {
             return $check_class;
         }
 
         return DefaultServiceCheck::class;
+    }
+
+    private static function checkToClass(string $check): string
+    {
+        $name = ucwords(str_replace('_', ' ', strtolower($check)));
+        $class = str_replace(' ', '', $name);
+
+        return '\LibreNMS\Services\Checks\\' . $class;
     }
 }

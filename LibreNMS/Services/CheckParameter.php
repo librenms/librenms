@@ -120,9 +120,15 @@ class CheckParameter
         ];
     }
 
+    /**
+     * Set flag that this parameter has a default variable.
+     * Default will be filled by calling getDefault() on the ServiceCheck at runtime.
+     * Also sets required to false.
+     */
     public function setHasDefault(): CheckParameter
     {
         $this->default = true;
+        $this->required = false;
 
         return $this;
     }
