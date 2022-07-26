@@ -342,8 +342,8 @@
 								@foreach($port_groups as $group)
 									<li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                                 @endforeach
-							    @endif
                                 </ul>
+							    @endif
                             </li>
 
                             <li role="presentation" class="divider"></li>
