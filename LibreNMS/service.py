@@ -4,7 +4,7 @@ import sys
 import threading
 import time
 
-import pymysql
+import pymysql  # pylint: disable=import-error
 
 import LibreNMS
 
