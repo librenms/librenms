@@ -59,14 +59,13 @@ class Stats
         return $enabled == 1;
     }
 
-    public function clearStats()
+    public function clearStats(): void
     {
         $uuid = Callback::get('uuid');
 
         $response = \Http::withOptions(['proxy' => Proxy::forGuzzle()])
             ->asForm()
             ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
-
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();
@@ -182,7 +181,7 @@ class Stats
     }
 
     /**
-     * @param Builder|string $table
+     * @param  Builder|string  $table
      * @param  array  $groups
      * @return \Illuminate\Support\Collection
      */
@@ -199,7 +198,7 @@ class Stats
             ->get();
     }
 
-    private function selectStatic($value, $name = 'version'): array
+    private function selectStatic(string $value, string $name = 'version'): array
     {
         return [['total' => 1, $name => $value]];
     }

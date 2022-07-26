@@ -203,7 +203,7 @@ class Version
         if (file_exists('/etc/os-release')) {
             $info = @parse_ini_file('/etc/os-release');
         } else {
-            foreach(glob('/etc/*-release') as $file) {
+            foreach (glob('/etc/*-release') as $file) {
                 $content = file_get_contents($file);
                 // normal os release style
                 $info = @parse_ini_string($content);
@@ -220,6 +220,7 @@ class Version
         }
 
         $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
+
         return implode(' ', $only);
     }
 }
