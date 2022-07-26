@@ -787,8 +787,8 @@ foreach ($ports as $port) {
                     $port_update = 'update_extended';
                 }
 
-                $port[$port_update][$oid] = $this_port[$oid];
-                $port[$port_update][$oid . '_prev'] = $port[$oid];
+                $port[$port_update][$oid] = set_numeric($this_port[$oid] ?? 0);
+                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
