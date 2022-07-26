@@ -30,6 +30,7 @@ use App\Models\BgpPeer;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\PortGroup;
 use App\Models\Location;
 use App\Models\Notification;
 use App\Models\Package;
@@ -112,7 +113,9 @@ class MenuComposer
             Config::get('int_core') ||
             Config::get('int_l2tp') ||
             $vars['custom_port_descr']->isNotEmpty();
-
+        
+        $vars['port_groups'] = PortGroup::hasAccess($user)->orderBy('name')->get(['port_groups.id', 'name', 'desc']);
+        
         // Sensor menu
         $vars['sensor_menu'] = ObjectCache::sensors();
 
