@@ -52,6 +52,7 @@ from argparse import ArgumentParser
 
 import LibreNMS
 from LibreNMS.command_runner import command_runner
+from LibreNMS.config import DBConfig
 
 
 logger = logging.getLogger(__name__)
@@ -445,7 +446,7 @@ def wrapper(
         logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
-    sconfig = LibreNMS.DBConfig()
+    sconfig = DBConfig()
     sconfig.populate(config)
     db_connection = LibreNMS.DB(sconfig)
     cursor = db_connection.query(query)

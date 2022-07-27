@@ -7,6 +7,7 @@ import time
 import pymysql  # pylint: disable=import-error
 
 import LibreNMS
+from LibreNMS.config import DBConfig
 
 try:
     import psutil
@@ -37,7 +38,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class ServiceConfig(LibreNMS.DBConfig):
+class ServiceConfig(DBConfig):
     def __init__(self):
         """
         Stores all of the configuration variables for the LibreNMS service in a common object
