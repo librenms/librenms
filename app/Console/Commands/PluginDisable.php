@@ -19,17 +19,12 @@ class PluginDisable extends LnmsCommand
         $this->addArgument('plugin', InputArgument::REQUIRED);
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
         try {
             $plugin = $this->argument('plugin');
             $query = Plugin::when($plugin !== 'all', function ($query) use ($plugin) {
-                $query->where('plugin_name', 'like', $this->argument('plugin'));
+                $query->where('plugin_name', 'like', $plugin);
             });
 
             $updated = $query->update(['plugin_active' => 0]);

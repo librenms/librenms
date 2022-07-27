@@ -14,29 +14,18 @@ class PluginEnable extends LnmsCommand
 
     protected $name = 'plugin:enable';
 
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
         $this->addArgument('plugin', InputArgument::REQUIRED);
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(): int
     {
         try {
             $plugin = $this->argument('plugin');
             $query = Plugin::when($plugin !== 'all', function (Builder $query) use ($plugin) {
-                $query->where('plugin_name', 'like', $this->argument('plugin'))
+                $query->where('plugin_name', 'like', $plugin)
                     ->orderBy('version', 'DESC')
                     ->limit(1);
             });
