@@ -43,7 +43,7 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
         }
 
         if ($this->could_not_check_cron) {
-            return ValidationResult::warn(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
+            return ValidationResult::info(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
         }
 
         return ValidationResult::fail(trans('validation.validations.poller.CheckPythonWrapper.not_detected'));
