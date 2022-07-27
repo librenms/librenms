@@ -79,7 +79,8 @@ class CheckDispatcherService implements \LibreNMS\Interfaces\Validation
 
         // python wrapper found, just warn
         if (Poller::exists()) {
-            return ValidationResult::warn(trans('validation.validations.poller.CheckDispatcherService.warn'));
+            $status = Poller::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::WARNING;
+            return new ValidationResult(trans('validation.validations.poller.CheckDispatcherService.warn'), $status);
         }
 
         // no python wrapper registered, fail

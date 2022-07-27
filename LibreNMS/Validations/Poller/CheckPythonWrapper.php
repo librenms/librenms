@@ -26,11 +26,15 @@
 namespace LibreNMS\Validations\Poller;
 
 use App\Models\Poller;
+use App\Models\PollerCluster;
 use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 {
+    /** @var bool */
+    private $could_not_check_cron = false;
+
     /**
      * @inheritDoc
      */
@@ -42,15 +46,22 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 
         // check if cron is installed, then try to check if the cron entries are enabled.
         $cron = Config::locateBinary('cron');
-        if ($cron) {
+        if ($cron !== 'cron') { // cron is installed
             if ($this->wrapperCronEnabled()) {
                 return $this->checkPythonWrapper();
             }
 
-            return ValidationResult::info(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
+            if ($this->could_not_check_cron) {
+                return ValidationResult::info(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
+            }
+
+
+            $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+            return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.not_detected'), $status);
         }
 
-        return ValidationResult::fail(trans('validation.validations.poller.CheckPythonWrapper.not_detected'));
+        $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+        return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.no_pollers'), $status);
     }
 
     /**
@@ -64,7 +75,8 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
     private function checkPythonWrapper(): ValidationResult
     {
         if (! Poller::isActive()->exists()) {
-            return ValidationResult::fail(trans('validation.validations.poller.CheckPythonWrapper.fail'));
+            $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+            return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.fail'), $status);
         }
 
         $inactive_pollers = Poller::isInactive()->get();
@@ -81,10 +93,12 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
         $files = glob('/etc/cron.d/*');
         $files[] = '/etc/crontab';
         $files[] = '/var/spool/cron/crontabs/librenms';
+        $this->could_not_check_cron = true; // set this in case we can't read any cron files
 
         $cron_entries = array_reduce($files, function ($entries, $file) {
             if (is_readable($file)) {
                 $entries .= file_get_contents($file) . PHP_EOL;
+                $this->could_not_check_cron = false;
             }
 
             return $entries;

@@ -36,8 +36,14 @@ class CheckActivePoller implements \LibreNMS\Interfaces\Validation
      */
     public function validate(): ValidationResult
     {
-        if (! PollerCluster::isActive()->exists() && ! Poller::isActive()->exists()) {
+        $dispatcher_exists = PollerCluster::isActive()->exists();
+        $wrapper_exists = Poller::isActive()->exists();
+        if (! $dispatcher_exists && ! $wrapper_exists) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckActivePoller.fail'));
+        }
+
+        if ($dispatcher_exists && $wrapper_exists) {
+            return ValidationResult::fail(trans('validation.validations.poller.CheckActivePoller.both_fail'));
         }
 
         return ValidationResult::ok(trans('validation.validations.poller.CheckActivePoller.ok'));

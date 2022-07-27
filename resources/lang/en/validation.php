@@ -240,6 +240,7 @@ return [
         'poller' => [
             'CheckActivePoller' => [
                 'fail' => 'No active polling method detected',
+                'both_fail' => 'Both Dispatcher Service and Python Wrapper were active recently, this could cause double polling',
                 'ok' => 'Active pollers found',
             ],
             'CheckDispatcherService' => [
@@ -247,7 +248,7 @@ return [
                 'ok' => 'Dispatcher Service is enabled',
                 'nodes_down' => 'Some dispatcher nodes have not checked in recently',
                 'not_detected' => 'Dispatcher Service not detected',
-                'warn' => 'Dispatcher Service has been used, but not recently. It may take up to 5 minutes to register.',
+                'warn' => 'Dispatcher Service has been used, but not recently',
             ],
             'CheckLocking' => [
                 'fail' => 'Locking server issue: :message',
@@ -255,6 +256,7 @@ return [
             ],
             'CheckPythonWrapper' => [
                 'fail' => 'No active python wrapper pollers found',
+                'no_pollers' => 'No python wrapper pollers found',
                 'cron_unread' => 'Could not read cron files',
                 'ok' => 'Python poller wrapper is polling',
                 'nodes_down' => 'Some poller nodes have not checked in recently',
