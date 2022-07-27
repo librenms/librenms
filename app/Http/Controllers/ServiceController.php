@@ -221,9 +221,9 @@ class ServiceController extends Controller
     }
 
     /**
-     * @param string $state
-     * @param bool $disabled
-     * @param bool $ignored
+     * @param  string  $state
+     * @param  bool  $disabled
+     * @param  bool  $ignored
      * @return \Closure
      */
     private function filterServices($state, $disabled, $ignored): Closure

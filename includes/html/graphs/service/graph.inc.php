@@ -16,7 +16,6 @@
 /** @var string $rrd_filename */
 /** @var string $rrd_options */
 /** @var array $vars */
-
 $service_check = \LibreNMS\Services::makeCheck($service);
 
 include 'includes/html/graphs/common.inc.php';
