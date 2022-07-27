@@ -253,7 +253,7 @@ class DB:
                 logger.debug("Using cleartext MySQL connection")
             elif sslmode == "verify_ca":
                 logger.info(
-                    "Using TLS MySQL connection without CA trust validation only"
+                    "Using TLS MySQL connection without CN/SAN check (CA validation only)"
                 )
                 args["ssl"] = {"ca": self.config.db_ssl_ca, "check_hostname": False}
             elif sslmode == "verify_identity":
