@@ -240,7 +240,7 @@ return [
         'poller' => [
             'CheckActivePoller' => [
                 'fail' => 'No active polling method detected',
-                'ok' => 'Active pollers found'
+                'ok' => 'Active pollers found',
             ],
             'CheckDispatcherService' => [
                 'fail' => 'No active dispatcher nodes found',

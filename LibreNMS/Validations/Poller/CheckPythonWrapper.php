@@ -30,6 +30,7 @@ use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 {
+    /** @var bool */
     private $could_not_check_cron = false;
 
     /**
@@ -70,7 +71,6 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 
         return ValidationResult::ok(trans('validation.validations.poller.CheckPythonWrapper.ok'));
     }
-
 
     private function wrapperCronEnabled(): bool
     {

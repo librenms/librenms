@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Poller extends Model
@@ -35,15 +36,15 @@ class Poller extends Model
 
     // ---- Scopes ----
 
-    public function scopeIsInactive($query)
+    public function scopeIsInactive(Builder $query): Builder
     {
         $default = (int) \LibreNMS\Config::get('rrd.step');
-        $query->where('last_polled', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
+        return $query->where('last_polled', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
     }
 
-    public function scopeIsActive($query)
+    public function scopeIsActive(Builder $query): Builder
     {
         $default = (int) \LibreNMS\Config::get('rrd.step');
-        $query->where('last_polled', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
+        return $query->where('last_polled', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
     }
 }
