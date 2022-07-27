@@ -43,7 +43,6 @@ class ServiceConfig(LibreNMS.DBConfig):
         Stores all of the configuration variables for the LibreNMS service in a common object
         Starts with defaults, but can be populated with variables from config.php by calling populate()
         """
-        super().__init__()
         self._uuid = str(uuid1())
         self.set_name(gethostname())
 

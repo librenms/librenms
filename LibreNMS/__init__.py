@@ -318,16 +318,15 @@ class DBConfig:
     Bare minimal config class for LibreNMS.DB class usage
     """
 
-    def __init__(self):
-        # Start with defaults and override
-        self.db_host = "localhost"
-        self.db_port = 0
-        self.db_socket = None
-        self.db_user = "librenms"
-        self.db_pass = ""
-        self.db_name = "librenms"
-        self.db_sslmode = "disabled"
-        self.db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
+    # Start with defaults and override
+    db_host = "localhost"
+    db_port = 0
+    db_socket = None
+    db_user = "librenms"
+    db_pass = ""
+    db_name = "librenms"
+    db_sslmode = "disabled"
+    db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
 
     def populate(self, _config):
         for key, val in _config.items():
@@ -336,7 +335,7 @@ class DBConfig:
                 self.db_port = int(val)
             elif key.startswith("db_"):
                 # Prevent prototype pollution by enforcing prefix
-                setattr(self, key, val)
+                setattr(DBConfig, key, val)
 
 
 class RecurringTimer:
