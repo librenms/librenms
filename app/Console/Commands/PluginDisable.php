@@ -23,9 +23,11 @@ class PluginDisable extends LnmsCommand
     {
         try {
             $plugin = $this->argument('plugin');
-            $query = Plugin::when($plugin !== 'all', function ($query) use ($plugin) {
+            $query = Plugin::query();
+
+            if ($plugin !== 'all') {
                 $query->where('plugin_name', 'like', $plugin);
-            });
+            }
 
             $updated = $query->update(['plugin_active' => 0]);
 

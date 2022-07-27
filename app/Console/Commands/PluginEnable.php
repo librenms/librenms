@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Console\Commands\Traits\CompletesPluginArgument;
 use App\Console\LnmsCommand;
 use App\Models\Plugin;
-use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\Console\Input\InputArgument;
 
 class PluginEnable extends LnmsCommand
@@ -24,11 +23,14 @@ class PluginEnable extends LnmsCommand
     {
         try {
             $plugin = $this->argument('plugin');
-            $query = Plugin::when($plugin !== 'all', function (Builder $query) use ($plugin) {
+
+            $query = Plugin::query();
+
+            if ($plugin !== 'all') {
                 $query->where('plugin_name', 'like', $plugin)
-                    ->orderBy('version', 'DESC')
-                    ->limit(1);
-            });
+                    ->limit(1)
+                    ->orderBy('version', 'DESC');
+            }
 
             $updated = $query->update(['plugin_active' => 1]);
 
