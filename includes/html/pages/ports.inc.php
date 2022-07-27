@@ -404,12 +404,10 @@ foreach ($vars as $var => $value) {
                     }
                 }
                 break;
-                case 'group':
-                $where .= ' AND ( ';
-                 foreach (DB::table('port_group_port')->where('port_group_id', $vars['group'])->pluck('port_id') as $prt) {
-                     $where .= 'port_id = ? OR ';
-                     $param[] = $prt;
-                 }
+            case 'group':
+                $where .= ' AND port_id IN (';
+                $where .= DB::table('port_group_port')->where('port_group_id', $vars['group'])->pluck('port_id')->implode(',');
+                $where .= ')';
                 break;
         }
     }
