@@ -313,6 +313,32 @@ class DB:
             conn.close()
 
 
+class DBConfig:
+    """
+    Bare minimal config class for LibreNMS.DB class usage
+    """
+
+    def __init__(self):
+        # Start with defaults and override
+        self.db_host = "localhost"
+        self.db_port = 0
+        self.db_socket = None
+        self.db_user = "librenms"
+        self.db_pass = ""
+        self.db_name = "librenms"
+        self.db_sslmode = "disabled"
+        self.db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
+
+    def populate(self, _config):
+        for key, val in _config.items():
+            if key == "db_port":
+                # Special case: port number
+                self.db_port = int(val)
+            elif key.startswith("db_"):
+                # Prevent prototype pollution by enforcing prefix
+                setattr(self, key, val)
+
+
 class RecurringTimer:
     def __init__(self, duration, target, thread_name=None):
         self.duration = duration

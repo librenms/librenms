@@ -37,12 +37,13 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class ServiceConfig:
+class ServiceConfig(LibreNMS.DBConfig):
     def __init__(self):
         """
         Stores all of the configuration variables for the LibreNMS service in a common object
         Starts with defaults, but can be populated with variables from config.php by calling populate()
         """
+        super().__init__()
         self._uuid = str(uuid1())
         self.set_name(gethostname())
 
@@ -95,15 +96,6 @@ class ServiceConfig:
     redis_sentinel = None
     redis_sentinel_service = None
     redis_timeout = 60
-
-    db_host = "localhost"
-    db_port = 0
-    db_socket = None
-    db_user = "librenms"
-    db_pass = ""
-    db_name = "librenms"
-    db_sslmode = "disabled"
-    db_ssl_ca = "/etc/ssl/certs/ca-certificates.crt"
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
