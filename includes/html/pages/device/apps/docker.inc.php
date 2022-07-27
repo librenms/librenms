@@ -1,6 +1,6 @@
 <?php
 
-$domain_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'docker');
+$domain_list = Rrd::getRrdApplicationArrays($device, $app->app_id, 'docker', null, 'metrics');
 
 print_optionbar_start();
 

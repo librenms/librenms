@@ -21,10 +21,12 @@
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\Data\Store;
 
+use App\Models\ApplicationMetrics;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -484,11 +486,13 @@ class Rrd extends BaseDatastore
      * @param  int  $app_id  application id on the device
      * @param  string  $app_name  name of app to be searched
      * @param  string  $category  which category of graphs are searched
+     * @param  string  $filter  filter filenames against selected table
      * @return array array of rrd files for this host
      */
-    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
+    public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null, $filter = null)
     {
         $entries = [];
+        $filteredList = [];
         $separator = '-';
 
         $rrdfile_array = $this->getRrdFiles($device);
@@ -511,7 +515,20 @@ class Rrd extends BaseDatastore
             }
         }
 
-        return $entries;
+        //apply filter
+        if ($filter == 'metrics' && $entries) {
+           foreach ($entries as $rrdName) {
+                $cnt = ApplicationMetrics::where('app_id', $app_id)
+                    ->where('metric', 'like', $rrdName . '%')
+                    ->count();
+
+                if ($cnt) {
+                    array_push($filteredList, $rrdName);
+                }
+            }
+        }
+
+        return $filteredList ?: $entries;
     }
 
     /**
