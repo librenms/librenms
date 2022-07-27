@@ -107,7 +107,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         $flags = array_keys($this->hasDefaults());
         $modern = is_array($this->service->service_param);
         if ($modern) {
-            $flags += array_keys($this->service->service_param);
+            $flags = array_merge($flags, array_keys($this->service->service_param));
         }
 
         foreach ($flags as $flag) {
@@ -142,7 +142,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     {
         switch ($flag) {
             case '-H':
-                return $this->service->service_ip ?? $this->service->device->overwrite_ip ?? $this->service->device->hostname;
+                return $this->service->service_ip ?: $this->service->device->overwrite_ip ?: $this->service->device->hostname;
             default:
                 return '';
         }

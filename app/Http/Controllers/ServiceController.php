@@ -214,8 +214,15 @@ class ServiceController extends Controller
         $service = $this->validateNewService($request);
         $response = app(\LibreNMS\Modules\Services::class)->checkService($service);
 
+        $message = $response->message;
+
+        // prepend the CLI for troubleshooting if the check fails
+        if ($response->result == 2) {
+            $message = $response->commandLine . PHP_EOL . PHP_EOL . $message;
+        }
+
         return response()->json([
-            'message' => $response->message,
+            'message' => $message,
             'result' => $response->result,
         ]);
     }

@@ -129,11 +129,12 @@ class Services implements Module
         $command = \LibreNMS\Services::makeCheck($service)->buildCommand();
         $process = new Process($command, null, ['LC_NUMERIC' => 'C']);
 
-        Log::debug(sprintf('[Service Check] %s', $process->getCommandLine()));
+        $cli = $process->getCommandLine();
+        Log::debug(sprintf('[Service Check] %s', $cli));
 
         $process->run();
 
-        return new ServiceCheckResponse($process->getOutput(), $process->getExitCode());
+        return new ServiceCheckResponse($process->getOutput(), $process->getExitCode(), $cli);
     }
 
     private function canSkip(Device $device, Service $service): bool

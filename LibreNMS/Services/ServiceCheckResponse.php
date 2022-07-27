@@ -35,9 +35,12 @@ class ServiceCheckResponse
     public $result;
     /** @var string The textual response of the check */
     public $message;
+    /** @var string The command line ran */
+    public $commandLine;
 
-    public function __construct(string $output, int $return)
+    public function __construct(string $output, int $return, string $commandLine)
     {
+        $this->commandLine = $commandLine;
         $this->result = $return;
 
         // Split out the response and the performance data.

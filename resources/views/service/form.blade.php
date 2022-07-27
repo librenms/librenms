@@ -154,7 +154,7 @@
             errors: {},
             async save() {
                 const url = this.service_id ? '{{ route('services.update', ['service' => '?']) }}'.replace('?', this.service_id) : '{{ route('services.store') }}';
-                if (await this.submitCheck(url) !== false) {
+                if (await this.submitCheck(url, this.service_id ? 'PUT' : 'POST') !== false) {
                     toastr.success('{{ __('service.added') }}');
                     this.$dispatch('service-saved');
 
@@ -169,9 +169,9 @@
                     this.testResult = 1;
                 }
             },
-            async submitCheck(url, test=false) {
+            async submitCheck(url, method) {
                 const response = await fetch(url, {
-                    method: test ? 'POST' : 'PUT',
+                    method: method,
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@
                 }
             },
             async test() {
-                const result = await this.submitCheck('{{ route('services.test') }}', true)
+                const result = await this.submitCheck('{{ route('services.test') }}', 'POST')
                 if (result !== false) {
                     this.testMessage = result.message;
                     this.testResult = result.result;
