@@ -36,9 +36,8 @@ class ApplicationMetrics extends DeviceRelatedModel
         'app_id',
         'metric',
         'value',
-        'value_prev'
+        'value_prev',
     ];
-
 
     /**
      * Set the keys for a save update query. (no primary key)

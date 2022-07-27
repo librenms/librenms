@@ -517,12 +517,12 @@ class Rrd extends BaseDatastore
 
         //apply filter
         if ($filter == 'metrics' && $entries) {
-           foreach ($entries as $rrdName) {
-                $cnt = ApplicationMetrics::where('app_id', $app_id)
+            foreach ($entries as $rrdName) {
+                $found = ApplicationMetrics::where('app_id', $app_id)
                     ->where('metric', 'like', $rrdName . '%')
-                    ->count();
+                    ->exists();
 
-                if ($cnt) {
+                if ($found) {
                     array_push($filteredList, $rrdName);
                 }
             }
