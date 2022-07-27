@@ -179,15 +179,9 @@ class Services implements Module
             }, $metrics);
             Log::debug('Service DS: ' . json_encode($service->service_ds));
 
-            $rrd_def = new RrdDefinition();
-            $fields = [];
             foreach ($metrics as $key => $data) {
                 // c = counter type (exclude uptime)
                 $ds_type = ($data['uom'] == 'c') && ! (preg_match('/[Uu]ptime/', $key)) ? 'COUNTER' : 'GAUGE';
-                $rrd_def->addDataset($key, $ds_type, 0);
-
-                // prep update data
-                $fields[$key] = $data['value'];
 
                 app('Datastore')->put($os->getDeviceArray(), 'services', [
                     'service_id' => $service->service_id,
@@ -195,12 +189,6 @@ class Services implements Module
                     'rrd_def' => RrdDefinition::make()->addDataset('value', $ds_type, null, null, null, ['services', $service->service_id], $key),
                 ], ['value' => $data['value']]);
             }
-
-            app('Datastore')->put($os->getDeviceArray(), 'services', [
-                'service_id' => $service->service_id,
-                'rrd_name' => ['services', $service->service_id],
-                'rrd_def' => $rrd_def,
-            ], $fields);
         }
     }
 }
