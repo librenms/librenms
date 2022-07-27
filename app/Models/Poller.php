@@ -32,4 +32,18 @@ class Poller extends Model
     public $timestamps = false;
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
+
+    // ---- Scopes ----
+
+    public function scopeIsInactive($query)
+    {
+        $default = (int) \LibreNMS\Config::get('rrd.step');
+        $query->where('last_polled', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
+    }
+
+    public function scopeIsActive($query)
+    {
+        $default = (int) \LibreNMS\Config::get('rrd.step');
+        $query->where('last_polled', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
+    }
 }

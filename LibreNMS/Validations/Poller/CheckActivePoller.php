@@ -1,6 +1,6 @@
 <?php
 /**
- * DistributedPoller.php
+ * CheckActivePoller.php
  *
  * -Description-
  *
@@ -19,22 +19,35 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Validations;
+namespace LibreNMS\Validations\Poller;
 
-use LibreNMS\Config;
+use App\Models\Poller;
+use App\Models\PollerCluster;
+use LibreNMS\ValidationResult;
 
-class DistributedPoller extends BaseValidation
+class CheckActivePoller implements \LibreNMS\Interfaces\Validation
 {
-    protected $directory = 'DistributedPoller';
-    protected $name = 'distributedpoller';
-
-    public function isDefault(): bool
+    /**
+     * @inheritDoc
+     */
+    public function validate(): ValidationResult
     {
-        // run by default if distributed polling is enabled
-        return Config::get('distributed_poller');
+        if (! PollerCluster::isActive()->exists() && ! Poller::isActive()->exists()) {
+            return ValidationResult::fail(trans('validation.validations.poller.CheckActivePoller.fail'));
+        }
+
+        return ValidationResult::ok(trans('validation.validations.poller.CheckActivePoller.ok'));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function enabled(): bool
+    {
+        return true;
     }
 }
