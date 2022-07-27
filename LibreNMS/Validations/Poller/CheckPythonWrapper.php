@@ -26,23 +26,27 @@
 namespace LibreNMS\Validations\Poller;
 
 use App\Models\Poller;
+use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
 {
-    /** @var bool */
-    private $could_not_check_cron = false;
-
     /**
      * @inheritDoc
      */
     public function validate(): ValidationResult
     {
-        if (Poller::exists() || $this->wrapperCronEnabled()) {
+        if (Poller::exists()) {
             return $this->checkPythonWrapper();
         }
 
-        if ($this->could_not_check_cron) {
+        // check if cron is installed, then try to check if the cron entries are enabled.
+        $cron = Config::locateBinary('cron');
+        if ($cron) {
+            if ($this->wrapperCronEnabled()) {
+                return $this->checkPythonWrapper();
+            }
+
             return ValidationResult::info(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
         }
 
@@ -77,12 +81,10 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
         $files = glob('/etc/cron.d/*');
         $files[] = '/etc/crontab';
         $files[] = '/var/spool/cron/crontabs/librenms';
-        $this->could_not_check_cron = true; // set this in case we can't read any cron files
 
         $cron_entries = array_reduce($files, function ($entries, $file) {
             if (is_readable($file)) {
                 $entries .= file_get_contents($file) . PHP_EOL;
-                $this->could_not_check_cron = false;
             }
 
             return $entries;
