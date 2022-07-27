@@ -198,7 +198,12 @@ class Stats
             ->get();
     }
 
-    private function selectStatic(string $value, string $name = 'version'): array
+    /**
+     * @param  string|int|float  $value
+     * @param  string  $name
+     * @return array[]
+     */
+    private function selectStatic($value, string $name = 'version'): array
     {
         return [['total' => 1, $name => $value]];
     }
