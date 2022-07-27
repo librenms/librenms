@@ -35,7 +35,7 @@ class CheckLocking implements \LibreNMS\Interfaces\Validation
     public function validate(): ValidationResult
     {
         try {
-            $lock = \Cache::lock('dist_test_validation');
+            $lock = \Cache::lock('dist_test_validation', 5);
             $lock->get();
             $lock->release();
 
