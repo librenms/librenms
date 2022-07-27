@@ -99,7 +99,7 @@ class DistributedPoller extends BaseValidation
         }
 
         $node = PollerCluster::firstWhere('node_id', config('librenms.node_id'));
-        if (! $node->exists) {
+        if (is_null($node)) {
             $validator->fail('Dispatcher service is enabled on your cluster, but not in use on this node');
 
             return;
