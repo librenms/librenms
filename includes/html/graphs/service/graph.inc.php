@@ -13,7 +13,6 @@
 
 // variables from previous scripts
 /** @var \App\Models\Service $service */
-/** @var string $rrd_filename */
 /** @var string $rrd_options */
 /** @var array $vars */
 $service_check = \LibreNMS\Services::makeCheck($service);
@@ -26,8 +25,8 @@ $check_ds = $service_check->serviceDataSets();
 if (! empty($check_ds)) {
     $ds = isset($check_ds[$vars['ds']]) ? $vars['ds'] : \Illuminate\Support\Arr::first($check_ds);
 
-    if (Rrd::checkRrdExists($rrd_filename)) {
-        $rrd_options .= $service_check->graphRrdCommands($rrd_filename, $ds);
+    if ($graph_commands = $service_check->graphRrdCommands($ds)) {
+        $rrd_options .= $graph_commands;
 
         return;
     }

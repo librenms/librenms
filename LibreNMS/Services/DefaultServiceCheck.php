@@ -58,27 +58,32 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         return $this->service->service_ds ?? [];
     }
 
-    public function graphRrdCommands(string $rrd_filename, string $ds): string
+    public function graphRrdCommands(string $ds): string
     {
-        // use raw service_ds instead of possibly overriden serviceDataSets()
-        if (! isset($this->service->service_ds[$ds])) {
+        if (! isset($this->serviceDataSets()[$ds])) {
             return '';
         }
-        $title = Rrd::fixedSafeDescr(ucfirst($ds) . ($this->service->service_ds[$ds] ? ' (' . $this->service->service_ds[$ds] . ')' : ''), 15);
 
-        $tint = preg_match('/loss/i', $ds) ? 'pinks' : 'blues';
-        $color_avg = Config::get("graph_colours.$tint.2");
-        $color_max = Config::get("graph_colours.$tint.0");
+        $rrd_filename = $this->rrdName($ds);
+        if (\Rrd::checkRrdExists($rrd_filename)) {
+            $title = Rrd::fixedSafeDescr(ucfirst($ds) . ($this->service->service_ds[$ds] ? ' (' . $this->service->service_ds[$ds] . ')' : ''), 15);
 
-        $rrd_additions = ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
-        $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';
-        $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
-        $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . $title . "' ";
-        $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
-        $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
-        $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';
+            $tint = preg_match('/loss/i', $ds) ? 'pinks' : 'blues';
+            $color_avg = Config::get("graph_colours.$tint.2");
+            $color_max = Config::get("graph_colours.$tint.0");
 
-        return $rrd_additions;
+            $rrd_additions = ' DEF:DS=' . $rrd_filename . ':value:AVERAGE ';
+            $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':value:MAX ';
+            $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
+            $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . $title . "' ";
+            $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
+            $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
+            $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';
+
+            return $rrd_additions;
+        }
+
+        return '';
     }
 
     /**
@@ -146,5 +151,9 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
             default:
                 return '';
         }
+    }
+
+    protected function rrdName(string $ds) {
+        return \Rrd::name($this->service->device->hostname, ['service', $this->service->service_id, $ds]);
     }
 }

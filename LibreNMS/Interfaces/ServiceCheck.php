@@ -53,7 +53,7 @@ interface ServiceCheck
      * @param  string  $ds
      * @return string
      */
-    public function graphRrdCommands(string $rrd_filename, string $ds): string;
+    public function graphRrdCommands(string $ds): string;
 
     /**
      * Get the available check parameters.

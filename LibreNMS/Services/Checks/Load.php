@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Services\Checks;
 
+use App\Facades\Rrd;
 use LibreNMS\Services\DefaultServiceCheck;
 
 class Load extends DefaultServiceCheck
@@ -34,20 +35,25 @@ class Load extends DefaultServiceCheck
         return ['load' => ''];
     }
 
-    public function graphRrdCommands(string $rrd_filename, string $ds): string
+    public function graphRrdCommands(string $ds): string
     {
-        if ($ds == 'load') {
-            $graph = ' DEF:DS0=' . $rrd_filename . ':load1:AVERAGE ';
+        $rrd_filename = $this->rrdName('load1');
+        if ($ds == 'load' && Rrd::checkRrdExists($rrd_filename)) {
+            $graph = ' DEF:DS0=' . $rrd_filename . ':value:AVERAGE ';
             $graph .= ' LINE1.25:DS0#' . \LibreNMS\Config::get('graph_colours.mixed.0') . ":'" . str_pad(substr('Load 1', 0, 15), 15) . "' ";
             $graph .= ' GPRINT:DS0:LAST:%5.2lf%s ';
             $graph .= ' GPRINT:DS0:AVERAGE:%5.2lf%s ';
             $graph .= ' GPRINT:DS0:MAX:%5.2lf%s\\l ';
-            $graph .= ' DEF:DS1=' . $rrd_filename . ':load5:AVERAGE ';
+
+            $rrd_filename = $this->rrdName('load5');
+            $graph .= ' DEF:DS1=' . $rrd_filename . ':value:AVERAGE ';
             $graph .= ' LINE1.25:DS1#' . \LibreNMS\Config::get('graph_colours.mixed.1') . ":'" . str_pad(substr('Load 5', 0, 15), 15) . "' ";
             $graph .= ' GPRINT:DS1:LAST:%5.2lf%s ';
             $graph .= ' GPRINT:DS1:AVERAGE:%5.2lf%s ';
             $graph .= ' GPRINT:DS1:MAX:%5.2lf%s\\l ';
-            $graph .= ' DEF:DS2=' . $rrd_filename . ':load15:AVERAGE ';
+
+            $rrd_filename = $this->rrdName('load15');
+            $graph .= ' DEF:DS2=' . $rrd_filename . ':value:AVERAGE ';
             $graph .= ' LINE1.25:DS2#' . \LibreNMS\Config::get('graph_colours.mixed.2') . ":'" . str_pad(substr('Load 15', 0, 15), 15) . "' ";
             $graph .= ' GPRINT:DS2:LAST:%5.2lf%s ';
             $graph .= ' GPRINT:DS2:AVERAGE:%5.2lf%s ';
@@ -56,6 +62,6 @@ class Load extends DefaultServiceCheck
             return $graph;
         }
 
-        return parent::graphRrdCommands($rrd_filename, $ds);
+        return parent::graphRrdCommands($ds);
     }
 }

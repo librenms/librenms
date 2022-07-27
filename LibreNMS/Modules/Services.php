@@ -188,6 +188,12 @@ class Services implements Module
 
                 // prep update data
                 $fields[$key] = $data['value'];
+
+                app('Datastore')->put($os->getDeviceArray(), 'services', [
+                    'service_id' => $service->service_id,
+                    'rrd_name' => ['service', $service->service_id, $key],
+                    'rrd_def' => RrdDefinition::make()->addDataset('value', $ds_type, null, null, null, ['services', $service->service_id], $key),
+                ], ['value' => $data['value']]);
             }
 
             app('Datastore')->put($os->getDeviceArray(), 'services', [
