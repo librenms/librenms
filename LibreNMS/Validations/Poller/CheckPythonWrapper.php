@@ -55,12 +55,13 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
                 return ValidationResult::info(trans('validation.validations.poller.CheckPythonWrapper.cron_unread'));
             }
 
-
             $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+
             return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.not_detected'), $status);
         }
 
         $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+
         return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.no_pollers'), $status);
     }
 
@@ -76,6 +77,7 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
     {
         if (! Poller::isActive()->exists()) {
             $status = PollerCluster::isActive()->exists() ? ValidationResult::SUCCESS : ValidationResult::FAILURE;
+
             return new ValidationResult(trans('validation.validations.poller.CheckPythonWrapper.fail'), $status);
         }
 
