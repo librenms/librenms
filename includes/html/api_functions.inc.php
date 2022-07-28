@@ -457,28 +457,35 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
-    // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
+    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
 
-    if (! $device) {
-        return api_error(404, "Device $hostname does not exist");
+    if (is_null($device)) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
     }
 
     $notes = $request->json('notes');
+    $title = $request->json('title') ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
-        'title' => $device->displayName(),
+        'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
-        'start' => date('Y-m-d H:i:s'),
     ]);
 
+    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
     $duration = $request->json('duration');
+
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
-        $alert_schedule->end = \Carbon\Carbon::now()
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours($duration_hour)->addMinutes($duration_min)
             ->format('Y-m-d H:i:00');
     }
@@ -491,7 +498,11 @@ function maintenance_device(Illuminate\Http\Request $request)
         $device->save();
     }
 
-    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -2143,7 +2154,11 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (! $device_group) {
-        return api_error(404, 'Device group not found');
+        return api_error(404, "Device group $name not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
     }
 
     $notes = $request->json('notes');
@@ -2170,7 +2185,11 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $alert_schedule->save();
     $alert_schedule->deviceGroups()->attach($device_group);
 
-    return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function get_devices_by_group(Illuminate\Http\Request $request)
