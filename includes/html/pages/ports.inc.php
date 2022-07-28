@@ -405,9 +405,8 @@ foreach ($vars as $var => $value) {
                 }
                 break;
             case 'group':
-                $where .= ' AND port_id IN (';
-                $where .= DB::table('port_group_port')->where('port_group_id', $vars['group'])->pluck('port_id')->implode(',');
-                $where .= ')';
+                $where .= ' AND port_id IN (SELECT `port_id` FROM `port_group_port` WHERE `port_group_id` = ?)';
+                $param[] = $vars['group'];
                 break;
         }
     }
