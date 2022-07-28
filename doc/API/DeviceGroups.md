@@ -150,15 +150,28 @@ Route: `/api/v0/devicesgroups/:name/maintenance`
 
 Input (JSON):
 
-- title: Some title for the Maintenance
-- notes: Some description for the Maintenance
-- start: Start time of Maintenance in format H:m
-- duration: Duration of Maintenance in format H:m
+- `title`: *optional* - Some title for the Maintenance  
+  Will be replaced with device group name if omitted
+- `notes`: *optional* - Some description for the Maintenance
+- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
+  eg: 2022-08-01 22:45:00  
+  Current system time `now()` will be used if omitted
+- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
+  eg: 02:00
 
-Example:
+Example with start time:
 
 ```curl
-curl -X POST -d '{"title":"Device group Maintenance","notes":"A 2 hour Maintenance triggered via API","start":"04:30","duration":"2:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/localhost/maintenance
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  --data-raw '
+{
+ "title":"Device group Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with start time",
+  "start":"2022-08-01 08:00:00",
+  "duration":"2:00"
+}
+'
 ```
 
 Output:
@@ -166,6 +179,30 @@ Output:
 ```json
 {
     "status": "ok",
-    "message": "Device group Cisco switches (2) will begin maintenance mode at 5:00 for 2:00 h"
+    "message": "Device group Cisco switches (2) will begin maintenance mode at 2022-08-01 22:45:00 for 2:00h"
 }
 ```
+
+Example with no start time:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  --data-raw '
+{
+ "title":"Device group Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with no start time",
+  "duration":"2:00"
+}
+'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device group Cisco switches (2) moved into maintenance mode for 2:00h"
+}
+```
+
