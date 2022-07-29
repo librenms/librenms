@@ -500,7 +500,6 @@ function update_application($app, $response, $metrics = [], $status = '')
         Log::event('Application ' . $app->displayName() . ' ' . $event_msg, DeviceCache::getPrimary(), 'application', $severity);
     }
 
-    $app->data = $metrics ?? null;
     $app->save();
 
     // update metrics

@@ -14,7 +14,7 @@ $smalldescrlen = 25;
 if (isset($vars['container'])) {
     $containers = [$vars['container']];
 } else {
-    $containers = Rrd::getRrdApplicationArrays($device, $app->app_id, 'docker', false, 'metrics');
+    $containers = $app->data['containers'] ?? [];
 }
 
 $int = 0;
