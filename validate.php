@@ -160,7 +160,7 @@ LibreNMS  | ${versions['local_ver']}
 DB Schema | ${versions['db_schema']}
 PHP       | ${versions['php_ver']}
 Python    | ${versions['python_ver']}
-MySQL     | ${versions['mysql_ver']}
+Database  | ${versions['database_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}
 ====================================

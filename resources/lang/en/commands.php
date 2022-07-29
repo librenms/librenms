@@ -149,6 +149,24 @@ return [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
+    'plugin:disable' => [
+        'description' => 'Disable all plugins with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to disable or "all" to disable all plugins',
+        ],
+        'already_disabled' => 'Plugin already disabled',
+        'disabled' => ':count plugin disabled|:count plugins disabled',
+        'failed' => 'Failed to disable plugin(s)',
+    ],
+    'plugin:enable' => [
+        'description' => 'Enable the newest plugin with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to enable or "all" to disable all plugins',
+        ],
+        'already_enabled' => 'Plugin already enabled',
+        'enabled' => ':count plugin enabled|:count plugins enabled',
+        'failed' => 'Failed to enable plugin(s)',
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
