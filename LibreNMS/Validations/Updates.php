@@ -66,7 +66,7 @@ class Updates extends BaseValidation
             $remote_ver = Version::get()->remoteCommit();
             if ($local_ver['sha'] != ($remote_ver['sha'] ?? null)) {
                 if (empty($local_ver['date'])) {
-                    $process = new Process(['git', 'show', '--no-patch', '--pretty=%H|%ct'], base_path());
+                    $process = new Process(['git', 'show', '--queit', '--pretty=%H|%ct'], base_path());
                     $process->run();
                     $error = rtrim($process->getErrorOutput());
 
