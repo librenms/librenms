@@ -371,7 +371,7 @@ Commit SHA: %s
 Commit Date: %s
 DB Schema: %s
 PHP: %s
-MySQL: %s
+Database: %s
 RRDTool: %s
 SNMP: %s
 ==================================
@@ -380,7 +380,7 @@ EOH,
                 Git::localDate(),
                 vsprintf('%s (%s)', $version->database()),
                 phpversion(),
-                Version::get()->databaseServer(),
+                $version->databaseServer(),
                 $version->rrdtool(),
                 $version->netSnmp()
             ));

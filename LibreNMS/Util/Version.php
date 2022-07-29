@@ -122,7 +122,22 @@ class Version
 
     public function databaseServer(): string
     {
-        return Eloquent::isConnected() ? Arr::first(DB::selectOne('select version()')) : 'Not Connected';
+        if (!Eloquent::isConnected()) {
+            return 'Not Connected';
+        }
+
+        switch(Eloquent::getDriver()) {
+            case "mysql":
+                $ret =  Arr::first(DB::selectOne('select version()'));
+                return (str_contains($ret, "MariaDB") ? "MariaDB " : "MySQL ") . $ret;
+            break;
+            case "sqlite":
+                return "SQLite " . Arr::first(DB::selectOne('select sqlite_version()'));
+            break;
+            default:
+                return "Unsupported: " . Eloquent::getDriver();
+            break;
+        }
     }
 
     public function database(): array
