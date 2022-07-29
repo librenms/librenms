@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Models\ApplicationMetrics;
+use App\Models\Application;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -517,13 +517,13 @@ class Rrd extends BaseDatastore
 
         //apply filter
         if ($filter == 'metrics' && $entries) {
-            foreach ($entries as $rrdName) {
-                $found = ApplicationMetrics::where('app_id', $app_id)
-                    ->where('metric', 'like', $rrdName . '%')
-                    ->exists();
-
-                if ($found) {
-                    array_push($filteredList, $rrdName);
+            $appData = Application::where('app_id', $app_id)->pluck('data');
+            if (! empty($appData)) {
+                $appData = array_shift(json_decode($appData, true)); //backk to array
+                foreach ($entries as $rrdName) {
+                    if (isset($appData[$rrdName])) {
+                        array_push($filteredList, $rrdName);
+                    }
                 }
             }
         }
