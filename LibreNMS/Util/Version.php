@@ -53,6 +53,11 @@ class Version
         return new static;
     }
 
+    public function release(): string
+    {
+        return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
+    }
+
     public function local(): string
     {
         if ($this->is_git_install && $version = $this->fromGit()) {
@@ -185,5 +190,37 @@ class Version
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
 
         return $matches[0] ?? '';
+    }
+
+    /**
+     * The OS/distribution and version
+     */
+    public function os(): string
+    {
+        $info = [];
+
+        // find release file
+        if (file_exists('/etc/os-release')) {
+            $info = @parse_ini_file('/etc/os-release');
+        } else {
+            foreach (glob('/etc/*-release') as $file) {
+                $content = file_get_contents($file);
+                // normal os release style
+                $info = @parse_ini_string($content);
+                if (! empty($info)) {
+                    break;
+                }
+
+                // just a string of text
+                if (substr_count($content, PHP_EOL) <= 1) {
+                    $info = ['NAME' => trim(str_replace('release ', '', $content))];
+                    break;
+                }
+            }
+        }
+
+        $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
+
+        return implode(' ', $only);
     }
 }
