@@ -39,11 +39,11 @@ class CheckDatabaseServerVersion implements Validation
     public function validate(): ValidationResult
     {
         $version = Version::get()->databaseServer();
-        list($name, $version) = explode(' ', $version, 2);
-        list($version,) = explode('-', $version, 2);
+        [$name, $version] = explode(' ', $version, 2);
+        [$version] = explode('-', $version, 2);
 
-        switch($name) {
-            case "MariaDB":
+        switch ($name) {
+            case 'MariaDB':
                 if (version_compare($version, Database::MARIADB_MIN_VERSION, '<=')) {
                     return ValidationResult::fail(
                         trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MariaDB', 'min' => Database::MARIADB_MIN_VERSION, 'date' => Database::MARIADB_MIN_VERSION_DATE]),
@@ -51,7 +51,7 @@ class CheckDatabaseServerVersion implements Validation
                     );
                 }
             break;
-            case "MySQL":
+            case 'MySQL':
                 if (version_compare($version, Database::MYSQL_MIN_VERSION, '<=')) {
                     return ValidationResult::fail(
                         trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MySQL', 'min' => Database::MYSQL_MIN_VERSION, 'date' => Database::MYSQL_MIN_VERSION_DATE]),

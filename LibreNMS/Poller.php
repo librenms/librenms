@@ -43,7 +43,6 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
-use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
