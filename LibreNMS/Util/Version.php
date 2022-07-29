@@ -129,6 +129,7 @@ class Version
         switch (Eloquent::getDriver()) {
             case 'mysql':
                 $ret = Arr::first(DB::selectOne('select version()'));
+
                 return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
             case 'sqlite':
                 return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));

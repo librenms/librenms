@@ -140,7 +140,7 @@ class Stats
             'vminfo'           => $this->selectTotal('vminfo', ['vm_type']),
             'vmware'           => $this->selectTotal('vminfo'),
             'vrfs'             => $this->selectTotal('vrfs'),
-            'mysql_version'    => $this->selectStatic($version->databaseServer()),
+            'database_version' => $this->selectStatic($version->databaseServer()),
             'php_version'      => $this->selectStatic(phpversion()),
             'python_version'   => $this->selectStatic($version->python()),
             'rrdtool_version'  => $this->selectStatic($version->rrdtool()),
