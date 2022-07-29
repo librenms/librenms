@@ -46,6 +46,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('mem_limit', 'GAUGE', 0);
 
 $metrics = [];
+$containerNames = [];
 foreach ($docker_data as $data) {
     $containerNames[] = $container = $data['container'];
 
