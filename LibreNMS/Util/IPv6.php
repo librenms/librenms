@@ -42,7 +42,7 @@ class IPv6 extends IP
         [$this->ip, $this->cidr] = $this->extractCidr($ipv6);
 
         if (! self::isValid($this->ip)) {
-            throw new InvalidIpException("$ipv6 is not a valid ipv4 address");
+            throw new InvalidIpException("$ipv6 is not a valid ipv6 address");
         }
 
         $this->ip = $this->compressed();  // store in compressed format
