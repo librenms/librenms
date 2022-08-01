@@ -69,9 +69,9 @@ class PortsController extends TableController
                 });
             },
             'devicegroup' => function( $query, $devicegroup){
-			    return $query->whereHas('device', function ($query) use ($devicegroup){
-				    return $query->whereHas('groups', function ($query) use ($devicegroup) {
-					    return $query->where('id', $devicegroup);
+               return $query->whereHas('device', function ($query) use ($devicegroup){
+                   return $query->whereHas('groups', function ($query) use ($devicegroup) {
+                       return $query->where('id', $devicegroup);
                     });
                 });
             },
