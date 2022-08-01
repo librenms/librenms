@@ -577,7 +577,7 @@ function update_application($app, $response, $metrics = [], $status = '')
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  *
- * If the data has is in base64, it will be converted and then ran gunzipped.
+ * If the data has is in base64, it will be converted and then gunzipped.
  * https://github.com/librenms/librenms-agent/blob/master/utils/lnms_return_optimizer
  * May be used to convert output from extends to that via piping it through it.
  *
