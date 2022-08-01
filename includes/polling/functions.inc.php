@@ -630,6 +630,9 @@ function json_app_get($device, $extend, $min_version = 1)
 {
     $output = snmp_get($device, 'nsExtendOutputFull.' . string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
+    // save for returning if not JSON
+    $orig_output = $output;
+
     // make sure we actually get something back
     if (empty($output)) {
         throw new JsonAppPollingFailedException('Empty return from snmp_get.', -2);
@@ -663,7 +666,7 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppParsingFailedException('Invalid JSON', $output, -3);
+        throw new JsonAppParsingFailedException('Invalid JSON', $orig_output, -3);
     }
 
     // There no keys in the array, meaning '{}' was was returned
