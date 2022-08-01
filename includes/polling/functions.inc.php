@@ -577,6 +577,10 @@ function update_application($app, $response, $metrics = [], $status = '')
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  *
+ * If the data has is in base64, it will be converted and then ran gunzipped.
+ * https://github.com/librenms/librenms-agent/blob/master/utils/lnms_return_optimizer
+ * May be used to convert output from extends to that via piping it through it.
+ *
  * The required keys for the returned JSON are as below.
  *  version     - The version of the snmp extend script. Should be numeric and at least 1.
  *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
@@ -629,6 +633,29 @@ function json_app_get($device, $extend, $min_version = 1)
     // make sure we actually get something back
     if (empty($output)) {
         throw new JsonAppPollingFailedException('Empty return from snmp_get.', -2);
+    }
+
+    // checks for base64 decoding and converts it to non-base64 so it can gunzip
+    if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
+        $output = base64_decode($output);
+        $i = 10;
+        $flg = ord(substr($output, 3, 1));
+        if ($flg > 0) {
+            if ($flg & 4) {
+                list($xlen) = unpack('v', substr($output, $i, 2));
+                $i = $i + 2 + $xlen;
+            }
+            if ($flg & 8) {
+                $i = strpos($output, "\0", $i) + 1;
+            }
+            if ($flg & 16) {
+                $i = strpos($output, "\0", $i) + 1;
+            }
+            if ($flg & 2) {
+                $i = $i + 2;
+            }
+        }
+        $output = gzinflate(substr($output, $i, -8));
     }
 
     //  turn the JSON into a array
