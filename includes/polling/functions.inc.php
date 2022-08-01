@@ -641,24 +641,7 @@ function json_app_get($device, $extend, $min_version = 1)
     // checks for base64 decoding and converts it to non-base64 so it can gunzip
     if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
         $output = base64_decode($output);
-        $i = 10;
-        $flg = ord(substr($output, 3, 1));
-        if ($flg > 0) {
-            if ($flg & 4) {
-                [$xlen] = unpack('v', substr($output, $i, 2));
-                $i = $i + 2 + $xlen;
-            }
-            if ($flg & 8) {
-                $i = strpos($output, "\0", $i) + 1;
-            }
-            if ($flg & 16) {
-                $i = strpos($output, "\0", $i) + 1;
-            }
-            if ($flg & 2) {
-                $i = $i + 2;
-            }
-        }
-        $output = gzinflate(substr($output, $i, -8));
+        $output = gzdecode($output);
     }
 
     //  turn the JSON into a array
