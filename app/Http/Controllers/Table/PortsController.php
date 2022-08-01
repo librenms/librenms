@@ -73,7 +73,7 @@ class PortsController extends TableController
 				    return $query->whereHas('groups', function ($query) use ($devicegroup) {
 					    return $query->where('id', $devicegroup);
                     });
-               });
+                });
             },
         ];
     }
