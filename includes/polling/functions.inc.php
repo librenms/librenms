@@ -642,7 +642,7 @@ function json_app_get($device, $extend, $min_version = 1)
         $flg = ord(substr($output, 3, 1));
         if ($flg > 0) {
             if ($flg & 4) {
-                list($xlen) = unpack('v', substr($output, $i, 2));
+                [$xlen] = unpack('v', substr($output, $i, 2));
                 $i = $i + 2 + $xlen;
             }
             if ($flg & 8) {
