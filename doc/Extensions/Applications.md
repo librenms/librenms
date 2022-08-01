@@ -2183,30 +2183,33 @@ systemctl restart snmpd
 
 For metrics the stats are migrated as below from the stats JSON.
 
-'f_drop_percent' and 'drop_percent' are computed based on the found data.
+`f_drop_percent` and `drop_percent` are computed based on the found data.
 
-```
-uptime              => $json->{stats}{uptime},
-total               => $json->{stats}{captured}{total},
-drop                => $json->{stats}{captured}{drop},
-ignore              => $json->{stats}{captured}{ignore},
-threshold           => $json->{stats}{captured}{theshold},
-after               => $json->{stats}{captured}{after},
-match               => $json->{stats}{captured}{match},
-bytes               => $json->{stats}{captured}{bytes_total},
-bytes_ignored       => $json->{stats}{captured}{bytes_ignored},
-max_bytes_log_line  => $json->{stats}{captured}{max_bytes_log_line},
-eps                 => $json->{stats}{captured}{eps},
-f_total             => $json->{stats}{flow}{total},
-f_dropped           => $json->{stats}{flow}{dropped},
-```
+| Instance Key       | Stats JSON Key                     |
+|--------------------|------------------------------------|
+| uptime             | .stats.uptime                      |
+| total              | .stats.captured.total              |
+| drop               | .stats.captured.drop               |
+| ignore             | .stats.captured.ignore             |
+| threshold          | .stats.captured.theshold           |
+| after              | .stats.captured.after              |
+| match              | .stats.captured.match              |
+| bytes              | .stats.captured.bytes_total        |
+| bytes_ignored      | .stats.captured.bytes_ignored      |
+| max_bytes_log_line | .stats.captured.max_bytes_log_line |
+| eps                | .stats.captured.eps                |
+| f_total            | .stats.flow.total                  |
+| f_dropped          | .stats.flow.dropped                |
 
-Those keys are appended with the name of the instance running. The
-default is named 'ids' unless otherwise specified via the extend.
+Those keys are appended with the name of the instance running with `_`
+between the instance name and instance metric key. So `uptime` for
+`ids` would be `ids_uptime`.
 
-There is a special instance name of '.total' which is the total of all
+The default is named 'ids' unless otherwise specified via the extend.
+
+There is a special instance name of `.total` which is the total of all
 the instances. So if you want the total eps, the metric would be
-'.total_eps'. Also worth noting that the alert value is the highest
+`.total_eps`. Also worth noting that the alert value is the highest
 one found among all the instances.
 
 ### SNMP Extend
