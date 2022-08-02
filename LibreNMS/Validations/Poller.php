@@ -1,8 +1,8 @@
 <?php
 /**
- * DistributedPoller.php
+ * Poller.php
  *
- * -Description-
+ * Validate poller is active and various poller support
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +19,14 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
-
-class DistributedPoller extends BaseValidation
+class Poller extends BaseValidation
 {
-    protected $directory = 'DistributedPoller';
-    protected $name = 'distributedpoller';
-
-    public function isDefault(): bool
-    {
-        // run by default if distributed polling is enabled
-        return Config::get('distributed_poller');
-    }
+    protected $directory = 'Poller';
+    protected $name = 'poller';
 }

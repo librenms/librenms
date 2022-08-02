@@ -8906,26 +8906,6 @@ parameters:
 			path: app/Models/Plugin.php
 
 		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:scopeIsActive\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:scopeIsActive\\(\\) has parameter \\$query with no type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:setPollerGroupsAttribute\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:setPollerGroupsAttribute\\(\\) has parameter \\$groups with no type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
 			message: "#^Method App\\\\Models\\\\PollerGroup\\:\\:list\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/PollerGroup.php

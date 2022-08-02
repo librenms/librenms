@@ -1,6 +1,6 @@
 <?php
 /**
- * DistributedPoller.php
+ * CheckRrdcached.php
  *
  * -Description-
  *
@@ -19,22 +19,35 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Validations;
+namespace LibreNMS\Validations\DistributedPoller;
 
 use LibreNMS\Config;
+use LibreNMS\ValidationResult;
+use LibreNMS\Validations\Rrd\CheckRrdcachedConnectivity;
 
-class DistributedPoller extends BaseValidation
+class CheckRrdcached implements \LibreNMS\Interfaces\Validation
 {
-    protected $directory = 'DistributedPoller';
-    protected $name = 'distributedpoller';
-
-    public function isDefault(): bool
+    /**
+     * @inheritDoc
+     */
+    public function validate(): ValidationResult
     {
-        // run by default if distributed polling is enabled
-        return Config::get('distributed_poller');
+        if (! Config::get('rrdcached')) {
+            return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckRrdcached.fail'), 'lnms config:set rrdcached <rrdcached server ip:port>');
+        }
+
+        return (new CheckRrdcachedConnectivity)->validate();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function enabled(): bool
+    {
+        return (bool) Config::get('distributed_poller');
     }
 }
