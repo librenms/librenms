@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'freeswitch';
-$app_id = $app['app_id'];
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -21,7 +20,7 @@ foreach ($lines as $line) {
     $freeswitch[$var] = $value;
 }
 // Freeswitch stats
-$rrd_name = ['app', $name, 'stats', $app_id];
+$rrd_name = ['app', $name, 'stats', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('calls', 'GAUGE', 0, 10000)
     ->addDataset('channels', 'GAUGE', 0, 10000)

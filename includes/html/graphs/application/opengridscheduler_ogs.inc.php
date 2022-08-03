@@ -24,7 +24,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'ogs', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ogs', $app->app_id]);
 
 $array = [
     'running_jobs' => ['descr' => 'running'],

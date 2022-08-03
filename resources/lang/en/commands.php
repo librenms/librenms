@@ -110,7 +110,7 @@ return [
     'device:poll' => [
         'description' => 'Poll data from device(s) as defined by discovery',
         'arguments' => [
-            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
@@ -119,7 +119,10 @@ return [
         'errors' => [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+            'no_devices' => 'No devices found matching your given device specification.',
+            'none_polled' => 'No devices were polled.',
         ],
+        'polled' => 'Polled :count devices in :time',
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
@@ -145,6 +148,24 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
+    ],
+    'plugin:disable' => [
+        'description' => 'Disable all plugins with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to disable or "all" to disable all plugins',
+        ],
+        'already_disabled' => 'Plugin already disabled',
+        'disabled' => ':count plugin disabled|:count plugins disabled',
+        'failed' => 'Failed to disable plugin(s)',
+    ],
+    'plugin:enable' => [
+        'description' => 'Enable the newest plugin with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to enable or "all" to disable all plugins',
+        ],
+        'already_enabled' => 'Plugin already enabled',
+        'enabled' => ':count plugin enabled|:count plugins enabled',
+        'failed' => 'Failed to enable plugin(s)',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
