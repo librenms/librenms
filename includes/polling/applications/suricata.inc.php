@@ -4,8 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'suricata';
-$app_id = $app['app_id'];
-
 try {
     $suricata = json_app_get($device, 'suricata-stats');
 } catch (JsonAppException $e) {
@@ -151,13 +149,13 @@ $field_keys = [
 ];
 
 // process each instance
-$instance_list = [];
+$instances = [];
 foreach ($suricata['data'] as $instance => $stats) {
     if ($instance == '.total') {
-        $rrd_name = ['app', $name, $app_id];
+        $rrd_name = ['app', $name, $app->app_id];
     } else {
-        $rrd_name = ['app', $name, $app_id, $instance];
-        $instance_list[] = $instance;
+        $rrd_name = ['app', $name, $app->app_id, $instance];
+        $instances[] = $instance;
     }
 
     foreach ($instance_keys as $metric_key) {
@@ -169,46 +167,22 @@ foreach ($suricata['data'] as $instance => $stats) {
         $fields[$field_key] = $stats[$field_key];
     }
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
 
-//
-// component processing for ZFS
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'suricata'],
-    ],
-];
+// check for added or removed instances
+$old_instances = $app->data['instances'] ?? [];
+$added_instances = array_diff($instances, $old_instances);
+$removed_instances = array_diff($old_instances, $instances);
 
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-// if no instances, delete the components
-if (empty($instance_list)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
-    }
-} else {
-    if (isset($components[$device_id])) {
-        $ourc = $components[$device_id];
-    } else {
-        $ourc = $component->createComponent($device_id, 'suricata');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($instance_list);
-
-    $id = $component->getFirstComponentID($ourc);
-    $ourc[$id]['label'] = 'Suricata';
-    $ourc[$id]['instances'] = json_encode($instance_list);
-
-    $component->setComponentPrefs($device_id, $ourc);
+// if we have any source instances, save and log
+if (count($added_instances) > 0 || count($removed_instances) > 0) {
+    $app->data = ['instances' => $instances];
+    $log_message = 'Suricata Instance Change:';
+    $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
+    $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
+    log_event($log_message, $device, 'application');
 }
 
 //

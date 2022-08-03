@@ -27,7 +27,7 @@ Output:
             "local_branch": "master",
             "db_schema": 249,
             "php_ver": "7.2.2",
-            "mysql_ver": "5.5.56-MariaDB",
+            "database_ver": "MariaDB 5.5.56-MariaDB",
             "rrdtool_ver": "1.4.8",
             "netsnmp_ver": "NET-SNMP 5.7.2"
         }

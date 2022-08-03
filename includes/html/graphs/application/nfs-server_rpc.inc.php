@@ -25,7 +25,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-default', $app->app_id]);
 
 $array = [
     'rpc_calls' => ['descr' => 'calls', 'colour' => '2C8437'], // green : good

@@ -38,16 +38,18 @@ Connect to the server command line and follow the instructions below.
     === "NGINX"
         ```
         dnf -y install epel-release
+        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:7.3
+        dnf module enable php:8.1
         dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
     === "Apache"
         ```
         dnf -y install epel-release
+        dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:7.3
+        dnf module enable php:8.1
         dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
@@ -419,7 +421,8 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
 
     ```
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(logs|rrd|storage)(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(rrd|storage)(/.*)?'
+    semanage fcontext -a -t httpd_log_t "/opt/librenms/logs(/.*)?"
     semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1

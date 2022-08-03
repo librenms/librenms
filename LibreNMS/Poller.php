@@ -43,7 +43,6 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
-use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -152,6 +151,14 @@ class Poller
         }
 
         return $polled;
+    }
+
+    /**
+     * Get the total number of devices to poll.
+     */
+    public function totalDevices(): int
+    {
+        return $this->buildDeviceQuery()->count();
     }
 
     private function pollModules(): void
@@ -363,7 +370,7 @@ Commit SHA: %s
 Commit Date: %s
 DB Schema: %s
 PHP: %s
-MySQL: %s
+Database: %s
 RRDTool: %s
 SNMP: %s
 ==================================
@@ -372,7 +379,7 @@ EOH,
                 Git::localDate(),
                 vsprintf('%s (%s)', $version->database()),
                 phpversion(),
-                Version::get()->databaseServer(),
+                $version->databaseServer(),
                 $version->rrdtool(),
                 $version->netSnmp()
             ));

@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ntp-client';
-$app_id = $app['app_id'];
 
 try {
     $ntp = json_app_get($device, $name);
@@ -25,7 +24,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('offset', 'GAUGE', -1000, 1000)
     ->addDataset('frequency', 'GAUGE', -1000, 1000)
