@@ -133,19 +133,6 @@ function port_permitted($port_id, $device_id = null)
     return \Permissions::canAccessPort($port_id, Auth::id());
 }
 
-function application_permitted($app_id, $device_id = null)
-{
-    if (! is_numeric($app_id)) {
-        return false;
-    }
-
-    if (! $device_id) {
-        $device_id = get_device_id_by_app_id($app_id);
-    }
-
-    return device_permitted($device_id);
-}
-
 function device_permitted($device_id)
 {
     if (Auth::user() && Auth::user()->hasGlobalRead()) {
@@ -1076,60 +1063,6 @@ function get_oxidized_nodes_list()
 }
 
 /**
- * Get the fail2ban jails for a device... just requires the device ID
- * an empty return means either no jails or fail2ban is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_fail2ban_jails($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'fail2ban'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $f2bc = $component->getComponents($device_id, $options);
-
-    if (isset($f2bc[$device_id])) {
-        $id = $component->getFirstComponentID($f2bc, $device_id);
-
-        return json_decode($f2bc[$device_id][$id]['jails']);
-    }
-
-    return [];
-}
-
-/**
- * Get the Postgres databases for a device... just requires the device ID
- * an empty return means Postres is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_postgres_databases($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'postgres'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $pgc = $component->getComponents($device_id, $options);
-
-    if (isset($pgc[$device_id])) {
-        $id = $component->getFirstComponentID($pgc, $device_id);
-
-        return json_decode($pgc[$device_id][$id]['databases']);
-    }
-
-    return [];
-}
-
-/**
  * Return stacked graphs information
  *
  * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
@@ -1172,60 +1105,6 @@ function parse_at_time($time)
     }
 
     return (int) strtotime($time);
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_zfs_pools($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'zfs'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $zfsc = $component->getComponents($device_id, $options);
-
-    if (isset($zfsc[$device_id])) {
-        $id = $component->getFirstComponentID($zfsc, $device_id);
-
-        return json_decode($zfsc[$device_id][$id]['pools']);
-    }
-
-    return [];
-}
-
-/**
- * Get the ports for a device... just requires the device ID
- * an empty return means portsactivity is not in use or there are currently no ports
- *
- * @param $device_id
- * @return array
- */
-function get_portactivity_ports($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'portsactivity'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $portsc = $component->getComponents($device_id, $options);
-
-    if (isset($portsc[$device_id])) {
-        $id = $component->getFirstComponentID($portsc, $device_id);
-
-        return json_decode($portsc[$device_id][$id]['ports']);
-    }
-
-    return [];
 }
 
 /**
@@ -1322,33 +1201,6 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
 
     return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
-}
-
-/**
- * Returns a list of the various suricata instances for
- * the specified device id.
- *
- * @param $device_id
- * @return array
- */
-function get_suricata_instances($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'suricata'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $ourc = $component->getComponents($device_id, $options);
-
-    if (isset($ourc[$device_id])) {
-        $id = $component->getFirstComponentID($ourc, $device_id);
-
-        return json_decode($ourc[$device_id][$id]['instances']);
-    }
-
-    return [];
 }
 
 /**
@@ -1456,31 +1308,4 @@ function nfsen_live_dir($hostname)
             return $base_dir . '/profiles-data/live/' . $hostname;
         }
     }
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_chrony_sources($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'chronyd'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $chronyd_cpnt = $component->getComponents($device_id, $options);
-
-    if (isset($chronyd_cpnt[$device_id])) {
-        $id = $component->getFirstComponentID($chronyd_cpnt, $device_id);
-
-        return json_decode($chronyd_cpnt[$device_id][$id]['sources']);
-    }
-
-    return [];
 }

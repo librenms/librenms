@@ -2,9 +2,9 @@
     <table id="alertlog-stats_{{ $id }}" class="table table-hover table-condensed table-striped" data-ajax="true">
         <thead>
         <tr>
-            <th data-column-id="count">Count</th>
-            <th data-column-id="hostname">Device</th>
-            <th data-column-id="alert_rule">Alert rule</th>
+            <th data-column-id="count">{{ __('Count') }}</th>
+            <th data-column-id="hostname">{{ __('Device') }}</th>
+            <th data-column-id="alert_rule">{{ __('Alert rule') }}</th>
         </tr>
         </thead>
     </table>

@@ -5,7 +5,6 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'fbsd-nfs-client';
-$app_id = $app['app_id'];
 
 try {
     $nfs = json_app_get($device, 'fbsdnfsclient', 0);
@@ -34,7 +33,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('getattr', 'DERIVE', 0)
     ->addDataset('setattr', 'DERIVE', 0)
@@ -124,6 +123,6 @@ $fields = [
     'accsmisses' => $nfs['data']['AccsMisses'],
 ];
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 update_application($app, 'OK', $nfs['data']);

@@ -47,8 +47,8 @@
                     <td>{{ $version_python }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('MySQL') }}</b></td>
-                    <td>{{ $version_mysql }}</td>
+                    <td><b>{{ __('Database') }}</b></td>
+                    <td>{{ $version_database }}</td>
                 </tr>
                 <tr>
                     <td><a href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>

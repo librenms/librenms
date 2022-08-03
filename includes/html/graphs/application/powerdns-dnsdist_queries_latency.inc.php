@@ -24,7 +24,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id]);
 
 $array = [
     'latency_0_1' => ['descr' => '< 1ms', 'colour' => '58b146'],

@@ -16,11 +16,6 @@ use LibreNMS\Validations\Php;
 
 $options = getopt('df:o:t:r:');
 
-if (isset($options['d'])) {
-    echo "DEBUG\n";
-    Debug::set();
-}
-
 /**
  * Scripts without dependencies
  */
@@ -45,6 +40,11 @@ if ($options['f'] === 'composer_get_plugins') {
 $init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
+
+if (isset($options['d'])) {
+    echo "DEBUG\n";
+    Debug::set();
+}
 
 if ($options['f'] === 'update') {
     if (! Config::get('update')) {
@@ -126,7 +126,7 @@ if ($options['f'] === 'authlog') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'includes/callback.php';
+    \LibreNMS\Util\Stats::submit();
 }
 
 if ($options['f'] === 'device_perf') {
