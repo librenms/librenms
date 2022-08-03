@@ -10,7 +10,7 @@ over:
 discovery:
     - sysDescr:
             - HN4000-I
-            - HN4000-E 
+            - HN4000e
 bad_if:
   - notPresent
   - serConsole
