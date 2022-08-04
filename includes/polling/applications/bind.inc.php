@@ -2,6 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+global $agent_data;
 $name = 'bind';
 
 if (! empty($agent_data['app'][$name])) {

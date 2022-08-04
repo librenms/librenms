@@ -26,6 +26,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+global $agent_data;
 $name = 'tinydns';
 
 if (! empty($agent_data['app'][$name]) && $app->app_id > 0) {

@@ -2,6 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+global $agent_data;
 $name = 'proxmox';
 
 if (! function_exists('proxmox_port_exists')) {

@@ -3,6 +3,7 @@
 // Polls Apache statistics from script via SNMP
 use LibreNMS\RRD\RrdDefinition;
 
+global $agent_data;
 $name = 'apache';
 
 if (! empty($agent_data['app'][$name])) {

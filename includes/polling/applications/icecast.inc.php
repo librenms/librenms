@@ -2,6 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+global $agent_data;
 $name = 'icecast';
 
 if (! empty($agent_data[$name])) {
