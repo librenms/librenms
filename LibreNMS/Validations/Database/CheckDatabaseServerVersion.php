@@ -39,22 +39,26 @@ class CheckDatabaseServerVersion implements Validation
     public function validate(): ValidationResult
     {
         $version = Version::get()->databaseServer();
-        $version = explode('-', $version);
+        [$name, $version] = explode(' ', $version, 2);
+        [$version] = explode('-', $version, 2);
 
-        if (isset($version[1]) && $version[1] == 'MariaDB') {
-            if (version_compare($version[0], Database::MARIADB_MIN_VERSION, '<=')) {
-                return ValidationResult::fail(
-                    trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MariaDB', 'min' => Database::MARIADB_MIN_VERSION, 'date' => Database::MARIADB_MIN_VERSION_DATE]),
-                    trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MariaDB', 'suggested' => Database::MARIADB_RECOMMENDED_VERSION]),
-                );
-            }
-        } else {
-            if (version_compare($version[0], Database::MYSQL_MIN_VERSION, '<=')) {
-                return ValidationResult::fail(
-                    trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MySQL', 'min' => Database::MYSQL_MIN_VERSION, 'date' => Database::MYSQL_MIN_VERSION_DATE]),
-                    trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MySQL', 'suggested' => Database::MYSQL_RECOMMENDED_VERSION]),
-                );
-            }
+        switch ($name) {
+            case 'MariaDB':
+                if (version_compare($version, Database::MARIADB_MIN_VERSION, '<=')) {
+                    return ValidationResult::fail(
+                        trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MariaDB', 'min' => Database::MARIADB_MIN_VERSION, 'date' => Database::MARIADB_MIN_VERSION_DATE]),
+                        trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MariaDB', 'suggested' => Database::MARIADB_RECOMMENDED_VERSION]),
+                    );
+                }
+            break;
+            case 'MySQL':
+                if (version_compare($version, Database::MYSQL_MIN_VERSION, '<=')) {
+                    return ValidationResult::fail(
+                        trans('validation.validations.database.CheckDatabaseServerVersion.fail', ['server' => 'MySQL', 'min' => Database::MYSQL_MIN_VERSION, 'date' => Database::MYSQL_MIN_VERSION_DATE]),
+                        trans('validation.validations.database.CheckDatabaseServerVersion.fix', ['server' => 'MySQL', 'suggested' => Database::MYSQL_RECOMMENDED_VERSION]),
+                    );
+                }
+            break;
         }
 
         return ValidationResult::ok(trans('validation.validations.database.CheckDatabaseServerVersion.ok'));

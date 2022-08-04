@@ -72,7 +72,7 @@ Commit SHA: {$versions['local_sha']}
 Commit Date: {$versions['local_date']}
 DB Schema: {$versions['db_schema']}
 PHP: {$versions['php_ver']}
-MySQL: {$versions['mysql_ver']}
+Database: {$versions['database_ver']}
 RRDTool: {$versions['rrdtool_ver']}
 SNMP: {$versions['netsnmp_ver']}
 ==================================
