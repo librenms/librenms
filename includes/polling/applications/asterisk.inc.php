@@ -2,7 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'asterisk';
 
 if (! empty($agent_data[$name])) {

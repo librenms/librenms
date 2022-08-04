@@ -56,7 +56,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'gpsd';
 
 if ($app->app_id > 0) {

@@ -6,7 +6,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'powerdns';
 $powerdns = [];
 

@@ -2,7 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'freeradius';
 
 if (! empty($agent_data['app'][$name])) {

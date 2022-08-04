@@ -3,7 +3,6 @@
 // FIXME - this is lame
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'mysql';
 
 if (! empty($agent_data['app'][$name])) {

@@ -27,7 +27,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $data = '';
 $name = 'rrdcached';
 

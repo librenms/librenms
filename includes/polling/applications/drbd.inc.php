@@ -2,9 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-global $agent_data;
 $name = 'drbd';
-
 $drbd_data = $agent_data['app'][$name][$app->app_instance];
 foreach (explode('|', $drbd_data) as $part) {
     [$stat, $val] = explode('=', $part);
