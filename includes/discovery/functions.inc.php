@@ -288,7 +288,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             [$high_limit, $low_limit] = [$low_limit, $high_limit];
         }
 
-        if ($high_limit != $sensor_entry['sensor_limit'] && $sensor_entry['sensor_custom'] == 'No') {
+        if ((string) $high_limit != (string) $sensor_entry['sensor_limit'] && $sensor_entry['sensor_custom'] == 'No') {
             $update = ['sensor_limit' => ($high_limit == null ? ['NULL'] : $high_limit)];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
@@ -297,7 +297,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             log_event('Sensor High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $high_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
-        if ($sensor_entry['sensor_limit_low'] != $low_limit && $sensor_entry['sensor_custom'] == 'No') {
+        if ((string) $sensor_entry['sensor_limit_low'] != (string) $low_limit && $sensor_entry['sensor_custom'] == 'No') {
             $update = ['sensor_limit_low' => ($low_limit == null ? ['NULL'] : $low_limit)];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
@@ -306,7 +306,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             log_event('Sensor Low Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $low_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
-        if ($warn_limit != $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
+        if ((string) $warn_limit != (string) $sensor_entry['sensor_limit_warn'] && $sensor_entry['sensor_custom'] == 'No') {
             $update = ['sensor_limit_warn' => ($warn_limit == null ? ['NULL'] : $warn_limit)];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
@@ -315,7 +315,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             log_event('Sensor Warn High Limit Updated: ' . $class . ' ' . $type . ' ' . $index . ' ' . $descr . ' (' . $warn_limit . ')', $device, 'sensor', 3, $sensor_entry['sensor_id']);
         }
 
-        if ($sensor_entry['sensor_limit_low_warn'] != $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
+        if ((string) $sensor_entry['sensor_limit_low_warn'] != (string) $low_warn_limit && $sensor_entry['sensor_custom'] == 'No') {
             $update = ['sensor_limit_low_warn' => ($low_warn_limit == null ? ['NULL'] : $low_warn_limit)];
             $updated = dbUpdate($update, 'sensors', '`sensor_id` = ?', [$sensor_entry['sensor_id']]);
             d_echo("( $updated updated )\n");
