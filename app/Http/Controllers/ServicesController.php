@@ -12,7 +12,7 @@ use LibreNMS\Enum\CheckStatus;
 use LibreNMS\Services;
 use LibreNMS\Services\CheckParameter;
 
-class ServiceController extends Controller
+class ServicesController extends Controller
 {
     public function __construct()
     {
