@@ -7,31 +7,40 @@ Make sure you select your server's OS in the tabbed options below.
 Choice of web server is your preference, NGINX is recommended.
 
 Connect to the server command line and follow the instructions below.
+!!! note
 
-> NOTE: These instructions assume you are the **root** user.  If you
-> are not, prepend `sudo` to the shell commands (the ones that aren't
-> at `mysql>` prompts) or temporarily become a user with root
-> privileges with `sudo -s` or `sudo -i`.
+    These instructions assume you are the **root** user.  
+    If you are not, prepend `sudo` to the shell commands (the ones that aren't
+    at `mysql>` prompts) or temporarily become a user with root
+    privileges with `sudo -s` or `sudo -i`.
 
 **Please note the minimum supported PHP version is @= php.version_min =@**
 
 ## Install Required Packages
+
+=== "Ubuntu 22.04"
+    === "NGINX"
+        ```
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
+        ```
 
 === "Ubuntu 20.04"
     === "NGINX"
         ```
         apt install software-properties-common
         add-apt-repository universe
+        add-apt-repository ppa:ondrej/php
         apt update
-        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
         ```
 
     === "Apache"
         ```
         apt install software-properties-common
         add-apt-repository universe
+        add-apt-repository ppa:ondrej/php
         apt update
-        apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
+        apt install acl curl apache2 fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
         ```
 
 === "CentOS 8"
@@ -56,7 +65,11 @@ Connect to the server command line and follow the instructions below.
 === "Debian 11"
     === "NGINX"
         ```
-        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd whois
+        apt install apt-transport-https lsb-release ca-certificates wget
+        wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+        echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury-php.list
+        apt update
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd whois
         ```
 
 ## Add librenms user
@@ -101,10 +114,16 @@ See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
 Ensure date.timezone is set in php.ini to your preferred time zone.
 
+=== "Ubuntu 22.04"
+    ```bash
+    vi /etc/php/8.1/fpm/php.ini
+    vi /etc/php/8.1/cli/php.ini
+    ```
+
 === "Ubuntu 20.04"
     ```bash
-    vi /etc/php/7.4/fpm/php.ini
-    vi /etc/php/7.4/cli/php.ini
+    vi /etc/php/8.1/fpm/php.ini
+    vi /etc/php/8.1/cli/php.ini
     ```
 
 === "CentOS 8"
@@ -114,8 +133,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 
 === "Debian 11"
     ```bash
-    vi /etc/php/7.4/fpm/php.ini
-    vi /etc/php/7.4/cli/php.ini
+    vi /etc/php/8.1/fpm/php.ini
+    vi /etc/php/8.1/cli/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -126,6 +145,11 @@ timedatectl set-timezone Etc/UTC
 
 
 ## Configure MariaDB
+
+=== "Ubuntu 22.04"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
 
 === "Ubuntu 20.04"
     ```
@@ -170,10 +194,16 @@ exit
 
 ## Configure PHP-FPM
 
+=== "Ubuntu 22.04"
+    ```bash
+    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
+    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    ```
+
 === "Ubuntu 20.04"
     ```bash
-    cp /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/librenms.conf
-    vi /etc/php/7.4/fpm/pool.d/librenms.conf
+    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
+    vi /etc/php/8.1/fpm/pool.d/librenms.conf
     ```
 
 === "CentOS 8"
@@ -184,8 +214,8 @@ exit
 
 === "Debian 11"
     ```bash
-    cp /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/librenms.conf
-    vi /etc/php/7.4/fpm/pool.d/librenms.conf
+    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
+    vi /etc/php/8.1/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -208,6 +238,44 @@ If there are no other PHP web applications on this server, you may remove www.co
 Feel free to tune the performance settings in librenms.conf to meet your needs.
 
 ## Configure Web Server
+
+=== "Ubuntu 22.04"
+    === "NGINX"
+        ```bash
+        vi /etc/nginx/conf.d/librenms.conf
+        ```
+
+        Add the following config, edit `server_name` as required:
+
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+
+        ```bash
+        rm /etc/nginx/sites-enabled/default
+        systemctl restart nginx
+        systemctl restart php8.1-fpm
+        ```
 
 === "Ubuntu 20.04"
     === "NGINX"
@@ -244,7 +312,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
-        systemctl restart php7.4-fpm
+        systemctl restart php8.1-fpm
         ```
 
     === "Apache"
@@ -282,7 +350,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         a2enmod proxy_fcgi setenvif rewrite
         a2ensite librenms.conf
         systemctl restart apache2
-        systemctl restart php7.4-fpm
+        systemctl restart php8.1-fpm
         ```
 
 === "CentOS 8"
@@ -402,10 +470,13 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php7.4-fpm
+        systemctl restart php8.1-fpm
         ```
 
 ## SELinux
+
+=== "Ubuntu 22.04"
+    SELinux not enabled by default
 
 === "Ubuntu 20.04"
     SELinux not enabled by default
@@ -469,6 +540,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     SELinux not enabled by default
 
 ## Allow access through firewall
+
+=== "Ubuntu 22.04"
+    Firewall not enabled by default
 
 === "Ubuntu 20.04"
     Firewall not enabled by default

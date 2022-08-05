@@ -121,6 +121,7 @@ var grid = $("#ports").bootgrid({
             ignore: '<?php echo $vars['ignore']; ?>',
             deleted: '<?php echo $vars['deleted']; ?>',
             errors: '<?php echo $vars['errors']; ?>',
+            devicegroup: '<?php echo $vars['devicegroup']; ?>',
         };
     },
     url: '<?php echo route('table.ports') ?>'

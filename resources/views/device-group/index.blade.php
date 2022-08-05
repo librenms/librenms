@@ -24,6 +24,7 @@
                         <th>{{ __('Description') }}</th>
                         <th>{{ __('Type') }}</th>
                         <th>{{ __('Devices') }}</th>
+                        <th>{{ __('Ports') }}</th>
                         <th>{{ __('Pattern') }}</th>
                         <th>{{ __('Actions') }}</th>
                     </tr>
@@ -36,6 +37,9 @@
                             <td>{{ __(ucfirst($device_group->type)) }}</td>
                             <td>
                                 <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ url("/ports/devicegroup=$device_group->id") }}">View</a>
                             </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>
