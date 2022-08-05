@@ -52,6 +52,8 @@ class RrdDefinition
      * @param  int  $min  Minimum allowed value.  null means undefined.
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string|array  $source_rrd
+     * @param  string  $source_ds
      * @return RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_rrd = null, $source_ds = null)
@@ -60,14 +62,12 @@ class RrdDefinition
             d_echo('DS must be set to a non-empty string.');
         }
 
-        $source_index = null;
-        if ($source_rrd && $source_ds && ! in_array($source_rrd, $this->sources)) {
-            $source_index = array_push($this->sources, $source_rrd); // sources are 1 based
-        }
-
+        $source_rrd_key = is_array($source_rrd) ? implode(',', $source_rrd) : $source_rrd;
+        $this->sources[$source_rrd_key] = $source_rrd;
         $name = $this->escapeName($name);
+
         $this->dataSets[$name] = [
-            is_null($source_index) ? $name : "$name={$source_ds}[$source_index]",
+            is_null($source_rrd) ? $name : "$name={$source_ds}[$source_rrd_key]",
             $this->checkType($type),
             is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
             is_null($min) ? 'U' : $min,
