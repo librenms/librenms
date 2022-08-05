@@ -174,10 +174,11 @@ class Services implements Module
     private function saveMetrics(array $metrics, Service $service, OS $os): void
     {
         // If we have performance data we will store it.
+        $service->service_ds = array_map(function ($metric) {
+            return $metric['uom'];
+        }, $metrics);
+
         if (! empty($metrics)) {
-            $service->service_ds = array_map(function ($metric) {
-                return $metric['uom'];
-            }, $metrics);
             Log::debug('Service DS: ' . json_encode($service->service_ds));
 
             $legacy_metrics = [];
