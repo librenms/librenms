@@ -51,13 +51,14 @@ class ServiceCheckResponse
         foreach (explode(' ', trim($output_matches['metrics'] ?? '')) as $metric) {
             // Separate the DS and value: DS=value
             // This regex checks for valid UOM's to be used for graphing https://nagios-plugins.org/doc/guidelines.html#AEN200
-            if (preg_match('/^(?<ds>[^=]+)=(?<value>[\d.-]+)(?<uom>us|ms|s|KB|MB|GB|TB|c|%|B)/', $metric, $metric_matches)) {
+            if (preg_match('/^(?<ds>[^=]+)=(?<value>[\d.-]+)(?<uom>us|ms|s|KB|MB|GB|TB|c|%|B)?;/', $metric, $metric_matches)) {
+                $uom = $metric_matches['uom'] ?? '';
                 $this->metrics[$metric_matches['ds']] = [
                     'value' => $metric_matches['value'],
-                    'uom' => $metric_matches['uom'],
-                    'storage' => $service_check->getStorageType($metric_matches['ds'], $metric_matches['uom']),
+                    'uom' => $uom,
+                    'storage' => $service_check->getStorageType($metric_matches['ds'], $uom),
                 ];
-                \Log::debug('Perf Data - DS: ' . $metric_matches['ds'] . ', Value: ' . $metric_matches['value'] . ', UOM: ' . $metric_matches['uom']);
+                \Log::debug('Perf Data - DS: ' . $metric_matches['ds'] . ', Value: ' . $metric_matches['value'] . ', UOM: ' . $uom);
             } else {
                 // No DS. Don't add an entry to the array.
                 \Log::debug('Perf Data - None.');
