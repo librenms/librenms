@@ -61,7 +61,7 @@ class Port extends DeviceRelatedModel
      */
     public function getLabel()
     {
-        $os = $this->device->os;
+        $os = optional($this->device)->os;
 
         if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;

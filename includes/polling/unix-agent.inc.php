@@ -55,6 +55,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'ceph',
             'mysql',
             'nginx',
+            'php-fpm',
             'powerdns',
             'powerdns-recursor',
             'proxmox',

@@ -189,7 +189,11 @@ class PluginManager
 
         if (! $plugin) {
             try {
-                $plugin = Plugin::create([
+                // plugin should not exist, but check for safety
+                $plugin = Plugin::firstOrCreate([
+                    'version' => 2,
+                    'plugin_name' => $name,
+                ], [
                     'plugin_name' => $name,
                     'plugin_active' => $name !== 'ExamplePlugin',
                     'version' => 2,

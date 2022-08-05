@@ -8,6 +8,7 @@ body {
   color: #555;
   font-size: 10pt;
   line-height: 20px;
+  overflow-y: scroll;
 }
 
 ul { margin: 0px; padding: 0px; list-style: disc outside; }

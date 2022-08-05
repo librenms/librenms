@@ -160,6 +160,13 @@ This yields `(&(objectclass=user)(sAMAccountName=$username))` for the
 user filter and `(&(objectclass=group)(sAMAccountName=$group))` for
 the group filter.
 
+### SELinux configuration
+
+On RHEL / CentOS / Fedora, in order for LibreNMS to reach Active Directory, you need to allow LDAP requests in SELinux:
+```
+setsebool -P httpd_can_connect_ldap 1
+```
+
 ## LDAP Authentication
 
 Config option: `ldap`
@@ -248,6 +255,13 @@ $config['auth_ldap_groups'] = [
     '{admin_group}' => ['level' => 10],
     '{global_readonly_group}' => ['level' => 5],
 ];
+```
+
+### SELinux configuration
+
+On RHEL / CentOS / Fedora, in order for LibreNMS to reach LDAP, you need to allow LDAP requests in SELinux:
+```
+setsebool -P httpd_can_connect_ldap 1
 ```
 
 ## Radius Authentication

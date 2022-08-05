@@ -4,7 +4,7 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app->app_id]);
 
 $array = [
     'sb_reading'   => [
