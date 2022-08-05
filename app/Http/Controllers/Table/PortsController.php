@@ -155,7 +155,7 @@ class PortsController extends TableController
             'status' => $status,
             'device' => Url::deviceLink($port->device),
             'port' => Url::portLink($port),
-            'secondsIfLastChange' => ceil($port->device->uptime - ($port->ifLastChange / 100)),
+            'secondsIfLastChange' => ceil(optional($port->device)->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
             'ifMtu' => $port->ifMtu,
