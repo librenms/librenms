@@ -40,18 +40,12 @@ interface ServiceCheck
     /**
      * Get data sets to be used for graphing.
      * If you don't want to graph all metrics or perhaps want to add synthetic graphs, you can do so here.
-     *
-     * @return array
      */
     public function serviceDataSets(): array;
 
     /**
      * Creates the rrdtool commandline for graphing the given data set.
      * See DefaultServiceCheck for base implementation.
-     *
-     * @param  string  $rrd_filename
-     * @param  string  $ds
-     * @return string
      */
     public function graphRrdCommands(string $ds): string;
 
@@ -72,4 +66,10 @@ interface ServiceCheck
      * Fill in the default value for the given flag, must exist in the hasDefaults() array
      */
     public function getDefault(string $flag): string;
+
+    /**
+     * Get the storage type GAUGE, COUNTER, DERIVE, etc
+     * https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     */
+    public function getStorageType(string $ds, string $uom): string;
 }

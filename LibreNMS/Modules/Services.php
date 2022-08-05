@@ -126,7 +126,8 @@ class Services implements Module
 
     public function checkService(Service $service): ServiceCheckResponse
     {
-        $command = \LibreNMS\Services::makeCheck($service)->buildCommand();
+        $service_check = \LibreNMS\Services::makeCheck($service);
+        $command = $service_check->buildCommand();
         $process = new Process($command, null, ['LC_NUMERIC' => 'C']);
 
         $cli = $process->getCommandLine();
@@ -134,7 +135,7 @@ class Services implements Module
 
         $process->run();
 
-        return new ServiceCheckResponse($process->getOutput(), $process->getExitCode(), $cli);
+        return new ServiceCheckResponse($process->getOutput(), $process->getExitCode(), $service_check, $cli);
     }
 
     private function canSkip(Device $device, Service $service): bool
@@ -179,16 +180,54 @@ class Services implements Module
             }, $metrics);
             Log::debug('Service DS: ' . json_encode($service->service_ds));
 
-            foreach ($metrics as $key => $data) {
-                // c = counter type (exclude uptime)
-                $ds_type = ($data['uom'] == 'c') && ! (preg_match('/[Uu]ptime/', $key)) ? 'COUNTER' : 'GAUGE';
-
+            $legacy_metrics = [];
+            foreach ($metrics as $ds => $data) {
                 app('Datastore')->put($os->getDeviceArray(), 'services', [
                     'service_id' => $service->service_id,
-                    'rrd_name' => ['service', $service->service_id, $key],
-                    'rrd_def' => RrdDefinition::make()->addDataset('value', $ds_type, null, null, null, ['services', $service->service_id], $key),
+                    'rrd_name' => ['service', $service->service_id, $ds],
+                    'rrd_def' => RrdDefinition::make()
+                        ->addDataset('value', $data['storage'], null, null, null, ['services', $service->service_id], $this->legacyDsName($legacy_metrics, $ds)),
                 ], ['value' => $data['value']]);
             }
         }
     }
+
+    /**
+     * The legacy ds generation method
+     * Normalize ds for rrd : ds-name must be 1 to 19 characters long in the characters [a-zA-Z0-9_]
+     * http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     */
+    private function legacyDsName(array &$metrics, string $ds): string
+    {
+        $normalized_ds = preg_replace('[^a-zA-Z0-9_]', '_', $ds);
+
+        // if ds_name is longer than 19 characters, only use the first 19
+        if (strlen($normalized_ds) > 19) {
+            $normalized_ds = substr($normalized_ds, 0, 19);
+        }
+
+        if ($ds != $normalized_ds) {
+            // ds has changed. check if normalized_ds is already in the array
+            if (isset($metrics[$normalized_ds])) {
+                \Log::debug("$normalized_ds collides with an existing index");
+
+                // Try to generate a unique name
+                for ($i = 0; $i < 100; $i++) {
+                    $tmp_ds_name = substr($normalized_ds, 0, 19 - strlen("$i")) . $i;
+                    if (! isset($metrics[$tmp_ds_name])) {
+                        \Log::debug("$normalized_ds collides with an existing index");
+
+                        $metrics[$tmp_ds_name] = true;
+                        return $tmp_ds_name;
+                    }
+                }
+
+                \Log::debug('could not generate a unique ds-name for ' . $ds);
+            }
+        }
+
+        $metrics[$normalized_ds] = true;
+        return $normalized_ds;
+    }
+
 }

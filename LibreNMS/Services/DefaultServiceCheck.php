@@ -58,6 +58,10 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         return $this->service->service_ds ?? [];
     }
 
+    /**
+     * Creates the rrdtool commandline for graphing the given data set.
+     * See DefaultServiceCheck for base implementation.
+     */
     public function graphRrdCommands(string $ds): string
     {
         if (! isset($this->serviceDataSets()[$ds])) {
@@ -105,6 +109,60 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     }
 
     /**
+     * Mark parameters that have defaults with descriptions
+     * This will mark these as optional for users and indicate the defaults.
+     */
+    public function hasDefaults(): array
+    {
+        return [
+            '-H' => trans('service.defaults.hostname'),
+        ];
+    }
+
+    /**
+     * Get the storage type GAUGE, COUNTER, DERIVE, etc
+     * https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     */
+    public function getStorageType(string $ds, string $uom): string
+    {
+        if (($uom == 'c') && ! (preg_match('/[Uu]ptime/', $ds))) {
+            return 'COUNTER';
+        }
+
+        return 'GAUGE';
+    }
+
+    /**
+     * Fill in the default value for the given flag, must exist in the hasDefaults() array
+     */
+    public function getDefault(string $flag): string
+    {
+        switch ($flag) {
+            case '-H':
+                return $this->service->service_ip ?: $this->service->device->overwrite_ip ?: $this->service->device->hostname;
+            default:
+                return '';
+        }
+    }
+
+    /**
+     * Helper method to generate the rrd file name for a given data set
+     */
+    protected function rrdName(string $ds): string
+    {
+        return \Rrd::name($this->service->device->hostname, ['service', $this->service->service_id, $ds]);
+    }
+
+    protected function parseLegacyParams(): array
+    {
+        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($this->service->service_param));
+
+        return array_map(function ($part) {
+            return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
+        }, $parts);
+    }
+
+    /**
      * Merge either modern (array) or legacy (string) parameters into the command
      */
     private function appendParameters(array $command): array
@@ -125,35 +183,5 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         }
 
         return $modern ? $command : array_merge($command, $this->parseLegacyParams());
-    }
-
-    protected function parseLegacyParams(): array
-    {
-        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($this->service->service_param));
-
-        return array_map(function ($part) {
-            return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
-        }, $parts);
-    }
-
-    public function hasDefaults(): array
-    {
-        return [
-            '-H' => trans('service.defaults.hostname'),
-        ];
-    }
-
-    public function getDefault(string $flag): string
-    {
-        switch ($flag) {
-            case '-H':
-                return $this->service->service_ip ?: $this->service->device->overwrite_ip ?: $this->service->device->hostname;
-            default:
-                return '';
-        }
-    }
-
-    protected function rrdName(string $ds) {
-        return \Rrd::name($this->service->device->hostname, ['service', $this->service->service_id, $ds]);
     }
 }
