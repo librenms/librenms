@@ -44,7 +44,7 @@
                     <td class="col-sm-12">
                         <div class="col-sm-1">
                                 <span class="alert-status"
-                                      x-bind:class="{'label-danger': service_status === 2, 'label-warning': service_status === 1, 'label-success': service_status === 0, 'label-info': service_status < 0 || service_status > 2}">
+                                      x-bind:class="{{ (int) $service->service_disabled }} ? 'label-default' : {'label-danger': service_status === 2, 'label-warning': service_status === 1, 'label-success': service_status === 0, 'label-info': service_status < 0 || service_status > 2}">
                                     <span class="device-services-page">{{ $service->service_type }}</span>
                                 </span>
                         </div>
