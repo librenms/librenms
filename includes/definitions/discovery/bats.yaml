@@ -15,12 +15,11 @@ modules:
             data:
                 -
                     oid: aatsDot1
-                    value: linkDistanceMeters
+                    value: status
                     group: Positioner
-                    divisor: 1000
-                    num_oid: '.1.3.6.1.4.1.37069.1.2.6.2.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.37069.1.1.1.{{ $index }}'
                     descr: 'Link distance (km)'
-                    index: 'linkDistanceMeters.{{ $index }}'
+                    index: 'status.{{ $index }}'
                 -
                     oid: aatsDot1
                     value: currentHeading360ScaleFloat
@@ -82,9 +81,9 @@ modules:
                     index: 'linkStatusInt.{{ $index }}'
                     state_name: linkStatus
                     states:
-                        - { value:  0, generic: 0, graph: 0, descr: Disconnected }
+                        - { value:  0, generic: 2, graph: 0, descr: Disconnected }
                         - { value:  1, generic: 1, graph: 0, descr: Marginal }
-                        - { value:  2, generic: 2, graph: 0, descr: Connected }
+                        - { value:  2, generic: 0, graph: 0, descr: Connected }
                 -
                     oid: aatsDot1
                     value: currentGPSStatusInt
