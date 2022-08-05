@@ -17,6 +17,6 @@ return [
     'sent' => 'Poslali smo vam link za reset loinke u e-mailu!',
     'throttled' => 'Molim sačekajte pre nego pokušate ponovo.',
     'token' => 'Vaučer za reset lozinke je neispravan.',
-    'user' => "Ne postoji korisnik sa takvom e-mail adresom",
+    'user' => 'Ne postoji korisnik sa takvom e-mail adresom',
 
 ];
