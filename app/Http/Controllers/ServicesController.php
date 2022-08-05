@@ -217,7 +217,7 @@ class ServicesController extends Controller
         $message = $response->message;
 
         // prepend the CLI for troubleshooting if the check fails
-        if ($response->result == 2) {
+        if ($response->result == 2 || $response->result == 3) {
             $message = $response->commandLine . PHP_EOL . PHP_EOL . $message;
         }
 
