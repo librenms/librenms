@@ -87,6 +87,13 @@ function poll_sensor($device, $class)
                 }
             }
 
+            if ($class == 'temperature') {
+                preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
+                if (! empty($temp_response[0])) {
+                    $sensor_value = $temp_response[0];
+                }
+            }
+
             if ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
