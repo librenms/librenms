@@ -2,11 +2,11 @@
     <table id="eventlog" class="table table-hover table-condensed table-striped" data-ajax="true">
         <thead>
         <tr>
-            <th data-column-id="datetime" data-order="desc">Timestamp</th>
-            <th data-column-id="type">Type</th>
-            <th data-column-id="device_id">Hostname</th>
-            <th data-column-id="message">Message</th>
-            <th data-column-id="username">User</th>
+            <th data-column-id="datetime" data-order="desc">{{ __('Timestamp') }}</th>
+            <th data-column-id="type">{{ __('Type') }}</th>
+            <th data-column-id="device_id">{{ __('Hostname') }}</th>
+            <th data-column-id="message">{{ __('Message') }}</th>
+            <th data-column-id="username">{{ __('User') }}</th>
         </tr>
         </thead>
     </table>
