@@ -59,6 +59,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'powerdns',
             'powerdns-recursor',
             'proxmox',
+            'redis',
             'rrdcached',
             'tinydns',
             'gpsd',
