@@ -849,26 +849,41 @@ Extend` heading top of page.
 
 ## Mdadm
 
-This shell script checks mdadm health and array data
+It allows you to checks mdadm health and array data
+
+This script require: jq
 
 ### SNMP Extend
 
-1. Download the script onto the desired host.
+1. Install jq
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/mdadm
+sudo apt install jq
 ```
 
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+2. Download the script onto the desired host.
+```
+sudo wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
+```
+
+3. Make the script executable
+```
+sudo chmod +x /etc/snmp/mdadm
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend mdadm /etc/snmp/mdadm
 ```
 
-4. Restart snmpd on your host
+5. Verify it is working by running
+```
+sudo /etc/snmp/mdadm
+```
+
+6. Restart snmpd on your host
+```
+sudo service snmpd restart
+```
 
 The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
