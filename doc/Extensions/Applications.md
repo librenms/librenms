@@ -1926,7 +1926,7 @@ extend rpigpiomonitor /etc/snmp/rpigpiomonitor.php
 
 ## Redis
 
-SNMP extend script to monitor your Redis Server
+Script to monitor your Redis Server
 
 ### SNMP Extend
 
@@ -1944,6 +1944,11 @@ chmod +x /etc/snmp/redis.py
 ```
 extend redis /etc/snmp/redis.py
 ```
+
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `redis` script to `/usr/lib/check_mk_agent/local/`
 
 ## RRDCached
 
