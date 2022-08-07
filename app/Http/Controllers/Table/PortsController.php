@@ -63,6 +63,11 @@ class PortsController extends TableController
             'port_descr_type',
             'ports.disabled' => 'disabled',
             'ports.ignore' => 'ignore',
+            'group' => function ($query, $group) {
+                return $query->whereHas('groups', function ($query) use ($group) {
+                    return $query->where('id', $group);
+                });
+            },
             'devicegroup' => function ($query, $devicegroup) {
                 return $query->whereHas('device', function ($query) use ($devicegroup) {
                     return $query->whereHas('groups', function ($query) use ($devicegroup) {
