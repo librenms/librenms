@@ -551,7 +551,7 @@ function version_info($remote = false)
         'db_schema' => vsprintf('%s (%s)', $version->database()),
         'php_ver' => phpversion(),
         'python_ver' => $version->python(),
-        'mysql_ver' => $version->databaseServer(),
+        'database_ver' => $version->databaseServer(),
         'rrdtool_ver' => $version->rrdtool(),
         'netsnmp_ver' => $version->netSnmp(),
     ];

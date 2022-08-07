@@ -88,7 +88,7 @@ extra:
   article_nav_top: false
   article_nav_bottom: true
   php:
-    version_min: 7.3
+    version_min: 8.1
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
