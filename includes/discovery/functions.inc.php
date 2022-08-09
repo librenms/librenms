@@ -24,7 +24,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Number;
 
 function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {

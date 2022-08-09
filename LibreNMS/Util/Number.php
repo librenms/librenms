@@ -125,6 +125,7 @@ class Number
                 $value = $temp_response[0];
             }
         }
+
         return $value;
     }
 }
