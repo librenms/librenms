@@ -81,9 +81,14 @@ function poll_sensor($device, $class)
             }
 
             if (! is_numeric($sensor_value)) {
-                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
+                preg_match('/-?\d*\.\d+/', $sensor_value, $temp_response);
                 if (! empty($temp_response[0])) {
                     $sensor_value = $temp_response[0];
+                } else {
+                    preg_match('/-?\d+/', $sensor_value, $temp_response);
+                    if (! empty($temp_response[0])) {
+                        $sensor_value = $temp_response[0];
+                    }
                 }
             }
 

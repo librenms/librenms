@@ -885,9 +885,14 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', $snmp_value, $temp_response);
+                    preg_match('/-?\d*\.\d+/', $snmp_value, $temp_response);
                     if (! empty($temp_response[0])) {
                         $snmp_value = $temp_response[0];
+                    } else {
+                        preg_match('/-?\d+/', $snmp_value, $temp_response);
+                        if (! empty($temp_response[0])) {
+                            $snmp_value = $temp_response[0];
+                        }
                     }
                 }
 
