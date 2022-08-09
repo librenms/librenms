@@ -24,6 +24,7 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Number;
 
 function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {
@@ -885,15 +886,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.\d+/', $snmp_value, $temp_response);
-                    if (! empty($temp_response[0])) {
-                        $snmp_value = $temp_response[0];
-                    } else {
-                        preg_match('/-?\d+/', $snmp_value, $temp_response);
-                        if (! empty($temp_response[0])) {
-                            $snmp_value = $temp_response[0];
-                        }
-                    }
+                    $snmp_value = \LibreNMS\Util\Number::getNumberFromString($snmp_value);
                 }
 
                 if (is_numeric($snmp_value)) {
