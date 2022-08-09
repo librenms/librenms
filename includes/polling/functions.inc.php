@@ -81,7 +81,7 @@ function poll_sensor($device, $class)
             }
 
             if (! is_numeric($sensor_value and $class != 'temperature')) {
-                $sensor_value = \LibreNMS\Util\Number::getNumberFromString($sensor_value);
+                $sensor_value = \LibreNMS\Util\Number::fromString($sensor_value);
             }
 
             if ($class == 'state') {

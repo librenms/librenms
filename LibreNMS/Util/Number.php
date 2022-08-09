@@ -114,7 +114,7 @@ class Number
      * Return the supplied string if no number was found
      * Prefers to return the float above the first int
      */
-    public static function getNumberFromString(string $value): string
+    public static function fromString(string $value): string
     {
         preg_match('/-?\d*\.\d+/', $value, $temp_response);
         if (! empty($temp_response[0])) {
