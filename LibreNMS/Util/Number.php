@@ -108,4 +108,23 @@ class Number
 
         return $float == $int ? $int : $float;
     }
+
+    /**
+     * Function to return the first number from a supplied string
+     * Return the supplied string if no number was found
+     * Prefers to return the float above the first int
+     */
+    public static function getNumberFromString($value)
+    {
+        preg_match('/-?\d*\.\d+/', $value, $temp_response);
+        if (! empty($temp_response[0])) {
+            $value = $temp_response[0];
+        } else {
+            preg_match('/-?\d+/', $value, $temp_response);
+            if (! empty($temp_response[0])) {
+                $value = $temp_response[0];
+            }
+        }
+        return $value;
+    }
 }

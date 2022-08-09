@@ -11,6 +11,7 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -81,15 +82,7 @@ function poll_sensor($device, $class)
             }
 
             if (! is_numeric($sensor_value)) {
-                preg_match('/-?\d*\.\d+/', $sensor_value, $temp_response);
-                if (! empty($temp_response[0])) {
-                    $sensor_value = $temp_response[0];
-                } else {
-                    preg_match('/-?\d+/', $sensor_value, $temp_response);
-                    if (! empty($temp_response[0])) {
-                        $sensor_value = $temp_response[0];
-                    }
-                }
+                $sensor_value = \LibreNMS\Util\Number::getNumberFromString($sensor_value);
             }
 
             if ($class == 'state') {
