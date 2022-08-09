@@ -885,7 +885,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     } else {
-                        $snmp_value = \LibreNMS\Util\Number::getNumberFromString($snmp_value);
+                        $snmp_value = \LibreNMS\Util\Number::fromString($snmp_value);
                     }
                 }
 
