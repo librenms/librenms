@@ -80,7 +80,7 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if (! is_numeric($sensor_value AND $class != 'temperature')) {
+            if (! is_numeric($sensor_value and $class != 'temperature')) {
                 $sensor_value = \LibreNMS\Util\Number::getNumberFromString($sensor_value);
             }
 
