@@ -11,7 +11,6 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Number;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
