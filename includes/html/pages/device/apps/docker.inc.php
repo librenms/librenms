@@ -1,9 +1,5 @@
 <?php
 
-$domain_list = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'docker');
-
-print_optionbar_start();
-
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -11,19 +7,24 @@ $link_array = [
     'app' => 'docker',
 ];
 
-$containers_list = [];
+print_optionbar_start();
 
-foreach ($domain_list as $label) {
-    $container = $label;
+echo generate_link('All Containers', $link_array);
+echo ' | Containers:';
 
-    if ($vars['container'] == $container) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+$containers = $app->data['containers'] ?? [];
+sort($containers);
+foreach ($containers as $index => $container) {
+    $label = $vars['container'] == $container
+        ? '<span class="pagemenu-selected">' . $container . '</span>'
+        : $container;
+
+    echo generate_link($label, $link_array, ['container' => $container]);
+
+    if ($index < (count($containers) - 1)) {
+        echo ', ';
     }
-
-    array_push($containers_list, generate_link($label, $link_array, ['container' => $container]));
 }
-
-printf('%s | containers: %s', generate_link('All Containers', $link_array), implode(', ', $containers_list));
 
 print_optionbar_end();
 
