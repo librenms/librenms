@@ -48,7 +48,13 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                 echo "Checking BGP peer $peer_ip ";
 
                 // --- Collect BGP data ---
-                if (count($peer_data_check) > 0) {
+                // If a Cisco device has BGP peers in VRF(s),
+                // but no BGP peers in the default VRF,
+                // a SNMP (v3) walk without context will not find any
+                // cbgpPeer2RemoteAs, resulting in empty $peer_data_check.
+                // Without the or clause, we won't see the VRF BGP peers.
+                // ($peer_data_check isn't used in the Cisco code path,)
+                if (count($peer_data_check) > 0 || ($device['os_group'] == 'cisco' && count(DeviceCache::getPrimary()->getVrfContexts()) > 1)) {
                     if ($generic) {
                         echo "\nfallback to default mib";
 

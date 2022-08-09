@@ -28,6 +28,7 @@ theme:
     - navigation.sections
     - navigation.tracking
     - navigation.top
+    - content.tabs.link
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
@@ -72,14 +73,22 @@ plugins:
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
         'Installation/Ubuntu-image.md': 'Installation/Images.md'
         'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
-
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+          remove_comments: true
+      js_files:
+          - js/docs-settings-links.js
+      css_files:
+          - librenms.css
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css
   - librenms.css
 extra_javascript:
-  - js/docs-install-tab.js
   - js/docs-settings-links.js
 extra:
   analytics:
