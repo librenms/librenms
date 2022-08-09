@@ -94,25 +94,24 @@
         }
     },
     "os": {
-        "discovery": {
+        "poller": {
             "devices": [
                 {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.37069",
-                    "sysDescr": "AATS",
-                    "sysContact": "<private>",
-                    "version": null,
+                    "sysName": "127.1.6.1",
+                    "sysObjectID": null,
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": "v2c",
                     "hardware": null,
                     "features": null,
-                    "os": "bats",
-                    "type": "wireless",
+                    "os": "generic",
+                    "type": "",
                     "serial": null,
-                    "icon": "bats.png",
-                    "location": "At 53.6958, 3.3482. Scanning Target K5P ENB 01 (0.5 km)"
+                    "icon": "generic.svg",
+                    "location": null
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "sensors": {
         "discovery": {
