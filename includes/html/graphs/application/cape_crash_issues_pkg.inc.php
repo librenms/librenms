@@ -9,14 +9,13 @@ $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
 
-$packages = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'cape');
+$packages = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'cape', 'pkg-crash_issues___-___');
 
 $rrd_list = [];
 $packages_int = 0;
-while(isset($packages[$packages_int])) {
-    $label=$packages[$packages_int];
-    $label=preg_filter('/^pkg\-/', '', $label);
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg',$label]);
+foreach ($packages as $index => $package) {
+    $label=preg_filter('/^pkg\-crash\_issues\_\_\_\-\_\_\_\-/', '', $package);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],$package]);
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => $label,

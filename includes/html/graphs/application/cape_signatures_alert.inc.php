@@ -18,9 +18,9 @@ if (isset($vars['stddev'])) {
 }
 
 if (isset($vars['package'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg',$vars['package']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-signatures_alert___-___',$vars['package']]);
 }else{
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'signatures_alert']);
 }
 
 $rrd_list = [];

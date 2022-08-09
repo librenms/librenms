@@ -10,9 +10,9 @@ $addarea = 0;
 $transparency = 15;
 
 if (isset($vars['package'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg',$vars['package']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-running_processes___-___',$vars['package']]);
 }else{
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'running_processes']);
 }
 
 $rrd_list = [];
