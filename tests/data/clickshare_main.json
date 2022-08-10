@@ -896,30 +896,6 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.7312.2468.1.2.3.0",
-                    "sensor_index": "0",
-                    "sensor_type": "clickshare",
-                    "sensor_descr": "Case",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 55.652,
-                    "sensor_limit": 95,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 45.652,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
                 }
             ]
         },
