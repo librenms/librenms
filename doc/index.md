@@ -35,7 +35,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/API/">
-            <i class="fas fa-connectdevelop"></i>
+            <i class="fab fa-connectdevelop"></i>
             <span>API</span>
           </a>
         </div>
