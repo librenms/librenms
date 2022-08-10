@@ -125,6 +125,11 @@ class Number
                 $value = $temp_response[0];
             }
         }
+        if (is_numeric($value)) {
+            $float = (float) $value;
+            $int = (int) $value;
+            $vlaue = $float == $int ? $int : $float;
+        }
 
         return $value;
     }
