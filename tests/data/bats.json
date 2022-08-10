@@ -202,7 +202,7 @@
                     "group": "Positioner",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 17,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -706,7 +706,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 17,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
