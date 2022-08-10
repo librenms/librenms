@@ -202,7 +202,7 @@
                     "group": "Positioner",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 17,
+                    "sensor_current": 344.4,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
