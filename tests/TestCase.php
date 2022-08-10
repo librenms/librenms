@@ -35,4 +35,13 @@ abstract class TestCase extends BaseTestCase
             }
         }
     }
+
+    protected function tearDown(): void
+    {
+        $this->beforeApplicationDestroyed(function () {
+            $this->getConnection()->disconnect();
+        });
+
+        parent::tearDown();
+    }
 }

@@ -221,5 +221,52 @@ return [
 
             ],
         ],
+        'distributedpoller' => [
+            'CheckDistributedPollerEnabled' => [
+                'ok' => 'Distributed Polling setting is enabled globally',
+                'not_enabled' => 'You have not enabled distributed_poller',
+                'not_enabled_globally' => 'You have not enabled distributed_poller globally',
+            ],
+            'CheckMemcached' => [
+                'not_configured_host' => 'You have not configured distributed_poller_memcached_host',
+                'not_configured_port' => 'You have not configured distributed_poller_memcached_port',
+                'could_not_connect' => 'Could not connect to memcached server',
+                'ok' => 'Connection to memcached is ok',
+            ],
+            'CheckRrdcached' => [
+                'fail' => 'You have not enabled rrdcached',
+            ],
+        ],
+        'poller' => [
+            'CheckActivePoller' => [
+                'fail' => 'No active polling method detected',
+                'both_fail' => 'Both Dispatcher Service and Python Wrapper were active recently, this could cause double polling',
+                'ok' => 'Active pollers found',
+            ],
+            'CheckDispatcherService' => [
+                'fail' => 'No active dispatcher nodes found',
+                'ok' => 'Dispatcher Service is enabled',
+                'nodes_down' => 'Some dispatcher nodes have not checked in recently',
+                'not_detected' => 'Dispatcher Service not detected',
+                'warn' => 'Dispatcher Service has been used, but not recently',
+            ],
+            'CheckLocking' => [
+                'fail' => 'Locking server issue: :message',
+                'ok' => 'Locks are functional',
+            ],
+            'CheckPythonWrapper' => [
+                'fail' => 'No active python wrapper pollers found',
+                'no_pollers' => 'No python wrapper pollers found',
+                'cron_unread' => 'Could not read cron files',
+                'ok' => 'Python poller wrapper is polling',
+                'nodes_down' => 'Some poller nodes have not checked in recently',
+                'not_detected' => 'Python wrapper cron entry is not present',
+            ],
+            'CheckRedis' => [
+                'bad_driver' => 'Using :driver for locking, you should set CACHE_DRIVER=redis',
+                'ok' => 'Redis is functional',
+                'unavailable' => 'Redis is unavailable',
+            ],
+        ],
     ],
 ];

@@ -10,7 +10,7 @@ $bigdescrlen = 20;
 $smalldescrlen = 15;
 $colours = 'mixed';
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app['app_id'], 'connections']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'redis', $app->app_id, 'connections']);
 
 $array = [
     'received' => 'Received',

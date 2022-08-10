@@ -3,9 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'drbd';
-$app_id = $app['app_id'];
-$app_instance = $app['app_instance'];
-$drbd_data = $agent_data['app'][$name][$app_instance];
+$drbd_data = $agent_data['app'][$name][$app->app_instance];
 foreach (explode('|', $drbd_data) as $part) {
     [$stat, $val] = explode('=', $part);
     if (! empty($stat)) {
@@ -13,7 +11,7 @@ foreach (explode('|', $drbd_data) as $part) {
     }
 }
 
-$rrd_name = ['app', $name, $app_instance];
+$rrd_name = ['app', $name, $app->app_instance];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ns', 'DERIVE', 0, 125000000000)
     ->addDataset('nr', 'DERIVE', 0, 125000000000)

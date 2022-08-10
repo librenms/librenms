@@ -63,6 +63,13 @@ class PortsController extends TableController
             'port_descr_type',
             'ports.disabled' => 'disabled',
             'ports.ignore' => 'ignore',
+            'devicegroup' => function ($query, $devicegroup) {
+                return $query->whereHas('device', function ($query) use ($devicegroup) {
+                    return $query->whereHas('groups', function ($query) use ($devicegroup) {
+                        return $query->where('id', $devicegroup);
+                    });
+                });
+            },
         ];
     }
 
@@ -148,7 +155,7 @@ class PortsController extends TableController
             'status' => $status,
             'device' => Url::deviceLink($port->device),
             'port' => Url::portLink($port),
-            'secondsIfLastChange' => ceil($port->device->uptime - ($port->ifLastChange / 100)),
+            'secondsIfLastChange' => ceil(optional($port->device)->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
             'ifMtu' => $port->ifMtu,
