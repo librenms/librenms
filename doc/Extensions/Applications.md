@@ -51,14 +51,14 @@ like that for proxmox:
 extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 ```
 
-### JSON Return Optimization Using lnms_return_optimizer
+### JSON Return Optimization Using librenms_return_optimizer
 
 While the json_app_get does allow for more complex and larger data
 to be easily returned by a extend and the data to then be worked
 with, this can also sometimes result in large returns that
 occasionally don't play nice with SNMP on some networks.
 
-lnms_return_optimizer fixes this via taking the extend output
+`librenms_return_optimizer` fixes this via taking the extend output
 piped to it, gzipping it, and then converting it to base64. The
 later is needed as net-snmp does not play that nice with binary data,
 converting most of the non-printable characters to `.`. This does add
@@ -66,20 +66,16 @@ a bit of additional overhead to the gzipped data, but still tends to
 be result in a return that is usually a third of the size for JSONs
 items.
 
-This does require changing out the extend works, requires using it
-from a cached state as netsnmp does not play nice with commands
-involving a pipe.
-
-To do this just set up a crontab entry such as below.
+The change required is fairly simply. So for the portactivity example below...
 
 ```
-*/5 * * * * /etc/snmp/extends/portactivity smtps,http,imap,imaps,postgresql,https,ldap,ldaps,nfsd,syslog-conn,ssh,matrix,gitea | /usr/local/bin/lnms_return_optimizer > /var/cache/portactivity.json
+extend portactivity /etc/snmp/extends/portactivity smtps,http,imap,imaps,postgresql,https,ldap,ldaps,nfsd,syslog-conn,ssh,matrix,gitea
 ```
 
-And then snmpd.conf as below.
+Would become this...
 
 ```
-extend portactivity /bin/cat /var/cache/portactivity.json
+extend portactivity /usr/local/bin/lnms_return_optimizer -- /etc/snmp/extends/portactivity smtps,http,imap,imaps,postgresql,https,ldap,ldaps,nfsd,syslog-conn,ssh,matrix,gitea
 ```
 
 The requirements for this are Perl, MIME::Base64, and Gzip::Faster.
