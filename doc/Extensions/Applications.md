@@ -121,9 +121,13 @@ Currently supported applications as are below.
 - redis
 - seafile
 - supervisord
-- suricata
 - ups-apcups
 - zfs
+
+The following apps have extends that have native support for this,
+if congiured to do so.
+
+- suricata
 
 ## Enable the application discovery module
 
@@ -2270,6 +2274,12 @@ cpanm Suricata::Monitoring
 3. Configure snmpd.conf
 ```
 extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c
+```
+
+Or if you want to use try compressing the return via Base64+GZIP...
+
+```
+extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c -b
 ```
 
 4. Restart snmpd on your system.
