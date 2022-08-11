@@ -84,7 +84,7 @@ Installing on FreeBSD...
 
 ```
 pkg install p5-MIME-Base64 p5-Gzip-Faster wget
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/lnms_return_optimizer -O /usr/local/bin/lnms_return_optimizer
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/librenms_return_optimizer -O /usr/local/bin/librenms_return_optimizer
 chmod +x /usr/local/bin/lnms_return_optimizer
 ```
 
@@ -94,7 +94,7 @@ Installing on Debian...
 apt-get install zlib1g-dev cpanminus wget
 cpanm Gzip::Faster
 cpanm MIME::Base64
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/lnms_return_optimizer -O /usr/local/bin/lnms_return_optimizer
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/librenms_return_optimizer -O /usr/local/bin/librenms_return_optimizer
 chmod +x /usr/local/bin/lnms_return_optimizer
 ```
 
