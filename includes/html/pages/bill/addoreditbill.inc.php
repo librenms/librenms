@@ -30,7 +30,7 @@
   <div id="cdrDiv">
     <label class="col-sm-4 control-label" for="bill_cdr">CDR</label>
     <div class="col-sm-3">
-      <input class="form-control input-sm" type="text" name="bill_cdr" value="<?php echo $cdr['data'] ?>">
+      <input class="form-control input-sm" type="number" min="1" name="bill_cdr" value="<?php echo $cdr['data'] ?>">
     </div>
     <div class="col-sm-5">
       <select name="bill_cdr_type" class="form-control input-sm">
@@ -62,7 +62,7 @@
   <div id="quotaDiv">
     <label class="col-sm-4 control-label" for="bill_quota">Quota</label>
     <div class="col-sm-3">
-      <input class="form-control input-sm" type="text" name="bill_quota" value="<?php echo $quota['data'] ?>">
+      <input class="form-control input-sm" type="number" min="1" name="bill_quota" value="<?php echo $quota['data'] ?>">
     </div>
     <div class="col-sm-5">
       <select name="bill_quota_type" class="form-control input-sm">

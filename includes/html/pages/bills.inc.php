@@ -26,6 +26,7 @@ if ($_POST['addbill'] == 'yes') {
                 }
 
                 $bill_quota = (is_numeric($_POST['bill_quota']) ? $_POST['bill_quota'] * \LibreNMS\Config::get('billing.base') * $multiplier : 0);
+                $bill_quota = $bill_quota ?: 1;
                 $bill_cdr = 0;
             }
         }
@@ -45,6 +46,7 @@ if ($_POST['addbill'] == 'yes') {
                 }
 
                 $bill_cdr = (is_numeric($_POST['bill_cdr']) ? $_POST['bill_cdr'] * $multiplier : 0);
+                $bill_cdr = $bill_cdr ?: 1;
                 $bill_quota = 0;
             }
         }

@@ -9,6 +9,10 @@ if (Auth::user()->hasGlobalAdmin()) {
 if (bill_permitted($bill_id)) {
     $bill_data = dbFetchRow('SELECT * FROM bills WHERE bill_id = ?', [$bill_id]);
 
+    // Quickfix for division by zero
+    $bill_data['bill_quota'] = $bill_data['bill_quota'] ?: 1;
+    $bill_data['bill_cdr'] = $bill_data['bill_cdr'] ?: 1;
+
     $bill_name = $bill_data['bill_name'];
 
     $today = str_replace('-', '', dbFetchCell('SELECT CURDATE()'));
@@ -178,7 +182,7 @@ if (bill_permitted($bill_id)) {
         } elseif ($bill_data['bill_type'] == 'cdr') {
             // The customer is billed based on a CDR with 95th%ile overage
             $unit = 'kbps';
-            $cdr = $bill_data['bill_cdr'];
+            $cdr = $bill_data['bill_cdr'] ?: 1;
             $rate_95th = round($rate_95th, 2);
             $percent = round((($rate_95th) / $cdr * 100), 2);
             $background = \LibreNMS\Util\Color::percentage($percent, null);

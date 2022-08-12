@@ -94,10 +94,12 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $used95th = \LibreNMS\Util\Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
     $notes = $bill['bill_notes'];
 
+    // Quickfix for division by zero
+    $bill['bill_allowed'] = $bill['bill_allowed'] ?: 1;
+
     if ($prev) {
         $percent = $bill['bill_percent'];
         $overuse = $bill['bill_overuse'];
-    } else {
     }
 
     if (strtolower($bill['bill_type']) == 'cdr') {
