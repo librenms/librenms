@@ -388,6 +388,24 @@ $graphs['chronyd'] = [
     'frequency',
     'root',
 ];
+$graphs['sagan'] = [
+    'after',
+    'bytes_ignored',
+    'bytes',
+    'drop_percent',
+    'drop',
+    'eps',
+    'f_drop_percent',
+    'f_dropped',
+    'f_total',
+    'ignore',
+    'match',
+    'max_bytes_log_line',
+    'threshold',
+    'total',
+    'uptime',
+    'alert',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

@@ -80,12 +80,14 @@ function poll_sensor($device, $class)
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if ($class == 'temperature') {
-                preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
+            if (! is_numeric($sensor_value)) {
+                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
                 if (! empty($temp_response[0])) {
                     $sensor_value = $temp_response[0];
                 }
-            } elseif ($class == 'state') {
+            }
+
+            if ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
                         'SELECT `state_value`

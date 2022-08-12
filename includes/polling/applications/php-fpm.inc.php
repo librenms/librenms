@@ -3,9 +3,14 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'php-fpm';
-$options = '-Oqv';
-$oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.104.112.102.112.109.115.112';
-$phpfpm = snmp_walk($device, $oid, $options);
+
+if (! empty($agent_data['app'][$name])) {
+    $phpfpm = $agent_data['app'][$name];
+} else {
+    $options = '-Oqv';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.104.112.102.112.109.115.112';
+    $phpfpm = snmp_walk($device, $oid, $options);
+}
 
 [$pool,$start_time,$start_since,$accepted_conn,$listen_queue,$max_listen_queue,$listen_queue_len,$idle_processes,
      $active_processes,$total_processes,$max_active_processes,$max_children_reached,$slow_requests] = explode("\n", $phpfpm);

@@ -3,7 +3,10 @@
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is @= config.extra.php_min_version =@**
+!!! warning
+
+    Please note the minimum supported PHP version is @= php.version_min =@.  
+    The guide below might not have been updated to reflect it!
 
 # Install Required Packages
 
