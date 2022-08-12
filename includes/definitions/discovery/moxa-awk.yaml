@@ -1,9 +1,9 @@
 mib: MOXA-AWK4131A-MIB
 modules:
     os:
-        hardware: '.1.3.6.1.4.1.8691.15.34.1.1.1.0'
-        version: '.1.3.6.1.4.1.8691.15.34.1.1.5.0' 
-        serial: '.1.3.6.1.4.1.8691.15.34.1.1.3.0'
+        hardware: MOXA-AWK4131A-MIB::overviewModelName.0
+        version: MOXA-AWK4131A-MIB::overviewFirmwareVersion.0
+        serial: MOXA-AWK4131A-MIB::overviewSerialNumber.0
     mempools:
         data:
             - 
