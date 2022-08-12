@@ -158,10 +158,13 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $this->userFilter($username),
             $attributes
         );
-        $entries = ldap_get_entries($connection, $search);
 
-        if ($entries['count']) {
-            return $this->getUseridFromSid($this->sidFromLdap($entries[0]['objectsid'][0]));
+        if ($search !== false) {
+            $entries = ldap_get_entries($connection, $search);
+
+            if ($entries !== false && $entries['count']) {
+                return $this->getUseridFromSid($this->sidFromLdap($entries[0]['objectsid'][0]));
+            }
         }
 
         return -1;
