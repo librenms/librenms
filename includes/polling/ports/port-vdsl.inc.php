@@ -19,9 +19,8 @@ use LibreNMS\Util\Number;
 //  ),
 //)
 
-if (isset($port_vdsl_tree[$ifIndex])) {
-    $this_port_vdsl = $port_vdsl_tree[$ifIndex];
-    d_echo ($this_port_vdsl);
+if (isset($this_port['xtuc'])) {
+    d_echo ($this_port);
 
     $multiplier = 1;
 
@@ -78,6 +77,6 @@ if (isset($port_vdsl_tree[$ifIndex])) {
 //    $tags = compact('ifName', 'rrd_name', 'rrd_def');
 //    data_update($device, 'adsl', $tags, $fields);
 
-    echo 'VDSL (' . $this_port['ifName'] . '/' . Number::formatSi($this_port_vdsl['xtur']['xdsl2ChStatusActDataRate']*$multiplier, 2, 3, 'bps') . '/' . Number::formatSi($this_port_vdsl['xtuc']['xdsl2ChStatusActDataRate']*$multiplier, 2, 3, 'bps') . ') \n';
+    echo 'VDSL (' . $this_port['ifName'] . '/' . Number::formatSi($this_port['xtur']['xdsl2ChStatusActDataRate']*$multiplier, 2, 3, 'bps') . '/' . Number::formatSi($this_port['xtuc']['xdsl2ChStatusActDataRate']*$multiplier, 2, 3, 'bps') . ') \n';
 
 }//end if

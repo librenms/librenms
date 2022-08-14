@@ -352,14 +352,15 @@ if ($adsl_id) {
     echo 'ADSL ';
     $port_stats = snmpwalk_cache_oid($device, 'adslMibObjects', $port_stats, 'ADSL-LINE-MIB');
 }//end if
+
 if ($vdsl_id) {
     echo 'VDSL ';
     $port_vdsl_tree1 = snmpwalk_group($device, 'xdsl2ChannelStatusTable','VDSL2-LINE-MIB', 2);
     $port_vdsl_tree2 = snmpwalk_group($device, 'xdsl2LineEntry','VDSL2-LINE-MIB', 2);
+
     foreach($port_vdsl_tree1 as $key => $val) {
-        $port_vdsl_tree[$key] = array_merge_recursive($val, $port_vdsl_tree2[$key]);
+        $port_stats[$key] = array_merge_recursive($port_stats[$key], $val,$port_vdsl_tree2[$key]);
     }
-    d_echo ($port_vdsl_tree);
 }//end if
 
 if (Config::get('enable_ports_poe')) {

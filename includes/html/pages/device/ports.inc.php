@@ -33,8 +33,15 @@ if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '" . $
     $menu_options['neighbours'] = 'Neighbours';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'")) {
-    $menu_options['adsl'] = 'ADSL';
+// Check if we have DSL
+$component = new LibreNMS\Component();
+$options['filter']['name'] = ['LIKE', '%dsl'];
+$options['filter']['type'] = ['=', 'ports'];
+$components = $component->getComponents($device['device_id'], $options);
+$dsl = count($components[$device['device_id']]);
+
+if ($dsl > 0) {
+    $menu_options['adsl'] = 'xDSL';
 }
 
 $sep = '';
