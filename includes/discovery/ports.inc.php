@@ -67,7 +67,7 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 }
 
 // Do any xDSL discovery
-require base_path('includes/discovery/ports/port-dsl.inc.php');
+require base_path('includes/discovery/ports/port-xdsl.inc.php');
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
