@@ -186,7 +186,7 @@ function discover_device(&$device, $force_module = false)
 //end discover_device()
 
 // Discover sensors
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type='GAUGE')
 {
     $guess_limits = Config::get('sensors.guess_limits', true);
 
@@ -243,6 +243,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
             'group' => $group,
+            'rrd_type' => $rrd_type,
         ];
 
         foreach ($insert as $key => $val_check) {

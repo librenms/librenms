@@ -100,7 +100,7 @@ class YamlDiscovery
                     }
 
                     foreach ($data as $name => $value) {
-                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags'])) {
+                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
                             $current_data[$name] = $value;
                         } elseif (Str::contains($value, '{{')) {
                             // replace embedded values
