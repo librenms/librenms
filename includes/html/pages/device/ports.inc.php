@@ -41,7 +41,7 @@ $components = $component->getComponents($device['device_id'], $options);
 $dsl = count($components[$device['device_id']]);
 
 if ($dsl > 0) {
-    $menu_options['adsl'] = 'xDSL';
+    $menu_options['xdsl'] = 'xDSL';
 }
 
 $sep = '';
@@ -130,7 +130,7 @@ if ($vars['view'] == 'minigraphs') {
     }
 
     echo '</div>';
-} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
+} elseif ($vars['view'] == 'arp' || $vars['view'] == 'xdsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
     include 'ports/' . $vars['view'] . '.inc.php';
 } else {
     if ($vars['view'] == 'details') {

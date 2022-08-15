@@ -26,3 +26,16 @@ if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'ad
 
     include 'includes/html/print-interface-graphs.inc.php';
 }
+
+if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'vdsl'))) {
+    $iid = $id;
+    echo '<div class=graphhead>VDSL Current Line Speed</div>';
+    $graph_type = 'port_vdsl_speed';
+
+    include 'includes/html/print-interface-graphs.inc.php';
+
+    echo '<div class=graphhead>VDSL Attainable Speed</div>';
+    $graph_type = 'port_vdsl_attainable';
+
+    include 'includes/html/print-interface-graphs.inc.php';
+}

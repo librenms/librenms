@@ -82,7 +82,9 @@ if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPh
 }
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '" . $port->port_id . "'")) {
-    $menu_options['adsl'] = 'xDSL';
+    $menu_options['xdsl'] = 'xDSL';
+} elseif (dbFetchCell("SELECT COUNT(*) FROM `ports_vdsl` WHERE `port_id` = '" . $port->port_id . "'")) {
+    $menu_options['xdsl'] = 'xDSL';
 }
 
 if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '" . $port->ifIndex . "' and `device_id` = '" . $device['device_id'] . "'")) {

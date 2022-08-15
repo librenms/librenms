@@ -1,0 +1,34 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+
+class CreatePortsVdslTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::create('ports_vdsl', function (Blueprint $table) {
+            $table->unsignedInteger('port_id')->unique();
+            $table->timestamp('port_vdsl_updated')->useCurrent();
+            $table->integer('xdsl2LineStatusAttainableRateDs');
+            $table->integer('xdsl2LineStatusAttainableRateUs');
+            $table->integer('xdsl2ChStatusActDataRateXtur');
+            $table->integer('xdsl2ChStatusActDataRateXtuc');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::drop('ports_vdsl');
+    }
+}
