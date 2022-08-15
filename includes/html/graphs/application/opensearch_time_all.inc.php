@@ -14,7 +14,7 @@ $tr_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, '
 $tf_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tf']);
 $tg_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tg']);
 $tm_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tm']);
-$tg_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tg']);
+$tw_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'tw']);
 
 $rrd_list[] = [
     'filename' => $ti_rrd_filename,

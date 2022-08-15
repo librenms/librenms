@@ -64,6 +64,7 @@ if ($graph_set == 'cluster') {
         'opensearch_c_rel_shards'=>'Relocating Shards',
         'opensearch_c_init_shards'=>'Initializing Shards',
         'opensearch_c_delayed_shards'=>'Delayed Shards',
+        'opensearch_c_unass_shards'=>'Unassigned Shards',
     ];
 } elseif ($graph_set == 'translog') {
     $graphs = [
@@ -225,6 +226,7 @@ if ($graph_set == 'cluster') {
         'opensearch_c_rel_shards'=>'Relocating Shards',
         'opensearch_c_init_shards'=>'Initializing Shards',
         'opensearch_c_delayed_shards'=>'Delayed Shards',
+        'opensearch_c_unass_shards'=>'Unassigned Shards',
     ];
 }
 

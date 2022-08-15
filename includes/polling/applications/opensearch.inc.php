@@ -127,7 +127,7 @@ $metrics = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
 
-$rrd_name = ['app', $name, $app->app_id, 'tr'];
+$rrd_name = ['app', $name, $app->app_id, 'tf'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('tf_total', 'DERIVE', 0)
     ->addDataset('tf_periodic', 'DERIVE', 0)
