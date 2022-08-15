@@ -8,7 +8,7 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'c']);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
@@ -36,6 +36,11 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr'    => 'Delayed Unass.',
         'ds'       => 'c_delayed_shards',
+    ];
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr'    => 'Unassigned',
+        'ds'       => 'c_unass_shards',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
