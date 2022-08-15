@@ -190,7 +190,12 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tm_throttled_time', 'DERIVE', 0)
     ->addDataset('tm_throttled_size', 'DERIVE', 0);
 $metrics = [
-
+    'tm_total' => $data['tm_total'],
+    'tm_time' => $data['tm_time'],
+    'tm_docs' => $data['tm_docs'],
+    'tm_size' => $data['tm_size'],
+    'tm_throttled_time' => $data['tm_throttled_time'],
+    'tm_throttled_size' => $data['tm_throttled_size'],
 ];
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
