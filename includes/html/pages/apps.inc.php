@@ -126,6 +126,17 @@ $graphs['nfs-server'] = [
 $graphs['os-updates'] = [
     'packages',
 ];
+$graphs['opensearch'] = [
+    'status',
+    'c_nodes',
+    'c_data_nodes',
+    'c_pending_tasks',
+    'c_in_fl_fetch',
+    'c_task_max_in_time',
+    'c_act_shards_perc',
+    'mem_all',
+    'time_all',
+];
 $graphs['dhcp-stats'] = [
     'stats',
     'pools_percent',
