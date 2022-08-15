@@ -31,6 +31,7 @@ if (isset($int_colour)) {
 }
 
 $port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', [$port['port_id']]);
+$port_vdsl = dbFetchRow('SELECT * FROM `ports_vdsl` WHERE `port_id` = ?', [$port['port_id']]);
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
@@ -157,7 +158,16 @@ if (! empty($port_adsl['adslLineCoding'])) {
     echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
     echo '<br />';
     echo 'SNR:' . $port_adsl['adslAturCurrSnrMgn'] . 'dB/' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB';
-} else {
+} elseif ($port_vdsl['xdsl2LineStatusAttainableRateDs']) {
+    echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
+    echo '<br />';
+    // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
+    // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
+    echo 'Sync:' . Number::formatSi($port_vdsl['xdsl2ChStatusActDataRateXtur'], 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl['xdsl2ChStatusActDataRateXtuc'], 2, 3, 'bps');
+    echo '<br />';
+    echo 'Max:' . Number::formatSi($port_vdsl['xdsl2LineStatusAttainableRateDs'], 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl['xdsl2LineStatusAttainableRateUs'], 2, 3, 'bps');
+
+} else{
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
         echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']) . '</span>';
