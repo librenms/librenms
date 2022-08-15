@@ -2,6 +2,7 @@
 #######################
 .*
 !/.gitignore
+!/.git-blame-ignore-revs
 !/.editorconfig
 !/.scrutinizer.yml
 !/.php_cs
