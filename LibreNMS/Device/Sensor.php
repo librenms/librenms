@@ -98,7 +98,7 @@ class Sensor implements DiscoveryModule, PollerModule
         $low_warn = null,
         $entPhysicalIndex = null,
         $entPhysicalMeasured = null,
-        $rrd_type = 'GAUGE',
+        $rrd_type = 'GAUGE'
     ) {
         $this->type = $type;
         $this->device_id = $device_id;
