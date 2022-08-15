@@ -66,7 +66,7 @@ $metrics = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
 
-$rrd_name = ['app', $name, $app->app_id, 'ttl'];
+$rrd_name = ['app', $name, $app->app_id, 'ti'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('ti_total', 'DERIVE', 0)
     ->addDataset('ti_time', 'DERIVE', 0)
