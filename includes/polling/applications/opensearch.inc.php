@@ -140,7 +140,6 @@ $metrics = [
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $metrics);
 
-
 $rrd_name = ['app', $name, $app->app_id, 'tqc'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('tqc_size', 'GAUGE', 0)
