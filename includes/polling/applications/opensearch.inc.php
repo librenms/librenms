@@ -291,4 +291,5 @@ if (isset($app->data['cluster'])) {
 //
 // update the app metrics
 //
+unset($returned['data']['cluster_name']);
 update_application($app, 'OK', $returned['data']);
