@@ -31,11 +31,11 @@ $rrd_list[] = [
     'descr'    => 'Query',
     'ds'       => 'ts_q_time',
 ];
-    $rrd_list[] = [
-        'filename' => $ts_rrd_filename,
-        'descr'    => 'Fetch',
-        'ds'       => 'ts_f_time',
-    ];
+$rrd_list[] = [
+    'filename' => $ts_rrd_filename,
+    'descr'    => 'Fetch',
+    'ds'       => 'ts_f_time',
+];
 $rrd_list[] = [
     'filename' => $ts_rrd_filename,
     'descr'    => 'Scroll',
@@ -72,9 +72,9 @@ $rrd_list[] = [
     'ds'       => 'tg_exists_time',
 ];
 $rrd_list[] = [
-     'filename' => $tg_rrd_filename,
-     'descr'    => 'Get Missing',
-     'ds'       => 'tg_missing_time',
+    'filename' => $tg_rrd_filename,
+    'descr'    => 'Get Missing',
+    'ds'       => 'tg_missing_time',
 ];
 $rrd_list[] = [
     'filename' => $tm_rrd_filename,

@@ -16,7 +16,7 @@ try {
 
 $data = $returned['data'];
 
-$rrd_name = ['app', $name, $app->app_id,'c'];
+$rrd_name = ['app', $name, $app->app_id, 'c'];
 $rrd_def = RrdDefinition::make()
     ->addDataset('c_nodes', 'GAUGE', 0)
     ->addDataset('c_data_nodes', 'GAUGE', 0)
