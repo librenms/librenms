@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
@@ -14,7 +14,7 @@
                     "type": "power",
                     "serial": "<serial>",
                     "icon": "eltek.png",
-                    "location": "<location>"
+                    "location": "<LOCATION>"
                 }
             ]
         },
