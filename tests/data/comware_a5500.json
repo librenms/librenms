@@ -7030,6 +7030,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -7054,6 +7055,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -7078,6 +7080,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

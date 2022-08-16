@@ -14380,6 +14380,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14389,7 +14390,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.58",
                     "sensor_index": "Poe1.58",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/10",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14404,6 +14405,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14413,7 +14415,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.59",
                     "sensor_index": "Poe1.59",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/11",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14428,6 +14430,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14437,7 +14440,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.60",
                     "sensor_index": "Poe1.60",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/12",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14452,6 +14455,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14461,7 +14465,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.61",
                     "sensor_index": "Poe1.61",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/13",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14476,6 +14480,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14485,7 +14490,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.62",
                     "sensor_index": "Poe1.62",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/14",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14500,6 +14505,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14509,7 +14515,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.63",
                     "sensor_index": "Poe1.63",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/15",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14524,6 +14530,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14533,7 +14540,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.64",
                     "sensor_index": "Poe1.64",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/16",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14548,6 +14555,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14557,7 +14565,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.65",
                     "sensor_index": "Poe1.65",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/17",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14572,6 +14580,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14581,7 +14590,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.66",
                     "sensor_index": "Poe1.66",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/18",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14596,6 +14605,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14605,7 +14615,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.67",
                     "sensor_index": "Poe1.67",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/19",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14620,6 +14630,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14629,7 +14640,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.68",
                     "sensor_index": "Poe1.68",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/20",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14644,6 +14655,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14653,7 +14665,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.69",
                     "sensor_index": "Poe1.69",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/21",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14668,6 +14680,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14677,7 +14690,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.70",
                     "sensor_index": "Poe1.70",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/22",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14692,6 +14705,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14701,7 +14715,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.71",
                     "sensor_index": "Poe1.71",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/23",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14716,6 +14730,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14725,7 +14740,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.72",
                     "sensor_index": "Poe1.72",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/24",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14740,6 +14755,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14749,7 +14765,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.73",
                     "sensor_index": "Poe1.73",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/25",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14764,6 +14780,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14773,7 +14790,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.74",
                     "sensor_index": "Poe1.74",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/26",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14788,6 +14805,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14797,7 +14815,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.75",
                     "sensor_index": "Poe1.75",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/27",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14812,6 +14830,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14821,7 +14840,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.76",
                     "sensor_index": "Poe1.76",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/28",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14836,6 +14855,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14845,7 +14865,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.77",
                     "sensor_index": "Poe1.77",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/29",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14860,6 +14880,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14869,7 +14890,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.78",
                     "sensor_index": "Poe1.78",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/30",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14884,6 +14905,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14893,7 +14915,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.79",
                     "sensor_index": "Poe1.79",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/31",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14908,6 +14930,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14917,7 +14940,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.89.108.1.1.5.1.80",
                     "sensor_index": "Poe1.80",
                     "sensor_type": "rlPethPsePortOutputPower",
-                    "sensor_descr": "PoE-gi1/0/32",
+                    "sensor_descr": "PoE-",
                     "group": "PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14932,6 +14955,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14956,6 +14980,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -14980,6 +15005,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -15004,6 +15030,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -15028,6 +15055,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -15052,6 +15080,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlPhdUnitEnvParamEntry"
                 },
                 {
@@ -15076,6 +15105,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlPhdUnitEnvParamEntry"
                 },
                 {
@@ -15100,6 +15130,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlPhdUnitEnvParamEntry"
                 },
                 {
@@ -15124,6 +15155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -15148,6 +15180,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

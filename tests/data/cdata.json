@@ -4300,6 +4300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ponCardRunningStatus"
                 },
                 {
@@ -4324,6 +4325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sysServices"
                 },
                 {
@@ -4348,6 +4350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -4406,6 +4409,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ponCardRunningStatus"
                 },
                 {
@@ -4430,6 +4434,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 6,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sysServices"
                 },
                 {
@@ -4454,6 +4459,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
