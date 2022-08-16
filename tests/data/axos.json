@@ -21,7 +21,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.6321.1.2.4.1.4",
                     "sysDescr": "Calix, Inc E5-16F AXOS-R2.2.0",
                     "sysContact": null,

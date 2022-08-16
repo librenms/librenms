@@ -35,7 +35,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.43.10.27.4.1.2.11",
                     "sysDescr": "3Com SuperStack 3",
                     "sysContact": null,

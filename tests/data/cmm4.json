@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".0.0.0.0.0.0.0.0.0.0",
                     "sysDescr": "CMM4 3.0",
                     "sysContact": null,
