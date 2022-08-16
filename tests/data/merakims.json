@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "Meraki MS",
                     "sysContact": null,
