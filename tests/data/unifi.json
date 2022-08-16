@@ -574,25 +574,24 @@
         }
     },
     "os": {
-        "discovery": {
+        "poller": {
             "devices": [
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "Linux 3.3.8 #1 Wed Jan 18 09:26:53 PST 2017 mips",
-                    "sysContact": "<private>",
-                    "version": null,
+                    "sysContact": null,
+                    "version": "v2c",
                     "hardware": null,
                     "features": null,
-                    "os": "unifi",
-                    "type": "wireless",
+                    "os": "generic",
+                    "type": "",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "generic.svg",
+                    "location": null
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "mempools": {
         "discovery": {

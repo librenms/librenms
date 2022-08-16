@@ -1,24 +1,23 @@
 {
     "os": {
-        "discovery": {
+        "poller": {
             "devices": [
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.25053.3.1.5.15",
                     "sysDescr": "Ruckus Wireless ZD1200",
-                    "sysContact": "<private>",
-                    "version": "9.13.3.0 build 145 (US)",
-                    "hardware": "ZD1200",
-                    "features": "Licenses: 8/10",
-                    "os": "ruckuswireless",
-                    "type": "wireless",
-                    "serial": "051608001610",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "sysContact": null,
+                    "version": "v2c",
+                    "hardware": null,
+                    "features": null,
+                    "os": "generic",
+                    "type": "",
+                    "serial": null,
+                    "icon": "generic.svg",
+                    "location": null
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "processors": {
         "discovery": {
