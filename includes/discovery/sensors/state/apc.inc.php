@@ -190,3 +190,38 @@ foreach (array_keys($apcContactData) as $index) {
         create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
     }
 }
+
+// Monitor contact switches via the UIO ports. (For NMC with no UPS)
+$apcNMUContactData = snmpwalk_cache_oid($device, 'uioInputContactStatusTable', [], 'PowerNet-MIB', null, '-OQUse');
+$apcNMUContactData = snmpwalk_cache_oid($device, 'uioInputContactConfigTable', $apcNMUContactData, 'PowerNet-MIB', null, '-OQUse');
+$device_type = snmp_get($device, '.1.3.6.1.2.1.1.2.0', '-OqvnU', 'PowerNet-MIB');
+
+foreach (array_keys($apcNMUContactData) as $index) {
+    // APC disabled (1), enabled (2)
+    if ($apcNMUContactData[$index]['uioInputContactStatusCommStatus'] != 1 && $device_type == '.1.3.6.1.4.1.318') {
+        $current = $apcNMUContactData[$index]['uioInputContactStatusCurrentState'];
+        $sensorType = 'apc';
+        $cur_oid = '.1.3.6.1.4.1.318.1.1.25.2.2.1.5.' . $index;
+        $severity = $apcNMUContactData[$index]['uioInputContactConfigSeverity'];
+
+        // APC critical (1), warning (2)
+        // LibreNMS warning (1), critical (2)
+        $faultGeneric = 1;
+        if ($severity == 1) {
+            $faultGeneric = 2;
+        } elseif ($severity == 2) {
+            $faultGeneric = 1;
+        }
+
+        $state_name = $apcNMUContactData[$index]['uioInputContactStatusContactName'];
+        $states = [
+            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'noFault'],
+            ['value' => 2, 'generic' => $faultGeneric, 'graph' => 1, 'descr' => 'fault'],
+            ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'disabled'],
+        ];
+        create_state_index($state_name, $states);
+
+        discover_sensor($valid['sensor'], 'state', $device, $cur_oid, $state_name . '.' . $index, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
+    }
+}
