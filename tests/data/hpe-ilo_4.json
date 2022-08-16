@@ -4563,7 +4563,6 @@
                     "user_func": null,
                     "state_name": "cpqDaLogDrvStatus"
                 },
-
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",
