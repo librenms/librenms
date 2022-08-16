@@ -63,6 +63,31 @@ foreach (array_keys($apc_env_data) as $index) {
     }
 }
 
+// Environmental monitoring on NMU
+$apc_nmu_data = snmpwalk_cache_oid($device, 'uioSensorStatusTable', [], 'PowerNet-MIB', null, '-OQUse');
+$apc_nmu_data = snmpwalk_cache_oid($device, 'uioSensorConfigTable', $apc_nmu_data, 'PowerNet-MIB', null, '-OQUse');
+$device_type = snmp_get($device, '.1.3.6.1.2.1.1.2.0', '-OqvnU', 'PowerNet-MIB');
+
+foreach (array_keys($apc_nmu_data) as $index) {
+    // APC connected(2), disconnected(1)
+    if ($apc_nmu_data[$index]['uioSensorStatusCommStatus'] != 1 && $device_type == '.1.3.6.1.4.1.318') {
+        $descr = $apc_nmu_data[$index]['uioSensorStatusSensorName'];
+        $current = $apc_nmu_data[$index]['uioSensorStatusTemperatureDegC'];
+        $sensorType = 'apc';
+        $oid = '.1.3.6.1.4.1.318.1.1.25.1.2.1.6.' . $index;
+        // APC enum disabled(1), enabled(2)
+        $low_limit = $apc_nmu_data[$index]['uioSensorConfigMinTemperatureThreshold'];
+        $low_warn_limit = $apc_nmu_data[$index]['uioSensorConfigLowTemperatureThreshold'];
+        $high_warn_limit = $apc_nmu_data[$index]['uioSensorConfigHighTemperatureThreshold'];
+        $high_limit = $apc_nmu_data[$index]['uioSensorConfigMaxTemperatureThreshold'];
+
+        if ($current > 0) {
+            // Temperature = 0 -> Sensor not available
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        }
+    }
+}
+
 // InRow Chiller.
 // A silly check to find out if it's the right hardware.
 $oids = snmp_get($device, 'airIRRCGroupSetpointsCoolMetric.0', '-OsqnU', 'PowerNet-MIB');
