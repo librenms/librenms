@@ -74,7 +74,7 @@ if (isset($options['o'])) {
     $os_name = $options['os'];
 }
 
-if ((isset($options['m']) && $options['m'] == "all") || (isset($options['modules']) && $options['modules'] == "all")) {
+if ((isset($options['m']) && $options['m'] == 'all') || (isset($options['modules']) && $options['modules'] == 'all')) {
     $modules_input = 'all';
     $modules = [];
 } elseif (isset($options['m'])) {
