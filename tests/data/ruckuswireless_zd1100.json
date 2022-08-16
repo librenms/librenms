@@ -1,24 +1,23 @@
 {
     "os": {
-        "discovery": {
+        "poller": {
             "devices": [
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.25053.3.1.5.2",
                     "sysDescr": "Ruckus Wireless ZD1106",
-                    "sysContact": "<private>",
-                    "version": "9.7.2.0 build 20 (US)",
-                    "hardware": "ZD1106",
-                    "features": "Licenses: 13/12",
-                    "os": "ruckuswireless",
-                    "type": "wireless",
-                    "serial": "431323000588",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "sysContact": null,
+                    "version": "v2c",
+                    "hardware": null,
+                    "features": null,
+                    "os": "generic",
+                    "type": "",
+                    "serial": null,
+                    "icon": "generic.svg",
+                    "location": null
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "processors": {
         "discovery": {
