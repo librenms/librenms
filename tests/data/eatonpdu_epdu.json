@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.534.6.6.7",
                     "sysDescr": "Eaton ePDU MA 1P IN:L6-30P 24A OUT:20xC13, 4xC19",
                     "sysContact": null,
