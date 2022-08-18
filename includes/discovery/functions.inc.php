@@ -76,7 +76,7 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
     }
 
     try {
-        $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('default_poller_group'));
+        $remote_device_id = addHost($hostname, '', '161', 'udp', $device['poller_group']); // discover with actual poller group
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
         discover_device($remote_device);
@@ -84,7 +84,9 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
 
         if ($remote_device_id && is_array($device) && ! empty($method)) {
             $extra_log = '';
-            $int = cleanPort($interface);
+            // cleanPort expect array
+            $ifArray = ['ifName' => $interface, 'ifDescr' => $interface, 'ifAlias' => $interface, 'device_id' => $device['device_id']];
+            $int = cleanPort($ifArray);
             if (is_array($int)) {
                 $extra_log = ' (port ' . $int['label'] . ') ';
             }
