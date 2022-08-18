@@ -83,7 +83,12 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
         device_by_id_cache($remote_device_id, 1);
 
         if ($remote_device_id && is_array($device) && ! empty($method)) {
-            $extra_log = isset($interface) ? ' (port ' . htmlentities($interface) . ') ' : '';
+            $extra_log = '';
+            if (is_array($interface)) {
+                $int = cleanPort($interface);
+                $extra_log = ' (port ' . $int['label'] . ') ';
+            }
+
             log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery', 1);
         } else {
             log_event("$method discovery of " . $remote_device['hostname'] . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', 5);
