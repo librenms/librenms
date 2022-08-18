@@ -42,9 +42,9 @@ function cleanPort($interface, $device = null)
         return $interface;
     }
 
-    $interface['ifAlias'] = isset($interface['ifAlias']) ? htmlentities($interface['ifAlias']) : '';
-    $interface['ifName'] = isset($interface['ifName']) ? htmlentities($interface['ifName']) : '';
-    $interface['ifDescr'] = isset($interface['ifDescr']) ? htmlentities($interface['ifDescr']) : '';
+    $interface['ifAlias'] = htmlentities($interface['ifAlias'] ?? '');
+    $interface['ifName'] = htmlentities($interface['ifName'] ?? '');
+    $interface['ifDescr'] = htmlentities($interface['ifDescr'] ?? '');
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
