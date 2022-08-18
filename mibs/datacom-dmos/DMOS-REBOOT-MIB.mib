@@ -1,0 +1,36 @@
+DMOS-REBOOT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+;
+
+dmosRebootMIB MODULE-IDENTITY
+    LAST-UPDATED "201910170000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION "Reboot execution."
+    REVISION "201910170000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { datacomDevicesMIBs 10 }
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+rebootReason OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dmosRebootMIB 1 }
+
+END

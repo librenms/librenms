@@ -1,0 +1,660 @@
+DMOS-INVENTORY-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+;
+
+dmosInventoryMIB MODULE-IDENTITY
+    LAST-UPDATED "202105140000Z"
+    ORGANIZATION "@ORGANIZATION"
+    CONTACT-INFO "@CONTACT-INFO"
+    DESCRIPTION ""
+    REVISION "202105140000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { datacomDevicesMIBs 11 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+HexList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION "confd:hexList"
+    SYNTAX      OCTET STRING
+
+SlotIdTypeRestricted ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "snmp restricted string"
+    SYNTAX      OCTET STRING (SIZE (0 .. 10))
+
+chassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of Chassis inventory information"
+    ::= { dmosInventoryMIB 1 }
+
+chassisEntry OBJECT-TYPE
+    SYNTAX      ChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { chassisChassisId }
+        ::= { chassisTable 1 }
+
+ChassisEntry ::=
+    SEQUENCE {
+        chassisChassisId Unsigned32,
+        chassisProductName String,
+        chassisPartNumber String,
+        chassisSerialNumber String,
+        chassisVendor String,
+        chassisProductModel String,
+        chassisProductRevision UnsignedShort,
+        chassisPcbRevision UnsignedShort,
+        chassisHardwareVersion UnsignedByte,
+        chassisOperationTemperature String,
+        chassisSystemMacAddress HexList,
+        chassisFactoryStatus UnsignedByte,
+        chassisNumMaintenance UnsignedByte,
+        chassisItemsMaintenance Unsigned32,
+        chassisDateLastMaintenance String,
+        chassisCardSpecific String,
+        chassisFirmwareRevision String,
+        chassisInventoryState INTEGER
+    }
+
+chassisChassisId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis identification"
+    ::= { chassisEntry 1 }
+
+chassisProductName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of product"
+    ::= { chassisEntry 2 }
+
+chassisPartNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product part number"
+    ::= { chassisEntry 3 }
+
+chassisSerialNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product serial number"
+    ::= { chassisEntry 4 }
+
+chassisVendor OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product vendor"
+    ::= { chassisEntry 5 }
+
+chassisProductModel OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware model of the product"
+    ::= { chassisEntry 6 }
+
+chassisProductRevision OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product revision"
+    ::= { chassisEntry 7 }
+
+chassisPcbRevision OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PCB revision"
+    ::= { chassisEntry 8 }
+
+chassisHardwareVersion OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware version"
+    ::= { chassisEntry 9 }
+
+chassisOperationTemperature OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Range of operating temperature"
+    ::= { chassisEntry 10 }
+
+chassisSystemMacAddress OBJECT-TYPE
+    SYNTAX      HexList (SIZE (6 .. 6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product MAC address"
+    ::= { chassisEntry 11 }
+
+chassisFactoryStatus OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Factory status of Product"
+    ::= { chassisEntry 12 }
+
+chassisNumMaintenance OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of maintenances of Product"
+    ::= { chassisEntry 13 }
+
+chassisItemsMaintenance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maintenance items of Product"
+    ::= { chassisEntry 14 }
+
+chassisDateLastMaintenance OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date of last maintenance of Product"
+    ::= { chassisEntry 15 }
+
+chassisCardSpecific OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Card specific info"
+    ::= { chassisEntry 16 }
+
+chassisFirmwareRevision OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware revision of Product"
+    ::= { chassisEntry 17 }
+
+chassisInventoryState OBJECT-TYPE
+    SYNTAX      INTEGER {valid-inventory(1),no-inventory(2),invalid-inventory(3),deferred-inventory(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State of inventory"
+    ::= { chassisEntry 18 }
+
+chassisSlotTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChassisSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of Slot inventory information"
+    ::= { dmosInventoryMIB 2 }
+
+chassisSlotEntry OBJECT-TYPE
+    SYNTAX      ChassisSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { chassisChassisId, IMPLIED chassisSlotSlotId }
+        ::= { chassisSlotTable 1 }
+
+ChassisSlotEntry ::=
+    SEQUENCE {
+        chassisSlotSlotId SlotIdTypeRestricted,
+        chassisSlotId String,
+        chassisSlotCardPartNumber String,
+        chassisSlotCardSerialNumber String,
+        chassisSlotCardVendor String,
+        chassisSlotCardProductModel String,
+        chassisSlotCardProductRevision UnsignedShort,
+        chassisSlotCardPcbRevision UnsignedShort,
+        chassisSlotCardHardwareVersion UnsignedByte,
+        chassisSlotCardOperationTemperature String,
+        chassisSlotCardSystemMacAddress HexList,
+        chassisSlotCardFactoryStatus UnsignedByte,
+        chassisSlotCardNumMaintenance UnsignedByte,
+        chassisSlotCardItemsMaintenance Unsigned32,
+        chassisSlotCardDateLastMaintenance String,
+        chassisSlotCardCardSpecific String,
+        chassisSlotCardFirmwareRevision String,
+        chassisSlotCardInventoryState INTEGER
+    }
+
+chassisSlotSlotId OBJECT-TYPE
+    SYNTAX      SlotIdTypeRestricted
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot identification"
+    ::= { chassisSlotEntry 1 }
+
+chassisSlotId OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slot identification field in format chassis/slot"
+    ::= { chassisSlotEntry 2 }
+
+chassisSlotCardPartNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product part number"
+    ::= { chassisSlotEntry 3 }
+
+chassisSlotCardSerialNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product serial number"
+    ::= { chassisSlotEntry 4 }
+
+chassisSlotCardVendor OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product vendor"
+    ::= { chassisSlotEntry 5 }
+
+chassisSlotCardProductModel OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware model of the product"
+    ::= { chassisSlotEntry 6 }
+
+chassisSlotCardProductRevision OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product revision"
+    ::= { chassisSlotEntry 7 }
+
+chassisSlotCardPcbRevision OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "PCB revision"
+    ::= { chassisSlotEntry 8 }
+
+chassisSlotCardHardwareVersion OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware version"
+    ::= { chassisSlotEntry 9 }
+
+chassisSlotCardOperationTemperature OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Range of operating temperature"
+    ::= { chassisSlotEntry 10 }
+
+chassisSlotCardSystemMacAddress OBJECT-TYPE
+    SYNTAX      HexList (SIZE (6 .. 6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Product MAC address"
+    ::= { chassisSlotEntry 11 }
+
+chassisSlotCardFactoryStatus OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Factory status of Product"
+    ::= { chassisSlotEntry 12 }
+
+chassisSlotCardNumMaintenance OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of maintenances of Product"
+    ::= { chassisSlotEntry 13 }
+
+chassisSlotCardItemsMaintenance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maintenance items of Product"
+    ::= { chassisSlotEntry 14 }
+
+chassisSlotCardDateLastMaintenance OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date of last maintenance of Product"
+    ::= { chassisSlotEntry 15 }
+
+chassisSlotCardCardSpecific OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Card specific info"
+    ::= { chassisSlotEntry 16 }
+
+chassisSlotCardFirmwareRevision OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Firmware revision of Product"
+    ::= { chassisSlotEntry 17 }
+
+chassisSlotCardInventoryState OBJECT-TYPE
+    SYNTAX      INTEGER {valid-inventory(1),no-inventory(2),invalid-inventory(3),deferred-inventory(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State of inventory"
+    ::= { chassisSlotEntry 18 }
+
+transceiverInventoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TransceiverInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of transceiver inventory information"
+    ::= { dmosInventoryMIB 3 }
+
+transceiverInventoryEntry OBJECT-TYPE
+    SYNTAX      TransceiverInventoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { transceiverInventoryIfIndex }
+        ::= { transceiverInventoryTable 1 }
+
+TransceiverInventoryEntry ::=
+    SEQUENCE {
+        transceiverInventoryIfIndex Unsigned32,
+        transceiverInventoryInfoType INTEGER,
+        transceiverInventoryInfoConnector INTEGER,
+        transceiverInventoryInfoEthernetStandards ConfdString,
+        transceiverInventoryInfoVendorName String,
+        transceiverInventoryInfoVendorSn String,
+        transceiverInventoryInfoVendorPn String,
+        transceiverInventoryInfoLaserWavelength String,
+        transceiverInventoryInfoDiagnostics INTEGER,
+        transceiverInventoryInfoTemperatureThresholdsAlarmLow ConfdString,
+        transceiverInventoryInfoTemperatureThresholdsAlarmHigh ConfdString,
+        transceiverInventoryInfoTemperatureThresholdsWarningLow ConfdString,
+        transceiverInventoryInfoTemperatureThresholdsWarningHigh ConfdString,
+        transceiverInventoryInfoRxPowerThresholdsAlarmLow ConfdString,
+        transceiverInventoryInfoRxPowerThresholdsAlarmHigh ConfdString,
+        transceiverInventoryInfoRxPowerThresholdsWarningLow ConfdString,
+        transceiverInventoryInfoRxPowerThresholdsWarningHigh ConfdString,
+        transceiverInventoryInfoTxPowerThresholdsAlarmLow ConfdString,
+        transceiverInventoryInfoTxPowerThresholdsAlarmHigh ConfdString,
+        transceiverInventoryInfoTxPowerThresholdsWarningLow ConfdString,
+        transceiverInventoryInfoTxPowerThresholdsWarningHigh ConfdString,
+        transceiverInventoryInfoVcc3v3ThresholdsAlarmLow ConfdString,
+        transceiverInventoryInfoVcc3v3ThresholdsAlarmHigh ConfdString,
+        transceiverInventoryInfoVcc3v3ThresholdsWarningLow ConfdString,
+        transceiverInventoryInfoVcc3v3ThresholdsWarningHigh ConfdString,
+        transceiverInventoryInfoTxBiasThresholdsAlarmLow ConfdString,
+        transceiverInventoryInfoTxBiasThresholdsAlarmHigh ConfdString,
+        transceiverInventoryInfoTxBiasThresholdsWarningLow ConfdString,
+        transceiverInventoryInfoTxBiasThresholdsWarningHigh ConfdString,
+        transceiverInventoryInfoPhysicalMedia INTEGER,
+        transceiverInventoryInfoReadOk TruthValue,
+        transceiverInventoryInfoFiberType INTEGER
+    }
+
+transceiverInventoryIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface index"
+    ::= { transceiverInventoryEntry 1 }
+
+transceiverInventoryInfoType OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),gbic(1),soldered-on-mobo(2),sfp(3),xbi-300-pin(4),xenpak(5),xfp(6),xff(7),xfp-e(8),xpak(9),x2(10),dwdm-sfp(11),qsfp(12),qsfp-plus(13),qsfp28(17),qsfp-dd(24)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver type"
+    ::= { transceiverInventoryEntry 2 }
+
+transceiverInventoryInfoConnector OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),sc(1),style-1-copper(2),style-2-copper(3),bnc-tnc(4),coaxial-headers(5),fiber-jack(6),lc(7),mt-rj(8),mu(9),sg(10),optical-pigtail(11),mpo-parallel-optic(12),hssdc-ii(32),copper-pigtail(33),rj45(34),not-separable-connector(35)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver connector"
+    ::= { transceiverInventoryEntry 3 }
+
+transceiverInventoryInfoEthernetStandards OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ethernet standards supported by the transceiver"
+    ::= { transceiverInventoryEntry 4 }
+
+transceiverInventoryInfoVendorName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver vendor name"
+    ::= { transceiverInventoryEntry 5 }
+
+transceiverInventoryInfoVendorSn OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver serial number"
+    ::= { transceiverInventoryEntry 6 }
+
+transceiverInventoryInfoVendorPn OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver part number"
+    ::= { transceiverInventoryEntry 7 }
+
+transceiverInventoryInfoLaserWavelength OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver laser wavelength"
+    ::= { transceiverInventoryEntry 8 }
+
+transceiverInventoryInfoDiagnostics OBJECT-TYPE
+    SYNTAX      INTEGER {unavailable(0),internally-calibrated(1),externally-calibrated(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver digital diagnostics type"
+    ::= { transceiverInventoryEntry 9 }
+
+transceiverInventoryInfoTemperatureThresholdsAlarmLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low alarm threshold"
+    ::= { transceiverInventoryEntry 10 }
+
+transceiverInventoryInfoTemperatureThresholdsAlarmHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High alarm threshold"
+    ::= { transceiverInventoryEntry 11 }
+
+transceiverInventoryInfoTemperatureThresholdsWarningLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low warning threshold"
+    ::= { transceiverInventoryEntry 12 }
+
+transceiverInventoryInfoTemperatureThresholdsWarningHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High warning threshold"
+    ::= { transceiverInventoryEntry 13 }
+
+transceiverInventoryInfoRxPowerThresholdsAlarmLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low alarm threshold"
+    ::= { transceiverInventoryEntry 14 }
+
+transceiverInventoryInfoRxPowerThresholdsAlarmHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High alarm threshold"
+    ::= { transceiverInventoryEntry 15 }
+
+transceiverInventoryInfoRxPowerThresholdsWarningLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low warning threshold"
+    ::= { transceiverInventoryEntry 16 }
+
+transceiverInventoryInfoRxPowerThresholdsWarningHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High warning threshold"
+    ::= { transceiverInventoryEntry 17 }
+
+transceiverInventoryInfoTxPowerThresholdsAlarmLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low alarm threshold"
+    ::= { transceiverInventoryEntry 18 }
+
+transceiverInventoryInfoTxPowerThresholdsAlarmHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High alarm threshold"
+    ::= { transceiverInventoryEntry 19 }
+
+transceiverInventoryInfoTxPowerThresholdsWarningLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low warning threshold"
+    ::= { transceiverInventoryEntry 20 }
+
+transceiverInventoryInfoTxPowerThresholdsWarningHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High warning threshold"
+    ::= { transceiverInventoryEntry 21 }
+
+transceiverInventoryInfoVcc3v3ThresholdsAlarmLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low alarm threshold"
+    ::= { transceiverInventoryEntry 22 }
+
+transceiverInventoryInfoVcc3v3ThresholdsAlarmHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High alarm threshold"
+    ::= { transceiverInventoryEntry 23 }
+
+transceiverInventoryInfoVcc3v3ThresholdsWarningLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low warning threshold"
+    ::= { transceiverInventoryEntry 24 }
+
+transceiverInventoryInfoVcc3v3ThresholdsWarningHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High warning threshold"
+    ::= { transceiverInventoryEntry 25 }
+
+transceiverInventoryInfoTxBiasThresholdsAlarmLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low alarm threshold"
+    ::= { transceiverInventoryEntry 26 }
+
+transceiverInventoryInfoTxBiasThresholdsAlarmHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High alarm threshold"
+    ::= { transceiverInventoryEntry 27 }
+
+transceiverInventoryInfoTxBiasThresholdsWarningLow OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low warning threshold"
+    ::= { transceiverInventoryEntry 28 }
+
+transceiverInventoryInfoTxBiasThresholdsWarningHigh OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High warning threshold"
+    ::= { transceiverInventoryEntry 29 }
+
+transceiverInventoryInfoPhysicalMedia OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),electrical(1),optical(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver physical media"
+    ::= { transceiverInventoryEntry 30 }
+
+transceiverInventoryInfoReadOk OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver information valid"
+    ::= { transceiverInventoryEntry 31 }
+
+transceiverInventoryInfoFiberType OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),unavailable(1),single-mode(2),multimode(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver supported fiber type"
+    ::= { transceiverInventoryEntry 32 }
+
+END

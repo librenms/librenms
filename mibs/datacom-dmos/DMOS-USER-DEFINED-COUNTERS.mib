@@ -1,0 +1,156 @@
+DMOS-USER-DEFINED-COUNTERS DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+;
+
+dmosUserDefinedCountersMIB MODULE-IDENTITY
+    LAST-UPDATED "201907160000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "This module contains the YANG definitions for user-defined counters."
+    REVISION "201907160000Z"
+    DESCRIPTION "Initial revision."
+    ::= { datacomDevicesMIBs 9 }
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+Counter-type ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {octets(0)}
+
+countersIngressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CountersIngressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Ingress counters"
+    ::= { dmosUserDefinedCountersMIB 1 }
+
+countersIngressEntry OBJECT-TYPE
+    SYNTAX      CountersIngressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { countersIngressId }
+        ::= { countersIngressTable 1 }
+
+CountersIngressEntry ::=
+    SEQUENCE {
+        countersIngressId Unsigned32,
+        countersIngressDescription String,
+        countersIngressValue Counter64,
+        countersIngressType Counter-type
+    }
+
+countersIngressId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { countersIngressEntry 1 }
+
+countersIngressDescription OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User-friendly counter identification"
+    ::= { countersIngressEntry 2 }
+
+countersIngressValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { countersIngressEntry 3 }
+
+countersIngressType OBJECT-TYPE
+    SYNTAX      Counter-type
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of counter"
+    DEFVAL { octets }
+    ::= { countersIngressEntry 4 }
+
+countersEgressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CountersEgressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Egress counters"
+    ::= { dmosUserDefinedCountersMIB 2 }
+
+countersEgressEntry OBJECT-TYPE
+    SYNTAX      CountersEgressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { countersEgressId }
+        ::= { countersEgressTable 1 }
+
+CountersEgressEntry ::=
+    SEQUENCE {
+        countersEgressId Unsigned32,
+        countersEgressDescription String,
+        countersEgressValue Counter64,
+        countersEgressType Counter-type
+    }
+
+countersEgressId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { countersEgressEntry 1 }
+
+countersEgressDescription OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User-friendly counter identification"
+    ::= { countersEgressEntry 2 }
+
+countersEgressValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { countersEgressEntry 3 }
+
+countersEgressType OBJECT-TYPE
+    SYNTAX      Counter-type
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type of counter"
+    DEFVAL { octets }
+    ::= { countersEgressEntry 4 }
+
+END

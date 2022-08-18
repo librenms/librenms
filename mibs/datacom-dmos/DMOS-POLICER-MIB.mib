@@ -1,0 +1,200 @@
+DMOS-POLICER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+;
+
+dmosPolicerMIB MODULE-IDENTITY
+    LAST-UPDATED "202012150000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "The module for managing QoS traffic policing."
+    REVISION "202012150000Z"
+    DESCRIPTION "Increase maximum number of instances."
+    ::= { datacomDevicesMIBs 12 }
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+DscpValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+PcpValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "<0-7>;;PCP value"
+    SYNTAX      Integer32 (0 .. 7)
+
+PolicerMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {flow(0),srtcm(1),trtcm(2),trtcmds(3)}
+
+PolicerStage ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {ingress(0),egress(1)}
+
+policerInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicerInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dmosPolicerMIB 1 }
+
+policerInstanceEntry OBJECT-TYPE
+    SYNTAX      PolicerInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policerInstanceInstanceId }
+        ::= { policerInstanceTable 1 }
+
+PolicerInstanceEntry ::=
+    SEQUENCE {
+        policerInstanceInstanceId UnsignedShort,
+        policerInstanceProfile String,
+        policerInstanceMode PolicerMode,
+        policerInstanceStage PolicerStage,
+        policerInstanceCir Unsigned32,
+        policerInstanceEir Unsigned32,
+        policerInstancePir Unsigned32,
+        policerInstanceForwarded Counter64,
+        policerInstanceDropped Counter64
+    }
+
+policerInstanceInstanceId OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Instance ID"
+    ::= { policerInstanceEntry 1 }
+
+policerInstanceProfile OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 48))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Profile name"
+    ::= { policerInstanceEntry 2 }
+
+policerInstanceMode OBJECT-TYPE
+    SYNTAX      PolicerMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policer mode"
+    ::= { policerInstanceEntry 3 }
+
+policerInstanceStage OBJECT-TYPE
+    SYNTAX      PolicerStage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policer stage"
+    ::= { policerInstanceEntry 4 }
+
+policerInstanceCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Committed information rate (kbits/s)"
+    ::= { policerInstanceEntry 5 }
+
+policerInstanceEir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Excess information rate (kbits/s)"
+    ::= { policerInstanceEntry 6 }
+
+policerInstancePir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peak information rate (kbits/s)"
+    ::= { policerInstanceEntry 7 }
+
+policerInstanceForwarded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of forwarded bytes"
+    ::= { policerInstanceEntry 8 }
+
+policerInstanceDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of dropped bytes"
+    ::= { policerInstanceEntry 9 }
+
+policerInstanceInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicerInstanceInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { dmosPolicerMIB 10 }
+
+policerInstanceInterfaceEntry OBJECT-TYPE
+    SYNTAX      PolicerInstanceInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { policerInstanceInstanceId, policerInstanceInterfaceIfIndex }
+        ::= { policerInstanceInterfaceTable 1 }
+
+PolicerInstanceInterfaceEntry ::=
+    SEQUENCE {
+        policerInstanceInterfaceIfIndex Integer32,
+        policerInstanceInterfaceIfName String
+    }
+
+policerInstanceInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1 .. 2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface index"
+    ::= { policerInstanceInterfaceEntry 1 }
+
+policerInstanceInterfaceIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (0 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { policerInstanceInterfaceEntry 2 }
+
+END

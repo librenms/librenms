@@ -1,0 +1,39 @@
+DMOS-EXPERIMENTAL-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    dmosNotificationsMIB,
+    dmosNotifications
+         FROM DMOS-NOTIFICATIONS-MIB;
+
+dmosExperimentalNotificationsMIB MODULE-IDENTITY
+    LAST-UPDATED "201610200000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION
+                "This module contains experimental DmOS notifications and related objects
+                for internal use and can change without notice"
+    REVISION    "201610200000Z"
+    DESCRIPTION "Initial revision"
+    ::= { dmosNotificationsMIB 4294967294 }
+
+experimentalNotificationObjects OBJECT IDENTIFIER ::= { dmosExperimentalNotificationsMIB 1 }
+
+experimentalCustomNotifications OBJECT IDENTIFIER ::= { dmosExperimentalNotificationsMIB 2 }
+
+experimentalDmosNotifications OBJECT IDENTIFIER ::= { dmosNotifications 4294967294 }
+
+END

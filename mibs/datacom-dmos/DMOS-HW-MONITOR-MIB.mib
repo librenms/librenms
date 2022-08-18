@@ -1,0 +1,282 @@
+DMOS-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+    UnsignedPercent
+        FROM DMOS-TC-MIB;
+
+dmosHwMonitorMIB MODULE-IDENTITY
+    LAST-UPDATED "201701020000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br"
+    DESCRIPTION "This module contains DmOS thermal information and status monitoring objects."
+    REVISION "201701020000Z"
+    DESCRIPTION "First revision"
+    ::= { datacomDevicesMIBs 6 }
+
+EnvironmentSensorTemperature ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX Integer32
+
+EnvironmentSensorStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {fail(-2),error(-1),normal(0),high(1),low(2),critical(3)}
+
+environment OBJECT IDENTIFIER ::= { dmosHwMonitorMIB 1 }
+
+environmentChassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EnvironmentChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of chassis for which thermal management information is available"
+    ::= { environment 1 }
+
+environmentChassisEntry OBJECT-TYPE
+    SYNTAX      EnvironmentChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis identification field"
+    INDEX { environmentChassisId }
+        ::= { environmentChassisTable 1 }
+
+EnvironmentChassisEntry ::=
+    SEQUENCE {
+        environmentChassisId Unsigned32
+    }
+
+environmentChassisId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Chassis identifier"
+    ::= { environmentChassisEntry 1 }
+
+environmentSlotTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EnvironmentSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of slots for which thermal management information is available"
+    ::= { environment 2 }
+
+environmentSlotEntry OBJECT-TYPE
+    SYNTAX      EnvironmentSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot thermal information structure"
+    INDEX { environmentChassisId, environmentSlotId }
+        ::= { environmentSlotTable 1 }
+
+EnvironmentSlotEntry ::=
+    SEQUENCE {
+        environmentSlotId DisplayString
+    }
+
+environmentSlotId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Slot identifier"
+    ::= { environmentSlotEntry 1 }
+
+temperatureSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TemperatureSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of temperature sensors present on a given slot and chassis"
+    ::= { environment 3 }
+
+temperatureSensorEntry OBJECT-TYPE
+    SYNTAX      TemperatureSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Temperature sensor information structure"
+    INDEX { environmentChassisId, environmentSlotId, temperatureSensorId }
+        ::= { temperatureSensorTable 1 }
+
+TemperatureSensorEntry ::=
+    SEQUENCE {
+        temperatureSensorId DisplayString,
+        temperatureSensorDescription DisplayString,
+        temperatureSensorMaxTemperature EnvironmentSensorTemperature,
+        temperatureSensorMinTemperature EnvironmentSensorTemperature,
+        temperatureSensorHysteresis EnvironmentSensorTemperature,
+        temperatureSensorCurrentTemperature EnvironmentSensorTemperature,
+        temperatureSensorTemperatureReadError TruthValue,
+        temperatureSensorTemperatureStatus EnvironmentSensorStatus
+    }
+
+temperatureSensorId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Temperature sensor identifier"
+    ::= { temperatureSensorEntry 1 }
+
+temperatureSensorDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Temperature sensor description"
+    ::= { temperatureSensorEntry 2 }
+
+temperatureSensorMaxTemperature OBJECT-TYPE
+    SYNTAX      EnvironmentSensorTemperature
+    UNITS       "C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "High temperature alarm threshold"
+    ::= { temperatureSensorEntry 3 }
+
+temperatureSensorMinTemperature OBJECT-TYPE
+    SYNTAX      EnvironmentSensorTemperature
+    UNITS       "C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Low temperature alarm threshold"
+    ::= { temperatureSensorEntry 4 }
+
+temperatureSensorHysteresis OBJECT-TYPE
+    SYNTAX      EnvironmentSensorTemperature
+    UNITS       "C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hysteresis value for both high and low temperature alarms"
+    ::= { temperatureSensorEntry 5 }
+
+temperatureSensorCurrentTemperature OBJECT-TYPE
+    SYNTAX      EnvironmentSensorTemperature
+    UNITS       "C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current temperature value being read by the sensor"
+    ::= { temperatureSensorEntry 6 }
+
+temperatureSensorTemperatureReadError OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if an error occured while trying to read from the sensor"
+    ::= { temperatureSensorEntry 7 }
+
+temperatureSensorTemperatureStatus OBJECT-TYPE
+    SYNTAX      EnvironmentSensorStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Temperature status based on minimum and maximum thresholds"
+    ::= { temperatureSensorEntry 8 }
+
+fanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of individual fans manageable on a given fan module/slot"
+    ::= { environment 4 }
+
+fanEntry OBJECT-TYPE
+    SYNTAX      FanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fan information structure"
+    INDEX { environmentChassisId, environmentSlotId, fanId }
+        ::= { fanTable 1 }
+
+FanEntry ::=
+    SEQUENCE {
+        fanId DisplayString,
+        fanDescription DisplayString,
+        fanSpeed Unsigned32,
+        fanSpeedReadError TruthValue,
+        fanSpeedStatus EnvironmentSensorStatus
+    }
+
+fanId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fan identifier"
+    ::= { fanEntry 1 }
+
+fanDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Fan description"
+    ::= { fanEntry 2 }
+
+fanSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "RPM"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current speed of the fan"
+    ::= { fanEntry 4 }
+
+fanSpeedReadError OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if an error occured while trying to read from the sensor"
+    ::= { fanEntry 5 }
+
+fanSpeedStatus OBJECT-TYPE
+    SYNTAX      EnvironmentSensorStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current state of the fan based on its speed"
+    ::= { fanEntry 6 }
+
+psuTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of Power Supply Units"
+    ::= { environment 5}
+
+psuEntry OBJECT-TYPE
+    SYNTAX      PsuEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Power Supply Unit information structure"
+    INDEX { IMPLIED psuId }
+        ::= { psuTable 1 }
+
+PsuEntry ::=
+    SEQUENCE {
+        psuId DisplayString,
+        psuStatus INTEGER
+    }
+
+psuId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Power Supply Unit identifier"
+    ::= { psuEntry 1 }
+
+psuStatus OBJECT-TYPE
+    SYNTAX      INTEGER {ok(0),powerInputFailure(1),fuseFailure(2),error(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current state of the PSU"
+    ::= { psuEntry 2 }
+
+END

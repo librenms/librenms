@@ -1,0 +1,727 @@
+--
+-- DATACOM Telematica
+-- Copyright 1999-2018 by Datacom Telematica (Teracom Telematica Ltda). All Rights Reserved.
+-- This DATACOM SNMP MIB Specification is Datacom proprietary intellectual property.
+--
+-- This module will be extend, as required. The specification and other information
+-- contained in this document can be modified without prior notice. The user should
+-- consult Datacom to determine whether any such changes have been done.
+--
+TWAMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION FROM SNMPv2-TC
+    InetAddress, InetPortNumber       FROM INET-ADDRESS-MIB
+    datacomDevicesMIBs                FROM DATACOM-SMI;
+
+twampMIB MODULE-IDENTITY
+    LAST-UPDATED "201910230000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+
+    DESCRIPTION
+        "The MIB for Datacom TWAMP sessions and statistics"
+
+    REVISION "201910230000Z"
+    DESCRIPTION "First revision"
+
+::={ datacomDevicesMIBs 7 }
+
+-- General Objects definition
+
+TwampTestLossRatio ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "This type represents a floating point number
+                  in the binary exchange format for packet loss."
+    SYNTAX       Unsigned32 (0..10000)
+
+TwampMeasure     ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "This type represents a floating point number
+                  in the binary interchange format for the data
+                  measurements of the TWAMP."
+    SYNTAX       INTEGER
+
+-- Objects of Session Table
+
+twampSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TwampSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains all information about all TWAMP
+         Sessions, indexed by the Session ID."
+    ::= { twampMIB 1 }
+
+twampSessionEntry OBJECT-TYPE
+    SYNTAX      TwampSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "All information needed for a TWAMP Session to work correctly."
+    INDEX { twampSessionId }
+    ::= { twampSessionTable 1 }
+
+TwampSessionEntry ::= SEQUENCE {
+   twampSessionId          Unsigned32,
+   twampSessionDuration    Unsigned32,
+   twampSessionInterval    Unsigned32,
+   twampSessionState       INTEGER,
+   twampSessionSrcAddr     InetAddress,
+   twampSessionDstAddr     InetAddress,
+   twampSessionDstPort     InetPortNumber,
+   twampSessionPktSize     Unsigned32,
+   twampSessionDSCP        Unsigned32,
+   twampSessionTotalTests  Unsigned32,
+   twampSessionTotalTxPkts Unsigned32,
+   twampSessionTotalRxPkts Unsigned32,
+   twampSessionDescription DisplayString
+
+}
+
+-- Objects Description
+
+twampSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP session identifier"
+    ::= { twampSessionEntry 1 }
+
+twampSessionDuration OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The duration of a TWAMP session"
+    ::= { twampSessionEntry 2 }
+
+twampSessionInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP session timeout"
+    ::= { twampSessionEntry 3 }
+
+twampSessionState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        inactive(0),
+        active(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether the session is active or inactive"
+    ::= { twampSessionEntry 4 }
+
+twampSessionSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents local IP"
+    ::= { twampSessionEntry 5 }
+
+twampSessionDstAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the remote IP"
+    ::= { twampSessionEntry 6 }
+
+twampSessionDstPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the destination port on the reflector side"
+    ::= { twampSessionEntry 7 }
+
+twampSessionPktSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    UNITS       "B"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the size of the packet"
+    ::= { twampSessionEntry 8 }
+
+twampSessionDSCP OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the DSCP value used by TWAMP packets, ranging from 0 to 63."
+    ::= { twampSessionEntry 9 }
+
+twampSessionTotalTests OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total of tests within the session"
+    ::= { twampSessionEntry 10 }
+
+twampSessionTotalTxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total of transmitted packets"
+    ::= { twampSessionEntry 11 }
+
+twampSessionTotalRxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total of received packets"
+    ::= { twampSessionEntry 12 }
+
+twampSessionDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Description of session"
+    ::= { twampSessionEntry 13 }
+
+
+-- Objects of Results Table
+
+twampTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TwampTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the two-way test results of each TWAMP session,
+         indexed by the Session ID and Test index, respectively."
+    ::= { twampMIB 2 }
+
+twampTestEntry OBJECT-TYPE
+    SYNTAX      TwampTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "All results of each Test of each Session. Defined by RFC 5357."
+    INDEX { twampSessionId, twampTestIndex }
+    ::= { twampTestTable 1 }
+
+TwampTestEntry ::= SEQUENCE {
+   twampTestSessionId         Unsigned32,
+   twampTestIndex             Unsigned32,
+   twampTestId                Unsigned32,
+   twampTestDelayMin          TwampMeasure,
+   twampTestDelayMax          TwampMeasure,
+   twampTestDelayAvg          TwampMeasure,
+   twampTestJitterMin         TwampMeasure,
+   twampTestJitterMax         TwampMeasure,
+   twampTestJitterAvg         TwampMeasure,
+   twampTestTxPkts            Unsigned32,
+   twampTestRxPkts            Unsigned32,
+   twampTestLossRatio         TwampTestLossRatio,
+   twampTestConnectivity      INTEGER,
+   twampTestRoundTripDelayMin TwampMeasure,
+   twampTestRoundTripDelayMax TwampMeasure,
+   twampTestRoundTripDelayAvg TwampMeasure,
+   twampTestState             INTEGER,
+   twampTestDescription       DisplayString
+
+}
+
+-- Objects Description
+
+twampTestSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP session identifier"
+    ::= { twampTestEntry 1 }
+
+twampTestIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The table index of a TWAMP test within the session"
+    ::= { twampTestEntry 2 }
+
+twampTestId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP test identifier within the session"
+    ::= { twampTestEntry 3 }
+
+twampTestDelayMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum delay value identified during the test"
+    ::= { twampTestEntry 4 }
+
+twampTestDelayMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum delay value identified during the test"
+    ::= { twampTestEntry 5 }
+
+twampTestDelayAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average delay value identified during the test"
+    ::= { twampTestEntry 6 }
+
+twampTestJitterMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum Jitter value identified during the test"
+    ::= { twampTestEntry 7 }
+
+twampTestJitterMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum Jitter value identified during the test"
+    ::= { twampTestEntry 8 }
+
+twampTestJitterAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average Jitter value identified during the test"
+    ::= { twampTestEntry 9 }
+
+twampTestTxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent during the test"
+    ::= { twampTestEntry 10 }
+
+twampTestRxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received during the test"
+    ::= { twampTestEntry 11 }
+
+twampTestLossRatio OBJECT-TYPE
+    SYNTAX      TwampTestLossRatio
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of packets lost during the test"
+    ::= { twampTestEntry 12 }
+
+twampTestConnectivity OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether the test has connectivity with the reflector"
+    ::= { twampTestEntry 13 }
+
+twampTestRoundTripDelayMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum round-trip delay value identified during the test"
+    ::= { twampTestEntry 14 }
+
+twampTestRoundTripDelayMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum round-trip delay value identified during the test"
+    ::= { twampTestEntry 15 }
+
+twampTestRoundTripDelayAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average round-trip delay value identified during the test"
+    ::= { twampTestEntry 16 }
+
+twampTestState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        unknown(0),
+        running(1),
+        last-run-fail(2),
+        last-run-success(3)
+
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the state of test"
+    ::= { twampTestEntry 17 }
+
+
+twampTestDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Description of test session"
+    ::= { twampTestEntry 18 }
+
+
+
+-- Objects of far-end results table
+
+twampFarEndTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TwampFarEndTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the far-end test results of each TWAMP session,
+         indexed by the Session ID and Test index, respectively."
+    ::= { twampMIB 3 }
+
+twampFarEndTestEntry OBJECT-TYPE
+    SYNTAX      TwampFarEndTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The far-end results of each Test of each Session. Defined by RFC 5357."
+    INDEX { twampSessionId, twampFarEndTestIndex }
+    ::= { twampFarEndTestTable 1 }
+
+TwampFarEndTestEntry ::= SEQUENCE {
+   twampFarEndTestSessionId    Unsigned32,
+   twampFarEndTestIndex        Unsigned32,
+   twampFarEndTestId           Unsigned32,
+   twampFarEndTestDelayMin     TwampMeasure,
+   twampFarEndTestDelayMax     TwampMeasure,
+   twampFarEndTestDelayAvg     TwampMeasure,
+   twampFarEndTestJitterMin    TwampMeasure,
+   twampFarEndTestJitterMax    TwampMeasure,
+   twampFarEndTestJitterAvg    TwampMeasure,
+   twampFarEndTestTxPkts       Unsigned32,
+   twampFarEndTestRxPkts       Unsigned32,
+   twampFarEndTestLossRatio    TwampTestLossRatio,
+   twampFarEndTestConnectivity INTEGER
+}
+
+-- Objects Description
+
+twampFarEndTestSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP session identifier"
+    ::= { twampFarEndTestEntry 1 }
+
+twampFarEndTestIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The table index of a TWAMP test within the session"
+    ::= { twampFarEndTestEntry 2 }
+
+twampFarEndTestId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP test identifier within the session"
+    ::= { twampFarEndTestEntry 3 }
+
+twampFarEndTestDelayMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum delay value identified during the test"
+    ::= { twampFarEndTestEntry 4 }
+
+twampFarEndTestDelayMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum delay value identified during the test"
+    ::= { twampFarEndTestEntry 5 }
+
+twampFarEndTestDelayAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average delay value identified during the test"
+    ::= { twampFarEndTestEntry 6 }
+
+twampFarEndTestJitterMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum Jitter value identified during the test"
+    ::= { twampFarEndTestEntry 7 }
+
+twampFarEndTestJitterMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum Jitter value identified during the test"
+    ::= { twampFarEndTestEntry 8 }
+
+twampFarEndTestJitterAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average Jitter value identified during the test"
+    ::= { twampFarEndTestEntry 9 }
+
+twampFarEndTestTxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent during the test"
+    ::= { twampFarEndTestEntry 10 }
+
+twampFarEndTestRxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received during the test"
+    ::= { twampFarEndTestEntry 11 }
+
+twampFarEndTestLossRatio OBJECT-TYPE
+    SYNTAX      TwampTestLossRatio
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of packets lost during the test"
+    ::= { twampFarEndTestEntry 12 }
+
+twampFarEndTestConnectivity OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether the test has connectivity with the reflector"
+    ::= { twampFarEndTestEntry 13 }
+
+-- Objects of near-end results table
+
+twampNearEndTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TwampNearEndTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the near-end test results of each TWAMP session,
+         indexed by the Session ID and Test index, respectively."
+    ::= { twampMIB 4 }
+
+twampNearEndTestEntry OBJECT-TYPE
+    SYNTAX      TwampNearEndTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The near-end results of each Test of each Session. Defined by RFC 5357."
+    INDEX { twampSessionId, twampNearEndTestIndex }
+    ::= { twampNearEndTestTable 1 }
+
+TwampNearEndTestEntry ::= SEQUENCE {
+   twampNearEndTestSessionId    Unsigned32,
+   twampNearEndTestIndex        Unsigned32,
+   twampNearEndTestId           Unsigned32,
+   twampNearEndTestDelayMin     TwampMeasure,
+   twampNearEndTestDelayMax     TwampMeasure,
+   twampNearEndTestDelayAvg     TwampMeasure,
+   twampNearEndTestJitterMin    TwampMeasure,
+   twampNearEndTestJitterMax    TwampMeasure,
+   twampNearEndTestJitterAvg    TwampMeasure,
+   twampNearEndTestTxPkts       Unsigned32,
+   twampNearEndTestRxPkts       Unsigned32,
+   twampNearEndTestLossRatio    TwampTestLossRatio,
+   twampNearEndTestConnectivity INTEGER
+}
+
+-- Objects Description
+
+twampNearEndTestSessionId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP session identifier"
+    ::= { twampNearEndTestEntry 1 }
+
+twampNearEndTestIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The table index of a TWAMP test within the session"
+    ::= { twampNearEndTestEntry 2 }
+
+twampNearEndTestId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TWAMP test identifier within the session"
+    ::= { twampNearEndTestEntry 3 }
+
+twampNearEndTestDelayMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum delay value identified during the test"
+    ::= { twampNearEndTestEntry 4 }
+
+twampNearEndTestDelayMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum delay value identified during the test"
+    ::= { twampNearEndTestEntry 5 }
+
+twampNearEndTestDelayAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average delay value identified during the test"
+    ::= { twampNearEndTestEntry 6 }
+
+twampNearEndTestJitterMin OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum Jitter value identified during the test"
+    ::= { twampNearEndTestEntry 7 }
+
+twampNearEndTestJitterMax OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum Jitter value identified during the test"
+    ::= { twampNearEndTestEntry 8 }
+
+twampNearEndTestJitterAvg OBJECT-TYPE
+    SYNTAX      TwampMeasure
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average Jitter value identified during the test"
+    ::= { twampNearEndTestEntry 9 }
+
+twampNearEndTestTxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent during the test"
+    ::= { twampNearEndTestEntry 10 }
+
+twampNearEndTestRxPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets received during the test"
+    ::= { twampNearEndTestEntry 11 }
+
+twampNearEndTestLossRatio OBJECT-TYPE
+    SYNTAX      TwampTestLossRatio
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of packets lost during the test"
+    ::= { twampNearEndTestEntry 12 }
+
+twampNearEndTestConnectivity OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether the test has connectivity with the reflector"
+    ::= { twampNearEndTestEntry 13 }
+
+END

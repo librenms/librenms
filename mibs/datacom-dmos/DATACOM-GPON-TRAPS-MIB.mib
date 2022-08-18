@@ -1,0 +1,220 @@
+--
+-- DATACOM
+-- Copyright 2016 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
+-- This DATACOM SNMP MIB Specification is Datacom proprietary intellectual property.
+--
+-- This module will be extend, as required. The specification and other information
+-- contained in this document can be modified without prior notice. The user should
+-- consult Datacom to determine whether any such changes have been done.
+--
+DATACOM-GPON-TRAPS-MIB	DEFINITIONS ::= BEGIN
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+	datacomAccessDevicesMIBs, datacomModules
+		FROM DATACOM-SMI
+	genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, genDvTrapsInfLastTrAlarmVal
+		FROM DATACOM-GENERIC-DEVICE-TRAPS-MIB;
+
+datacomGponTrapsMIBModule MODULE-IDENTITY
+    LAST-UPDATED "201602030000Z"
+    ORGANIZATION	"DATACOM"
+    CONTACT-INFO
+                "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION
+        " The MIB module for DATACOM GPON traps. "
+    REVISION "201602030000Z"
+    DESCRIPTION
+        " Updated for SNMPv2. "
+    ::={ datacomModules 5 }
+
+--  -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- --
+dmAdGponTrapsMIB  OBJECT IDENTIFIER	::={ datacomAccessDevicesMIBs 200 }
+--  -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- --
+-- ######  OBJECTS   ########
+dmAdGponTrapsInf	OBJECT IDENTIFIER	::={ dmAdGponTrapsMIB 1 }
+-- information about the last trap of this mib occurred in the management card
+
+dmAdGponTraps	OBJECT IDENTIFIER	::={ dmAdGponTrapsMIB 2 }
+-- Alarms (usually including a slot/port/ONU-ID resource).
+
+
+dmAdGponTrapsInfLastTrapOnuID OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS      read-only
+        STATUS      current
+        DESCRIPTION
+             " ONU ID of the last trap. "
+::= { dmAdGponTrapsInf 1 }
+
+dmAdGponTrapsInfLastTrapSwdlInfo OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         started (21),
+                         aborted (22),
+                         successful (23),
+                         error (24),
+                         invalid (25)
+                     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "ONU SWDL progress status."
+     ::= { dmAdGponTrapsInf 2 }
+
+dmAdGponTrapsInfLastTrapOnuSN OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "ONU Serial Number."
+::= { dmAdGponTrapsInf 3 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- EVENTS
+--
+-- GPON TRAPS MIB
+--
+
+gPonLOSiAlarm	NOTIFICATION-TYPE
+    OBJECTS 		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Loss of signal for ONU."
+    ::=  {  dmAdGponTraps 50001 }
+gPonLOFiAlarm NOTIFICATION-TYPE
+    OBJECTS 		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Loss of Frame of ONU."
+    ::=  {  dmAdGponTraps 50002  }
+gPonDOWiAlarm NOTIFICATION-TYPE
+		OBJECTS 		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION	" Drift of Window of ONU."
+    ::=  {  dmAdGponTraps 50003  }
+gPonSFiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Signal Fail of ONU."
+    ::=  {  dmAdGponTraps 50004  }
+gPonSDiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Signal degrade of ONU."
+    ::=  {  dmAdGponTraps 50005  }
+gPonLCDGiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Loss of GEM channel delineation."
+    ::=  {  dmAdGponTraps 50006  }
+gPonRDiAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Remote defect indication of ONU."
+    ::=  {  dmAdGponTraps 50007 }
+gPonTFAlarm	NOTIFICATION-TYPE
+    OBJECTS 		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, genDvTrapsInfLastTrAlarmVal}
+    STATUS		current
+    DESCRIPTION		"Transmitter failure on PON link."
+    ::= {  dmAdGponTraps 50008  }
+gPonSUFiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Start-up Failure of ONU."
+    ::=  {  dmAdGponTraps 50009  }
+gPonDFiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU does not react correctly after three Deactivate_ONU-ID or three Disable_Serial_Number messages."
+    ::=  {  dmAdGponTraps 50010  }
+gPonLOAiAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Loss of Ack with ONU."
+    ::=  {  dmAdGponTraps 50011 }
+gPonDGiAlarm  NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Receive Dying Gasp of ONU."
+    ::=  {  dmAdGponTraps 50012  }
+gPonLOAMiAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Loss of PLOAM for ONU."
+    ::=  {  dmAdGponTraps 50013 }
+gPonMISiAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Link Mismatch of ONU."
+    ::=  {  dmAdGponTraps 50014 }
+gPonPEEiAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"Physical Equipment error of ONU."
+    ::=  {  dmAdGponTraps 50015 }
+gPonOnuEquipmentFailureAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Equipment failure."
+    ::=  {  dmAdGponTraps 50016 }
+gPonOnuPowerFailureAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Power failure."
+    ::=  {  dmAdGponTraps 50017 }
+gPonOnuBatteryMissingAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Battery missing."
+    ::=  {  dmAdGponTraps 50018 }
+gPonOnuBatteryFailureAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Battery failure."
+    ::=  {  dmAdGponTraps 50019 }
+gPonOnuBatteryLowAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Battery low."
+    ::=  {  dmAdGponTraps 50020 }
+gPonOnuPhysicalIntrusionAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Physical intrusion."
+    ::=  {  dmAdGponTraps 50021 }
+gPonOnuSelfTestFailureAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Self testing failure."
+    ::=  {  dmAdGponTraps 50022 }
+gPonOnuVoltageRedAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU Voltage red."
+    ::=  {  dmAdGponTraps 50023 }
+gPonOnuDiscoveredEvent NOTIFICATION-TYPE
+    OBJECTS     { genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuSN }
+    STATUS      current
+    DESCRIPTION     "ONU discovered on PON link."
+    ::=  {  dmAdGponTraps 50024 }
+
+gPonOnuPasswordMismatchAlarm NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, genDvTrapsInfLastTrAlarmVal }
+    STATUS		current
+    DESCRIPTION		"ONU password mismatch."
+    ::=  {  dmAdGponTraps 50025 }
+
+gPonOnuSwdlInProgressEvent NOTIFICATION-TYPE
+    OBJECTS		{ genDvTrapsInfLastTrDevNo, genDvTrapsInfLastTrDevLocalId, genDvTrapsInfLastTrSlotNo, genDvTrapsInfLastTrPortNo, dmAdGponTrapsInfLastTrapOnuID, dmAdGponTrapsInfLastTrapSwdlInfo }
+    STATUS		current
+    DESCRIPTION		"ONU Software download in progress."
+    ::=  {  dmAdGponTraps 50026 }
+END

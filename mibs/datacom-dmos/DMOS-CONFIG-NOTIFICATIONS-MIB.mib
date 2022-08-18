@@ -1,0 +1,50 @@
+DMOS-CONFIG-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    dmosNotifications,
+    notificationTime,
+    notificationName,
+    notificationSourceType,
+    notificationSourceValue,
+    notificationInfo
+        FROM DMOS-NOTIFICATIONS-MIB;
+
+dmosConfigNotificationsMIB MODULE-IDENTITY
+    LAST-UPDATED "202011110000Z"
+    ORGANIZATION    "DATACOM"
+    CONTACT-INFO
+                "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "DmOS MIB module for configuration notifications."
+    REVISION "202011110000Z"
+    DESCRIPTION " First release "
+    ::= { dmosNotifications 8 }
+
+dmosConfigNotificationGroups OBJECT IDENTIFIER ::= { dmosConfigNotificationsMIB 1 }
+
+configCommit    NOTIFICATION-TYPE
+    OBJECTS {
+        notificationTime,
+        notificationName,
+        notificationSourceType,
+        notificationSourceValue,
+        notificationInfo }
+
+    STATUS        current
+    DESCRIPTION   "Configuration commit trap."
+    ::=  {  dmosConfigNotificationsMIB 2 }
+
+END

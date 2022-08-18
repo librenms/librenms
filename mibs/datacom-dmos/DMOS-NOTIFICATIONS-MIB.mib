@@ -1,0 +1,107 @@
+DMOS-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI
+    OBJECT-GROUP                    FROM SNMPv2-CONF
+    DateAndTime, DisplayString      FROM SNMPv2-TC
+    datacomDevicesMIBs              FROM DATACOM-SMI;
+
+dmosNotificationsMIB MODULE-IDENTITY
+    LAST-UPDATED "201610200000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "This module contains DmOS notifications data for SNMP"
+    REVISION    "201610200000Z"
+    DESCRIPTION "Initial revision"
+    ::= { datacomDevicesMIBs 3 }
+
+notificationObjects OBJECT IDENTIFIER ::= { dmosNotificationsMIB 1 }
+
+notificationTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Date and Time when notification was generated"
+    ::= { notificationObjects 1 }
+
+notificationName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Name of notification"
+    ::= { notificationObjects 2 }
+
+notificationSourceType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Type of source"
+    ::= { notificationObjects 3 }
+
+notificationSourceValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Source identification"
+    ::= { notificationObjects 4 }
+
+notificationSeverity OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Notification severity"
+    ::= { notificationObjects 5 }
+
+notificationInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Summarized information of the notification"
+    ::= { notificationObjects 6 }
+
+notificationAlarmState OBJECT-TYPE
+    SYNTAX      INTEGER {clear(1), set(2), unstable(3)}
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Alarm state"
+    ::= { notificationObjects 7 }
+
+notificationGroups OBJECT IDENTIFIER ::= { dmosNotificationsMIB 2 }
+
+infoNotificationGroup OBJECT-GROUP
+    OBJECTS { notificationTime,
+              notificationName,
+              notificationSourceType,
+              notificationSourceValue,
+              notificationInfo }
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that describes an occurrence informed by a
+        notification not related to any alarm"
+    ::= { notificationGroups 1 }
+
+alarmNotificationGroup OBJECT-GROUP
+    OBJECTS { notificationSeverity,
+              notificationAlarmState }
+    STATUS      current
+    DESCRIPTION
+        "The notifications that inform an alarm state transition contain all
+        object members of this group in addition to infoNotificationGroup
+        members"
+    ::= { notificationGroups 2 }
+
+dmosNotifications OBJECT IDENTIFIER ::= { dmosNotificationsMIB 3 }
+
+END

@@ -1,0 +1,111 @@
+DMOS-EXPERIMENTAL-TEST-NOTIFICATIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    enterprises, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    FixedPoint2Dec
+        FROM DMOS-TC-MIB
+    dmosNotificationsMIB,
+    dmosNotifications,
+    notificationTime,
+    notificationName,
+    notificationSourceType,
+    notificationSourceValue,
+    notificationSeverity,
+    notificationInfo,
+    notificationAlarmState
+        FROM DMOS-NOTIFICATIONS-MIB
+    experimentalNotificationObjects,
+    experimentalCustomNotifications,
+    experimentalDmosNotifications
+        FROM DMOS-EXPERIMENTAL-NOTIFICATIONS-MIB;
+
+dmosExperimentalTestNotificationsMIB MODULE-IDENTITY
+    LAST-UPDATED "201610200000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "The notifications designed to be used in the tests of the notification manager"
+    REVISION    "201610200000Z"
+    DESCRIPTION "Initial revision"
+    ::= { experimentalNotificationObjects 2 }
+
+testParamUint32 OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "An unsigned 32-bit integer for testing."
+    ::= { dmosExperimentalTestNotificationsMIB 1 }
+
+testParamInt32 OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A signed 32-bit integer for testing."
+    ::= { dmosExperimentalTestNotificationsMIB 2 }
+
+testParamStr OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A string for testing."
+    ::= { dmosExperimentalTestNotificationsMIB 3 }
+
+testParamFloat OBJECT-TYPE
+    SYNTAX          FixedPoint2Dec
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A signed 32-bit integer for testing."
+    ::= { dmosExperimentalTestNotificationsMIB 4 }
+
+notificationTrap NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "A trap without binds."
+    ::= { experimentalCustomNotifications 1 }
+
+eventTrap NOTIFICATION-TYPE
+    OBJECTS {
+        testParamStr,
+        testParamUint32,
+        testParamStr
+    }
+    STATUS current
+    DESCRIPTION
+        "A test trap."
+    ::= { experimentalCustomNotifications 2 }
+
+alarmTrap NOTIFICATION-TYPE
+    OBJECTS {
+        notificationTime,
+        notificationName,
+        notificationSourceType,
+        notificationSourceValue,
+        notificationSeverity,
+        notificationInfo,
+        notificationAlarmState,
+        testParamUint32,
+        testParamInt32,
+        testParamStr,
+        testParamFloat
+    }
+    STATUS current
+    DESCRIPTION
+        "Example trap."
+    ::= { experimentalDmosNotifications 1 }
+
+END

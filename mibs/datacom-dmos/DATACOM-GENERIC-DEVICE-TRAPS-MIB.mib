@@ -1,0 +1,1512 @@
+--
+-- DATACOM
+-- Copyright 2015 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
+-- This DATACOM SNMP MIB Specification is DATACOM proprietary intellectual property.
+--
+-- This module will be extend, as required. The specification and other information
+-- contained in this document can be modified without prior notice. The user should
+-- consult DATACOM to determine whether any such changes have been done.
+--
+
+DATACOM-GENERIC-DEVICE-TRAPS-MIB   DEFINITIONS ::= BEGIN
+
+IMPORTS
+  OBJECT-TYPE, TimeTicks, Counter32, Gauge32  FROM SNMPv2-SMI
+  datacomGenericMIBs, datacomModules          FROM DATACOM-SMI;
+
+
+
+datacomGenDvTrapsMIBModule OBJECT IDENTIFIER ::={ datacomModules 24 }
+--  MODULE-IDENTITY
+--  ORGANIZATION    "DATACOM"
+--  CONTACT-INFO
+--                "DATACOM
+--
+--              Postal: DATACOM
+--                      Rua America, 1000
+--                      Eldorado do Sul - RS
+--                      Brasil
+--                      CEP: 92990-000
+--
+--                      Tel: +55 51 3933 3000
+--                      Fax: +55 51 3933 3003
+
+--
+--                 e-mail: datacom@datacom.ind.br"
+--	DESCRIPTION
+--		" DATACOM's Enterprise Trap Definitions for the generic devices traps. "
+--
+--
+--  -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- --
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+--
+
+dmGenDvTrapsMIB  OBJECT IDENTIFIER	::={ datacomGenericMIBs 4  }
+
+--  -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- --
+ -- textual conventions
+
+      DisplayString ::= OCTET STRING
+      -- This data type is used to model textual information taken
+      -- from the NVT ASCII character set.  By convention, objects
+      -- with this syntax are declared as having
+      --
+      --      SIZE (0..255)
+
+
+--  -- -- -- -- -- -- -- -- -- --  -- -- -- -- -- -- -- -- -- --
+
+  DmDevIndex      ::= INTEGER
+  DmDevLocalIndex ::= INTEGER
+    -- where    1 - local devices
+    --          2.. - remoteDevice1 .. remoteDeviceN
+  DmSlotIndex   ::= INTEGER
+  DmPortIndex   ::= INTEGER
+  DmTrapIndex   ::= INTEGER(1..999999)
+
+
+
+-- ######  OBJECTS   ########
+
+dmGenDvTrapsInf	OBJECT IDENTIFIER   ::={ dmGenDvTrapsMIB 1 }
+
+
+-- group dmMdTrapsInf
+
+genDvTrapsInfMibVersion	OBJECT-TYPE
+  SYNTAX    DisplayString
+  ACCESS    read-only
+  STATUS    mandatory
+  DESCRIPTION
+       " The genDvTraps MIB version supported by this agent software version. "
+::={ dmGenDvTrapsInf 1 }
+
+
+-- information about the last trap of this mib occurred in the management card
+genDvTrapsInfLastTrDevNo OBJECT-TYPE
+       SYNTAX  DmDevIndex
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Device number of the last trap. "
+::= { dmGenDvTrapsInf 11 }
+
+genDvTrapsInfLastTrDevLocalId OBJECT-TYPE
+       SYNTAX  DmDevLocalIndex
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Device local of the last trap. "
+::= { dmGenDvTrapsInf 12 }
+
+genDvTrapsInfLastTrSlotNo OBJECT-TYPE
+       SYNTAX  DmSlotIndex
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Slot number of the last trap. "
+::= { dmGenDvTrapsInf 13 }
+
+genDvTrapsInfLastTrPortNo OBJECT-TYPE
+       SYNTAX  DmPortIndex
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Port number of the last trap. "
+::= { dmGenDvTrapsInf 14 }
+
+genDvTrapsInfLastTrValue OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " New value of the object that changed. "
+::= { dmGenDvTrapsInf 15 }
+
+genDvTrapsInfLastTrType OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Type of the last trap. "
+::= { dmGenDvTrapsInf 16 }
+
+genDvTrapsInfLastTrTimeStamp OBJECT-TYPE
+       SYNTAX  TimeTicks
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Time stamp of the last trap. "
+::= { dmGenDvTrapsInf 17 }
+
+genDvTrapsInfLastTrDeviceProduct OBJECT-TYPE
+       SYNTAX  OBJECT IDENTIFIER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+      " The device product of the last trap. "
+::= { dmGenDvTrapsInf 18 }
+
+genDvTrapsInfLastTrAlarmId OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Alarm number of the last trap. "
+::= { dmGenDvTrapsInf 19 }
+
+genDvTrapsInfLastTrAlarmVal OBJECT-TYPE
+       SYNTAX  INTEGER {
+         deactivated (1),
+         actived     (2),
+         unstable    (3)
+      }
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Alarm value of the last trap. "
+::= { dmGenDvTrapsInf 20 }
+
+genDvTrapsInfLastTrUserName OBJECT-TYPE
+       SYNTAX  DisplayString
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " User name of the last trap. "
+::= { dmGenDvTrapsInf 21 }
+
+
+genDvTrapsInfLastTrAlarmSeverityVal OBJECT-TYPE
+       SYNTAX  INTEGER {
+         info        (1),
+         warning     (2),
+         minor       (3),
+         major       (4),
+         critical    (5)
+      }
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Severity value of a trap. "
+::= { dmGenDvTrapsInf 22 }
+
+genDvTrapsInfLastTrChannel OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Channel of the last trap. "
+::= { dmGenDvTrapsInf 23 }
+
+genDvTrapLicenseSN OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " The license with serial number. "
+::= { dmGenDvTrapsInf 24 }
+
+genDvTrapLicenseExpire OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Time to expire a License. "
+::= { dmGenDvTrapsInf 25 }
+
+genDvTrapsInfLastTrValueVlan OBJECT-TYPE
+        SYNTAX  INTEGER(1..4096)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             " Vlan's number. "
+::= { dmGenDvTrapsInf 26 }
+
+genDvTrapsInfLastTrStringMac OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "String containing MAC address (format xx:xx:xx:xx:xx:xx)."
+::= { dmGenDvTrapsInf 27 }
+
+-- trapInformationTable
+genDvTrapsInfTable  OBJECT-TYPE
+    SYNTAX	SEQUENCE OF GenDvTrapsInfEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+      " Table with general trap information about the equipment managed by
+        this MIB. "
+::={ dmGenDvTrapsInf 100 }
+
+genDvTrapsInfEntry OBJECT-TYPE
+    SYNTAX	GenDvTrapsInfEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+      " Entry of genDvTrapsInfTable. "
+    INDEX 	{ genDvTrapsInfIdxNo }
+::={ genDvTrapsInfTable 1 }
+
+GenDvTrapsInfEntry ::=
+    SEQUENCE {
+      genDvTrapsInfIdxNo            DmTrapIndex,
+      genDvTrapsInfObjectOid        OBJECT IDENTIFIER,
+      genDvTrapsInfObjIntegerVal    INTEGER,
+      genDvTrapsInfObjTmTicksVal    TimeTicks,
+      genDvTrapsInfObjStringVal     OCTET STRING,
+      genDvTrapsInfObjCounterVal    Counter32,
+      genDvTrapsInfObjGaugeVal      Gauge32
+      }
+
+genDvTrapsInfIdxNo OBJECT-TYPE
+        SYNTAX    DmTrapIndex
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+          " Index number. "
+::= { genDvTrapsInfEntry 1 }
+
+genDvTrapsInfObjectOid	OBJECT-TYPE
+    SYNTAX		OBJECT IDENTIFIER
+    ACCESS		read-only
+    STATUS		mandatory
+    DESCRIPTION
+          " OID (Object Identifier) number. "
+::={ genDvTrapsInfEntry 2 }
+
+genDvTrapsInfObjIntegerVal OBJECT-TYPE
+    SYNTAX 		INTEGER
+        ACCESS		read-only
+        STATUS  	mandatory
+        DESCRIPTION
+          " Object value (Integer). "
+::={ genDvTrapsInfEntry 3 }
+
+genDvTrapsInfObjTmTicksVal OBJECT-TYPE
+    SYNTAX 		TimeTicks
+        ACCESS		read-only
+        STATUS  	mandatory
+        DESCRIPTION
+          " Object value (TimeTicks). "
+::={ genDvTrapsInfEntry 4 }
+
+genDvTrapsInfObjStringVal OBJECT-TYPE
+    SYNTAX 		OCTET STRING
+        ACCESS		read-only
+        STATUS  	mandatory
+        DESCRIPTION
+          " Object value (Octet String). "
+::={ genDvTrapsInfEntry 5 }
+
+genDvTrapsInfObjCounterVal OBJECT-TYPE
+    SYNTAX 		Counter32
+        ACCESS		read-only
+        STATUS  	mandatory
+        DESCRIPTION
+          " Object value (Counter). "
+::={ genDvTrapsInfEntry 6 }
+
+genDvTrapsInfObjGaugeVal OBJECT-TYPE
+    SYNTAX 		Gauge32
+        ACCESS		read-only
+        STATUS  	mandatory
+        DESCRIPTION
+          " Object value (Gauge). "
+::={ genDvTrapsInfEntry 7 }
+
+
+
+
+
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+-- EVENTS
+
+-- genDv MIB
+--
+
+mtGenDvInfInsertedDevTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrDeviceProduct
+        }
+  DESCRIPTION
+    " This trap is sent every time an remote device
+      is inserted. "
+::= 1
+
+
+mtGenDvInfRemovedDevTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId
+        }
+  DESCRIPTION
+    " This trap is sent every time an remote device
+      is removed. "
+::= 2
+
+
+-- agent status traps
+mtGenDvStSnmpManagementStatusTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time the genDvtSnmpManagementStatus
+      object changes its state. "
+::= 51
+
+
+mtGenDvStLatchedPossibleNewCfgTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time the genDvtLatchedPossibleNewCfg
+      object changes its state.
+      Values: 1	none
+              2	possibleNewConfig"
+::= 52
+
+agFwRemDownTempMemTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time the dmAgFwRemDownTempMem
+      object changes its state. "
+::= 61
+
+agFwRemDownActionStTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time the dmAgFwRemDownActionSt
+      object changes its state. "
+::= 62
+
+-- equip
+
+mtGenDvInfNumPortsTrap TRAP-TYPE
+  ENTERPRISE	dmGenDvTrapsMIB
+  VARIABLES	{
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap indicates device's port state
+     2 - fail interface on slot.
+     3 - unknown interface on slot. "
+::= 100
+
+mtGenDvInfTempRangeTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time the temperature
+    is out of range.
+    Values: 1	Temperature inside range
+                2	Temperature above limit
+                3	Temperature below limit
+                4	Shutdown temperature"
+::= 601
+
+mtGenDvInfFanFailTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time Fan fails.
+    Values: 1	Fan working properly
+                2	Fan failure"
+::= 611
+
+-- port
+mtGenDvInfInsertedPortTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo
+        }
+  DESCRIPTION
+    " This trap is sent every time an interface
+      is inserted in device. "
+::= 701
+
+mtGenDvInfRemovedPortTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo
+        }
+  DESCRIPTION
+    " This trap is sent every time an interface
+      is removed from device. "
+::= 702
+
+mtGenDvInfPortConfigModeTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time there is a
+      change at the interface config mode object. "
+::= 809
+
+mtGenDvInfPowerStatusTrap  TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrValue
+        }
+  DESCRIPTION
+    " This trap is sent every time Power Status change. "
+::= 901
+
+
+smtGenDvStLinkStatusTribE1PpiExcSlipTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the link
+         STATUS object changes its value. "
+::= 13018
+
+smtGenDvStLinkStatusDigitalItfExcSlipTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the link
+         STATUS object changes its value. "
+::= 13204
+
+smtGenDvStLinkStatusDslExcSlipTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the link
+         STATUS object changes its value. "
+::= 13304
+
+smtGenDvStPhSlotPresenceTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,					-- genDvStPhSlotPresence
+        genDvTrapsInfObjIntegerVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value.
+         Values are 1 : CardRemoved 2: CardInserted"
+::= 17001
+
+-- NE-FW_Update_Failure
+smtGenDvStCurrentDevCpuFWUpdateFailure TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value. "
+::= 17007
+
+smtGenDvStCurrentDevCpuFWInvalidInactive TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrValue
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value.
+         Values: 1	Firmware inactive valid
+                  2	Firmware inactive invalid"
+::= 17009
+
+smtGenDvStCurrentDevCpuFWImageTemporary TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value. "
+::= 17010
+
+-- NE-FW_Update_Beginning
+smtGenDvStCurrentDevCpuFWUpdateBeginning TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value. "
+::= 17011
+
+smtsdhStCurrentDevCpuFWUpdateReady TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         presence object changes its value. "
+::= 17015
+
+smtsdhStCurrentDevFWVersionChanged TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjIntegerVal
+      }
+  DESCRIPTION
+       " Firmware version changed.
+        Values:  genDvTrapsInfObjIntegerVal 2 = FW Version Changed"
+::= 17020
+
+-- NE-Card_Removed
+smtGenDvStPhSlotStCardRemovedTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17022
+
+-- NE-Card_Mismatch
+smtGenDvStPhSlotStCardMismatchTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17023
+
+-- NE-Card_Disabled
+smtGenDvStPhSlotStCardDisabledTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17024
+
+-- Card-Unsupported
+smtGenDvStPhSlotStUnsupportedCardTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17025
+
+-- Card-Config_Mismatch
+smtGenDvStPhSlotStCardConfigMismatch TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17026
+
+smtGenDvStPhSlotStCardFail TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17027
+
+smtGenDvStPhSlotStCardFwMismatch TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17028
+
+smtGenDvStPhSlotStCardCriticalTemp TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17029
+
+smtGenDvStPhSlotStCardHwConfigFail TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17030
+
+smtGenDvStPhSlotStCardHwProtected TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17031
+
+smtGenDvStPhSlotStCardVendorMismatch TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status object changes its value. "
+::= 17032
+
+-- OBJ genDvStPhSlotStFail -> fail (CPU)
+smtGenDvStPhSlotStFailCpuFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 17012
+
+smtGenDvStPhSlotStFailCriticalTempTrap TRAP-TYPE
+  ENTERPRISE   dmGenDvTrapsMIB
+  VARIABLES   {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 17013
+
+smtGenDvStLastChangeTmTrap TRAP-TYPE
+  ENTERPRISE    dmGenDvTrapsMIB
+  VARIABLES   {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfObjectOid,       -- genDvEquipTmUtc
+        genDvTrapsInfObjGaugeVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         equipment time change its value (configuration). "
+::= 17151
+
+smtGenDvStLastActivationTrap TRAP-TYPE
+  ENTERPRISE   dmGenDvTrapsMIB
+  VARIABLES    {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrUserName
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         up time of last configuration activated
+         object changes its value. "
+::= 17171
+
+smtGenDvStUserListChangedTrap TRAP-TYPE
+  ENTERPRISE    dmGenDvTrapsMIB
+  VARIABLES     {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfObjectOid,
+        genDvTrapsInfObjIntegerVal
+      }
+  DESCRIPTION
+    " This trap is sent every time an remote device
+      is removed. "
+::= 17172
+
+-- OBJ genDvStPhSlotStFail -> fail (Fan)
+smtGenDvStPhSlotStFailFanFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16002
+
+smtGenDvStPhSlotStFailFanMismatchTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16007
+
+-- OBJ genDvStPhSlotStFail -> fail (Power Supply)
+smtGenDvStPhSlotStFailPwrSuppFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16102
+
+smtGenDvStPhSlotStFailFuseFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16105
+
+-- NE-Power_Redundancy_Fail
+smtGenDvStPhSlotStFailPwrRedundancyFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16103
+
+-- NE-Power_Overload
+smtGenDvStPhSlotStFailPwrOverloadTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16104
+
+-- Ethernet-Overload
+smtGenDvEthernetOverloadTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16111
+
+
+-- OBJ genDvStPhSlotStFail -> fail (Aggregate)
+smtGenDvStPhSlotStFailAggFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16122
+
+-- OBJ genDvStPhSlotOperSt -> prevMaintReq (Aggregate)
+smtGenDvStPhSlotOperStAggPrevMaintReqTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         operational status object changes its value. "
+::= 16126
+
+-- OBJ genDvStPhSlotStFail -> fail (Tributary)
+smtGenDvStPhSlotStFailTribFailTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmId,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent every time the local
+         status fail object changes its value. "
+::= 16132
+
+smtGenDvStCpuActiveTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo
+      }
+  DESCRIPTION
+       " This trap is sent every time the cpu
+         becames active. "
+::= 17191
+
+smtGenDvStCpuColdStartTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the cpu
+         starts up after a power-off state. "
+::= 17192
+
+smtGenDvStCpuWarmStartTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId
+      }
+  DESCRIPTION
+       " This trap is sent every time the cpu
+         starts up after a software reset. "
+::= 17193
+
+smtGenDvInfInsertedDevTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,					-- genDvInfDeviceSerialNo
+        genDvTrapsInfObjStringVal
+      }
+  DESCRIPTION
+    " This trap is sent every time an remote device
+      is inserted. "
+::= 20001
+
+smtGenDvInfRemovedDevTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfObjectOid,					-- genDvInfDeviceSerialNo
+        genDvTrapsInfObjStringVal
+      }
+  DESCRIPTION
+    " This trap is sent every time an remote device
+      is removed. "
+::= 20002
+
+sFPmismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when an SFP is mismatched."
+::= 21003
+
+sFPvendorMismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when a not approved sfp is inserted in the
+equipment. "
+::= 21007
+
+configTemporaryAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when a temporary config alarm changes its value. "
+::= 21101
+
+edfaFailureAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the EDFA alarm changes its value. "
+::= 22014
+
+edfaLowInputPowerFailureAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the EDFA-Low_Input_Power alarm changes its value. "
+::= 22015
+
+icad2Subdev1MismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_1_Mismatch alarm changes its value. "
+::= 22101
+
+icad2Subdev2MismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_2_Mismatch alarm changes its value. "
+::= 22102
+
+icad2Subdev1NotPresentAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_1_Not_Present alarm changes its value. "
+::= 22103
+
+icad2Subdev2NotPresentAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_2_Not_Present alarm changes its value. "
+::= 22104
+icad2Subdev1FailureAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_1_Failure alarm changes its value. "
+::= 22105
+
+icad2Subdev2FailureAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES     {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrSlotNo,
+          genDvTrapsInfLastTrPortNo,
+          genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+       " This trap is sent when the Icad2-Subdev_2_Failure alarm changes its value. "
+::= 22106
+
+smtGenDvStLostComWithItfTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time the communication with interface module is lost. "
+::= 30000
+
+smtGenDvStLoSTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a loss of signal is detected. "
+::= 30001
+
+smtGenDvStAiSTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time an alarm indication signal is raised. "
+::= 30002
+
+smtGenDvStLofTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a loss of frame alignment is detected. "
+::= 30003
+
+smtGenDvStRalmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a remote alarm is raised. "
+::= 30004
+
+smtGenDvStMfaTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a no multiframe alignment found alarm is raised. "
+::= 30005
+
+smtGenDvStLomTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a loss of multiframe alignment alarm is raised. "
+::= 30006
+
+smtGenDvStCpuLoadThresholdTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmSeverityVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a cpuload threshold is reached. "
+::= 30007
+
+smtGenDvStDiskUseThresholdTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmSeverityVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a disk usage threshold is reached. "
+::= 30008
+
+smtGenDvStMemoryUseThresholdTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrTimeStamp,
+        genDvTrapsInfLastTrAlarmSeverityVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a memory use threshold is reached. "
+::= 30009
+
+stMacSpoofingTrap  TRAP-TYPE
+   ENTERPRISE    dmGenDvTrapsMIB
+   VARIABLES     {
+            genDvTrapsInfLastTrDevNo,
+            genDvTrapsInfLastTrDevLocalId,
+            genDvTrapsInfLastTrSlotNo,
+            genDvTrapsInfLastTrPortNo,
+            genDvTrapsInfLastTrValueVlan,
+            genDvTrapsInfLastTrStringMac
+      }
+  DESCRIPTION "  This trap is sent when it is detected that the user over this port
+  sent traffic containing source MAC address already in use by another user port,
+  potentially a malicious use of the line"
+::= 30010
+
+
+tLoginFailTrap TRAP-TYPE
+      ENTERPRISE  dmGenDvTrapsMIB
+    VARIABLES {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrUserName
+      }
+      DESCRIPTION
+          "This trap is sent when an user try logging with a incorrect username or password."
+::= 40001
+
+tLoginSucessTrap TRAP-TYPE
+      ENTERPRISE dmGenDvTrapsMIB
+    VARIABLES {
+          genDvTrapsInfLastTrDevNo,
+          genDvTrapsInfLastTrDevLocalId,
+          genDvTrapsInfLastTrUserName
+      }
+      DESCRIPTION
+          "This trap is sent when an user get logging."
+::= 40002
+
+tTxFaultTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent every time a TX fault is detected."
+::= 40003
+
+cpuFWMismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent when the current MPU FW is
+         not the selected firmware. "
+::= 40004
+
+cardFWMismatchAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent when the card FW is
+         not the same as the active MPU. "
+::= 40005
+
+fwLoadByTftpAlarmTrap TRAP-TYPE
+  ENTERPRISE 	dmGenDvTrapsMIB
+  VARIABLES 	{
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent when line card loaded firmware from tftp instead of
+flash. "
+::= 40006
+
+trapLicenseWillExpire TRAP-TYPE
+  ENTERPRISE    dmGenDvTrapsMIB
+  VARIABLES     {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapLicenseSN,
+        genDvTrapLicenseExpire
+      }
+  DESCRIPTION
+    " This trap is sent when the expiration of a license will occur in less than
+XXX hours. "
+::= 40007
+
+trapLicenseExpired TRAP-TYPE
+  ENTERPRISE    dmGenDvTrapsMIB
+  VARIABLES     {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapLicenseSN
+      }
+  DESCRIPTION
+    " This trap is sent when a license is expired. "
+::= 40008
+
+uBootUpdateAvailAlarmTrap TRAP-TYPE
+  ENTERPRISE    dmGenDvTrapsMIB
+  VARIABLES     {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrAlarmVal
+      }
+  DESCRIPTION
+    " This trap is sent when U-boot must be updated. "
+::= 40009
+
+swNonHomologSfpTrap TRAP-TYPE
+   ENTERPRISE    dmGenDvTrapsMIB
+   VARIABLES     {
+        genDvTrapsInfLastTrDevNo,
+        genDvTrapsInfLastTrDevLocalId,
+        genDvTrapsInfLastTrSlotNo,
+        genDvTrapsInfLastTrPortNo
+   }
+   DESCRIPTION "This trap is sent when a non-homologated SFP is placed."
+::= 40010
+
+END

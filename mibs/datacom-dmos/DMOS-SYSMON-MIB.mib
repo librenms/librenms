@@ -1,0 +1,1021 @@
+DMOS-SYSMON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+    Unsigned8, UnsignedPercent
+        FROM DMOS-TC-MIB;
+
+dmosSysmonMIB MODULE-IDENTITY
+    LAST-UPDATED "201602120000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br"
+    DESCRIPTION "This module contains DmOS CPU and memory usage monitoring objects."
+    REVISION "201602120000Z"
+    DESCRIPTION "First revision"
+    ::= { datacomDevicesMIBs 4 }
+
+-- CPU information
+cpu OBJECT IDENTIFIER ::= { dmosSysmonMIB 1 }
+
+-- Memory information
+memory OBJECT IDENTIFIER ::= { dmosSysmonMIB 2 }
+
+cpuChassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of chassis for which CPU usage information is available"
+    ::= { cpu 1 }
+
+cpuChassisEntry OBJECT-TYPE
+    SYNTAX      CpuChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Chassis identification field"
+    INDEX { cpuChassisId }
+        ::= { cpuChassisTable 1 }
+
+CpuChassisEntry ::=
+    SEQUENCE {
+        cpuChassisId Unsigned32
+    }
+
+cpuChassisId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Chassis identifier"
+    ::= { cpuChassisEntry 1 }
+
+cpuSlotTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of slots for which CPU usage information is available"
+    ::= { cpu 2 }
+
+cpuSlotEntry OBJECT-TYPE
+    SYNTAX      CpuSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot CPU usage information structure"
+    INDEX { cpuChassisId, cpuSlotId }
+        ::= { cpuSlotTable 1 }
+
+CpuSlotEntry ::=
+    SEQUENCE {
+        cpuSlotId DisplayString,
+        cpuLoadFiveSecondsActive UnsignedPercent,
+        cpuLoadFiveSecondsIdle UnsignedPercent,
+        cpuLoadOneMinuteActive UnsignedPercent,
+        cpuLoadOneMinuteIdle UnsignedPercent,
+        cpuLoadFiveMinutesActive UnsignedPercent,
+        cpuLoadFiveMinutesIdle UnsignedPercent
+    }
+
+cpuSlotId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot identifier"
+    ::= { cpuSlotEntry 1 }
+
+cpuLoadFiveSecondsActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU load over the last five seconds"
+    ::= { cpuSlotEntry 2 }
+
+cpuLoadFiveSecondsIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU load over the last five seconds"
+    ::= { cpuSlotEntry 3 }
+
+cpuLoadOneMinuteActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU load over the last minute"
+    ::= { cpuSlotEntry 4 }
+
+cpuLoadOneMinuteIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU load over the last minute"
+    ::= { cpuSlotEntry 5 }
+
+cpuLoadFiveMinutesActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU load of the las five minutes"
+    ::= { cpuSlotEntry 6 }
+
+cpuLoadFiveMinutesIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU load over the last five minutes"
+    ::= { cpuSlotEntry 7 }
+
+cpuCoreTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuCoreEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Detailed information per CPU core"
+    ::= { cpu 3 }
+
+cpuCoreEntry OBJECT-TYPE
+    SYNTAX      CpuCoreEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "CPU core usage information structure"
+    INDEX { cpuChassisId, cpuSlotId, cpuCoreCoreId }
+        ::= { cpuCoreTable 1 }
+
+CpuCoreEntry ::=
+    SEQUENCE {
+        cpuCoreCoreId Unsigned8,
+        cpuCoreFiveSecondsActive UnsignedPercent,
+        cpuCoreFiveSecondsUser UnsignedPercent,
+        cpuCoreFiveSecondsSystem UnsignedPercent,
+        cpuCoreFiveSecondsNice UnsignedPercent,
+        cpuCoreFiveSecondsIdle UnsignedPercent,
+        cpuCoreFiveSecondsWait UnsignedPercent,
+        cpuCoreFiveSecondsInterrupt UnsignedPercent,
+        cpuCoreFiveSecondsSoftirq UnsignedPercent,
+        cpuCoreOneMinuteActive UnsignedPercent,
+        cpuCoreOneMinuteUser UnsignedPercent,
+        cpuCoreOneMinuteSystem UnsignedPercent,
+        cpuCoreOneMinuteNice UnsignedPercent,
+        cpuCoreOneMinuteIdle UnsignedPercent,
+        cpuCoreOneMinuteWait UnsignedPercent,
+        cpuCoreOneMinuteInterrupt UnsignedPercent,
+        cpuCoreOneMinuteSoftirq UnsignedPercent,
+        cpuCoreFiveMinutesActive UnsignedPercent,
+        cpuCoreFiveMinutesUser UnsignedPercent,
+        cpuCoreFiveMinutesSystem UnsignedPercent,
+        cpuCoreFiveMinutesNice UnsignedPercent,
+        cpuCoreFiveMinutesIdle UnsignedPercent,
+        cpuCoreFiveMinutesWait UnsignedPercent,
+        cpuCoreFiveMinutesInterrupt UnsignedPercent,
+        cpuCoreFiveMinutesSoftirq UnsignedPercent
+    }
+
+cpuCoreCoreId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "CPU core identifier"
+    ::= { cpuCoreEntry 1 }
+
+cpuCoreFiveSecondsActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU core load over the last five seconds"
+    ::= { cpuCoreEntry 2 }
+
+cpuCoreFiveSecondsUser OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average user space CPU core load over the last five seconds"
+    ::= { cpuCoreEntry 3 }
+
+cpuCoreFiveSecondsSystem OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average kernel space CPU core load over tha last five seconds"
+    ::= { cpuCoreEntry 4 }
+
+cpuCoreFiveSecondsNice OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent on niced processes over the last five seconds"
+    ::= { cpuCoreEntry 5 }
+
+cpuCoreFiveSecondsIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU core load over the last five seconds"
+    ::= { cpuCoreEntry 6 }
+
+cpuCoreFiveSecondsWait OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent waiting for I/O over the last five seconds"
+    ::= { cpuCoreEntry 7 }
+
+cpuCoreFiveSecondsInterrupt OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling hardware interrupts over the last five seconds"
+    ::= { cpuCoreEntry 8 }
+
+cpuCoreFiveSecondsSoftirq OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling software interrupts over the last five seconds"
+    ::= { cpuCoreEntry 9 }
+
+cpuCoreOneMinuteActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU core load over the last minute"
+    ::= { cpuCoreEntry 10 }
+
+cpuCoreOneMinuteUser OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average user space CPU core load over the last minute"
+    ::= { cpuCoreEntry 11 }
+
+cpuCoreOneMinuteSystem OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average kernel space CPU core load over tha last minute"
+    ::= { cpuCoreEntry 12 }
+
+cpuCoreOneMinuteNice OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent on niced processes over the last minute"
+    ::= { cpuCoreEntry 13 }
+
+cpuCoreOneMinuteIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU core load over the last minute"
+    ::= { cpuCoreEntry 14 }
+
+cpuCoreOneMinuteWait OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent waiting for I/O over the last minute"
+    ::= { cpuCoreEntry 15 }
+
+cpuCoreOneMinuteInterrupt OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling hardware interrupts over the last minute"
+    ::= { cpuCoreEntry 16 }
+
+cpuCoreOneMinuteSoftirq OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling hardware interrupts over the last minute"
+    ::= { cpuCoreEntry 17 }
+
+cpuCoreFiveMinutesActive OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average active CPU core load over the last five minutes"
+    ::= { cpuCoreEntry 18 }
+
+cpuCoreFiveMinutesUser OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average user space CPU core load over the last five minutes"
+    ::= { cpuCoreEntry 19 }
+
+cpuCoreFiveMinutesSystem OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average kernel space CPU core load over tha last five minutes"
+    ::= { cpuCoreEntry 20 }
+
+cpuCoreFiveMinutesNice OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent on niced processes over the last five minutes"
+    ::= { cpuCoreEntry 21 }
+
+cpuCoreFiveMinutesIdle OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average idle CPU core load over the last five minutes"
+    ::= { cpuCoreEntry 22 }
+
+cpuCoreFiveMinutesWait OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent waiting for I/O over the last five minutes"
+    ::= { cpuCoreEntry 23 }
+
+cpuCoreFiveMinutesInterrupt OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling hardware interrupts over the last five minutes"
+    ::= { cpuCoreEntry 24 }
+
+cpuCoreFiveMinutesSoftirq OBJECT-TYPE
+    SYNTAX      UnsignedPercent
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU core load spent handling hardware interrupts over the last five minutes"
+    ::= { cpuCoreEntry 25 }
+
+memoryChassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MemoryChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of chassis for which memory usage information is available"
+    ::= { memory 1 }
+
+memoryChassisEntry OBJECT-TYPE
+    SYNTAX      MemoryChassisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { memoryChassisId }
+        ::= { memoryChassisTable 1 }
+
+MemoryChassisEntry ::=
+    SEQUENCE {
+        memoryChassisId Unsigned32
+    }
+
+memoryChassisId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Chassis identifier"
+    ::= { memoryChassisEntry 1 }
+
+memorySlotTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MemorySlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of slots for which memory usage information is available"
+    ::= { memory 2 }
+
+memorySlotEntry OBJECT-TYPE
+    SYNTAX      MemorySlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot memory usage information structure"
+    INDEX { memoryChassisId, memorySlotId }
+        ::= { memorySlotTable 1 }
+
+MemorySlotEntry ::=
+    SEQUENCE {
+        memorySlotId DisplayString,
+        memoryFiveSecondsTotal Unsigned32,
+        memoryFiveSecondsUsed Unsigned32,
+        memoryFiveSecondsFree Unsigned32,
+        memoryFiveSecondsBuffered Unsigned32,
+        memoryFiveSecondsCached Unsigned32,
+        memoryFiveSecondsAvailable Unsigned32,
+        memoryFiveSecondsSlabRecl Unsigned32,
+        memoryFiveSecondsSlabUnrecl Unsigned32,
+        memoryFiveMinutesTotal Unsigned32,
+        memoryFiveMinutesUsed Unsigned32,
+        memoryFiveMinutesFree Unsigned32,
+        memoryFiveMinutesBuffered Unsigned32,
+        memoryFiveMinutesCached Unsigned32,
+        memoryFiveMinutesAvailable Unsigned32,
+        memoryFiveMinutesSlabRecl Unsigned32,
+        memoryFiveMinutesSlabUnrecl Unsigned32,
+        memoryThirtyMinutesTotal Unsigned32,
+        memoryThirtyMinutesUsed Unsigned32,
+        memoryThirtyMinutesFree Unsigned32,
+        memoryThirtyMinutesBuffered Unsigned32,
+        memoryThirtyMinutesCached Unsigned32,
+        memoryThirtyMinutesAvailable Unsigned32,
+        memoryThirtyMinutesSlabRecl Unsigned32,
+        memoryThirtyMinutesSlabUnrecl Unsigned32,
+        memoryOneMinuteTotal Unsigned32,
+        memoryOneMinuteUsed Unsigned32,
+        memoryOneMinuteFree Unsigned32,
+        memoryOneMinuteBuffered Unsigned32,
+        memoryOneMinuteCached Unsigned32,
+        memoryOneMinuteAvailable Unsigned32,
+        memoryOneMinuteSlabRecl Unsigned32,
+        memoryOneMinuteSlabUnrecl Unsigned32,
+        memoryFiveSecondsTotalKB Unsigned32,
+        memoryFiveSecondsUsedKB Unsigned32,
+        memoryFiveSecondsFreeKB Unsigned32,
+        memoryFiveSecondsBufferedKB Unsigned32,
+        memoryFiveSecondsCachedKB Unsigned32,
+        memoryFiveSecondsAvailableKB Unsigned32,
+        memoryFiveSecondsSlabReclKB Unsigned32,
+        memoryFiveSecondsSlabUnreclKB Unsigned32,
+        memoryFiveMinutesTotalKB Unsigned32,
+        memoryFiveMinutesUsedKB Unsigned32,
+        memoryFiveMinutesFreeKB Unsigned32,
+        memoryFiveMinutesBufferedKB Unsigned32,
+        memoryFiveMinutesCachedKB Unsigned32,
+        memoryFiveMinutesAvailableKB Unsigned32,
+        memoryFiveMinutesSlabReclKB Unsigned32,
+        memoryFiveMinutesSlabUnreclKB Unsigned32,
+        memoryThirtyMinutesTotalKB Unsigned32,
+        memoryThirtyMinutesUsedKB Unsigned32,
+        memoryThirtyMinutesFreeKB Unsigned32,
+        memoryThirtyMinutesBufferedKB Unsigned32,
+        memoryThirtyMinutesCachedKB Unsigned32,
+        memoryThirtyMinutesAvailableKB Unsigned32,
+        memoryThirtyMinutesSlabReclKB Unsigned32,
+        memoryThirtyMinutesSlabUnreclKB Unsigned32,
+        memoryOneMinuteTotalKB Unsigned32,
+        memoryOneMinuteUsedKB Unsigned32,
+        memoryOneMinuteFreeKB Unsigned32,
+        memoryOneMinuteBufferedKB Unsigned32,
+        memoryOneMinuteCachedKB Unsigned32,
+        memoryOneMinuteAvailableKB Unsigned32,
+        memoryOneMinuteSlabReclKB Unsigned32,
+        memoryOneMinuteSlabUnreclKB Unsigned32
+    }
+
+memorySlotId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot identifier"
+    ::= { memorySlotEntry 1 }
+
+memoryFiveSecondsTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of total memory over the last five seconds"
+    ::= { memorySlotEntry 2 }
+
+memoryFiveSecondsUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of used memory over the last five seconds"
+    ::= { memorySlotEntry 3 }
+
+memoryFiveSecondsFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of free memory over the last five seconds"
+    ::= { memorySlotEntry 4 }
+
+memoryFiveSecondsBuffered OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of buffered memory over the last five seconds"
+    ::= { memorySlotEntry 5 }
+
+memoryFiveSecondsCached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of cached memory over the last five seconds"
+    ::= { memorySlotEntry 6 }
+
+memoryFiveSecondsAvailable OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of available memory over the last five seconds"
+    ::= { memorySlotEntry 7 }
+
+memoryFiveSecondsSlabRecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of reclaimable slab memory over the last five seconds"
+    ::= { memorySlotEntry 8 }
+
+memoryFiveSecondsSlabUnrecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last five seconds"
+    ::= { memorySlotEntry 9 }
+
+memoryFiveMinutesTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of total memory over the last five minutes"
+    ::= { memorySlotEntry 10 }
+
+memoryFiveMinutesUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of used memory over the last five minutes"
+    ::= { memorySlotEntry 11 }
+
+memoryFiveMinutesFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of free memory over the last five minutes"
+    ::= { memorySlotEntry 12 }
+
+memoryFiveMinutesBuffered OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of buffered memory over the last five minutes"
+    ::= { memorySlotEntry 13 }
+
+memoryFiveMinutesCached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of cached memory over the last five minutes"
+    ::= { memorySlotEntry 14 }
+
+memoryFiveMinutesAvailable OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of available memory over the last five minutes"
+    ::= { memorySlotEntry 15 }
+
+memoryFiveMinutesSlabRecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of reclaimable slab memory over the last five minutes"
+    ::= { memorySlotEntry 16 }
+
+memoryFiveMinutesSlabUnrecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last five minutes"
+    ::= { memorySlotEntry 17 }
+
+memoryThirtyMinutesTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of total memory over the last thirty minutes"
+    ::= { memorySlotEntry 18 }
+
+memoryThirtyMinutesUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of used memory over the last thirty minutes"
+    ::= { memorySlotEntry 19 }
+
+memoryThirtyMinutesFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of free memory over the last thirty minutes"
+    ::= { memorySlotEntry 20 }
+
+memoryThirtyMinutesBuffered OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of buffered memory over the last thirty minutes"
+    ::= { memorySlotEntry 21 }
+
+memoryThirtyMinutesCached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of cached memory over the last thirty minutes"
+    ::= { memorySlotEntry 22 }
+
+memoryThirtyMinutesAvailable OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of available memory over the last thirty minutes"
+    ::= { memorySlotEntry 23 }
+
+memoryThirtyMinutesSlabRecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of reclaimable slab memory over the last thirty minutes"
+    ::= { memorySlotEntry 24 }
+
+memoryThirtyMinutesSlabUnrecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last thirty minutes"
+    ::= { memorySlotEntry 25 }
+
+memoryOneMinuteTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of total memory over the last minute"
+    ::= { memorySlotEntry 26 }
+
+memoryOneMinuteUsed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of used memory over the last minute"
+    ::= { memorySlotEntry 27 }
+
+memoryOneMinuteFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of free memory over the last minute"
+    ::= { memorySlotEntry 28 }
+
+memoryOneMinuteBuffered OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of buffered memory over the last minute"
+    ::= { memorySlotEntry 29 }
+
+memoryOneMinuteCached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of cached memory over the last minute"
+    ::= { memorySlotEntry 30 }
+
+memoryOneMinuteAvailable OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of available memory over the last minute"
+    ::= { memorySlotEntry 31 }
+
+memoryOneMinuteSlabRecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of reclaimable slab memory over the last minute"
+    ::= { memorySlotEntry 32 }
+
+memoryOneMinuteSlabUnrecl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last minute"
+    ::= { memorySlotEntry 33 }
+
+memoryFiveSecondsTotalKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of total memory over the last five seconds"
+    ::= { memorySlotEntry 34 }
+
+memoryFiveSecondsUsedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of used memory over the last five seconds"
+    ::= { memorySlotEntry 35 }
+
+memoryFiveSecondsFreeKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of free memory over the last five seconds"
+    ::= { memorySlotEntry 36 }
+
+memoryFiveSecondsBufferedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of buffered memory over the last five seconds"
+    ::= { memorySlotEntry 37 }
+
+memoryFiveSecondsCachedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of cached memory over the last five seconds"
+    ::= { memorySlotEntry 38 }
+
+memoryFiveSecondsAvailableKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of available memory over the last five seconds"
+    ::= { memorySlotEntry 39 }
+
+memoryFiveSecondsSlabReclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of reclaimable slab memory over the last five seconds"
+    ::= { memorySlotEntry 40 }
+
+memoryFiveSecondsSlabUnreclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last five seconds"
+    ::= { memorySlotEntry 41 }
+
+memoryFiveMinutesTotalKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of total memory over the last five minutes"
+    ::= { memorySlotEntry 42 }
+
+memoryFiveMinutesUsedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of used memory over the last five minutes"
+    ::= { memorySlotEntry 43 }
+
+memoryFiveMinutesFreeKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of free memory over the last five minutes"
+    ::= { memorySlotEntry 44 }
+
+memoryFiveMinutesBufferedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of buffered memory over the last five minutes"
+    ::= { memorySlotEntry 45 }
+
+memoryFiveMinutesCachedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of cached memory over the last five minutes"
+    ::= { memorySlotEntry 46 }
+
+memoryFiveMinutesAvailableKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of available memory over the last five minutes"
+    ::= { memorySlotEntry 47 }
+
+memoryFiveMinutesSlabReclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of reclaimable slab memory over the last five minutes"
+    ::= { memorySlotEntry 48 }
+
+memoryFiveMinutesSlabUnreclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last five minutes"
+    ::= { memorySlotEntry 49 }
+
+memoryThirtyMinutesTotalKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of total memory over the last thirty minutes"
+    ::= { memorySlotEntry 50 }
+
+memoryThirtyMinutesUsedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of used memory over the last thirty minutes"
+    ::= { memorySlotEntry 51 }
+
+memoryThirtyMinutesFreeKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of free memory over the last thirty minutes"
+    ::= { memorySlotEntry 52 }
+
+memoryThirtyMinutesBufferedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of buffered memory over the last thirty minutes"
+    ::= { memorySlotEntry 53 }
+
+memoryThirtyMinutesCachedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of cached memory over the last thirty minutes"
+    ::= { memorySlotEntry 54 }
+
+memoryThirtyMinutesAvailableKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of available memory over the last thirty minutes"
+    ::= { memorySlotEntry 55 }
+
+memoryThirtyMinutesSlabReclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of reclaimable slab memory over the last thirty minutes"
+    ::= { memorySlotEntry 56 }
+
+memoryThirtyMinutesSlabUnreclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last thirty minutes"
+    ::= { memorySlotEntry 57 }
+
+memoryOneMinuteTotalKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of total memory over the last minute"
+    ::= { memorySlotEntry 58 }
+
+memoryOneMinuteUsedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of used memory over the last minute"
+    ::= { memorySlotEntry 59 }
+
+memoryOneMinuteFreeKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of free memory over the last minute"
+    ::= { memorySlotEntry 60 }
+
+memoryOneMinuteBufferedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of buffered memory over the last minute"
+    ::= { memorySlotEntry 61 }
+
+memoryOneMinuteCachedKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of cached memory over the last minute"
+    ::= { memorySlotEntry 62 }
+
+memoryOneMinuteAvailableKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of available memory over the last minute"
+    ::= { memorySlotEntry 63 }
+
+memoryOneMinuteSlabReclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of reclaimable slab memory over the last minute"
+    ::= { memorySlotEntry 64 }
+
+memoryOneMinuteSlabUnreclKB OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "KBytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average amount of unreclaimable slab memory over the last minute"
+    ::= { memorySlotEntry 65 }
+
+END

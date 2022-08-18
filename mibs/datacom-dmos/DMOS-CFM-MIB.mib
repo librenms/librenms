@@ -1,0 +1,306 @@
+DMOS-CFM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    datacomDevicesMIBs
+        FROM DATACOM-SMI
+;
+
+dmosCfmMIB MODULE-IDENTITY
+    LAST-UPDATED "202009160000Z"
+    ORGANIZATION "DATACOM"
+    CONTACT-INFO
+                 "DATACOM
+
+                 Postal: DATACOM
+                     Rua America, 1000
+                     Eldorado do Sul, RS
+                     CEP 92990-000
+                             BRAZIL
+
+                 Tel:+55(51)3933 3000
+                 Fax:+55(51)3933 3003
+
+                 E-mail: datacom@datacom.ind.br "
+    DESCRIPTION "The DmOS MIB module for the CFM protocol"
+    REVISION "202009160000Z"
+    DESCRIPTION "Initial revision."
+    ::= { datacomDevicesMIBs 14 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+CfmFngTimer ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "<2500-10000>;;Time in milliseconds (100ms step)"
+    SYNTAX      Integer32 (2500 .. 10000)
+
+CfmIntfStatusTlv ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {up(0),down(1),testing(2),unknown(3),dormant(4),not-Present(5),lower-Layer-Down(6),invalid(7)}
+
+CfmMaId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING (SIZE (1 .. 43))
+
+CfmMdId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING (SIZE (1 .. 43))
+
+CfmMepId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "<1-8191>;;MEP unique identifier inside this MA"
+    SYNTAX      Integer32 (1 .. 8191)
+
+CfmPortStateTlv ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {blocked(0),unblocked(1),not-Present(2),invalid(3)}
+
+CfmVlanId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+-- Display information about CFM Delay Measurement Probe
+cfmDelayMeasurement OBJECT IDENTIFIER ::= { dmosCfmMIB 1 }
+
+cfmDelayMeasurementProbeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CfmDelayMeasurementProbeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display CFM Delay Measurement Probes List"
+    ::= { cfmDelayMeasurement 1 }
+
+cfmDelayMeasurementProbeEntry OBJECT-TYPE
+    SYNTAX      CfmDelayMeasurementProbeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { cfmDelayMeasurementProbeId }
+        ::= { cfmDelayMeasurementProbeTable 1 }
+
+CfmDelayMeasurementProbeEntry ::=
+    SEQUENCE {
+        cfmDelayMeasurementProbeId UnsignedShort
+    }
+
+cfmDelayMeasurementProbeId OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeEntry 1 }
+
+cfmDelayMeasurementProbeSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CfmDelayMeasurementProbeSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display CFM Delay Measurement Sessions"
+    ::= { cfmDelayMeasurement 2 }
+
+cfmDelayMeasurementProbeSessionEntry OBJECT-TYPE
+    SYNTAX      CfmDelayMeasurementProbeSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { cfmDelayMeasurementProbeId, cfmDelayMeasurementProbeSessionId }
+        ::= { cfmDelayMeasurementProbeSessionTable 1 }
+
+CfmDelayMeasurementProbeSessionEntry ::=
+    SEQUENCE {
+        cfmDelayMeasurementProbeSessionId UnsignedShort,
+        cfmDelayMeasurementProbeSessionPcp Integer32,
+        cfmDelayMeasurementProbeSessionLastAvgDelay Integer32,
+        cfmDelayMeasurementProbeSessionLastMinDelay Integer32,
+        cfmDelayMeasurementProbeSessionLastMaxDelay Integer32,
+        cfmDelayMeasurementProbeSessionLastAvgJitter Integer32,
+        cfmDelayMeasurementProbeSessionLastMinJitter Integer32,
+        cfmDelayMeasurementProbeSessionLastMaxJitter Integer32,
+        cfmDelayMeasurementProbeSessionLastLossRatio Integer32,
+        cfmDelayMeasurementProbeSessionLastPcpMismatchRatio Integer32,
+        cfmDelayMeasurementProbeSessionAllAvgDelay Integer32,
+        cfmDelayMeasurementProbeSessionAllMinDelay Integer32,
+        cfmDelayMeasurementProbeSessionAllMaxDelay Integer32,
+        cfmDelayMeasurementProbeSessionAllAvgJitter Integer32,
+        cfmDelayMeasurementProbeSessionAllMinJitter Integer32,
+        cfmDelayMeasurementProbeSessionAllMaxJitter Integer32,
+        cfmDelayMeasurementProbeSessionAllLossRatio Integer32,
+        cfmDelayMeasurementProbeSessionAllPcpMismatchRatio Integer32
+    }
+
+cfmDelayMeasurementProbeSessionId OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 1 }
+
+cfmDelayMeasurementProbeSessionPcp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Display data of a session with a specific PCP"
+    ::= { cfmDelayMeasurementProbeSessionEntry 2 }
+
+cfmDelayMeasurementProbeSessionLastAvgDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 3 }
+
+cfmDelayMeasurementProbeSessionLastMinDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 4 }
+
+cfmDelayMeasurementProbeSessionLastMaxDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 5 }
+
+cfmDelayMeasurementProbeSessionLastAvgJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 6 }
+
+cfmDelayMeasurementProbeSessionLastMinJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 7 }
+
+cfmDelayMeasurementProbeSessionLastMaxJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 8 }
+
+cfmDelayMeasurementProbeSessionLastLossRatio OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 9 }
+
+cfmDelayMeasurementProbeSessionLastPcpMismatchRatio OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 10 }
+
+cfmDelayMeasurementProbeSessionAllAvgDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 11 }
+
+cfmDelayMeasurementProbeSessionAllMinDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 12 }
+
+cfmDelayMeasurementProbeSessionAllMaxDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 13 }
+
+cfmDelayMeasurementProbeSessionAllAvgJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 14 }
+
+cfmDelayMeasurementProbeSessionAllMinJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 15 }
+
+cfmDelayMeasurementProbeSessionAllMaxJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "us"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 16 }
+
+cfmDelayMeasurementProbeSessionAllLossRatio OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 17 }
+
+cfmDelayMeasurementProbeSessionAllPcpMismatchRatio OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { cfmDelayMeasurementProbeSessionEntry 18 }
+
+END
