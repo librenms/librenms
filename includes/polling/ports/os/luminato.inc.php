@@ -23,20 +23,20 @@
  *
  * @author     peca.nesovanovic@sattrakt.com
  */
+
 $ver = intval($device['version']);
 d_echo('PORTS: Luminato v' . $ver);
 
-$rfcmib = SnmpQuery::walk('RFC1213-MIB::ifSpeed')->table(2);
+// add IF-MIB::ifSpeed if missing
+if (! array_key_exists('ifSpeed', Arr::first($port_stats))) {
+    SnmpQuery::hideMib()->walk('IF-MIB::ifSpeed')->table(2, $port_stats);
+}
 
+// emulate ifOperStatus if missing and ver >= 20 ifSpeed is actually ifHighSpeed
 foreach ($port_stats as $key => $data) {
-    $speed = $rfcmib[$key]['RFC1213-MIB::ifSpeed'];
-
-    if ($ver >= 20) {
+    if (empty($data['ifOperStatus'])) {
         $port_stats[$key]['ifOperStatus'] = $data['ifConnectorPresent'] ? 'up' : 'down';
-    } else {
-        $speed = $speed / 1000000;
     }
 
-    $port_stats[$key]['ifHighSpeed'] = $speed;
-    $port_stats[$key]['ifSpeed'] = 0;
+    $port_stats[$key]['ifHighSpeed'] = ($ver < 20 ? $data['ifSpeed'] / 1000000 : $data['ifSpeed']);
 }
