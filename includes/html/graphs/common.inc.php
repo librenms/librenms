@@ -94,11 +94,14 @@ if ($_GET['bg']) {
     $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';
 }
 
+if ($_GET['bbg']) {
+    $rrd_options .= ' -c BACK#' . Clean::alphaDash($_GET['bbg']) . ' ';
+}
+
 if ($_GET['font']) {
     $rrd_options .= ' -c FONT#' . Clean::alphaDash($_GET['font']) . ' ';
 }
 
-// $rrd_options .= " -c BACK#FFFFFF";
 if ($height < '99') {
     $rrd_options .= ' --only-graph';
 }
