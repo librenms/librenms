@@ -520,7 +520,7 @@
                 },
                 {
                     "metric": "VMs_cuckoo70_ip",
-                    "value": "",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -682,6 +682,18 @@
                 },
                 {
                     "metric": "VMs_cuckoo71_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_console_type",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
@@ -892,7 +904,7 @@
                 },
                 {
                     "metric": "VMs_cuckoo71_ip",
-                    "value": "",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1054,6 +1066,18 @@
                 },
                 {
                     "metric": "VMs_cuckoo72_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_console_type",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
@@ -1264,7 +1288,7 @@
                 },
                 {
                     "metric": "VMs_cuckoo72_ip",
-                    "value": "",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1426,6 +1450,18 @@
                 },
                 {
                     "metric": "VMs_win10-base_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console_type",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
@@ -1636,7 +1672,7 @@
                 },
                 {
                     "metric": "VMs_win10-base_ip",
-                    "value": "",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -2008,7 +2044,7 @@
                 },
                 {
                     "metric": "VMs_win10_ip",
-                    "value": "",
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
