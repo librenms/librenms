@@ -22,7 +22,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"hv\":\"libvirt\",\"VMs\":[\"cucko...\":[]}}"
+                    "data": "{\"hv\":\"libvirt\",\"VMs\":[\"cuckoo70\",\"cuckoo71\",\"cuckoo72\",\"win10\",\"win10-base\"],\"VMdisks\":{\"cuckoo70\":[\"sda\",\"sdb\"],\"cuckoo71\":[\"sda\",\"sdb\"],\"cuckoo72\":[\"sda\",\"sdb\"],\"win10\":[\"sda\",\"sdb\"],\"win10-base\":[\"sda\",\"sdb\"]},\"VMdifs\":[],\"VMdstatus\":[],\"VMifs\":{\"cuckoo70\":[],\"cuckoo71\":[],\"cuckoo72\":[],\"win10\":[],\"win10-base\":[]}}"
                 }
             ],
             "application_metrics": [
@@ -299,18 +299,6 @@
                 {
                     "metric": "VMs_cuckoo70_coll",
                     "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_cuckoo70_console",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_cuckoo70_console_type",
-                    "value": "",
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -687,18 +675,6 @@
                     "app_type": "hv-monitor"
                 },
                 {
-                    "metric": "VMs_cuckoo71_console",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_cuckoo71_console_type",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
                     "metric": "VMs_cuckoo71_cow",
                     "value": 0,
                     "value_prev": null,
@@ -1067,18 +1043,6 @@
                 {
                     "metric": "VMs_cuckoo72_coll",
                     "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_cuckoo72_console",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_cuckoo72_console_type",
-                    "value": "",
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1455,18 +1419,6 @@
                     "app_type": "hv-monitor"
                 },
                 {
-                    "metric": "VMs_win10-base_console",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_console_type",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
                     "metric": "VMs_win10-base_cow",
                     "value": 0,
                     "value_prev": null,
@@ -1835,18 +1787,6 @@
                 {
                     "metric": "VMs_win10_coll",
                     "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10_console",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10_console_type",
-                    "value": "",
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
