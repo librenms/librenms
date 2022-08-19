@@ -18,20 +18,14 @@
                 {
                     "app_type": "hv-monitor",
                     "app_state": "OK",
-                    "discovered": "1",
+                    "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": null
+                    "data": "{\"hv\":\"libvirt\",\"VMs\":[\"cucko...\":[]}}"
                 }
             ],
             "application_metrics": [
-                {
-                    "metric": "hv",
-                    "value": "libvirt",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
                 {
                     "metric": "totals_blocked",
                     "value": 0,
