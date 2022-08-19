@@ -179,6 +179,7 @@ return [
          * LibreNMS Service Providers...
          */
         App\Providers\ConfigServiceProvider::class,
+        App\Providers\ErrorReportingProvider::class,
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
@@ -246,6 +247,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
+        'Flare' => Facade\Ignition\Facades\Flare::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,

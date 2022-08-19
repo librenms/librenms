@@ -37,6 +37,7 @@ global $vars, $console_color;
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+const IGNORE_ERRORS = true;
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -87,7 +88,6 @@ if (module_selected('web', $init_modules)) {
     Laravel::bootCli();
 }
 Debug::set($debug ?? false); // override laravel configured settings (hides legacy errors too)
-restore_error_handler(); // disable Laravel error handler
 
 if (! module_selected('nodb', $init_modules)) {
     if (! \LibreNMS\DB\Eloquent::isConnected()) {

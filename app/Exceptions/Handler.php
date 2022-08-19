@@ -63,6 +63,12 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
+    public function report(Throwable $e)
+    {
+        parent::report($e);
+        \Flare::report($e);
+    }
+
     protected function convertExceptionToArray(Throwable $e)
     {
         // override the non-debug error output to clue in user on how to debug
