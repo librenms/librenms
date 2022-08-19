@@ -23,7 +23,6 @@
  *
  * @author     peca.nesovanovic@sattrakt.com
  */
-
 $ver = intval($device['version']);
 d_echo('PORTS: Luminato v' . $ver);
 
