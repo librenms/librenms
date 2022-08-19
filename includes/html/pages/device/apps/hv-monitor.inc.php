@@ -100,11 +100,11 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
                generate_device_link([device_id=>$port->device_id]) .
                ', ' .
                generate_port_link([
-                                   'label' => $port->label,
-                                   'port_id' => $port->port_id,
-                                   'ifName' => $port->ifName,
-                                   'device_id' => $port->device_id,
-                                  ]) .
+                   'label' => $port->label,
+                   'port_id' => $port->port_id,
+                   'ifName' => $port->ifName,
+                   'device_id' => $port->device_id,
+               ]) .
             ')';
     }
     echo "<br>\n";
