@@ -9,7 +9,7 @@ $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg',$vars['package']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg___-___',$vars['package']]);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {

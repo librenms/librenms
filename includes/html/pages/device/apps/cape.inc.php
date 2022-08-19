@@ -78,6 +78,7 @@ if (isset($vars['package'])) {
         'cape_running_processes' => 'Running Processes Per Run Stats During Time Slot',
         'cape_signatures_alert' => 'Signatures Alert Per Run Stats During Time Slot',
         'cape_signatures_total' => 'Signatures Total Per Run Stats During Time Slot',
+        'cape_malscore' => 'Malscore Stats During Time Slot',
     ];
 }else{
     if (sizeof($packages) > 0) {
@@ -105,6 +106,7 @@ if (isset($vars['package'])) {
             'cape_signatures_alert_pkg' => 'Signatures Alert Per Run Stats During Time Slot By Package',
             'cape_signatures_total' => 'Signatures Total Per Run Stats During Time Slot',
             'cape_signatures_total_pkg' => 'Signatures Total Per Run Stats During Time Slot By Package',
+            'cape_malscore' => 'Malscore Stats During Time Slot',
         ];
     } else {
         $graphs = [
@@ -121,6 +123,7 @@ if (isset($vars['package'])) {
             'cape_running_processes' => 'Running Processes Per Run Stats During Time Slot',
             'cape_signatures_alert' => 'Signatures Alert Per Run Stats During Time Slot',
             'cape_signatures_total' => 'Signatures Total Per Run Stats During Time Slot',
+            'cape_malscore' => 'Malscore Stats During Time Slot',
         ];
    }
 }
