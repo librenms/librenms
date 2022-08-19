@@ -303,6 +303,18 @@
                     "app_type": "hv-monitor"
                 },
                 {
+                    "metric": "VMs_cuckoo70_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
                     "metric": "VMs_cuckoo70_cow",
                     "value": 0,
                     "value_prev": null,
