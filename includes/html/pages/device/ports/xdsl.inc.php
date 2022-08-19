@@ -19,4 +19,3 @@ foreach ($ports as $port) {
 }
 echo '</table></div>';
 echo "<div style='min-height: 150px;'></div>";
-

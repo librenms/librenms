@@ -5,7 +5,7 @@ use LibreNMS\Config;
 if (Config::get('enable_ports_adsl')) {
     //discover if any port has dsl data.
     $adsl_stats = snmpwalk_cache_oid($device, 'adslMibObjects', [], 'ADSL-LINE-MIB');
-    $vdsl_stats = snmpwalk_cache_oid($device, 'xdsl2LineEntry', [], 'VDSL2-LINE-MIB');
+    $vdsl_stats = snmpwalk_cache_oid($device, 'vdsl2MIB', [], 'VDSL2-LINE-MIB');
     d_echo($adsl_stats);
     d_echo($vdsl_stats);
 

@@ -359,7 +359,11 @@ if ($vdsl_id) {
     $port_vdsl_tree2 = snmpwalk_group($device, 'xdsl2LineEntry','VDSL2-LINE-MIB', 2);
 
     foreach($port_vdsl_tree1 as $key => $val) {
-        $port_stats[$key] = array_merge_recursive($port_stats[$key], $val,$port_vdsl_tree2[$key]);
+        if (isset($port_vdsl_tree2[$key])) {
+            $port_stats[$key] = array_merge_recursive($port_stats[$key], $val,$port_vdsl_tree2[$key]);
+        } else {
+            $port_stats[$key] = array_merge_recursive($port_stats[$key], $val);
+        }
     }
 }//end if
 

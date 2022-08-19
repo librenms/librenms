@@ -35,15 +35,15 @@ if (isset($this_port['xtuc'])) {
     }
     $rrd_att_name = Rrd::portName($port_id, 'xdsl2LineStatusAttainableRate');
     $rrd_att_def = RrdDefinition::make()->disableNameChecking()
-        ->addDataset('ds', 'GAUGE', 0, 99999999)
-        ->addDataset('us', 'GAUGE', 0, 99999999);
+        ->addDataset('ds', 'GAUGE', 0)
+        ->addDataset('us', 'GAUGE', 0);
 //    'xdsl2LineStatusAttainableRateDs' => '153868',
 //    'xdsl2LineStatusAttainableRateUs' => '51824',
 
-    $rrd_act_name = Rrd::portName($port_id, 'xdsl2LineStatusActRate');
+    $rrd_act_name = Rrd::portName($port_id, 'xdsl2ChStatusActDataRate');
     $rrd_act_def = RrdDefinition::make()->disableNameChecking()
-        ->addDataset('xtuc', 'GAUGE', 0, 99999999)
-        ->addDataset('xtur', 'GAUGE', 0, 99999999);
+        ->addDataset('xtuc', 'GAUGE', 0)
+        ->addDataset('xtur', 'GAUGE', 0);
 //  array (
 //    'xtuc' =>
 //    array (
