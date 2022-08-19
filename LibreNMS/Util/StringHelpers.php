@@ -55,6 +55,7 @@ class StringHelpers
             'fbsd-nfs-server' => 'FreeBSD NFS Server',
             'freeradius' => 'FreeRADIUS',
             'gpsd' => 'GPSD',
+            'hv-monitor' => 'HV Monitor',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
             'nfs-server' => 'NFS Server',
