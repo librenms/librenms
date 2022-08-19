@@ -52,14 +52,16 @@ if (sizeof($packages) > 0) {
 
 echo "<b>Show Standard Deviation:</b> ";
 
-if ($vars['stddev'] == 'on') {
-    $label = '<span class="pagemenu-selected">On</span>';
-    echo generate_link($label, $link_array, ['stddev'=>'on']) . ', ' .
-    generate_link('Off', $link_array, ['stddev'=>'off']);
-}else{
-    $label = '<span class="pagemenu-selected">Off</span>';
-    echo generate_link('On', $link_array, ['stddev'=>'on']) . ', ' .
-    generate_link($label, $link_array, ['stddev'=>'off']);
+if (sizeof($packages) > 0) {
+    if ($vars['stddev'] == 'on') {
+        $label = '<span class="pagemenu-selected">On</span>';
+        echo generate_link($label, $link_array, ['stddev'=>'on']) . ', ' .
+        generate_link('Off', $link_array, ['stddev'=>'off']);
+    }else{
+        $label = '<span class="pagemenu-selected">Off</span>';
+        echo generate_link('On', $link_array, ['stddev'=>'on']) . ', ' .
+        generate_link($label, $link_array, ['stddev'=>'off']);
+    }
 }
 
 print_optionbar_end();
@@ -112,18 +114,7 @@ if (isset($vars['package'])) {
         $graphs = [
             'cape_status' => 'Run Statuses',
             'cape_lines' => 'Log Lines',
-            'cape_run_stats' => 'Run Stats',
-            'cape_anti_issues' => 'Anti Issues Per Run Stats During Time Slot',
-            'cape_api_calls' => 'API Calls Per Run Stats During Time Slot',
-            'cape_crash_issues' => 'Crash Issues Per Run Stats During Time Slot',
-            'cape_domains' => 'Domains Per Run Stats During Time Slot',
-            'cape_dropped_files' => 'Dropped Files Per Run Stats During Time Slot',
-            'cape_files_written' => 'Files Written Per Run Stats During Time Slot',
-            'cape_registry_keys_modified' => 'Registry Keys Modified Per Run Stats During Time Slot',
-            'cape_running_processes' => 'Running Processes Per Run Stats During Time Slot',
-            'cape_signatures_alert' => 'Signatures Alert Per Run Stats During Time Slot',
-            'cape_signatures_total' => 'Signatures Total Per Run Stats During Time Slot',
-            'cape_malscore' => 'Malscore Stats During Time Slot',
+            'cape_pending' => 'Pending',
         ];
    }
 }
