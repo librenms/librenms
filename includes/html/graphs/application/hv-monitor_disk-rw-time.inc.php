@@ -25,7 +25,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr'    => 'Write',
         'ds'       => 'wtime',
-        'invert'   => true
+        'invert'   => true,
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');

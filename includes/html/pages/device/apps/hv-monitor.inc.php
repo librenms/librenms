@@ -11,13 +11,13 @@ $link_array = [
 
 print_optionbar_start();
 
-if (!isset($vars['vm'])){
+if (! isset($vars['vm'])) {
     echo generate_link('<span class="pagemenu-selected"><b>Totals</b></span>', $link_array);
-}else{
+} else {
     echo generate_link('<b>Totals</b>', $link_array);
 }
 echo '<b> | VMs: </b>';
-$vm_links=[];
+$vm_links = [];
 foreach ($app->data['VMs'] as $vm) {
     $label = $vm;
 
@@ -29,62 +29,62 @@ foreach ($app->data['VMs'] as $vm) {
 }
 echo implode(', ', $vm_links);
 
-if (!isset($vars['vmif']) && !isset($vars['vmdisk'])){
-    if (!isset($vars['vmpage'])) {
+if (! isset($vars['vmif']) && ! isset($vars['vmdisk'])) {
+    if (! isset($vars['vmpage'])) {
         $vars['vmpage'] = 'general';
     }
 }
 
 echo '<br><b>Pages: </b>';
 if ($vars['vmpage'] == 'general') {
-    $page_links[]='<span class="pagemenu-selected">General</span>';
+    $page_links[] = '<span class="pagemenu-selected">General</span>';
 } else {
-    $page_links[]=generate_link('General', $link_array, ['vm' => $vars['vm'],'vmpage'=>'general']);
+    $page_links[] = generate_link('General', $link_array, ['vm' => $vars['vm'], 'vmpage'=>'general']);
 }
 if ($vars['vmpage'] == 'disk') {
-    $page_links[]='<span class="pagemenu-selected">Disk</span>';
+    $page_links[] = '<span class="pagemenu-selected">Disk</span>';
 } else {
-    $page_links[]=generate_link('Disk', $link_array, ['vm' => $vars['vm'],'vmpage'=>'disk']);
+    $page_links[] = generate_link('Disk', $link_array, ['vm' => $vars['vm'], 'vmpage'=>'disk']);
 }
 if ($vars['vmpage'] == 'network') {
-    $page_links[]='<span class="pagemenu-selected">Network</span>';
+    $page_links[] = '<span class="pagemenu-selected">Network</span>';
 } else {
-    $page_links[]=generate_link('Network', $link_array, ['vm' => $vars['vm'],'vmpage'=>'network']);
+    $page_links[] = generate_link('Network', $link_array, ['vm' => $vars['vm'], 'vmpage'=>'network']);
 }
 if ($vars['vmpage'] == 'Snapshots') {
-    $page_links[]='<span class="pagemenu-selected">Network</span>';
+    $page_links[] = '<span class="pagemenu-selected">Network</span>';
 } else {
-     $page_links[]=generate_link('Snapshots', $link_array, ['vm' => $vars['vm'],'vmpage'=>'snapshots']);
+    $page_links[] = generate_link('Snapshots', $link_array, ['vm' => $vars['vm'], 'vmpage'=>'snapshots']);
 }
 echo implode(', ', $page_links);
 
-if (isset($vars['vm'])){
+if (isset($vars['vm'])) {
     echo '<br><b>Disks:</b> ';
-    $disk_links=[];
+    $disk_links = [];
     foreach ($app->data['VMdisks'][$vars['vm']] as $index => $disk) {
-            $label = $disk;
+        $label = $disk;
 
-            if ($vars['vmdisk'] == $disk) {
-                $label = '<span class="pagemenu-selected">' . $disk . '</span>';
-            }
-            if ($vars['vmdisk'] == $disk) {
-                $disk_links[] = $label;
-            } else {
-                $disk_links[] = generate_link($label, $link_array, ['vm' => $vars['vm'],'vmdisk'=>$disk]);
-            }
+        if ($vars['vmdisk'] == $disk) {
+            $label = '<span class="pagemenu-selected">' . $disk . '</span>';
+        }
+        if ($vars['vmdisk'] == $disk) {
+            $disk_links[] = $label;
+        } else {
+            $disk_links[] = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmdisk'=>$disk]);
+        }
     }
     echo implode(', ', $disk_links);
 
-    echo "<br><b>Interfaces:</b> ";
-    $if_links=[];
+    echo '<br><b>Interfaces:</b> ';
+    $if_links = [];
     foreach ($app->data['VMifs'][$vars['vm']] as $vmif => $if_info) {
         $label = $vmif;
 
         if ($vars['vmif'] == $vmif) {
-            $if_links[]='<span class="pagemenu-selected">' . $vmif . '</span>';
+            $if_links[] = '<span class="pagemenu-selected">' . $vmif . '</span>';
         } else {
-            $if_links[]=generate_link($label, $link_array, ['vm' => $vars['vm'],'vmif'=>$vmif]);
-       }
+            $if_links[] = generate_link($label, $link_array, ['vm' => $vars['vm'], 'vmif'=>$vmif]);
+        }
     }
     echo implode(', ', $if_links);
 }
@@ -94,7 +94,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
 
     echo "\n<br>\n" .
-        '<b>MAC:</b> '. $mac;
+        '<b>MAC:</b> ' . $mac;
     if (isset($port) && isset($mac) && $mac != '') {
         echo ' (' .
                generate_device_link([device_id=>$port->device_id]) .
@@ -105,7 +105,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
                                    'ifName' => $port->ifName,
                                    'device_id' => $port->device_id,
                                   ]) .
-            ")";
+            ')';
     }
     echo "<br>\n";
 
@@ -118,8 +118,8 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     //
     // Mainly for CBSD
     $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']]);
-    if (!isset($port)) {
-        echo '<b>HV if:</b> '.$app->data['VMifs'][$vars['vm']][$vars['vmif']]['if'] . "\n";
+    if (! isset($port)) {
+        echo '<b>HV if:</b> ' . $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if'] . "\n";
     } else {
         echo '<b>HV if:</b> ' .
             generate_port_link([
@@ -133,8 +133,8 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
     // Not likely to be known on Libvirt systems thanks to Libvirt sucking at reporting some info... and IF stuff in general
     if ($app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent'] != '') {
         $port = Port::with('device')->firstWhere(['device_id' => $app->device_id, 'ifName' => $app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent']]);
-        if (!isset($port)) {
-            echo '<br><b>HV parent if:</b> '.$app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent'];
+        if (! isset($port)) {
+            echo '<br><b>HV parent if:</b> ' . $app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent'];
         } else {
             echo '<br><b>HV parent if:</b> ' .
                 generate_port_link([
@@ -149,7 +149,6 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
 
 print_optionbar_end();
 
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -158,11 +157,11 @@ $link_array = [
 ];
 
 $graphs = [];
-if (!isset($vars['vm']) && isset($vars['vmpage']) && $vars['vmpage'] == 'general') {
+if (! isset($vars['vm']) && isset($vars['vmpage']) && $vars['vmpage'] == 'general') {
     $graphs['hv-monitor_status'] = 'VM Statuses Count';
 }
 
-if (!isset($vars['vmdisk']) and !isset($vars['vmif'])) {
+if (! isset($vars['vmdisk']) and ! isset($vars['vmif'])) {
     if (isset($vars['vmpage']) && $vars['vmpage'] == 'general') {
         if (isset($vars['vm']) && $app->data['hv'] == 'libvirt') {
             $graphs['hv-monitor_status-int'] = 'VM Status: 0=no state, 1=running, 2=blocked, 3=paused, 4=being shut down, 5=shut off, 6=crashed, 7=PM suspended';
@@ -182,17 +181,17 @@ if (!isset($vars['vmdisk']) and !isset($vars['vmif'])) {
     if (isset($vars['vmpage']) && $vars['vmpage'] == 'disk') {
         $graphs['hv-monitor_disk-size2'] = 'Disk Size';
         // Linux does not support fetching block IO for procs
-        if($app->data['hv'] != 'libvirt'){
+        if ($app->data['hv'] != 'libvirt') {
             $graphs['hv-monitor_disk-rw-blocks'] = 'Disk RW, Blocks';
         }
         $graphs['hv-monitor_disk-rw-bytes'] = 'Disk RW, Bytes';
         $graphs['hv-monitor_disk-rw-reqs'] = 'Disk RW, Requests';
         $graphs['hv-monitor_cow'] = 'COWs';
-        if($app->data['hv'] == 'CBSD'){
+        if ($app->data['hv'] == 'CBSD') {
             $graphs['hv-monitor_disk-rw-time'] = 'Disk RW, Time';
         }
         // does not appear to be a tracked stat on FreeBSD
-        if($app->data['hv'] == 'libvirt'){
+        if ($app->data['hv'] == 'libvirt') {
             $graphs['hv-monitor_disk-ftime'] = 'Disk Flush, Time';
             $graphs['hv-monitor_disk-freqs'] = 'Disk Flush, Requests';
         }
@@ -202,7 +201,7 @@ if (!isset($vars['vmdisk']) and !isset($vars['vmif'])) {
         $graphs['hv-monitor_snaps'] = 'Snapshots';
         // curious not supported by libvirt
         // CBSD and other future bhyve based ones this is easy to get if using ZFS
-        if($app->data['hv'] == 'CBSD'){
+        if ($app->data['hv'] == 'CBSD') {
             $graphs['hv-monitor_snaps_size'] = 'Snapshots Size';
         }
     }
@@ -218,10 +217,10 @@ if (!isset($vars['vmdisk']) and !isset($vars['vmif'])) {
     $graphs['hv-monitor_disk-size'] = 'Size';
     $graphs['hv-monitor_disk-rw-bytes'] = 'Disk RW, Bytes';
     $graphs['hv-monitor_disk-rw-reqs'] = 'Disk RW, Requests';
-    if($app->data['hv'] != 'CBSD'){
+    if ($app->data['hv'] != 'CBSD') {
         $graphs['hv-monitor_disk-rw-time'] = 'Disk RW, Time';
     }
-    if($app->data['hv'] == 'libvirt'){
+    if ($app->data['hv'] == 'libvirt') {
         $graphs['hv-monitor_disk-ftime'] = 'Disk Flush, Time';
         $graphs['hv-monitor_disk-freqs'] = 'Disk Flush, Requests';
     }
@@ -232,9 +231,6 @@ if (!isset($vars['vmdisk']) and !isset($vars['vmif'])) {
     $graphs['hv-monitor_net-drops'] = 'Drops';
     $graphs['hv-monitor_net-coll'] = 'Collisions';
 }
-
-
-
 
 foreach ($graphs as $key => $text) {
     $graph_type = $key;

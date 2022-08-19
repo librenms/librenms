@@ -15,7 +15,7 @@ try {
     return;
 }
 
-$app_data['hv']=$return_data['hv'];
+$app_data['hv'] = $return_data['hv'];
 
 if (! is_array($app_data['VMs'])) {
     $app_data['VMs'] = [];
@@ -188,9 +188,9 @@ $vm_rrd_def = RrdDefinition::make()
     ->addDataset('odrop', 'DERIVE', 0)
     ->addDataset('coll', 'DERIVE', 0);
 
-$VMs=[];
+$VMs = [];
 foreach ($return_data['VMs'] as $vm => $vm_info) {
-    $VMs[]=$vm;
+    $VMs[] = $vm;
 
     $vm_fields = [
         'usertime' => $vm_info['usertime'],
@@ -235,7 +235,7 @@ foreach ($return_data['VMs'] as $vm => $vm_info) {
         'coll' => $vm_info['coll'],
     ];
 
-    $rrd_name = ['app', $name, $app_id,'vm',$vm];
+    $rrd_name = ['app', $name, $app_id, 'vm', $vm];
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $vm_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $vm_fields);
 }
@@ -258,13 +258,11 @@ $disk_rrd_def = RrdDefinition::make()
     ->addDataset('ftime', 'DDERIVE', 0)
     ->addDataset('freqs', 'DERIVE', 0);
 
-
-
 foreach ($VMs as $vm) {
-    $vm_disks=[];
+    $vm_disks = [];
 
     foreach ($return_data['VMs'][$vm]['disks'] as $disk => $disk_info) {
-        $vm_disks[]=$disk;
+        $vm_disks[] = $disk;
 
         $disk_fields = [
             'in_use' => $disk_info['in_use'],
@@ -280,13 +278,13 @@ foreach ($VMs as $vm) {
             'freqs' => $disk_info['freqs'],
         ];
 
-        $rrd_name = ['app', $name, $app_id,'vmdisk',$vm,'__-__',$disk];
+        $rrd_name = ['app', $name, $app_id, 'vmdisk', $vm, '__-__', $disk];
         $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $disk_rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $disk_fields);
     }
     sort($vm_disks);
 
-    $app_data['VMdisks'][$vm]=$vm_disks;
+    $app_data['VMdisks'][$vm] = $vm_disks;
 }
 
 //
@@ -304,10 +302,10 @@ $if_rrd_def = RrdDefinition::make()
     ->addDataset('coll', 'DERIVE', 0);
 
 foreach ($VMs as $vm) {
-    $vm_ifs=[];
+    $vm_ifs = [];
 
     foreach ($return_data['VMs'][$vm]['ifs'] as $vm_if => $if_info) {
-        $vm_ifs[$vm_if]=[
+        $vm_ifs[$vm_if] = [
             'mac' => $if_info['mac'],
             'parent' => $if_info['parent'],
             'if' => $if_info['if'],
@@ -325,12 +323,12 @@ foreach ($VMs as $vm) {
             'coll' => $if_info['coll'],
         ];
 
-        $rrd_name = ['app', $name, $app_id,'vmif',$vm,'__-__',$vm_if];
+        $rrd_name = ['app', $name, $app_id, 'vmif', $vm, '__-__', $vm_if];
         $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $if_rrd_def, 'rrd_name' => $rrd_name];
         data_update($device, 'app', $tags, $if_fields);
     }
 
-    $app_data['VMifs'][$vm]=$vm_ifs;
+    $app_data['VMifs'][$vm] = $vm_ifs;
 }
 //
 // all done so update the app metrics and app_data

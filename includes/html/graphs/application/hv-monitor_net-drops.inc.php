@@ -27,7 +27,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'filename' => $rrd_filename,
         'descr'    => 'Out',
         'ds'       => 'odrop',
-        'invert'   => true
+        'invert'   => true,
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
