@@ -1006,11 +1006,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:getDomainSid\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:getFullname\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1122,11 +1117,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\ActiveDirectoryAuthorizer\\:\\:getDn\\(\\) has parameter \\$samaccountname with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\ActiveDirectoryAuthorizer\\:\\:getDomainSid\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
 
