@@ -14,9 +14,8 @@ if (isset($vars['stddev'])) {
     $vars['stddev']='off';
 }
 
-print_optionbar_start();
-
 if (sizeof($packages) > 0) {
+    print_optionbar_start();
 
     if (isset($vars['package'])) {
         echo generate_link('General', $link_array, []);
@@ -29,7 +28,6 @@ if (sizeof($packages) > 0) {
     $packages_int = 0;
     while(isset($packages[$packages_int])) {
         $package = $packages[$packages_int];
-##        $package=preg_filter('/^pkg\-/', '', $package);
         $label = $package;
 
         if ($vars['package'] == $package) {
@@ -48,9 +46,7 @@ if (sizeof($packages) > 0) {
     }
 
     echo "<br>\n";
-}
 
-if (sizeof($packages) > 0) {
     echo "<b>Show Standard Deviation:</b> ";
     if ($vars['stddev'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
