@@ -53,14 +53,4 @@ return [
 
     'node_id' => env('NODE_ID'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Flare KEY
-    |--------------------------------------------------------------------------
-    |
-    | Key used to send errors to Flare
-    */
-
-    'flare_key' => env('FLARE_KEY', 'quYFBTFNKHLBqFCoeo5yDVOQNbs6muV1'),
-
 ];
