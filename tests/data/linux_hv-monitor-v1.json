@@ -1449,403 +1449,19 @@
                     "app_type": "hv-monitor"
                 },
                 {
-                    "metric": "VMs_win10-base_coll",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_console",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_console_type",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_cow",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_cpus",
-                    "value": "2",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disk_alloc",
-                    "value": 536870912000,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disk_in_use",
-                    "value": 18936074240,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disk_on_disk",
-                    "value": 18935054336,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_alloc",
-                    "value": "536870912000",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_freqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_ftime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_in_use",
-                    "value": "18936074240",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_on_disk",
-                    "value": "18935054336",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_rbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_rreqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_rtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_wbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_wreqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sda_wtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_alloc",
-                    "value": "4380387328",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_freqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_ftime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_in_use",
-                    "value": "4380393472",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_on_disk",
-                    "value": "4380387328",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_rbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_rreqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_rtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_wbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_wreqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_disks_sdb_wtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_etimes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_freqs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_ftime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_ibytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_idrop",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_ierrs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_inblk",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_ip",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_ipkts",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_majflt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_mem_alloc",
-                    "value": 4294967296,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_minflt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_nice",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_nivcsw",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_nswap",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_nvcsw",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_obytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_odrop",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_oerrs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_opkts",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_os_type",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_oublk",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_pcpu",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_pmem",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_pri",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_rbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_rss",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_snaps",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_snaps_size",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_status_int",
-                    "value": "5",
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_systime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_usertime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_vsz",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_wbytes",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_console",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10-base_console_type",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
                     "metric": "VMs_win10_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console_type",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
@@ -1870,13 +1486,13 @@
                 },
                 {
                     "metric": "VMs_win10_disk_in_use",
-                    "value": 29271355392,
+                    "value": 18936074240,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10_disk_on_disk",
-                    "value": 536953094144,
+                    "value": 18935054336,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1900,13 +1516,13 @@
                 },
                 {
                     "metric": "VMs_win10_disks_sda_in_use",
-                    "value": "29271355392",
+                    "value": "18936074240",
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10_disks_sda_on_disk",
-                    "value": "536953094144",
+                    "value": "18935054336",
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -2176,7 +1792,7 @@
                 },
                 {
                     "metric": "VMs_win10_snaps",
-                    "value": 5,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -2212,6 +1828,390 @@
                 },
                 {
                     "metric": "VMs_win10_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_in_use",
+                    "value": 29271355392,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_on_disk",
+                    "value": 536953094144,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_in_use",
+                    "value": "29271355392",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_on_disk",
+                    "value": "536953094144",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_snaps",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_wbytes",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
