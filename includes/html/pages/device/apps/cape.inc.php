@@ -50,9 +50,8 @@ if (sizeof($packages) > 0) {
     echo "<br>\n";
 }
 
-echo "<b>Show Standard Deviation:</b> ";
-
 if (sizeof($packages) > 0) {
+    echo "<b>Show Standard Deviation:</b> ";
     if ($vars['stddev'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
         echo generate_link($label, $link_array, ['stddev'=>'on']) . ', ' .
@@ -62,9 +61,8 @@ if (sizeof($packages) > 0) {
         echo generate_link('On', $link_array, ['stddev'=>'on']) . ', ' .
         generate_link($label, $link_array, ['stddev'=>'off']);
     }
+    print_optionbar_end();
 }
-
-print_optionbar_end();
 
 if (isset($vars['package'])) {
     $graphs = [
