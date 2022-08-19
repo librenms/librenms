@@ -1486,13 +1486,13 @@
                 },
                 {
                     "metric": "VMs_win10_disk_in_use",
-                    "value": 18936074240,
+                    "value": 29271355392,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10_disk_on_disk",
-                    "value": 18935054336,
+                    "value": 536953094144,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1516,13 +1516,13 @@
                 },
                 {
                     "metric": "VMs_win10_disks_sda_in_use",
-                    "value": "18936074240",
+                    "value": 29271355392,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10_disks_sda_on_disk",
-                    "value": "18935054336",
+                    "value": 536953094144,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1792,7 +1792,7 @@
                 },
                 {
                     "metric": "VMs_win10_snaps",
-                    "value": 0,
+                    "value": 5,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1833,19 +1833,19 @@
                     "app_type": "hv-monitor"
                 },
                 {
-                    "metric": "VMs_win10_console",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
-                    "metric": "VMs_win10_console_type",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "hv-monitor"
-                },
-                {
                     "metric": "VMs_win10-base_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console_type",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
@@ -1870,13 +1870,13 @@
                 },
                 {
                     "metric": "VMs_win10-base_disk_in_use",
-                    "value": 29271355392,
+                    "value": 18936074240,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10-base_disk_on_disk",
-                    "value": 536953094144,
+                    "value": 18935054336,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -1900,13 +1900,13 @@
                 },
                 {
                     "metric": "VMs_win10-base_disks_sda_in_use",
-                    "value": "29271355392",
+                    "value": 18936074240,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
                 {
                     "metric": "VMs_win10-base_disks_sda_on_disk",
-                    "value": "536953094144",
+                    "value": 18935054336,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
@@ -2176,7 +2176,7 @@
                 },
                 {
                     "metric": "VMs_win10-base_snaps",
-                    "value": 5,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "hv-monitor"
                 },
