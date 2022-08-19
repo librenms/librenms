@@ -1833,6 +1833,18 @@
                     "app_type": "hv-monitor"
                 },
                 {
+                    "metric": "VMs_win10-base_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
                     "metric": "VMs_win10_coll",
                     "value": 0,
                     "value_prev": null,
