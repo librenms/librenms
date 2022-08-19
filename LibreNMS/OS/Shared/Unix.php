@@ -117,8 +117,7 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
             $device->hardware = $hardware;
         }
 
-        $serial = SnmpQuery::mibDir('dell')->get([
-            'MIB-Dell-10892::chassisServiceTagName.1', // Dell
+        $serial = SnmpQuery::get([
             'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."serial"',
             '.1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1', // legacy nsExtendOutLine.1 UCD-SNMP-MIB prefix with extend "serial"
             '.1.3.6.1.4.1.2021.7890.4.101.1', // legacy UCD-SNMP-MIB exec
