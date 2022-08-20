@@ -1,3 +1,150 @@
+## 22.8.0
+*(2022-08-19)*
+
+A big thank you to the following 26 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (18)
+  - [Npeca75](https://github.com/Npeca75) (12)
+  - [Jellyfrog](https://github.com/Jellyfrog) (9)
+  - [gs-kamnas](https://github.com/gs-kamnas) (5)
+  - [earendilfr](https://github.com/earendilfr) (3)
+  - [fbouynot](https://github.com/fbouynot) (3)
+  - [VVelox](https://github.com/VVelox) (3)
+  - [rhinoau](https://github.com/rhinoau) (2)
+  - [Schouwenburg](https://github.com/Schouwenburg) (2)
+  - [electrocret](https://github.com/electrocret) (2)
+  - [aztec102](https://github.com/aztec102) (2)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+  - [loopodoopo](https://github.com/loopodoopo) (1)
+  - [washcroft](https://github.com/washcroft) (1)
+  - [Laplacence](https://github.com/Laplacence) (1)
+  - [opalivan](https://github.com/opalivan) (1)
+  - [Jarod2801](https://github.com/Jarod2801) (1)
+  - [Martin22](https://github.com/Martin22) (1)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (1)
+  - [ciscoqid](https://github.com/ciscoqid) (1)
+  - [Fehler12](https://github.com/Fehler12) (1)
+  - [PedroChaps](https://github.com/PedroChaps) (1)
+  - [ajsiersema](https://github.com/ajsiersema) (1)
+  - [quentinsch](https://github.com/quentinsch) (1)
+  - [Mar974](https://github.com/Mar974) (1)
+  - [mwobst](https://github.com/mwobst) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (46)
+  - [Jellyfrog](https://github.com/Jellyfrog) (26)
+  - [PipoCanaja](https://github.com/PipoCanaja) (2)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [Cormoran96](https://github.com/Cormoran96) (1)
+  - [bennet-esyoil](https://github.com/bennet-esyoil) (1)
+  - [ottorei](https://github.com/ottorei) (1)
+
+#### Feature
+* Prepare for PHP 8.1 ([#14156](https://github.com/librenms/librenms/pull/14156)) - [Jellyfrog](https://github.com/Jellyfrog)
+* New Poller validations ([#14148](https://github.com/librenms/librenms/pull/14148)) - [murrant](https://github.com/murrant)
+* New lnms command to enable and disable plugins ([#14147](https://github.com/librenms/librenms/pull/14147)) - [murrant](https://github.com/murrant)
+* Support for SSL/TLS protected connections to MySQL databases ([#14142](https://github.com/librenms/librenms/pull/14142)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Collect OS distro and LibreNMS version ([#14138](https://github.com/librenms/librenms/pull/14138)) - [murrant](https://github.com/murrant)
+* Lnms device:poll better feedback ([#14130](https://github.com/librenms/librenms/pull/14130)) - [murrant](https://github.com/murrant)
+* Per-App data storage ([#14087](https://github.com/librenms/librenms/pull/14087)) - [VVelox](https://github.com/VVelox)
+
+#### Device
+* Fix luminato port poll ([#14217](https://github.com/librenms/librenms/pull/14217)) - [murrant](https://github.com/murrant)
+* Teltonika RUT fix ([#14202](https://github.com/librenms/librenms/pull/14202)) - [loopodoopo](https://github.com/loopodoopo)
+* Initial support for Moxa AWK Industrial APs ([#14197](https://github.com/librenms/librenms/pull/14197)) - [rhinoau](https://github.com/rhinoau)
+* Mikrotik wifi station mode sensors ([#14193](https://github.com/librenms/librenms/pull/14193)) - [Npeca75](https://github.com/Npeca75)
+* Update mellanox os image ([#14184](https://github.com/librenms/librenms/pull/14184)) - [Laplacence](https://github.com/Laplacence)
+* Change state_name for Racoms modulation ([#14174](https://github.com/librenms/librenms/pull/14174)) - [Martin22](https://github.com/Martin22)
+* Cisco SB/CBS environment sensors ([#14154](https://github.com/librenms/librenms/pull/14154)) - [Fehler12](https://github.com/Fehler12)
+* Fix Rocky Linux and AlmaLinux icons and logos ([#14150](https://github.com/librenms/librenms/pull/14150)) - [murrant](https://github.com/murrant)
+* Add additional sysObjectIDs for variants of the Arista 7130 ([#14144](https://github.com/librenms/librenms/pull/14144)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Eltex MES 2324p Add ([#14135](https://github.com/librenms/librenms/pull/14135)) - [aztec102](https://github.com/aztec102)
+* Solid Optics EDFAMUX support ([#14129](https://github.com/librenms/librenms/pull/14129)) - [murrant](https://github.com/murrant)
+* Merge netmanplus and riello and improve device support ([#14125](https://github.com/librenms/librenms/pull/14125)) - [murrant](https://github.com/murrant)
+* Bats support ([#14108](https://github.com/librenms/librenms/pull/14108)) - [Schouwenburg](https://github.com/Schouwenburg)
+* Solved aos6 problem where Librenms wasn't identifying all vlans ([#14107](https://github.com/librenms/librenms/pull/14107)) - [PedroChaps](https://github.com/PedroChaps)
+* Fix Cisco polling BGP peers in non-default VRF ([#14105](https://github.com/librenms/librenms/pull/14105)) - [ajsiersema](https://github.com/ajsiersema)
+* Added support for CheckPoint 1100, 1450 & 1490 models. ([#14074](https://github.com/librenms/librenms/pull/14074)) - [quentinsch](https://github.com/quentinsch)
+* Ns-bsd updated for SNS LTSB 3.7.19 ([#14060](https://github.com/librenms/librenms/pull/14060)) - [Mar974](https://github.com/Mar974)
+* ZTE ZXA10 Update (Added dBm graphs) ([#14049](https://github.com/librenms/librenms/pull/14049)) - [aztec102](https://github.com/aztec102)
+
+#### Webui
+* Fix ports display ([#14183](https://github.com/librenms/librenms/pull/14183)) - [murrant](https://github.com/murrant)
+* Ports by device group ([#14175](https://github.com/librenms/librenms/pull/14175)) - [electrocret](https://github.com/electrocret)
+* Empty Outages table ([#14167](https://github.com/librenms/librenms/pull/14167)) - [Npeca75](https://github.com/Npeca75)
+* View Ports in Portgroups ([#14141](https://github.com/librenms/librenms/pull/14141)) - [electrocret](https://github.com/electrocret)
+* Fix eventlog filtering ([#14136](https://github.com/librenms/librenms/pull/14136)) - [murrant](https://github.com/murrant)
+* [gui] enable permanent vertical scroll ([#14102](https://github.com/librenms/librenms/pull/14102)) - [Npeca75](https://github.com/Npeca75)
+
+#### Alerting
+* Correct logic for recurring alert rules that span UTC days ([#14145](https://github.com/librenms/librenms/pull/14145)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Improvements to PagerDuty alert formatting ([#14143](https://github.com/librenms/librenms/pull/14143)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Add rich (=html) support for messages via Matrix ([#14054](https://github.com/librenms/librenms/pull/14054)) - [mwobst](https://github.com/mwobst)
+
+#### Graphs
+* Fix unauth application graphs ([#14216](https://github.com/librenms/librenms/pull/14216)) - [murrant](https://github.com/murrant)
+* Allow specifying the background colour in graph images ([#14192](https://github.com/librenms/librenms/pull/14192)) - [washcroft](https://github.com/washcroft)
+
+#### Applications
+* Add possibility to monitor redis application through the unix-agent ([#14182](https://github.com/librenms/librenms/pull/14182)) - [earendilfr](https://github.com/earendilfr)
+* Fix error between application module and unix-agent ([#14177](https://github.com/librenms/librenms/pull/14177)) - [earendilfr](https://github.com/earendilfr)
+* Add possibility to monitor the php-fpm service with the unix agent ([#14173](https://github.com/librenms/librenms/pull/14173)) - [earendilfr](https://github.com/earendilfr)
+* [apps] Docker only show current containers ([#14152](https://github.com/librenms/librenms/pull/14152)) - [Npeca75](https://github.com/Npeca75)
+* Add support for Sagan ([#14070](https://github.com/librenms/librenms/pull/14070)) - [VVelox](https://github.com/VVelox)
+* Add Opensearch\Elasticsearch monitoring ([#14053](https://github.com/librenms/librenms/pull/14053)) - [VVelox](https://github.com/VVelox)
+
+#### Api
+* Standardize device and device group maintenance API ([#14153](https://github.com/librenms/librenms/pull/14153)) - [rhinoau](https://github.com/rhinoau)
+* Fix maintenance APIs not associating device or group ([#14127](https://github.com/librenms/librenms/pull/14127)) - [murrant](https://github.com/murrant)
+
+#### Discovery
+* Fix legacy os extends ([#14220](https://github.com/librenms/librenms/pull/14220)) - [murrant](https://github.com/murrant)
+* Sensors, convert hex to strings ([#14121](https://github.com/librenms/librenms/pull/14121)) - [murrant](https://github.com/murrant)
+
+#### Polling
+* Fix for number in sensor string ([#14185](https://github.com/librenms/librenms/pull/14185)) - [Schouwenburg](https://github.com/Schouwenburg)
+
+#### Authentication
+* AD Auth PHP 8.1 fixes ([#14215](https://github.com/librenms/librenms/pull/14215)) - [murrant](https://github.com/murrant)
+
+#### Bug
+* Autodiscovery fix ([#14213](https://github.com/librenms/librenms/pull/14213)) - [Npeca75](https://github.com/Npeca75)
+* Fix alert log clearing SQL query ([#14200](https://github.com/librenms/librenms/pull/14200)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix error when ldap_search returns false ([#14199](https://github.com/librenms/librenms/pull/14199)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix unnecessary Updates of DB when values are equal ([#14179](https://github.com/librenms/librenms/pull/14179)) - [opalivan](https://github.com/opalivan)
+* Fix APP_KEY generation when using fpm ([#14168](https://github.com/librenms/librenms/pull/14168)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix validation error ([#14163](https://github.com/librenms/librenms/pull/14163)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* IPv6 Debug typo ([#14162](https://github.com/librenms/librenms/pull/14162)) - [Npeca75](https://github.com/Npeca75)
+* Replace git show --no-patch option with --quiet ([#14160](https://github.com/librenms/librenms/pull/14160)) - [ciscoqid](https://github.com/ciscoqid)
+* Fix 500 error in validation when UI containers and poller containers have differing node_ids ([#14146](https://github.com/librenms/librenms/pull/14146)) - [gs-kamnas](https://github.com/gs-kamnas)
+* Use --no-patch to support old git clients ([#14137](https://github.com/librenms/librenms/pull/14137)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Use "database version" instead of "mysql version" ([#14158](https://github.com/librenms/librenms/pull/14158)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Documentation
+* Update to mkdocs-material 8.3.9 ([#14189](https://github.com/librenms/librenms/pull/14189)) - [Jellyfrog](https://github.com/Jellyfrog)
+* SNMP extend / fix mdadm documentation ([#14186](https://github.com/librenms/librenms/pull/14186)) - [Npeca75](https://github.com/Npeca75)
+* Update index.md ([#14178](https://github.com/librenms/librenms/pull/14178)) - [Jarod2801](https://github.com/Jarod2801)
+* Add instructions for PHP 8.1 and Ubuntu 22.04 ([#14166](https://github.com/librenms/librenms/pull/14166)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Update php installation instruction for CentOS 8 to reflect the minim… ([#14159](https://github.com/librenms/librenms/pull/14159)) - [fbouynot](https://github.com/fbouynot)
+* Fix typo in Smokeping SELinux documentation ([#14155](https://github.com/librenms/librenms/pull/14155)) - [fbouynot](https://github.com/fbouynot)
+* Add device_default_display info ([#14151](https://github.com/librenms/librenms/pull/14151)) - [murrant](https://github.com/murrant)
+* Change SELinux context for logs ([#14128](https://github.com/librenms/librenms/pull/14128)) - [fbouynot](https://github.com/fbouynot)
+
+#### Translation
+* Serbian translation, part3 ([#14205](https://github.com/librenms/librenms/pull/14205)) - [Npeca75](https://github.com/Npeca75)
+* More Serbian translation ([#14181](https://github.com/librenms/librenms/pull/14181)) - [Npeca75](https://github.com/Npeca75)
+* Enable translation on Eventlog & Component-status widgets ([#14180](https://github.com/librenms/librenms/pull/14180)) - [Npeca75](https://github.com/Npeca75)
+* Initial support for Serbian language ([#14165](https://github.com/librenms/librenms/pull/14165)) - [Npeca75](https://github.com/Npeca75)
+* Enable translation in 3 Alert widget ([#14164](https://github.com/librenms/librenms/pull/14164)) - [Npeca75](https://github.com/Npeca75)
+
+#### Tests
+* Allow save-test-data.php to run all modules explicitely ([#14212](https://github.com/librenms/librenms/pull/14212)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Increase OS detection time, sometimes it is not ready by 5s ([#14133](https://github.com/librenms/librenms/pull/14133)) - [murrant](https://github.com/murrant)
+
+
 ## 22.7.0
 *(2022-07-20)*
 
