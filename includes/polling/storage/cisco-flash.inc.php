@@ -1,6 +1,6 @@
 <?php
 /**
- * CISCO-FLASH-MIB.inc.php
+ * cisco-flash.inc.php
  *
  * LibreNMS storage polling module for Cisco Flash
  *
