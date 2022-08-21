@@ -75,11 +75,7 @@ modules:
                     index: 'zxAnOpticalIfRxPwrCurrValue.{{ $index }}'
                     descr: "{{ $ifName }} Rx"
                     group: OLT Interfaces
-                    skip_values:
-                        -
-                            oid: zxAnOpticalIfRxPwrCurrValue
-                            op: '='
-                            value: '2147483647'
+                    skip_value_gt: 20
                     divisor: 1000
                     high_limit: -8
                     warn_limit: -10
@@ -92,11 +88,7 @@ modules:
                     index: 'zxAnOpticalIfTxPwrCurrValue.{{ $index }}'
                     descr: "{{ $ifName }} Tx"
                     group: OLT Interfaces
-                    skip_values:
-                        -
-                            oid: zxAnOpticalIfTxPwrCurrValue
-                            op: '='
-                            value: '2147483647'
+                    skip_value_gt: 20
                     divisor: 1000
                     high_limit: 4
                     low_limit: -4
@@ -109,9 +101,17 @@ modules:
                     group: '{{ $ifName }} ONU Rx Signals'
                     skip_values:
                         -
+                            device: hardware
+                            op: 'contains'
+                            value: 'C300'
+                        -
                             oid: zxAnPonRxOpticalPower
                             op: '='
                             value: '65535000'
+                        -
+                            oid: zxAnPonRxOpticalPower
+                            op: '='
+                            value: '80000'
                     divisor: 1000
                     high_limit: -8
                     warn_limit: -10
