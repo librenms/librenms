@@ -27,6 +27,7 @@ namespace LibreNMS\Services;
 
 use App\Models\Service;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 
@@ -46,7 +47,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     public function buildCommand(): array
     {
         return $this->appendParameters([
-            Config::get('nagios_plugins') . '/check_' . $this->service->service_type,
+            Str::finish(Config::get('nagios_plugins'), '/') . 'check_' . $this->service->service_type,
         ]);
     }
 
