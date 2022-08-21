@@ -96,10 +96,10 @@ class HelpParser
      */
     private function parseUsage(string $usage): void
     {
-        $usage .= ' ';
+        $usage .= ' '; // make regex easier
         $optional_args = [];
         $required_args = [];
-        $filtered = preg_replace_callback('/\[(-\w.*?)\] /', function ($match) use (&$optional_args) {
+        $filtered = preg_replace_callback('/\[(\[?-\w.*?)] /', function ($match) use (&$optional_args) {
             $optional_args[] = $match[1];
 
             return '';
@@ -120,6 +120,13 @@ class HelpParser
         $group_params = new Collection;
         $exclusive = true;
 
+        // check for group with optional value
+        if (preg_match('/\[(?<group>[^]]+)](?<value>\w*)/', $group, $multi_value_matches)) {
+            $group = $multi_value_matches['group'];
+            $value = $multi_value_matches['value'];
+        }
+
+        // check for a group
         $args = preg_split('/(\||]\[)/', $group);
         if (count($args) === 1) {
             $exclusive = false;
@@ -128,7 +135,7 @@ class HelpParser
         }
         foreach ($args as $arg) {
             $parts = explode(' ', $arg, 2);
-            $group_params->push((new CheckParameter('', $parts[0], $parts[1] ?? ''))->setRequired($required));
+            $group_params->push((new CheckParameter('', $parts[0], $value ?? $parts[1] ?? ''))->setRequired($required));
         }
 
         // set group
