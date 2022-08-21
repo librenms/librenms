@@ -168,6 +168,14 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     private function appendParameters(array $command): array
     {
         $flags = array_keys($this->hasDefaults());
+
+        // service does not have -H, don't try to set it
+        if ($this->service->service_ip === null) {
+            if (($key = array_search('-H', $flags)) !== false) {
+                unset($flags[$key]);
+            }
+        }
+
         $modern = is_array($this->service->service_param);
         if ($modern) {
             $flags = array_merge($flags, array_keys($this->service->service_param));

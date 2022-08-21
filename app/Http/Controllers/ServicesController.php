@@ -260,6 +260,7 @@ class ServicesController extends Controller
     {
         $services = Services::list();
         $param_rules = $this->buildParamRules($request->get('service_type'), $services);
+        $hostname_default = isset($param_rules['service_param.--hostname']) ? '' : null; // '' = this device, null = service does not require hostname
         unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
@@ -277,6 +278,8 @@ class ServicesController extends Controller
             'service_name' => 'nullable|string',
             'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
         ] + $param_rules);
+
+        $validated['service_ip'] = $validated['service_ip'] ?? $hostname_default;
 
         return new Service($validated);
     }
