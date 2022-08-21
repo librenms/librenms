@@ -72,13 +72,16 @@
                 </select>
                 <input type='text' id='service_param' name='service_param' class='form-control has-feedback  tw-ml-2 tw-flex-grow' x-model="currentValue" x-ref="value"
                        x-bind:placeholder="currentParam && getParameter(currentParam).value"
-                       x-bind:title="currentParam && getParameter(currentParam).description"
                        x-bind:disabled="currentParam && ! getParameter(currentParam).value"
                        x-bind:required="currentParam && getParameter(currentParam).value">
                 <button x-on:click.prevent="addTag(currentParam, currentValue)"
                         x-bind:disabled="! currentParam"
                         x-bind:class="currentParam ? 'hover:tw-bg-blue-700' : 'tw-opacity-50 !tw-cursor-not-allowed'"
                         class="tw-bg-blue-500 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-ml-2 tw-flex-none"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="tw-p-3 tw-text-gray-500" x-show="currentParam">
+                <i class="fa fa-solid fa-question-circle"></i>
+                <span x-text="getParameter(currentParam).description"></span>
             </div>
             <template x-for="(value, param) in service_param">
                 <div class="tw-bg-indigo-100 tw-inline-flex tw-items-center tw-rounded tw-mt-2 tw-mr-1">
