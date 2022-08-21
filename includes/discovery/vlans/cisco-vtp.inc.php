@@ -1,6 +1,6 @@
 <?php
 
-if ($device['os_group'] == 'cisco') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo "Cisco VLANs:\n";
 
     $native_vlans = snmpwalk_cache_oid($device, 'vlanTrunkPortNativeVlan', [], 'CISCO-VTP-MIB');

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Str;
 
-if ($device['os_group'] == 'cisco') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo ' CISCO-ENTITY-SENSOR: ';
 
     $oids = [];

@@ -297,7 +297,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         }
         $hc_test = array_slice($port_stats, 0, 1);
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
-        if ((! isset($hc_test[0]['ifHCInOctets']) && ! is_numeric($hc_test[0]['ifHCInOctets'])) ||
+        if ((! isset($hc_test[0]['ifHCInOctets']) && ! is_numeric($hc_test[0]['ifHCInOctets'] ?? null)) ||
             ((! isset($hc_test[0]['ifHighSpeed']) && ! is_numeric($hc_test[0]['ifHighSpeed'])))) {
             $ifEntrySnmpFlags = ['-OQUst'];
             if ($device['os'] == 'bintec-beip-plus') {
@@ -420,7 +420,7 @@ if (Config::get('enable_ports_poe')) {
     }
 }
 
-if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
         $pagp_port_stats = snmpwalk_cache_oid($device, $oid, [], 'CISCO-PAGP-MIB');
     }
@@ -599,7 +599,7 @@ foreach ($ports as $port) {
         }
 
         // rewrite the ifPhysAddress
-        if (strpos($this_port['ifPhysAddress'], ':')) {
+        if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
             [$a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode(':', $this_port['ifPhysAddress']);
             $this_port['ifPhysAddress'] = zeropad($a_a) . zeropad($a_b) . zeropad($a_c) . zeropad($a_d) . zeropad($a_e) . zeropad($a_f);
         }
@@ -669,7 +669,7 @@ foreach ($ports as $port) {
         }
 
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
-        echo "VLAN = {$this_port['ifVlan']} ";
+        echo 'VLAN = ' . ($this_port['ifVlan'] ?? '?') . ' ';
 
         // attempt to fill missing fields
         port_fill_missing($this_port, $device);
@@ -678,14 +678,14 @@ foreach ($ports as $port) {
         $tune_port = false;
         foreach ($data_oids as $oid) {
             if ($oid == 'ifAlias') {
-                if ($device['attribs']['ifName:' . $port['ifName']]) {
+                if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 } else {
                     $this_port['ifAlias'] = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
             }
             if ($oid == 'ifSpeed') {
-                if ($device['attribs']['ifSpeed:' . $port['ifName']]) {
+                if (! empty($device['attribs']['ifSpeed:' . $port['ifName']])) {
                     $this_port['ifSpeed'] = $port['ifSpeed'];
                 }
             }
@@ -693,12 +693,8 @@ foreach ($ports as $port) {
             if ($port[$oid] != $this_port[$oid] && ! isset($this_port[$oid])) {
                 $port['update'][$oid] = ['NULL'];
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
-                if (Debug::isEnabled()) {
-                    d_echo($oid . ': ' . $port[$oid] . ' -> NULL ');
-                } else {
-                    echo $oid . ' ';
-                }
-            } elseif ($port[$oid] != $this_port[$oid]) {
+                d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
+            } elseif ($port[$oid] != ($this_port[$oid] ?? null)) {
                 // if the value is different, update it
 
                 // rrdtune if needed
@@ -753,11 +749,12 @@ foreach ($ports as $port) {
                 'notes',
             ];
 
+            $port_ifAlias = []; // for port descr parser mappings
             include Config::get('install_dir') . '/' . Config::get('port_descr_parser');
 
             foreach ($port_attribs as $attrib) {
                 $attrib_key = 'port_descr_' . $attrib;
-                if ($port_ifAlias[$attrib] != $port[$attrib_key]) {
+                if (($port_ifAlias[$attrib] ?? null) != $port[$attrib_key]) {
                     if (! isset($port_ifAlias[$attrib])) {
                         $port_ifAlias[$attrib] = ['NULL'];
                         $log_port = 'NULL';
@@ -775,7 +772,7 @@ foreach ($ports as $port) {
         if (! empty($port['skipped'])) {
             // We don't care about statistics for skipped selective polling ports
             d_echo("$port_id skipped because selective polling ports is set.");
-        } elseif ($port['ifType'] != 'vdsl' && $port['ifType'] != 'adsl' && $port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && $this_port['ifLastChange'] == $port['ifLastChange']) {
+        } elseif ($port['ifType'] != 'vdsl' && $port['ifType'] != 'adsl' && $port['ifOperStatus'] == 'down' && $port['ifOperStatus_prev'] == 'down' && $this_port['ifOperStatus'] == 'down' && ($this_port['ifLastChange'] ?? null) == $port['ifLastChange']) {
             // We don't care about statistics for down ports on which states did not change since last polling
             // We still take into account 'adsl' & 'vdsl' ports that may update speed/noise even if the interface is status down
             d_echo("$port_id skipped because port is still down since last polling.");
@@ -790,12 +787,12 @@ foreach ($ports as $port) {
                     $port_update = 'update_extended';
                 }
 
-                $port[$port_update][$oid] = set_numeric($this_port[$oid]);
+                $port[$port_update][$oid] = set_numeric($this_port[$oid] ?? 0);
                 $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
-                    $oid_diff = ($this_port[$oid] - $port[$oid]);
+                    $oid_diff = (($this_port[$oid] ?? 0) - $port[$oid]);
                     $oid_rate = ($oid_diff / $polled_period);
                     if ($oid_rate < 0) {
                         $oid_rate = '0';
@@ -853,17 +850,17 @@ foreach ($ports as $port) {
                 ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
             $fields = [
-                'INOCTETS' => $this_port['ifInOctets'],
-                'OUTOCTETS' => $this_port['ifOutOctets'],
+                'INOCTETS' => $this_port['ifInOctets'] ?? null,
+                'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
                 'INERRORS' => $this_port['ifInErrors'],
                 'OUTERRORS' => $this_port['ifOutErrors'],
-                'INUCASTPKTS' => $this_port['ifInUcastPkts'],
-                'OUTUCASTPKTS' => $this_port['ifOutUcastPkts'],
-                'INNUCASTPKTS' => $this_port['ifInNUcastPkts'],
-                'OUTNUCASTPKTS' => $this_port['ifOutNUcastPkts'],
+                'INUCASTPKTS' => $this_port['ifInUcastPkts'] ?? null,
+                'OUTUCASTPKTS' => $this_port['ifOutUcastPkts'] ?? null,
+                'INNUCASTPKTS' => $this_port['ifInNUcastPkts'] ?? null,
+                'OUTNUCASTPKTS' => $this_port['ifOutNUcastPkts'] ?? null,
                 'INDISCARDS' => $this_port['ifInDiscards'],
                 'OUTDISCARDS' => $this_port['ifOutDiscards'],
-                'INUNKNOWNPROTOS' => $this_port['ifInUnknownProtos'],
+                'INUNKNOWNPROTOS' => $this_port['ifInUnknownProtos'] ?? null,
                 'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'],
                 'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
                 'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'],
@@ -898,7 +895,7 @@ foreach ($ports as $port) {
 
             // End Update IF-MIB
             // Update PAgP
-            if ($this_port['pagpOperationMode'] || $port['pagpOperationMode']) {
+            if (! empty($this_port['pagpOperationMode']) || ! empty($port['pagpOperationMode'])) {
                 foreach ($pagp_oids as $oid) {
                     // Loop the OIDs
                     if ($this_port[$oid] != $port[$oid]) {

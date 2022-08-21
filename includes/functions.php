@@ -627,9 +627,9 @@ function is_port_valid($port, $device)
 
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'];
-    $ifAlias = $port['ifAlias'];
+    $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
-    $ifOperStatus = $port['ifOperStatus'];
+    $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
@@ -696,7 +696,7 @@ function is_port_valid($port, $device)
 function port_fill_missing(&$port, $device)
 {
     // When devices do not provide data, populate with other data if available
-    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+    if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
@@ -704,12 +704,12 @@ function port_fill_missing(&$port, $device)
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+    } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
 
-    if ($port['ifName'] == '' || $port['ifName'] == null) {
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
@@ -864,7 +864,7 @@ function dnslookup($device, $type = false, $return = false)
     }
     $record = dns_get_record($device['hostname'], $type);
 
-    return $record[0][$return];
+    return $record[0][$return] ?? null;
 }//end dnslookup
 
 /**
