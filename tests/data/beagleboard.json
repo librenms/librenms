@@ -1628,7 +1628,7 @@
                     "storage_descr": "/run/user/1000",
                     "storage_size": 60563456,
                     "storage_units": 1024,
-                    "storage_used": 60563456,
+                    "storage_used": 0,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,

@@ -945,7 +945,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
-                        $sensor_name = $data['state_name'] ?: $data['oid'];
+                        $sensor_name = $data['state_name'] ?? $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
@@ -1018,7 +1018,7 @@ function build_bgp_peers($device, $data, $peer2)
 
     $peerlist = [];
     $ver = '';
-    foreach (explode("\n", $peers) as $peer) {
+    foreach ($peers ? explode("\n", $peers) : [] as $peer) {
         $local_ip = null;
         if ($peer2 === true) {
             [$ver, $peer] = explode('.', $peer, 2);

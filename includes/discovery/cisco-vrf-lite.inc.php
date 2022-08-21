@@ -21,7 +21,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
     $ids = [];
 
     // For the moment only will be cisco and the version 3
-    if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
+    if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
         $mib = 'SNMP-COMMUNITY-MIB';
         $mib = 'CISCO-CONTEXT-MAPPING-MIB';
         //-Osq because if i put the n the oid from the first command is not the same of this one
