@@ -42,39 +42,14 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
     public function boot(): void
     {
-        // don't report when:
         Flare::filterExceptionsUsing(function (\Exception $e) {
-            if (! Config::get('reporting.error')) {
-                return false;
-            }
-
-            // Only run in production
-            if (! $this->app->isProduction()) {
-                return false;
-            }
-
-            // Check if git installation
-            if (! Git::repoPresent()) {
-                return false;
-            }
-
-            // Repo url must be offical one
-            if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
-                return false;
-            }
-
-            // Check if repo is modified
-            if (! Git::unchanged()) {
-                return false;
-            }
-
-            // Check if repo is modified
-            if (! Git::officalCommit()) {
-                return false;
-            }
-
-            return true;
+            return $this->isReportingEnabled();
         });
+
+        Flare::filterReportsUsing(function (Report $report) {
+            return $this->isReportingEnabled();
+        });
+
 
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
@@ -125,10 +100,54 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
             return $next($report);
         });
 
-        // Override the Laravel error handler
+        // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
 
         parent::boot();
+    }
+
+    /**
+     * Checks the state of the config and current install to determine if reporting should be enabled
+     * The primary factor is the setting reporting.error
+     */
+    public function isReportingEnabled(): bool
+    {
+        // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
+        if (! Config::isLoaded()) {
+            return false;
+        }
+
+        // check the user setting
+        if (! Config::get('reporting.error')) {
+            return false;
+        }
+
+        // Only run in production
+        if (! $this->app->isProduction()) {
+            return false;
+        }
+
+        // Check if git installation
+        if (! Git::repoPresent()) {
+            return false;
+        }
+
+        // Repo url must be official one
+        if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
+            return false;
+        }
+
+        // Check if repo is modified
+        if (! Git::unchanged()) {
+            return false;
+        }
+
+        // Check if repo is modified
+        if (! Git::officalCommit()) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

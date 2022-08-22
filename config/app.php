@@ -179,7 +179,7 @@ return [
          * LibreNMS Service Providers...
          */
         App\Providers\ConfigServiceProvider::class,
-        App\Providers\ErrorReportingProvider::class,
+        App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
