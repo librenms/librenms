@@ -760,7 +760,7 @@
         }, 100);
     });
 
-@if($browser_push)
+    @if($browser_push)
         if (localStorage.getItem('notifications') !== 'disabled') {
             Notification.requestPermission().then(function (permission) {
                 if (permission === "denied") {
