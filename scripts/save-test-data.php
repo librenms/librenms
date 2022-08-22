@@ -53,7 +53,8 @@ Required:
   -v, --variant      The variant of the OS to use, usually the device model
 
 Optional:
-  -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
+  -m, --modules      The discovery/poller module(s) to collect data for, comma delimited.
+                     Use -m 'all' for all modules.
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
@@ -73,7 +74,10 @@ if (isset($options['o'])) {
     $os_name = $options['os'];
 }
 
-if (isset($options['m'])) {
+if ((isset($options['m']) && $options['m'] == 'all') || (isset($options['modules']) && $options['modules'] == 'all')) {
+    $modules_input = 'all';
+    $modules = [];
+} elseif (isset($options['m'])) {
     $modules_input = $options['m'];
     $modules = explode(',', $modules_input);
 } elseif (isset($options['modules'])) {

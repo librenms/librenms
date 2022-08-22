@@ -287,7 +287,7 @@ if ($options['f'] === 'alert_log') {
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    $sql = str_replace('?', strval($purge_duration), $sql);
+    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
     lock_and_purge_query($table, $sql, $msg);
 }
 
