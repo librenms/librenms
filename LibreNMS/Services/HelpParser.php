@@ -99,15 +99,16 @@ class HelpParser
         $usage .= ' '; // make regex easier
         $optional_args = [];
         $required_args = [];
+        $usage = str_replace(' | -', '|-', $usage); // remove spaces that complicate parsing
         $filtered = preg_replace_callback('/\[(\[?-\w.*?)] /', function ($match) use (&$optional_args) {
             $optional_args[] = $match[1];
 
             return '';
         }, $usage);
 
-        preg_match('/(?<= )-\w \S+/', $filtered, $required_args);
+        preg_match_all('/(?<= )-\w \S+/', $filtered, $required_args);
 
-        foreach ($required_args as $entry) {
+        foreach ($required_args[0] as $entry) {
             $this->parseOptionGroup($entry, true);
         }
         foreach ($optional_args as $entry) {

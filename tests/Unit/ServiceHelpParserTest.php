@@ -37,6 +37,140 @@ class ServiceHelpParserTest extends TestCase
     {
         return [
             [
+                'check_disk',
+                <<<'EOF'
+check_disk v2.3.1 (monitoring-plugins 2.3.1)
+Copyright (c) 1999 Ethan Galstad <nagios@nagios.org>
+Copyright (c) 1999-2008 Monitoring Plugins Development Team
+        <devel@monitoring-plugins.org>
+
+This plugin checks the amount of used disk space on a mounted file system
+and generates an alert if free space is less than one of the threshold values
+
+
+Usage:
+ check_disk -w limit -c limit [-W limit] [-K limit] {-p path | -x device}
+[-C] [-E] [-e] [-f] [-g group ] [-k] [-l] [-M] [-m] [-R path ] [-r path ]
+[-t timeout] [-u unit] [-v] [-X type] [-N type]
+
+Options:
+ -h, --help
+    Print detailed help screen
+ -V, --version
+    Print version information
+ --extra-opts=[section][@file]
+    Read options from an ini file. See
+    https://www.monitoring-plugins.org/doc/extra-opts.html
+    for usage and examples.
+ -w, --warning=INTEGER
+    Exit with WARNING status if less than INTEGER units of disk are free
+ -w, --warning=PERCENT%
+    Exit with WARNING status if less than PERCENT of disk space is free
+ -c, --critical=INTEGER
+    Exit with CRITICAL status if less than INTEGER units of disk are free
+ -c, --critical=PERCENT%
+    Exit with CRITICAL status if less than PERCENT of disk space is free
+ -W, --iwarning=PERCENT%
+    Exit with WARNING status if less than PERCENT of inode space is free
+ -K, --icritical=PERCENT%
+    Exit with CRITICAL status if less than PERCENT of inode space is free
+ -p, --path=PATH, --partition=PARTITION
+    Mount point or block device as emitted by the mount(8) command (may be repeated)
+ -x, --exclude_device=PATH <STRING>
+    Ignore device (only works if -p unspecified)
+ -C, --clear
+    Clear thresholds
+ -E, --exact-match
+    For paths or partitions specified with -p, only check for exact paths
+ -e, --errors-only
+    Display only devices/mountpoints with errors
+ -f, --freespace-ignore-reserved
+    Don't account root-reserved blocks into freespace in perfdata
+ -P, --iperfdata
+    Display inode usage in perfdata
+ -g, --group=NAME
+    Group paths. Thresholds apply to (free-)space of all partitions together
+ -k, --kilobytes
+    Same as '--units kB'
+ -l, --local
+    Only check local filesystems
+ -L, --stat-remote-fs
+    Only check local filesystems against thresholds. Yet call stat on remote filesystems
+    to test if they are accessible (e.g. to detect Stale NFS Handles)
+ -M, --mountpoint
+    Display the mountpoint instead of the partition
+ -m, --megabytes
+    Same as '--units MB'
+ -A, --all
+    Explicitly select all paths. This is equivalent to -R '.*'
+ -R, --eregi-path=PATH, --eregi-partition=PARTITION
+    Case insensitive regular expression for path/partition (may be repeated)
+ -r, --ereg-path=PATH, --ereg-partition=PARTITION
+    Regular expression for path or partition (may be repeated)
+ -I, --ignore-eregi-path=PATH, --ignore-eregi-partition=PARTITION
+    Regular expression to ignore selected path/partition (case insensitive) (may be repeated)
+ -i, --ignore-ereg-path=PATH, --ignore-ereg-partition=PARTITION
+    Regular expression to ignore selected path or partition (may be repeated)
+ -t, --timeout=INTEGER
+    Seconds before plugin times out (default: 10)
+ -u, --units=STRING
+    Choose bytes, kB, MB, GB, TB (default: MB)
+ -v, --verbose
+    Show details for command-line debugging (output may be truncated by
+    the monitoring system)
+ -X, --exclude-type=TYPE
+    Ignore all filesystems of indicated type (may be repeated)
+ -N, --include-type=TYPE
+    Check only filesystems of indicated type (may be repeated)
+
+Examples:
+ check_disk -w 10% -c 5% -p /tmp -p /var -C -w 100000 -c 50000 -p /
+    Checks /tmp and /var at 10% and 5%, and / at 100MB and 50MB
+ check_disk -w 100 -c 50 -C -w 1000 -c 500 -g sidDATA -r '^/oracle/SID/data.*$'
+    Checks all filesystems not matching -r at 100M and 50M. The fs matching the -r regex
+    are grouped which means the freespace thresholds are applied to all disks together
+ check_disk -w 100 -c 50 -C -w 1000 -c 500 -p /foo -C -w 5% -c 3% -p /bar
+    Checks /foo for 1000M/500M and /bar for 5/3%. All remaining volumes use 100M/50M
+
+Send email to help@monitoring-plugins.org if you have questions regarding
+use of this software. To submit patches or suggest improvements, send email
+to devel@monitoring-plugins.org
+
+EOF,
+                [
+                    new CheckParameter('--warning', '-w', 'INTEGER', 'Exit with WARNING status if less than INTEGER units of disk are free'),
+                    new CheckParameter('--critical', '-c', 'INTEGER', 'Exit with CRITICAL status if less than INTEGER units of disk are free'),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                    new CheckParameter('--long', '', '', ''),
+                ]
+            ],
+            [
                 'check_smtp',
                 <<<'EOF'
 check_smtp v2.3.1 (monitoring-plugins 2.3.1)
