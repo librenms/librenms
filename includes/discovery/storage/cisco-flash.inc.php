@@ -35,7 +35,7 @@ if ($device['os_group'] == 'cisco') {
         $storage_free = (Number::cast($entry['ciscoFlashPartitionFreeSpace']) === 4294967295 ? $entry['ciscoFlashPartitionFreeSpaceExtended'] : $entry['ciscoFlashPartitionFreeSpace']);
         $storage_used = $storage_size - $storage_free;
         $storage_units = 1;
-        discover_storage($valid_storage, $device, $index, 'flash', 'CISCO-FLASH-MIB', $name, $storage_size, $storage_units, $storage_used);
+        discover_storage($valid_storage, $device, $index, 'flash', 'cisco-flash', $name, $storage_size, $storage_units, $storage_used);
     }
     unset ($ciscoFlashPartitionName, $storage_size, $storage_free, $storage_used, $storage_units, $oids, $entry);
 }
