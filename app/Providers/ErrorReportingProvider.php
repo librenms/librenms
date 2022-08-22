@@ -35,8 +35,10 @@ use LibreNMS\Util\Version;
 
 class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 {
-    protected int $errorReportingLevel = E_ALL & ~E_NOTICE;
-    private mixed $laravelErrorHandler;
+    /** @var int */
+    protected $errorReportingLevel = E_ALL & ~E_NOTICE;
+    /** @var callable */
+    private $laravelErrorHandler;
 
     public function boot(): void
     {
