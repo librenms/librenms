@@ -138,6 +138,10 @@ class Poller
                 $this->device->displayName(),
                 $this->device->device_id,
                 $measurement->getDuration()));
+            \Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
+                $this->device->hostname,
+                $this->device->device_id,
+                $measurement->getDuration()));
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
@@ -147,6 +151,14 @@ class Poller
         }
 
         return $polled;
+    }
+
+    /**
+     * Get the total number of devices to poll.
+     */
+    public function totalDevices(): int
+    {
+        return $this->buildDeviceQuery()->count();
     }
 
     private function pollModules(): void
@@ -176,7 +188,7 @@ class Poller
                     $instance->poll($this->os);
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                     \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                 }
 
@@ -358,7 +370,7 @@ Commit SHA: %s
 Commit Date: %s
 DB Schema: %s
 PHP: %s
-MySQL: %s
+Database: %s
 RRDTool: %s
 SNMP: %s
 ==================================
@@ -367,7 +379,7 @@ EOH,
                 Git::localDate(),
                 vsprintf('%s (%s)', $version->database()),
                 phpversion(),
-                \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?',
+                $version->databaseServer(),
                 $version->rrdtool(),
                 $version->netSnmp()
             ));

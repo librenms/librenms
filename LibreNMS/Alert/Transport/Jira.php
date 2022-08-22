@@ -78,7 +78,7 @@ class Jira extends Transport
 
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code == 200) {
+        if ($code == 200 || $code == 201) {
             $jiraout = json_decode($ret, true);
             d_echo('Created jira issue ' . $jiraout['key'] . ' for ' . $obj['hostname']);
 

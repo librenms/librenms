@@ -27,7 +27,7 @@ $delay = $_POST['delay'];
 $interval = $_POST['interval'];
 $mute = $_POST['mute'];
 $invert = $_POST['invert'];
-$name = $_POST['name'];
+$name = strip_tages($_POST['name']);
 if ($_POST['proc'] != '') {
     $proc = $_POST['proc'];
 } else {

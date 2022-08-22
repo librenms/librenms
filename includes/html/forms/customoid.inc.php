@@ -3,68 +3,34 @@
 header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
-    $response = [
+    exit(json_encode([
         'status'  => 'error',
         'message' => 'Need to be admin',
-    ];
-    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    exit;
+    ]));
 }
 
-$status = 'ok';
+$status = 'error';
 $message = '';
 
 $device_id = $_POST['device_id'];
 $id = $_POST['ccustomoid_id'];
 $action = $_POST['action'];
-$name = $_POST['name'];
-$oid = $_POST['oid'];
-$datatype = $_POST['datatype'];
-if (empty(($_POST['unit']))) {
-    $unit = ['NULL'];
-} else {
+$name = strip_tags($_POST['name']);
+$oid = strip_tags($_POST['oid']);
+$datatype = strip_tags($_POST['datatype']);
+if (! empty(($_POST['unit']))) {
     $unit = $_POST['unit'];
-}
-if (! empty(($_POST['limit'])) && is_numeric($_POST['limit'])) {
-    $limit = $_POST['limit'];
 } else {
-    $limit = ['NULL'];
+    $unit = ['NULL'];
 }
-if (! empty(($_POST['limit_warn'])) && is_numeric($_POST['limit_warn'])) {
-    $limit_warn = $_POST['limit_warn'];
-} else {
-    $limit_warn = ['NULL'];
-}
-if (! empty(($_POST['limit_low'])) && is_numeric($_POST['limit_low'])) {
-    $limit_low = $_POST['limit_low'];
-} else {
-    $limit_low = ['NULL'];
-}
-if (! empty(($_POST['limit_low_warn'])) && is_numeric($_POST['limit_low_warn'])) {
-    $limit_low_warn = $_POST['limit_low_warn'];
-} else {
-    $limit_low_warn = ['NULL'];
-}
-if ($_POST['alerts'] == 'on') {
-    $alerts = 1;
-} else {
-    $alerts = 0;
-}
-if ($_POST['passed'] == 'on') {
-    $passed = 1;
-} else {
-    $passed = 0;
-}
-if (! empty(($_POST['divisor'])) && is_numeric($_POST['divisor'])) {
-    $divisor = $_POST['divisor'];
-} else {
-    $divisor = 1;
-}
-if (! empty(($_POST['multiplier'])) && is_numeric($_POST['multiplier'])) {
-    $multiplier = $_POST['multiplier'];
-} else {
-    $multiplier = 1;
-}
+$limit = set_numeric($_POST['limit'], ['NULL']);
+$limit_warn = set_numeric($_POST['limit_warn'], ['NULL']);
+$limit_low = set_numeric($_POST['limit_low'], ['NULL']);
+$limit_low_warn = set_numeric($_POST['limit_low_warn'], ['NULL']);
+$alerts = ($_POST['alerts'] == 'on' ? 1 : 0);
+$passed = ($_POST['passed'] == 'on' ? 1 : 0);
+$divisor = set_numeric($_POST['divisor'], 1);
+$multiplier = set_numeric($_POST['multiplier'], 1);
 if (! empty(($_POST['user_func']))) {
     $user_func = $_POST['user_func'];
 } else {
@@ -78,6 +44,18 @@ if ($action == 'test') {
     $rawdata = snmp_get($device, $oid, '-Oqv');
 
     if (is_numeric($rawdata)) {
+        $oid_value = $rawdata;
+    } elseif (
+        ! empty($_POST['unit']) &&
+        str_i_contains($rawdata, $unit) &&
+        is_numeric(trim(str_replace($unit, '', $rawdata)))
+    ) {
+        $oid_value = trim(str_replace($unit, '', $rawdata));
+    } elseif (is_numeric(string_to_float($rawdata))) {
+        $oid_value = string_to_float($rawdata);
+    }
+
+    if (is_numeric($oid_value)) {
         if (dbUpdate(
             [
                 'customoid_passed' => 1,
@@ -87,12 +65,11 @@ if ($action == 'test') {
             [$id]
         ) >= 0) {
             $message = "Test successful for <i>$name</i>, value $rawdata received";
+            $status = 'ok';
         } else {
-            $status = 'error';
             $message = "Failed to set pass on OID <i>$name</i>";
         }
     } else {
-        $status = 'error';
         $message = "Invalid data in SNMP reply, value $rawdata received";
     }
 } else {
@@ -118,45 +95,39 @@ if ($action == 'test') {
             [$id]
         ) >= 0) { //end if condition
             $message = "Edited OID: <i>$name</i>";
+            $status = 'ok';
         } else {
-            $status = 'error';
             $message = "Failed to edit OID <i>$name</i>";
         }
+    } elseif (empty($name)) {
+        $message = 'No OID name provided';
+    } elseif (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', [$name, $device_id])) {
+        $message = "OID named <i>$name</i> on this device already exists";
     } else {
-        if (empty($name)) {
-            $status = 'error';
-            $message = 'No OID name provided';
+        $id = dbInsert(
+            [
+                'device_id'                => $device_id,
+                'customoid_descr'          => $name,
+                'customoid_oid'            => $oid,
+                'customoid_datatype'       => $datatype,
+                'customoid_unit'           => $unit,
+                'customoid_divisor'        => $divisor,
+                'customoid_multiplier'     => $multiplier,
+                'customoid_limit'          => $limit,
+                'customoid_limit_warn'     => $limit_warn,
+                'customoid_limit_low'      => $limit_low,
+                'customoid_limit_low_warn' => $limit_low_warn,
+                'customoid_alert'          => $alerts,
+                'customoid_passed'         => $passed,
+                'user_func'                => $user_func,
+            ],
+            'customoids'
+        );
+        if ($id) {
+            $message = "Added OID: <i>$name</i>";
+            $status = 'ok';
         } else {
-            if (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', [$name, $device_id])) {
-                $status = 'error';
-                $message = "OID named <i>$name</i> on this device already exists";
-            } else {
-                $id = dbInsert(
-                    [
-                        'device_id'                => $device_id,
-                        'customoid_descr'          => $name,
-                        'customoid_oid'            => $oid,
-                        'customoid_datatype'       => $datatype,
-                        'customoid_unit'           => $unit,
-                        'customoid_divisor'        => $divisor,
-                        'customoid_multiplier'     => $multiplier,
-                        'customoid_limit'          => $limit,
-                        'customoid_limit_warn'     => $limit_warn,
-                        'customoid_limit_low'      => $limit_low,
-                        'customoid_limit_low_warn' => $limit_low_warn,
-                        'customoid_alert'          => $alerts,
-                        'customoid_passed'         => $passed,
-                        'user_func'                => $user_func,
-                    ],
-                    'customoids'
-                );
-                if ($id) {
-                    $message = "Added OID: <i>$name</i>";
-                } else {
-                    $status = 'error';
-                    $message = "Failed to add OID: <i>$name</i>";
-                }
-            }
+            $message = "Failed to add OID: <i>$name</i>";
         }
     }
 }

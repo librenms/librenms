@@ -54,23 +54,6 @@ class FunctionsTest extends TestCase
         $this->assertFalse(isHexString('a5fe53'));
     }
 
-    public function testLinkify()
-    {
-        $input = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	http://foo.co.uk/
-sdfsd ftp://192.168.1.1/help/me/now.php
-http://regexr.com/foo.html?q=bar
-https://mediatemple.net.';
-
-        $expected = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
-sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.php</a>
-<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
-<a href="https://mediatemple.net">https://mediatemple.net</a>.';
-
-        $this->assertSame($expected, linkify($input));
-    }
-
     public function testDynamicDiscoveryGetValue()
     {
         $pre_cache = [

@@ -3,10 +3,10 @@
         <thead>
         <tr>
             <th data-column-id="status" data-sortable="false"></th>
-            <th data-column-id="time_logged" data-order="desc">Timestamp</th>
+            <th data-column-id="time_logged" data-order="desc">{{ __('Timestamp') }}</th>
             <th data-column-id="details" data-sortable="false">&nbsp;</th>
-            <th data-column-id="hostname">Device</th>
-            <th data-column-id="alert">Alert</th>
+            <th data-column-id="hostname">{{ __('Device') }}</th>
+            <th data-column-id="alert">{{ __('Alert') }}</th>
         </tr>
         </thead>
     </table>

@@ -1,0 +1,15 @@
+os: adva_xg300
+text: 'ADVA OptiSwitch'
+type: network
+icon: adva
+group: ADVA
+ifname: true
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.629.22
+mib_dir: adva

@@ -41,13 +41,21 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
-    public function username()
+    public function username(): string
     {
         return 'username';
     }
 
-    public function showLoginForm()
+    /**
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+     */
+    public function showLoginForm(Request $request)
     {
+        // Check if we want to redirect users to the socialite provider directly
+        if (! $request->has('redirect') && Config::get('auth.socialite.redirect') && array_key_first(Config::get('auth.socialite.configs', []))) {
+            return (new SocialiteController)->redirect($request, array_key_first(Config::get('auth.socialite.configs', [])));
+        }
+
         if (Config::get('public_status')) {
             $devices = Device::isActive()->with('location')->get();
 
@@ -57,7 +65,7 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    protected function loggedOut(Request $request)
+    protected function loggedOut(Request $request): \Illuminate\Http\RedirectResponse
     {
         return redirect(Config::get('auth_logout_handler', $this->redirectTo));
     }

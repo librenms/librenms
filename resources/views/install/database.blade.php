@@ -12,15 +12,15 @@
                 >
                     <span id="credential-status">
                        @if($valid_credentials === null)
-                            <i class="fa fa-lg fa-question-circle-o text-muted"></i>
+                            <i class="fa-solid fa-lg fa-square-question text-muted"></i>
                         @elseif($valid_credentials)
-                            <i class="fa fa-lg fa-check-square-o text-success"></i>
+                            <i class="fa-solid fa-lg fa-square-check  text-success"></i>
                         @else
-                            <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
+                            <i class="fa-solid fa-lg fa-rectangle-xmark text-danger"></i>
                         @endif
                     </span>
                     {{ __('install.database.credentials') }}
-                    <i class="fa fa-lg fa-chevron-down rotate-if-collapsed fa-pull-right"></i>
+                    <span class="fa-pull-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
                 </div>
                 <div id="db-form-container" class="card-body collapse @if(!$valid_credentials) show @endif">
                     <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.acton.test-database') }}">
@@ -82,15 +82,15 @@
                 >
                     <span id="migrate-status">
                         @if($migrated === null)
-                            <i class="fa fa-lg fa-question-circle-o text-muted"></i>
+                            <i class="fa-solid fa-lg fa-square-question text-muted"></i>
                         @elseif($migrated)
-                            <i class="fa fa-lg fa-check-square-o text-success"></i>
+                            <i class="fa-solid fa-lg fa-square-check  text-success"></i>
                         @else
-                            <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
+                            <i class="fa-solid fa-lg fa-rectangle-xmark text-danger"></i>
                         @endif
                     </span>
                     {{ __('install.migrate.migrate') }}
-                    <i class="fa fa-lg fa-chevron-down rotate-if-collapsed fa-pull-right"></i>
+                    <span class="fa-pull-right"><i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed"></i></span>
                 </div>
                 <div id="migrate-container" class="card-body collapse @if(!$migrated) show @endif">
                     <div class="row">
@@ -114,7 +114,7 @@
     <script>
         $('#database-form').on("submit", function (event) {
             event.preventDefault();
-            $('#credential-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
+            $('#credential-status>i').attr('class', 'fa-solid fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
 
             $.ajax({
@@ -124,11 +124,11 @@
                 data: $('#database-form').serialize(),
                 success: function (response) {
                     if (response.result === 'ok') {
-                        $('#credential-status>i').attr('class', 'fa fa-lg fa-check-square-o text-success');
+                        $('#credential-status>i').attr('class', 'fa-solid fa-lg fa-square-check text-success');
                         $('#migrate-step').show();
                         $('#db-form-container').collapse('hide')
                     } else {
-                        $('#credential-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
+                        $('#credential-status>i').attr('class', 'fa-solid fa-lg fa-rectangle-xmark text-danger')
                         if (response.message) {
                             $('#error-box').append($('<div class="alert alert-danger">' + response.message + '</div>'))
                         }
@@ -140,7 +140,7 @@
 
         $('#migrate-btn').on("click", function () {
             $('#migrate-warning').show()
-            $('#migrate-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
+            $('#migrate-status>i').attr('class', 'fa-solid fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
             $('#migrate-btn').prop('disabled', true).addClass('disabled')
 
@@ -155,7 +155,7 @@
                 if (output.innerHTML.indexOf('Error!') !== -1) {
                     // if error word in output, show the retry button
                     $('#migrate-warning').hide();
-                    $('#migrate-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
+                    $('#migrate-status>i').attr('class', 'fa-solid fa-lg fa-rectangle-xmark text-danger')
                     $('#migrate-btn').prop('disabled', false).removeClass('disabled').text('{{ __('install.migrate.retry') }}')
                     $('#error-box').append($('<div class="alert alert-danger">{{ __('install.migrate.error') }}</div>'));
                 }
@@ -170,7 +170,7 @@
                     $('#migrate-warning').hide();
                     checkStepStatus(function (status) {
                         if (status.database.complete) {
-                            $('#migrate-status>i').attr('class', 'fa fa-lg fa-check-square-o text-success');
+                            $('#migrate-status>i').attr('class', 'fa-solid fa-lg fa-square-check  text-success');
                             $('#migrate-container').collapse('hide');
                         }
                     });

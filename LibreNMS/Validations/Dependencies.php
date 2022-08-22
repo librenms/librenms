@@ -38,7 +38,7 @@ class Dependencies extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if (EnvHelper::librenmsDocker()) {
             $validator->ok('Installed from the official Docker image; no Composer required');

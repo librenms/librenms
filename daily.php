@@ -14,11 +14,32 @@ use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Validations\Php;
 
+$options = getopt('df:o:t:r:');
+
+/**
+ * Scripts without dependencies
+ */
+if ($options['f'] === 'composer_get_plugins') {
+    $output = [];
+
+    $plugins = is_file('composer.plugins.json') ?
+        json_decode(file_get_contents('composer.plugins.json')) : [];
+
+    foreach ($plugins->require ?? [] as $package => $version) {
+        $output[] = "$package:$version";
+    }
+
+    echo implode(' ', $output);
+
+    return;
+}
+
+/**
+ * Scripts with dependencies
+ */
 $init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
-
-$options = getopt('df:o:t:r:');
 
 if (isset($options['d'])) {
     echo "DEBUG\n";
@@ -105,7 +126,7 @@ if ($options['f'] === 'authlog') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'includes/callback.php';
+    \LibreNMS\Util\Stats::submit();
 }
 
 if ($options['f'] === 'device_perf') {
@@ -266,7 +287,7 @@ if ($options['f'] === 'alert_log') {
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    $sql = str_replace('?', strval($purge_duration), $sql);
+    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -365,8 +386,6 @@ if ($options['f'] === 'recalculate_device_dependencies') {
 
     $lock = Cache::lock('recalculate_device_dependencies', 86000);
     if ($lock->get()) {
-        \LibreNMS\DB\Eloquent::boot();
-
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
             // anonymous recursive function

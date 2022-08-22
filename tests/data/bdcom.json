@@ -20263,7 +20263,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "10.200.0.225",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -20291,7 +20291,7 @@
                     "inetCidrRouteDest": "10.200.0.224",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 30
                 },
                 {
@@ -20319,7 +20319,7 @@
                     "inetCidrRouteDest": "10.200.7.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 }
             ]
@@ -22496,5 +22496,47 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "9845621f063b",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "6196664",
+                    "topChanges": 2,
+                    "designatedRoot": "9845621f063b",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 97,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "9845621f063b",
+                    "designatedCost": 0,
+                    "designatedBridge": "9845621f063b",
+                    "designatedPort": 97,
+                    "forwardTransitions": 3,
+                    "ifIndex": 97
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

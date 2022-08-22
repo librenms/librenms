@@ -170,7 +170,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`display`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (! Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';

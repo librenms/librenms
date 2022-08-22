@@ -38,7 +38,7 @@ class Mail extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if (Config::get('alert.transports.mail') === true) {
             $run_test = 1;

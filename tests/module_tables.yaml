@@ -128,6 +128,15 @@ storage:
     storage:
         excluded_fields: [device_id, storage_id]
         order_by: storage_index, storage_type
+stp:
+    stp:
+        excluded_fields: [stp_id, device_id]
+        order_by: bridgeAddress
+    ports_stp:
+        excluded_fields: [port_stp_id, device_id, port_id]
+        order_by: port_index
+        joins:
+            - { left: ports_stp.port_id, right: ports.port_id, select: [ ifIndex ] }
 printer-supplies:
     printer_supplies:
         excluded_fields: [device_id, supply_id]

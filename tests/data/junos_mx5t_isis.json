@@ -12953,7 +12953,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65534,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ]
         },
@@ -12979,7 +12980,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65534,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ]
         }
@@ -13001,6 +13003,7 @@
         "discovery": {
             "isis_adjacencies": [
                 {
+                    "index": null,
                     "ifIndex": 559,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",
@@ -13013,6 +13016,7 @@
                     "isisCircAdminState": "on"
                 },
                 {
+                    "index": null,
                     "ifIndex": 572,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",

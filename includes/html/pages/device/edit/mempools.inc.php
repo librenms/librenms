@@ -14,8 +14,6 @@
 
 ?>
 
-<h3>Memory settings</h3>
-
 <div class="table-responsive">
     <table id="mempool" class="table table-hover table-condensed mempool">
         <thead>

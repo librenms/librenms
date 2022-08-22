@@ -45,6 +45,7 @@ return [
             'full' => 'Run full checks ignoring changed file filtering',
             'module' => 'Specific Module to run tests on. Implies unit, --db, --snmpsim',
             'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
+            'os-modules-only' => 'Skip os detection test when specifying a specific OS.  Speeds up test time when checking non-detection changes.',
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
@@ -63,6 +64,43 @@ return [
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
     ],
+    'device:add' => [
+        'description' => 'Add a new device',
+        'arguments' => [
+            'device spec' => 'Hostname or IP to add',
+        ],
+        'options' => [
+            'v1' => 'Use SNMP v1',
+            'v2c' => 'Use SNMP v2c',
+            'v3' => 'Use SNMP v3',
+            'display-name' => "A string to display as the name of this device, defaults to hostname.\nMay be a simple template using replacements: {{ \$hostname }}, {{ \$sysName }}, {{ \$sysName_fallback }}, {{ \$ip }}",
+            'force' => 'Just add the device, do not make any safety checks',
+            'group' => 'Poller group (for distributed polling)',
+            'ping-fallback' => 'Add the device as ping only if it does not respond to SNMP',
+            'port-association-mode' => 'Sets how ports are mapped. ifName is suggested for Linux/Unix',
+            'community' => 'SNMP v1 or v2 community',
+            'transport' => 'Transport to connect to the device',
+            'port' => 'SNMP transport port',
+            'security-name' => 'SNMPv3 security username',
+            'auth-password' => 'SNMPv3 authentication password',
+            'auth-protocol' => 'SNMPv3 authentication protocol',
+            'privacy-protocol' => 'SNMPv3 privacy protocol',
+            'privacy-password' => 'SNMPv3 privacy password',
+            'ping-only' => 'Add a ping only device',
+            'os' => 'Ping only: specify OS',
+            'hardware' => 'Ping only: specify hardware',
+            'sysName' => 'Ping only: specify sysName',
+        ],
+        'validation-errors' => [
+            'port.between' => 'Port should be 1-65535',
+            'poller-group.in' => 'The given poller-group does not exist',
+        ],
+        'messages' => [
+            'save_failed' => 'Failed to save device :hostname',
+            'try_force' => 'You my try with the --force option to skip safety checks',
+            'added' => 'Added device :hostname (:device_id)',
+        ],
+    ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
@@ -72,7 +110,7 @@ return [
     'device:poll' => [
         'description' => 'Poll data from device(s) as defined by discovery',
         'arguments' => [
-            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
@@ -81,7 +119,10 @@ return [
         'errors' => [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+            'no_devices' => 'No devices found matching your given device specification.',
+            'none_polled' => 'No devices were polled.',
         ],
+        'polled' => 'Polled :count devices in :time',
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
@@ -102,6 +143,29 @@ return [
             'not_in' => ':attribute must not match current APP_KEY',
             'required' => 'Either old key or --generate-new-key is required.',
         ],
+    ],
+    'lnms' => [
+        'validation-errors' => [
+            'optionValue' => 'Selected :option is invalid. Should be one of: :values',
+        ],
+    ],
+    'plugin:disable' => [
+        'description' => 'Disable all plugins with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to disable or "all" to disable all plugins',
+        ],
+        'already_disabled' => 'Plugin already disabled',
+        'disabled' => ':count plugin disabled|:count plugins disabled',
+        'failed' => 'Failed to disable plugin(s)',
+    ],
+    'plugin:enable' => [
+        'description' => 'Enable the newest plugin with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to enable or "all" to disable all plugins',
+        ],
+        'already_enabled' => 'Plugin already enabled',
+        'enabled' => ':count plugin enabled|:count plugins enabled',
+        'failed' => 'Failed to enable plugin(s)',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

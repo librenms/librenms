@@ -3,7 +3,7 @@
 --   
 -- June 2001, Ravindra Rathi
 --   
--- Copyright (c) 2001, 2010 by Cisco Systems, Inc.
+-- Copyright (c) 2001, 2010, 2020 by Cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *****************************************************************
@@ -42,8 +42,9 @@ IMPORTS
     ciscoMgmt
         FROM CISCO-SMI;
 
+
 ciscoBgp4MIB MODULE-IDENTITY
-    LAST-UPDATED    "201009300000Z"
+    LAST-UPDATED    "202005080000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -110,6 +111,12 @@ ciscoBgp4MIB MODULE-IDENTITY
            Secondary identifier to indicate the type of the 
            Network Layer Reachability Information(NLRI) being 
            carried."
+    REVISION        "202005060000Z"
+    DESCRIPTION
+        "+cbgpPeer3Table: Changed VrfId, Type, RemoteAddr, VrfName to read-only"
+    REVISION        "202004140000Z"
+    DESCRIPTION
+        "+Added cbgpPeer3Table"
     REVISION        "201009300000Z"
     DESCRIPTION
         "+Added cbgpNotifsEnable and cbgpLocalAs
@@ -140,6 +147,7 @@ ciscoBgp4MIB MODULE-IDENTITY
     DESCRIPTION
         "Initial version of the MIB module."
     ::= { ciscoMgmt 187 }
+
 
 ciscoBgp4MIBObjects  OBJECT IDENTIFIER
     ::= { ciscoBgp4MIB 1 }
@@ -212,7 +220,6 @@ CbgpNetworkAddress ::= TEXTUAL-CONVENTION
          RFC 2547, Section 4.1, BGP/MPLS VPNs."
     SYNTAX          OCTET STRING (SIZE (0..255))
 
-
 -- Global objects.
 
 cbgpNotifsEnable OBJECT-TYPE
@@ -244,8 +251,6 @@ cbgpLocalAs OBJECT-TYPE
          RFC 4893, BGP Support for Four-octet AS
          Number Space." 
     ::= { cbgpGlobal 2 }
-
-
 -- BGP4 Received Routes for all the supported address families
 
 cbgpRouteTable OBJECT-TYPE
@@ -277,14 +282,14 @@ cbgpRouteEntry OBJECT-TYPE
     DESCRIPTION
         "Information about a path to a network received from
         a peer."
-    INDEX {
-        cbgpRouteAfi,
-        cbgpRouteSafi,
-        cbgpRoutePeerType,
-        cbgpRoutePeer,
-        cbgpRouteAddrPrefix,
-        cbgpRouteAddrPrefixLen
-    } 
+    INDEX           {
+                        cbgpRouteAfi,
+                        cbgpRouteSafi,
+                        cbgpRoutePeerType,
+                        cbgpRoutePeer,
+                        cbgpRouteAddrPrefix,
+                        cbgpRouteAddrPrefixLen
+                    } 
     ::= { cbgpRouteTable 1 }
 
 CbgpRouteEntry ::= SEQUENCE {
@@ -710,11 +715,11 @@ cbgpPeerCapsEntry OBJECT-TYPE
         capability is received multiple times with different
         values during a BGP connection establishment, 
         corresponding entries are differentiated with indices."
-    INDEX {
-        bgpPeerRemoteAddr,
-        cbgpPeerCapCode,
-        cbgpPeerCapIndex
-    } 
+    INDEX           {
+                        bgpPeerRemoteAddr,
+                        cbgpPeerCapCode,
+                        cbgpPeerCapIndex
+                    } 
     ::= { cbgpPeerCapsTable 1 }
 
 CbgpPeerCapsEntry ::= SEQUENCE {
@@ -829,11 +834,11 @@ cbgpPeerAddrFamilyEntry OBJECT-TYPE
         "An entry is identified by an AFI/SAFI pair and
         peer address. It contains names associated with
         an address family."
-    INDEX {
-        bgpPeerRemoteAddr,
-        cbgpPeerAddrFamilyAfi,
-        cbgpPeerAddrFamilySafi
-    } 
+    INDEX           {
+                        bgpPeerRemoteAddr,
+                        cbgpPeerAddrFamilyAfi,
+                        cbgpPeerAddrFamilySafi
+                    } 
     ::= { cbgpPeerAddrFamilyTable 1 }
 
 CbgpPeerAddrFamilyEntry ::= SEQUENCE {
@@ -899,11 +904,11 @@ cbgpPeerAddrFamilyPrefixEntry OBJECT-TYPE
         "An entry is identified by an AFI/SAFI pair and
         peer address. It contains information associated 
         with route prefixes belonging to an address family."
-    INDEX {
-        bgpPeerRemoteAddr,
-        cbgpPeerAddrFamilyAfi,
-        cbgpPeerAddrFamilySafi
-    } 
+    INDEX           {
+                        bgpPeerRemoteAddr,
+                        cbgpPeerAddrFamilyAfi,
+                        cbgpPeerAddrFamilySafi
+                    } 
     ::= { cbgpPeerAddrFamilyPrefixTable 1 }
 
 CbgpPeerAddrFamilyPrefixEntry ::= SEQUENCE {
@@ -1001,6 +1006,8 @@ cbgpPeerWithdrawnPrefixes OBJECT-TYPE
         this connection. It is initialized to zero when the
         connection is undergone a hard reset." 
     ::= { cbgpPeerAddrFamilyPrefixEntry 8 }
+ 
+
 
 cbgpPeer2Table OBJECT-TYPE
     SYNTAX          SEQUENCE OF CbgpPeer2Entry 
@@ -1019,10 +1026,10 @@ cbgpPeer2Entry OBJECT-TYPE
     DESCRIPTION
         "Entry containing information about the
         connection with a BGP peer."
-    INDEX {
-        cbgpPeer2Type,
-        cbgpPeer2RemoteAddr
-    } 
+    INDEX           {
+                        cbgpPeer2Type,
+                        cbgpPeer2RemoteAddr
+                    } 
     ::= { cbgpPeer2Table 1 }
 
 CbgpPeer2Entry ::= SEQUENCE {
@@ -1470,6 +1477,8 @@ cbgpPeer2PrevState OBJECT-TYPE
         "RFC 1771, Section 8, A Border Gateway Protocol 4
          (BGP-4)." 
     ::= { cbgpPeer2Entry 29 }
+ 
+
 
 cbgpPeer2CapsTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CbgpPeer2CapsEntry 
@@ -1507,12 +1516,12 @@ cbgpPeer2CapsEntry OBJECT-TYPE
         capability is received multiple times with different
         values during a BGP connection establishment,
         corresponding entries are differentiated with indices."
-    INDEX {
-        cbgpPeer2Type,
-        cbgpPeer2RemoteAddr,
-        cbgpPeer2CapCode,
-        cbgpPeer2CapIndex
-    } 
+    INDEX           {
+                        cbgpPeer2Type,
+                        cbgpPeer2RemoteAddr,
+                        cbgpPeer2CapCode,
+                        cbgpPeer2CapIndex
+                    } 
     ::= { cbgpPeer2CapsTable 1 }
 
 CbgpPeer2CapsEntry ::= SEQUENCE {
@@ -1611,6 +1620,8 @@ cbgpPeer2CapValue OBJECT-TYPE
          draft-ietf-idr-add-paths-04.txt, Advertisement
          of Multiple Paths in BGP." 
     ::= { cbgpPeer2CapsEntry 3 }
+ 
+
 
 cbgpPeer2AddrFamilyTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CbgpPeer2AddrFamilyEntry 
@@ -1635,12 +1646,12 @@ cbgpPeer2AddrFamilyEntry OBJECT-TYPE
         "An entry is identified by an AFI/SAFI pair and
         peer address. It contains names associated with
         an address family."
-    INDEX {
-        cbgpPeer2Type,
-        cbgpPeer2RemoteAddr,
-        cbgpPeer2AddrFamilyAfi,
-        cbgpPeer2AddrFamilySafi
-    } 
+    INDEX           {
+                        cbgpPeer2Type,
+                        cbgpPeer2RemoteAddr,
+                        cbgpPeer2AddrFamilyAfi,
+                        cbgpPeer2AddrFamilySafi
+                    } 
     ::= { cbgpPeer2AddrFamilyTable 1 }
 
 CbgpPeer2AddrFamilyEntry ::= SEQUENCE {
@@ -1679,6 +1690,8 @@ cbgpPeer2AddrFamilyName OBJECT-TYPE
     DESCRIPTION
         "Implementation specific Address Family name." 
     ::= { cbgpPeer2AddrFamilyEntry 3 }
+ 
+
 
 cbgpPeer2AddrFamilyPrefixTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CbgpPeer2AddrFamilyPrefixEntry 
@@ -1703,12 +1716,12 @@ cbgpPeer2AddrFamilyPrefixEntry OBJECT-TYPE
         "An entry is identified by an AFI/SAFI pair and
         peer address. It contains information associated
         with route prefixes belonging to an address family."
-    INDEX {
-        cbgpPeer2Type,
-        cbgpPeer2RemoteAddr,
-        cbgpPeer2AddrFamilyAfi,
-        cbgpPeer2AddrFamilySafi
-    } 
+    INDEX           {
+                        cbgpPeer2Type,
+                        cbgpPeer2RemoteAddr,
+                        cbgpPeer2AddrFamilyAfi,
+                        cbgpPeer2AddrFamilySafi
+                    } 
     ::= { cbgpPeer2AddrFamilyPrefixTable 1 }
 
 CbgpPeer2AddrFamilyPrefixEntry ::= SEQUENCE {
@@ -1810,10 +1823,503 @@ cbgpPeer2WithdrawnPrefixes OBJECT-TYPE
     ::= { cbgpPeer2AddrFamilyPrefixEntry 8 }
  
 
+
+cbgpPeer3Table OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CbgpPeer3Entry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "BGP peer table.  This table contains,
+        one entry per BGP peer, information about
+        the connections with BGP peers on per vrf basis"
+    ::= { cbgpPeer 9 }
+
+cbgpPeer3Entry OBJECT-TYPE
+    SYNTAX          CbgpPeer3Entry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Entry containing information about the
+        connection with a BGP peer in particular vrf"
+    INDEX           {
+                        cbgpPeer3VrfId,
+                        cbgpPeer3Type,
+                        cbgpPeer3RemoteAddr
+                    } 
+    ::= { cbgpPeer3Table 1 }
+
+CbgpPeer3Entry ::= SEQUENCE {
+        cbgpPeer3VrfId                         Unsigned32,
+        cbgpPeer3Type                          InetAddressType,
+        cbgpPeer3RemoteAddr                    InetAddress,
+        cbgpPeer3VrfName                       SnmpAdminString,
+        cbgpPeer3State                         INTEGER,
+        cbgpPeer3AdminStatus                   INTEGER,
+        cbgpPeer3NegotiatedVersion             Integer32,
+        cbgpPeer3LocalAddr                     InetAddress,
+        cbgpPeer3LocalPort                     InetPortNumber,
+        cbgpPeer3LocalAs                       InetAutonomousSystemNumber,
+        cbgpPeer3LocalIdentifier               IpAddress,
+        cbgpPeer3RemotePort                    InetPortNumber,
+        cbgpPeer3RemoteAs                      InetAutonomousSystemNumber,
+        cbgpPeer3RemoteIdentifier              IpAddress,
+        cbgpPeer3InUpdates                     Counter32,
+        cbgpPeer3OutUpdates                    Counter32,
+        cbgpPeer3InTotalMessages               Counter32,
+        cbgpPeer3OutTotalMessages              Counter32,
+        cbgpPeer3LastError                     OCTET STRING,
+        cbgpPeer3FsmEstablishedTransitions     Counter32,
+        cbgpPeer3FsmEstablishedTime            Gauge32,
+        cbgpPeer3ConnectRetryInterval          Integer32,
+        cbgpPeer3HoldTime                      Integer32,
+        cbgpPeer3KeepAlive                     Integer32,
+        cbgpPeer3HoldTimeConfigured            Integer32,
+        cbgpPeer3KeepAliveConfigured           Integer32,
+        cbgpPeer3MinASOriginationInterval      Integer32,
+        cbgpPeer3MinRouteAdvertisementInterval Integer32,
+        cbgpPeer3InUpdateElapsedTime           Gauge32,
+        cbgpPeer3LastErrorTxt                  SnmpAdminString,
+        cbgpPeer3PrevState                     INTEGER
+}
+
+cbgpPeer3VrfId OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "id of the vrf that peer is configured
+        in." 
+    ::= { cbgpPeer3Entry 1 }
+
+cbgpPeer3Type OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Represents the type of Peer address stored
+        in cbgpPeer3Entry." 
+    ::= { cbgpPeer3Entry 2 }
+
+cbgpPeer3RemoteAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The remote IP address of this entry's BGP
+        peer." 
+    ::= { cbgpPeer3Entry 3 }
+
+cbgpPeer3VrfName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "name of the vrf that peer is configured
+        in." 
+    ::= { cbgpPeer3Entry 4 }
+
+cbgpPeer3State OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        idle(1),
+                        connect(2),
+                        active(3),
+                        opensent(4),
+                        openconfirm(5),
+                        established(6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The BGP peer connection state."
+    REFERENCE       "RFC 4271, Section 8.2.2." 
+    ::= { cbgpPeer3Entry 5 }
+
+cbgpPeer3AdminStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        stop(1),
+                        start(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The desired state of the BGP connection.
+        A transition from 'stop' to 'start' will cause
+        the BGP Manual Start Event to be generated.
+        A transition from 'start' to 'stop' will cause
+        the BGP Manual Stop Event to be generated.
+        This parameter can be used to restart BGP peer
+        connections.  Care should be used in providing
+        write access to this object without adequate
+        authentication."
+    REFERENCE       "RFC 4271, Section 8.1.2." 
+    ::= { cbgpPeer3Entry 6 }
+
+cbgpPeer3NegotiatedVersion OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The negotiated version of BGP running between
+        the two peers.
+
+        This entry MUST be zero (0) unless the
+        cbgpPeer3State is in the openconfirm or the
+        established state.
+
+        Note that legal values for this object are
+        between 0 and 255."
+    REFERENCE
+        "RFC 4271, Section 4.2.
+         RFC 4271, Section 7." 
+    ::= { cbgpPeer3Entry 7 }
+
+cbgpPeer3LocalAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The local IP address of this entry's BGP
+        connection." 
+    ::= { cbgpPeer3Entry 8 }
+
+cbgpPeer3LocalPort OBJECT-TYPE
+    SYNTAX          InetPortNumber
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The local port for the TCP connection between
+        the BGP peers." 
+    ::= { cbgpPeer3Entry 9 }
+
+cbgpPeer3LocalAs OBJECT-TYPE
+    SYNTAX          InetAutonomousSystemNumber
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The local AS number for this session." 
+    ::= { cbgpPeer3Entry 10 }
+
+cbgpPeer3LocalIdentifier OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The BGP Identifier of this entry's BGP peer." 
+    ::= { cbgpPeer3Entry 11 }
+
+cbgpPeer3RemotePort OBJECT-TYPE
+    SYNTAX          InetPortNumber
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The remote port for the TCP connection
+        between the BGP peers.  Note that the
+        objects cbgpPeer3LocalAddr,
+        cbgpPeer3LocalPort, cbgpPeer3RemoteAddr, and
+        cbgpPeer3RemotePort provide the appropriate
+        reference to the standard MIB TCP
+        connection table." 
+    ::= { cbgpPeer3Entry 12 }
+
+cbgpPeer3RemoteAs OBJECT-TYPE
+    SYNTAX          InetAutonomousSystemNumber
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The remote autonomous system number received in
+        the BGP OPEN message."
+    REFERENCE       "RFC 4271, Section 4.2." 
+    ::= { cbgpPeer3Entry 13 }
+
+cbgpPeer3RemoteIdentifier OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The BGP Identifier of this entry's BGP peer.
+        This entry MUST be 0.0.0.0 unless the
+        cbgpPeer3State is in the openconfirm or the
+        established state."
+    REFERENCE       "RFC 4271, Section 4.2, 'BGP Identifier'." 
+    ::= { cbgpPeer3Entry 14 }
+
+cbgpPeer3InUpdates OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BGP UPDATE messages
+        received on this connection."
+    REFERENCE       "RFC 4271, Section 4.3." 
+    ::= { cbgpPeer3Entry 15 }
+
+cbgpPeer3OutUpdates OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of BGP UPDATE messages
+        transmitted on this connection."
+    REFERENCE       "RFC 4271, Section 4.3." 
+    ::= { cbgpPeer3Entry 16 }
+
+cbgpPeer3InTotalMessages OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of messages received
+        from the remote peer on this connection."
+    REFERENCE       "RFC 4271, Section 4." 
+    ::= { cbgpPeer3Entry 17 }
+
+cbgpPeer3OutTotalMessages OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of messages transmitted to
+        the remote peer on this connection."
+    REFERENCE       "RFC 4271, Section 4." 
+    ::= { cbgpPeer3Entry 18 }
+
+cbgpPeer3LastError OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (2))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The last error code and subcode seen by this
+        peer on this connection.  If no error has
+        occurred, this field is zero.  Otherwise, the
+        first byte of this two byte OCTET STRING
+        contains the error code, and the second byte
+        contains the subcode."
+    REFERENCE       "RFC 4271, Section 4.5." 
+    ::= { cbgpPeer3Entry 19 }
+
+cbgpPeer3FsmEstablishedTransitions OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of times the BGP FSM
+        transitioned into the established state
+        for this peer."
+    REFERENCE       "RFC 4271, Section 8." 
+    ::= { cbgpPeer3Entry 20 }
+
+cbgpPeer3FsmEstablishedTime OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This timer indicates how long (in
+        seconds) this peer has been in the
+        established state or how long
+        since this peer was last in the
+        established state.  It is set to zero when
+        a new peer is configured or when the router is
+        booted."
+    REFERENCE       "RFC 4271, Section 8." 
+    ::= { cbgpPeer3Entry 21 }
+
+cbgpPeer3ConnectRetryInterval OBJECT-TYPE
+    SYNTAX          Integer32 (1..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the
+        ConnectRetry timer.  The suggested value
+        for this timer is 120 seconds."
+    REFERENCE
+        "RFC 4271, Section 8.2.2.  This is the value used
+         to initialize the 'ConnectRetryTimer'." 
+    ::= { cbgpPeer3Entry 22 }
+
+cbgpPeer3HoldTime OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 3..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the Hold
+        Timer established with the peer.  The
+        value of this object is calculated by this
+        BGP speaker, using the smaller of the
+        values in cbgpPeer3HoldTimeConfigured and the
+        Hold Time received in the OPEN message.
+
+        This value must be at least three seconds
+        if it is not zero (0).
+
+        If the Hold Timer has not been established
+        with the peer this object MUST have a value
+        of zero (0).
+
+        If the cbgpPeer3HoldTimeConfigured object has
+        a value of (0), then this object MUST have a
+        value of (0)."
+    REFERENCE       "RFC 4271, Section 4.2." 
+    ::= { cbgpPeer3Entry 23 }
+
+cbgpPeer3KeepAlive OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 1..21845)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the KeepAlive
+        timer established with the peer.  The value
+        of this object is calculated by this BGP
+        speaker such that, when compared with
+        cbgpPeer3HoldTime, it has the same proportion
+        that cbgpPeer3KeepAliveConfigured has,
+        compared with cbgpPeer3HoldTimeConfigured.
+
+        If the KeepAlive timer has not been established
+        with the peer, this object MUST have a value
+        of zero (0).
+
+        If the of cbgpPeer3KeepAliveConfigured object
+        has a value of (0), then this object MUST have
+        a value of (0)."
+    REFERENCE       "RFC 4271, Section 4.4." 
+    ::= { cbgpPeer3Entry 24 }
+
+cbgpPeer3HoldTimeConfigured OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 3..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the Hold Time
+        configured for this BGP speaker with this
+        peer.  This value is placed in an OPEN
+        message sent to this peer by this BGP
+        speaker, and is compared with the Hold
+        Time field in an OPEN message received
+        from the peer when determining the Hold
+        Time (cbgpPeer3HoldTime) with the peer.
+        This value must not be less than three
+        seconds if it is not zero (0).  If it is
+        zero (0), the Hold Time is NOT to be
+        established with the peer.  The suggested
+        value for this timer is 90 seconds."
+    REFERENCE
+        "RFC 4271, Section 4.2.
+         RFC 4271, Section 10." 
+    ::= { cbgpPeer3Entry 25 }
+
+cbgpPeer3KeepAliveConfigured OBJECT-TYPE
+    SYNTAX          Integer32 (0 | 1..21845)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the
+        KeepAlive timer configured for this BGP
+        speaker with this peer.  The value of this
+        object will only determine the
+        KEEPALIVE messages' frequency relative to
+        the value specified in
+        cbgpPeer3HoldTimeConfigured; the actual
+        time interval for the KEEPALIVE messages is
+        indicated by cbgpPeer3KeepAlive.  A
+        reasonable maximum value for this timer
+        would be one third of that of
+        cbgpPeer3HoldTimeConfigured.
+        If the value of this object is zero (0),
+        no periodical KEEPALIVE messages are sent
+        to the peer after the BGP connection has
+        been established.  The suggested value for
+        this timer is 30 seconds."
+    REFERENCE
+        "RFC 4271, Section 4.4.
+         RFC 4271, Section 10." 
+    ::= { cbgpPeer3Entry 26 }
+
+cbgpPeer3MinASOriginationInterval OBJECT-TYPE
+    SYNTAX          Integer32 (1..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the
+        MinASOriginationInterval timer.
+        The suggested value for this timer is 15
+        seconds."
+    REFERENCE
+        "RFC 4271, Section 9.2.1.2.
+         RFC 4271, Section 10." 
+    ::= { cbgpPeer3Entry 27 }
+
+cbgpPeer3MinRouteAdvertisementInterval OBJECT-TYPE
+    SYNTAX          Integer32 (1..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Time interval (in seconds) for the
+        MinRouteAdvertisementInterval timer.
+        The suggested value for this timer is 30
+        seconds for EBGP connections and 5
+        seconds for IBGP connections."
+    REFERENCE
+        "RFC 4271, Section 9.2.1.1.
+         RFC 4271, Section 10." 
+    ::= { cbgpPeer3Entry 28 }
+
+cbgpPeer3InUpdateElapsedTime OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Elapsed time (in seconds) since the last BGP
+        UPDATE message was received from the peer.
+        Each time cbgpPeer3InUpdates is incremented,
+        the value of this object is set to zero (0)."
+    REFERENCE
+        "RFC 4271, Section 4.3.
+         RFC 4271, Section 8.2.2, Established state." 
+    ::= { cbgpPeer3Entry 29 }
+
+cbgpPeer3LastErrorTxt OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Implementation specific error description for
+        bgpPeerLastErrorReceived." 
+    ::= { cbgpPeer3Entry 30 }
+
+cbgpPeer3PrevState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none(0),
+                        idle(1),
+                        connect(2),
+                        active(3),
+                        opensent(4),
+                        openconfirm(5),
+                        established(6)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The BGP peer connection previous state."
+    REFERENCE
+        "RFC 1771, Section 8, A Border Gateway Protocol 4
+         (BGP-4)." 
+    ::= { cbgpPeer3Entry 31 }
+ 
+
 -- Notifications
 
 ciscoBgp4NotifyPrefix  OBJECT IDENTIFIER
     ::= { ciscoBgp4MIB 0 }
+
 
 cbgpFsmStateChange NOTIFICATION-TYPE
     OBJECTS         {
@@ -2122,7 +2628,6 @@ ciscoBgp4MIBComplianceRev3 MODULE-COMPLIANCE
         "Write access is not required."
     ::= { ciscoBgp4MIBCompliances 4 }
 
-
 -- Units of conformance
 
 ciscoBgp4RouteGroup OBJECT-GROUP
@@ -2273,8 +2778,5 @@ ciscoBgp4GlobalGroup OBJECT-GROUP
     ::= { ciscoBgp4MIBGroups 8 }
 
 END
-
-
-
 
 

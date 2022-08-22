@@ -13,9 +13,6 @@
  */
 
 ?>
-
-<h3>Processor settings</h3>
-
 <div class="table-responsive">
     <table id="processor" class="table table-hover table-condensed processor">
         <thead>

@@ -23,59 +23,30 @@
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
  */
 $index = 0;
-$fgHaSystemModeOid = 'fgHaSystemMode.0';
-$systemMode = snmp_get($device, $fgHaSystemModeOid, '-Ovq', 'FORTINET-FORTIGATE-MIB');
+$fgHaSystemMode_num = '.1.3.6.1.4.1.12356.101.13.1.1.0';
+$fgHaSystemMode_txt = 'fgHaSystemMode.0';
+$systemMode = snmp_get($device, $fgHaSystemMode_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
 
 // Verify that the device is clustered
 if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
-    $fgHaStatsEntryOid = 'fgHaStatsEntry';
+    // Indexes of all the members
+    $fgHaStatsIndex_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.1';
+    $fgHaStatsIndex_txt = 'fgHaStatsIndex';
 
     // Fetch the cluster members
-    $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsEntryOid, [], 'FORTINET-FORTIGATE-MIB');
+    $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsIndex_txt, [], 'FORTINET-FORTIGATE-MIB');
 
-    if (is_array($haStatsEntries)) {
-        $stateName = 'clusterState';
-        $descr = 'Cluster State';
-
-        $states = [
-            ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'CRITICAL'],
-            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'OK'],
-        ];
-
-        create_state_index($stateName, $states);
-
-        $clusterMemberCount = count($haStatsEntries);
-
-        // If the device is part of a cluster but the member count is 1 the cluster has issues
-        $clusterState = $clusterMemberCount == 1 ? 0 : 1;
-
-        discover_sensor(
-            $valid['sensor'],
-            'state',
-            $device,
-            $fgHaSystemModeOid,
-            $index,
-            $stateName,
-            $descr,
-            1,
-            1,
-            null,
-            null,
-            null,
-            null,
-            $clusterState,
-            'snmp',
-            null,
-            null,
-            null,
-            'HA'
-        );
-
-        create_sensor_to_state_index($device, $stateName, $index);
+    foreach ($haStatsEntries as $index => $entry) {
+        // Get name of cluster member
+        $fgHaStatsHostname_txt = 'fgHaStatsHostname.' . $index;
+        $cluster_member_name = snmp_get($device, $fgHaStatsHostname_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
 
         // Setup a sensor for the cluster sync state
-        $stateName = 'haSyncStatus';
-        $descr = 'HA sync status';
+        $fgHaStatsSyncStatus_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.12';
+        $fgHaStatsSyncStatus_txt = 'fgHaStatsSyncStatus';
+        $stateName = 'haSyncStatus ' . $index;
+        $descr = 'HA sync status ' . $cluster_member_name;
+
         $states = [
             ['value' => 0, 'generic' => 2, 'graph' => 0, 'descr' => 'Out Of Sync'],
             ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'In Sync'],
@@ -88,8 +59,8 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
             $valid['sensor'],
             'state',
             $device,
-            $fgHaStatsEntryOid,
-            $index,
+            $fgHaStatsSyncStatus_num . '.' . $index,
+            $fgHaStatsSyncStatus_txt . '.' . $index,
             $stateName,
             $descr,
             1,
@@ -112,9 +83,13 @@ if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
 
 unset(
     $index,
-    $fgHaSystemModeOid,
+    $fgHaSystemMode_num,
+    $fgHaSystemMode_txt,
     $systemMode,
-    $fgHaStatsEntryOid,
+    $fgHaStatsIndex_num,
+    $fgHaStatsIndex_txt,
+    $fgHaStatsSyncStatus_num,
+    $fgHaStatsSyncStatus_txt,
     $haStatsEntries,
     $stateName,
     $descr,

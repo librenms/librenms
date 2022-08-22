@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Validate;
 
@@ -232,10 +233,10 @@ class CommonFunctionsTest extends TestCase
             4 => 'ifAlias',
         ];
 
-        $this->assertEquals($modes, get_port_assoc_modes());
-        $this->assertEquals('ifIndex', get_port_assoc_mode_name(1));
-        $this->assertEquals(1, get_port_assoc_mode_id('ifIndex'));
-        $this->assertFalse(get_port_assoc_mode_name(666));
-        $this->assertFalse(get_port_assoc_mode_id('lucifer'));
+        $this->assertEquals($modes, PortAssociationMode::getModes());
+        $this->assertEquals('ifIndex', PortAssociationMode::getName(1));
+        $this->assertEquals(1, PortAssociationMode::getId('ifIndex'));
+        $this->assertNull(PortAssociationMode::getName(666));
+        $this->assertNull(PortAssociationMode::getId('lucifer'));
     }
 }

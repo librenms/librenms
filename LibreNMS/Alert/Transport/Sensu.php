@@ -151,7 +151,7 @@ class Sensu extends Transport
             'librenms-device-id' => strval($obj['device_id']),
             'librenms-rule-id' => strval($obj['rule_id']),
             'librenms-status-reason' => $obj['status_reason'],
-        ], function (string $s): bool {
+        ], function (?string $s): bool {
             return (bool) strlen($s); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
         });
     }
@@ -177,7 +177,7 @@ class Sensu extends Transport
     public static function getEntityName($obj, $key)
     {
         if ($key === 'shortname') {
-            return Sensu::shortenName($obj['hostname']);
+            return Sensu::shortenName($obj['display']);
         }
 
         return $obj[$key];

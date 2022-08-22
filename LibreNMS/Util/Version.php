@@ -25,6 +25,10 @@
 
 namespace LibreNMS\Util;
 
+use DB;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -32,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    const VERSION = '21.12.0';
+    public const VERSION = '22.8.0';
 
     /**
      * @var bool
@@ -49,6 +53,11 @@ class Version
         return new static;
     }
 
+    public function release(): string
+    {
+        return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
+    }
+
     public function local(): string
     {
         if ($this->is_git_install && $version = $this->fromGit()) {
@@ -56,6 +65,77 @@ class Version
         }
 
         return self::VERSION;
+    }
+
+    /**
+     * Compiles local commit data
+     *
+     * @return array with keys sha, date, and branch
+     */
+    public function localCommit(): array
+    {
+        if ($this->is_git_install) {
+            $install_dir = base_path();
+            $version_process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], $install_dir);
+            $version_process->run();
+
+            // failed due to permissions issue
+            if ($version_process->getExitCode() == 128 && Str::startsWith($version_process->getErrorOutput(), 'fatal: unsafe repository')) {
+                (new Process(['git', 'config', '--global', '--add', 'safe.directory', $install_dir]))->run();
+                $version_process->run();
+            }
+
+            [$local_sha, $local_date] = array_pad(explode('|', rtrim($version_process->getOutput())), 2, '');
+
+            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $install_dir);
+            $branch_process->run();
+            $branch = rtrim($branch_process->getOutput());
+
+            return [
+                'sha' => $local_sha,
+                'date' => $local_date,
+                'branch' => $branch,
+            ];
+        }
+
+        return ['sha' => null, 'date' => null, 'branch' => null];
+    }
+
+    /**
+     * Fetches the remote commit from the github api if on the daily release channel
+     *
+     * @return array
+     */
+    public function remoteCommit(): array
+    {
+        if ($this->is_git_install && Config::get('update_channel') == 'master') {
+            try {
+                $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
+
+                return $github->json();
+            } catch (ConnectionException $e) {
+            }
+        }
+
+        return [];
+    }
+
+    public function databaseServer(): string
+    {
+        if (! Eloquent::isConnected()) {
+            return 'Not Connected';
+        }
+
+        switch (Eloquent::getDriver()) {
+            case 'mysql':
+                $ret = Arr::first(DB::selectOne('select version()'));
+
+                return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
+            case 'sqlite':
+                return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));
+            default:
+                return 'Unsupported: ' . Eloquent::getDriver();
+        }
     }
 
     public function database(): array
@@ -123,5 +203,37 @@ class Version
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
 
         return $matches[0] ?? '';
+    }
+
+    /**
+     * The OS/distribution and version
+     */
+    public function os(): string
+    {
+        $info = [];
+
+        // find release file
+        if (file_exists('/etc/os-release')) {
+            $info = @parse_ini_file('/etc/os-release');
+        } else {
+            foreach (glob('/etc/*-release') as $file) {
+                $content = file_get_contents($file);
+                // normal os release style
+                $info = @parse_ini_string($content);
+                if (! empty($info)) {
+                    break;
+                }
+
+                // just a string of text
+                if (substr_count($content, PHP_EOL) <= 1) {
+                    $info = ['NAME' => trim(str_replace('release ', '', $content))];
+                    break;
+                }
+            }
+        }
+
+        $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
+
+        return implode(' ', $only);
     }
 }

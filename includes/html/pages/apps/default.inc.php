@@ -52,5 +52,3 @@ foreach ($apps as $app) {
     echo '</div>';
     echo '</div>';
 }//end foreach
-
-echo '</table>';

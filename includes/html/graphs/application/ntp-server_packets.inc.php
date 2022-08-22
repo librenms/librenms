@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $scale_min = 0;
 $nototal = (($width < 224) ? 1 : 0);
 $unit_text = 'Packets';
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp-server', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ntp-server', $app->app_id]);
 $array = [
     'packets_drop'   => [
         'descr'  => 'Dropped',

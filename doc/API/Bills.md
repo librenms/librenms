@@ -1,6 +1,3 @@
-source: API/Bills.md
-path: blob/master/doc/
-
 ### `list_bills`
 
 Retrieve the list of bills currently in the system.

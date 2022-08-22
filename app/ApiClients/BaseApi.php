@@ -25,20 +25,21 @@
 
 namespace App\ApiClients;
 
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Http;
+use LibreNMS\Util\Proxy;
 
 class BaseApi
 {
     protected $base_uri;
     private $client;
 
-    protected function getClient()
+    protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
         if (is_null($this->client)) {
-            $this->client = new Client([
-                'base_uri' => $this->base_uri,
-                'timeout' => 2,
-            ]);
+            $this->client = Http::withOptions([
+                'proxy' => Proxy::forGuzzle($this->base_uri),
+            ])->baseUrl($this->base_uri)
+            ->timeout(3);
         }
 
         return $this->client;

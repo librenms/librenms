@@ -549,7 +549,7 @@
                     "sysDescr": "HP Stack, revision KA.15.03.3004, ROM KA.15.05 (/sw/code/build/tam(KA_15_03))",
                     "sysContact": "<private>",
                     "version": "KA.15.03.3004",
-                    "hardware": "",
+                    "hardware": "Stack",
                     "features": null,
                     "os": "procurve",
                     "type": "network",

@@ -1,0 +1,126 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "---",
+                    "sysObjectID": ".1.3.6.1.4.1.34652",
+                    "sysDescr": "VS5793 CATV Optical Receiver",
+                    "sysContact": "---",
+                    "version": "3176",
+                    "hardware": "VS5793",
+                    "features": null,
+                    "os": "volius",
+                    "type": "network",
+                    "serial": "257900320931910",
+                    "icon": "volius.png",
+                    "location": "---"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.6.1.1.2.1",
+                    "sensor_index": "1",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Optical power input 1",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": -1.6,
+                    "sensor_limit": 5,
+                    "sensor_limit_warn": 2,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -6,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.2.10.6.0",
+                    "sensor_index": "0",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Temperature device",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 41.7,
+                    "sensor_limit": 55,
+                    "sensor_limit_warn": 45,
+                    "sensor_limit_low": 0,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "tv_signal",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.6.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Output TV Signal",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 11.4,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 105,
+                    "sensor_limit_low_warn": 113,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.2.10.7.1.3.2",
+                    "sensor_index": "2",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Voltage Sensor 2",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 11.975,
+                    "sensor_limit": 13.77125,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 10.17875,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

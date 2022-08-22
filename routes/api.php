@@ -67,6 +67,10 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::post('{hostname}/maintenance', 'LegacyApiController@maintenance_device')->name('maintenance_device');
         });
 
+        Route::group(['prefix' => 'devicegroups'], function () {
+            Route::post('{name}/maintenance', 'LegacyApiController@maintenance_devicegroup')->name('maintenance_devicegroup');
+        });
+
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
         Route::delete('bills/{bill_id}', 'LegacyApiController@delete_bill')->name('delete_bill');
         Route::put('alerts/{id}', 'LegacyApiController@ack_alert')->name('ack_alert');
@@ -78,6 +82,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('oxidized/config/search/{searchstring}', 'LegacyApiController@search_oxidized')->name('search_oxidized');
         Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
+        Route::patch('devices/{hostname}/port/{portid}', 'LegacyApiController@update_device_port_notes')->name('update_device_port_notes');
         Route::post('port_groups', 'LegacyApiController@add_port_group')->name('add_port_group');
         Route::post('port_groups/{port_group_id}/assign', 'LegacyApiController@assign_port_group')->name('assign_port_group');
         Route::post('port_groups/{port_group_id}/remove', 'LegacyApiController@remove_port_group')->name('remove_port_group');
@@ -139,6 +144,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'routing'], function () {
         Route::get('bgp/cbgp', 'LegacyApiController@list_cbgp')->name('list_cbgp');
         Route::get('vrf', 'LegacyApiController@list_vrf')->name('list_vrf');
+        Route::get('mpls/services', 'LegacyApiController@list_mpls_services')->name('list_mpls_services');
+        Route::get('mpls/saps', 'LegacyApiController@list_mpls_saps')->name('list_mpls_saps');
     });
 
     Route::group(['prefix' => 'resources'], function () {

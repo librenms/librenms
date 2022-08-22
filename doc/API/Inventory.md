@@ -1,6 +1,3 @@
-source: API/Inventory.md
-path: blob/master/doc/
-
 ### `get_inventory`
 
 Retrieve the inventory for a device. If you call this without any

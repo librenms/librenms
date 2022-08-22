@@ -31,11 +31,13 @@ use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
+use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
@@ -43,7 +45,14 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling, SlaPolling
+class Cisco extends OS implements
+    OSDiscovery,
+    SlaDiscovery,
+    StpInstanceDiscovery,
+    ProcessorDiscovery,
+    MempoolsDiscovery,
+    NacPolling,
+    SlaPolling
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -336,7 +345,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         return $slas;
     }
 
-    private function getSlaTag($data)
+    private function getSlaTag($data): string
     {
         if (! empty($data['rttMonCtrlAdminTag'])) {
             return $data['rttMonCtrlAdminTag'];
@@ -344,11 +353,11 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         switch ($data['rttMonCtrlAdminRttType']) {
             case 'http':
-                return $data['rttMonEchoAdminURL'];
+                return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
-                return $data['rttMonEchoAdminTargetAddressString'];
+                return $data['rttMonEchoAdminTargetAddressString'] ?? '';
             case 'echo':
-                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true);
+                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
                 $tag = IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) . ':' . $data['rttMonEchoAdminTargetPort'];
                 if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
@@ -518,6 +527,20 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
+    }
+
+    public function discoverStpInstances(?string $vlan = null): Collection
+    {
+        $vlans = $this->getDevice()->vlans;
+        $instances = new Collection;
+
+        // attempt to discover context based vlan instances
+        foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
+            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
+            $instances = $instances->merge(parent::discoverStpInstances($vlan));
+        }
+
+        return $instances;
     }
 
     protected function getMainSerial()

@@ -34,10 +34,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$transport_id = $vars['transport_id'];
-$name = $vars['name'];
+$transport_id = strip_tags($vars['transport_id']);
+$name = strip_tags($vars['name']);
 $is_default = (int) (isset($vars['is_default']) && $vars['is_default'] == 'on');
-$transport_type = $vars['transport-type'];
+$transport_type = strip_tags($vars['transport-type']);
 
 if (empty($name)) {
     $status = 'error';

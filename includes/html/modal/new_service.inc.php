@@ -47,7 +47,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='name' class='col-sm-3 control-label'>Name: </label>
+                            <label for='name' class='col-sm-3 control-label'>Name </label>
                             <div class="col-sm-9">
                                 <input type='text' id='name' name='name' class='form-control input-sm' placeholder=''/>
                             </div>
@@ -55,7 +55,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='stype' class='col-sm-3 control-label'>Check Type: </label>
+                            <label for='stype' class='col-sm-3 control-label'>Check Type </label>
                             <div class="col-sm-9">
                                 <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
                                     <?php echo $stype?>
@@ -65,7 +65,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class='form-group row'>
-                            <label for='desc' class='col-sm-3 control-label'>Description: </label>
+                            <label for='desc' class='col-sm-3 control-label'>Description </label>
                             <div class='col-sm-9'>
                                 <textarea id='desc' name='desc' class='form-control' rows='5'></textarea>
                             </div>
@@ -73,7 +73,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='ip' class='col-sm-3 control-label'>Remote Host: </label>
+                            <label for='ip' class='col-sm-3 control-label'>Remote Host </label>
                             <div class="col-sm-9">
                                 <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
                             </div>
@@ -81,7 +81,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='param' class='col-sm-3 control-label'>Parameters: </label>
+                            <label for='param' class='col-sm-3 control-label'>Parameters </label>
                             <div class="col-sm-9">
                                 <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
                             </div>
@@ -94,14 +94,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag: </label>
+                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag </label>
                             <div class="col-sm-9">
                                 <input type="hidden" name="ignore" id='ignore' value="0">
                                 <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting: </label>
+                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting </label>
                             <div class="col-sm-9">
                                 <input type='hidden' id='disabled' name='disabled' value="0">
                                 <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">

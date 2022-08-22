@@ -159,11 +159,6 @@
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
                         </li>
-                        @config('poller_modules.mib')
-                            <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('mibs') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                           aria-hidden="true"></i> {{ __('MIB definitions') }}</a></li>
-                        @endconfig
                     </ul>
                 </li>
 {{-- Devices --}}
@@ -339,9 +334,17 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> {{ __('Manage Groups') }}
-                            </a></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+							@if($port_groups->isNotEmpty())
+                                <li class="dropdown-submenu">
+                                <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
+								<ul class="dropdown-menu scrollable-menu">
+								@foreach($port_groups as $group)
+									<li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                @endforeach
+                                </ul>
+                                </li>
+							@endif
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
@@ -373,7 +376,7 @@
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span class="hidden-sm">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('health/metric=mempool') }}"><i class="fa fa-braille fa-fw fa-lg"
+                        <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"

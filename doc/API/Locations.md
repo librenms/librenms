@@ -1,6 +1,3 @@
-source: API/Locations.md
-path: blob/master/doc/
-
 ### `add_location`
 
 Add a new location

@@ -1,6 +1,3 @@
-source: Extensions/Graylog.md
-path: blob/master/doc/
-
 # Graylog integration
 
 We have simple integration for Graylog, you will be able to view any

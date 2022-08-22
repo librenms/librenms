@@ -10,6 +10,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
@@ -51,7 +52,6 @@ class DeviceController extends Controller
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
-        'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
         'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
@@ -166,7 +166,7 @@ class DeviceController extends Controller
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $link) {
             $device_links['custom' . ($index + 1)] = [
                 'icon' => $link['icon'] ?? 'fa-external-link',
-                'url' => view(['template' => $link['url']], ['device' => $device])->__toString(),
+                'url' => Blade::render($link['url'], ['device' => $device]),
                 'title' => $link['title'],
                 'external' => $link['external'] ?? true,
             ];

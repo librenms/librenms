@@ -1,6 +1,3 @@
-source: Extensions/RRDCached.md
-path: blob/master/doc/
-
 # Setting up RRDCached
 
 This document will explain how to set up RRDCached for LibreNMS.
@@ -228,13 +225,44 @@ ExecStart=/usr/bin/rrdcached -w 1800 -z 1800 -f 3600 -s librenms -U librenms -G 
 WantedBy=default.target
 ```
 
-2: Start rrdcached
+2: Configure SELinux for RRDCached
+
+```
+cat > rrdcached_librenms.te << EOF
+module rrdcached_librenms 1.0;
+ 
+require {
+        type var_run_t;
+        type tmp_t;
+        type httpd_t;
+        type rrdcached_t;
+        type httpd_sys_rw_content_t;
+        class dir { add_name getattr remove_name rmdir search write };
+        class file { create getattr open read rename setattr unlink write };
+        class sock_file { create setattr unlink write };
+        class capability { fsetid sys_resource };
+}
+ 
+#============= rrdcached_t ==============
+ 
+allow rrdcached_t httpd_sys_rw_content_t:dir { add_name getattr remove_name search write };
+allow rrdcached_t httpd_sys_rw_content_t:file { create getattr open read rename setattr unlink write };
+allow rrdcached_t self:capability fsetid;
+allow rrdcached_t var_run_t:sock_file { create setattr unlink };
+EOF
+
+checkmodule -M -m -o rrdcached_librenms.mod rrdcached_librenms.te
+semodule_package -o rrdcached_librenms.pp -m rrdcached_librenms.mod
+semodule -i rrdcached_librenms.pp
+```
+
+3: Start rrdcached
 
 ```bash
 systemctl enable --now rrdcached.service
 ```
 
-3: Edit `/opt/librenms/config.php` to include:
+4: Edit `/opt/librenms/config.php` to include:
 
 ```php
 $config['rrdcached'] = "unix:/run/rrdcached.sock";
@@ -291,5 +319,54 @@ Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
 ## Securing RRCached
 
-Please see [RRDCached Security](RRDCached-Security.md)
+According to the [man page](https://linux.die.net/man/1/rrdcached),
+under "SECURITY CONSIDERATIONS", rrdcached has no authentication or
+security except for running under a unix socket. If you choose to use
+a network socket instead of a unix socket, you will need to secure
+your rrdcached installation. To do so you can proxy rrdcached using
+nginx to allow only specific IPs to connect.
 
+Using the same setup above, using nginx version 1.9.0 or later, you
+can follow this setup to proxy the default rrdcached port to the local
+unix socket.
+
+(You can use `./conf.d` for your configuration as well)
+
+`mkdir /etc/nginx/streams-{available,enabled}`
+
+add the following to your nginx.conf file:
+
+```nginx
+#/etc/nginx/nginx.conf
+...
+stream {
+    include /etc/nginx/streams-enabled/*;
+}
+```
+
+Add this to `/etc/nginx/streams-available/rrd`
+
+```nginx
+server {
+    listen 42217;
+
+    error_log  /var/log/nginx/rrd.stream.error.log;
+
+    allow $LibreNMS_IP;
+    deny all;
+
+    proxy_pass unix:/run/rrdcached.sock;
+}
+
+```
+
+Replace `$LibreNMS_IP` with the ip of the server that will be using
+rrdcached. You can specify more than one `allow` statement. This will
+bind nginx to TCP 42217 (the default rrdcached port), allow the
+specified IPs to connect, and deny all others.
+
+next, we'll symlink the config to streams-enabled:
+`ln -s /etc/nginx/streams-{available,enabled}/rrd`
+
+and reload nginx
+`service nginx reload`

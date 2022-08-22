@@ -1,6 +1,3 @@
-source: Developing/Using-Git.md
-path: blob/master/doc/
-
 Git can have a bit of a steep learning curve, stick with it as it is
 worth learning the [basics][1][2] at least.
 

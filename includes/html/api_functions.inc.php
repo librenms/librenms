@@ -12,10 +12,13 @@
  * the source code distribution for details.
  */
 
+use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\MplsSap;
+use App\Models\MplsService;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -367,12 +370,8 @@ function list_devices(Illuminate\Http\Request $request)
 function add_device(Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
-    // FIXME: Execution flow through this function could be improved
-    $data = json_decode($request->getContent(), true);
+    $data = $request->json()->all();
 
-    $additional = [];
-    // keep scrutinizer from complaining about snmpver not being set for all execution paths
-    $snmpver = 'v2c';
     if (empty($data)) {
         return api_error(400, 'No information has been provided to add this new device');
     }
@@ -380,54 +379,45 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Missing the device hostname');
     }
 
-    $hostname = $data['hostname'];
-    $port = $data['port'] ?: Config::get('snmp.port');
-    $transport = $data['transport'] ?: 'udp';
-    $poller_group = $data['poller_group'] ?: 0;
-    $force_add = $data['force_add'] ? true : false;
-    $snmp_disable = ($data['snmp_disable']);
-    if ($snmp_disable) {
-        $additional = [
-            'sysName'      => $data['sysName'] ?: '',
-            'os'           => $data['os'] ?: 'ping',
-            'hardware'     => $data['hardware'] ?: '',
-            'snmp_disable' => 1,
-        ];
-    } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
-        if ($data['community']) {
-            Config::set('snmp.community', [$data['community']]);
+    try {
+        $device = new Device(Arr::only($data, [
+            'hostname',
+            'display',
+            'overwrite_ip',
+            'port',
+            'transport',
+            'poller_group',
+            'snmpver',
+            'port_association_mode',
+            'community',
+            'authlevel',
+            'authname',
+            'authpass',
+            'authalgo',
+            'cryptopass',
+            'cryptoalgo',
+        ]));
+
+        // uses different name in legacy call
+        if (! empty($data['version'])) {
+            $device->snmpver = $data['version'];
         }
 
-        $snmpver = $data['version'];
-    } elseif ($data['version'] == 'v3') {
-        $v3 = [
-            'authlevel'  => $data['authlevel'],
-            'authname'   => $data['authname'],
-            'authpass'   => $data['authpass'],
-            'authalgo'   => $data['authalgo'],
-            'cryptopass' => $data['cryptopass'],
-            'cryptoalgo' => $data['cryptoalgo'],
-        ];
+        if (! empty($data['snmp_disable'])) {
+            $device->os = $data['os'] ?? 'ping';
+            $device->sysName = $data['sysName'] ?? '';
+            $device->hardware = $data['hardware'] ?? '';
+            $device->snmp_disable = 1;
+        }
 
-        $v3_config = Config::get('snmp.v3');
-        array_unshift($v3_config, $v3);
-        Config::set('snmp.v3', $v3_config);
-        $snmpver = 'v3';
-    } else {
-        return api_error(400, 'You haven\'t specified an SNMP version to use');
-    }
-
-    $additional['overwrite_ip'] = $data['overwrite_ip'] ?: null;
-
-    try {
-        $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
 
-    $device = device_by_id_cache($device_id);
+    $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
-    return api_success([$device], 'devices', $response);
+    return api_success([$device->attributesToArray()], 'devices', $message);
 }
 
 function del_device(Illuminate\Http\Request $request)
@@ -467,40 +457,52 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
-    // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
+    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
 
-    if (! $device) {
-        return api_error(404, "Device $hostname does not exist");
+    if (is_null($device)) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
     }
 
     $notes = $request->json('notes');
+    $title = $request->json('title') ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
-        'title' => $device->displayName(),
+        'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
-        'start' => date('Y-m-d H:i:s'),
     ]);
 
+    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
     $duration = $request->json('duration');
+
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
-        $alert_schedule->end = \Carbon\Carbon::now()
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours($duration_hour)->addMinutes($duration_min)
             ->format('Y-m-d H:i:00');
     }
 
-    $device->alertSchedules()->save($alert_schedule);
+    $alert_schedule->save();
+    $alert_schedule->devices()->attach($device);
 
     if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
         $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
         $device->save();
     }
 
-    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -1130,6 +1132,28 @@ function get_port_stack(Illuminate\Http\Request $request)
     });
 }
 
+function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+{
+    $portid = $request->route('portid');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'notes';
+    $content = $data[$field];
+    if (empty($data)) {
+        return api_error(400, 'Port field to patch has not been supplied.');
+    }
+
+    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+        return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
+    } else {
+        return api_error(500, 'Port ' . $field . ' field failed to be updated');
+    }
+}
+
 function list_alert_rules(Illuminate\Http\Request $request)
 {
     $id = $request->route('id');
@@ -1453,7 +1477,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id'])
+             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
              ->get();
 
     /** @var Device $device */
@@ -2116,6 +2140,58 @@ function get_device_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
 }
 
+function maintenance_devicegroup(Illuminate\Http\Request $request)
+{
+    if (empty($request->json())) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $device_group) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
+    }
+
+    $notes = $request->json('notes');
+    $title = $request->json('title') ?? $device_group->name;
+
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $title,
+        'notes' => $notes,
+        'recurring' => 0,
+    ]);
+
+    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
+    $duration = $request->json('duration');
+
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
+            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $alert_schedule->save();
+    $alert_schedule->deviceGroups()->attach($device_group);
+
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
+}
+
 function get_devices_by_group(Illuminate\Http\Request $request)
 {
     $name = $request->route('name');
@@ -2185,6 +2261,38 @@ function get_vrf(Illuminate\Http\Request $request)
     }
 
     return api_success($vrf, 'vrf');
+}
+
+function list_mpls_services(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_services->isEmpty()) {
+        return api_error(404, 'MPLS Services do not exist');
+    }
+
+    return api_success($mpls_services, 'mpls_services', null, 200, $mpls_services->count());
+}
+
+function list_mpls_saps(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_saps->isEmpty()) {
+        return api_error(404, 'SAPs do not exist');
+    }
+
+    return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
 }
 
 function list_ipsec(Illuminate\Http\Request $request)

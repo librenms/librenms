@@ -62,7 +62,7 @@
         },
         data() {
             return {
-                localList: this.value,
+                localList: this.value ?? [],
                 newItem: ""
             }
         },

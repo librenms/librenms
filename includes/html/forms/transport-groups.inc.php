@@ -35,7 +35,7 @@ $status = 'ok';
 $message = '';
 
 $group_id = $vars['group_id'];
-$name = $vars['name'];
+$name = strip_tags($vars['name']);
 
 $target_members = [];
 foreach ((array) $vars['members'] as $target) {

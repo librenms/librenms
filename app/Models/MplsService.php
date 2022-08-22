@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MplsService extends Model implements Keyable
+class MplsService extends DeviceRelatedModel implements Keyable
 {
     protected $primaryKey = 'svc_id';
     public $timestamps = false;

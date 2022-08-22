@@ -105,6 +105,7 @@
                                     "text",
                                     "boolean",
                                     "array",
+                                    "array-sub-keyed",
                                     "password",
                                     "email",
                                     "color",

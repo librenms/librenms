@@ -21,7 +21,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
     $ids = [];
 
     // For the moment only will be cisco and the version 3
-    if ($device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
+    if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['snmpver'] == 'v3') {
         $mib = 'SNMP-COMMUNITY-MIB';
         $mib = 'CISCO-CONTEXT-MAPPING-MIB';
         //-Osq because if i put the n the oid from the first command is not the same of this one
@@ -99,13 +99,10 @@ if (Config::get('enable_vrf_lite_cisco')) {
     $tmpVrfC = dbFetchRows('SELECT * FROM vrf_lite_cisco WHERE device_id = ? ', [
         $device['device_id'], ]);
 
-    //Delete all vrf that chaged
+    //Delete all vrf that changed
     foreach ($tmpVrfC as $vrfC) {
-        unset($ids[$vrfC['vrf_lite_cisco_id']]);
-    }
-    if (! empty($ids)) {
-        foreach ($ids as $id) {
-            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', [$id]);
+        if (! in_array($vrfC['vrf_lite_cisco_id'], $ids)) {
+            dbDelete('vrf_lite_cisco', 'vrf_lite_cisco_id = ? ', [$vrfC['vrf_lite_cisco_id']]);
         }
     }
     unset($ids);

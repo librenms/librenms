@@ -1,6 +1,3 @@
-source: Developing/os/Initial-Detection.md
-path: blob/master/doc/
-
 This document will provide the information you should need to add
 basic detection for a new OS.
 
@@ -42,6 +39,14 @@ is the preferred method for detection.  Other options are available:
   matches one of the regex statements under this item
 - `snmpget` Do not use this unless none of the other methods
   work. Fetch an oid and compare it against a value.
+```yaml
+discovery:
+    -
+      snmpget:
+        - oid: <someoid>
+        - op: <["=","!=","==","!==","<=",">=","<",">","starts","ends","contains","regex","not_starts","not_ends","not_contains","not_regex","in_array","not_in_array","exists"]>
+        - value: <'string' | boolean>
+```
 - `_except` You can add this to any of the above to exclude that
   element. As an example:
 
@@ -155,6 +160,7 @@ more complex collection is required.
 - `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
 - `<field>_regex` parse the value out of the returned oid data, must use a named group
 - `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
+- `<field>_replace` An array of replacements ['find', 'replace'] or strings to remove
 - `hardware_mib` MIB used to translate sysObjectID to get hardware. hardware_regex can process the result.
 
 ```yaml

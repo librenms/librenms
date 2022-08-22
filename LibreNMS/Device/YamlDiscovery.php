@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use LibreNMS\Util\Compare;
 
 class YamlDiscovery
 {
@@ -225,7 +226,9 @@ class YamlDiscovery
         $sub_index = 0;
         $sub_index_end = null;
         if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            [,$name, $sub_index, $sub_index_end] = $matches;
+            $name = $matches[1] ?? null;
+            $sub_index = $matches[2] ?? null;
+            $sub_index_end = $matches[3] ?? null;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -290,14 +293,14 @@ class YamlDiscovery
                     $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
-                        foreach ((array) $data['oid'] as $oid) {
+                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUS'];
+                                    $snmp_flag = ['-OteQUSa'];
                                 } else {
-                                    $snmp_flag = ['-OteQUs'];
+                                    $snmp_flag = ['-OteQUsa'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
@@ -325,12 +328,13 @@ class YamlDiscovery
      * Check to see if we should skip this discovery item
      *
      * @param  mixed  $value
+     * @param  int|string  $index
      * @param  array  $yaml_item_data  The data key from this item
      * @param  array  $group_options  The options key from this group of items
      * @param  array  $pre_cache  The pre-cache data array
      * @return bool
      */
-    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
+    public static function canSkipItem($value, $index, array $yaml_item_data, array $group_options, array $pre_cache = []): bool
     {
         $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
@@ -338,12 +342,20 @@ class YamlDiscovery
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = $skip_value['op'] ?? '!=';
-                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
-                if (Str::contains($skip_value['oid'], '.')) {
-                    [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
-                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+
+                if (isset($skip_value['device'])) {
+                    // field from device model
+                    $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } else {
+                    // oid previously fetched from the device
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                    if (Str::contains($skip_value['oid'], '.')) {
+                        [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
+                        $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                    }
                 }
-                if (compare_var($tmp_value, $skip_value['value'], $op)) {
+
+                if (Compare::values($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
             }

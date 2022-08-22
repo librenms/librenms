@@ -23,7 +23,7 @@ if ($mempools->isNotEmpty()) {
         <div class="panel-heading">
         ';
     echo '<a href="' . $mempools_url . '">';
-    echo '<i class="fa fa-braille fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
+    echo '<i class="fas fa-memory fa-lg icon-theme" aria-hidden="true"></i> <strong>Memory</strong></a>';
     echo '
         </div>
         <table class="table table-hover table-condensed table-striped">

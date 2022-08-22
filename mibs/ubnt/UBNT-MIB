@@ -5,22 +5,22 @@ UBNT-MIB DEFINITIONS ::= BEGIN
         OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF;
 
     ubntMIB MODULE-IDENTITY
-    LAST-UPDATED "201402270000Z"
-    ORGANIZATION "Ubiquiti Networks, Inc."
-    CONTACT-INFO "support@ubnt.com"
-    DESCRIPTION  "The MIB module for Ubiquiti Networks, Inc. entities"
-    REVISION "201402270000Z"
+    LAST-UPDATED "202109210000Z"
+    ORGANIZATION "Ubiquiti, Inc."
+    CONTACT-INFO "support@ui.com"
+    DESCRIPTION  "The MIB module for Ubiquiti, Inc. entities"
+    REVISION "202109210000Z"
     DESCRIPTION "Split revision"
     ::= { ubnt 1 }
 
     -- --------------------------------------------------------------------------------
-    --                         Ubiquiti Networks Root
+    --                         Ubiquiti Root
     -- --------------------------------------------------------------------------------
 
     ubnt OBJECT IDENTIFIER ::= { enterprises 41112 }
 
     -- --------------------------------------------------------------------------------
-    --                         Ubiquiti Networks SNMP Information
+    --                         Ubiquiti SNMP Information
     -- --------------------------------------------------------------------------------
 
     ubntSnmpInfo OBJECT IDENTIFIER ::= { ubntMIB 2 }
@@ -33,11 +33,12 @@ UBNT-MIB DEFINITIONS ::= BEGIN
     ubntMFiGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 7}
     ubntUniTelGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 8}
     ubntAFLTUGroups OBJECT IDENTIFIER ::= { ubntSnmpInfo 9}
+    uiAF60Groups OBJECT IDENTIFIER ::= { ubntSnmpInfo 10}
 
     -- --------------------------------------------------------------------------------
-    --                         Ubiquiti Networks Products
+    --                         Ubiquiti Products
     -- --------------------------------------------------------------------------------
-    
+
     ubntAirFIBER OBJECT IDENTIFIER ::= { ubntMIB 3 }
     ubntEdgeMax OBJECT IDENTIFIER ::= { ubntMIB 5 }
     ubntUniFi OBJECT IDENTIFIER ::= { ubntMIB 6 }
@@ -45,9 +46,10 @@ UBNT-MIB DEFINITIONS ::= BEGIN
     ubntMFi OBJECT IDENTIFIER ::= { ubntMIB 8 }
     ubntUniTel OBJECT IDENTIFIER ::= { ubntMIB 9 }
     ubntAFLTU OBJECT IDENTIFIER ::= { ubntMIB 10 }
+    uiAF60 OBJECT IDENTIFIER ::= { ubntMIB 11 }
 
     -- --------------------------------------------------------------------------------
-    --                         Ubiquiti Networks OR table
+    --                         Ubiquiti OR table
     -- --------------------------------------------------------------------------------
 
     ubntORTable OBJECT-TYPE

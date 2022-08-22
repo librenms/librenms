@@ -16,18 +16,17 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nfs-server';
-$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
 $nfsstats = snmp_get($device, $oid, '-Oqv');
 
 // rrd names
 $rrd_name = [];
-$rrd_name['default'] = ['app', 'nfs-server-default', $app_id];
-$rrd_name['proc2'] = ['app', 'nfs-server-proc2', $app_id];
-$rrd_name['proc3'] = ['app', 'nfs-server-proc3', $app_id];
-$rrd_name['proc4'] = ['app', 'nfs-server-proc4', $app_id];
-$rrd_name['proc4ops'] = ['app', 'nfs-server-proc4ops', $app_id];
+$rrd_name['default'] = ['app', 'nfs-server-default', $app->app_id];
+$rrd_name['proc2'] = ['app', 'nfs-server-proc2', $app->app_id];
+$rrd_name['proc3'] = ['app', 'nfs-server-proc3', $app->app_id];
+$rrd_name['proc4'] = ['app', 'nfs-server-proc4', $app->app_id];
+$rrd_name['proc4ops'] = ['app', 'nfs-server-proc4ops', $app->app_id];
 
 // rrd definitions
 $rrd_def_array['default'] = RrdDefinition::make()

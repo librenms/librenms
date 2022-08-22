@@ -171,7 +171,12 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Application Service Providers...
+         * Package Service Providers...
+         */
+        \SocialiteProviders\Manager\ServiceProvider::class,
+
+        /*
+         * LibreNMS Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
@@ -179,12 +184,12 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        App\Providers\ConfigServiceProvider::class,
+        App\Providers\SocialiteListenersServiceProvider::class,
+
         App\Providers\ComposerServiceProvider::class,
         App\Providers\DatastoreServiceProvider::class,
-
-        /*
-         * LibreNMS Service Providers...
-         */
         App\Providers\SnmptrapProvider::class,
         App\Providers\PluginProvider::class,
     ],
@@ -240,7 +245,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Debugbar' => Barryvdh\Debugbar\Facade::class,
+        'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,

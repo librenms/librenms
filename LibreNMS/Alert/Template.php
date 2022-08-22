@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\AlertState;
 
 class Template
@@ -74,9 +75,9 @@ class Template
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
-            return view(['template' => $data['template']->template], $alert)->__toString();
+            return Blade::render($data['template']->template, $alert);
         } catch (\Exception $e) {
-            return view(['template' => $this->getDefaultTemplate()], $alert)->__toString();
+            return Blade::render($this->getDefaultTemplate(), $alert);
         }
     }
 
@@ -90,9 +91,9 @@ class Template
     {
         $alert['alert'] = new AlertData($data['alert']);
         try {
-            return view(['template' => $data['title']], $alert)->__toString();
+            return Blade::render($data['title'], $alert);
         } catch (\Exception $e) {
-            return $data['title'] ?: view(['template' => 'Template ' . $data['name']], $alert)->__toString();
+            return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
         }
     }
 

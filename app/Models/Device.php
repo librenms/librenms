@@ -79,7 +79,7 @@ class Device extends BaseModel
 
     // ---- Helper Functions ----
 
-    public static function findByHostname($hostname)
+    public static function findByHostname(string $hostname): ?Device
     {
         return static::where('hostname', $hostname)->first();
     }
@@ -110,7 +110,7 @@ class Device extends BaseModel
         return $overwrite_ip ?: $hostname;
     }
 
-    public static function findByIp($ip)
+    public static function findByIp(?string $ip): ?Device
     {
         if (! IP::isValid($ip)) {
             return null;
@@ -210,7 +210,7 @@ class Device extends BaseModel
 
                 if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
-                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
+                        $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
@@ -242,7 +242,7 @@ class Device extends BaseModel
 
         $length = \LibreNMS\Config::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
-            $take = substr_count($name, '.', 0, $length) + 1;
+            $take = max(substr_count($name, '.', 0, $length), 1);
 
             return implode('.', array_slice(explode('.', $name), 0, $take));
         }
@@ -561,8 +561,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -572,8 +572,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -583,8 +583,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }
@@ -594,8 +594,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }
@@ -612,9 +612,9 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Alert::class, 'device_id');
     }
 
-    public function attribs(): HasMany
+    public function alertLogs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+        return $this->hasMany(\App\Models\AlertLog::class, 'device_id');
     }
 
     public function alertSchedules(): MorphToMany
@@ -625,6 +625,16 @@ class Device extends BaseModel
     public function applications(): HasMany
     {
         return $this->hasMany(\App\Models\Application::class, 'device_id');
+    }
+
+    public function attribs(): HasMany
+    {
+        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+    }
+
+    public function availability(): HasMany
+    {
+        return $this->hasMany(\App\Models\Availability::class, 'device_id');
     }
 
     public function bgppeers(): HasMany
@@ -647,6 +657,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
+    public function diskIo(): HasMany
+    {
+        return $this->hasMany(\App\Models\DiskIo::class, 'device_id');
+    }
+
     public function hostResources(): HasMany
     {
         return $this->hasMany(HrDevice::class, 'device_id');
@@ -660,6 +675,11 @@ class Device extends BaseModel
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
+    }
+
+    public function entityState(): HasMany
+    {
+        return $this->hasMany(EntityState::class, 'device_id');
     }
 
     public function eventlogs(): HasMany
@@ -692,9 +712,19 @@ class Device extends BaseModel
         return $this->hasManyThrough(\App\Models\Ipv6Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
+    public function isisAdjacencies(): HasMany
+    {
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
+    }
+
+    public function macs(): HasMany
+    {
+        return $this->hasMany(Ipv4Mac::class, 'device_id');
     }
 
     public function mefInfo(): HasMany
@@ -705,6 +735,11 @@ class Device extends BaseModel
     public function muninPlugins(): HasMany
     {
         return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
+    }
+
+    public function netscalerVservers(): HasMany
+    {
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function ospfAreas(): HasMany
@@ -725,16 +760,6 @@ class Device extends BaseModel
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
-    }
-
-    public function isisAdjacencies(): HasMany
-    {
-        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
-    }
-
-    public function netscalerVservers(): HasMany
-    {
-        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function packages(): HasMany
@@ -765,6 +790,21 @@ class Device extends BaseModel
     public function portsNac(): HasMany
     {
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+    }
+
+    public function portsStp(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVlan(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortVlan::class, 'device_id', 'device_id');
+    }
+
+    public function processes(): HasMany
+    {
+        return $this->hasMany(\App\Models\Process::class, 'device_id');
     }
 
     public function processors(): HasMany
@@ -805,6 +845,11 @@ class Device extends BaseModel
     public function stpInstances(): HasMany
     {
         return $this->hasMany(Stp::class, 'device_id');
+    }
+
+    public function stpPorts(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
     }
 
     public function mempools(): HasMany
@@ -880,6 +925,11 @@ class Device extends BaseModel
     public function syslogs(): HasMany
     {
         return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
+    }
+
+    public function tnmsNeInfo(): HasMany
+    {
+        return $this->hasMany(TnmsneInfo::class, 'device_id');
     }
 
     public function users(): BelongsToMany

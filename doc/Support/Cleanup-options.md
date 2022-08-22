@@ -1,6 +1,3 @@
-source: Support/Cleanup-options.md
-path: blob/master/doc/
-
 # Cleanup Options
 
 As the number of devices starts to grow in your LibreNMS install, so

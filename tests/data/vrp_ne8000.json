@@ -43,7 +43,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -65,7 +66,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -87,7 +89,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -109,7 +112,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "REDES DEL OESTE S.A, AR",
@@ -131,7 +135,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "YOUTUBE, US",
@@ -153,7 +158,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -175,7 +181,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -197,7 +204,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "FACEBOOK-OFFNET, US",
@@ -219,7 +227,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -241,7 +250,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -263,7 +273,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -285,7 +296,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -307,7 +319,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -329,7 +342,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PowerHost Telecom SPA, CL",
@@ -351,7 +365,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -373,7 +388,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -395,7 +411,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "LVLT-3549, US",
@@ -417,7 +434,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -439,7 +457,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -461,7 +480,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -483,7 +503,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -505,7 +526,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -527,7 +549,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -1107,7 +1130,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1129,7 +1153,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1151,7 +1176,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1173,7 +1199,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "REDES DEL OESTE S.A, AR",
@@ -1195,7 +1222,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "YOUTUBE, US",
@@ -1217,7 +1245,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -1239,7 +1268,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -1261,7 +1291,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "FACEBOOK-OFFNET, US",
@@ -1283,7 +1314,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1305,7 +1337,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1327,7 +1360,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1349,7 +1383,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1371,7 +1406,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1393,7 +1429,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PowerHost Telecom SPA, CL",
@@ -1415,7 +1452,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -1437,7 +1475,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -1459,7 +1498,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "LVLT-3549, US",
@@ -1481,7 +1521,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1503,7 +1544,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1525,7 +1567,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1547,7 +1590,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1569,7 +1613,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1591,7 +1636,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [

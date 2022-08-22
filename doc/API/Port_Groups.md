@@ -1,6 +1,3 @@
-source: API/Port_Groups.md
-path: blob/master/doc/
-
 ### `get_port_groups`
 
 List all port groups.

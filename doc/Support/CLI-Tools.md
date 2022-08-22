@@ -1,6 +1,3 @@
-source: Support/CLI-Tools.md
-path: blob/master/doc/
-
 # Command line tools
 
 Here's a brief list of command line tools, some might be missing.

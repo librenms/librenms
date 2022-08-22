@@ -372,6 +372,38 @@
             "order": 1,
             "type": "text"
         },
+        "auth.socialite.redirect": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 1,
+            "type": "boolean",
+            "default": false
+        },
+        "auth.socialite.register": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+
+        "auth.socialite.configs": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 3,
+            "type": "array-sub-keyed",
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.listener": ["not_regex:/[:|@]/"],
+                "value.*.listener": ["regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.redirect": "url",
+                "value.saml.metadata": "url_or_xml",
+                "value.saml.acs": "url",
+                "value.saml.entityid": "url"
+            }
+        },
+
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
@@ -433,6 +465,18 @@
             "section": "ad",
             "order": 12,
             "type": "text"
+        },
+        "auth_ad_starttls": {
+            "default": "disabled",
+            "group": "auth",
+            "section": "ad",
+            "order": 13,
+            "type": "select",
+            "options": {
+                "disabled": "Disabled",
+                "optional": "Optional",
+                "required": "Required"
+            }
         },
         "auth_ldap_attr.uid": {
             "default": "uid",
@@ -545,6 +589,13 @@
             "section": "ldap",
             "order": 0,
             "type": "text"
+        },
+        "auth_ldap_require_groupmembership": {
+            "default": true,
+            "group": "auth",
+            "section": "ldap",
+            "order": 4,
+            "type": "boolean"
         },
         "auth_ldap_starttls": {
             "default": "disabled",
@@ -2686,6 +2737,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_drops": {
+            "default": {
+                "section": "firewall",
+                "order": 11,
+                "descr": "Drops"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_fragmented": {
             "default": {
                 "section": "firewall",
@@ -3469,6 +3528,13 @@
                 "custom7": "Custom 7",
                 "custom8": "Custom 8"
             }
+        },
+        "http_auth_header": {
+            "default": "REMOTE_USER",
+            "group": "auth",
+            "section": "general",
+            "order": 4,
+            "type": "text"
         },
         "html_dir": {
             "type": "directory"
@@ -4645,13 +4711,6 @@
             "default": true,
             "type": "boolean"
         },
-        "poller_modules.mib": {
-            "order": 260,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "poller_modules.stp": {
             "order": 380,
             "group": "poller",
@@ -5145,11 +5204,25 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.oids.no_bulk": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 20,
+            "type": "array",
+            "default": []
+        },
+        "snmp.oids.unordered": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 21,
+            "type": "array",
+            "default": []
+        },
         "snmp.timeout": {
             "group": "poller",
             "section": "snmp",
             "order": 5,
-            "type": "integer",
+            "type": "float",
             "default": 1
         },
         "snmp.retries": {
@@ -5313,13 +5386,6 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "executable"
-        },
-        "traceroute6": {
-            "default": "traceroute6",
-            "group": "external",
-            "section": "binaries",
-            "order": 14,
             "type": "executable"
         },
         "transit_descr": {

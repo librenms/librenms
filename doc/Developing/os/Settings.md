@@ -1,6 +1,3 @@
-source: os/Settings.md
-path: blob/master/doc/
-
 # Optional OS Settings
 
 This page documents settings that can be set in the os yaml files or
@@ -120,6 +117,15 @@ snmpwalk for an OS set the following.
 
 ```yaml
 snmp_bulk: false
+```
+
+If only some specific OIDs fail with snmpbulkwalk. You can disable just those OIDs.
+This needs to match exactly the OID being walked by LibreNMS. MIB::oid is preferred to prevent name collisions.
+
+```yaml
+oids:
+    no_bulk:
+        - UCD-SNMP-MIB::laLoadInt
 ```
 
 #### Limit the oids per snmpget

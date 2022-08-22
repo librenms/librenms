@@ -1,6 +1,3 @@
-source: Extensions/Supermicro.md
-path: blob/master/doc/
-
 # Supermicro
 
 For some Supermicro information to show up in LibreNMS, you will need to install an agent.

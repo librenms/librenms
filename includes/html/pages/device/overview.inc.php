@@ -30,6 +30,10 @@ if ($device['os'] == 'cimc') {
     require 'overview/cimc.inc.php';
 }
 
+if ($device['os'] == 'ping') {
+    require 'overview/ping.inc.php';
+}
+
 echo '
     </div>
     <div class="col-md-6">

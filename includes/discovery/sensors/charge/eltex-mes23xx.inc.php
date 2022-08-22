@@ -18,9 +18,10 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2021 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
 $oids = snmp_walk($device, 'eltEnvMonBatteryStatusCharge', '-Osqn', 'ELTEX-MES-HWENVIROMENT-MIB');
 $oids = trim($oids);
 
@@ -31,15 +32,16 @@ if ($oids) {
             $oid = trim(explode(' ', $data)[0]);
             $value = trim(explode(' ', $data)[1]);
             $index = trim(explode('.', $oid)[14]);
+            if ($value <= 100) { // value > 100 if there is no battery connected
+                $type = 'eltex-mes23xx';
+                $limit = 101;
+                $limitwarn = 100;
+                $lowlimit = 0;
+                $lowwarnlimit = 10;
+                $descr = 'Battery Charge';
 
-            $type = 'eltex-mes23xx';
-            $limit = 101;
-            $limitwarn = 100;
-            $lowlimit = 0;
-            $lowwarnlimit = 10;
-            $descr = 'Battery Charge';
-
-            discover_sensor($valid['sensor'], 'charge', $device, $oid, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value);
+                discover_sensor($valid['sensor'], 'charge', $device, $oid, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value);
+            }
         }
     }
 }

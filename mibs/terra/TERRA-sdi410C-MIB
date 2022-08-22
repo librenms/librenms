@@ -1,0 +1,692 @@
+--File Name : sdi410C-TERRA-MIB
+--Date      : October 09 2017
+--****************************************************
+--sdi410C-TERRA-MIB:     sdi410C Platform Specific MIB
+--
+--October 2017, Virginijus Bieliauskas
+--
+--Copyright (c) 2017 by TERRA Electronics.
+--All rights reserved.
+--
+--****************************************************
+
+TERRA-sdi410C-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DefStatus
+        FROM TERRA-DEFINITIONS-MIB
+    terraProducts
+        FROM TERRA-PRODUCTS-MIB;
+
+    terra-sdi410C MODULE-IDENTITY
+        LAST-UPDATED        "201710090000Z"
+        ORGANIZATION        "TERRA Electronics"
+        CONTACT-INFO        "TERRA Electronics
+                            
+                            Draugystes 22
+                            Kaunas
+                            Lithuania
+                            LT-51256
+                            E-mail: design@terraelectronics.com"
+        DESCRIPTION         "This MIB provides Terra DVB-S/S2 to IP streamer sdi410C information."
+
+        REVISION            "201710091100Z"
+        DESCRIPTION         "Production version"
+        ::= { terraProducts 8 }
+
+
+    sdi410cstatus OBJECT IDENTIFIER ::= { terra-sdi410C 1 }
+
+    mainStatus OBJECT IDENTIFIER ::= { sdi410cstatus 1 }
+
+    inBR OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input bitrate in kbps"
+        ::= { mainStatus 1 }
+
+    outBR OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate in kbps"
+        ::= { mainStatus 2 }
+
+    load OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "percents"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Processor load in percents"
+        ::= { mainStatus 3 }
+
+    temp OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "deg C"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Internal temperature in deg C"
+        ::= { mainStatus 4 }
+
+    supply OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "volts V"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Supply voltage in tenths V"
+        ::= { mainStatus 5 }
+
+    outStream1 OBJECT IDENTIFIER ::= { sdi410cstatus 2 }
+
+    outBr1 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the all transport stream in kbps"
+        ::= { outStream1 1 }
+
+    outStream2 OBJECT IDENTIFIER ::= { sdi410cstatus 3 }
+
+    outBr2 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream2 1 }
+
+    outStream3 OBJECT IDENTIFIER ::= { sdi410cstatus 4 }
+
+    outBr3 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream3 1 }
+
+    outStream4 OBJECT IDENTIFIER ::= { sdi410cstatus 5 }
+
+    outBr4 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream4 1 }
+
+    outStream5 OBJECT IDENTIFIER ::= { sdi410cstatus 6 }
+
+    outBr5 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream5 1 }
+
+    outStream6 OBJECT IDENTIFIER ::= { sdi410cstatus 7 }
+
+    outBr6 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream6 1 }
+
+    outStream7 OBJECT IDENTIFIER ::= { sdi410cstatus 8 }
+
+    outBr7 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream7 1 }
+
+    outStream8 OBJECT IDENTIFIER ::= { sdi410cstatus 9 }
+
+    outBr8 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream8 1 }
+
+    outStream9 OBJECT IDENTIFIER ::= { sdi410cstatus 10 }
+
+    outBr9 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream9 1 }
+
+    outStream10 OBJECT IDENTIFIER ::= { sdi410cstatus 11 }
+
+    outBr10 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream10 1 }
+
+    outStream11 OBJECT IDENTIFIER ::= { sdi410cstatus 12 }
+
+    outBr11 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream11 1 }
+
+    outStream12 OBJECT IDENTIFIER ::= { sdi410cstatus 13 }
+
+    outBr12 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream12 1 }
+
+    outStream13 OBJECT IDENTIFIER ::= { sdi410cstatus 14 }
+
+    outBr13 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream13 1 }
+
+    outStream14 OBJECT IDENTIFIER ::= { sdi410cstatus 15 }
+
+    outBr14 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream14 1 }
+
+    outStream15 OBJECT IDENTIFIER ::= { sdi410cstatus 16 }
+
+    outBr15 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream15 1 }
+
+    outStream16 OBJECT IDENTIFIER ::= { sdi410cstatus 17 }
+
+    outBr16 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream16 1 }
+
+    outStream17 OBJECT IDENTIFIER ::= { sdi410cstatus 18 }
+
+    outBr17 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream17 1 }
+
+    outStream18 OBJECT IDENTIFIER ::= { sdi410cstatus 19 }
+
+    outBr18 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream18 1 }
+
+    outStream19 OBJECT IDENTIFIER ::= { sdi410cstatus 20 }
+
+    outBr19 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream19 1 }
+
+    outStream20 OBJECT IDENTIFIER ::= { sdi410cstatus 21 }
+
+    outBr20 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream20 1 }
+
+    outStream21 OBJECT IDENTIFIER ::= { sdi410cstatus 22 }
+
+    outBr21 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream21 1 }
+
+    outStream22 OBJECT IDENTIFIER ::= { sdi410cstatus 23 }
+
+    outBr22 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream22 1 }
+
+    outStream23 OBJECT IDENTIFIER ::= { sdi410cstatus 24 }
+
+    outBr23 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream23 1 }
+
+    outStream24 OBJECT IDENTIFIER ::= { sdi410cstatus 25 }
+
+    outBr24 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream24 1 }
+
+    outStream25 OBJECT IDENTIFIER ::= { sdi410cstatus 26 }
+
+    outBr25 OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "kbps"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate of the individual service in kbps"
+        ::= { outStream25 1 }
+
+    inputStatus OBJECT IDENTIFIER ::= { sdi410cstatus 27 }
+
+    lock OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tuner lock status"
+        ::= { inputStatus 1 }
+
+    std OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation standard"
+        ::= { inputStatus 2 }
+
+    level OBJECT-TYPE
+        SYNTAX              DisplayString
+        UNITS               "dbuV"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input signal level  in dbuV"
+        ::= { inputStatus 3 }
+
+    mod OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Modulation"
+        ::= { inputStatus 4 }
+
+    freq OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "MHz"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Frequency in MHz"
+        ::= { inputStatus 5 }
+
+    sr OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "Ks/s"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Symbol rate in Ks/s"
+        ::= { inputStatus 6 }
+
+    fec OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Forward error correction"
+        ::= { inputStatus 7 }
+
+    snr OBJECT-TYPE
+        SYNTAX              Integer32
+        UNITS               "tenths of dB"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Signal to noise ratio in tenths of dB"
+        ::= { inputStatus 8 }
+
+    vber OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Viterbi bit error ratio (DVB-S only)"
+        ::= { inputStatus 9 }
+
+    per OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Packet error ratio"
+        ::= { inputStatus 10 }
+
+    inCCerr OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input CC error count"
+        ::= { inputStatus 11 }
+
+    sdi410calarms OBJECT IDENTIFIER ::= { terra-sdi410C 2 }
+
+    alarmCam OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "CAM initialisation error"
+        ::= { sdi410calarms 1 }
+
+    alarmDesc OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Descrambling error"
+        ::= { sdi410calarms 2 }
+
+    alarmInpsig OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No input signal"
+        ::= { sdi410calarms 3 }
+
+    alarmBitovf OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output bitrate overflow"
+        ::= { sdi410calarms 4 }
+
+    alarmLinks OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Streaming ETH interface link down"
+        ::= { sdi410calarms 5 }
+
+    alarmLinkc OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Control ETH interface link down"
+        ::= { sdi410calarms 6 }
+
+    alarmPowovl OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LNB power overloaded"
+        ::= { sdi410calarms 7 }
+
+    alarmPowv OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Power voltage is out of limits"
+        ::= { sdi410calarms 8 }
+
+    alarmTemps OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Temperature sensor error"
+        ::= { sdi410calarms 9 }
+
+    alarmOvh OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Module is overheated"
+        ::= { sdi410calarms 10 }
+
+    alarmTsErr OBJECT-TYPE
+        SYNTAX              DefStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input transport stream error"
+        ::= { sdi410calarms 11 }
+
+    sdi410cnotifications OBJECT IDENTIFIER ::= { terra-sdi410C 3 }
+
+    notifyCam NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmCam
+                }
+        STATUS              current
+        DESCRIPTION         "CAM initialisation error"
+        ::= { sdi410cnotifications 1 }
+
+    notifyDesc NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmDesc
+                }
+        STATUS              current
+        DESCRIPTION         "Descrambling error"
+        ::= { sdi410cnotifications 2 }
+
+    notifyInpsig NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmInpsig
+                }
+        STATUS              current
+        DESCRIPTION         "No input signal"
+        ::= { sdi410cnotifications 3 }
+
+    notifyBitovf NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmBitovf
+                }
+        STATUS              current
+        DESCRIPTION         "Output bitrate overflow"
+        ::= { sdi410cnotifications 4 }
+
+    notifyLinks NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmLinks
+                }
+        STATUS              current
+        DESCRIPTION         "Streaming ETH interface link down"
+        ::= { sdi410cnotifications 5 }
+
+    notifyLinkc NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmLinkc
+                }
+        STATUS              current
+        DESCRIPTION         "Control ETH interface link down"
+        ::= { sdi410cnotifications 6 }
+
+    notifyPowovl NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmPowovl
+                }
+        STATUS              current
+        DESCRIPTION         "LNB power overloaded"
+        ::= { sdi410cnotifications 7 }
+
+    notifyPowv NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmPowv
+                }
+        STATUS              current
+        DESCRIPTION         "Power voltage is out of limits"
+        ::= { sdi410cnotifications 8 }
+
+    notifyTemps NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmTemps
+                }
+        STATUS              current
+        DESCRIPTION         "Temperature sensor error"
+        ::= { sdi410cnotifications 9 }
+
+    notifyOvh NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmOvh
+                }
+        STATUS              current
+        DESCRIPTION         "Module is overheated"
+        ::= { sdi410cnotifications 10 }
+
+    notifyTsErr NOTIFICATION-TYPE
+        OBJECTS {           
+                        alarmTsErr
+                }
+        STATUS              current
+        DESCRIPTION         "Input transport stream error"
+        ::= { sdi410cnotifications 11 }
+
+    sdi410cInfo OBJECT IDENTIFIER ::= { terra-sdi410C 4 }
+
+    infVersion OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Represents device firmware version number"
+        ::= { sdi410cInfo 1 }
+
+    infSerNum OBJECT-TYPE
+        SYNTAX              DisplayString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Represents device Serial Number"
+        ::= { sdi410cInfo 2 }
+
+    terrasdi410cMIBConformance OBJECT IDENTIFIER ::= { terra-sdi410C 5 }
+
+    terrasdi410cMIBGroups OBJECT IDENTIFIER ::= { terrasdi410cMIBConformance 1 }
+
+    sdi410cTerraMibAllObjects OBJECT-GROUP
+        OBJECTS {           
+                        inBR,
+                        outBR,
+                        load,
+                        temp,
+                        outBr1,
+                        outBr2,
+                        outBr3,
+                        outBr4,
+                        outBr5,
+                        outBr6,
+                        outBr7,
+                        outBr8,
+                        outBr9,
+                        outBr10,
+                        outBr11,
+                        outBr12,
+                        outBr13,
+                        outBr14,
+                        outBr15,
+                        outBr16,
+                        outBr17,
+                        outBr18,
+                        outBr19,
+                        outBr20,
+                        outBr21,
+                        outBr22,
+                        outBr23,
+                        outBr24,
+                        outBr25,
+                        lock,
+                        std,
+                        level,
+                        mod,
+                        freq,
+                        sr,
+                        fec,
+                        snr,
+                        vber,
+                        per,
+                        inCCerr,
+                        alarmCam,
+                        alarmDesc,
+                        alarmInpsig,
+                        alarmBitovf,
+                        alarmLinks,
+                        alarmLinkc,
+                        alarmPowovl,
+                        alarmPowv,
+                        alarmTemps,
+                        alarmOvh,
+                        alarmTsErr,
+                        infVersion,
+                        infSerNum
+                }
+        STATUS              current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { terrasdi410cMIBGroups 1 }
+
+    sdi410cTerraMibAllNotifications NOTIFICATION-GROUP
+        NOTIFICATIONS       {
+                                notifyCam,
+                                notifyDesc,
+                                notifyInpsig,
+                                notifyBitovf,
+                                notifyLinks,
+                                notifyLinkc,
+                                notifyPowovl,
+                                notifyPowv,
+                                notifyTemps,
+                                notifyOvh,
+                                notifyTsErr
+                            }
+        STATUS              current
+        DESCRIPTION         "This automatically created notification group
+                            contains all notifications that do not belong
+                            to any other NOTIFICATION-GROUP"
+        ::= { terrasdi410cMIBGroups 2 }
+
+END

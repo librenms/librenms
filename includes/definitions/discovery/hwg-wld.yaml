@@ -17,6 +17,11 @@ modules:
                         - { descr: invalid, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: alarm, graph: 0, value: 3, generic: 2 }
+                    skip_values:
+                        -
+                            oid: wldValue
+                            op: '='
+                            value: 2
                 -
                     oid: wldTable
                     value: wldValue

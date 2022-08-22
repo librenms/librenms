@@ -72,7 +72,7 @@ class Nac implements Module
 
             $delete = $existing_entries->diffKeys($nac_entries)->pluck('ports_nac_id');
             if ($delete->isNotEmpty()) {
-                $count = PortsNac::query()->whereIn('ports_nac_id', $delete)->delete();
+                $count = PortsNac::query()->whereIntegerInRaw('ports_nac_id', $delete)->delete();
                 d_echo('Deleted ' . $count, str_repeat('-', $count));
             }
         }

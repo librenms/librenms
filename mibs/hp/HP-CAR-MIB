@@ -1,0 +1,265 @@
+-- *****************************************************************
+-- Commited Access Rate MIB file.
+-- *****************************************************************
+HP-CAR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE,
+	Gauge
+		FROM RFC1155-SMI
+
+        Counter64
+		FROM SNMPv2-SMI
+
+
+	snCAR
+		FROM HP-SN-SWITCH-GROUP-MIB;
+			
+
+snPortCARs	OBJECT IDENTIFIER ::= { snCAR 1 }
+
+PacketSource ::= INTEGER { 
+		input(0), --for inbound traffic
+		output(1) --for outbound traffic
+	}
+
+RateLimitType ::= INTEGER { 
+		all(3), 		--	all traffic.                             
+		quickAcc(2), 	--	traffic matches rate-limit's access list.
+		standardAcc(1) 	--	traffic matches standard access list.    
+	}
+
+RateLimitAction ::= INTEGER {
+		continue(1), 
+		drop(2), 
+		precedCont(3),
+		precedXmit(4), 
+		xmit(5) 
+	}
+
+
+snPortCARTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnPortCAREntry
+	ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        "A table of rate limit configuration entries.
+	Rate Limit is a method of traffic control.  It allows a set
+	of rate limits to be configured and applied to packets flowing
+	into/out of an interface to regulate network traffic."
+
+        ::= { snPortCARs 1 }
+
+snPortCAREntry OBJECT-TYPE
+        SYNTAX SnPortCAREntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+        	"A collection of rate-limit configuration objects on this 
+		interface."
+        INDEX { snPortCARifIndex, snPortCARDirection, snPortCARRowIndex }
+        ::= { snPortCARTable 1 }
+
+SnPortCAREntry ::=
+	SEQUENCE {
+		snPortCARifIndex
+						INTEGER,
+		snPortCARDirection
+               		PacketSource,
+		snPortCARRowIndex
+                        INTEGER,
+		snPortCARType
+                        RateLimitType,
+		snPortCARAccIdx
+                        INTEGER,
+		snPortCARRate
+                        INTEGER,
+		snPortCARLimit
+                        INTEGER,
+		snPortCARExtLimit
+                        INTEGER,
+		snPortCARConformAction
+       					RateLimitAction,
+		snPortCARExceedAction
+       					RateLimitAction,
+		snPortCARStatSwitchedPkts
+                        Counter64,
+		snPortCARStatSwitchedBytes
+                        Counter64,
+		snPortCARStatFilteredPkts
+                        Counter64,
+		snPortCARStatFilteredBytes
+                        Counter64,
+		snPortCARStatCurBurst
+       					Gauge
+	}
+snPortCARifIndex OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ifIndex value for this rate limit entry."
+    ::= { snPortCAREntry 1 }
+
+snPortCARDirection OBJECT-TYPE
+	SYNTAX  PacketSource
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+       		"The input or output transmission direction for the 
+                Rate Limit object.
+				input (0), --for inbound traffic
+				output(1) --for outbound traffic "
+        ::= { snPortCAREntry 2 }
+
+snPortCARRowIndex OBJECT-TYPE
+	SYNTAX  INTEGER (1..2147483647)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The table index for rate limit objects.
+		It increases as the rate limit entries are added.
+		Skips the number when a row is deleted."
+
+        ::= { snPortCAREntry 3 }
+
+snPortCARType OBJECT-TYPE
+	SYNTAX  RateLimitType
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+		"The type of traffic rate-limited against."
+
+	::= { snPortCAREntry 4 }
+
+snPortCARAccIdx OBJECT-TYPE
+	SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+		"The index to the access list if RateLimitType is either
+		quickAcc or standardAcc."
+
+	::= { snPortCAREntry 5 }
+
+snPortCARRate OBJECT-TYPE
+	SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+		"The comitted access rate. This determines the long term
+		average transmission rate. Traffic that falls under this
+		rate always conforms. This is average rate in bits per 
+		second."
+
+	::= { snPortCAREntry 6 }
+
+snPortCARLimit OBJECT-TYPE
+	SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+		"This is the normal burst size that determines how large traffic
+		bursts can be before some traffic exceeds the rate limit. This
+		specifies the number of bytes that are guaranteed to be transported
+		by the network at the average rate under normal conditions during
+		committed time interval. This normal burst size is in bytes."
+
+	::= { snPortCAREntry 7 }
+
+snPortCARExtLimit OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This is the extended burst limit that determines how large traffic
+		bursts can be before all the traffic exceeds the rate limit. This
+		burst size is in bytes."
+
+	::= { snPortCAREntry 8 }
+
+snPortCARConformAction OBJECT-TYPE
+	SYNTAX	RateLimitAction
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Action to be taken when the traffic is within
+		the Rate Limit.
+		drop		drop the packet.
+		xmit		transmit the packet.
+		continue	continue to evaluate to the subsequent
+					rate limits.
+		precedXmit	rewrite the IP precedence and transmit
+					the packet.
+		precedCont	rewrite the IP precedence and allow it
+					evaluated by subsequent rate limits."
+
+	::= { snPortCAREntry 9 }
+
+snPortCARExceedAction OBJECT-TYPE
+	SYNTAX	RateLimitAction
+	ACCESS  read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Action to be taken when the traffic exceeds
+		the Rate Limit.drop		
+		drop the packet.
+		xmit		transmit the packet.
+		continue	continue to evaluate to the subsequent
+					rate limits.
+		precedXmit	rewrite the IP precedence and transmit
+					the packet.
+		precedCont	rewrite the IP precedence and allow it
+					evaluated by subsequent rate limits."
+
+	::= { snPortCAREntry 10 }
+
+snPortCARStatSwitchedPkts OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The counter of packets permitted by this rate limit."
+
+	::= { snPortCAREntry 11 }
+
+snPortCARStatSwitchedBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The counter of bytes permitted by this interface."
+
+	::= { snPortCAREntry 12 }
+
+snPortCARStatFilteredPkts OBJECT-TYPE
+	SYNTAX  Counter64
+	--UNITS	"packets"
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The counter of packets which exceeded this rate limit."
+
+	::= { snPortCAREntry 13 }
+
+snPortCARStatFilteredBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The counter of bytes which exceeded this rate limit."
+
+	::= { snPortCAREntry 14 }
+
+snPortCARStatCurBurst OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current received burst size."
+	::= { snPortCAREntry 15 }
+
+-- end of snPortCARTable
+
+
+END

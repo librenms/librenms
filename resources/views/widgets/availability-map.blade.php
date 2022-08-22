@@ -30,16 +30,14 @@
         @if($type == 0)
             @if($color_only_select == 1)
                 <span class="label {{ $row['labelClass'] }} widget-availability-fixed widget-availability label-font-border"> </span>
-            @else
-            @if($color_only_select == 2)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->hostname) }}</span>
-            @else
-            @if($color_only_select == 3)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->sysName) }}</span>
+            @elseif($color_only_select == 2)
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->hostname }}</span>
+            @elseif($color_only_select == 3)
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->sysName }}</span>
+            @elseif($color_only_select == 4)
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->shortDisplayName() }}</span>
             @else
                 <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['stateName']) }}</span>
-            @endif
-            @endif
             @endif
         @else
             <div class="availability-map-oldview-box-{{ $row['stateName'] }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>

@@ -29,6 +29,12 @@ class LdapAuthorizer extends AuthorizerBase
                 if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
                     $this->bind();
                 }
+
+                if (Config::get('auth_ldap_require_groupmembership') === false) {
+                    // skip group check if the server does not support ldap_compare (hint: google gsuite ldap)
+                    return true;
+                }
+
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
                     // no groups, don't check membership
@@ -379,9 +385,9 @@ class LdapAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
 
         $use_tls = Config::get('auth_ldap_starttls');
-        if ($use_tls == 'optional' || $use_tls == 'require') {
+        if ($use_tls == 'optional' || $use_tls == 'required') {
             $tls_success = ldap_start_tls($this->ldap_connection);
-            if ($use_tls == 'require' && $tls_success === false) {
+            if ($use_tls == 'required' && $tls_success === false) {
                 $error = ldap_error($this->ldap_connection);
                 throw new AuthenticationException("Fatal error: LDAP TLS required but not successfully negotiated: $error");
             }

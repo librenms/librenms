@@ -1,6 +1,3 @@
-source: API/Logs.md
-path: blob/master/doc/
-
 All the `list_*logs` calls are aliased to `list_logs`.
 
 Retrieve all logs or logs for a specific device.

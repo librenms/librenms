@@ -1,4 +1,3 @@
-
 # LibreNMS VMs
 
 > NOTE: We highly advise that you change all passwords on this image

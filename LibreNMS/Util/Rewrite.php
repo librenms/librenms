@@ -185,23 +185,26 @@ class Rewrite
      *
      * Assumes the MAC address is well-formed and in a common format.
      * 00:12:34:ab:cd:ef becomes 001234abcdef
-     * 00:12:34:AB:CD:EF becomes 001234ABCDEF
-     * 0:12:34:AB:CD:EF  becomes 001234ABCDEF
-     * 00-12-34-AB-CD-EF becomes 001234ABCDEF
-     * 001234-ABCDEF     becomes 001234ABCDEF
-     * 0012.34AB.CDEF    becomes 001234ABCDEF
-     * 00:02:04:0B:0D:0F becomes 0002040B0D0F
-     * 0:2:4:B:D:F       becomes 0002040B0D0F
+     * 00:12:34:AB:CD:EF becomes 001234abcdef
+     * 0:12:34:AB:CD:EF  becomes 001234abcdef
+     * 00-12-34-AB-CD-EF becomes 001234abcdef
+     * 001234-ABCDEF     becomes 001234abcdef
+     * 0012.34AB.CDEF    becomes 001234abcdef
+     * 00:02:04:0B:0D:0F becomes 0002040b0d0f
+     * 0:2:4:B:D:F       becomes 0002040b0d0f
      *
      * @param  string  $mac  hexadecimal MAC address with or without common delimiters
      * @return string undelimited hexadecimal MAC address
      */
-    public static function macToHex($mac)
+    public static function macToHex(string $mac): string
     {
-        $mac_array = explode(':', str_replace(['-', '.'], ':', $mac));
-        $mac_padding = array_fill(0, count($mac_array), 12 / count($mac_array));
+        // split it apart
+        $mac_array = explode(':', str_replace(['-', '.', ' '], ':', strtolower(trim($mac))));
+        $len = count($mac_array);
+        $mac_padding = array_fill(0, $len, ceil(12 / $len));
 
-        return implode(array_map('zeropad', $mac_array, $mac_padding));
+        // pad the parts to prefix 0s and only take the last 12 digits
+        return substr(implode(array_map('zeropad', $mac_array, $mac_padding)), -12);
     }
 
     /**

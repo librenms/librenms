@@ -7,7 +7,7 @@
 -- May  2004, Arul Mozhi
 -- Mar  2015, Neha Jagtap
 --   
--- Copyright (c) 2001-2003, 2004, 2008, 2013-2015 by cisco Systems Inc.
+-- Copyright (c) 2001-2018 by cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *****************************************************************
@@ -42,7 +42,7 @@ IMPORTS
 
 
 ciscoEntityExtMIB MODULE-IDENTITY
-    LAST-UPDATED    "201504170000Z"
+    LAST-UPDATED    "201804040000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -92,6 +92,11 @@ ciscoEntityExtMIB MODULE-IDENTITY
 
         Booting is the process of initializing the
         hardware and starting the Operating System."
+    REVISION        "201804040000Z"
+    DESCRIPTION
+        "Added the following groups OBJECT-GROUP
+         ceExtNVRAMOverflowGroup
+         ceExtHCNVRAMGroup"
     REVISION        "201504170000Z"
     DESCRIPTION
         "Added ceExtUSBModemTable,
@@ -339,11 +344,15 @@ ceExtPhysicalProcessorEntry OBJECT-TYPE
     ::= { ceExtPhysicalProcessorTable 1 }
 
 CeExtPhysicalProcessorEntry ::= SEQUENCE {
-        ceExtProcessorRam         Unsigned32,
-        ceExtNVRAMSize            Unsigned32,
-        ceExtNVRAMUsed            Unsigned32,
-        ceExtProcessorRamOverflow Unsigned32,
-        ceExtHCProcessorRam       Unsigned64
+        ceExtProcessorRam               Unsigned32,
+        ceExtNVRAMSize                  Unsigned32,
+        ceExtNVRAMUsed                  Unsigned32,
+        ceExtProcessorRamOverflow       Unsigned32,
+        ceExtHCProcessorRam             Unsigned64,
+        ceExtNVRAMSizeOverflow          Unsigned32,
+        ceExtHCNVRAMSize                Unsigned64,
+        ceExtNVRAMUsedOverflow          Unsigned32,
+        ceExtHCNVRAMUsed                Unsigned64
 }
 
 ceExtProcessorRam OBJECT-TYPE
@@ -401,8 +410,52 @@ ceExtHCProcessorRam OBJECT-TYPE
         available on the Processor. This object is a 64-bit version
         of ceExtProcessorRam." 
     ::= { ceExtPhysicalProcessorEntry 5 }
- 
 
+ceExtNVRAMSizeOverflow OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of ceExtNVRAMSize.
+        This object needs to be supported only if the available NVRAM
+        bytes exceeds 32-bit, otherwise this object value would be set
+        to 0." 
+    ::= { ceExtPhysicalProcessorEntry 6 }
+
+ceExtHCNVRAMSize OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the total number of bytes of NVRAM
+        available on the Processor. This object is a 64-bit version
+        of ceExtNVRAMSize."
+    ::= { ceExtPhysicalProcessorEntry 7 }
+ 
+ceExtNVRAMUsedOverflow OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of ceExtNVRAMUsed.
+        This object needs to be supported only if the used NVRAM
+        bytes exceeds 32-bit, otherwise this object value would be set
+        to 0." 
+    ::= { ceExtPhysicalProcessorEntry 8 }
+
+ceExtHCNVRAMUsed OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the number of bytes of NVRAM used
+        on the Processor. This object is a 64-bit version of
+        ceExtHCNVRAMUsed." 
+    ::= { ceExtPhysicalProcessorEntry 9 }
 
 ceExtConfigRegTable OBJECT-TYPE
     SYNTAX          SEQUENCE OF CeExtConfigRegEntry 
@@ -1124,7 +1177,7 @@ ciscoEntityExtMIBComplianceRev5 MODULE-COMPLIANCE
     ::= { ciscoEntityExtMIBCompliances 6 }
 
 ciscoEntityExtMIBComplianceRev6 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          current 
     DESCRIPTION
         "Compliance for SNMP Entities which support modules
         with CPU, NVRAM and configuration register."
@@ -1367,164 +1420,26 @@ ceExtUsbModemNotifControlGroup OBJECT-GROUP
         MODEM notifications."
     ::= { ciscoEntityExtMIBGroups 15 }
 
+ceExtNVRAMOverflowGroup OBJECT-GROUP
+    OBJECTS         { 
+                        ceExtNVRAMSizeOverflow,
+                        ceExtNVRAMUsedOverflow
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects providing Overflow (upper 32-bit) objects 
+        for processor NVRAM information."
+    ::= { ciscoEntityExtMIBGroups 16 }
+
+ceExtHCNVRAMGroup OBJECT-GROUP
+    OBJECTS         { 
+                        ceExtHCNVRAMSize, 
+                        ceExtHCNVRAMUsed
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects providing High Capacity (HC) objects 
+        for processor NVRAM information."
+    ::= { ciscoEntityExtMIBGroups 17 }
+
 END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

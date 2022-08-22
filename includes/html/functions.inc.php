@@ -81,19 +81,6 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-/**
- * Find all links in some text and turn them into html links.
- *
- * @param  string  $text
- * @return string
- */
-function linkify($text)
-{
-    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
-
-    return preg_replace($regex, '<a href="$0">$0</a>', $text);
-}
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
@@ -144,19 +131,6 @@ function port_permitted($port_id, $device_id = null)
     }
 
     return \Permissions::canAccessPort($port_id, Auth::id());
-}
-
-function application_permitted($app_id, $device_id = null)
-{
-    if (! is_numeric($app_id)) {
-        return false;
-    }
-
-    if (! $device_id) {
-        $device_id = get_device_id_by_app_id($app_id);
-    }
-
-    return device_permitted($device_id);
 }
 
 function device_permitted($device_id)
@@ -350,11 +324,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
 
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    if ($port['port_descr_descr']) {
-        $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
-    } elseif ($port['ifAlias']) {
-        $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
-    }
+    $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
     $graph_array['type'] = $port['graph_type'];
@@ -770,8 +740,14 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
-            $tmp_alerts = cleanPort($tmp_alerts);
-            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            if ($tmp_alerts['isisISAdjState']) {
+                $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
+                $port = \App\Models\Port::find($tmp_alerts['port_id']);
+                $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
+            } else {
+                $tmp_alerts = cleanPort($tmp_alerts);
+                $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            }
             $fallback = false;
         }
 
@@ -1087,60 +1063,6 @@ function get_oxidized_nodes_list()
 }
 
 /**
- * Get the fail2ban jails for a device... just requires the device ID
- * an empty return means either no jails or fail2ban is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_fail2ban_jails($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'fail2ban'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $f2bc = $component->getComponents($device_id, $options);
-
-    if (isset($f2bc[$device_id])) {
-        $id = $component->getFirstComponentID($f2bc, $device_id);
-
-        return json_decode($f2bc[$device_id][$id]['jails']);
-    }
-
-    return [];
-}
-
-/**
- * Get the Postgres databases for a device... just requires the device ID
- * an empty return means Postres is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_postgres_databases($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'postgres'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $pgc = $component->getComponents($device_id, $options);
-
-    if (isset($pgc[$device_id])) {
-        $id = $component->getFirstComponentID($pgc, $device_id);
-
-        return json_decode($pgc[$device_id][$id]['databases']);
-    }
-
-    return [];
-}
-
-/**
  * Return stacked graphs information
  *
  * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
@@ -1183,60 +1105,6 @@ function parse_at_time($time)
     }
 
     return (int) strtotime($time);
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_zfs_pools($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'zfs'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $zfsc = $component->getComponents($device_id, $options);
-
-    if (isset($zfsc[$device_id])) {
-        $id = $component->getFirstComponentID($zfsc, $device_id);
-
-        return json_decode($zfsc[$device_id][$id]['pools']);
-    }
-
-    return [];
-}
-
-/**
- * Get the ports for a device... just requires the device ID
- * an empty return means portsactivity is not in use or there are currently no ports
- *
- * @param $device_id
- * @return array
- */
-function get_portactivity_ports($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'portsactivity'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $portsc = $component->getComponents($device_id, $options);
-
-    if (isset($portsc[$device_id])) {
-        $id = $component->getFirstComponentID($portsc, $device_id);
-
-        return json_decode($portsc[$device_id][$id]['ports']);
-    }
-
-    return [];
 }
 
 /**
@@ -1440,31 +1308,4 @@ function nfsen_live_dir($hostname)
             return $base_dir . '/profiles-data/live/' . $hostname;
         }
     }
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_chrony_sources($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'chronyd'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $chronyd_cpnt = $component->getComponents($device_id, $options);
-
-    if (isset($chronyd_cpnt[$device_id])) {
-        $id = $component->getFirstComponentID($chronyd_cpnt, $device_id);
-
-        return json_decode($chronyd_cpnt[$device_id][$id]['sources']);
-    }
-
-    return [];
 }

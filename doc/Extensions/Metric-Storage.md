@@ -1,5 +1,3 @@
-source: Extensions/Metric-Storage.md
-path: blob/master/doc/
 hide_toc: true
 
 # Metric storage

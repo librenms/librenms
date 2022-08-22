@@ -64,7 +64,7 @@ if (! $auth) {
     if ($type != 'sensor') {
         echo '<div style="float: right;"><form action="">';
         echo csrf_field();
-        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" >";
+        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
 
         foreach (get_graph_subtypes($type, $device) as $avail_type) {
             echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";

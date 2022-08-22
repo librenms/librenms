@@ -4,7 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
-$app_id = $app['app_id'];
 
 try {
     $returned = json_app_get($device, 'portactivity', 1);
@@ -68,7 +67,7 @@ $ports_rrd_def = RrdDefinition::make()
 $ports_keys = array_keys($ports);
 $ports_keys_int = 0;
 while (isset($ports[$ports_keys[$ports_keys_int]])) {
-    $rrd_name = ['app', $name, $app_id, $ports_keys[$ports_keys_int]];
+    $rrd_name = ['app', $name, $app->app_id, $ports_keys[$ports_keys_int]];
     $fields = [
         'total_conns' => $ports[$ports_keys[$ports_keys_int]]['total_conns'],
         'total_to' => $ports[$ports_keys[$ports_keys_int]]['total_to'],
@@ -113,49 +112,24 @@ while (isset($ports[$ports_keys[$ports_keys_int]])) {
         'fromUNKNOWN' => $ports[$ports_keys[$ports_keys_int]]['from']['UNKNOWN'],
         'fromother' => $ports[$ports_keys[$ports_keys_int]]['from']['other'],
     ];
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $ports_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     $ports_keys_int++;
 }
 
-//
-// component processing for portsactivity
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'portsactivity'],
-    ],
-];
+// check for added or removed instances
+$old_ports = $app->data['ports'] ?? [];
+$added_ports = array_diff($ports_keys, $old_ports);
+$removed_ports = array_diff($old_ports, $ports_keys);
 
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-//delete portsactivity component if nothing is found
-if (empty($ports_keys)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
-    }
-    //add portsactivity component if found
-} else {
-    if (isset($components[$device_id])) {
-        $portsc = $components[$device_id];
-    } else {
-        $portsc = $component->createComponent($device_id, 'portsactivity');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($ports_keys);
-
-    $id = $component->getFirstComponentID($portsc);
-    $portsc[$id]['label'] = 'Portsactivity';
-    $portsc[$id]['ports'] = json_encode($ports_keys);
-
-    $component->setComponentPrefs($device_id, $portsc);
+// if we have any source instances, save and log
+if (count($added_ports) > 0 || count($removed_ports) > 0) {
+    $app->data = ['ports' => $ports_keys];
+    $log_message = 'Portactivity Port Change:';
+    $log_message .= count($added_ports) > 0 ? ' Added ' . implode(',', $added_ports) : '';
+    $log_message .= count($removed_ports) > 0 ? ' Removed ' . implode(',', $added_ports) : '';
+    log_event($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', data_flatten($ports));

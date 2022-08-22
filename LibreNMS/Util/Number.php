@@ -43,7 +43,7 @@ class Number
         }
 
         if ($value >= '0.1') {
-            $sizes = ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
+            $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
             $ext = $sizes[0];
             for ($i = 1; (($i < count($sizes)) && ($value >= 1000)); $i++) {
                 $value = $value / 1000;

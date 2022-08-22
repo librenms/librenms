@@ -21,7 +21,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 $oid = '';
                 $sep = '';
                 $adsep = '';
-                unset($ipv6_address);
+                $ipv6_address = '';
                 $do = '0';
                 foreach (explode(':', $ipv6addr) as $part) {
                     $n = hexdec($part);

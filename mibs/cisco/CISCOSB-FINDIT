@@ -10,7 +10,7 @@ IMPORTS
     InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB;
 
 rlFindit   MODULE-IDENTITY
-		LAST-UPDATED "201702090000Z"
+		LAST-UPDATED "202105190000Z"
         ORGANIZATION "Cisco Systems, Inc."
          CONTACT-INFO
          "Postal: 170 West Tasman Drive
@@ -21,7 +21,7 @@ rlFindit   MODULE-IDENTITY
 
         DESCRIPTION
                 "The private MIB module definition for Findit Agent."
-		REVISION "201102090000Z"
+		REVISION "202105190000Z"
         DESCRIPTION
                 "Added this MODULE-IDENTITY clause."
         ::= { switch001 235 }

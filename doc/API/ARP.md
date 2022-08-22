@@ -1,6 +1,3 @@
-source: API/ARP.md
-path: blob/master/doc/
-
 ### `list_arp`
 
 Retrieve a specific ARP entry or all ARP entries for a device

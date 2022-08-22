@@ -29,7 +29,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $data = '';
 $name = 'rrdcached';
-$app_id = $app['app_id'];
 
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];
@@ -73,7 +72,7 @@ if ($agent_data['app'][$name]) {
     }
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('queue_length', 'GAUGE', 0)
     ->addDataset('updates_received', 'COUNTER', 0)

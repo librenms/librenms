@@ -1,12 +1,12 @@
-source: Installation/Installation-Ubuntu-1804-Nginx.md
-path: blob/master/doc/
-
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is @= php.version_min =@**
+!!! warning
+
+    Please note the minimum supported PHP version is @= php.version_min =@.  
+    The guide below might not have been updated to reflect it!
 
 # Install Required Packages
 
@@ -247,7 +247,7 @@ Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
 - [Performance tuning](../Support/Performance.md)
-- [Alerting](../Extensions/Alerting.md)
+- [Alerting](../Alerting/index.md)
 - [Device Groups](../Extensions/Device-Groups.md)
 - [Auto discovery](../Extensions/Auto-Discovery.md)
 

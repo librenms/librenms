@@ -1,6 +1,3 @@
-source: Developing/SNMP-Traps.md
-path: blob/master/doc/
-
 # Creating snmp trap handlers
 
 You must have a working snmptrapd. See

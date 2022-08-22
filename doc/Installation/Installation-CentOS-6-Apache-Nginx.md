@@ -1,12 +1,12 @@
-source: Installation/Installation-CentOS-6-Apache-Nginx.md
-path: blob/master/doc/
-
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is @= php.version_min =@**
+!!! warning
+
+    Please note the minimum supported PHP version is @= php.version_min =@.  
+    The guide below might not have been updated to reflect it!
 
 # On the DB Server
 

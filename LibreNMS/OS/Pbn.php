@@ -31,6 +31,16 @@ use LibreNMS\OS;
 
 class Pbn extends OS implements ProcessorDiscovery
 {
+    public function __construct(&$device)
+    {
+        parent::__construct($device);
+
+        preg_match('/^.* Build (?<build>\d+)/', $this->getDevice()->version, $version);
+        if ($version['build'] <= 16607) { // Buggy version :-(
+            $this->stpTimeFactor = 1;
+        }
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered

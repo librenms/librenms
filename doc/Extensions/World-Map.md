@@ -1,6 +1,3 @@
-source: Extensions/World-Map.md
-path: blob/master/doc/
-
 # World Map Configuration
 
 LibreNMS comes with a configurable Geo Map based on World Map Widget

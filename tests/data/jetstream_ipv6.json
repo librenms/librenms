@@ -6902,5 +6902,61 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "98dac4733a5e",
+                    "protocolSpecification": "unknown",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "12822",
+                    "topChanges": 52,
+                    "designatedRoot": "0264329fbc02",
+                    "rootCost": 30000,
+                    "rootPort": 25,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 49176,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 30000,
+                    "designatedBridge": "98dac4733a5e",
+                    "designatedPort": 24,
+                    "forwardTransitions": 6,
+                    "ifIndex": 49176
+                },
+                {
+                    "vlan": null,
+                    "port_index": 49177,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 54,
+                    "forwardTransitions": 1,
+                    "ifIndex": 49177
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

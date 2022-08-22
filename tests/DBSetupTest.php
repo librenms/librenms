@@ -114,7 +114,9 @@ class DBSetupTest extends DBTestCase
         $mode = $result->mode;
 
         // NO_AUTO_CREATE_USER is removed in mysql 8
-        $expected = ($vendor !== 'MariaDB' && version_compare($version, '8.0.0') >= 0)
+        $expected = (
+            ($vendor !== 'MariaDB' && version_compare($version, '8.0.0') >= 0) ||
+            ($vendor == 'MariaDB' && version_compare($version, '10.5.15') >= 0))
             ? 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
             : 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 

@@ -1,5 +1,3 @@
-path: blob/master/doc/
-
 # Environment Variables
 
 LibreNMS allows certain settings to be set via the environment or

@@ -139,7 +139,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($port->device->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities(optional($port->device)->displayName() . ' - ' . $label)) . '</div>';
         if ($description = $port->getDescription()) {
             $content .= addslashes(htmlentities($description)) . '<br />';
         }
@@ -230,7 +230,7 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [is_numeric($device) ? $device : $device->device_id];
+        $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
@@ -559,6 +559,29 @@ class Url
         }
 
         return new ParameterBag($vars);
+    }
+
+    /**
+     * Parse options from the url including get/post parameters and any url segments containing an =
+     *
+     * @param  int|string|null  $key  Optional key to pull from the options
+     * @param  mixed  $default  The default value to return when the given key does not exist
+     * @return array|mixed|null
+     */
+    public static function parseOptions($key = null, $default = null)
+    {
+        $request = request();
+        $options = $request->all();
+
+        foreach (explode('/', $request->path()) as $segment) {
+            $segment = urldecode($segment);
+            if (Str::contains($segment, '=')) {
+                [$name, $value] = explode('=', $segment, 2);
+                $options[$name] = $value;
+            }
+        }
+
+        return is_null($key) ? $options : $options[$key] ?? $default;
     }
 
     private static function escapeBothQuotes($string)

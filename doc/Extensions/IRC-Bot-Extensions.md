@@ -1,6 +1,3 @@
-source: Extensions/IRC-Bot-Extensions.md
-path: blob/master/doc/
-
 # IRC Bot Extensions
 
 Okay this is a very quick walk-through in writing your own `commands` for the IRC-Bot.

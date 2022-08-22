@@ -1,5 +1,4 @@
 </form>
-<h3> Port Settings </h3>
 <span id="message"></span>
 
 <form id='ignoreport' name='ignoreport' method='post' action='' role='form' class='form-inline'>

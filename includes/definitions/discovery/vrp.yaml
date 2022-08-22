@@ -33,7 +33,9 @@ modules:
                 -
                     oid:
                         - entPhysicalName
+                        - hwEntityStateTable
                         - hwEntityAdminStatus
+                        - hwPwrStatusTable
                         - hwStackPortTable
                         - hw3GTable
         temperature:
@@ -72,6 +74,16 @@ modules:
                             oid: hwEntityTemperature
                             op: '>='
                             value: '2147483646'
+                -
+                    oid: hwTemperatureThresholdTable
+                    value: hwEntityTempValue
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.8.1.6.{{ $index }}'
+                    descr: 'TempSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    warn_limit: hwEntityTempMinorAlmThreshold
+                    high_limit: hwEntityTempMajorAlmThreshold
+                    divisor: 1
         count:
             data:
                 -
@@ -233,6 +245,8 @@ modules:
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
                     group: '{{ $entPhysicalName }}'
+                    low_limit: hwEntityOpticalRxLowWarnThreshold
+                    high_limit: hwEntityOpticalRxHighWarnThreshold
                     skip_values:
                         -
                             oid: hwEntityOpticalRxPower
@@ -375,6 +389,41 @@ modules:
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
+                -
+                    oid: hwEntityStateTable
+                    value: hwEntityVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.13.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwEntityVoltage
+                            op: '='
+                            value: '0'
+                        -
+                            oid: hwEntityVoltage
+                            op: '>='
+                            value: '2147483646'
+                -
+                    oid: hwPwrStatusTable
+                    value: hwEntityPwrVoltage
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.8.{{ $index }}'
+                    descr: 'PWR{{ $hwEntityPwrSlot }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                -
+                    oid: hwVoltageInfoTable
+                    value: hwEntityVolCurValue
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.9.1.7.{{ $index }}'
+                    descr: 'VoltSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    low_limit: hwEntityVolLowAlmFatal
+                    low_warn_limit: hwEntityVolLowAlmMajor
+                    warn_limit: hwEntityVolHighAlmMajor
+                    high_limit: hwEntityVolHighAlmFatal
+                    divisor: 1000
         current:
             data:
                 -
@@ -393,6 +442,37 @@ modules:
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '<'
+                            value: '1000'
+                -
+                    oid: hwOpticalModuleInfoTable
+                    value: hwEntityOpticalBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '='
+                            value: '-1'
+                        -
+                            oid: hwEntityOpticalMode
+                            op: '='
+                            value: '1'
+                        -
+                            oid: hwEntityOpticalBiasCurrent
+                            op: '>='
+                            value: '1000'
+                -
+                    oid: hwPwrStatusTable
+                    value: hwEntityPwrCurrent
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.18.1.7.{{ $index }}'
+                    descr: 'PWR{{ $hwEntityPwrSlot }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
         power:
             data:
                 -
@@ -407,6 +487,24 @@ modules:
                     descr: 'Current Power Consumption'
                     index: 1
                     divisor: 1000
+                -
+                    oid: hwBoardCurrentPower
+                    num_oid: '.1.3.6.1.4.1.2011.6.157.2.1.1.4.{{ $index }}'
+                    descr: '{{ $entPhysicalName }}'
+                    index: '{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwBoardCurrentPower
+                            op: '='
+                            value: '-1'
+        percent:
+            data:
+                -
+                    oid: hwFanStatusTable
+                    value: hwEntityFanSpeed
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.5.{{ $index }}'
+                    descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Speed'
         state:
             data:
                 -
@@ -520,7 +618,6 @@ modules:
                         - { descr: 'serviceAvailable', graph: 1, value: 2, generic: 0 }
                         - { descr: 'regionEmergency', graph: 1, value: 3, generic: 2 }
                         - { descr: 'savingStatus', graph: 1, value: 4, generic: 3 }
-
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
@@ -530,3 +627,27 @@ modules:
                             oid: hw3GIMEI
                             op: '='
                             value: ''
+                -
+                    oid: hwVoltageInfoTable
+                    value: hwEntityVolStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.9.1.5.{{ $index }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    descr: 'VoltStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
+                -
+                    oid: hwTemperatureThresholdTable
+                    value: hwEntityTempStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.8.1.5.{{ $index }}'
+                    group: 'Slot-{{ $subindex0 }}'
+                    descr: 'TempStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
+                    states:
+                        - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'Major', graph: 1, value: 3, generic: 2 }
+                        - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }

@@ -1,6 +1,3 @@
-source: Extensions/Customizing-the-Web-UI.md
-path: blob/master/doc/
-
 # Customizing the Web UI
 
 ## Custom menu entry

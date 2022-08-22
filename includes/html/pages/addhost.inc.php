@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
@@ -45,9 +46,9 @@ if (! empty($_POST['hostname'])) {
             $snmpver = 'v2c';
             $additional = [
                 'snmp_disable' => 1,
-                'os'           => $_POST['os'] ? $_POST['os_id'] : 'ping',
-                'hardware'     => $_POST['hardware'],
-                'sysName'      => $_POST['sysName'],
+                'os'           => $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping',
+                'hardware'     => strip_tags($_POST['hardware']),
+                'sysName'      => strip_tags($_POST['sysName']),
             ];
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
@@ -55,7 +56,7 @@ if (! empty($_POST['hostname'])) {
             }
 
             $snmpver = strip_tags($_POST['snmpver']);
-            print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
+            print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map("\LibreNMS\Util\Clean::html", Config::get('snmp.community'))) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = [
                 'authlevel'  => strip_tags($_POST['authlevel']),
@@ -181,7 +182,7 @@ foreach (Config::get('snmp.transports') as $transport) {
             <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
 <?php
 
-foreach (get_port_assoc_modes() as $mode) {
+foreach (PortAssociationMode::getModes() as $mode) {
     $selected = '';
     if ($mode == Config::get('default_port_association_mode')) {
         $selected = 'selected';

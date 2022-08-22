@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Models\Device;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -65,6 +67,7 @@ class ModuleTestHelper
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
+        'stp' => ['ports', 'vlans', 'stp'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
     ];
@@ -147,7 +150,7 @@ class ModuleTestHelper
     public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
     {
         if ($full) {
-            $snmp_oids[] = [
+            $snmp_oids[][] = [
                 'oid' => '.',
                 'method' => 'walk',
                 'mib' => null,
@@ -195,7 +198,6 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose();
-        \Log::setDefaultDriver('console');
         discover_device($device, $this->parseArgs('discovery'));
         $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
         $poller->poll();
@@ -211,7 +213,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):[^:]+:[0-9]+\' \'(.+)\']/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\']/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
@@ -492,7 +494,7 @@ class ModuleTestHelper
             if (empty($results)) {
                 $this->qPrint("No data for $filename\n");
             } else {
-                $this->qPrint("Saved snmprec data $filename\n");
+                $this->qPrint("\nSaved snmprec data $filename\n");
                 file_put_contents($filename, $output);
             }
         }
@@ -558,11 +560,15 @@ class ModuleTestHelper
 
         // Add the test device
         try {
-            Config::set('snmp.community', [$this->file_name]);
-            $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
-
-            // disable to block normal pollers
-            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
+            $new_device = new Device([
+                'hostname' => $snmpsim->getIp(),
+                'version' => 'v2c',
+                'community' => $this->file_name,
+                'port' => $snmpsim->getPort(),
+                'disabled' => 1, // disable to block normal pollers
+            ]);
+            (new ValidateDeviceAndCreate($new_device, true))->execute();
+            $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {

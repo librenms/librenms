@@ -1,0 +1,182 @@
+
+EXTREME-DOS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS  
+        MODULE-IDENTITY     FROM SNMPv2-SMI
+		OBJECT-TYPE         FROM SNMPv2-SMI
+        TruthValue          FROM SNMPv2-TC
+		extremeAgent        FROM EXTREME-BASE-MIB
+		extremeV2Traps		FROM EXTREME-BASE-MIB
+        extremenetworks		FROM EXTREME-BASE-MIB
+		DisplayString       FROM RFC1213-MIB
+                TimeTicks		FROM SNMPv2-SMI
+		NOTIFICATION-TYPE	FROM SNMPv2-SMI;
+
+        extremeDosMib MODULE-IDENTITY
+                LAST-UPDATED "0401020000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Dos protect objects information"
+        ::= { extremeAgent 28 }
+
+        extremeDosProtect OBJECT IDENTIFIER ::= { extremeDosMib 1 }
+
+
+extremeDosEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Flag indicates whether DOS protection is enabled or disabled."
+    DEFVAL { false }
+    ::= { extremeDosProtect 1 }
+
+
+extremeDosNoticeLevel    OBJECT-TYPE
+    SYNTAX      INTEGER(150..100000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number of packets per second to be received for logging."
+    DEFVAL { 4000 }
+    ::= { extremeDosProtect 2 }
+
+extremeDosAlertLevel    OBJECT-TYPE
+    SYNTAX      INTEGER(150..100000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number of packets per second to be received for ACL creation."
+    DEFVAL { 4000 }
+    ::= { extremeDosProtect 3 }
+
+extremeDosFilterType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+		destination (1),
+		source	    (2),
+		destinationAndSource (3)
+		}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The type of access list filter to be set when threshold pakets are received"
+    DEFVAL { destination }
+    ::= { extremeDosProtect 4 }
+
+extremeDosAclTimeout    OBJECT-TYPE
+    SYNTAX      INTEGER(2..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The timeout interval period over which DOS protect is exercised."
+    DEFVAL { 15 }
+    ::= { extremeDosProtect 5 }
+
+extremeDosAclRulePrecedence    OBJECT-TYPE
+    SYNTAX      INTEGER(0..25588)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The DOS filter Rule Precedence."
+    DEFVAL { 10 }
+    ::= { extremeDosProtect 6 }
+
+extremeDosMessagesEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Flag indicates whether DOS messages are enabled or disabled."
+    DEFVAL { true }
+    ::= { extremeDosProtect 7 }
+
+extremeDosPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ExtremeDosPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains the port wise listing of DOS attributes."
+    ::= { extremeDosProtect 8 }
+
+extremeDosPortEntry       OBJECT-TYPE
+    SYNTAX      ExtremeDosPortEntry
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "Information about the Dos attributes of a particular port."
+    INDEX   { extremeDosIfIndex }
+    ::= { extremeDosPortTable 1 }
+
+ExtremeDosPortEntry ::= SEQUENCE {
+      extremeDosIfIndex          		INTEGER,
+      extremeDosPortTrusted			TruthValue,
+      extremeDosIsDosActive			TruthValue
+}
+
+extremeDosIfIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for this entry."
+    ::= { extremeDosPortEntry 1 }
+
+extremeDosPortTrusted    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the port is trusted or untrusted."
+    DEFVAL { false }
+    ::= { extremeDosPortEntry 2 }
+
+extremeDosIsDosActive    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether DOS is active on this port."
+    ::= { extremeDosPortEntry 3 }
+
+
+--TRAPS MIB Definitions for DOS
+  
+--   extremeDosThresholdReached	TRAP-TYPE
+--   ENTERPRISE  extremenetworks
+--   VARIABLES   {extremeDosAlertLevel}
+--   DESCRIPTION
+--   	  "The extremeDosThresholdReached notification is generated when the
+--   	  DOS threshold is crossed"
+--   ::= 23
+
+--   extremeDosThresholdCleared	TRAP-TYPE
+--   ENTERPRISE  extremenetworks
+--   VARIABLES   {extremeDosAlertLevel}
+--   DESCRIPTION
+--   	  "The extremeDosThresholdCleared notification is generated when the
+--   	  DOS threshold is Cleared"
+--   ::= 24
+
+
+   extremeDosTraps 	OBJECT IDENTIFIER
+	::= { extremeV2Traps 14 }
+
+   extremeDosTrapsPrefix   OBJECT IDENTIFIER
+	::= { extremeDosTraps 0 }
+
+   extremeDosThresholdCleared NOTIFICATION-TYPE
+	OBJECTS { extremeDosAlertLevel }
+	STATUS current
+	DESCRIPTION
+		"The extremeDosThresholdCleared notification is generated when
+		the DOS threshold is cleared ."
+	    ::= { extremeDosTrapsPrefix 1 }
+
+    extremeDosThresholdReached NOTIFICATION-TYPE
+	OBJECTS { extremeDosAlertLevel }
+	STATUS current
+	DESCRIPTION
+		"The extremeDosThresholdReached notification is generated when
+		the DOS threshold is crossed for any of the ports."
+	    ::= { extremeDosTrapsPrefix 2 }
+END

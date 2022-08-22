@@ -21,7 +21,7 @@ if ($device['os'] == 'junos') {
          $ai_ig_data['aiVirtualControllerIPAddress.0'],  // entPhysicalDescr
          'chassis',                                      // entPhysicalClass
          $ai_ig_data['aiVirtualControllerName.0'],       // entPhysicalName
-         'Instant Virutal Controller Cluster',           // entPhysicalModelName
+         'Instant Virtual Controller Cluster',           // entPhysicalModelName
          $ai_ig_data['aiVirtualControllerKey.0'],        // entPhysicalSerialNum
          '0',                                            // entPhysicalContainedIn
          'Aruba',                                        // entPhysicalMfgName
@@ -153,7 +153,7 @@ if ($device['os'] == 'ios' or $device['os'] == 'iosxe') {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
-    unset($ifIndex);
+    $ifIndex = 0;
     if ($device['os'] == 'junos') {
         // Juniper's MIB doesn't have the same objects as the Entity MIB, so some values
         // are made up here.
@@ -177,6 +177,7 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalIndex = str_replace('.', '', $entPhysicalIndex);
     } elseif ($device['os'] == 'aruba-instant') {
         $entPhysicalDescr = $entry['aiAPMACAddress'];
+        $entPhysicalClass = '';
         $entPhysicalContainedIn = 1;
         $entPhysicalSerialNum = $entry['aiAPSerialNum'];
         $entPhysicalModelName = $entry['aiAPModel'];
@@ -288,7 +289,7 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         'cevPort10GigBaseLR'   => '10GigBaseLR',
     ];
 
-    if ($entPhysicalVendorTypes[$entPhysicalVendorType] && ! $entPhysicalModelName) {
+    if (! empty($entPhysicalVendorTypes[$entPhysicalVendorType]) && ! $entPhysicalModelName) {
         $entPhysicalModelName = $entPhysicalVendorTypes[$entPhysicalVendorType];
     }
 

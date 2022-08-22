@@ -1,6 +1,3 @@
-source: Extensions/Component.md
-path: blob/master/doc/
-
 # About
 
 The Component extension provides a generic database storage mechanism
@@ -11,7 +8,7 @@ discovery/poller modules.
 It provides a status (Nagios convention), the ability to Disable (do
 not poll), or Ignore (do not Alert).
 
-# Database Structure
+## Database Structure
 
 The database structure contains the component table:
 
@@ -48,7 +45,7 @@ mysql> select * from component_prefs limit 1;
 2 rows in set (0.00 sec)
 ```
 
-## Reserved Fields
+### Reserved Fields
 
 When this data from both the `component` and `component_prefs` tables
 is returned in one single consolidated array, there is the potential
@@ -58,7 +55,7 @@ fields of the `component` table are reserved, they cannot be used as
 custom attributes, if you update these the module will attempt to
 write them to the `component` table, not the `component_prefs` table.
 
-# Using Components
+## Using Components
 
 Create an instance of the component class:
 
@@ -66,7 +63,7 @@ Create an instance of the component class:
 $COMPONENT = new LibreNMS\Component();
 ```
 
-## Retrieving Components
+### Retrieving Components
 
 Now you can retrieve an array of the available components:
 

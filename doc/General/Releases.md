@@ -1,6 +1,3 @@
-source: General/Releases.md
-path: blob/master/doc/
-
 # Choosing a release
 
 We try to ensure that breaking changes aren't introduced by utilising

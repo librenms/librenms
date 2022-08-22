@@ -286,8 +286,8 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
-        # make sure the vendor directory is clean
-        git checkout vendor/ --quiet > /dev/null 2>&1
+        # Restore composer files if user installed plugins
+        git checkout --quiet -- composer.json composer.lock
 
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
@@ -346,12 +346,13 @@ main () {
                 # re-check dependencies after pull with the new code
                 check_dependencies
 
-                # Check for missing vendor dir
-                if [ ! -f vendor/autoload.php ]; then
-                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
-                    git reset HEAD vendor/  # don't add vendor directory to the index
-                fi
+                # Insert user installed plugins before calling composer install
 
+                PLUGINS=$(call_daily_php "composer_get_plugins")
+                if [ -n "$PLUGINS" ]; then
+                    # shellcheck disable=SC2086
+                    FORCE=1 ${COMPOSER} require --update-no-dev --no-install $PLUGINS
+                fi
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
 
                 # Check if we need to revert (Must be in post pull so we can update it)

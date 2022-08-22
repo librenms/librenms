@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
@@ -33,7 +34,7 @@ if ($_POST['editing']) {
                 $update['retries'] = ['NULL'];
             }
 
-            if ($snmpver != 'v3') {
+            if ($snmpver != 'v3' && $_POST['community'] != '********') {
                 $community = $_POST['community'];
                 $update['community'] = $community;
             }
@@ -178,8 +179,6 @@ $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$device['
 $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
 
-echo '<h3> SNMP Settings </h3>';
-
 // use PHP Flasher to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
     if (is_array($update_message)) {
@@ -288,7 +287,7 @@ echo "      </select>
         <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
-foreach (get_port_assoc_modes() as $pam_id => $pam) {
+foreach (PortAssociationMode::getModes() as $pam_id => $pam) {
     echo "           <option value='$pam_id'";
 
     if ($pam_id == $device['port_association_mode']) {
@@ -320,7 +319,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='" . htmlspecialchars($device['community']) . "'/>
+    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value==\"********\" ? decodeURIComponent(\"" . rawurlencode($device['community']) . "\") : this.value);'/>
     </div>
     </div>
     </div>

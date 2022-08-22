@@ -1,14 +1,15 @@
-source: Extensions/Applications.md
-path: blob/master/doc/
-
 # Applications
 
 You can use Application support to graph performance statistics of
 many applications.
 
-Different applications support a variety of ways to collect data: 1)
-by direct connection to the application, 2) snmpd extend, or 3) [the
-agent](Agent-Setup.md). The monitoring of applications could be added
+Different applications support a variety of ways to collect data: 
+
+1. By direct connection to the application
+2. snmpd extend
+3. [The agent](Agent-Setup.md).
+
+The monitoring of applications could be added
 before or after the hosts have been added to LibreNMS.
 
 If multiple methods of collection are listed you only need to enable one.
@@ -84,65 +85,6 @@ be manually enabled if using the agent. Some applications will be
 automatically enabled by the unix-agent poller module. It is better to
 ensure that your application is enabled for monitoring. You can check
 by following the steps under the `SNMP Extend` heading.
-
-1. [Apache](#apache) - SNMP extend, Agent
-1. [Asterisk](#asterisk) - SNMP extend
-1. [backupninja](#backupninja) - SNMP extend
-1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
-1. [Certificate](#certificate) - Certificate extend
-1. [C.H.I.P.](#chip) - SNMP extend
-1. [DHCP Stats](#dhcp-stats) - SNMP extend
-1. [Docker Stats](#docker-stats) - SNMP extend
-1. [Entropy](#entropy) - SNMP extend
-1. [EXIM Stats](#exim-stats) - SNMP extend
-1. [Fail2ban](#fail2ban) - SNMP extend
-1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
-1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
-1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
-1. [Freeswitch](#freeswitch) - SNMP extend, Agent
-1. [GPSD](#gpsd) - SNMP extend, Agent
-1. [Icecast](#icecast) - SNMP extend, Agent
-1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
-1. [Mailscanner](#mailscanner) - SNMP extend
-1. [Mdadm](#mdadm) - SNMP extend
-1. [MegaRAID](#megaraid) - SNMP extend
-1. [Memcached](#memcached) - SNMP extend
-1. [Munin](#munin) - Agent
-1. [MySQL](#mysql) - SNMP extend, Agent
-1. [NGINX](#nginx) - SNMP extend, Agent
-1. [NFS Server](#nfs-server) - SNMP extend
-1. [NTP Client](#ntp-client) - SNMP extend
-1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
-1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
-1. [Open Grid Scheduler](#open-grid-scheduler) - SNMP extend
-1. [Opensips](#opensips) - SNMP extend
-1. [OS Updates](#os-updates) - SNMP extend
-1. [PHP-FPM](#php-fpm) - SNMP extend
-1. [Pi-hole](#pi-hole) - SNMP extend
-1. [Portactivity](#portactivity) - SNMP extend
-1. [Postfix](#postfix) - SNMP extend
-1. [Postgres](#postgres) - SNMP extend
-1. [PowerDNS](#powerdns) - Agent
-1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
-1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
-1. [PowerMon](#powermon) - SNMP extend
-1. [Proxmox](#proxmox) - SNMP extend
-1. [Puppet Agent](#puppet-agent) - SNMP extend
-1. [PureFTPd](#pureftpd) - SNMP extend
-1. [Raspberry PI](#raspberry-pi) - SNMP extend
-1. [Raspberry PI GPIO Monitor](#raspberry-pi-gpio-monitor) - SNMP extend
-1. [Redis](#redis) - SNMP extend
-1. [RRDCached](#rrdcached) - SNMP extend
-1. [SDFS info](#sdfs-info) - SNMP extend
-1. [Seafile](#seafile) - SNMP extend
-1. [SMART](#smart) - SNMP extend
-1. [Squid](#squid) - SNMP proxy
-1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-1. [Unbound](#unbound) - SNMP extend, Agent
-1. [UPS-nut](#ups-nut) - SNMP extend
-1. [UPS-apcups](#ups-apcups) - SNMP extend
-1. [Voip-monitor](#voip-monitor) - SNMP extend
-1. [ZFS](#zfs) - SNMP extend
 
 ## Apache
 
@@ -435,42 +377,6 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-## DHCP Stats
-
-A small python3 script that reports current DHCP leases stats and pool usage.
-
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
-
-### SNMP Extend
-
-1. Copy the shell script to the desired host.
-```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/dhcp.py
-```
-
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
-```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
-```
-Key 'leasefile' specifies the path to your lease file.
-
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-```
-extend dhcpstats /etc/snmp/dhcp.py
-```
-
-5. Restart snmpd on your host
-
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
-
 ## Docker Stats
 
 It allows you to know which container docker run and their stats.
@@ -587,17 +493,17 @@ chmod +x /etc/snmp/fail2ban
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
-    
+
     1. If you want to use the cache, it is as below, by using the -c switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -c
     ```
-    
+
     2. If you want to use the cache and update it if needed, this can by using the -c and -U switches.
     ```
     extend fail2ban /etc/snmp/fail2ban -c -U
     ```
-    
+
     3. If you need to specify a custom location for the fail2ban-client, that can be done via the -f switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
@@ -853,6 +759,43 @@ chmod +x /etc/snmp/icecast-stats.sh
 ```
 extend icecast /etc/snmp/icecast-stats.sh
 ```
+
+## ISC DHCP Stats
+
+A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
+
+Also you have to install the dhcpd-pools Package.
+Under Ubuntu/Debian just run `apt install dhcpd-pools`
+
+### SNMP Extend
+
+1. Copy the shell script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/dhcp.py
+```
+
+3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+```
+{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+```
+Key 'leasefile' specifies the path to your lease file.
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /etc/snmp/dhcp.py
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend
@@ -906,26 +849,41 @@ Extend` heading top of page.
 
 ## Mdadm
 
-This shell script checks mdadm health and array data
+It allows you to checks mdadm health and array data
+
+This script require: jq
 
 ### SNMP Extend
 
-1. Download the script onto the desired host.
+1. Install jq
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/mdadm
+sudo apt install jq
 ```
 
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+2. Download the script onto the desired host.
+```
+sudo wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
+```
+
+3. Make the script executable
+```
+sudo chmod +x /etc/snmp/mdadm
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend mdadm /etc/snmp/mdadm
 ```
 
-4. Restart snmpd on your host
+5. Verify it is working by running
+```
+sudo /etc/snmp/mdadm
+```
+
+6. Restart snmpd on your host
+```
+sudo service snmpd restart
+```
 
 The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
@@ -1199,6 +1157,33 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Chronyd
+
+A shell script that gets the stats from chronyd and exports them with SNMP Extend.
+
+### SNMP Extend
+
+1. Download the shell script onto the desired host
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chrony -O /etc/snmp/chrony
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/chrony
+```
+
+3. Edit the snmpd.conf file to include the extend by adding the following line to the end of the config file:
+```
+extend chronyd /etc/snmp/chrony
+```
+
+Note: Some distributions need sudo-permissions for the script to work with SNMP Extend. See the instructions on the section SUDO for more information.
+
+4. Restart snmpd service on the host
+
+Application should be auto-discovered and its stats presented on the Apps-page on the host. Note: Applications module needs to be enabled on the host or globally for the statistics to work as intended.
+
 ## Nvidia GPU
 
 ### SNMP Extend
@@ -1228,6 +1213,45 @@ sees them as being.
 
 For questions about what the various values are/mean, please see the
 nvidia-smi man file under the section covering dmon.
+
+## Opensearch\Elasticsearch
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensearch -O /etc/snmp/opensearch
+```
+
+2. Make it executable
+```
+chmod +x /etc/snmp/opensearch
+```
+
+3. Install the required Perl dependencies.
+```
+# FreeBSD
+pkg install p5-JSON p5-libwww
+# Debian/Ubuntu
+apt-get install libjson-perl libwww-perl
+# cpanm
+cpanm JSON Libwww
+```
+
+4. Update your snmpd.conf.
+```
+extend opensearch /bin/cat /var/cache/opensearch.json
+```
+
+5. Update root crontab with. This is required as it will this will
+likely time out otherwise. Use `*/1` if you want to have the most
+recent stats when polled or to `*/5` if you just want at exactly a 5
+minute interval.
+```
+*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+```
+
+6. Enable it or wait for the device to be re-disocvered.
 
 ## Open Grid Scheduler
 
@@ -1349,6 +1373,10 @@ to monitor multiple pools, this won't do it.
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+### Agent
+[Install the agent](Agent-Setup.md) on this device if it isn't already 
+and copy the `phpfpmsp` script to `/usr/lib/check_mk_agent/local/`
 
 ## Pi-hole
 
@@ -1937,7 +1965,7 @@ extend rpigpiomonitor /etc/snmp/rpigpiomonitor.php
 
 ## Redis
 
-SNMP extend script to monitor your Redis Server
+Script to monitor your Redis Server
 
 ### SNMP Extend
 
@@ -1956,6 +1984,11 @@ chmod +x /etc/snmp/redis.py
 extend redis /etc/snmp/redis.py
 ```
 
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `redis` script to `/usr/lib/check_mk_agent/local/`
+
 ## RRDCached
 
 Install/Setup:
@@ -1972,7 +2005,7 @@ SNMP extend script to monitor your (remote) RRDCached via snmp
 
 1. Download the script onto the desired host
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached -O /etc/snmp/rrdcached
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rrdcached -O /etc/snmp/rrdcached
 ```
 
 2. Make the script executable
@@ -2182,6 +2215,132 @@ for net-snmp, please see the links below.
 <http://wiki.squid-cache.org/Features/Snmp>
 <http://www.net-snmp.org/wiki/index.php/Snmpd_proxy>
 
+## Supervisord
+
+It shows you the totals per status and also the uptime per process. That way you can add alerts for instance when there are process in state `FATAL`.
+
+### SNMP Extend
+
+1. Copy the python script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/supervisord.py -O /etc/snmp/supervisord.py
+```
+Notice that this will use the default unix socket path. Modify the `unix_socket_path` variable in the script if your path differs from the default.
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/supervisord.py
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend supervisord /etc/snmp/supervisord.py
+```
+
+4. Restart snmpd on your host
+```
+systemctl restart snmpd
+```
+
+## Sagan
+
+For metrics the stats are migrated as below from the stats JSON.
+
+`f_drop_percent` and `drop_percent` are computed based on the found data.
+
+| Instance Key       | Stats JSON Key                     |
+|--------------------|------------------------------------|
+| uptime             | .stats.uptime                      |
+| total              | .stats.captured.total              |
+| drop               | .stats.captured.drop               |
+| ignore             | .stats.captured.ignore             |
+| threshold          | .stats.captured.theshold           |
+| after              | .stats.captured.after              |
+| match              | .stats.captured.match              |
+| bytes              | .stats.captured.bytes_total        |
+| bytes_ignored      | .stats.captured.bytes_ignored      |
+| max_bytes_log_line | .stats.captured.max_bytes_log_line |
+| eps                | .stats.captured.eps                |
+| f_total            | .stats.flow.total                  |
+| f_dropped          | .stats.flow.dropped                |
+
+Those keys are appended with the name of the instance running with `_`
+between the instance name and instance metric key. So `uptime` for
+`ids` would be `ids_uptime`.
+
+The default is named 'ids' unless otherwise specified via the extend.
+
+There is a special instance name of `.total` which is the total of all
+the instances. So if you want the total eps, the metric would be
+`.total_eps`. Also worth noting that the alert value is the highest
+one found among all the instances.
+
+### SNMP Extend
+
+1. Install the extend.
+```
+cpanm Sagan::Monitoring
+```
+
+2. Setup cron. Below is a example.
+```
+*/5 * * * * /usr/local/bin/sagan_stat_check > /dev/null
+```
+
+3. Configure snmpd.conf
+```
+extend sagan-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin sagan_stat_check -c
+```
+
+4. Restart snmpd on your system.
+
+You will want to make sure that sagan is setup to with the values set
+below for stats-json processor, for a single instance setup..
+
+```
+enabled: yes
+time: 300
+subtract_old_values: true
+filename: "$LOG_PATH/stats.json"
+```
+
+Any configuration of sagan_stat_check should be done in the cron
+setup. If the default does not work, check the docs for it at
+[MetaCPAN for
+sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
+
+
+## Suricata
+
+### SNMP Extend
+
+1. Install the extend.
+```
+cpanm Suricata::Monitoring
+```
+
+2. Setup cron. Below is a example.
+```
+*/5 * * * * /usr/local/bin/suricata_stat_check > /dev/null
+```
+
+3. Configure snmpd.conf
+```
+extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c
+```
+
+4. Restart snmpd on your system.
+
+You will want to make sure Suricata is set to output the stats
+to the eve file once a minute. This will help make sure that
+it won't be to far back in the file and will make sure it is
+recent when the cronjob runs.
+
+Any configuration of suricata_stat_check should be done in the cron
+setup. If the default does not work, check the docs for it at
+[MetaCPAN for
+suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
+
 ## TinyDNS aka djbdns
 
 ### Agent
@@ -2286,7 +2445,7 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify it's name as an argument into `/etc/snmp/ups-nut.sh`
+Optionally if you have multiple UPS or your UPS is not named APCUPS you can specify its name as an argument into `/etc/snmp/ups-nut.sh`
 ```
 extend ups-nut /etc/snmp/ups-nut.sh ups1
 extend ups-nut /etc/snmp/ups-nut.sh ups2
@@ -2371,7 +2530,7 @@ echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
 chmod +x /etc/snmp/zfs-linux
-echo "extend zfs sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
+echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
 
 Edit your sudo users (usually `visudo`) and add at the bottom:

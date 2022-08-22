@@ -66,6 +66,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
+            'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
@@ -120,7 +121,7 @@ return [
         'testing' => [
             'driver' => env('DB_TEST_DRIVER', 'mysql'),
             'host' => env('DB_TEST_HOST', 'localhost'),
-            'port' => env('DB_TEST_PORT', ''),
+            'port' => env('DB_TEST_PORT', '3306'),
             'database' => env('DB_TEST_DATABASE', 'librenms_phpunit_78hunjuybybh'),
             'username' => env('DB_TEST_USERNAME', 'root'),
             'password' => env('DB_TEST_PASSWORD', ''),
