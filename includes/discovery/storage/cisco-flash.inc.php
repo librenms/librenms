@@ -27,8 +27,9 @@ use LibreNMS\Util\Number;
 
 if ($device['os_group'] == 'cisco') {
     $ciscoFlashPartitionName = snmpwalk_cache_oid($device, 'ciscoFlashPartitionName', null, 'CISCO-FLASH-MIB');
-    foreach ($ciscoFlashPartitionName as $index => $name) {
-        $name = array_shift($name);
+    $ciscoFlashDeviceName = snmpwalk_cache_oid($device, 'ciscoFlashDeviceName', null, 'CISCO-FLASH-MIB');
+    foreach ($ciscoFlashPartitionName as $index => $partitionName) {
+        $name = array_shift($ciscoFlashDeviceName[$index[0]]) . '(' . array_shift($partitionName) . '):';
         $oids = array('ciscoFlashPartitionSize.' . $index, 'ciscoFlashPartitionFreeSpace.' . $index, 'ciscoFlashPartitionSizeExtended.' . $index, 'ciscoFlashPartitionFreeSpaceExtended.' . $index);
         $entry = array_shift(snmp_get_multi($device, $oids, '-OQUs', 'CISCO-FLASH-MIB'));
         $storage_size = (Number::cast($entry['ciscoFlashPartitionSize']) === 4294967295 ? $entry['ciscoFlashPartitionSizeExtended'] : $entry['ciscoFlashPartitionSize']);
