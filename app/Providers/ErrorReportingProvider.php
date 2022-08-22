@@ -35,10 +35,10 @@ use LibreNMS\Util\Version;
 
 class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 {
-    protected $errorReportingLevel = E_ALL & ~E_NOTICE;
-    private $laravelErrorHandler;
+    protected int $errorReportingLevel = E_ALL & ~E_NOTICE;
+    private mixed $laravelErrorHandler;
 
-    public function boot()
+    public function boot(): void
     {
         // don't report when:
         Flare::filterExceptionsUsing(function (\Exception $e) {

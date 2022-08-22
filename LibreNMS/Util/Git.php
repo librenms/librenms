@@ -67,7 +67,7 @@ class Git
     /**
      * Note: It assumes origin/master points to github.com/librenms/librenms for this to work.
      */
-    public static function officalCommit(?string $hash = null, string $remote = "origin/master"): bool
+    public static function officalCommit(?string $hash = null, string $remote = 'origin/master'): bool
     {
         if ($hash === null) {
             $process = new Process(['git', 'rev-parse', 'HEAD']);
