@@ -139,11 +139,11 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      * @param  string  $file
      * @param  int  $line
      * @param  array  $context
-     * @return void
+     * @return bool
      *
      * @throws \ErrorException
      */
-    public function handleError($level, $message, $file = '', $line = 0, $context = [])
+    public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
         // report errors if they are allowed
         if ($this->errorReportingLevel & $level) {
@@ -154,5 +154,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         if (! defined('IGNORE_ERRORS')) {
             call_user_func($this->laravelErrorHandler, $level, $message, $file, $line);
         }
+
+        return true;
     }
 }
