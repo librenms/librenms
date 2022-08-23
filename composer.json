@@ -59,7 +59,7 @@
         "barryvdh/laravel-ide-helper": "^2.8",
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
-        "friendsofphp/php-cs-fixer": "^2.16",
+        "friendsofphp/php-cs-fixer": "^v3.4",
         "laravel/dusk": "^6.15",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
