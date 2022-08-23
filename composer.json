@@ -29,6 +29,7 @@
         "doctrine/dbal": "^2.11",
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
+        "facade/ignition": "^2.17.6",
         "fico7489/laravel-pivot": "^3.0",
         "fruitcake/laravel-cors": "^2.0",
         "genealabs/laravel-caffeine": "^8.0",
@@ -57,7 +58,6 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",
         "barryvdh/laravel-ide-helper": "^2.8",
-        "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^v3.4",
         "laravel/dusk": "^6.15",
@@ -87,7 +87,8 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "nunomaduro/laravel-console-summary"
+                "nunomaduro/laravel-console-summary",
+                "facade/ignition"
             ]
         }
     },
