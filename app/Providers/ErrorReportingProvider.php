@@ -25,13 +25,14 @@
 
 namespace App\Providers;
 
+use App\Logging\Reporting\Middleware\CleanContext;
+use App\Logging\Reporting\Middleware\SetGroups;
 use ErrorException;
 use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Git;
-use LibreNMS\Util\Version;
 
 class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 {
@@ -58,10 +59,10 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
         // Filter some extra fields for privacy
         // Move to header middleware when switching to spatie/laravel-ignition
-        Flare::registerMiddleware([$this, 'cleanContext']);
+        Flare::registerMiddleware(CleanContext::class);
 
         // Add more LibreNMS related info
-        Flare::registerMiddleware([$this, 'setGroups']);
+        Flare::registerMiddleware(SetGroups::class);
 
         // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
@@ -151,66 +152,5 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         return true;
-    }
-
-    /**
-     * Middleware to remove hostname from the context.
-     *
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
-     * @return mixed
-     */
-    public function cleanContext(Report $report, $next)
-    {
-        try {
-            $report->setApplicationPath('');
-            $context = $report->allContext();
-
-            if (isset($context['request']['url'])) {
-                $context['request']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['request']['url']);
-            }
-
-            if (isset($context['session']['_previous']['url'])) {
-                $context['session']['_previous']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['_previous']['url']);
-            }
-
-            $context['headers']['host'] = null;
-            $context['headers']['referer'] = null;
-
-            $report->userProvidedContext($context);
-        } catch (\Exception $e) {
-        }
-
-        return $next($report);
-    }
-
-    /**
-     * Middleware to set LibreNMS and Tools grouping data
-     *
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
-     * @return mixed
-     */
-    public function setGroups(Report $report, $next)
-    {
-        try {
-            $version = Version::get();
-
-            $report->group('LibreNMS', [
-                'Git version' => $version->local(),
-                'App version' => Version::VERSION,
-            ]);
-
-            $report->group('Tools', [
-                'Database' => $version->databaseServer(),
-                'Net-SNMP' => $version->netSnmp(),
-                'Python' => $version->python(),
-                'RRDtool' => $version->rrdtool(),
-
-            ]);
-        } catch (\Exception $e) {
-        }
-
-        return $next($report);
     }
 }
