@@ -89,12 +89,14 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         // check the user setting
         if (! Config::get('reporting.error')) {
             \Log::debug('Reporting disabled by user setting');
+
             return false;
         }
 
         // Only run in production
         if (! $this->app->isProduction()) {
             \Log::debug('Reporting disabled because app is not in production');
+
             return false;
         }
 
@@ -102,16 +104,19 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         if (Git::repoPresent()) {
             if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+
                 return false;
             }
 
             if (! Git::unchanged()) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+
                 return false;
             }
 
             if (! Git::officalCommit()) {
                 \Log::debug('Reporting disabled due to local modifications');
+
                 return false;
             }
         }
@@ -152,7 +157,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      * Middleware to remove hostname from the context.
      *
      * @param  \Facade\FlareClient\Report  $report
-     * @param  Callable  $next
+     * @param  callable  $next
      * @return mixed
      */
     public function cleanContext(Report $report, $next)
@@ -183,7 +188,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      * Middleware to set LibreNMS and Tools grouping data
      *
      * @param  \Facade\FlareClient\Report  $report
-     * @param  Callable  $next
+     * @param  callable  $next
      * @return mixed
      */
     public function setGroups(Report $report, $next)

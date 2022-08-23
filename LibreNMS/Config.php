@@ -569,6 +569,7 @@ class Config
 
     /**
      * Check if the config has been loaded yet
+     *
      * @return bool
      */
     public static function isLoaded(): bool
