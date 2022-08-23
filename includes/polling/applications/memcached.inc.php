@@ -38,26 +38,27 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('bytes_written', 'DERIVE', 0, 125000000000);
 
 $fields = [
-    'uptime'            => $data['uptime'],
-    'threads'           => $data['threads'],
-    'rusage_user_ms'    => $data['rusage_user_microseconds'],
-    'rusage_system_ms'  => $data['rusage_system_microseconds'],
-    'curr_items'        => $data['curr_items'],
-    'total_items'       => $data['total_items'],
-    'limit_maxbytes'    => $data['limit_maxbytes'],
-    'curr_connections'  => $data['curr_connections'],
-    'total_connections' => $data['total_connections'],
-    'conn_structures'   => $data['connection_structures'],
-    'bytes'             => $data['bytes'],
-    'cmd_get'           => $data['cmd_get'],
-    'cmd_set'           => $data['cmd_set'],
-    'get_hits'          => $data['get_hits'],
-    'get_misses'        => $data['get_misses'],
-    'evictions'         => $data['evictions'],
-    'bytes_read'        => $data['bytes_read'],
-    'bytes_written'     => $data['bytes_written'],
+    'uptime'            => $data['uptime'] ?? null,
+    'threads'           => $data['threads'] ?? null,
+    'rusage_user_ms'    => $data['rusage_user_microseconds'] ?? null,
+    'rusage_system_ms'  => $data['rusage_system_microseconds'] ?? null,
+    'curr_items'        => $data['curr_items'] ?? null,
+    'total_items'       => $data['total_items'] ?? null,
+    'limit_maxbytes'    => $data['limit_maxbytes'] ?? null,
+    'curr_connections'  => $data['curr_connections'] ?? null,
+    'total_connections' => $data['total_connections'] ?? null,
+    'conn_structures'   => $data['connection_structures'] ?? null,
+    'bytes'             => $data['bytes'] ?? null,
+    'cmd_get'           => $data['cmd_get'] ?? null,
+    'cmd_set'           => $data['cmd_set'] ?? null,
+    'get_hits'          => $data['get_hits'] ?? null,
+    'get_misses'        => $data['get_misses'] ?? null,
+    'evictions'         => $data['evictions'] ?? null,
+    'bytes_read'        => $data['bytes_read'] ?? null,
+    'bytes_written'     => $data['bytes_written'] ?? null,
 ];
 
+$app_id = $app->app_id;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 update_application($app, $result, $fields);
