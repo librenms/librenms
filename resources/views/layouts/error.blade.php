@@ -76,8 +76,8 @@
 
     <p>{{ __("If you need additional help, you can find how to get help at") }} <a target="_blank" href="https://docs.librenms.org/Support">https://docs.librenms.org/Support</a>.</p>
 
-    @if(config('flare.key'))
-    <p>{{ __("Please include this error-ID when reporting problems:") }} <b>{{ \Facade\Ignition\Facades\Flare::sentReports()->latestUuid() }}</b></p>
+    @if(! empty(Flare::sentReports()->all()))
+    <p>{{ __("Please include this Error-ID when reporting problems:") }} <a href="{{ Flare::sentReports()->latestUrl() }}">{{ Flare::sentReports()->latestUuid() }}</a></p>
     @endif
 </div>
 </body>
