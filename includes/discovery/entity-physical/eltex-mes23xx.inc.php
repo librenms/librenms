@@ -29,12 +29,14 @@ $trans = snmpwalk_cache_multi_oid($device, 'eltPhdTransceiverInfoEntry', [], 'EL
 echo ' entAliasMappingIdentifier';
 $mapping = snmpwalk_cache_multi_oid($device, 'entAliasMappingIdentifier', [], 'ENTITY-MIB:IF-MIB');
 
-function normData($par = null)
-{
-    $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
-    $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
+if (!function_exists('normData') {
+    function normData($par = null)
+    {
+        $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
+        $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
 
-    return $ret;
+        return $ret;
+    }
 }
 
 foreach ($trans as $index => $data) {
