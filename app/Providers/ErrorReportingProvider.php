@@ -56,50 +56,12 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
             return \LibreNMS\Util\Version::VERSION;
         });
 
-        Flare::registerMiddleware(function (Report $report, $next) {
+        // Filter some extra fields for privacy
+        // Move to header middleware when switching to spatie/laravel-ignition
+        Flare::registerMiddleware([$this, 'cleanContext']);
 
-            // Filter some extra fields for privacy
-            // Move to header middleware when switching to spatie/laravel-ignition
-            try {
-                $report->setApplicationPath('');
-                $context = $report->allContext();
-
-                if (isset($context['request']['url'])) {
-                    $context['request']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['request']['url']);
-                }
-
-                if (isset($context['session']['_previous']['url'])) {
-                    $context['session']['_previous']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['_previous']['url']);
-                }
-
-                $context['headers']['host'] = null;
-                $context['headers']['referer'] = null;
-
-                $report->userProvidedContext($context);
-            } catch (\Exception $e) {
-            }
-
-            // Add more LibreNMS related info
-            try {
-                $version = Version::get();
-
-                $report->group('LibreNMS', [
-                    'Git version' => $version->local(),
-                    'App version' => Version::VERSION,
-                ]);
-
-                $report->group('Tools', [
-                    'Database' => $version->databaseServer(),
-                    'Net-SNMP' => $version->netSnmp(),
-                    'Python' => $version->python(),
-                    'RRDtool' => $version->rrdtool(),
-
-                ]);
-            } catch (\Exception $e) {
-            }
-
-            return $next($report);
-        });
+        // Add more LibreNMS related info
+        Flare::registerMiddleware([$this, 'setGroups']);
 
         // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
@@ -117,41 +79,41 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
             return $this->reportingEnabled;
         }
 
-        $this->reportingEnabled = false;
-
         // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
         if (! Config::isLoaded()) {
             return false;
         }
 
+        $this->reportingEnabled = false; // don't cache before config is loaded
+
         // check the user setting
         if (! Config::get('reporting.error')) {
+            \Log::debug('Reporting disabled by user setting');
             return false;
         }
 
         // Only run in production
         if (! $this->app->isProduction()) {
+            \Log::debug('Reporting disabled because app is not in production');
             return false;
         }
 
-        // Check if git installation
-        if (! Git::repoPresent()) {
-            return false;
-        }
+        // Check git
+        if (Git::repoPresent()) {
+            if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
+                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+                return false;
+            }
 
-        // Repo url must be official one
-        if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
-            return false;
-        }
+            if (! Git::unchanged()) {
+                \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
+                return false;
+            }
 
-        // Check if repo is modified
-        if (! Git::unchanged()) {
-            return false;
-        }
-
-        // Check if repo is modified
-        if (! Git::officalCommit()) {
-            return false;
+            if (! Git::officalCommit()) {
+                \Log::debug('Reporting disabled due to local modifications');
+                return false;
+            }
         }
 
         $this->reportingEnabled = true;
@@ -184,5 +146,66 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         return true;
+    }
+
+    /**
+     * Middleware to remove hostname from the context.
+     *
+     * @param  \Facade\FlareClient\Report  $report
+     * @param  Callable  $next
+     * @return mixed
+     */
+    public function cleanContext(Report $report, $next)
+    {
+        try {
+            $report->setApplicationPath('');
+            $context = $report->allContext();
+
+            if (isset($context['request']['url'])) {
+                $context['request']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['request']['url']);
+            }
+
+            if (isset($context['session']['_previous']['url'])) {
+                $context['session']['_previous']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['_previous']['url']);
+            }
+
+            $context['headers']['host'] = null;
+            $context['headers']['referer'] = null;
+
+            $report->userProvidedContext($context);
+        } catch (\Exception $e) {
+        }
+
+        return $next($report);
+    }
+
+    /**
+     * Middleware to set LibreNMS and Tools grouping data
+     *
+     * @param  \Facade\FlareClient\Report  $report
+     * @param  Callable  $next
+     * @return mixed
+     */
+    public function setGroups(Report $report, $next)
+    {
+        try {
+            $version = Version::get();
+
+            $report->group('LibreNMS', [
+                'Git version' => $version->local(),
+                'App version' => Version::VERSION,
+            ]);
+
+            $report->group('Tools', [
+                'Database' => $version->databaseServer(),
+                'Net-SNMP' => $version->netSnmp(),
+                'Python' => $version->python(),
+                'RRDtool' => $version->rrdtool(),
+
+            ]);
+        } catch (\Exception $e) {
+        }
+
+        return $next($report);
     }
 }
