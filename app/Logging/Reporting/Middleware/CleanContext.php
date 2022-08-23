@@ -46,6 +46,10 @@ class CleanContext
                 $context['request']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['request']['url']);
             }
 
+            if (isset($context['session']['url']['intended'])) {
+                $context['session']['url']['intended'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['url']['intended']);
+            }
+
             if (isset($context['session']['_previous']['url'])) {
                 $context['session']['_previous']['url'] = str_replace($context['headers']['host'] ?? '', 'librenms', $context['session']['_previous']['url']);
             }
