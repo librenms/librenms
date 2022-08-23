@@ -42,7 +42,7 @@ class User extends Authenticatable
 
     public function toFlare(): array
     {
-        return [];
+        return $this->only(['level', 'auth_type', 'enabled']);
     }
 
     // ---- Helper Functions ----
