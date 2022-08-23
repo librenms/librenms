@@ -1,9 +1,5 @@
 <?php
 
-$disks = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'smart');
-
-print_optionbar_start();
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -11,19 +7,24 @@ $link_array = [
     'app'    => 'smart',
 ];
 
-$drives = [];
+print_optionbar_start();
 
-foreach ($disks as $label) {
-    $disk = $label;
+echo generate_link('All Drives', $link_array);
+echo ' | Drives: ';
 
-    if ($vars['disk'] == $disk) {
-        $label = '<span class="pagemenu-selected">' . $label . '</span>';
+$disks = $app->data['disks'] ?? [];
+sort($disks);
+foreach ($disks as $index => $disk) {
+    $label = $vars['disk'] == $disk
+        ? '<span class="pagemenu-selected">' . $disk . '</span>'
+        : $disk;
+
+    echo generate_link($label, $link_array, ['disk' => $disk]);
+
+    if ($index < (count($disks) - 1)) {
+        echo ', ';
     }
-
-    array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]));
 }
-
-printf('%s | drives: %s', generate_link('All Drives', $link_array), implode(', ', $drives));
 
 print_optionbar_end();
 
