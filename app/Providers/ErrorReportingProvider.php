@@ -39,6 +39,8 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     protected $errorReportingLevel = E_ALL & ~E_NOTICE;
     /** @var callable */
     private $laravelErrorHandler;
+    /** @var bool */
+    private $reportingEnabled;
 
     public function boot(): void
     {
@@ -49,7 +51,6 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         Flare::filterReportsUsing(function (Report $report) {
             return $this->isReportingEnabled();
         });
-
 
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
@@ -112,6 +113,12 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      */
     public function isReportingEnabled(): bool
     {
+        if ($this->reportingEnabled !== null) {
+            return $this->reportingEnabled;
+        }
+
+        $this->reportingEnabled = false;
+
         // safety check so we don't leak early reports (but reporting should not be loaded before the config is)
         if (! Config::isLoaded()) {
             return false;
@@ -146,6 +153,8 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         if (! Git::officalCommit()) {
             return false;
         }
+
+        $this->reportingEnabled = true;
 
         return true;
     }
