@@ -696,7 +696,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
                     }
 
-                    if ($devices['os'] == 'firebrick') {
+                    if ($device['os'] == 'firebrick') {
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', $key);
                             $protocol = $oid[0];
