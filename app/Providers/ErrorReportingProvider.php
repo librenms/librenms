@@ -46,6 +46,11 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     public function boot(): void
     {
         Flare::filterExceptionsUsing(function (\Exception $e) {
+            // ignore errors in vendor code
+            if (str_contains($e->getFile(), '/vendor/')) {
+                return false;
+            }
+
             return $this->isReportingEnabled();
         });
 
