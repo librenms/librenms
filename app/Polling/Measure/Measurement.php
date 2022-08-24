@@ -43,7 +43,7 @@ class Measurement
     /**
      * Create a measurement with an existing duration
      */
-    public static function make(string $type, float $duration): Measurement
+    public static function make(string $type, float $duration): self
     {
         return new static($type, $duration);
     }
@@ -54,7 +54,7 @@ class Measurement
      * @param  string  $type
      * @return static
      */
-    public static function start(string $type): Measurement
+    public static function start(string $type): self
     {
         return new static($type);
     }
@@ -62,7 +62,7 @@ class Measurement
     /**
      * End the timer for this operation
      */
-    public function end(): Measurement
+    public function end(): self
     {
         $this->duration = microtime(true) - $this->start;
 

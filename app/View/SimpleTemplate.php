@@ -59,7 +59,7 @@ class SimpleTemplate
     /**
      * By default, unmatched templates will be removed from the output, set this to keep them
      */
-    public function keepEmptyTemplates(): SimpleTemplate
+    public function keepEmptyTemplates(): self
     {
         $this->keepEmpty = true;
 
@@ -69,7 +69,7 @@ class SimpleTemplate
     /**
      * Add a variable to the set of possible substitutions
      */
-    public function setVariable(string $key, string $value): SimpleTemplate
+    public function setVariable(string $key, string $value): self
     {
         $this->variables[$key] = $value;
 
@@ -80,7 +80,7 @@ class SimpleTemplate
      * Instead of using the given variables to replace {{ var }}
      * send the matched variable to this callback, which will return a string to replace it
      */
-    public function replaceWith(callable $callback): SimpleTemplate
+    public function replaceWith(callable $callback): self
     {
         $this->callback = $callback;
 

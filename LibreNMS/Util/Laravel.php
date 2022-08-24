@@ -83,7 +83,7 @@ class Laravel
      */
     public static function isCli(): bool
     {
-        return Laravel::isBooted()
+        return self::isBooted()
             ? App::runningInConsole()
             : (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']));
     }

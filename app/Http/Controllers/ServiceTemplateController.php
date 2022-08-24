@@ -317,8 +317,8 @@ class ServiceTemplateController extends Controller
      */
     public function apply(ServiceTemplate $template)
     {
-        ServiceTemplateController::applyDevices($template);
-        ServiceTemplateController::applyDeviceGroups($template);
+        self::applyDevices($template);
+        self::applyDeviceGroups($template);
 
         // remove any remaining services no longer in the correct device group
         foreach (Device::notInServiceTemplate($template->id)->notInDeviceGroup($template->groups)->get() as $device) {

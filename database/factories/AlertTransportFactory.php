@@ -28,7 +28,7 @@ class AlertTransportFactory extends Factory
         string $headers = 'test=header',
         string $username = '',
         string $password = ''
-    ): AlertTransportFactory {
+    ): self {
         $config = [
             'api-method' => $method,
             'api-url' => $url,

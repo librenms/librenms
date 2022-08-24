@@ -99,7 +99,7 @@ abstract class IP
             )
         );
 
-        return IP::fromHexString($hex, $ignore_errors);
+        return self::fromHexString($hex, $ignore_errors);
     }
 
     /**

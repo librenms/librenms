@@ -46,7 +46,7 @@ class UserPref extends BaseModel
 
     public static function setPref(User $user, $pref, $value)
     {
-        return UserPref::updateOrCreate(['user_id' => $user->user_id, 'pref' => $pref], ['value' => $value]);
+        return self::updateOrCreate(['user_id' => $user->user_id, 'pref' => $pref], ['value' => $value]);
     }
 
     public static function forgetPref(User $user, $pref)

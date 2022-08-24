@@ -32,52 +32,52 @@ interface SnmpQueryInterface
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SnmpQueryInterface;
+    public static function make(): self;
 
     /**
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SnmpQueryInterface;
+    public function device(Device $device): self;
 
     /**
      * Specify a device by a device array.
      * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
      */
-    public function deviceArray(array $device): SnmpQueryInterface;
+    public function deviceArray(array $device): self;
 
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SnmpQueryInterface;
+    public function context(string $context): self;
 
     /**
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(?string $dir): SnmpQueryInterface;
+    public function mibDir(?string $dir): self;
 
     /**
      * Do not error on out of order indexes.
      * Use with caution as we could get stuck in an infinite loop.
      */
-    public function allowUnordered(): SnmpQueryInterface;
+    public function allowUnordered(): self;
 
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQueryInterface;
+    public function numeric(): self;
 
     /**
      * Hide MIB in output
      */
-    public function hideMib(): SnmpQueryInterface;
+    public function hideMib(): self;
 
     /**
      * Output enum values as strings instead of values. This could affect index output.
      */
-    public function enumStrings(): SnmpQueryInterface;
+    public function enumStrings(): self;
 
     /**
      * Set option(s) for net-snmp command line.
@@ -88,7 +88,7 @@ interface SnmpQueryInterface
      * @param  array|string|null  $options
      * @return $this
      */
-    public function options($options = []): SnmpQueryInterface;
+    public function options($options = []): self;
 
     /**
      * snmpget an OID

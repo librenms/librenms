@@ -26,7 +26,7 @@ class Port extends DeviceRelatedModel
     {
         parent::boot();
 
-        static::deleting(function (Port $port) {
+        static::deleting(function (self $port) {
             // delete related data
             $port->adsl()->delete();
             $port->fdbEntries()->delete();

@@ -225,7 +225,7 @@ class SnmpResponse
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
      */
-    public function filterBadLines(): SnmpResponse
+    public function filterBadLines(): self
     {
         $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/', '', $this->raw);
         $this->raw = preg_replace('/\n[^\r\n]+No more variables left[^\r\n]+$/s', '', $this->raw);
@@ -233,7 +233,7 @@ class SnmpResponse
         return $this;
     }
 
-    public function append(SnmpResponse $response): SnmpResponse
+    public function append(self $response): self
     {
         $this->raw .= $response->raw;
         $this->stderr .= $response->stderr;

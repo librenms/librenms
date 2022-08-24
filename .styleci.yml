@@ -1,4 +1,5 @@
 preset: laravel
+risky: true
 enabled:
   - concat_with_spaces
 disabled:

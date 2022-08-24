@@ -79,7 +79,7 @@ class Device extends BaseModel
 
     // ---- Helper Functions ----
 
-    public static function findByHostname(string $hostname): ?Device
+    public static function findByHostname(string $hostname): ?self
     {
         return static::where('hostname', $hostname)->first();
     }
@@ -110,7 +110,7 @@ class Device extends BaseModel
         return $overwrite_ip ?: $hostname;
     }
 
-    public static function findByIp(?string $ip): ?Device
+    public static function findByIp(?string $ip): ?self
     {
         if (! IP::isValid($ip)) {
             return null;

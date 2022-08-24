@@ -74,7 +74,7 @@ class Url
 
         $class = self::deviceLinkDisplayClass($device);
         $graphs = Graph::getOverviewGraphsForDevice($device);
-        $url = Url::deviceUrl($device, $vars);
+        $url = self::deviceUrl($device, $vars);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         $contents = '<div><span class="list-large">' . $device->displayName() . '</span>';
@@ -105,8 +105,8 @@ class Url
             $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
-            $contents .= Url::minigraphImage($device, $start, $end, $graph);
-            $contents .= Url::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
+            $contents .= self::minigraphImage($device, $start, $end, $graph);
+            $contents .= self::minigraphImage($device, Carbon::now()->subWeek()->timestamp, $end, $graph);
             $contents .= '</div>';
         }
 
@@ -114,7 +114,7 @@ class Url
             $link = $contents;
         } else {
             $contents = self::escapeBothQuotes($contents);
-            $link = Url::overlibLink($url, $text, $contents, $class);
+            $link = self::overlibLink($url, $text, $contents, $class);
         }
 
         return $link;

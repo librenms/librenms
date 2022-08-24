@@ -68,7 +68,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function ok(string $message, string $fix = null): ValidationResult
+    public static function ok(string $message, string $fix = null): self
     {
         return new self($message, self::SUCCESS, $fix);
     }
@@ -80,7 +80,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function warn(string $message, string $fix = null): ValidationResult
+    public static function warn(string $message, string $fix = null): self
     {
         return new self($message, self::WARNING, $fix);
     }
@@ -91,7 +91,7 @@ class ValidationResult
      * @param  string  $message  The message to describe this result
      * @return ValidationResult
      */
-    public static function info(string $message): ValidationResult
+    public static function info(string $message): self
     {
         return new self($message, self::INFO);
     }
@@ -103,7 +103,7 @@ class ValidationResult
      * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function fail(string $message, string $fix = null): ValidationResult
+    public static function fail(string $message, string $fix = null): self
     {
         return new self($message, self::FAILURE, $fix);
     }
@@ -134,7 +134,7 @@ class ValidationResult
         return $this->list;
     }
 
-    public function setList(string $description, array $list): ValidationResult
+    public function setList(string $description, array $list): self
     {
         if (is_array(current($list))) {
             $list = array_map(function ($item) {
@@ -168,7 +168,7 @@ class ValidationResult
      * @param  string|array  $fix
      * @return ValidationResult $this
      */
-    public function setFix($fix): ValidationResult
+    public function setFix($fix): self
     {
         $this->fix = $fix;
 
@@ -272,7 +272,7 @@ class ValidationResult
     /**
      * Set fixer, optionally denote if this is fixable
      */
-    public function setFixer(string $fixer, bool $fixable = true): ValidationResult
+    public function setFixer(string $fixer, bool $fixable = true): self
     {
         $this->fixer = $fixable ? $fixer : null;
 

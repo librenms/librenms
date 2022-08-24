@@ -65,18 +65,18 @@ class ServiceTemplate extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (ServiceTemplate $template) {
+        static::deleting(function (self $template) {
             $template->devices()->detach();
             $template->groups()->detach();
         });
 
-        static::saving(function (ServiceTemplate $template) {
+        static::saving(function (self $template) {
             if ($template->type == 'dynamic' and $template->isDirty('rules')) {
                 $template->rules = $template->getDeviceParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (ServiceTemplate $template) {
+        static::saved(function (self $template) {
             if ($template->type == 'dynamic' and $template->isDirty('rules')) {
                 $template->updateDevices();
             }

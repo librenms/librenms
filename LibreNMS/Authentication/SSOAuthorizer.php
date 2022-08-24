@@ -211,7 +211,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             if (isset($config_map[$value])) {
                 $map = $config_map[$value];
 
-                if (is_integer($map) && $level < $map) {
+                if (is_int($map) && $level < $map) {
                     $level = $map;
                 }
             }

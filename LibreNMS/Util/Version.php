@@ -48,7 +48,7 @@ class Version
         $this->is_git_install = Git::repoPresent() && Git::binaryExists();
     }
 
-    public static function get(): Version
+    public static function get(): self
     {
         return new static;
     }

@@ -89,9 +89,9 @@ class FpingResponse
         $this->skipped = $skipped;
     }
 
-    public static function artificialUp(): FpingResponse
+    public static function artificialUp(): self
     {
-        return new FpingResponse(1, 1, 0, 0, 0, 0, 0, 0, true);
+        return new self(1, 1, 0, 0, 0, 0, 0, 0, true);
     }
 
     public function wasSkipped(): bool
@@ -99,7 +99,7 @@ class FpingResponse
         return $this->skipped;
     }
 
-    public static function parseOutput(string $output, int $code): FpingResponse
+    public static function parseOutput(string $output, int $code): self
     {
         preg_match('#= (\d+)/(\d+)/(\d+)%(, min/avg/max = ([\d.]+)/([\d.]+)/([\d.]+))?$#', $output, $parsed);
         [, $xmt, $rcv, $loss, , $min, $avg, $max] = array_pad($parsed, 8, 0);
@@ -110,7 +110,7 @@ class FpingResponse
             $loss = 100;
         }
 
-        return new FpingResponse(
+        return new self(
             (int) $xmt,
             (int) $rcv,
             (int) $loss,

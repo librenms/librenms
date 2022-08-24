@@ -40,17 +40,17 @@ class DeviceGroup extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (DeviceGroup $deviceGroup) {
+        static::deleting(function (self $deviceGroup) {
             $deviceGroup->devices()->detach();
         });
 
-        static::saving(function (DeviceGroup $deviceGroup) {
+        static::saving(function (self $deviceGroup) {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (DeviceGroup $deviceGroup) {
+        static::saved(function (self $deviceGroup) {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->updateDevices();
             }
