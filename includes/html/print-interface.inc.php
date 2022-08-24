@@ -94,8 +94,8 @@ echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) .
 if ($port['ifOperStatus'] == 'up') {
     $port['in_rate'] = ($port['ifInOctets_rate'] * 8);
     $port['out_rate'] = ($port['ifOutOctets_rate'] * 8);
-    $in_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $out_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $in_perc = Number::calculatePercent($port['in_rate'], $port['ifSpeed'], 0);
+    $out_perc = Number::calculatePercent($port['in_rate'], $port['ifSpeed'], 0);
     echo "<i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i> <span style='color: " . percent_colour($in_perc) . "'>" . Number::formatSi($port['in_rate'], 2, 3, 'bps') . "<br />
         <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i> <span style='color: " . percent_colour($out_perc) . "'>" . Number::formatSi($port['out_rate'], 2, 3, 'bps') . "<br />
         <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i> " . Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps') . "</span><br />
