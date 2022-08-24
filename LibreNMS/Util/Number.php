@@ -115,7 +115,7 @@ class Number
      * @param  int|float  $part
      * @param  int|float  $total
      * @param  int  $precision
-     * @return  float
+     * @return float
      */
     public static function calculatePercent($part, $total, int $precision = 2): float
     {
