@@ -11,7 +11,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
     if (! empty($peers)) {
         $generic = false;
         if ($device['os'] == 'junos') {
-            $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+            $peer_data_check = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerIndex', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.14', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
         } elseif ($device['os_group'] === 'arista') {
             $peer_data_check = snmpwalk_cache_oid($device, 'aristaBgp4V2PeerRemoteAs', [], 'ARISTA-BGP4V2-MIB');
         } elseif ($device['os'] === 'dell-os10') {
@@ -607,30 +607,31 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     } //end if
 
                     if ($device['os'] == 'junos') {
-                        $afis['ipv4'] = 1;
-                        $afis['ipv6'] = 2;
-                        $afis['l2vpn'] = 25;
-                        $safis['unicast'] = 1;
-                        $safis['multicast'] = 2;
-                        $safis['unicastAndMulticast'] = 3;
-                        $safis['labeledUnicast'] = 4;
-                        $safis['mvpn'] = 5;
-                        $safis['vpls'] = 65;
-                        $safis['evpn'] = 70;
-                        $safis['vpn'] = 128;
-                        $safis['rtfilter'] = 132;
-                        $safis['flow'] = 133;
+                        $safis = [
+                            'unicast' => 1,
+                            'multicast' => 2,
+                            'unicastAndMulticast' => 3,
+                            'labeledUnicast' => 4,
+                            'mvpn' => 5,
+                            'vpls' => 65,
+                            'evpn' => 70,
+                            'vpn' => 128,
+                            'rtfilter' => 132,
+                            'flow' => 133,
+                        ];
 
                         if (! isset($j_prefixes)) {
-                            $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixInPrefixesAccepted', $j_prefixes, 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQnU');
-                            $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixInPrefixesRejected', $j_prefixes, 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQnU');
-                            $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixOutPrefixes', $j_prefixes, 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQnU');
-                            d_echo($j_prefixes);
+                            $j_prefixes = SnmpQuery::walk([
+                                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted',
+                                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected',
+                                'BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes',
+                            ])->table(3);
                         }
 
-                        $cbgpPeerAcceptedPrefixes = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.8.' . $junos[(string) $peer_ip]['index'] . ".$afis[$afi]." . $safis[$safi]]);
-                        $cbgpPeerDeniedPrefixes = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.9.' . $junos[(string) $peer_ip]['index'] . ".$afis[$afi]." . $safis[$safi]]);
-                        $cbgpPeerAdvertisedPrefixes = array_shift($j_prefixes['1.3.6.1.4.1.2636.5.1.1.2.6.2.1.10.' . $junos[(string) $peer_ip]['index'] . ".$afis[$afi]." . $safis[$safi]]);
+                        $current_peer_data = $j_prefixes[$junos[(string) $peer_ip]['index']][$afi][$safis[$safi]];
+                        $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'];
+                        $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'];
+                        $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'];
                     }//end if
 
                     if ($device['os_group'] === 'arista') {

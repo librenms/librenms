@@ -20,6 +20,7 @@ if (Config::get('enable_bgp')) {
         $device['context_name'] = $context_name;
         $peer2 = false;
         $peers_data = '';
+        $bgp4_mib = false;
 
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
@@ -102,8 +103,9 @@ if (Config::get('enable_bgp')) {
                     $safis[133] = 'flow';
 
                     if (! isset($j_peerIndexes)) {
-                        $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
+                        $j_peerIndexes = [];
                         foreach ($j_bgp as $index => $entry) {
                             $peer_index = $entry['jnxBgpM2PeerIndex'];
                             try {
@@ -117,7 +119,8 @@ if (Config::get('enable_bgp')) {
                     }
 
                     if (! isset($j_afisafi)) {
-                        $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_afisafi = [];
                         foreach (array_keys($j_prefixes) as $key) {
                             [$index,$afisafi] = explode('.', $key, 2);
                             $j_afisafi[$index][] = $afisafi;
