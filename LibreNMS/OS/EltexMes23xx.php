@@ -35,7 +35,6 @@ class EltexMes23xx extends OS
         $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
         $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
 
-    return $ret;
+        return $ret;
     }
-
 }
