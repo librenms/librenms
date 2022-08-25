@@ -214,7 +214,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array['from'] = \LibreNMS\Config::get('time.day');
     $graph_array['height'] = '110';
     if (isset($width)) {
-        $graph_array['width'] = $width ;
+        $graph_array['width'] = $width;
     }
 
     // Peer Address
