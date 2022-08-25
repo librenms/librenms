@@ -971,7 +971,7 @@
         },
         "device_types": {
             "default": [
-                                {
+                {
                     "icon": "appliance.png",
                     "text": "Appliance",
                     "type": "appliance"
