@@ -7116,11 +7116,6 @@ parameters:
 			path: app/Http/Controllers/DeviceController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:deviceLinkMenu\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
