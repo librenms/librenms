@@ -7,6 +7,8 @@ require 'includes/html/graphs/common.inc.php';
 $multiplier = $multiplier ?? false;
 $print_total = $print_total ?? false;
 $percentile = $percentile ?? false;
+$unit_text = $unit_text ?? '';
+$line_text = $line_text ?? '';
 $previous = $_GET['previous'] ?? 'no';
 
 $unit_text = str_pad(substr($unit_text, 0, 18), 18);
