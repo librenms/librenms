@@ -127,7 +127,7 @@ if (Config::get('enable_bgp')) {
                         }
                     }
 
-                    foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi) {
+                    foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] ?? [] as $afisafi) {
                         [$afi,$safi] = explode('.', $afisafi);
                         $afi = $afis[$afi];
                         $safi = $safis[$safi];

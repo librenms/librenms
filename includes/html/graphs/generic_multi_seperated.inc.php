@@ -74,7 +74,7 @@ if ($_GET['previous']) {
 
 $rrd_options .= " COMMENT:'\\n'";
 
-foreach ($rrd_list as $rrd) {
+foreach ($rrd_list ?? [] as $rrd) {
     if (! Config::get("graph_colours.$colours_in.$iter") || ! Config::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
