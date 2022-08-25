@@ -111,6 +111,7 @@ class DeviceController extends Controller
     {
         ob_start();
         $device = $device->toArray();
+        $device['os_group'] = Config::get("os.{$device['os']}.group");
         Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];

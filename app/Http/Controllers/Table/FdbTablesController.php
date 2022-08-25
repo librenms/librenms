@@ -77,9 +77,9 @@ class FdbTablesController extends TableController
      */
     protected function search($search, $query, $fields = [])
     {
-        if ($search = trim(\Request::get('searchPhrase'))) {
+        if ($search = trim(\Request::get('searchPhrase') ?? '')) {
             $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', $search) . '%';
-            switch (\Request::get('searchby')) {
+            switch (\Request::get('searchby') ?? '') {
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':

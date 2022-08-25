@@ -2,7 +2,8 @@
 
 $param = [];
 
-$sql .= ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
+$sql = ' FROM `ipv4_mac` AS M, `ports` AS P, `devices` AS D ';
+$where = '';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -17,7 +18,7 @@ if (is_numeric($vars['device_id'])) {
     $param[] = $vars['device_id'];
 }
 
-if (is_numeric($vars['port_id'])) {
+if (isset($vars['port_id']) && is_numeric($vars['port_id'])) {
     $sql .= ' AND P.port_id = ?';
     $param[] = $vars['port_id'];
 }
@@ -65,7 +66,7 @@ $sql = "SELECT *,`P`.`ifDescr` AS `interface` $sql";
 
 foreach (dbFetchRows($sql, $param) as $entry) {
     $entry = cleanPort($entry);
-    if (! $ignore) {
+    if (! empty($ignore)) {
         if ($entry['ifInErrors'] > 0 || $entry['ifOutErrors'] > 0) {
             $error_img = generate_port_link($entry, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
         } else {

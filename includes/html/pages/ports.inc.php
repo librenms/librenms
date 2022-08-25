@@ -100,11 +100,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
         $results = dbFetchRows('SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`', [Auth::id()]);
     }
     foreach ($results as $data) {
-        if ($data['device_id'] == $vars['device_id']) {
-            $deviceselected = 'selected';
-        } else {
-            $deviceselected = '';
-        }
+        $deviceselected = isset($vars['device_id']) && $data['device_id'] == $vars['device_id'] ? 'selected' : '';
         $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . '...' : format_hostname($data);
         $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . '>' . $ui_device . '</option>';
     }
@@ -126,17 +122,13 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
 
     $output .= '</select>&nbsp;';
 
-    if (strlen($vars['hostname'])) {
-        $hasvalue = "value='" . $vars['hostname'] . "'";
-    } else {
-        $hasvalue = '';
-    }
+    $hasvalue = ! empty($vars['hostname']) ? "value='" . $vars['hostname'] . "'" : '';
 
     $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
 
     $output .= '</div>&nbsp;';
 
-    switch ($vars['state']) {
+    switch ($vars['state'] ?? '') {
         case 'up':
             $isup = 'selected';
             $isdown = '';
@@ -152,6 +144,10 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
             $isdown = '';
             $admindown = 'selected';
             break;
+        default:
+            $isup = '';
+            $isdown = '';
+            $admindown = '';
     }
 
     $output .= "<div class='form-group'>";
@@ -173,11 +169,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
 
     foreach ($ifSpeed as $data) {
         if ($data['ifSpeed']) {
-            if ($data['ifSpeed'] == $vars['ifSpeed']) {
-                $speedselected = 'selected';
-            } else {
-                $speedselected = '';
-            }
+            $speedselected = isset($vars['ifSpeed']) && $data['ifSpeed'] == $vars['ifSpeed'] ? 'selected' : '';
             $output .= "<option value='" . $data['ifSpeed'] . "'" . $speedselected . '>' . \LibreNMS\Util\Number::formatSi($data['ifSpeed'], 2, 3, 'bps') . '</option>';
         }
     }
@@ -196,11 +188,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
 
     foreach ($ifType as $data) {
         if ($data['ifType']) {
-            if ($data['ifType'] == $vars['ifType']) {
-                $dataselected = 'selected';
-            } else {
-                $dataselected = '';
-            }
+            $dataselected = isset($vars['ifType']) && $data['ifType'] == $vars['ifType'] ? 'selected' : '';
             $output .= "<option value='" . clean_bootgrid($data['ifType']) . "' " . $dataselected . '>' . clean_bootgrid($data['ifType']) . '</option>';
         }
     }
@@ -223,7 +211,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
 
     foreach ($port_descr_type as $data) {
         if ($data['port_descr_type']) {
-            if ($data['port_descr_type'] == $vars['port_descr_type']) {
+            if (isset($vars['port_descr_type']) && $data['port_descr_type'] == $vars['port_descr_type']) {
                 $portdescrib = 'selected';
             } else {
                 $portdescrib = '';
@@ -236,9 +224,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= '</div>';
     $output .= "<div class='form-group'>";
 
-    if (strlen($vars['ifAlias'])) {
-        $ifaliasvalue = "value='" . $vars['ifAlias'] . "'";
-    }
+    $ifaliasvalue = isset($vars['ifAlias']) ? "value='" . $vars['ifAlias'] . "'" : '';
 
     $output .= '</div>';
 
@@ -253,7 +239,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
         $location = $location_row['location'];
         $location_id = $location_row['id'];
         if ($location) {
-            if ($location_id == $vars['location']) {
+            if (isset($vars['location']) && $location_id == $vars['location']) {
                 $locationselected = 'selected';
             } else {
                 $locationselected = '';
@@ -265,23 +251,9 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
 
     $output .= '</select>&nbsp;';
 
-    if ($vars['ignore']) {
-        $ignorecheck = 'checked';
-    } else {
-        $ignorecheck = '';
-    }
-
-    if ($vars['disabled']) {
-        $disabledcheck = 'checked';
-    } else {
-        $disabledcheck = '';
-    }
-
-    if ($vars['deleted']) {
-        $deletedcheck = 'checked';
-    } else {
-        $deletedcheck = '';
-    }
+    $ignorecheck = isset($vars['ignore']) ? 'checked' : '';
+    $disabledcheck = isset($vars['disabled']) ? 'checked' : '';
+    $deletedcheck = isset($vars['deleted']) ? 'checked' : '';
 
     $output .= "<label for='ignore'>Ignored</label>&nbsp;";
     $output .= "<input type='checkbox' id='ignore' name='ignore' value='1' " . $ignorecheck . '>&nbsp;';
@@ -291,7 +263,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<input type='checkbox' id='deleted' name='deleted' value='1' " . $deletedcheck . '>&nbsp;';
 
     $output .= "<button type='submit' class='btn btn-default btn-sm'>Search</button>&nbsp;";
-    $output .= "<a class='btn btn-default btn-sm' href='" . \LibreNMS\Util\Url::generate(['page' => 'ports', 'section' => $vars['section'], 'bare' => $vars['bare']]) . "' title='Reset critera to default.'>Reset</a>";
+    $output .= "<a class='btn btn-default btn-sm' href='" . \LibreNMS\Util\Url::generate(['page' => 'ports', 'section' => $vars['section'] ?? '', 'bare' => $vars['bare'] ?? '']) . "' title='Reset critera to default.'>Reset</a>";
 
     $output .= '</div>';
 
@@ -416,7 +388,7 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
     $where .= ' AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0';
 }
 
-$query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where . ' ' . $query_sort;
+$query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
 $row = 1;
 
 [$format, $subformat] = explode('_', basename($vars['format']));
@@ -424,7 +396,7 @@ $row = 1;
 // only grab list of ports for graph pages, table uses ajax
 $ports = $format == 'graph' ? dbFetchRows($query, $param) : [];
 
-switch ($vars['sort']) {
+switch ($vars['sort'] ?? '') {
     case 'traffic':
         $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
         break;

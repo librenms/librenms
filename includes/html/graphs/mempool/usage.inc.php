@@ -2,6 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
+$unit_text = $unit_text ?? '';
 $rrd_options .= ' -u 100 -l 0 -E -b 1024 ';
 
 $iter = '1';

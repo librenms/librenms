@@ -166,13 +166,14 @@ if (defined('SHOW_SETTINGS')) {
 } else {
     $alert_id = $vars['alert_id'] ?? 0;
     $device_id = $device['device_id'];
-    $acknowledged = $widget_settings['acknowledged'];
-    $fired = $widget_settings['fired'];
-    $state = $widget_settings['state'];
-    $min_severity = $widget_settings['min_severity'];
-    $group = $widget_settings['group'];
-    $proc = $widget_settings['proc'];
-    $sort = $widget_settings['sort'];
+    $acknowledged = $widget_settings['acknowledged'] ?? '';
+    $fired = $widget_settings['fired'] ?? '';
+    $state = $widget_settings['state'] ?? '';
+    $min_severity = $widget_settings['min_severity'] ?? '';
+    $group = $widget_settings['group'] ?? '';
+    $proc = $widget_settings['proc'] ?? '';
+    $sort = $widget_settings['sort'] ?? '';
+    $unique_id = $unique_id ?? '';
 
     $title = 'Alerts';
 
@@ -217,7 +218,7 @@ if (defined('SHOW_SETTINGS')) {
 
     $widget_settings['title'] = $title;
 
-    $group = $widget_settings['group'];
+    $group = $widget_settings['group'] ?? '';
 
     $common_output[] = '
 <div class="row">

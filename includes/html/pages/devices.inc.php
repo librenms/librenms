@@ -74,8 +74,8 @@ foreach (get_graph_subtypes($type) as $avail_type) {
     $headeroptions .= '<option value="' .
         \LibreNMS\Util\Url::generate($vars, [
             'format' => 'graph_' . $avail_type,
-            'from' => $vars['from'] ?: \LibreNMS\Config::get('time.day'),
-            'to' => $vars['to'] ?: \LibreNMS\Config::get('time.now'),
+            'from' => $vars['from'] ?? \LibreNMS\Config::get('time.day'),
+            'to' => $vars['to'] ?? \LibreNMS\Config::get('time.now'),
         ]) . '" ' . $is_selected . '>' . $display_type . '</option>';
 }
 $headeroptions .= '</select>';
@@ -345,34 +345,34 @@ if ($format == 'graph') {
             post: function () {
                 return {
                     format: ' <?php echo $vars['format']; ?>',
-                    searchPhrase: '<?php echo htmlspecialchars($vars['searchquery']); ?>',
-                    os: '<?php echo $vars['os']; ?>',
-                    version: '<?php echo $vars['version']; ?>',
-                    hardware: '<?php echo $vars['hardware']; ?>',
-                    features: '<?php echo $vars['features']; ?>',
-                    location: '<?php echo $vars['location']; ?>',
-                    type: '<?php echo $vars['type']; ?>',
-                    state: '<?php echo $vars['state']; ?>',
-                    disabled: '<?php echo $vars['disabled']; ?>',
-                    ignore: '<?php echo $vars['ignore']; ?>',
-                    disable_notify: '<?php echo $vars['disable_notify']; ?>',
-                    group: '<?php echo $vars['group']; ?>',
-                    poller_group: '<?php echo $vars['poller_group']; ?>',
-                    device_id: '<?php echo $vars['device_id']; ?>',
+                    searchPhrase: '<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>',
+                    os: '<?php echo $vars['os'] ?? ''; ?>',
+                    version: '<?php echo $vars['version'] ?? ''; ?>',
+                    hardware: '<?php echo $vars['hardware'] ?? ''; ?>',
+                    features: '<?php echo $vars['features'] ?? ''; ?>',
+                    location: '<?php echo $vars['location'] ?? ''; ?>',
+                    type: '<?php echo $vars['type'] ?? ''; ?>',
+                    state: '<?php echo $vars['state'] ?? ''; ?>',
+                    disabled: '<?php echo $vars['disabled'] ?? ''; ?>',
+                    ignore: '<?php echo $vars['ignore'] ?? ''; ?>',
+                    disable_notify: '<?php echo $vars['disable_notify'] ?? ''; ?>',
+                    group: '<?php echo $vars['group'] ?? ''; ?>',
+                    poller_group: '<?php echo $vars['poller_group'] ?? ''; ?>',
+                    device_id: '<?php echo $vars['device_id'] ?? ''; ?>',
                 };
             },
             url: "<?php echo url('/ajax/table/device') ?>"
         });
 
         <?php
-        if (! isset($vars['searchbar']) && $vars['searchbar'] != 'hide') {
+        if (empty($vars['searchbar']) || $vars['searchbar'] != 'hide') {
             ?>
         $(".devices-headers-table-menu").append(
             "<div class='pull-left'>" +
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery']; ?>'' class='form-control' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery'] ?? ''; ?>'' class='form-control' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $state_selection ?></div>" +
             "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +
@@ -383,7 +383,7 @@ if ($format == 'graph') {
             "<div class='form-group'><select name='type' id='device-type' class='form-control'></select></div>" +
             "<input type='submit' class='btn btn-info' value='Search'>" +
             "<a href='<?php echo \LibreNMS\Util\Url::generate(array_diff_key($vars, ['_token' => 1])) ?>' title='Update the browser URL to reflect the search criteria.' class='btn btn-default'>Update URL</a>" +
-            "<a href='<?php echo \LibreNMS\Util\Url::generate(['page' => 'devices', 'section' => $vars['section'], 'bare' => $vars['bare']]) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
+            "<a href='<?php echo \LibreNMS\Util\Url::generate(['page' => 'devices', 'section' => $vars['section'] ?? '', 'bare' => $vars['bare'] ?? '']) ?>' title='Reset criteria to default.' class='btn btn-default'>Reset</a>" +
             "</form>" +
             "</div>"
         );

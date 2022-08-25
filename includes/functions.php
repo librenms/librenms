@@ -147,7 +147,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
