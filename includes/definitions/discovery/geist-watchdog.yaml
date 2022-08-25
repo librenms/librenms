@@ -31,7 +31,7 @@ modules:
                      - { value:  0, generic: 2, graph: 0, descr: 'Wet' }
                      - { value:  1, generic: 0, graph: 0, descr: 'Dry' }
 
-        temperature:
+      temperature:
             options:
                 divisor: 10
             data:
