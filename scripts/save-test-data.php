@@ -89,7 +89,8 @@ if ((isset($options['m']) && $options['m'] == 'all') || (isset($options['modules
 }
 
 $full_os_name = $os_name;
-$variant = '';
+$variant = null;
+
 if (isset($options['v'])) {
     $variant = $options['v'];
     $full_os_name = $os_name . '_' . $variant;
@@ -100,9 +101,9 @@ if (isset($options['v'])) {
 
 $os_list = [];
 
-if ($os_name && $variant) {
+if (isset($os_name) && isset($variant)) {
     $os_list = [$full_os_name => [$os_name, $variant]];
-} elseif ($os_name) {
+} elseif (isset($os_name)) {
     $os_list = ModuleTestHelper::findOsWithData($modules, $os_name);
 } else {
     $os_list = ModuleTestHelper::findOsWithData($modules);
