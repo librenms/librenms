@@ -13,14 +13,14 @@ foreach ($ports as $port) {
     $port['in_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifInOctets_rate'] * 8), 2, 3, 'bps');
     $port['out_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
 
-    if ($port['in_errors'] > 0 || $port['out_errors'] > 0) {
+    if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
         $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
     } else {
         $error_img = '';
     }
 
     if (port_permitted($port['port_id'], $port['device_id'])) {
-        $port = cleanPort($port, $device);
+        $port = cleanPort($port, $device ?? null);
 
         $graph_type = 'port_' . $subformat;
 

@@ -323,6 +323,10 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
         $port = array_merge($port, device_by_id_cache($port['device_id']));
     }
 
+    if (! isset($port['label'])) {
+        $port = cleanPort($port);
+    }
+
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
     $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
