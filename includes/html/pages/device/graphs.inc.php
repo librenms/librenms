@@ -27,7 +27,7 @@ $sep = '';
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
         $type = strtolower($section);
-        if (! $vars['group']) {
+        if (empty($vars['group'])) {
             $vars['group'] = $type;
         }
 

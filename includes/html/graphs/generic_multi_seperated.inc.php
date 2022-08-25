@@ -19,12 +19,13 @@ require 'includes/html/graphs/common.inc.php';
 
 $format = $format ?? '';
 $previous = $_GET['previous'] ?? 'no';
-$stack = $stack ?? '';
-$rrd_optionsb = $rrd_optionsb ?? '';
-$in_thingX = $in_thingX ?? '';
-$out_thingX = $out_thingX ?? '';
-$plusesX = $plusesX ?? '';
 $transparency = $transparency ?? false;
+$stack = $stack ?? '';
+
+$rrd_optionsb = '';
+$in_thingX = '';
+$out_thingX = '';
+$plusesX = '';
 $rrddescr_len = 14; // length of the padded rrd_descr in legend
 
 if ($width > '1500') {

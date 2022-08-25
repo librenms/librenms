@@ -24,8 +24,8 @@ $title = $vars['title'] ?? '';
 $vertical = $vars['vertical'] ?? '';
 $legend = $vars['legend'] ?? false;
 $output = (! empty($vars['output']) ? $vars['output'] : 'default');
-$from = parse_at_time($_GET['from']) ?: Config::get('time.day');
-$to = parse_at_time($_GET['to']) ?: Config::get('time.now');
+$from = empty($_GET['from']) ? Config::get('time.day') : parse_at_time($_GET['from']);
+$to = empty($_GET['to']) ? Config::get('time.now') : parse_at_time($_GET['to']);
 $period = ($to - $from);
 $prev_from = ($from - $period);
 
