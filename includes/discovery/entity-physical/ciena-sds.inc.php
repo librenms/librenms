@@ -21,21 +21,18 @@ $chassis_array = snmpwalk_cache_multi_oid(
     'cienaCesChassisGlobal',
     [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $chassis_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisPlatform',
     $chassis_array,
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $chassis_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisIDP',
     $chassis_array,
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 
 // PSU Stuff
@@ -44,7 +41,6 @@ $cienaCesChassisPowerModule = snmpwalk_cache_multi_oid(
     'cienaCesChassisPowerModule',
     [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 
 // Fan Stuff
@@ -53,21 +49,18 @@ $cienaCesChassisFanTrayEntry = snmpwalk_cache_multi_oid(
     'cienaCesChassisFanTrayEntry',
     [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $cienaCesChassisFanEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisFanEntry',
     [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $cienaCesChassisFanTempEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisFanTempEntry',
     [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 
 // Module Stuff
@@ -76,21 +69,18 @@ $module_array = snmpwalk_cache_multi_oid(
     'cienaCesModuleEntry',
     [],
     'CIENA-CES-MODULE-MIB',
-    'ciena'
 );
 $module_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesModuleDescriptionEntry',
     $module_array,
     'CIENA-CES-MODULE-MIB',
-    'ciena'
 );
 $module_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesModuleSwEntry',
     $module_array,
     'CIENA-CES-MODULE-MIB',
-    'ciena'
 );
 
 // Interface stuff
@@ -99,7 +89,6 @@ $interfaceIndexMapping = snmpwalk_cache_multi_oid(
     'dot1dBasePortIfIndex',
     [],
     'BRIDGE-MIB',
-    'ciena'
 );
 
 $cienaCesEttpConfigEntry = snmpwalk_cache_multi_oid(
@@ -107,14 +96,12 @@ $cienaCesEttpConfigEntry = snmpwalk_cache_multi_oid(
     'cienaCesEttpConfigEntry',
     [],
     'CIENA-CES-PORT-MIB',
-    'ciena'
 );
 $cienaCesPortXcvrEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesPortXcvrEntry',
     [],
     'CIENA-CES-PORT-XCVR-MIB',
-    'ciena'
 );
 
 foreach ($chassis_array as $cienaCesChassis => $chassis_contents) {
