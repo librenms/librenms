@@ -25,8 +25,7 @@ if (isset($this_port['xtuc'])) {
         'xdsl2LineStatusAttainableRateUs',
     ];
 
-
-    d_echo ($this_port);
+    d_echo($this_port);
 
     $multiplier = 1;
 
@@ -44,16 +43,15 @@ if (isset($this_port['xtuc'])) {
     $rrd_act_def = RrdDefinition::make()->disableNameChecking()
         ->addDataset('xtuc', 'GAUGE', 0)
         ->addDataset('xtur', 'GAUGE', 0);
-//  array (
-//    'xtuc' =>
-//    array (
-//      'xdsl2ChStatusActDataRate' => '147681',
-//    ),
-//    'xtur' =>
-//    array (
-//      'xdsl2ChStatusActDataRate' => '51547',
-//    ),
-
+    //  array (
+    //    'xtuc' =>
+    //    array (
+    //      'xdsl2ChStatusActDataRate' => '147681',
+    //    ),
+    //    'xtur' =>
+    //    array (
+    //      'xdsl2ChStatusActDataRate' => '51547',
+    //    ),
 
     if (dbFetchCell('SELECT COUNT(*) FROM `ports_vdsl` WHERE `port_id` = ?', [$port_id]) == '0') {
         dbInsert(['port_id' => $port_id], 'ports_vdsl');
@@ -70,7 +68,6 @@ if (isset($this_port['xtuc'])) {
 
     $fieldsAtt['ds'] = $this_port['xdsl2LineStatusAttainableRateDs'];
     $fieldsAtt['us'] = $this_port['xdsl2LineStatusAttainableRateUs'];
-
 
     $fieldsAct['xtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'];
     $fieldsAct['xtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'];
@@ -95,8 +92,7 @@ if (isset($this_port['xtuc'])) {
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
     data_update($device, 'xdsl2LineStatusActRate', $tags, $fieldsAct);
 
-//xtuc is CO
-//xtur is CPE (receiver)
-    echo 'VDSL (' . $this_port['ifName'] . '/' . Number::formatSi($this_port['xdsl2LineStatusAttainableRateDs']*$multiplier, 2, 3, 'bps') . '/' . Number::formatSi($this_port['xdsl2LineStatusAttainableRateUs']*$multiplier, 2, 3, 'bps') . ') \n';
-
+    //xtuc is CO
+    //xtur is CPE (receiver)
+    echo 'VDSL (' . $this_port['ifName'] . '/' . Number::formatSi($this_port['xdsl2LineStatusAttainableRateDs'] * $multiplier, 2, 3, 'bps') . '/' . Number::formatSi($this_port['xdsl2LineStatusAttainableRateUs'] * $multiplier, 2, 3, 'bps') . ') \n';
 }//end if

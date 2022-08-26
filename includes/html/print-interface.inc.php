@@ -6,6 +6,8 @@ $(function () {
 <?php
 
 use App\Models\Port;
+use App\Models\PortAdsl;
+use App\Models\PortVdsl;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
@@ -30,8 +32,10 @@ if (isset($int_colour)) {
     $i++;
 }
 
-$port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', [$port['port_id']]);
-$port_vdsl = dbFetchRow('SELECT * FROM `ports_vdsl` WHERE `port_id` = ?', [$port['port_id']]);
+//$port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', [$port['port_id']]);
+//$port_vdsl = dbFetchRow('SELECT * FROM `ports_vdsl` WHERE `port_id` = ?', [$port['port_id']]);
+$port_adsl = PortAdsl::where('port_id', '=', $port['port_id']);
+$port_vdsl = PortVdsl::where('port_id', '=', $port['port_id']);
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
@@ -166,8 +170,7 @@ if (! empty($port_adsl['adslLineCoding'])) {
     echo 'Sync:' . Number::formatSi($port_vdsl['xdsl2ChStatusActDataRateXtur'], 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl['xdsl2ChStatusActDataRateXtuc'], 2, 3, 'bps');
     echo '<br />';
     echo 'Max:' . Number::formatSi($port_vdsl['xdsl2LineStatusAttainableRateDs'], 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl['xdsl2LineStatusAttainableRateUs'], 2, 3, 'bps');
-
-} else{
+} else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
         echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']) . '</span>';

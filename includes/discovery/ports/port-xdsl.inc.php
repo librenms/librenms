@@ -77,4 +77,3 @@ if (Config::get('enable_ports_adsl')) {
     //save components
     $component->setComponentPrefs($device['device_id'], $components);
 }
-

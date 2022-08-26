@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Device;
+use App\Models\PortAdsl;
+use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
@@ -81,9 +84,9 @@ if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPh
     $menu_options['sensors'] = 'Health';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '" . $port->port_id . "'")) {
+if (PortAdsl::where('port_id', '=', $port->port_id)->count()) {
     $menu_options['xdsl'] = 'xDSL';
-} elseif (dbFetchCell("SELECT COUNT(*) FROM `ports_vdsl` WHERE `port_id` = '" . $port->port_id . "'")) {
+} elseif (PortVdsl::where('port_id', '=', $port->port_id)->count()) {
     $menu_options['xdsl'] = 'xDSL';
 }
 

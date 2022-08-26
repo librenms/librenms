@@ -1,17 +1,28 @@
 <?php
 
+use App\Models\Port;
+
 echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
 
 echo '<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>';
 $i = '0';
-$ports = dbFetchRows("select * from `ports` AS P, `ports_adsl` AS A WHERE P.device_id = ? AND (A.port_id = P.port_id) AND P.deleted = '0' ORDER BY `ifIndex` ASC", [$device['device_id']]);
+
+$ports = Port::where('ports.device_id', '=', $device['device_id'])
+    ->join('ports_adsl', 'ports.port_id', '=', 'ports_adsl.port_id')
+    ->where('ports.deleted', '=', '0')
+    ->orderby('ports.ifIndex', 'ASC')
+    ->get();
 
 foreach ($ports as $port) {
     include 'includes/html/print-interface-adsl.inc.php';
     $i++;
 }
 
-$ports = dbFetchRows("select * from `ports` AS P, `ports_vdsl` AS V WHERE P.device_id = ? AND (V.port_id = P.port_id) AND P.deleted = '0' ORDER BY `ifIndex` ASC", [$device['device_id']]);
+$ports = Port::where('ports.device_id', '=', $device['device_id'])
+    ->join('ports_vdsl', 'ports.port_id', '=', 'ports_vdsl.port_id')
+    ->where('ports.deleted', '=', '0')
+    ->orderby('ports.ifIndex', 'ASC')
+    ->get();
 
 foreach ($ports as $port) {
     include 'includes/html/print-interface-vdsl.inc.php';

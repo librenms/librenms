@@ -1,6 +1,8 @@
 <?php
 
 // This file prints a table row for each interface
+use app\Models\Ipv4Address;
+use app\Models\Ipv6Address;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -36,12 +38,12 @@ if ($port['ifAlias']) {
 
 $break = '';
 if ($port_details) {
-    foreach (dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip) {
+    foreach (Ipv4Address::where('port_id', (string) $port['port_id']) as $ip) {
         echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip['ipv4_address'] . "')\">" . $ip['ipv4_address'] . '/' . $ip['ipv4_prefixlen'] . '</a>';
         $break = ',';
     }
 
-    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip6) {
+    foreach (Ipv6Address::where('port_id', (string) $port['port_id']) as $ip6) {
         echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip6['ipv6_address'] . "')\">" . IP::parse($ip6['ipv6_address'], true) . '/' . $ip6['ipv6_prefixlen'] . '</a>';
         $break = ',';
     }
