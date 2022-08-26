@@ -259,13 +259,17 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [])
+    public static function findOsWithData($modules = [], string $os_filter = null)
     {
         $os_list = [];
 
         foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
+
+            if ($os_filter != '' && $os_filter != $os) {
+                continue;
+            }
 
             // calculate valid modules
             $decoded = json_decode(file_get_contents($file), true);

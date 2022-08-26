@@ -378,7 +378,9 @@ if ($options['f'] === 'mac_oui') {
 
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
-    unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    if (is_file(Config::get('install_dir') . '/cache/os_defs.cache')) {
+        unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    }
 }
 
 if ($options['f'] === 'recalculate_device_dependencies') {

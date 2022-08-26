@@ -972,51 +972,6 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "server.png",
-                    "text": "Servers",
-                    "type": "server"
-                },
-                {
-                    "icon": "network.png",
-                    "text": "Network",
-                    "type": "network"
-                },
-                {
-                    "icon": "wireless.png",
-                    "text": "Wireless",
-                    "type": "wireless"
-                },
-                {
-                    "icon": "firewall.png",
-                    "text": "Firewalls",
-                    "type": "firewall"
-                },
-                {
-                    "icon": "power.png",
-                    "text": "Power",
-                    "type": "power"
-                },
-                {
-                    "icon": "environment.png",
-                    "text": "Environment",
-                    "type": "environment"
-                },
-                {
-                    "icon": "loadbalancer.png",
-                    "text": "Load Balancers",
-                    "type": "loadbalancer"
-                },
-                {
-                    "icon": "storage.png",
-                    "text": "Storage",
-                    "type": "storage"
-                },
-                {
-                    "icon": "printer.png",
-                    "text": "Printers",
-                    "type": "printer"
-                },
-                {
                     "icon": "appliance.png",
                     "text": "Appliance",
                     "type": "appliance"
@@ -1025,6 +980,51 @@
                     "icon": "collaboration.png",
                     "text": "Collaboration",
                     "type": "collaboration"
+                },
+                {
+                    "icon": "environment.png",
+                    "text": "Environment",
+                    "type": "environment"
+                },
+                {
+                    "icon": "firewall.png",
+                    "text": "Firewalls",
+                    "type": "firewall"
+                },
+                {
+                    "icon": "loadbalancer.png",
+                    "text": "Load Balancers",
+                    "type": "loadbalancer"
+                },
+                {
+                    "icon": "network.png",
+                    "text": "Network",
+                    "type": "network"
+                },
+                {
+                    "icon": "printer.png",
+                    "text": "Printers",
+                    "type": "printer"
+                },
+                {
+                    "icon": "power.png",
+                    "text": "Power",
+                    "type": "power"
+                },
+                {
+                    "icon": "server.png",
+                    "text": "Servers",
+                    "type": "server"
+                },
+                {
+                    "icon": "storage.png",
+                    "text": "Storage",
+                    "type": "storage"
+                },
+                {
+                    "icon": "wireless.png",
+                    "text": "Wireless",
+                    "type": "wireless"
                 },
                 {
                     "icon": "workstation.png",

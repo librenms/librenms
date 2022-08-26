@@ -1268,7 +1268,7 @@ function cache_peeringdb()
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs as $ix) {
+                foreach ($ixs ?? [] as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
                     if ($tmp_ix) {

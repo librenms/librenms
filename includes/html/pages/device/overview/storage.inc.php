@@ -31,7 +31,7 @@ if (count($drives)) {
         }
 
         if ($device['os'] == 'freebsd') {
-            foreach (\LibreNMS\Config::get('ignore_bsd_os_drives') as $jdrive) {
+            foreach (\LibreNMS\Config::get('ignore_bsd_os_drives', []) as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
