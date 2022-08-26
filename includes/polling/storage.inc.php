@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['device_id']]) as $storage) {
     $descr = $storage['storage_descr'];
@@ -20,12 +21,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['devi
 
     d_echo($storage);
 
-    if ($storage['size']) {
-        $percent = round(($storage['used'] / $storage['size'] * 100));
-    } else {
-        $percent = 0;
-    }
-
+    $percent = Number::calculatePercent($storage['used'], $storage['size'], 0);
     echo $percent . '% ';
 
     $fields = [

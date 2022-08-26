@@ -155,6 +155,7 @@ function discover_device(&$device, $force_module = false)
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 Log::event("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
+                report($e);
             }
 
             $module_time = microtime(true) - $module_start;

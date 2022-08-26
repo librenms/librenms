@@ -57,7 +57,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $used_text = Number::formatSi($used, 2, 3, 'bps');
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
-                $percent = round((($rate_data['rate_95th'] / $bill['bill_cdr']) * 100), 2);
+                $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } elseif ($bill['bill_type'] == 'quota') {
                 $type = 'Quota';
                 $allowed = $bill['bill_quota'];
@@ -66,7 +66,7 @@ foreach (dbFetchRows('SELECT * FROM `bills` ORDER BY `bill_id`') as $bill) {
                 $used_text = format_bytes_billing($used);
                 $overuse = ($used - $allowed);
                 $overuse = (($overuse <= 0) ? '0' : $overuse);
-                $percent = round((($rate_data['total_data'] / $bill['bill_quota']) * 100), 2);
+                $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             }
 
             echo strftime('%x @ %X', strtotime($datefrom)) . ' to ' . strftime('%x @ %X', strtotime($dateto)) . ' ' . str_pad($type, 8) . ' ' . str_pad($allowed_text, 10) . ' ' . str_pad($used_text, 10) . ' ' . $percent . '%';
