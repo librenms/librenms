@@ -24,7 +24,7 @@ if (Config::get('enable_ports_adsl')) {
         }
     }
 
-    if (!empty($adsl_stats)) {
+    if (! empty($adsl_stats)) {
         // create a component (if not existing already) to keep track of it during polling and avoid polling non existing OIDs
         if (! $adsl_id) {
             $component_data = [
@@ -34,7 +34,7 @@ if (Config::get('enable_ports_adsl')) {
             $new_component = $component->createComponent($device['device_id'], 'ports');
             $component_id = key($new_component);
             $components[$component_id] = array_merge($new_component[$component_id], $component_data);
-        };
+        }
     } else {
         if ($adsl_id) {
             //remove it cause it is gone
@@ -42,7 +42,7 @@ if (Config::get('enable_ports_adsl')) {
         }
     }
 
-    if (!empty($vdsl_stats)) {
+    if (! empty($vdsl_stats)) {
         // create a component to keep track of it during polling and avoid polling non existing OIDs
         if (! $vdsl_id) {
             $component_data = [
@@ -52,7 +52,7 @@ if (Config::get('enable_ports_adsl')) {
             $new_component = $component->createComponent($device['device_id'], 'ports');
             $component_id = key($new_component);
             $components[$component_id] = array_merge($new_component[$component_id], $component_data);
-        };
+        }
     } else {
         if ($vdsl_id) {
             //remove it cause it is gone

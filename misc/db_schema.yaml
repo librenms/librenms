@@ -1637,6 +1637,16 @@ ports_stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
     ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
+ports_vdsl:
+  Columns:
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_vdsl_updated, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: xdsl2LineStatusAttainableRateDs, Type: int, 'Null': false, Extra: '' }
+    - { Field: xdsl2LineStatusAttainableRateUs, Type: int, 'Null': false, Extra: '' }
+    - { Field: xdsl2ChStatusActDataRateXtur, Type: int, 'Null': false, Extra: '' }
+    - { Field: xdsl2ChStatusActDataRateXtuc, Type: int, 'Null': false, Extra: '' }
+  Indexes:
+    ports_vdsl_port_id_unique: { Name: ports_vdsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
