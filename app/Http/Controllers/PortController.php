@@ -38,8 +38,8 @@ class PortController extends Controller
         $updated = false;
         $message = '';
 
-        if ($request->has('groups')) {
-            $changes = $port->groups()->sync($request->get('groups'));
+        if ($request->has('groups') || $port->groups()->exists()) {
+            $changes = $port->groups()->sync($request->get('groups', []));
             $groups_updated = array_sum(array_map(function ($group_ids) {
                 return count($group_ids);
             }, $changes));
