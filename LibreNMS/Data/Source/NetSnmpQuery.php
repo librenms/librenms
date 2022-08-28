@@ -87,6 +87,10 @@ class NetSnmpQuery implements SnmpQueryInterface
      * @var \App\Models\Device
      */
     private $device;
+    /**
+     * @var bool
+     */
+    private $abort = false;
 
     public function __construct()
     {
@@ -155,6 +159,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
+     * OIDs will be walked in order, so you may want to put your OIDs in a specific order.
+     */
+    public function abortOnFailure(): SnmpQueryInterface
+    {
+        $this->abort = true;
 
         return $this;
     }
@@ -330,17 +345,20 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
     }
 
-    private function execMultiple(string $command, array $oids): ?SnmpResponse
+    private function execMultiple(string $command, array $oids): SnmpResponse
     {
-        $combined = null;
+        $response = new SnmpResponse('');
 
         foreach ($oids as $oid) {
-            $response = $this->exec($command, [$oid]);
+            $response = $response->append($this->exec($command, [$oid]));
 
-            $combined = $combined ? $combined->append($response) : $response;
+            // if abort on failure is set, return after first failure
+            if ($this->abort && ! $response->isValid()) {
+                return $response;
+            }
         }
 
-        return $combined;
+        return $response;
     }
 
     private function exec(string $command, array $oids): SnmpResponse
