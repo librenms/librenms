@@ -354,6 +354,8 @@ class NetSnmpQuery implements SnmpQueryInterface
 
             // if abort on failure is set, return after first failure
             if ($this->abort && ! $response->isValid()) {
+                Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+
                 return $response;
             }
         }

@@ -10,8 +10,10 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php";
     } else {
-        $oids = SnmpQuery::enumStrings()->walk(['IP-MIB::ipAddressIfIndex.ipv6', 'IP-MIB::ipAddressOrigin.ipv6', 'IP-MIB::ipAddressPrefix.ipv6'])->table(4);
-        foreach ($oids['ipv6'] as $address => $data) {
+        $oids = SnmpQuery::enumStrings()->abortOnFailure()
+            ->walk(['IP-MIB::ipAddressIfIndex.ipv6', 'IP-MIB::ipAddressOrigin.ipv6', 'IP-MIB::ipAddressPrefix.ipv6'])
+            ->table(4);
+        foreach ($oids['ipv6'] ?? [] as $address => $data) {
             try {
                 $ifIndex = $data['IP-MIB::ipAddressIfIndex'];
                 $ipv6_address = IPv6::fromHexString($address)->uncompressed();
