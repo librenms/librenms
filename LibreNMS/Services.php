@@ -80,6 +80,19 @@ class Services
         return DefaultServiceCheck::class;
     }
 
+    /**
+     * Parse legacy options into escapable arguments
+     */
+    public static function parseLegacyParams(string $params): array
+    {
+        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($params));
+
+        return array_map(function ($part) {
+            return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
+        }, $parts);
+    }
+
+
     private static function checkToClass(string $check): string
     {
         $name = ucwords(str_replace('_', ' ', strtolower($check)));

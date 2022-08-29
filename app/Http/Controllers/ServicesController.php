@@ -93,6 +93,16 @@ class ServicesController extends Controller
      */
     public function show(Service $service): JsonResponse
     {
+        // legacy service_param, try to convert
+        if (is_string($service->service_param)) {
+            $modern = [];
+            foreach (Services::parseLegacyParams($service->service_param) as $group) {
+                [$key, $value] = array_pad(preg_split('/[= ]/', $group, 2), 2, null);
+                $modern[$key] = $value;
+            }
+            $service->service_param = $modern;
+        }
+
         return response()->json($service);
     }
 

@@ -288,7 +288,6 @@
                 });
 
                 this.errors = {};
-                this.service_param = {};
                 this.hasHostname = hasHostname;
                 this.parameters = parameters;
                 this.$nextTick(() => this.currentParam = this.$refs.param.value);

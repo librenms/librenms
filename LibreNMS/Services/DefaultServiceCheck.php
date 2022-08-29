@@ -30,6 +30,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Services;
 
 class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 {
@@ -186,15 +187,6 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         return \Rrd::name($this->service->device->hostname, ['service', $this->service->service_id, $ds]);
     }
 
-    protected function parseLegacyParams(): array
-    {
-        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($this->service->service_param));
-
-        return array_map(function ($part) {
-            return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
-        }, $parts);
-    }
-
     /**
      * Merge either modern (array) or legacy (string) parameters into the command
      */
@@ -223,6 +215,6 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
             }
         }
 
-        return $modern ? $command : array_merge($command, $this->parseLegacyParams());
+        return $modern ? $command : array_merge($command, Services::parseLegacyParams($this->service->service_param));
     }
 }
