@@ -22,6 +22,11 @@ $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
+//Get UFiber OLT ports
+if ($device['os'] == 'edgeosolt') {
+    require base_path('includes/discovery/ports/edgeosolt.inc.php');
+}
+
 //Change Zynos ports from swp to 1/1
 if ($device['os'] == 'zynos') {
     require base_path('includes/discovery/ports/zynos.inc.php');
