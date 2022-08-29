@@ -28,7 +28,6 @@ class Service extends DeviceRelatedModel
     protected $casts = [
         'service_ignore' => 'boolean',
         'service_disabled' => 'boolean',
-        'service_param' => 'array',
         'service_ds' => 'array',
         'service_template_id' => 'integer',
     ];
@@ -54,6 +53,23 @@ class Service extends DeviceRelatedModel
     public function getServiceTypeAttribute(): string
     {
         return Clean::fileName($this->attributes['service_type']);
+    }
+
+    /**
+     * @return  string|array  string legacy, array modern
+     */
+    public function getServiceParamAttribute()
+    {
+        return json_decode($this->attributes['service_param'], true) ?? $this->attributes['service_param'];
+    }
+
+    /**
+     * @param  string|array  $service_param string legacy, array modern
+     * @return void
+     */
+    public function setServiceParamAttribute($service_param)
+    {
+        $this->attributes['service_param'] = is_array($service_param) ? json_encode($service_param) : $service_param;
     }
 
     // ---- Query Scopes ----
