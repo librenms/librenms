@@ -167,7 +167,7 @@ class ServicesController extends Controller
             }
 
             if ($parameter->exclusive_group) {
-                $rules[] = 'exclude_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
+                $rules[] = 'prohibits:' . implode(',', $parameters->only($parameter->exclusive_group)->except($parameter->short ?: $parameter->param)->map(function (CheckParameter $param) {
                     return 'service_param.' . ($param->param ?: $param->short);
                 })->all());
             }
