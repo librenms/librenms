@@ -109,7 +109,7 @@ class Plugins
 
             foreach ((array) $hooks as $hookName) {
                 if ($hookName[0] != '_') {
-                    self::$plugins[$hookName][] = $class;
+                    self::$plugins[$hookName][] = $plugin;
                 }
             }
         }
