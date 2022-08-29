@@ -273,7 +273,8 @@ class ServicesController extends Controller
                 'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
             ] + $param_rules);
 
-        $validated['service_ip'] = $validated['service_ip'] ?? $hostname_default;
+        // set service IP if --hostname option exists, otherwise set to null
+        $validated['service_ip'] = isset($param_rules['service_param.--hostname']) ? $validated['service_ip'] ?? $hostname_default : null;
 
         return $validated;
     }
