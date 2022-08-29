@@ -90,7 +90,7 @@ class AppServiceProvider extends ServiceProvider
     private function registerFacades()
     {
         // replace log manager so we can add the event function
-        $this->app->bind('log', function ($app) {
+        $this->app->singleton('log', function ($app) {
             return new \App\Facades\LogManager($app);
         });
     }

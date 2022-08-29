@@ -502,7 +502,7 @@ function object_add_cache($section, $obj)
 function object_is_cached($section, $obj)
 {
     global $object_cache;
-    if (array_key_exists($obj, $object_cache)) {
+    if (is_array($object_cache) && array_key_exists($obj, $object_cache)) {
         return $object_cache[$section][$obj];
     } else {
         return false;

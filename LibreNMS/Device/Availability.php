@@ -26,6 +26,7 @@
 namespace LibreNMS\Device;
 
 use App\Models\DeviceOutage;
+use LibreNMS\Util\Number;
 
 class Availability
 {
@@ -126,6 +127,6 @@ class Availability
 
         $outage_summary = self::outageSummary($found_outages, $duration, $now);
 
-        return round(100 * ($duration - $outage_summary) / $duration, $precision);
+        return Number::calculatePercent($duration - $outage_summary, $duration, $precision);
     }
 }

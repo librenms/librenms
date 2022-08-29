@@ -41,9 +41,10 @@ function cleanPort($interface, $device = null)
     if (! $interface) {
         return $interface;
     }
-    $interface['ifAlias'] = htmlentities($interface['ifAlias']);
-    $interface['ifName'] = htmlentities($interface['ifName']);
-    $interface['ifDescr'] = htmlentities($interface['ifDescr']);
+
+    $interface['ifAlias'] = htmlentities($interface['ifAlias'] ?? '');
+    $interface['ifName'] = htmlentities($interface['ifName'] ?? '');
+    $interface['ifDescr'] = htmlentities($interface['ifDescr'] ?? '');
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);

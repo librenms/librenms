@@ -29,6 +29,7 @@ use LibreNMS\Enum\Alert;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 use Log;
 
 class PrinterSupplies implements Module
@@ -276,7 +277,7 @@ class PrinterSupplies implements Module
             }
         }
 
-        return round($raw_value / $capacity * 100);
+        return Number::calculatePercent($raw_value, $capacity, 0);
     }
 
     /**

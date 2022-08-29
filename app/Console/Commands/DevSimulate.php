@@ -51,6 +51,13 @@ class DevSimulate extends LnmsCommand
         $snmprec_dir = $this->snmpsim->getDir();
         $listen = $this->snmpsim->getIp() . ':' . $this->snmpsim->getPort();
 
+        $file = $this->argument('file');
+        if ($file && ! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
+            $this->error("$file does not exist");
+
+            return 1;
+        }
+
         $snmpsim = new Process([
             $this->snmpsim->findSnmpsimd(),
             "--data-dir=$snmprec_dir",

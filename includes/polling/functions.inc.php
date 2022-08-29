@@ -320,7 +320,7 @@ function poll_device($device, $force_module = false)
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
             d_echo('Device' . (isset($device['attribs']['poll_' . $module]) ? ($device['attribs']['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
-                $device['attribs']['poll_' . $module] ||
+                ! empty($device['attribs']['poll_' . $module]) ||
                 ($os_module_status && ! isset($device['attribs']['poll_' . $module])) ||
                 ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
@@ -333,6 +333,7 @@ function poll_device($device, $force_module = false)
                     // isolate module exceptions so they don't disrupt the polling process
                     Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
                     Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    report($e);
                 }
 
                 $module_time = microtime(true) - $module_start;

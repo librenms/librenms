@@ -1,0 +1,38 @@
+{
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "cisco-flash",
+                    "storage_index": "1.1",
+                    "storage_type": "flash",
+                    "storage_descr": "flash1(flash1):",
+                    "storage_size": 122185728,
+                    "storage_units": 1,
+                    "storage_used": 53897216,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "cisco-flash",
+                    "storage_index": "1.1",
+                    "storage_type": "flash",
+                    "storage_descr": "flash1(flash1):",
+                    "storage_size": 122185728,
+                    "storage_units": 1,
+                    "storage_used": 53897216,
+                    "storage_free": 68288512,
+                    "storage_perc": 44,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    }
+}
