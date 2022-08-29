@@ -138,12 +138,13 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         foreach (explode(' ', trim($metric_text)) as $metric) {
             // Separate the DS and value: DS=value
             // This regex checks for valid UOM's to be used for graphing https://nagios-plugins.org/doc/guidelines.html#AEN200
-            if (preg_match("/^'?(?<ds>[^=']+)'?=(?<value>[\\d.-]+)(?<uom>us|ms|s|KB|MB|GB|TB|c|%|B)?;/", $metric, $metric_matches)) {
+            if (preg_match('/^(?<ds>[^=]+)=(?<value>[\d.-]+)(?<uom>us|ms|s|KB|MB|GB|TB|c|%|B)?;/', $metric, $metric_matches)) {
                 $uom = $metric_matches['uom'] ?? '';
-                $metrics[$metric_matches['ds']] = [
+                $ds = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $metric_matches['ds']); // remove surrounding quotes if found
+                $metrics[$ds] = [
                     'value' => $metric_matches['value'],
                     'uom' => $uom,
-                    'storage' => $this->getStorageType($metric_matches['ds'], $uom),
+                    'storage' => $this->getStorageType($ds, $uom),
                 ];
             }
         }
