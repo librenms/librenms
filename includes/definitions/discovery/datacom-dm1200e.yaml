@@ -1,0 +1,16 @@
+mib: FASTPATH-SWITCHING-MIB
+modules:
+    os:
+        hardware: 
+                - ENTITY-MIB::entPhysicalDescr.2
+        version: 
+               - ENTITY-MIB::entPhysicalSoftwareRev.2
+    mempools:
+        data:
+            -
+                total: FASTPATH-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: FASTPATH-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
+                descr: 'Memory'
+                class: system
+                index: 0

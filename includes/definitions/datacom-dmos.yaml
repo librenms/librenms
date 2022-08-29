@@ -1,0 +1,9 @@
+os: datacom-dmos
+text: 'DmOS'
+type: network
+icon: datacom-dmos
+group: datacom
+
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3709.1.2.137

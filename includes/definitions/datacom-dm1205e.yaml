@@ -1,0 +1,12 @@
+os: datacom-dm1205e
+text: DM1205E
+type: network
+icon: datacom-dm1205e
+group: datacom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.13868.1.3.35.8

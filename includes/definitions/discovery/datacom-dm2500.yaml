@@ -1,0 +1,7 @@
+mib: SNMPv2-MIB
+modules:
+    os:
+        hardware: 
+                - SNMPv2-MIB::sysDescr.0
+        version: 
+          - SNMPv2-MIB::sysDescr.0
