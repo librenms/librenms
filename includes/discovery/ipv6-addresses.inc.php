@@ -1,6 +1,8 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\IPv6;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $device['context_name'] = $context_name;
@@ -8,50 +10,22 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php";
     } else {
-        $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
-        $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);
-        $oids = str_replace('"', '', $oids);
-        $oids = str_replace('IP-MIB::', '', $oids);
-        $oids = trim($oids);
-
-        foreach (explode("\n", $oids) as $data) {
-            if ($data) {
-                $data = trim($data);
-                [$ipv6addr,$ifIndex] = explode(' ', $data);
-                $oid = '';
-                $sep = '';
-                $adsep = '';
-                $ipv6_address = '';
-                $do = '0';
-                foreach (explode(':', $ipv6addr) as $part) {
-                    $n = hexdec($part);
-                    $oid = "$oid" . "$sep" . "$n";
-                    $sep = '.';
-                    $ipv6_address = $ipv6_address . "$adsep" . $part;
-                    $do++;
-                    if ($do == 2) {
-                        $adsep = ':';
-                        $do = '0';
-                    } else {
-                        $adsep = '';
-                    }
-                }
-
-                $ipv6_prefixlen = snmp_get($device, ".1.3.6.1.2.1.4.34.1.5.2.16.$oid", '', 'IP-MIB');
-                $ipv6_prefixlen = explode('.', $ipv6_prefixlen);
-                $ipv6_prefixlen = str_replace('"', '', end($ipv6_prefixlen));
-
-                if (Str::contains($ipv6_prefixlen, 'SNMPv2-SMI::zeroDotZero')) {
-                    d_echo('Incomplete IPv6 data in IF-MIB');
-                    $oids = trim(Str::replaceFirst($data, '', $oids));
-                }
-
-                $ipv6_origin = snmp_get($device, ".1.3.6.1.2.1.4.34.1.6.2.16.$oid", '-Ovq', 'IP-MIB');
-
+        $oids = SnmpQuery::enumStrings()->abortOnFailure()
+            ->walk(['IP-MIB::ipAddressIfIndex.ipv6', 'IP-MIB::ipAddressOrigin.ipv6', 'IP-MIB::ipAddressPrefix.ipv6'])
+            ->table(4);
+        foreach ($oids['ipv6'] ?? [] as $address => $data) {
+            try {
+                $ifIndex = $data['IP-MIB::ipAddressIfIndex'];
+                $ipv6_address = IPv6::fromHexString($address)->uncompressed();
+                $ipv6_origin = $data['IP-MIB::ipAddressOrigin'];
+                preg_match('/(\d{1,3})]$/', $data['IP-MIB::ipAddressPrefix'], $prefix_match);
+                $ipv6_prefixlen = $prefix_match[1] ?? 0;
                 discover_process_ipv6($valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $device['context_name']);
-            } //end if
-        } //end foreach
-    } //end 'else'
+            } catch (InvalidIpException $e) {
+                d_echo("Failed to decode ipv6: $address");
+            }
+        }
+    }
 
     if (empty($oids)) {
         $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');

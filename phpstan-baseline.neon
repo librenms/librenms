@@ -7116,11 +7116,6 @@ parameters:
 			path: app/Http/Controllers/DeviceController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:deviceLinkMenu\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
@@ -10834,11 +10829,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Tests\\\\MibTest\\:\\:testMibNameMatches\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/MibTest.php
-
-		-
-			message: "#^Property LibreNMS\\\\Tests\\\\Mocks\\\\SnmpQueryMock\\:\\:\\$context is never read, only written\\.$#"
-			count: 1
-			path: tests/Mocks/SnmpQueryMock.php
 
 		-
 			message: "#^Method LibreNMS\\\\Tests\\\\OSDiscoveryTest\\:\\:checkOS\\(\\) has no return type specified\\.$#"
