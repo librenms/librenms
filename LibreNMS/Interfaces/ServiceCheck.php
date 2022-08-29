@@ -68,8 +68,14 @@ interface ServiceCheck
     public function getDefault(string $flag): string;
 
     /**
-     * Get the storage type GAUGE, COUNTER, DERIVE, etc
-     * https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     * Get metrics from check, should be an array of metrics keyed by the metric name
+     * Each metric array should contain:
+     *   value: The value of the metric
+     *   uom: the unit of measure. see valid options: https://nagios-plugins.org/doc/guidelines.html#AEN200
+     *   storage: The RRD storage type: GAUGE, COUNTER, DERIVE, etc https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     *
+     * @param  string  $metric_text
+     * @return array
      */
-    public function getStorageType(string $ds, string $uom): string;
+    public function getMetrics(string $metric_text): array;
 }

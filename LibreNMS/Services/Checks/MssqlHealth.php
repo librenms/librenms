@@ -25,17 +25,11 @@
 
 namespace LibreNMS\Services\Checks;
 
-use Illuminate\Support\Collection;
-
 class MssqlHealth extends \LibreNMS\Services\DefaultServiceCheck
 {
-    public function availableParameters(): Collection
+    public function hasDefaults(): array
     {
-        $parameters = parent::availableParameters();
-
-        $parameters->get('--server')->setHasDefault();
-
-        return $parameters;
+        return ['--server' => 'use a section in freetds.conf instead of hostname/port'];
     }
 
     public function getDefault(string $flag): string
@@ -45,5 +39,13 @@ class MssqlHealth extends \LibreNMS\Services\DefaultServiceCheck
         }
 
         return parent::getDefault($flag);
+    }
+
+    public function getMetrics(string $metric_text): array
+    {
+        // bugfix storage size is lowercase
+        $metric_text = str_replace('kb', 'KB', $metric_text);
+
+        return parent::getMetrics($metric_text);
     }
 }

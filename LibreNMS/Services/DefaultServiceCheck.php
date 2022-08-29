@@ -121,10 +121,41 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     }
 
     /**
+     * Get metrics from check, should be an array of metrics keyed by the metric name
+     * Each metric array should contain:
+     *   value: The value of the metric
+     *   uom: the unit of measure. see valid options: https://nagios-plugins.org/doc/guidelines.html#AEN200
+     *   storage: The RRD storage type: GAUGE, COUNTER, DERIVE, etc https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+     *
+     * @param  string  $metric_text
+     * @return array
+     */
+    public function getMetrics(string $metric_text): array
+    {
+        $metrics = [];
+
+        // Split each performance metric and Loop through the perf string extracting our metric data
+        foreach (explode(' ', trim($metric_text)) as $metric) {
+            // Separate the DS and value: DS=value
+            // This regex checks for valid UOM's to be used for graphing https://nagios-plugins.org/doc/guidelines.html#AEN200
+            if (preg_match('/^(?<ds>[^=]+)=(?<value>[\d.-]+)(?<uom>us|ms|s|KB|MB|GB|TB|c|%|B)?;/', $metric, $metric_matches)) {
+                $uom = $metric_matches['uom'] ?? '';
+                $metrics[$metric_matches['ds']] = [
+                    'value' => $metric_matches['value'],
+                    'uom' => $uom,
+                    'storage' => $this->getStorageType($metric_matches['ds'], $uom),
+                ];
+            }
+        }
+
+        return $metrics;
+    }
+
+    /**
      * Get the storage type GAUGE, COUNTER, DERIVE, etc
      * https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
      */
-    public function getStorageType(string $ds, string $uom): string
+    protected function getStorageType(string $ds, string $uom): string
     {
         if (($uom == 'c') && ! (preg_match('/[Uu]ptime/', $ds))) {
             return 'COUNTER';
