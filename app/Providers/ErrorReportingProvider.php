@@ -27,6 +27,7 @@ namespace App\Providers;
 
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
+use App\Logging\Reporting\Middleware\SetInstanceId;
 use ErrorException;
 use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
@@ -74,6 +75,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
         // Add more LibreNMS related info
         Flare::registerMiddleware(SetGroups::class);
+        Flare::registerMiddleware(SetInstanceId::class);
 
         // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
@@ -136,6 +138,17 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    public static function getInstanceId(): string
+    {
+        $uuid = Config::get('_reporting.error_uuid');
+        if (empty($uuid)) {
+            $uuid = Str::uuid();
+            Config::persist('_reporting.error_uuid', $uuid);
+        }
+
+        return $uuid;
     }
 
     /**

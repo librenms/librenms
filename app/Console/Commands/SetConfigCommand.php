@@ -47,7 +47,11 @@ class SetConfigCommand extends LnmsCommand
         $force = $this->option('ignore-checks');
         $parent = null;
 
-        if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
+        if (Str::startsWith($setting, '_')) {
+            $this->error(trans('commands.config:set.errors.internal'));
+
+            return 2;
+        } elseif (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
             $os = $matches['os'];
             try {
                 $this->validateOsSetting($os, $matches['setting'], $value);

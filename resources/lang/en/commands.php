@@ -28,6 +28,7 @@ return [
             'invalid_os' => 'Specified OS (:os) does not exist',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
+            'internal' => 'This is an internal LibreNMS setting, it should not be changed!',
         ],
     ],
     'db:seed' => [

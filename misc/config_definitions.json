@@ -4861,6 +4861,11 @@
             "default": false,
             "type": "boolean"
         },
+        "_reporting.error_uuid": {
+            "default": null,
+            "hidden": true,
+            "type": "text"
+        },
         "rewrite_if": {
             "type": "array"
         },
