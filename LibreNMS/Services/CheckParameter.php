@@ -43,6 +43,8 @@ class CheckParameter
     public $inclusive_group;
     /** @var bool */
     public $default = false;
+    /** @var bool */
+    public $uses_target = false;
 
     /**
      * Create a new check parameter
@@ -70,6 +72,19 @@ class CheckParameter
         }
 
         $this->description .= trim($line);
+
+        return $this;
+    }
+
+    /**
+     * This parameter uses the service_ip target field.
+     * Also sets required and default flags.
+     */
+    public function usesTarget(): CheckParameter
+    {
+        $this->uses_target = true;
+        $this->required = true;
+        $this->default = true;
 
         return $this;
     }
@@ -115,6 +130,7 @@ class CheckParameter
             'description' => htmlentities($this->description),
             'required' => $this->required,
             'default' => $this->default,
+            'uses_target' => $this->uses_target,
             'exclusive_group' => isset($this->exclusive_group) ? array_map('htmlentities', $this->exclusive_group) : null,
             'inclusive_group' => isset($this->inclusive_group) ? array_map('htmlentities', $this->inclusive_group) : null,
         ];

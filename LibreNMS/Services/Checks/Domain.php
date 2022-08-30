@@ -25,26 +25,28 @@
 
 namespace LibreNMS\Services\Checks;
 
-use Illuminate\Support\Collection;
+use LibreNMS\Util\Validate;
 
 class Domain extends \LibreNMS\Services\DefaultServiceCheck
 {
-    /**
-     * @inerhitDoc
-     */
-    public function availableParameters(): Collection
+    public function hasDefaults(): array
     {
-        $checkParameters = parent::availableParameters();
-
-        $checkParameters->get('-d')->setHasDefault();
-
-        return $checkParameters;
+        return [
+            '-d' => trans('service.check_params.domain.-d.description'),
+            '-c' => trans('service.check_params.domain.-c.description'),
+            '-w' => trans('service.check_params.domain.-w.description'),
+        ];
     }
 
     public function getDefault(string $flag): string
     {
-        if ($flag == '-d') {
-            return $this->service->service_ip ?? $this->service->device->hostname;
+        switch ($flag) {
+            case '-d':
+                return $this->service->service_ip ?: Validate::hostname($this->service->device->hostname) ? $this->service->device->hostname : '';
+            case '-c':
+                return 10;
+            case '-w':
+                return 30;
         }
 
         return parent::getDefault($flag);

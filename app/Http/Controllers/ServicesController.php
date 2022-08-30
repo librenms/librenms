@@ -162,9 +162,17 @@ class ServicesController extends Controller
 
         $check = Services::makeCheck(new Service(['service_type' => $type]));
 
-        $parameters = $check->availableParameters()->keyBy('short');
+        $parameters = $check->availableParameters()->keyBy(function ($parameter) {
+            return $parameter->short ?: $parameter->param;
+        });
 
         foreach ($parameters as $parameter) {
+            if ($parameter->uses_target) {
+                // this option uses target, add service_ip to the rules, but not this parameter
+                $parameter_rules['service_ip'] = 'nullable|ip_or_hostname';
+                continue;
+            }
+
             $rules = [];
             $param = $parameter->param ?: $parameter->short;
 
@@ -205,7 +213,7 @@ class ServicesController extends Controller
     public function test(Request $request): JsonResponse
     {
         $service = $this->validateNewService($request);
-        $response = app(\LibreNMS\Modules\Services::class)->checkService($service);
+        $response = (new \LibreNMS\Modules\Services)->checkService($service);
 
         $message = $response->message;
 
@@ -263,13 +271,11 @@ class ServicesController extends Controller
     private function validateServiceData(Request $request, bool $new = true): array
     {
         $services = Services::list();
+        // create rules for parameters from actual check.  Adds service_ip if one of them uses it.
         $param_rules = $this->buildParamRules($request->get('service_type'), $services);
-        $hostname_default = isset($param_rules['service_param.--hostname']) ? '' : null; // '' = this device, null = service does not require hostname
-        unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
                 'device_id' => 'int|exists:App\Models\Device,device_id',
-                'service_ip' => 'nullable|ip_or_hostname',
                 'service_type' => [
                     $new ? 'required' : 'nullable',
                     Rule::in($services),
@@ -283,8 +289,8 @@ class ServicesController extends Controller
                 'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
             ] + $param_rules);
 
-        // set service IP if --hostname option exists, otherwise set to null
-        $validated['service_ip'] = isset($param_rules['service_param.--hostname']) ? $validated['service_ip'] ?? $hostname_default : null;
+        // set service IP if the check uses it, otherwise set to null to indicate it is unused
+        $validated['service_ip'] = isset($param_rules['service_ip']) ? $validated['service_ip'] ?? '' : null;
 
         return $validated;
     }

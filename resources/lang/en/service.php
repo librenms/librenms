@@ -43,7 +43,7 @@ return [
     'check_params' => [
         'dns' => [
             '-H' => [
-                'description' => 'Hostname',
+                'description' => 'The name or address you want to query',
                 'default' => 'localhost',
             ],
             '-s' => [
@@ -51,5 +51,20 @@ return [
                 'default' => 'This Device',
             ],
         ],
+        'domain' => [
+            '-d' => [
+                'description' =>  'Domain name to check',
+                'default' => 'This Device',
+            ],
+            '-c' =>[
+                'description' => 'Response time to result in critical status (days)',
+                'default' => '10',
+            ],
+            '-w' =>[
+                'description' => 'Response time to result in warning status (days)',
+                'default' => '30',
+            ],
+
+        ]
     ],
 ];

@@ -53,7 +53,7 @@
     <div class="form-group row" x-show="hasHostname">
         <label for='service_ip' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_ip') }}</label>
         <div class="col-sm-8 col-md-9">
-            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='{{ __('service.this_device') }}' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
+            <input type='search' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='{{ __('service.this_device') }}' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_ip">
@@ -279,7 +279,7 @@
                 let hasHostname = false;
 
                 parameters = parameters.filter(param => {
-                    if (param.param === '--hostname' || param.short === '-H') {
+                    if (param.uses_target) {
                         hasHostname = true;
                         return false;
                     }

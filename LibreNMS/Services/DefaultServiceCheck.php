@@ -36,6 +36,8 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 {
     /** @var \App\Models\Service */
     protected $service;
+    /** @var string short option to indicate supply service_ip for */
+    protected $target_option = '-H';
 
     public function __construct(Service $service)
     {
@@ -103,9 +105,13 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 
         $checkParameters = $parser->parse('check_' . $this->service->service_type);
 
-        // set hostname has default if it exists
-        $checkParameters->get('-H', new CheckParameter('', '', ''))
-            ->setHasDefault()->setRequired(false);
+        // mark the target (service_ip) option if it exists, by default this is -H
+        optional($checkParameters->get($this->target_option))->usesTarget();
+
+        // mark defaults as having default
+        foreach ($this->hasDefaults() as $option => $text) {
+            $checkParameters->get($option)->setHasDefault();
+        }
 
         return $checkParameters;
     }
@@ -117,7 +123,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     public function hasDefaults(): array
     {
         return [
-            '-H' => trans('service.defaults.hostname'),
+            $this->target_option => trans('service.defaults.hostname'),
         ];
     }
 
@@ -172,7 +178,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     public function getDefault(string $flag): string
     {
         switch ($flag) {
-            case '-H':
+            case $this->target_option:
                 return $this->service->service_ip ?: $this->service->device->overwrite_ip ?: $this->service->device->hostname;
             default:
                 return '';
@@ -194,9 +200,9 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     {
         $flags = array_keys($this->hasDefaults());
 
-        // service does not have -H, don't try to set it
+        // service does not have -H (or short_target_option), don't try to set it
         if ($this->service->service_ip === null) {
-            if (($key = array_search('-H', $flags)) !== false) {
+            if (($key = array_search($this->target_option, $flags)) !== false) {
                 unset($flags[$key]);
             }
         }

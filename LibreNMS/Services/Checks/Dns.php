@@ -25,21 +25,17 @@
 
 namespace LibreNMS\Services\Checks;
 
-use Illuminate\Support\Collection;
 use LibreNMS\Services\DefaultServiceCheck;
 
 class Dns extends DefaultServiceCheck
 {
-    /**
-     * @inerhitDoc
-     */
-    public function availableParameters(): Collection
+    protected $target_option = '-s';
+
+    public function hasDefaults(): array
     {
-        $checkParameters = parent::availableParameters();
-
-        $checkParameters->get('-s')->setHasDefault();
-
-        return $checkParameters;
+        return array_merge(parent::hasDefaults(), [
+            '-H' => trans('service.check_params.dns.-H.description'),
+        ]);
     }
 
     public function getDefault(string $flag): string
@@ -47,8 +43,6 @@ class Dns extends DefaultServiceCheck
         switch ($flag) {
             case '-H':
                 return 'localhost';
-            case '--server':
-                return $this->service->service_ip ?? $this->service->device->overwrite_ip ?: $this->service->device->hostname;
             default:
                 return parent::getDefault($flag);
         }

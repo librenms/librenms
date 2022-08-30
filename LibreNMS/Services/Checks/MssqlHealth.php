@@ -27,19 +27,7 @@ namespace LibreNMS\Services\Checks;
 
 class MssqlHealth extends \LibreNMS\Services\DefaultServiceCheck
 {
-    public function hasDefaults(): array
-    {
-        return ['--server' => 'use a section in freetds.conf instead of hostname/port'];
-    }
-
-    public function getDefault(string $flag): string
-    {
-        if ($flag == '--server') {
-            return $this->service->service_ip ?? $this->service->device->overwrite_ip ?? $this->service->device->hostname;
-        }
-
-        return parent::getDefault($flag);
-    }
+    protected $target_option = '--server';
 
     public function getMetrics(string $metric_text): array
     {
