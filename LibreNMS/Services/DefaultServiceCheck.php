@@ -223,4 +223,50 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 
         return $modern ? $command : array_merge($command, Services::parseLegacyParams($this->service->service_param));
     }
+
+    public function getParameterValidationRules(): array
+    {
+        $parameter_rules = [];
+
+        $parameters = $this->availableParameters()->keyBy(function ($parameter) {
+            return $parameter->short ?: $parameter->param;
+        });
+
+        foreach ($parameters as $parameter) {
+            if ($parameter->uses_target) {
+                // this option uses target, add service_ip to the rules, but not this parameter
+                $parameter_rules['service_ip'] = 'nullable|ip_or_hostname';
+                continue;
+            }
+
+            $rules = [];
+            $param = $parameter->param ?: $parameter->short;
+
+            if ($parameter->required) {
+                $rules[] = 'required';
+            } elseif ($parameter->inclusive_group) {
+                $rules[] = 'required_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
+                        return 'service_param.' . ($param->param ?: $param->short);
+                    })->all());
+            }
+
+            if ($parameter->exclusive_group) {
+                $rules[] = 'prohibits:' . implode(',', $parameters->only($parameter->exclusive_group)->except($parameter->short ?: $parameter->param)->map(function (CheckParameter $param) {
+                        return 'service_param.' . ($param->param ?: $param->short);
+                    })->all());
+            }
+
+            if ($parameter->value == 'INTEGER') {
+                $rules[] = 'integer';
+            } elseif ($parameter->value == 'ADDRESS') {
+                $rules[] = 'ip_or_hostname';
+            } elseif ($parameter->value == 'DOUBLE') {
+                $rules[] = 'numeric';
+            }
+
+            $parameter_rules["service_param.$param"] = $rules;
+        }
+
+        return $parameter_rules;
+    }
 }

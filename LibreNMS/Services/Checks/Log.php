@@ -41,7 +41,7 @@ class Log extends DefaultServiceCheck
         ]);
     }
 
-    public function validateParameters(): array
+    public function getParameterValidationRules(): array
     {
         return [
             '--filename' => function ($attribute, $value, $fail) {

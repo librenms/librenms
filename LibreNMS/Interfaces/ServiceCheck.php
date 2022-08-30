@@ -78,4 +78,10 @@ interface ServiceCheck
      * @return array
      */
     public function getMetrics(string $metric_text): array;
+
+    /**
+     * Get Laravel validation rules for the parameters of this check.
+     * Rules will be prefixed by "service_param." and prefer the long param over the short.
+     */
+    public function getParameterValidationRules(): array;
 }
