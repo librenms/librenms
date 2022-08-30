@@ -150,6 +150,7 @@
             currentParam: null,
             currentValue: null,
             hasHostname: true,
+            wipeParams: false,
             testMessage: '',
             testResult: 1,
             parameters: [],
@@ -273,7 +274,7 @@
                     this.currentValue = null;
                 }
             },
-            async fetchParams(type) {
+            async fetchParams(type, wipe_params = true) {
                 const response = await fetch('{{ route('services.params', ['type' => '?']) }}'.replace('?', type));
                 let parameters = await response.json();
                 let hasHostname = false;
@@ -287,6 +288,9 @@
                     return true;
                 });
 
+                if (wipe_params) {
+                    this.service_param = {};
+                }
                 this.errors = {};
                 this.hasHostname = hasHostname;
                 this.parameters = parameters;
@@ -306,26 +310,28 @@
                 }
 
                 if (this.service_type) {
-                    this.fetchParams(this.service_type);
+                    this.fetchParams(this.service_type, ! this.service_id);
                 }
-                this.$watch('service_type', service_type => this.fetchParams(service_type));
+                this.$watch('service_type', service_type => this.fetchParams(service_type, this.wipeParams));
                 this.$watch('service_param', () => this.currentParam = this.$refs.param.value);
                 if (typeof this.show !== 'undefined') {
                     this.$watch('show' , show => this.service_id = show);
                 }
-                this.$watch('service_id',  service_id => {
+                this.$watch('service_id', service_id => {
                     if (service_id) {
                         fetch('{{ route('services.show', ['service' => '?']) }}'.replace('?', service_id))
                             .then(response => response.json())
                             .then(result => {
+                                this.wipeParams = false; // prevent param wipe when loading
+                                this.service_type = result.service_type;
                                 this.service_name = result.service_name;
                                 this.device_id = result.device_id;
                                 this.service_desc = result.service_desc;
-                                this.service_type = result.service_type;
                                 this.service_ip = result.service_ip;
                                 this.service_param = result.service_param;
                                 this.service_ignore = result.service_ignore;
                                 this.service_disabled = result.service_disabled;
+                                this.$nextTick(() => this.wipeParams = true);
                             });
                     }
                 });
