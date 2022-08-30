@@ -4,16 +4,16 @@ use App\Models\Port;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
+if (empty($vars['view'])) {
+    $vars['view'] = trim(Config::get('ports_page_default'), '/');
+}
+
 if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
     if (isset($vars['graph'])) {
         $graph_type = 'port_' . $vars['graph'];
     } else {
         $graph_type = 'port_bits';
     }
-}
-
-if (! $vars['view']) {
-    $vars['view'] = trim(Config::get('ports_page_default'), '/');
 }
 
 $link_array = [
@@ -67,8 +67,10 @@ if (Config::get('enable_ports_etherlike')) {
     $graph_types['etherlike'] = 'Etherlike';
 }
 
+$type_sep = '';
+$vars['graph'] = $vars['graph'] ?? '';
 foreach ($graph_types as $type => $descr) {
-    echo "$type_sep";
+    echo $type_sep;
     if ($vars['graph'] == $type && $vars['view'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
     }
@@ -154,7 +156,7 @@ if ($vars['view'] == 'minigraphs') {
         $ports[$key]['ifOctets_rate'] = $port['ifInOctets_rate'] + $port['ifOutOctets_rate'];
     }
 
-    switch ($vars['sort']) {
+    switch ($vars['sort'] ?? '') {
         case 'traffic':
             $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
             break;
@@ -165,7 +167,6 @@ if ($vars['view'] == 'minigraphs') {
 
     foreach ($ports as $port) {
         include 'includes/html/print-interface.inc.php';
-        $i++;
     }
 
     echo '</table></div>';

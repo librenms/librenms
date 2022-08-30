@@ -1,7 +1,6 @@
 <?php
 
 if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'adsl'))) {
-    $iid = $id;
     echo '<div class=graphhead>ADSL Current Line Speed</div>';
     $graph_type = 'port_adsl_speed';
 

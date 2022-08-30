@@ -202,7 +202,7 @@ if ($vars['subview'] == 'top10') {
             $graph_array['height'] = '100';
             $graph_array['width'] = '216';
             $graph_array['to'] = Config::get('time.now');
-            echo '<tr bgcolor="' . $bg_colour . '"' . ($bg_image ? ' background="' . $bg_image . '"' : '') . '"><td colspan="7">';
+            echo '<tr bgcolor="' . $bg_colour . '"><td colspan="7">';
 
             include 'includes/html/print-graphrow.inc.php';
 

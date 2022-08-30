@@ -233,7 +233,7 @@ function generate_graph_js_state($args)
     $to = (is_numeric($args['to']) ? $args['to'] : 0);
     $width = (is_numeric($args['width']) ? $args['width'] : 0);
     $height = (is_numeric($args['height']) ? $args['height'] : 0);
-    $legend = str_replace("'", '', $args['legend']);
+    $legend = str_replace("'", '', $args['legend'] ?? '');
 
     $state = <<<STATE
 <script type="text/javascript" language="JavaScript">
@@ -321,6 +321,10 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     if (! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
+    }
+
+    if (! isset($port['label'])) {
+        $port = cleanPort($port);
     }
 
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
@@ -724,22 +728,24 @@ function get_url()
 
 function alert_details($details)
 {
-    if (! is_array($details)) {
+    if (is_string($details)) {
         $details = json_decode(gzuncompress($details), true);
+    } elseif (! is_array($details)) {
+        $details = [];
     }
 
     $max_row_length = 0;
     $all_fault_detail = '';
-    foreach ($details['rule'] as $o => $tmp_alerts) {
+    foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
         $fault_detail = '';
         $fallback = true;
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
-        if ($tmp_alerts['bill_id']) {
+        if (isset($tmp_alerts['bill_id'])) {
             $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
             $fallback = false;
         }
 
-        if ($tmp_alerts['port_id']) {
+        if (isset($tmp_alerts['port_id'])) {
             if ($tmp_alerts['isisISAdjState']) {
                 $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
                 $port = \App\Models\Port::find($tmp_alerts['port_id']);
@@ -751,12 +757,12 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['accesspoint_id']) {
+        if (isset($tmp_alerts['accesspoint_id'])) {
             $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
             $fallback = false;
         }
 
-        if ($tmp_alerts['sensor_id']) {
+        if (isset($tmp_alerts['sensor_id'])) {
             if ($tmp_alerts['sensor_class'] == 'state') {
                 // Give more details for a state (textual form)
                 $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
@@ -784,7 +790,7 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['bgpPeer_id']) {
+        if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
                 \LibreNMS\Util\Url::generate([
@@ -799,7 +805,7 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['type'] && $tmp_alerts['label']) {
+        if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
             if ($tmp_alerts['error'] == '') {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {

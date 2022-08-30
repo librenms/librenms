@@ -279,9 +279,11 @@ class DeviceController extends TableController
      */
     private function getLocation($device)
     {
+        $location = $device->location ?? '';
+
         return extension_loaded('mbstring')
-            ? mb_substr($device->location, 0, 32, 'utf8')
-            : substr($device->location, 0, 32);
+            ? mb_substr($location, 0, 32, 'utf8')
+            : substr($location, 0, 32);
     }
 
     private function getActions(Device $device): array

@@ -168,7 +168,7 @@ class ConnectivityHelper
     public function ipFamily(): string
     {
         if ($this->family === null) {
-            $this->family = preg_match('/6$/', $this->device->transport) ? 'ipv6' : 'ipv4';
+            $this->family = preg_match('/6$/', $this->device->transport ?? '') ? 'ipv6' : 'ipv4';
         }
 
         return $this->family;

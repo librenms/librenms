@@ -11,27 +11,28 @@ foreach ($_GET as $name => $value) {
 
 [$type, $subtype] = extract_graph_type($vars['type']);
 
-if (is_numeric($vars['device'])) {
-    $device = device_by_id_cache($vars['device']);
-} elseif (! empty($vars['device'])) {
-    $device = device_by_name($vars['device']);
+if (isset($vars['device'])) {
+    $device = is_numeric($vars['device'])
+        ? device_by_id_cache($vars['device'])
+        : device_by_name($vars['device']);
 }
 
 // FIXME -- remove these
 $width = $vars['width'];
 $height = $vars['height'];
-$title = $vars['title'];
-$vertical = $vars['vertical'];
-$legend = $vars['legend'];
+$title = $vars['title'] ?? '';
+$vertical = $vars['vertical'] ?? '';
+$legend = $vars['legend'] ?? false;
 $output = (! empty($vars['output']) ? $vars['output'] : 'default');
-$from = parse_at_time($_GET['from']) ?: Config::get('time.day');
-$to = parse_at_time($_GET['to']) ?: Config::get('time.now');
+$from = empty($_GET['from']) ? Config::get('time.day') : parse_at_time($_GET['from']);
+$to = empty($_GET['to']) ? Config::get('time.now') : parse_at_time($_GET['to']);
 $period = ($to - $from);
 $prev_from = ($from - $period);
 
 $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
 $rrd_options = '';
 
+$auth = false;
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
 //set default graph title
