@@ -64,7 +64,12 @@ return [
                 'description' => 'Response time to result in warning status (days)',
                 'default' => '30',
             ],
-
-        ]
+        ],
+        'mysql' => [
+            '-d' => [
+                'description' => 'Check database with indicated name',
+                'default' => 'mysql',
+            ],
+        ],
     ],
 ];

@@ -110,7 +110,7 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 
         // mark defaults as having default
         foreach ($this->hasDefaults() as $option => $text) {
-            $checkParameters->get($option)->setHasDefault();
+            optional($checkParameters->get($option))->setHasDefault();
         }
 
         return $checkParameters;

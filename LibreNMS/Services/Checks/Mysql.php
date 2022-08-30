@@ -26,18 +26,15 @@
 namespace LibreNMS\Services\Checks;
 
 use App\Facades\Rrd;
-use Illuminate\Support\Collection;
 use LibreNMS\Services\DefaultServiceCheck;
 
 class Mysql extends DefaultServiceCheck
 {
-    public function availableParameters(): Collection
+    public function hasDefaults(): array
     {
-        $parameters = parent::availableParameters();
-
-        $parameters->get('-d')->setHasDefault();
-
-        return $parameters;
+        return array_merge(parent::hasDefaults(), [
+            '-d' => trans('service.check_params.mysql.-d.description'),
+        ]);
     }
 
     public function getDefault(string $flag): string

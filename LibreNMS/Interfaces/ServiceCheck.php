@@ -51,6 +51,8 @@ interface ServiceCheck
 
     /**
      * Get the available check parameters.
+     * The default implementation calls the check with --help and attempts to parse the help.
+     * Calling this should be avoided when polling.
      *
      * @return \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter>
      */
