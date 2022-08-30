@@ -36,7 +36,7 @@ var eventlog_grid = $("#eventlog").bootgrid({
     {
         return {
             device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
-            eventtype: "' . addcslashes($vars['eventtype'], '"') . '",
+            eventtype: "' . addcslashes($vars['eventtype'] ?? '', '"') . '",
         };
     },
     url: "' . url('/ajax/table/eventlog') . '"

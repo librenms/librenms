@@ -34,7 +34,7 @@ foreach ($routing_count as $type => $value) {
     }
 
     echo $sep;
-    unset($sep);
+    $sep = '';
 
     if ($vars['protocol'] == $type) {
         echo '<span class="pagemenu-selected">';

@@ -28,8 +28,8 @@ foreach ($segments as $pos => $segment) {
     if ($pos === 0) {
         $vars['page'] = $segment;
     } else {
-        [$name, $value] = explode('=', $segment);
-        if ($value == '' || ! isset($value)) {
+        [$name, $value] = array_pad(explode('=', $segment), 2, null);
+        if (! $value) {
             if ($vars['page'] == 'device' && $pos < 3) {
                 // translate laravel device routes properly
                 $vars[$pos === 1 ? 'device' : 'tab'] = $name;

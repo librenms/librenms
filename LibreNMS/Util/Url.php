@@ -95,7 +95,7 @@ class Url
         }
 
         if ($device->location_id) {
-            $contents .= ' - ' . htmlentities($device->location);
+            $contents .= ' - ' . htmlentities($device->location ?? '');
         }
 
         $contents .= '</div>';
@@ -332,7 +332,7 @@ class Url
     {
         $urlargs = [];
         foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . urlencode($arg);
+            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
         return '<img src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;" />';
@@ -372,7 +372,7 @@ class Url
         $urlargs = [];
 
         foreach ($args as $key => $arg) {
-            $urlargs[] = $key . '=' . urlencode($arg);
+            $urlargs[] = $key . '=' . ($arg === null ? '' : urlencode($arg));
         }
 
         $tag = '<img class="img-responsive" src="' . url('graph.php') . '?' . implode('&amp;', $urlargs) . '" style="border:0;"';
