@@ -40,7 +40,8 @@ if ($device['os_group'] == 'cisco') {
     $components = $components[$device['device_id']];
     if (isset($components)) {
         $qfp = count($components);
-    }}
+    }
+}
 
 unset($datas);
 $datas[] = 'overview';
