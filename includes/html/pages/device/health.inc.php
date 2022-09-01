@@ -33,11 +33,13 @@ use App\Models\Storage;
 # QFP count for cisco devices
 */
 
+$qfp = 0;
 if ($device['os_group'] == 'cisco') {
     $component = new LibreNMS\Component();
     $components = $component->getComponents($device['device_id'], ['type'=> 'cisco-qfp']);
     $components = $components[$device['device_id']];
-    $qfp = isset($components) ? count($components) : 0;
+    $qfp = count($components);
+    $qfp = count($components ?? []);
 }
 
 unset($datas);
