@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use Exception;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail
@@ -90,7 +91,10 @@ class Mail
                 $mail->WordWrap = 76;
                 $mail->Body = $message;
                 if ($html) {
-                    $mail->isHTML(true);
+                    $mail->isHTML();
+                    if (Config::get('email_embed_graphs')) {
+                        self::embedGraphs($mail);
+                    }
                 }
                 switch (strtolower(trim(Config::get('email_backend')))) {
                     case 'sendmail':
@@ -123,5 +127,39 @@ class Mail
         }
 
         return 'No contacts found';
+    }
+
+    /**
+     * Search for generated graph links, generate them, attach them to the email and update the url to a cid link
+     */
+    private static function embedGraphs(PHPMailer $mail): void
+    {
+        $body = $mail->Body;
+
+        // search for generated graphs
+        preg_match_all('/ class=\"librenms-graph\" src=\"(.*?)\"/', $body, $match);
+
+        foreach (array_values(array_unique($match[1])) as $attachment_id => $url) {
+            try {
+                // fetch image
+                $url_data = parse_url($url);
+                parse_str($url_data['query'] ?? '', $params);
+                $image = Graph::get($params);
+
+                // attach image
+                if (Config::get('webui.graph_type') == 'svg') {
+                    $mail->addStringEmbeddedImage($image, $attachment_id, 'graph.svg', 'base64', 'image/svg+xml');
+                } else {
+                    $mail->addStringEmbeddedImage($image, $attachment_id, 'graph.png', 'base64', 'image/png');
+                }
+
+                // update image tag to link to attached image
+                $body = str_replace($url, "cid:$attachment_id", $body);
+            } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
+                report($e);
+            }
+        }
+
+        $mail->Body = $body;
     }
 }
