@@ -24,9 +24,9 @@ class OspfNbrFactory extends Factory
     {
         return [
             'id' => $this->faker->randomDigit(),
-            'ospfNbrIpAddr' => $this->faker->ipv4,
+            'ospfNbrIpAddr' => $this->faker->ipv4(),
             'ospfNbrAddressLessIndex' => $this->faker->randomDigit(),
-            'ospfNbrRtrId' => $this->faker->ipv4,
+            'ospfNbrRtrId' => $this->faker->ipv4(),
             'ospfNbrOptions' => 0,
             'ospfNbrPriority' => 1,
             'ospfNbrEvents' => $this->faker->randomDigit(),
