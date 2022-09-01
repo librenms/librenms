@@ -3,7 +3,7 @@
 echo 'Schleifenbauer ';
 $divisor = 100;
 
-foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
+foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] ?? [] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
     foreach ($pre_cache['sdbDevInActualVoltage'][$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInActualVoltage) {
         $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $voltage_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.7.$sdbDevIdIndex.$sdbDevInIndex";
@@ -19,7 +19,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 }
 
 $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
-foreach ($pre_cache['sdbDevOutMtActualVoltage'] as $sdbDevOutMtIndex => $sdbDevOutMtActualVoltage) {
+foreach ($pre_cache['sdbDevOutMtActualVoltage'] ?? [] as $sdbDevOutMtIndex => $sdbDevOutMtActualVoltage) {
     $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
     $voltage_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.7.$unit.$sdbDevOutMtIndex";
     $voltage = $sdbDevOutMtActualVoltage / $divisor;
