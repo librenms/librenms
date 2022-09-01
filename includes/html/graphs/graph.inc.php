@@ -32,7 +32,6 @@ $prev_from = ($from - $period);
 $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
 $rrd_options = '';
 
-$auth = false;
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
 
 //set default graph title
