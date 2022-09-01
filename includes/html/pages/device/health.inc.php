@@ -38,7 +38,7 @@ if ($device['os_group'] == 'cisco') {
     $component = new LibreNMS\Component();
     $components = $component->getComponents($device['device_id'], ['type'=> 'cisco-qfp']);
     $components = $components[$device['device_id']];
-    $qfp = count($components);
+    $qfp = isset($components) ? count($components) : 0;
 }
 
 unset($datas);
