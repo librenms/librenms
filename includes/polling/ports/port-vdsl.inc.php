@@ -54,20 +54,16 @@ if (isset($this_port['xtuc'])) {
     //      'xdsl2ChStatusActDataRate' => '51547',
     //    ),
 
-    if (PortVdsl::where('port_id', '=', $port_id)->count() == 0) {
-        //dbInsert(['port_id' => $port_id], 'ports_vdsl');
-        PortVdsl::create(['port_id' => $port_id]);
-    }
-
     $port['vdsl_update'] = ['port_vdsl_updated' => ['NOW()']];
+    $port['vdsl_update']['xdsl2ChStatusActDataRateXtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'] ?? 0;
+    $port['vdsl_update']['xdsl2ChStatusActDataRateXtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'] ?? 0;
     foreach ($vdsl_db_oids as $oid) {
-        $port['vdsl_update'][$oid] = $this_port[$oid];
+        if (isset($this_port[$oid])) {
+            $port['vdsl_update'][$oid] = $this_port[$oid];
+        }
     }
-    $port['vdsl_update']['xdsl2ChStatusActDataRateXtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'];
-    $port['vdsl_update']['xdsl2ChStatusActDataRateXtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'];
 
-    //dbUpdate($port['vdsl_update'], 'ports_vdsl', '`port_id` = ?', [$port_id]);
-    PortVdsl::where('port_id', '=', $port->port_id)->update($port['vdsl_update']);
+    PortVdsl::updateOrCreate(['port_id' => $port_id], $port['vdsl_update']);
 
     $fieldsAtt['ds'] = $this_port['xdsl2LineStatusAttainableRateDs'];
     $fieldsAtt['us'] = $this_port['xdsl2LineStatusAttainableRateUs'];

@@ -22,7 +22,7 @@ class PortAdsl extends PortRelatedModel
         'adslAturCurrSnrMgn',
         'adslAturCurrAtn',
         'adslAturCurrOutputPwr',
-        'adslAturCurrAttainableRate'
+        'adslAturCurrAttainableRate',
     ];
     protected $table = 'ports_adsl';
     protected $primaryKey = 'port_id';

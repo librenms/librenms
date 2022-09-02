@@ -129,15 +129,19 @@ if (isset($this_port['adslLineCoding'])) {
         $this_port[$oid] = ($this_port[$oid] / 10);
     }
 
-    if (PortAdsl::where('port_id', '=', $port_id)->count() == 0) {
-        PortAdsl::create(['port_id' => $port_id, 'adslLineCoding' => (string) $this_port['adslLineCoding']]);
-    }
-
     $port['adsl_update'] = ['port_adsl_updated' => ['NOW()']];
     foreach ($adsl_db_oids as $oid) {
-        $port['adsl_update'][$oid] = $this_port[$oid];
+        if (isset($this_port[$oid])) {
+            if (in_array($oid, ['adslAtucInvVendorID', 'adslAturInvVendorID', 'adslAturInvVersionNumber', 'adslAtucInvVersionNumber'])) {
+                $port['adsl_update'][$oid] = substr($this_port[$oid], 0, 16);
+            } elseif (in_array($oid, ['adslAturInvSerialNumber'])) {
+                $port['adsl_update'][$oid] = substr($this_port[$oid], 0, 32);
+            } else {
+                $port['adsl_update'][$oid] = $this_port[$oid];
+            }
+        }
     }
-    PortAdsl::where('port_id', '=', $port->port_id)->update($port['adsl_update']);
+    PortAdsl::updateOrCreate(['port_id' => $port_id], $port['adsl_update']);
 
     if ($this_port['adslAtucCurrSnrMgn'] > '1280') {
         $this_port['adslAtucCurrSnrMgn'] = 'U';

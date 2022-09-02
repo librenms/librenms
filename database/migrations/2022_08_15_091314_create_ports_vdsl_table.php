@@ -15,10 +15,10 @@ class CreatePortsVdslTable extends Migration
         Schema::create('ports_vdsl', function (Blueprint $table) {
             $table->unsignedInteger('port_id')->unique();
             $table->timestamp('port_vdsl_updated')->useCurrent();
-            $table->integer('xdsl2LineStatusAttainableRateDs');
-            $table->integer('xdsl2LineStatusAttainableRateUs');
-            $table->integer('xdsl2ChStatusActDataRateXtur');
-            $table->integer('xdsl2ChStatusActDataRateXtuc');
+            $table->integer('xdsl2LineStatusAttainableRateDs')->default(0);
+            $table->integer('xdsl2LineStatusAttainableRateUs')->default(0);
+            $table->integer('xdsl2ChStatusActDataRateXtur')->default(0);
+            $table->integer('xdsl2ChStatusActDataRateXtuc')->default(0);
         });
     }
 
