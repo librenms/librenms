@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PortAdsl;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -129,7 +130,7 @@ if (isset($this_port['adslLineCoding'])) {
     }
 
     if (PortAdsl::where('port_id', '=', $port_id)->count() == 0) {
-        PortAdsl::create(['port_id' => $port_id]);
+        PortAdsl::create(['port_id' => $port_id, 'adslLineCoding' => $this_port['adslLineCoding']]);
     }
 
     $port['adsl_update'] = ['port_adsl_updated' => ['NOW()']];
