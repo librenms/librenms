@@ -173,6 +173,7 @@ class RunAlerts
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
+                $obj['faults'][$i]['string'] = '';
                 foreach ($incident as $k => $v) {
                     if (! empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
                         $obj['faults'][$i]['string'] .= $k . ' => ' . $v . '; ';
@@ -206,11 +207,11 @@ class RunAlerts
     public function timeFormat($secs)
     {
         $bit = [
-            'y' => $secs / 31556926 % 12,
-            'w' => $secs / 604800 % 52,
-            'd' => $secs / 86400 % 7,
-            'h' => $secs / 3600 % 24,
-            'm' => $secs / 60 % 60,
+            'y' => round($secs / 31556926) % 12,
+            'w' => round($secs / 604800) % 52,
+            'd' => round($secs / 86400) % 7,
+            'h' => round($secs / 3600) % 24,
+            'm' => round($secs / 60) % 60,
             's' => $secs % 60,
         ];
         $ret = [];
@@ -535,7 +536,7 @@ class RunAlerts
                 c_echo(" :: $transport_title => ");
                 try {
                     $instance = new $class($item['transport_id']);
-                    $tmp = $instance->deliverAlert($obj, $item['opts']);
+                    $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
