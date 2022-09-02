@@ -128,18 +128,15 @@ if (isset($this_port['adslLineCoding'])) {
         $this_port[$oid] = ($this_port[$oid] / 10);
     }
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = ?', [$port_id]) == '0') {
-        dbInsert(['port_id' => $port_id], 'ports_adsl');
+    if (PortAdsl::where('port_id', '=', $port_id)->count() == 0) {
+        PortAdsl::create(['port_id' => $port_id]);
     }
 
     $port['adsl_update'] = ['port_adsl_updated' => ['NOW()']];
     foreach ($adsl_db_oids as $oid) {
-        $data = str_replace('"', '', $this_port[$oid]);
-        // FIXME - do we need this?
-        $port['adsl_update'][$oid] = $data;
+        $port['adsl_update'][$oid] = $this_port[$oid];
     }
-
-    dbUpdate($port['adsl_update'], 'ports_adsl', '`port_id` = ?', [$port_id]);
+    PortAdsl::where('port_id', '=', $port->port_id)->update($port['adsl_update']);
 
     if ($this_port['adslAtucCurrSnrMgn'] > '1280') {
         $this_port['adslAtucCurrSnrMgn'] = 'U';

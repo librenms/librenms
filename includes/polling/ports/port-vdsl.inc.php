@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\PortVdsl;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
@@ -53,8 +54,9 @@ if (isset($this_port['xtuc'])) {
     //      'xdsl2ChStatusActDataRate' => '51547',
     //    ),
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports_vdsl` WHERE `port_id` = ?', [$port_id]) == '0') {
-        dbInsert(['port_id' => $port_id], 'ports_vdsl');
+    if (PortVdsl::where('port_id', '=', $port_id)->count() == 0) {
+        //dbInsert(['port_id' => $port_id], 'ports_vdsl');
+        PortVdsl::create(['port_id' => $port_id]);
     }
 
     $port['vdsl_update'] = ['port_vdsl_updated' => ['NOW()']];
@@ -64,7 +66,8 @@ if (isset($this_port['xtuc'])) {
     $port['vdsl_update']['xdsl2ChStatusActDataRateXtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'];
     $port['vdsl_update']['xdsl2ChStatusActDataRateXtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'];
 
-    dbUpdate($port['vdsl_update'], 'ports_vdsl', '`port_id` = ?', [$port_id]);
+    //dbUpdate($port['vdsl_update'], 'ports_vdsl', '`port_id` = ?', [$port_id]);
+    PortVdsl::where('port_id', '=', $port->port_id)->update($port['vdsl_update']);
 
     $fieldsAtt['ds'] = $this_port['xdsl2LineStatusAttainableRateDs'];
     $fieldsAtt['us'] = $this_port['xdsl2LineStatusAttainableRateUs'];
