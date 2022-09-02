@@ -771,7 +771,7 @@ if (sizeof($returned['criticals']) > 0) {
 
 // log any criticals
 if (sizeof($returned['errors']) > 0) {
-    $log_message = 'CAPE Errors: ' . json_encode($returned['criticals']);
+    $log_message = 'CAPE Errors: ' . json_encode($returned['errors']);
     log_event($log_message, $device, 'application', 5);
 }
 
