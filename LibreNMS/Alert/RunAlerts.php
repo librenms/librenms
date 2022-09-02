@@ -34,6 +34,7 @@ use App\Facades\DeviceCache;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
 use Log;
@@ -538,6 +539,9 @@ class RunAlerts
                     $instance = new $class($item['transport_id']);
                     $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
+                } catch (AlertTransportDeliveryException $e) {
+                    Log::event($e->getMessage(), $obj['device_id'], 'alert', Alert::ERROR);
+                    $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
                 }
