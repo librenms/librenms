@@ -46,6 +46,10 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     public function boot(): void
     {
         Flare::filterExceptionsUsing(function (\Exception $e) {
+            if (Config::get('reporting.error.dump')) {
+                dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
+            }
+
             return $this->isReportingEnabled();
         });
 
