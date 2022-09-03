@@ -335,6 +335,7 @@ API Transport, you may want to include the url only instead of a html tag.
     'id' => $value['port_id'],
     'type' => 'port_bits',
     'from' => time() - 43200,
+    'to' => time(),
 ])
 ```
 
