@@ -23,6 +23,8 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
+use App\Models\BgpPeer;
+use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -48,20 +50,20 @@ foreach ($bgpPeers as $vrfId => $vrf) {
         // Force to null to avoid 0s going to the DB instead of Nulls
         $vrfId = null;
     } else {
-        $checkVrf = ' AND vrf_id = ? ';
         $vrfs = [
             'vrf_oid' => 'firebrick.' . $vrfId,
             'vrf_name' => $vrfId,
             'device_id' => $device['device_id'],
         ];
 
-        if (! dbFetchCell('SELECT COUNT(*) FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrfs['vrf_oid']])) {
+        if (! Vrf::where('device_id', '=', $device['device_id'])->where('vrf_oid', '=', $vrfs['vrf_oid'])->count()) {
+            //Should we insert a VRF here ? We are not in the VRF module !
             dbInsert($vrfs, 'vrfs');
         }
     }
     foreach ($vrf as $address => $value) {
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
-        if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]) < '1') {
+        if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
             $peers = [
                 'device_id' => $device['device_id'],
                 'vrf_id' => $vrfId,
@@ -92,7 +94,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
     }
 }
 // clean up peers
-$peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
+$peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', '=', $device['device_id']);
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
     $address = $value['bgpPeerIdentifier'];
@@ -100,7 +102,7 @@ foreach ($peers as $value) {
     // Cleanup code to deal with 0 vs Null in the DB
     if ($vrfId === 0) {
         // Database says it's table 0 - which is wrong.  It should be "null" for global table
-        $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+        $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
         echo str_repeat('-', $deleted);
         continue;
     } else {
@@ -108,11 +110,7 @@ foreach ($peers as $value) {
     }
 
     if (empty($bgpPeers[$testVrfId][$address])) {
-        if ($vrfId === null) {
-            $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id IS NULL', [$device['device_id'], $address]);
-        } else {
-            $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-        }
+        $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
         echo str_repeat('-', $deleted);
     }
 }
