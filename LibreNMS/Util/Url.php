@@ -30,6 +30,7 @@ use App\Models\Port;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Request;
@@ -336,7 +337,7 @@ class Url
             $args = self::parseLegacyPathVars($path);
         }
 
-        return \URL::signedRoute('graph', $args);
+        return LaravelUrl::signedRoute('graph', $args);
     }
 
     /**
