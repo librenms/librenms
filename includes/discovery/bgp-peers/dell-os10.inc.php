@@ -40,7 +40,7 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeersCache);
 
         foreach ($bgpPeers as $vrfInstance => $peer) {
-            $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfInstance]);
+            $vrfId = Vrf::select('vrf_id')->where('device_id', '=', $device['device_id'])->where('vrf_oid', '=', $vrfInstance)->first();
             if (is_null($vrfId)) {
                 $vrfId = 1; // According to the MIB
             }
@@ -52,7 +52,7 @@ if (Config::get('enable_bgp')) {
                 // Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
                 $bgpLocalAs = $value['os10bgp4V2PeerLocalAs'];
 
-                if (dbFetchCell('SELECT count(*) FROM `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) == 0) {
+                if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
                     $row = [
                         'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
@@ -70,7 +70,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                    dbInsert($row, 'bgpPeers');
+                    BgpPeer::create($row);
 
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
@@ -78,7 +78,8 @@ if (Config::get('enable_bgp')) {
                     }
                     echo '+';
                 } else {
-                    dbUpdate(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                    //dbUpdate(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                    BgpPeer::where('bgpPeerRemoteAs', $value['os10bgp4V2PeerRemoteAs'])->where('astext', $astext)->update(['bgpPeerIdentifier' => $address, 'device_id' => $device['device_id'], 'vrf_id' => $vrfId]);
                     echo '.';
                 }
             }
