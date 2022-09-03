@@ -632,6 +632,16 @@
         }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
     }
 
+    // make sure gridster stays disabled when the window is resized
+    addEvent(window, "resize", function(event) {
+        setTimeout(function(){
+            if(!gridster_state) {
+                gridster.disable();
+                gridster.disable_resize();
+            }
+        }, 100);
+    });
+
     $('#new-widget').popover();
 
     @if (empty($dashboard->dashboard_id) && $default_dash == 0)
