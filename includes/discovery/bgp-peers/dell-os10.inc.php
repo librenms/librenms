@@ -24,6 +24,8 @@
  * @author     LibreNMS Contributors
  */
 
+use App\Models\BgpPeer;
+use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 

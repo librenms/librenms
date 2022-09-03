@@ -24,8 +24,8 @@
  * @author     PipoCanaja
  */
 
-use app\Models\BgpPeer;
-use app\Models\Vrf;
+use App\Models\BgpPeer;
+use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
