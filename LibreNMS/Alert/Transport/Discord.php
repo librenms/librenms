@@ -58,7 +58,7 @@ class Discord extends Transport
         $curl = curl_init();
         $discord_title = '#' . $obj['uid'] . ' ' . $obj['title'];
         $discord_msg = $obj['msg'];
-        $color = self::getColorForState($obj['state']);
+        $color = hexdec(preg_replace('/[^\dA-Fa-f]/', '', self::getColorForState($obj['state'])));
 
         // Special handling for the elapsed text in the footer if the elapsed is not set.
         $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
@@ -67,7 +67,7 @@ class Discord extends Transport
             'embeds' => [
                 [
                     'title' => $discord_title,
-                    'color' => hexdec($color),
+                    'color' => $color,
                     'description' => $discord_msg,
                     'fields' => $this->createDiscordFields($obj, $discord_opts),
                     'footer' => [

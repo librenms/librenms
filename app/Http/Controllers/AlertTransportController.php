@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -39,7 +40,7 @@ class AlertTransportController extends Controller
 
         $opts = Config::get('alert.transports.' . $transport->transport_type);
         try {
-            $result = $transport->instance()->deliverAlert($obj, $opts);
+            $result = $transport->instance()->deliverAlert(new AlertData($obj), $opts);
 
             if ($result === true) {
                 return response()->json(['status' => 'ok']);
