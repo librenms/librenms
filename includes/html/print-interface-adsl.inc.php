@@ -64,7 +64,7 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps');
+echo '' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps');
 echo '<br />';
 $port['graph_type'] = 'port_adsl_speed';
 echo generate_port_link(

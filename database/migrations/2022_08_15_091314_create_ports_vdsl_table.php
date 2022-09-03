@@ -19,6 +19,8 @@ class CreatePortsVdslTable extends Migration
             $table->integer('xdsl2LineStatusAttainableRateUs')->default(0);
             $table->integer('xdsl2ChStatusActDataRateXtur')->default(0);
             $table->integer('xdsl2ChStatusActDataRateXtuc')->default(0);
+            $table->decimal('xdsl2LineStatusActAtpDs')->default(0);
+            $table->decimal('xdsl2LineStatusActAtpUs')->default(0);
         });
     }
 

@@ -24,7 +24,17 @@ if (isset($this_port['xtuc'])) {
     $vdsl_db_oids = [
         'xdsl2LineStatusAttainableRateDs',
         'xdsl2LineStatusAttainableRateUs',
+        'xdsl2LineStatusActAtpDs',
+        'xdsl2LineStatusActAtpUs',
     ];
+    $vdsl_tenth_oids = [
+        'xdsl2LineStatusActAtpDs',
+        'xdsl2LineStatusActAtpUs',
+    ];
+
+    foreach ($vdsl_tenth_oids as $oid) {
+        $this_port[$oid] = ($this_port[$oid] / 10);
+    }
 
     d_echo($this_port);
 
@@ -54,6 +64,13 @@ if (isset($this_port['xtuc'])) {
     //      'xdsl2ChStatusActDataRate' => '51547',
     //    ),
 
+    $rrd_pow_name = Rrd::portName($port_id, 'xdsl2LineStatusActAtp');
+    $rrd_pow_def = RrdDefinition::make()->disableNameChecking()
+        ->addDataset('ds', 'GAUGE', 0)
+        ->addDataset('us', 'GAUGE', 0);
+    // xdsl2LineStatusActAtpDs.11 = 142  (equivalent adslAturCurrOutputPwr.13 = 142)
+    // xdsl2LineStatusActAtpUs.11 = 67 (equivlent adslAtucCurrOutputPwr.13 = 67)
+
     $port['vdsl_update'] = ['port_vdsl_updated' => ['NOW()']];
     $port['vdsl_update']['xdsl2ChStatusActDataRateXtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'] ?? 0;
     $port['vdsl_update']['xdsl2ChStatusActDataRateXtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'] ?? 0;
@@ -67,6 +84,9 @@ if (isset($this_port['xtuc'])) {
 
     $fieldsAtt['ds'] = $this_port['xdsl2LineStatusAttainableRateDs'];
     $fieldsAtt['us'] = $this_port['xdsl2LineStatusAttainableRateUs'];
+
+    $fieldsPow['ds'] = $this_port['xdsl2LineStatusActAtpDs'];
+    $fieldsPow['us'] = $this_port['xdsl2LineStatusActAtpUs'];
 
     $fieldsAct['xtuc'] = $this_port['xtuc']['xdsl2ChStatusActDataRate'];
     $fieldsAct['xtur'] = $this_port['xtur']['xdsl2ChStatusActDataRate'];
@@ -90,6 +110,11 @@ if (isset($this_port['xtuc'])) {
     $rrd_def = $rrd_act_def;
     $tags = compact('ifName', 'rrd_name', 'rrd_def');
     data_update($device, 'xdsl2LineStatusActRate', $tags, $fieldsAct);
+
+    $rrd_name = $rrd_pow_name;
+    $rrd_def = $rrd_pow_def;
+    $tags = compact('ifName', 'rrd_name', 'rrd_def');
+    data_update($device, 'xdsl2LineStatusActAtp', $tags, $fieldsPow);
 
     //xtuc is CO
     //xtur is CPE (receiver)

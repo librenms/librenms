@@ -1645,6 +1645,8 @@ ports_vdsl:
     - { Field: xdsl2LineStatusAttainableRateUs, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: xdsl2ChStatusActDataRateXtur, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: xdsl2ChStatusActDataRateXtuc, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2LineStatusActAtpDs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
+    - { Field: xdsl2LineStatusActAtpUs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
   Indexes:
     ports_vdsl_port_id_unique: { Name: ports_vdsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_vlans:

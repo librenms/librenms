@@ -106,13 +106,13 @@ echo '</td><td width=135>';
 //);
 
 echo '</td><td width=135>';
-//echo '' . $port['adslAturCurrOutputPwr'] . 'dBm/' . $port['adslAtucCurrOutputPwr'] . 'dBm';
-//echo '<br />';
-//$port['graph_type'] = 'port_adsl_power';
-//echo generate_port_link(
-//    $port,
-//    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
-//    $port['graph_type']
-//);
+echo '' . $port['xdsl2LineStatusActAtpDs'] . 'dBm/' . $port['xdsl2LineStatusActAtpUs'] . 'dBm';
+echo '<br />';
+$port['graph_type'] = 'port_vdsl_power';
+echo generate_port_link(
+    $port,
+    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+    $port['graph_type']
+);
 
 echo '</td>';

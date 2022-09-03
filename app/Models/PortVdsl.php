@@ -10,6 +10,8 @@ class PortVdsl extends PortRelatedModel
         'xdsl2LineStatusAttainableRateUs',
         'xdsl2ChStatusActDataRateXtur',
         'xdsl2ChStatusActDataRateXtuc',
+        'xdsl2LineStatusActAtpDs',
+        'xdsl2LineStatusActAtpUs',
     ];
     protected $table = 'ports_vdsl';
     protected $primaryKey = 'port_id';
