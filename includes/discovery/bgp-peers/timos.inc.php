@@ -24,6 +24,8 @@
  * @author     LibreNMS Contributors
  */
 
+use App\Models\BgpPeer;
+use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -47,7 +49,7 @@ if (Config::get('enable_bgp')) {
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
 
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) < '1') {
+                if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
                     $peers = [
                         'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
@@ -81,15 +83,11 @@ if (Config::get('enable_bgp')) {
         $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier`, `vrf_oid` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
-            $checkVrf = ' AND vrf_id = ? ';
-            if (empty($vrfId)) {
-                $checkVrf = ' AND `vrf_id` IS NULL ';
-            }
             $vrfOid = $value['vrf_oid'];
             $address = $value['bgpPeerIdentifier'];
 
             if (empty($bgpPeers[$vrfOid][$address])) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]);
+                $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;
