@@ -608,7 +608,7 @@ class Url
         $parsed_get_vars = [];
         if (empty($path)) {
             $path = Request::path();
-        } elseif (Str::startsWith($path, 'http')) {
+        } elseif (Str::startsWith($path, 'http') || str_contains($path, '?')) {
             $parsed_url = parse_url($path);
             $path = $parsed_url['path'] ?? '';
             parse_str($parsed_url['query'] ?? '', $parsed_get_vars);
