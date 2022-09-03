@@ -284,12 +284,61 @@ Note: To use HTML emails you must set HTML email to Yes in the WebUI
 under Global Settings > Alerting Settings > Email transport > Use HTML
 emails
 
-Note: To include Graphs you must enable unauthorized graphs in
-config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+## Graphs
+
+There are two helpers for graphs that will use a signed url to allow secure external
+access.  Anyone using the signed url will be able to view the graph. Your LibreNMS web
+must be accessible from the location where the graph is viewed.
+
+You may specify the graph one of two ways, a php array of parameters, or
+a direct url to a graph.
+
+Note that to and from can be specified either as timestamps with `time()`
+or as relative time `-3d` or `-36h`.  When using relative time, the graph
+will show based on when the user views the graph, not when the event happened.
+Sharing a graph image with a relative time will always give the recipient access
+to current data, where a specific timestamp will only allow access to that timeframe.
+
+### @signedGraphTag
+
+This will insert a specially formatted html img tag linking to the graph.
+Some transports may search the template for this tag to attach images properly
+for that transport.
 
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
-$config['allow_unauth_graphs'] = true;
+@signedGraphTag([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+    'width' => 700, 
+    'height' => 250
+])
+```
+
+Output:
+```html
+<img class="librenms-graph" src="https://librenms.org/graph?from=1662176216&amp;height=250&amp;id=20425&amp;to=1662219416&amp;type=port_bits&amp;width=700&amp;signature=f6e516e8fd893c772eeaba165d027cb400e15a515254de561a05b63bc6f360a4">
+```
+
+Specific graph using url input:
+
+```
+@signedGraphTag('https://librenms.org/graph.php?type=device_processor&from=-2d&device=2&legend=no&height=400&width=1200')
+```
+
+### @signedGraphUrl
+
+This is used when you need the url directly. One example is using the
+API Transport, you may want to include the url only instead of a html tag.
+
+```
+@signedGraphUrl([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+])
 ```
 
 ## Using models for optional data
@@ -355,7 +404,8 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 {{ $key }}: {{ $value['string'] }}<br>
 @endforeach
 @if ($alert->faults) <b>Faults:</b><br>
-@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
+@foreach ($alert->faults as $key => $value)
+@signedGraphTag(['device_id' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach
 Template: CPU alert <br>

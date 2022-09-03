@@ -4,11 +4,6 @@ use LibreNMS\Config;
 
 global $debug;
 
-// Push $_GET into $vars to be compatible with web interface naming
-foreach ($_GET as $name => $value) {
-    $vars[$name] = $value;
-}
-
 [$type, $subtype] = extract_graph_type($vars['type']);
 
 if (isset($vars['device'])) {
@@ -18,14 +13,14 @@ if (isset($vars['device'])) {
 }
 
 // FIXME -- remove these
-$width = $vars['width'];
-$height = $vars['height'];
+$width = $vars['width'] ?? 400;
+$height = $vars['height'] ?? round($width / 3);
 $title = $vars['title'] ?? '';
 $vertical = $vars['vertical'] ?? '';
 $legend = $vars['legend'] ?? false;
 $output = (! empty($vars['output']) ? $vars['output'] : 'default');
-$from = empty($_GET['from']) ? Config::get('time.day') : parse_at_time($_GET['from']);
-$to = empty($_GET['to']) ? Config::get('time.now') : parse_at_time($_GET['to']);
+$from = empty($vars['from']) ? Config::get('time.day') : parse_at_time($vars['from']);
+$to = empty($vars['to']) ? Config::get('time.now') : parse_at_time($vars['to']);
 $period = ($to - $from);
 $prev_from = ($from - $period);
 
@@ -113,6 +108,10 @@ try {
         echo $output === 'base64' ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+    if (\LibreNMS\Util\Debug::isEnabled()) {
+        throw $e;
+    }
+
     if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
         graph_error($width < 200 ? 'No Data' : 'No Data file ' . basename($rrd_filename));
     } else {
