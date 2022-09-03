@@ -296,6 +296,8 @@ a direct url to a graph.
 Note that to and from can be specified either as timestamps with `time()`
 or as relative time `-3d` or `-36h`.  When using relative time, the graph
 will show based on when the user views the graph, not when the event happened.
+Sharing a graph image with a relative time will always give the recipient access
+to current data, where a specific timestamp will only allow access to that timeframe.
 
 ### @signedGraphTag
 
