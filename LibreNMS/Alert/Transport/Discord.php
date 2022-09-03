@@ -84,7 +84,6 @@ class Discord extends Transport
 
         // remove all remaining HTML tags
         $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
-
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         Proxy::applyToCurl($curl);
@@ -108,7 +107,7 @@ class Discord extends Transport
         $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)" />#', function ($match) use (&$data, &$count) {
             $data['embeds'][] = [
                 'image' => [
-                    'url' => urldecode($match[1]),
+                    'url' => $match[1],
                 ],
             ];
 
