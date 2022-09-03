@@ -139,7 +139,7 @@ if (Config::get('enable_bgp')) {
             }
         }
         // clean up peers
-        $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
+        $peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', '=', $device['device_id']);
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
             $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
@@ -150,7 +150,7 @@ if (Config::get('enable_bgp')) {
             if ((empty($vrfId) && empty($bgpPeers[''][$address])) ||
                 (! empty($vrfId) && ! empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
                 (! empty($vrfId) && empty($vrfName))) {
-                $deleted = \App\Models\BgpPeer::where('device_id', $device['device_id'])
+                $deleted = BgpPeer::where('device_id', $device['device_id'])
                     ->where('bgpPeerIdentifier', $address)
                     ->where('vrf_id', $vrfId)
                     ->delete();
