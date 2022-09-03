@@ -32,6 +32,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Url
@@ -325,6 +326,20 @@ class Url
     }
 
     /**
+     * @param  array|string  $args
+     */
+    public static function forExternalGraph($args): string
+    {
+        // handle pasted string
+        if (is_string($args)) {
+            $path = str_replace(url('/') . '/', '', $args);
+            $args = self::parseLegacyPathVars($path);
+        }
+
+        return \URL::signedRoute('graph', $args);
+    }
+
+    /**
      * @param  array  $args
      * @return string
      */
@@ -582,6 +597,57 @@ class Url
         }
 
         return is_null($key) ? $options : $options[$key] ?? $default;
+    }
+
+    /**
+     * Parse variables from legacy path /key=value/key=value or regular get/post variables
+     */
+    public static function parseLegacyPathVars(?string $path = null): array
+    {
+        $vars = [];
+        $parsed_get_vars = [];
+        if (empty($path)) {
+            $path = Request::path();
+        } elseif (Str::startsWith($path, 'http') || str_contains($path, '?')) {
+            $parsed_url = parse_url($path);
+            $path = $parsed_url['path'] ?? '';
+            parse_str($parsed_url['query'] ?? '', $parsed_get_vars);
+        }
+
+        // don't parse the subdirectory, if there is one in the path
+        $base_url = parse_url(Config::get('base_url'))['path'] ?? '';
+        if (strlen($base_url) > 1) {
+            $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
+        } else {
+            $segments = explode('/', trim($path, '/'));
+        }
+
+        // parse the path
+        foreach ($segments as $pos => $segment) {
+            $segment = urldecode($segment);
+            if ($pos === 0) {
+                $vars['page'] = $segment;
+            } else {
+                [$name, $value] = array_pad(explode('=', $segment), 2, null);
+                if (! $value) {
+                    if ($vars['page'] == 'device' && $pos < 3) {
+                        // translate laravel device routes properly
+                        $vars[$pos === 1 ? 'device' : 'tab'] = $name;
+                    } elseif ($name) {
+                        $vars[$name] = 'yes';
+                    }
+                } else {
+                    $vars[$name] = $value;
+                }
+            }
+        }
+
+        $vars = array_merge($vars, $parsed_get_vars);
+
+        // don't leak login data
+        unset($vars['username'], $vars['password']);
+
+        return $vars;
     }
 
     private static function escapeBothQuotes($string)
