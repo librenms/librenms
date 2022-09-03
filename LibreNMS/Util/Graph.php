@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use Rrd;
 
@@ -64,7 +65,7 @@ class Graph
         $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
         $rrd_options = '';
 
-        $auth = null; // FIXME correct?
+        $auth = Auth::guest();
         require base_path("/includes/html/graphs/$type/auth.inc.php");
 
         //set default graph title

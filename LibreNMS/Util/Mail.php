@@ -90,11 +90,11 @@ class Mail
                 $mail->CharSet = 'utf-8';
                 $mail->WordWrap = 76;
                 $mail->Body = $message;
+                if (Config::get('email_attach_graphs')) {
+                    self::embedGraphs($mail);
+                }
                 if ($html) {
                     $mail->isHTML();
-                    if (Config::get('email_embed_graphs')) {
-                        self::embedGraphs($mail);
-                    }
                 }
                 switch (strtolower(trim(Config::get('email_backend')))) {
                     case 'sendmail':
@@ -141,20 +141,23 @@ class Mail
 
         foreach (array_values(array_unique($match[1])) as $attachment_id => $url) {
             try {
-                // fetch image
-                $url_data = parse_url($url);
-                parse_str($url_data['query'] ?? '', $params);
-                $image = Graph::get($params);
+                $cid = "graph$attachment_id";
+
+                // fetch image, do not debug as it will return the wrong format.
+                $prev = Debug::isEnabled();
+                Debug::set(false);
+                $image = Graph::get(Url::parseLegacyPathVars($url));
+                Debug::set($prev);
 
                 // attach image
                 if (Config::get('webui.graph_type') == 'svg') {
-                    $mail->addStringEmbeddedImage($image, $attachment_id, 'graph.svg', 'base64', 'image/svg+xml');
+                    $mail->addStringEmbeddedImage($image, $cid, "$cid.svg", PHPMailer::ENCODING_BASE64, 'image/svg+xml');
                 } else {
-                    $mail->addStringEmbeddedImage($image, $attachment_id, 'graph.png', 'base64', 'image/png');
+                    $mail->addStringEmbeddedImage($image, $cid, "$cid.png", PHPMailer::ENCODING_BASE64, 'image/png');
                 }
 
                 // update image tag to link to attached image
-                $body = str_replace($url, "cid:$attachment_id", $body);
+                $body = str_replace($url, "cid:$cid", $body);
             } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
                 report($e);
             }
