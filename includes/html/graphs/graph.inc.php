@@ -13,8 +13,8 @@ if (isset($vars['device'])) {
 }
 
 // FIXME -- remove these
-$width = $vars['width'];
-$height = $vars['height'];
+$width = $vars['width'] ?? 400;
+$height = $vars['height'] ?? round($width / 3);
 $title = $vars['title'] ?? '';
 $vertical = $vars['vertical'] ?? '';
 $legend = $vars['legend'] ?? false;
