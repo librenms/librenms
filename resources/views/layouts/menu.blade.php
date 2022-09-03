@@ -751,6 +751,15 @@
         });
     }
 
+   addEvent(window, "resize", function(event) {
+        setTimeout(function(){
+            if(!gridster_state) {
+                gridster.disable();
+                gridster.disable_resize();
+            }
+        }, 100);
+    });
+
     @if($browser_push)
         if (localStorage.getItem('notifications') !== 'disabled') {
             Notification.requestPermission().then(function (permission) {
