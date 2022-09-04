@@ -4853,6 +4853,14 @@
                 "git": "Git"
             }
         },
+        "reporting.error": {
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.error.dump": {
+            "default": false,
+            "type": "boolean"
+        },
         "rewrite_if": {
             "type": "array"
         },
@@ -5611,10 +5619,6 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
-        },
-        "reporting.error": {
-            "default": false,
-            "type": "boolean"
         }
     }
 }
