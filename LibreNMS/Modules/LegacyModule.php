@@ -48,6 +48,12 @@ class LegacyModule implements Module
 
     public function poll(OS $os): void
     {
+        if (! is_file(base_path("includes/polling/$this->name.inc.php"))) {
+            echo "Module $this->name does not exist, please remove it from your configuration";
+
+            return;
+        }
+
         $device = &$os->getDeviceArray();
         $device['attribs'] = $os->getDevice()->attribs->toArray();
         Debug::disableErrorReporting(); // ignore errors in legacy code
