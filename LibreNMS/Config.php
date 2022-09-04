@@ -445,6 +445,10 @@ class Config
         self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
+        // remove unused settings
+        self::forget('poller_modules.wifi');
+        self::forget('poller_modules.mib');
+
         // migrate device display
         if (! self::has('device_display_default')) {
             $display_value = '{{ $hostname }}';
