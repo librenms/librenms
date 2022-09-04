@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
@@ -46,7 +47,7 @@ class Graph
      *
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public static function get($vars, $flags = 0): string
+    public static function get($vars, int $flags = 0): string
     {
         define('IGNORE_ERRORS', true);
         chdir(base_path());
@@ -63,13 +64,13 @@ class Graph
 
         [$type, $subtype] = extract_graph_type($vars['type']);
 
+        $graph_title = '';
         if (isset($vars['device'])) {
-            $device = is_numeric($vars['device'])
-                ? device_by_id_cache($vars['device'])
-                : device_by_name($vars['device']);
+            $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : getidbyname($vars['device']));
+            DeviceCache::setPrimary($device['device_id']);
 
             //set default graph title
-            $graph_title = format_hostname($device);
+            $graph_title = DeviceCache::getPrimary()->displayName();
         }
 
         // variables for included graphs
