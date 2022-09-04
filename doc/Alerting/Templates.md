@@ -287,8 +287,12 @@ emails
 ## Graphs
 
 There are two helpers for graphs that will use a signed url to allow secure external
-access.  Anyone using the signed url will be able to view the graph. Your LibreNMS web
-must be accessible from the location where the graph is viewed.
+access.  Anyone using the signed url will be able to view the graph.
+
+ - Your LibreNMS web must be accessible from the location where the graph is viewed.
+   Some alert transports require publicly accessible urls.
+ - APP_URL must be set in .env to use signed graphs.
+ - Changing APP_KEY will invalidate all previously issued singed urls.
 
 You may specify the graph one of two ways, a php array of parameters, or
 a direct url to a graph.
