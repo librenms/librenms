@@ -5591,6 +5591,16 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
+			message: "#^Result of && is always false\\.$#"
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: "#^Variable \\$rrd_filename in empty\\(\\) always exists and is always falsy\\.$#"
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
 			message: "#^Method LibreNMS\\\\Util\\\\Html\\:\\:percentageBar\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Html.php
