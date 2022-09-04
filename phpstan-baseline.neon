@@ -2741,31 +2741,6 @@ parameters:
 			path: LibreNMS/Exceptions/JsonAppWrongVersionException.php
 
 		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$error with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$exit_code with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$image_output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:getImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:\\$image_output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\UnserializableRouteCache\\:\\:__construct\\(\\) has parameter \\$cli_php_version with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/UnserializableRouteCache.php
@@ -5612,11 +5587,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getTypes\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 

@@ -76,13 +76,6 @@ if (! empty($command_only)) {
     return;
 }
 
-// graph sent file not found flag
-if (! empty($no_file)) {
-    graph_error($width < 200 ? 'No Data' : 'No Data file ' . $no_file);
-
-    return;
-}
-
 if (empty($rrd_options)) {
     graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
 
