@@ -42,13 +42,6 @@ if ($auth && is_customoid_graph($type, $subtype)) {
     // Graph Template Missing");
 }
 
-if (! empty($error_msg)) {
-    // We have an error :(
-    graph_error($error_msg);
-
-    return;
-}
-
 if ($auth === null) {
     // We are unauthenticated :(
     graph_error($width < 200 ? 'No Auth' : 'No Authorization');

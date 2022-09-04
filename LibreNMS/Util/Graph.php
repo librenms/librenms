@@ -28,19 +28,34 @@ namespace LibreNMS\Util;
 use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\RrdGraphException;
 use Rrd;
 
 class Graph
 {
-    public static function get($vars): string
+    /**
+     * Fetch a graph image (as string) based on the given $vars
+     * Optionally, override the output format to base64
+     *
+     * @param  array|string  $vars
+     * @param  bool  $base64
+     * @return string
+     * @throws \LibreNMS\Exceptions\RrdGraphException
+     */
+    public static function get($vars, $base64 = false): string
     {
-        global $debug;
         define('IGNORE_ERRORS', true);
+        chdir(base_path());
 
         include_once base_path('includes/dbFacile.php');
         include_once base_path('includes/common.php');
         include_once base_path('includes/html/functions.inc.php');
         include_once base_path('includes/rewrites.php');
+
+        // handle possible graph url input
+        if (is_string($vars)) {
+            $vars = Url::parseLegacyPathVars($vars);
+        }
 
         [$type, $subtype] = extract_graph_type($vars['type']);
 
@@ -50,22 +65,22 @@ class Graph
                 : device_by_name($vars['device']);
         }
 
-        // FIXME -- remove these
-        $width = $vars['width'];
-        $height = $vars['height'];
+        // variables for included graphs
+        $width = $vars['width'] ?? 400;
+        $height = $vars['height'] ?? $width / 3;
         $title = $vars['title'] ?? '';
         $vertical = $vars['vertical'] ?? '';
         $legend = $vars['legend'] ?? false;
-        $output = (! empty($vars['output']) ? $vars['output'] : 'default');
-        $from = empty($vars['from']) ? Config::get('time.day') : parse_at_time($vars['from']);
-        $to = empty($vars['to']) ? Config::get('time.now') : parse_at_time($vars['to']);
+        $output = $base64 ? 'base64' : $vars['output'] ?? 'default';
+        $from = parse_at_time($vars['from'] ?? '-1d');
+        $to = empty($vars['to']) ? time() : parse_at_time($vars['to']);
         $period = ($to - $from);
         $prev_from = ($from - $period);
-
         $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+        Config::set('webui.graph_type', $graph_image_type); // set in case accessed elsewhere
         $rrd_options = '';
+        $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
 
-        $auth = Auth::guest();
         require base_path("/includes/html/graphs/$type/auth.inc.php");
 
         //set default graph title
@@ -77,17 +92,12 @@ class Graph
         } elseif ($auth && is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
             require base_path("/includes/html/graphs/$type/$subtype.inc.php");
         } else {
-            return self::error("$type*$subtype template missing", $vars);
+            throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
 
-        if (! empty($error_msg)) {
-            // We have an error :(
-            return self::error($error_msg, $vars);
-        }
-
-        if ($auth === null) {
+        if (! $auth) {
             // We are unauthenticated :(
-            return self::error($width < 200 ? 'No Auth' : 'No Authorization', $vars);
+            throw new RrdGraphException('No Authorization', 'No Auth', $width, $height);
         }
 
         if ($graph_image_type === 'svg') {
@@ -119,11 +129,11 @@ class Graph
 
         // graph sent file not found flag
         if (! empty($no_file)) {
-            return self::error($width < 200 ? 'No Data' : 'No Data file ' . $no_file, $vars);
+            throw new RrdGraphException('No Data file', 'No Data', $width, $height);
         }
 
         if (empty($rrd_options)) {
-            return self::error($width < 200 ? 'Def Error' : 'Graph Definition Error', $vars);
+            throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
 
         // Generating the graph!
@@ -137,20 +147,21 @@ class Graph
                 return $output === 'base64' ? base64_encode($image_data) : $image_data;
             }
         } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+            // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (\LibreNMS\Util\Debug::isEnabled()) {
                 throw $e;
             }
 
             if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-                return self::error($width < 200 ? 'No Data' : 'No Data file ' . basename($rrd_filename), $vars);
+                throw new RrdGraphException('No Data file' . basename($rrd_filename), 'No Data', $width, $height, $e->getCode(), $e->getImage());
             }
 
-            return self::error($width < 200 ? 'Draw Error' : 'Error Drawing Graph: ' . $e->getMessage(), $vars);
+            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $width, $height, $e->getCode(), $e->getImage());
         }
 
     }
 
-    public static function getTypes()
+    public static function getTypes(): array
     {
         return ['device', 'port', 'application', 'munin', 'service'];
     }
@@ -162,7 +173,7 @@ class Graph
      * @param  Device  $device
      * @return array
      */
-    public static function getSubtypes($type, $device = null)
+    public static function getSubtypes($type, $device = null): array
     {
         $types = [];
 
@@ -199,7 +210,7 @@ class Graph
      * @param  string  $subtype
      * @return bool
      */
-    public static function isMibGraph($type, $subtype)
+    public static function isMibGraph($type, $subtype): bool
     {
         return Config::get("graph_types.$type.$subtype.section") == 'mib';
     }
@@ -222,16 +233,21 @@ class Graph
     /**
      * Create image to output text instead of a graph.
      *
-     * @param  string  $text
-     * @param  array  $vars
-     * @param  int[]  $color
+     * @param  string  $text Error message to display
+     * @param  string|null  $short_text Error message for smaller graph images
+     * @param  int  $width  Width of graph image (defaults to 300)
+     * @param  int|null  $height Height of graph image (defaults to width / 3)
+     * @param  int[]  $color Color of text, defaults to dark red
+     * @return string the generated image
      */
-    public static function error($text, $vars = [], $color = [128, 0, 0]): string
+    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0]): string
     {
         $type = Config::get('webui.graph_type');
+        $height = $height ?? $width / 3;
 
-        $width = (int) ($vars['width'] ?? 150);
-        $height = (int) ($vars['height'] ?? 60);
+        if ($short_text !== null && $width < 200) {
+            $text = $short_text;
+        }
 
         if ($type === 'svg') {
             $rgb = implode(', ', $color);

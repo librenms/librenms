@@ -81,7 +81,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Blade::directive('graphImage', function ($vars, $base64 = false) {
-            return "<?php echo \LibreNMS\Util\Graph::get(is_array($vars) ? $vars : \LibreNMS\Util\Url::parseLegacyPathVars($vars), $base64); ?>";
+            return "<?php echo \LibreNMS\Util\Graph::get($vars, $base64); ?>";
         });
     }
 

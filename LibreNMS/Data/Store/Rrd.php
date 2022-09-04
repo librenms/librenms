@@ -559,7 +559,6 @@ class Rrd extends BaseDatastore
      * @param  string  $options
      * @return string
      *
-     * @throws \LibreNMS\Exceptions\FileExistsException
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
     public function graph(string $options): string
@@ -568,9 +567,13 @@ class Rrd extends BaseDatastore
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
-        $command = $this->buildCommand('graph', '-', $options);
-        $process->setInput($command . "\nquit");
-        $process->run();
+        try {
+            $command = $this->buildCommand('graph', '-', $options);
+            $process->setInput($command . "\nquit");
+            $process->run();
+        } catch (FileExistsException $e) {
+            throw new RrdGraphException($e->getMessage(), 'File Exists');
+        }
 
         $feedback_position = strrpos($process->getOutput(), 'OK ');
         if ($feedback_position !== false) {
@@ -584,6 +587,9 @@ class Rrd extends BaseDatastore
             $position += strlen($search);
             throw new RrdGraphException(
                 substr($process->getOutput(), $position),
+                null,
+                null,
+                null,
                 $process->getExitCode(),
                 substr($process->getOutput(), 0, $position)
             );
@@ -591,7 +597,7 @@ class Rrd extends BaseDatastore
 
         // only error text was returned
         $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
-        throw new RrdGraphException($error, $process->getExitCode(), '');
+        throw new RrdGraphException($error, null, null, null, $process->getExitCode());
     }
 
     private function getImageEnd(string $type): string

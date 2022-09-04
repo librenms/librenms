@@ -438,7 +438,7 @@ function generate_port_image($args)
  */
 function graph_error($text, $color = [128, 0, 0])
 {
-    echo \LibreNMS\Util\Graph::error($text, $color);
+    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
 }
 
 /**
