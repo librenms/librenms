@@ -10,6 +10,7 @@ if (empty($ports)) {
     graph_text_and_exit('No Ports');
 }
 
+$i = 0;
 foreach ($ports as $port) {
     $ignore = 0;
     if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
