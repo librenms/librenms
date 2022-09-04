@@ -5596,7 +5596,7 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Variable \\$rrd_filename in empty\\(\\) always exists and is always falsy\\.$#"
+			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
