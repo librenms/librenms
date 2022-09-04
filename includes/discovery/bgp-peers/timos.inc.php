@@ -44,12 +44,12 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeersCache);
 
         foreach ($bgpPeers as $vrfOid => $vrf) {
-            $vrfId = Vrf::select('vrf_id')->where('device_id', '=', $device['device_id'])->where('vrf_oid', '=', $vrfOid)->first();
+            $vrfId = Vrf::select('vrf_id')->firstWhere('vrf_oid', $vrfOid)->first();
             d_echo($vrfId);
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
 
-                if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
+                if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                     $peers = [
                         'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
@@ -67,7 +67,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                    dbInsert($peers, 'bgpPeers');
+                    BgpPeer::create($peers);
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
                         discover_new_device($name, $device, 'BGP');
@@ -87,7 +87,7 @@ if (Config::get('enable_bgp')) {
             $address = $value['bgpPeerIdentifier'];
 
             if (empty($bgpPeers[$vrfOid][$address])) {
-                $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
+                $deleted = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;

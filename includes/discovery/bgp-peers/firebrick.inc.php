@@ -56,14 +56,14 @@ foreach ($bgpPeers as $vrfId => $vrf) {
             'device_id' => $device['device_id'],
         ];
 
-        if (! Vrf::where('device_id', '=', $device['device_id'])->where('vrf_oid', '=', $vrfs['vrf_oid'])->count()) {
+        if (! DeviceCache::getPrimary()->vrfs()->where('vrf_oid', $vrfs['vrf_oid'])->exists()) {
             //Should we insert a VRF here ? We are not in the VRF module !
             dbInsert($vrfs, 'vrfs');
         }
     }
     foreach ($vrf as $address => $value) {
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
-        if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
+        if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
             $peers = [
                 'device_id' => $device['device_id'],
                 'vrf_id' => $vrfId,
@@ -81,7 +81,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
                 'bgpPeerInUpdateElapsedTime' => 0,
                 'astext' => $astext,
             ];
-            dbInsert($peers, 'bgpPeers');
+            BgpPeer::create($peers);
             if (Config::get('autodiscovery.bgp')) {
                 $name = gethostbyaddr($address);
                 discover_new_device($name, $device, 'BGP');
@@ -94,7 +94,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
     }
 }
 // clean up peers
-$peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', '=', $device['device_id']);
+$peers = DeviceCache::getPrimary()->bgppeers()->select('vrf_id', 'bgpPeerIdentifier');
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
     $address = $value['bgpPeerIdentifier'];
@@ -102,7 +102,7 @@ foreach ($peers as $value) {
     // Cleanup code to deal with 0 vs Null in the DB
     if ($vrfId === 0) {
         // Database says it's table 0 - which is wrong.  It should be "null" for global table
-        $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
+        $deleted = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
         echo str_repeat('-', $deleted);
         continue;
     } else {
@@ -110,7 +110,7 @@ foreach ($peers as $value) {
     }
 
     if (empty($bgpPeers[$testVrfId][$address])) {
-        $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
+        $deleted = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
         echo str_repeat('-', $deleted);
     }
 }

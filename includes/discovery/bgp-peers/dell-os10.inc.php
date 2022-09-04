@@ -42,7 +42,7 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeersCache);
 
         foreach ($bgpPeers as $vrfInstance => $peer) {
-            $vrfId = Vrf::select('vrf_id')->where('device_id', '=', $device['device_id'])->where('vrf_oid', '=', $vrfInstance)->first();
+            $vrfId = DeviceCache::getPrimary()->vrfs()->select('vrf_id')->firstWhere('vrf_oid', $vrfInstance);
             if (is_null($vrfId)) {
                 $vrfId = 1; // According to the MIB
             }
@@ -54,7 +54,7 @@ if (Config::get('enable_bgp')) {
                 // Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
                 $bgpLocalAs = $value['os10bgp4V2PeerLocalAs'];
 
-                if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
+                if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                     $row = [
                         'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
@@ -99,8 +99,8 @@ if (Config::get('enable_bgp')) {
         }
 
         // clean up peers
-        if (Vrf::where('device_id', '=', $device['device_id'])->count() == 0) {
-            $peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', '=', $device['device_id']);
+        if (Vrf::where('device_id', $device['device_id'])->count() == 0) {
+            $peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', $device['device_id']);
         } else {
             $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
         }
@@ -109,7 +109,7 @@ if (Config::get('enable_bgp')) {
             $address = $peer['bgpPeerIdentifier'];
 
             if (empty($bgpPeers[$vrfInstance][$address])) {
-                $deleted = BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
+                $deleted = BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;

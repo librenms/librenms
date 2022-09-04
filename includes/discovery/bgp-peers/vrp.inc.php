@@ -25,7 +25,6 @@
  */
 
 use App\Models\BgpPeer;
-use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -40,7 +39,7 @@ if (Config::get('enable_bgp')) {
 
     // So if we have HUAWEI BGP entries or if we don't have anything from HUAWEI nor BGP4-MIB
     if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
-        $vrfs = Vrf::select('vrf_id', 'vrf_name')->where('device_id', '=', $device['device_id']);
+        $vrfs = DeviceCache::getPrimary()->vrfs()->select('vrf_id', 'vrf_name');
         foreach ($vrfs as $vrf) {
             $map_vrf['byId'][$vrf['vrf_id']]['vrf_name'] = $vrf['vrf_name'];
             $map_vrf['byName'][$vrf['vrf_name']]['vrf_id'] = $vrf['vrf_id'];
@@ -90,7 +89,7 @@ if (Config::get('enable_bgp')) {
 
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['hwBgpPeerRemoteAs']);
-                if (BgpPeer::where('device_id', '=', $device['device_id'])->where('bgpPeerIdentifier', '=', $address)->where('vrf_id', '=', $vrfId)->count() < 1) {
+                if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                     $peers = [
                         'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
@@ -139,7 +138,7 @@ if (Config::get('enable_bgp')) {
             }
         }
         // clean up peers
-        $peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', '=', $device['device_id']);
+        $peers = DeviceCache::getPrimary()->bgppeers()->select('vrf_id', 'bgpPeerIdentifier');
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
             $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
