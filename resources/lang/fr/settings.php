@@ -396,8 +396,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',

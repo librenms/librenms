@@ -81,7 +81,7 @@ $config['poller_modules']['ospf']                        = true;
 $config['poller_modules']['cisco-ipsec-flow-monitor']    = false;
 $config['poller_modules']['cisco-remote-access-monitor'] = false;
 $config['poller_modules']['cisco-cef']                   = false;
-$config['poller_modules']['cisco-sla']                   = false;
+$config['poller_modules']['slas']                        = false;
 $config['poller_modules']['cisco-mac-accounting']        = false;
 $config['poller_modules']['cipsec-tunnels']              = false;
 $config['poller_modules']['cisco-ace-loadbalancer']      = false;
@@ -169,7 +169,7 @@ configured to be ignored by config options.
 
 `cisco-cef`: CEF detection and support.
 
-`cisco-sla`: SLA detection and support.
+`slas`: SLA detection and support.
 
 `cisco-mac-accounting`: MAC Address account support.
 

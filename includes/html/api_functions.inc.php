@@ -194,8 +194,8 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
         $out_rate = $port['ifOutOctets_rate'] * 8;
         $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
         $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
-        $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
+        $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
+        $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
         $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
         $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 

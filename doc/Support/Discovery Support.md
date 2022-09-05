@@ -76,7 +76,7 @@ $config['discovery_modules']['cisco-mac-accounting'] = false;
 $config['discovery_modules']['cisco-pw']             = false;
 $config['discovery_modules']['vrf']                  = false;
 $config['discovery_modules']['cisco-cef']            = false;
-$config['discovery_modules']['cisco-sla']            = false;
+$config['discovery_modules']['slas']                 = false;
 $config['discovery_modules']['cisco-cbqos']          = false;
 $config['discovery_modules']['cisco-otv']            = false;
 $config['discovery_modules']['ipv4-addresses']       = true;
@@ -175,7 +175,7 @@ device, with history data.
 
 `cisco-cef`: CEF detection and support.
 
-`cisco-sla`: SLA detection and support.
+`slas`: SLA detection and support.
 
 `vmware-vminfo`: Detection of vmware guests on an ESXi host
 

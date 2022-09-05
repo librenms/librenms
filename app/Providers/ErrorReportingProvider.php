@@ -30,6 +30,7 @@ use App\Logging\Reporting\Middleware\SetGroups;
 use ErrorException;
 use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Git;
@@ -45,8 +46,14 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
     public function boot(): void
     {
+        if (! method_exists(\Facade\FlareClient\Flare::class, 'filterReportsUsing')) {
+            Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
+
+            return;
+        }
+
         Flare::filterExceptionsUsing(function (\Exception $e) {
-            if (Config::get('reporting.error.dump')) {
+            if (Config::get('reporting.dump_errors')) {
                 dump('Exception: ' . $e->getMessage(), $e->getFile() . ':' . $e->getLine());
             }
 
@@ -92,7 +99,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         $this->reportingEnabled = false; // don't cache before config is loaded
 
         // check the user setting
-        if (! Config::get('reporting.error')) {
+        if (Config::get('reporting.error') !== true) {
             \Log::debug('Reporting disabled by user setting');
 
             return false;

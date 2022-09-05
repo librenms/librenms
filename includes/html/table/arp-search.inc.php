@@ -66,7 +66,7 @@ $sql = "SELECT *,`P`.`ifDescr` AS `interface` $sql";
 
 foreach (dbFetchRows($sql, $param) as $entry) {
     $entry = cleanPort($entry);
-    if (! empty($ignore)) {
+    if (empty($ignore)) {
         if ($entry['ifInErrors'] > 0 || $entry['ifOutErrors'] > 0) {
             $error_img = generate_port_link($entry, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
         } else {

@@ -96,7 +96,7 @@ which modules are enabled/disabled by default.
 ```yaml
 discovery_modules:
      cisco-cef: true
-     cisco-sla: true
+     slas: true
      cisco-mac-accounting: false
 ```
 
