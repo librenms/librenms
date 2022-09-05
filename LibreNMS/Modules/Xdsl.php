@@ -49,22 +49,26 @@ class Xdsl implements Module
     /** @var string[] */
     private $ifNameMap;
 
-
     /**
      * @inheritDoc
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
-        //discover if any port has dsl data.
-//        $this->pollAdsl($os, false);
+        //discover if any port has dsl data. We use the pollXdsl functions, with the store parameter set to false
+        $this->pollAdsl($os, false);
         $this->pollVdsl($os, false);
     }
 
     /**
-     * @inheritDoc
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
+        //only do polling if at least one portAdsl was discovered
         if ($os->getDevice()->portsAdsl()->exists()) {
             $this->pollAdsl($os);
         }
@@ -77,12 +81,20 @@ class Xdsl implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os)
+    public function cleanup(OS $os): void
     {
         $os->getDevice()->portsAdsl()->delete();
         $os->getDevice()->portsVdsl()->delete();
     }
 
+    /**
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param  \LibreNMS\OS  $os
+     * @param  bool  $store
+     */
     private function pollAdsl(OS $os, $store = true): Collection
     {
         $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->mapTable(function ($data, $ifIndex) use ($os, $store) {
@@ -109,9 +121,18 @@ class Xdsl implements Module
         });
 
         ModuleModelObserver::observe(PortAdsl::class);
+
         return $this->syncModels($os->getDevice(), 'portsAdsl', $adsl);
     }
 
+    /**
+     * Poll data for this module and update the DB / RRD.
+     * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
+     * Run frequently (default every 5 minutes)
+     *
+     * @param  \LibreNMS\OS  $os
+     * @param  bool  $store
+     */
     private function pollVdsl(OS $os, $store = true): Collection
     {
         $vdsl = \SnmpQuery::hideMib()->walk(['VDSL2-LINE-MIB::xdsl2ChannelStatusTable', 'VDSL2-LINE-MIB::xdsl2LineTable'])->table(1);
@@ -138,6 +159,7 @@ class Xdsl implements Module
         }
 
         ModuleModelObserver::observe(PortVdsl::class);
+
         return $this->syncModels($os->getDevice(), 'portsVdsl', $vdslPorts);
     }
 
@@ -209,7 +231,7 @@ class Xdsl implements Module
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2LineStatusAttainableRate'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('ds', 'GAUGE', 0)
-                ->addDataset('us', 'GAUGE', 0)
+                ->addDataset('us', 'GAUGE', 0),
         ], [
             'ds' => $data['xdsl2LineStatusAttainableRateDs'] ?? null,
             'us' => $data['xdsl2LineStatusAttainableRateUs'] ?? null,

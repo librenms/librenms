@@ -340,10 +340,12 @@ $vdsl_id = false;
 
 foreach ($components as $tmp_component_id => $tmp_component) {
     if ($tmp_component['name'] == 'adsl-port') {
-        $adsl_id = $tmp_component_id;
+        // No more polling outside the module
+        // $adsl_id = $tmp_component_id;
     }
     if ($tmp_component['name'] == 'vdsl-port') {
-        $vdsl_id = $tmp_component_id;
+        // No more polling outside the module
+        // $vdsl_id = $tmp_component_id;
     }
 }
 
