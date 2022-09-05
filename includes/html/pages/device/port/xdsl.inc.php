@@ -28,7 +28,6 @@ if (Rrd::checkRrdExists(Rrd::name($device['hostname'], Rrd::portName($port['port
 }
 
 if (Rrd::checkRrdExists(Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'xdsl2LineStatusAttainableRate')))) {
-    $iid = $id;
     echo '<div class=graphhead>VDSL Current Line Speed</div>';
     $graph_type = 'port_vdsl_speed';
 
