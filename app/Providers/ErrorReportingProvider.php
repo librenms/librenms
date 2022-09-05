@@ -92,7 +92,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         $this->reportingEnabled = false; // don't cache before config is loaded
 
         // check the user setting
-        if (! Config::get('reporting.error')) {
+        if (Config::get('reporting.error') !== true) {
             \Log::debug('Reporting disabled by user setting');
 
             return false;
