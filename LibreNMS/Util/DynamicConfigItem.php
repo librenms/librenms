@@ -219,23 +219,23 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     // ArrayAccess functions
-    public function offsetExists(mixed $offset): bool
+    public function offsetExists($offset): bool
     {
         return isset($this->$offset);
     }
 
     #[\ReturnTypeWillChange]
-    public function offsetGet(mixed $offset)
+    public function offsetGet($offset)
     {
         return isset($this->$offset) ? $this->$offset : null;
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void
+    public function offsetSet($offset, $value): void
     {
         $this->$offset = $value;
     }
 
-    public function offsetUnset(mixed $offset): void
+    public function offsetUnset($offset): void
     {
         unset($this->$offset);
     }
