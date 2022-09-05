@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
 use App\Plugins\Hooks\PortTabHook;
@@ -84,13 +85,13 @@ if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPh
     $menu_options['sensors'] = 'Health';
 }
 
-if (PortAdsl::where('port_id', '=', $port->port_id)->count()) {
+if (PortAdsl::where('port_id', $port->port_id)->count()) {
     $menu_options['xdsl'] = 'xDSL';
-} elseif (PortVdsl::where('port_id', '=', $port->port_id)->count()) {
+} elseif (PortVdsl::where('port_id', $port->port_id)->count()) {
     $menu_options['xdsl'] = 'xDSL';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '" . $port->ifIndex . "' and `device_id` = '" . $device['device_id'] . "'")) {
+if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex)->count()) {
     $menu_options['pagp'] = 'PAgP';
 }
 
@@ -108,7 +109,7 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
-$portModel = \App\Models\Port::find($port->port_id);
+$portModel = Port::find($port->port_id);
 
 if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
