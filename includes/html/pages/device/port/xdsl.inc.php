@@ -1,6 +1,6 @@
 <?php
 
-if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'adsl'))) {
+if (Rrd::checkRrdExists(Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'adsl')))) {
     echo '<div class=graphhead>ADSL Current Line Speed</div>';
     $graph_type = 'port_adsl_speed';
 
@@ -27,7 +27,7 @@ if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'ad
     include 'includes/html/print-interface-graphs.inc.php';
 }
 
-if (file_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'xdsl2LineStatusAttainableRate'))) {
+if (Rrd::checkRrdExists(Rrd::name($device['hostname'], Rrd::portName($port['port_id'], 'xdsl2LineStatusAttainableRate')))) {
     $iid = $id;
     echo '<div class=graphhead>VDSL Current Line Speed</div>';
     $graph_type = 'port_vdsl_speed';
