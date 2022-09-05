@@ -44,8 +44,6 @@ class SetInstanceId
         } catch (\Exception $e) {
         }
 
-        dd($report);
-
         return $next($report);
     }
 }
