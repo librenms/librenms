@@ -63,7 +63,6 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->mempool_used = $used * $this->mempool_precision;
         $this->mempool_free = $free * $this->mempool_precision;
         $percent = $this->normalizePercent($percent); // don't assign to model or it loses precision
-        $this->mempool_perc = $percent;
 
         if (! $this->mempool_total) {
             if (! $percent && $percent !== 0.0) {
@@ -87,6 +86,8 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
         if ($percent == null) {
             $this->mempool_perc = $this->mempool_used / $this->mempool_total * 100;
+        } else {
+            $this->mempool_perc = $percent;
         }
 
         return $this;
