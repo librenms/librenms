@@ -4857,7 +4857,7 @@
             "default": false,
             "type": "boolean"
         },
-        "reporting.error.dump": {
+        "reporting.dump_errors": {
             "default": false,
             "type": "boolean"
         },
