@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
-class PortVdsl extends PortRelatedModel
+use LibreNMS\Interfaces\Models\Keyable;
+
+class PortVdsl extends PortRelatedModel implements Keyable
 {
+    protected $table = 'ports_vdsl';
+    protected $primaryKey = 'port_id';
+    public $timestamps = false;
     protected $fillable = [
         'port_id',
         'xdsl2LineStatusAttainableRateDs',
@@ -13,7 +18,12 @@ class PortVdsl extends PortRelatedModel
         'xdsl2LineStatusActAtpDs',
         'xdsl2LineStatusActAtpUs',
     ];
-    protected $table = 'ports_vdsl';
-    protected $primaryKey = 'port_id';
-    public $timestamps = false;
+
+    /**
+     * @inheritDoc
+     */
+    public function getCompositeKey()
+    {
+        return $this->port_id;
+    }
 }

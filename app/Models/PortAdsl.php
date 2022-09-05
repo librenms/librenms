@@ -2,8 +2,13 @@
 
 namespace App\Models;
 
-class PortAdsl extends PortRelatedModel
+use LibreNMS\Interfaces\Models\Keyable;
+
+class PortAdsl extends PortRelatedModel implements Keyable
 {
+    protected $table = 'ports_adsl';
+    protected $primaryKey = 'port_id';
+    public $timestamps = false;
     protected $fillable = [
         'port_id',
         'adslLineCoding',
@@ -24,7 +29,12 @@ class PortAdsl extends PortRelatedModel
         'adslAturCurrOutputPwr',
         'adslAturCurrAttainableRate',
     ];
-    protected $table = 'ports_adsl';
-    protected $primaryKey = 'port_id';
-    public $timestamps = false;
+
+    /**
+     * @inheritDoc
+     */
+    public function getCompositeKey()
+    {
+        return $this->port_id;
+    }
 }
