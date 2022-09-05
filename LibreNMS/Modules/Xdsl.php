@@ -97,32 +97,37 @@ class Xdsl implements Module
      */
     private function pollAdsl(OS $os, $store = true): Collection
     {
-        $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->mapTable(function ($data, $ifIndex) use ($os, $store) {
-            $port = new PortAdsl($data);
+        $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->table(1);
 
-            // trim SnmpAdminStrings
-            foreach ($this->trimAdminString as $oid) {
-                $port->$oid = rtrim($port->$oid, '.');
-            }
-
+        $adslPorts = new Collection;
+        foreach ($adsl as $ifIndex => $data) {
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
-                $port->$oid = $port->$oid / 10;
+                if (isset($data[$oid])) {
+                    $data[$oid] = $data[$oid] / 10;
+                }
             }
 
-            $port->port_id = $os->ifIndexToId($ifIndex);
+            $portAdsl = new PortAdsl($data);
+            d_echo($data);
+            // trim SnmpAdminStrings
+            foreach ($this->trimAdminString as $oid) {
+                $portAdsl->$oid = rtrim($portAdsl->$oid, '.');
+            }
+
+            $portAdsl->port_id = $os->ifIndexToId($ifIndex);
 
             if ($store) {
-                $this->storeAdsl($port, $data, (int) $ifIndex, $os);
-                echo 'ADSL (' . $port->adslLineCoding . '/' . Number::formatSi($port->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($port->adslAturChanCurrTxRate, 2, 3, 'bps') . ')';
+                $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os);
+                echo 'ADSL (' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ')';
             }
 
-            return $port;
-        });
+            $adslPorts->push($portAdsl);
+        }
 
         ModuleModelObserver::observe(PortAdsl::class);
 
-        return $this->syncModels($os->getDevice(), 'portsAdsl', $adsl);
+        return $this->syncModels($os->getDevice(), 'portsAdsl', $adslPorts);
     }
 
     /**
@@ -144,11 +149,14 @@ class Xdsl implements Module
                 'xdsl2ChStatusActDataRateXtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? 0,
                 'xdsl2ChStatusActDataRateXtuc' => $data['xdsl2ChStatusActDataRate']['xtuc'] ?? 0,
             ]);
-            $portVdsl->fill($data); // fill oids that are one to one
 
-            foreach ($this->adslTenthValues as $oid) {
-                $portVdsl->$oid = $portVdsl->$oid / 10;
+            foreach ($this->vdslTenthValues as $oid) {
+                if (isset($data[$oid])) {
+                    $data[$oid] = $data[$oid] / 10;
+                }
             }
+
+            $portVdsl->fill($data); // fill oids that are one to one
 
             if ($store) {
                 $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os);
@@ -191,16 +199,16 @@ class Xdsl implements Module
             ->addDataset('AturChanUncorrectBl', 'COUNTER', null, 100000000000);
 
         $fields = [
-            'AtucCurrSnrMgn' => $data['adslAtucCurrSnrMgn'] > 1280 ? null : $data['adslAtucCurrSnrMgn'],
-            'AtucCurrAtn' => $data['adslAtucCurrAtn'],
-            'AtucCurrOutputPwr' => $data['adslAtucCurrOutputPwr'],
-            'AtucCurrAttainableRate' => $data['adslAtucCurrAttainableRate'],
-            'AtucChanCurrTxRate' => $data['adslAtucChanCurrTxRate'],
-            'AturCurrSnrMgn' => $data['adslAturCurrSnrMgn'] > 1280 ? null : $data['adslAturCurrSnrMgn'],
-            'AturCurrAtn' => $data['adslAturCurrAtn'],
-            'AturCurrOutputPwr' => $data['adslAturCurrOutputPwr'],
-            'AturCurrAttainableRate' => $data['adslAturCurrAttainableRate'],
-            'AturChanCurrTxRate' => $data['adslAturChanCurrTxRate'],
+            'AtucCurrSnrMgn' => ($data['adslAtucCurrSnrMgn'] ?? 0) > 1280 ? null : ($data['adslAtucCurrSnrMgn'] ?? null),
+            'AtucCurrAtn' => $data['adslAtucCurrAtn'] ?? null,
+            'AtucCurrOutputPwr' => $data['adslAtucCurrOutputPwr'] ?? null,
+            'AtucCurrAttainableRate' => $data['adslAtucCurrAttainableRate'] ?? null,
+            'AtucChanCurrTxRate' => $data['adslAtucChanCurrTxRate'] ?? null,
+            'AturCurrSnrMgn' => ($data['adslAturCurrSnrMgn'] ?? 0) > 1280 ? null : ($data['adslAturCurrSnrMgn'] ?? null),
+            'AturCurrAtn' => $data['adslAturCurrAtn'] ?? null,
+            'AturCurrOutputPwr' => $data['adslAturCurrOutputPwr'] ?? null,
+            'AturCurrAttainableRate' => $data['adslAturCurrAttainableRate'] ?? null,
+            'AturChanCurrTxRate' => $data['adslAturChanCurrTxRate'] ?? null,
             'AtucPerfLofs' => $data['adslAtucPerfLofs'] ?? null,
             'AtucPerfLoss' => $data['adslAtucPerfLoss'] ?? null,
             'AtucPerfLprs' => $data['adslAtucPerfLprs'] ?? null,
@@ -245,8 +253,8 @@ class Xdsl implements Module
                 ->addDataset('xtuc', 'GAUGE', 0)
                 ->addDataset('xtur', 'GAUGE', 0),
         ], [
-            'xtuc' => $data['xdsl2ChStatusActDataRate']['xtuc'],
-            'xtur' => $data['xdsl2ChStatusActDataRate']['xtur'],
+            'xtuc' => $data['xdsl2ChStatusActDataRate']['xtuc'] ?? null,
+            'xtur' => $data['xdsl2ChStatusActDataRate']['xtur'] ?? null,
         ]);
 
         // power levels
