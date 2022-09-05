@@ -98,8 +98,8 @@ class Xdsl implements Module
     private function pollAdsl(OS $os, $store = true): Collection
     {
         $adsl = \SnmpQuery::hideMib()->walk('ADSL-LINE-MIB::adslMibObjects')->table(1);
-
         $adslPorts = new Collection;
+
         foreach ($adsl as $ifIndex => $data) {
             // Values are 1/10
             foreach ($this->adslTenthValues as $oid) {
@@ -109,7 +109,7 @@ class Xdsl implements Module
             }
 
             $portAdsl = new PortAdsl($data);
-            d_echo($data);
+
             // trim SnmpAdminStrings
             foreach ($this->trimAdminString as $oid) {
                 $portAdsl->$oid = rtrim($portAdsl->$oid, '.');
@@ -119,7 +119,7 @@ class Xdsl implements Module
 
             if ($store) {
                 $this->storeAdsl($portAdsl, $data, (int) $ifIndex, $os);
-                echo 'ADSL (' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ')';
+                echo ' ADSL(' . $portAdsl->adslLineCoding . '/' . Number::formatSi($portAdsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($portAdsl->adslAturChanCurrTxRate, 2, 3, 'bps') . ') ';
             }
 
             $adslPorts->push($portAdsl);
@@ -141,8 +141,8 @@ class Xdsl implements Module
     private function pollVdsl(OS $os, $store = true): Collection
     {
         $vdsl = \SnmpQuery::hideMib()->walk(['VDSL2-LINE-MIB::xdsl2ChannelStatusTable', 'VDSL2-LINE-MIB::xdsl2LineTable'])->table(1);
-
         $vdslPorts = new Collection;
+
         foreach ($vdsl as $ifIndex => $data) {
             $portVdsl = new PortVdsl([
                 'port_id' => $os->ifIndexToId($ifIndex),
@@ -160,7 +160,7 @@ class Xdsl implements Module
 
             if ($store) {
                 $this->storeVdsl($portVdsl, $data, (int) $ifIndex, $os);
-                echo 'VDSL (' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') . ') \n';
+                echo ' VDSL(' . $os->ifIndexToName($ifIndex) . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($portVdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps') . ') ';
             }
 
             $vdslPorts->push($portVdsl);

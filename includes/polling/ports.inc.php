@@ -904,15 +904,6 @@ foreach ($ports as $port) {
                 include 'ports/port-etherlike.inc.php';
             }
 
-            // Do ADSL MIB
-            if ($adsl_id) {
-                include 'ports/port-adsl.inc.php';
-            }
-            // Do VDSL MIB
-            if ($vdsl_id) {
-                include 'ports/port-vdsl.inc.php';
-            }
-
             // Do PoE MIBs
             if (Config::get('enable_ports_poe')) {
                 include 'ports/port-poe.inc.php';

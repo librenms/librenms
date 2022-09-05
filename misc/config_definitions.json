@@ -1066,7 +1066,7 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.xsdl": {
+        "discovery_modules.xdsl": {
             "order": 255,
             "group": "discovery",
             "section": "discovery_modules",

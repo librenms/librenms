@@ -1,7 +1,5 @@
 <?php
 
-use App\Models\Port;
-
 echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
 
 echo '<tr><th>Port</th><th>Traffic</th><th>Sync Speed</th><th>Attainable Speed</th><th>Attenuation</th><th>SNR Margin</th><th>Output Powers</th></tr>';

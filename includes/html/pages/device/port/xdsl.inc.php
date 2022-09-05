@@ -37,4 +37,9 @@ if (Rrd::checkRrdExists(Rrd::name($device['hostname'], Rrd::portName($port['port
     $graph_type = 'port_vdsl_attainable';
 
     include 'includes/html/print-interface-graphs.inc.php';
+
+    echo '<div class=graphhead>VDSL Output Powers</div>';
+    $graph_type = 'port_vdsl_power';
+
+    include 'includes/html/print-interface-graphs.inc.php';
 }
