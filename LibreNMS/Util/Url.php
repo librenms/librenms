@@ -517,7 +517,7 @@ class Url
 
     /**
      * @param  string  $os
-     * @param  string  $feature
+     * @param  string|null  $feature
      * @param  string  $icon
      * @param  string  $dir  directory to search in (images/os/ or images/logos)
      * @return string
@@ -527,7 +527,7 @@ class Url
         $possibilities = [$icon];
 
         if ($os) {
-            if ($os == 'linux') {
+            if ($os == 'linux' && $feature) {
                 // first, prefer the first word of $feature
                 $distro = Str::before(strtolower(trim($feature)), ' ');
                 $possibilities[] = "$distro.svg";
