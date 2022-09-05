@@ -46,7 +46,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
     public function boot(): void
     {
-        if (! method_exists(Flare::class, 'filterReportsUsing')) {
+        if (! method_exists(\Facade\FlareClient\Flare::class, 'filterReportsUsing')) {
             Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
 
             return;
