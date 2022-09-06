@@ -46,7 +46,7 @@ class Mail extends Transport
             $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
         }
 
-        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html, $this->config['attach-graph']);
+        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html, $this->config['attach-graph'] ?? null);
     }
 
     public static function configTemplate()
@@ -64,7 +64,7 @@ class Mail extends Transport
                     'name' => 'attach-graph',
                     'descr' => 'Include graph image data in the email.  Will be embedded if html5, otherwise attached. Template must use @signedGraphTag',
                     'type' => 'checkbox',
-                    'default' => false,
+                    'default' => null,
                 ],
             ],
             'validation' => [
