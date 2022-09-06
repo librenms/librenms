@@ -18,6 +18,7 @@ class GraphController extends Controller
     public function __invoke(Request $request, string $path = ''): Response
     {
         $vars = array_merge(Url::parseLegacyPathVars($request->path()), $request->except(['username', 'password']));
+        $vars['graph_type'] = $vars['graph_type'] ?? Config::get('webui.graph_type');
 
         if (\Auth::check()) {
             // only allow debug for logged in users
@@ -25,7 +26,7 @@ class GraphController extends Controller
         }
 
         $headers = [
-            'Content-type' => Config::get('webui.graph_type') == 'svg' ? 'image/svg+xml' : 'image/png',
+            'Content-type' => Graph::imageType($vars['graph_type']),
         ];
 
         try {

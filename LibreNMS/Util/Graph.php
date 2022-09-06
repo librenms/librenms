@@ -34,8 +34,9 @@ use Rrd;
 
 class Graph
 {
-    const BASE64_OUTPUT = 1;
-    const COMMAND_ONLY = 2;
+    const BASE64_OUTPUT = 1; // BASE64 encoded image data
+    const INLINE_BASE64 = 2; // img src inline base64 image
+    const COMMAND_ONLY = 4; // just print the command
 
     /**
      * Fetch a graph image (as string) based on the given $vars
@@ -79,7 +80,7 @@ class Graph
         $title = $vars['title'] ?? '';
         $vertical = $vars['vertical'] ?? '';
         $legend = $vars['legend'] ?? false;
-        $output = $flags & self::BASE64_OUTPUT ? 'base64' : $vars['output'] ?? 'default';
+        $output = $vars['output'] ?? 'default';
         $from = parse_at_time($vars['from'] ?? '-1d');
         $to = empty($vars['to']) ? time() : parse_at_time($vars['to']);
         $period = ($to - $from);
@@ -140,12 +141,16 @@ class Graph
         try {
             $image_data = Rrd::graph($rrd_options);
 
-            // output the graph
+            // output the graph int the desired format
             if (Debug::isEnabled()) {
-                return '<img src="data:' . get_image_type($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
-            } else {
-                return $output === 'base64' ? base64_encode($image_data) : $image_data;
+                return '<img src="data:' . self::imageType($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+            } elseif ($flags & self::BASE64_OUTPUT || $output == 'base64') {
+                return base64_encode($image_data);
+            } elseif ($flags & self::INLINE_BASE64 || $output == 'inline-base64') {
+                return 'data:' . self::imageType($graph_image_type) . ';base64,' . base64_encode($image_data);
             }
+
+            return $image_data; // raw data
         } catch (RrdGraphException $e) {
             // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (Debug::isEnabled()) {
@@ -227,6 +232,17 @@ class Graph
         $os_group = Config::getOsSetting($device->os, 'group');
 
         return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
+    }
+
+    /**
+     * Get the http content type of the image
+     *
+     * @param  string  $type  svg or png
+     * @return string
+     */
+    public static function imageType(string $type): string
+    {
+        return $type === 'svg' ? 'image/svg+xml' : 'image/png';
     }
 
     /**

@@ -997,7 +997,7 @@ function eventlog_severity($eventlog_severity)
  */
 function get_image_type(string $type)
 {
-    return $type === 'svg' ? 'image/svg+xml' : 'image/png';
+    return \LibreNMS\Util\Graph::imageType($type);
 }
 
 function get_oxidized_nodes_list()
