@@ -1,12 +1,10 @@
 includes:
     - phpstan-baseline.neon
+    - tests/phpstan/ignore-by-php-version.neon.php
     - vendor/nunomaduro/larastan/extension.neon
     - vendor/phpstan/phpstan-mockery/extension.neon
 
 parameters:
-
-    phpVersion: 70300
-
     paths:
         - app
         - config
@@ -14,6 +12,9 @@ parameters:
         - LibreNMS
         - resources
         - tests
+
+    excludePaths:
+        - tests/phpstan/
 
     scanDirectories:
         - includes

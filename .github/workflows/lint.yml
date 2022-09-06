@@ -32,6 +32,10 @@ jobs:
   phpstan:
     name: PHP Static Analysis
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [7.3, 7.4, 8.0, 8.1]
     steps:
       -
         name: Checkout Code
@@ -41,7 +45,7 @@ jobs:
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: ${{ matrix.php }}
           tools: composer
           coverage: none
 
@@ -55,8 +59,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-
 
       -
         name: Cache pip

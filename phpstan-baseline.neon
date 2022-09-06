@@ -1061,11 +1061,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1291,11 +1286,6 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\LdapAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
@@ -1312,11 +1302,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:bind\\(\\) has parameter \\$credentials with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:connect\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizer.php
 
@@ -1431,12 +1416,12 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
