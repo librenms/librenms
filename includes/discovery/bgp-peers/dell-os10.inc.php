@@ -40,12 +40,12 @@ if (Config::get('enable_bgp')) {
             $bgpPeers[$vrfInstance][$address] = $value;
         }
         unset($bgpPeersCache);
+        
+        $vrfs = DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid');
 
         foreach ($bgpPeers as $vrfInstance => $peer) {
-            $vrfId = DeviceCache::getPrimary()->vrfs()->select('vrf_id')->firstWhere('vrf_oid', $vrfInstance);
-            if (is_null($vrfId)) {
-                $vrfId = 1; // According to the MIB
-            }
+            $vrfId = $vrfs[$vrfInstance] ?? 1; // According to the MIB
+
             foreach ($peer as $address => $value) {
                 // resolve AS number by DNS_TXT record
                 $astext = get_astext($value['os10bgp4V2PeerRemoteAs']);
