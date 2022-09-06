@@ -373,13 +373,13 @@ return [
         ],
         'discovery_modules' => [
             'arp-table' => [
-                'description' => 'ARP Table',
+                'description' => 'Table ARP',
             ],
             'applications' => [
                 'description' => 'Applications',
             ],
             'bgp-peers' => [
-                'description' => 'BGP Peers',
+                'description' => 'Adjacences BGP',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',
@@ -406,10 +406,10 @@ return [
                 'description' => 'Cisco VRF Lite',
             ],
             'discovery-arp' => [
-                'description' => 'Discovery ARP',
+                'description' => 'Découverte ARP',
             ],
             'discovery-protocols' => [
-                'description' => 'Discovery Protocols',
+                'description' => 'Protocoles de découverte',
             ],
             'entity-physical' => [
                 'description' => 'Entity Physical',
@@ -459,8 +459,11 @@ return [
             'ports-stack' => [
                 'description' => 'Ports Stack',
             ],
+            'printer-supplies' => [
+                'description' => 'Ressources d\'impression',
+            ],
             'processors' => [
-                'description' => 'Processors',
+                'description' => 'Processeurs',
             ],
 
             'route' => [
@@ -475,14 +478,10 @@ return [
                 'description' => 'Services',
             ],
             'storage' => [
-                'description' => 'Storage',
+                'description' => 'Stockage',
             ],
-
             'stp' => [
                 'description' => 'STP',
-            ],
-            'toner' => [
-                'description' => 'Toner',
             ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
@@ -498,6 +497,9 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
             ],
         ],
         'distributed_poller' => [
@@ -777,6 +779,146 @@ return [
         ],
         'ping' => [
             'description' => 'Chemin vers `ping`',
+        ],
+        'poller_modules' => [
+            'unix-agent' => [
+                'description' => 'Unix Agent',
+            ],
+            'os' => [
+                'description' => 'OS',
+            ],
+            'ipmi' => [
+                'description' => 'IPMI',
+            ],
+            'sensors' => [
+                'description' => 'Sensors',
+            ],
+            'processors' => [
+                'description' => 'Processeurs',
+            ],
+            'mempools' => [
+                'description' => 'Mempools',
+            ],
+            'storage' => [
+                'description' => 'Stockage',
+            ],
+            'netstats' => [
+                'description' => 'Netstats',
+            ],
+            'hr-mib' => [
+                'description' => 'HR Mib',
+            ],
+            'ucd-mib' => [
+                'description' => 'Ucd Mib',
+            ],
+            'ipSystemStats' => [
+                'description' => 'ipSystemStats',
+            ],
+            'ports' => [
+                'description' => 'Ports',
+            ],
+            'bgp-peers' => [
+                'description' => 'Adjacences BGP',
+            ],
+            'junose-atm-vp' => [
+                'description' => 'JunOS ATM VP',
+            ],
+            'ucd-diskio' => [
+                'description' => 'UCD DiskIO',
+            ],
+            'wifi' => [
+                'description' => 'Wifi',
+            ],
+            'wireless' => [
+                'description' => 'Wireless',
+            ],
+            'ospf' => [
+                'description' => 'OSPF',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
+            ],
+            'cisco-ipsec-flow-monitor' => [
+                'description' => 'Cisco IPSec flow Monitor',
+            ],
+            'cisco-remote-access-monitor' => [
+                'description' => 'Cisco remote access Monitor',
+            ],
+            'cisco-cef' => [
+                'description' => 'Cisco CEF',
+            ],
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
+            ],
+            'cisco-mac-accounting' => [
+                'description' => 'Cisco MAC Accounting',
+            ],
+            'cipsec-tunnels' => [
+                'description' => 'Ipsec Tunnels',
+            ],
+            'cisco-ace-serverfarms' => [
+                'description' => 'Cisco ACE Serverfarms',
+            ],
+            'cisco-asa-firewall' => [
+                'description' => 'Cisco ASA Firewall',
+            ],
+            'cisco-voice' => [
+                'description' => 'Cisco Voice',
+            ],
+            'cisco-cbqos' => [
+                'description' => 'Cisco CBQOS',
+            ],
+            'cisco-otv' => [
+                'description' => 'Cisco OTV',
+            ],
+            'cisco-qfp' => [
+                'description' => 'Cisco QFP',
+            ],
+            'cisco-vpdn' => [
+                'description' => 'Cisco VPDN',
+            ],
+            'nac' => [
+                'description' => 'NAC',
+            ],
+            'netscaler-vsvr' => [
+                'description' => 'Netscaler VSVR',
+            ],
+            'aruba-controller' => [
+                'description' => 'Contrôleur Aruba',
+            ],
+            'availability' => [
+                'description' => 'Disponibilité',
+            ],
+            'entity-physical' => [
+                'description' => 'Entity Physical',
+            ],
+            'entity-state' => [
+                'description' => 'Entity State',
+            ],
+            'applications' => [
+                'description' => 'Applications',
+            ],
+            'stp' => [
+                'description' => 'STP',
+            ],
+            'ntp' => [
+                'description' => 'NTP',
+            ],
+            'loadbalancers' => [
+                'description' => 'Loadbalancers',
+            ],
+            'mef' => [
+                'description' => 'MEF',
+            ],
+            'mpls' => [
+                'description' => 'MPLS',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Ressources d\'impression',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Table port FDB, entrées plus anciennes que',
