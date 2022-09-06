@@ -44,7 +44,7 @@ if (Config::get('enable_bgp')) {
         $vrfs = DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid');
 
         foreach ($bgpPeers as $vrfInstance => $peer) {
-            $vrfId = $vrfs[$vrfInstance] ?? 1; // According to the MIB
+            $vrfId = $vrfs->get($vrfInstance, 1); // According to the MIB
 
             foreach ($peer as $address => $value) {
                 // resolve AS number by DNS_TXT record
