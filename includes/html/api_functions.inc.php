@@ -1833,6 +1833,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid' => $bill['bill_custid'],
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes'],
+            'dir_95th' => $bill['dir_95th'],
         ];
         $update = dbUpdate($update_data, 'bills', 'bill_id=?', [$bill_id]);
         if ($update === false || $update < 0) {
@@ -1853,6 +1854,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid',
             'bill_ref',
             'bill_notes',
+            'dir_95th',
         ];
 
         if ($data['bill_type'] == 'quota') {
@@ -1891,6 +1893,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
                 'bill_custid' => $bill['bill_custid'],
                 'bill_ref' => $bill['bill_ref'],
                 'bill_notes' => $bill['bill_notes'],
+                'dir_95th' => $bill['dir_95th'],
             ],
             'bills'
         );
