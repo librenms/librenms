@@ -28,50 +28,6 @@ fdb-table:
         order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
 loadbalancers:
     component: true
-mempools:
-    mempools:
-        excluded_fields: [device_id, mempool_id]
-        order_by: mempool_type, mempool_id
-mpls:
-    mpls_lsps:
-        excluded_fields: [lsp_id, device_id]
-        order_by: vrf_oid, lsp_oid
-    mpls_lsp_paths:
-        excluded_fields: [lsp_path_id, device_id, lsp_id]
-        joins:
-            - { left: mpls_lsp_paths.lsp_id, right: mpls_lsps.lsp_id, select: [vrf_oid, lsp_oid] }
-        order_by: vrf_oid, lsp_oid, path_oid
-    mpls_sdps:
-        excluded_fields: [sdp_id, device_id]
-        order_by: sdp_oid
-    mpls_sdp_binds:
-        excluded_fields: [bind_id, sdp_id, svc_id, device_id]
-        joins:
-            - { left: mpls_sdp_binds.sdp_id, right: mpls_sdps.sdp_id, select: [mpls_sdps.sdp_oid] }
-            - { left: mpls_sdp_binds.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
-        order_by: mpls_sdps.sdp_oid, mpls_services.svc_oid
-    mpls_services:
-        excluded_fields: [svc_id, device_id]
-        order_by: svc_oid
-    mpls_saps:
-        excluded_fields: [sap_id, svc_id, device_id]
-        joins:
-            - { left: mpls_saps.svc_id, right: mpls_services.svc_id, select: [mpls_services.svc_oid] }
-        order_by: mpls_services.svc_oid, mpls_saps.sapPortId, mpls_saps.sapEncapValue
-ospf:
-    ospf_ports:
-        excluded_fields: [id, device_id, port_id]
-        joins:
-            - { left: ospf_ports.port_id, right: ports.port_id, select: [ ifIndex ] }
-    ospf_instances:
-        excluded_fields: [id, device_id]
-    ospf_areas:
-        excluded_fields: [id, device_id]
-    ospf_nbrs:
-        excluded_fields: [id, device_id]
-isis:
-    isis_adjacencies:
-        excluded_fields: [id, device_id, port_id]
 ports:
     ports:
         excluded_fields: [device_id, port_id, poll_time, poll_period, ifVrf]
@@ -92,17 +48,6 @@ route:
     route:
         excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
         order_by: inetCidrRouteDest
-nac:
-    ports_nac:
-        excluded_fields: [ports_nac_id, device_id, port_id]
-        joins:
-            - { left: ports_nac.port_id, right: ports.port_id, select: [ifIndex] }
-        order_by: ports.ifIndex, mac_address
-os:
-    devices:
-        included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
-        joins:
-            - { left: devices.location_id, right: locations.id, select: [location] }
 processors:
     processors:
         excluded_fields: [device_id, processor_id]
@@ -120,27 +65,10 @@ sensors:
             - { custom: 'INNER JOIN ( SELECT i.state_index_id FROM `sensors_to_state_indexes` i LEFT JOIN `sensors` s ON (i.`sensor_id` = s.`sensor_id`)  WHERE `device_id`=? GROUP BY i.state_index_id) d ON d.state_index_id = state_indexes.state_index_id' }
         order_by: state_indexes.state_name, state_translations.state_value
         custom_where: ''
-slas:
-    slas:
-        excluded_fields: [device_id, sla_id]
-        order_by: sla_nr
 storage:
     storage:
         excluded_fields: [device_id, storage_id]
         order_by: storage_index, storage_type
-stp:
-    stp:
-        excluded_fields: [stp_id, device_id]
-        order_by: bridgeAddress
-    ports_stp:
-        excluded_fields: [port_stp_id, device_id, port_id]
-        order_by: port_index
-        joins:
-            - { left: ports_stp.port_id, right: ports.port_id, select: [ ifIndex ] }
-printer-supplies:
-    printer_supplies:
-        excluded_fields: [device_id, supply_id]
-        order_by: supply_oid, supply_index
 vlans:
     vlans:
         excluded_fields: [vlan_id, device_id]

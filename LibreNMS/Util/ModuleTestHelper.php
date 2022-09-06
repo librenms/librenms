@@ -28,20 +28,15 @@ namespace LibreNMS\Util;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Device;
 use DeviceCache;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Poller;
-use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
 {
-    private static $module_tables;
-
     private $quiet = false;
     private $modules;
     private $variant;
@@ -59,18 +54,6 @@ class ModuleTestHelper
     // Definitions
     // ignore these when dumping all modules
     private $exclude_from_all = ['arp-table', 'fdb-table'];
-    private static $module_deps = [
-        'arp-table' => ['ports', 'arp-table'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
-        'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'isis' => ['ports', 'isis'],
-        'mpls' => ['ports', 'vrf', 'mpls'],
-        'nac' => ['ports', 'nac'],
-        'ospf' => ['ports', 'ospf'],
-        'stp' => ['ports', 'vlans', 'stp'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
-    ];
 
     /**
      * ModuleTester constructor.
@@ -92,7 +75,7 @@ class ModuleTestHelper
             $variant = '_' . $this->variant;
         }
         $install_dir = Config::get('install_dir');
-        $this->file_name = $os . $variant;
+        $this->file_name = $this->os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
         $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
         $this->json_dir = "$install_dir/tests/data/";
@@ -104,11 +87,6 @@ class ModuleTestHelper
         Config::set('influxdb.enable', false);
         Config::set('graphite.enable', false);
         Config::set('prometheus.enable', false);
-
-        if (is_null(self::$module_tables)) {
-            // only load the yaml once, then keep it in memory
-            self::$module_tables = Yaml::parse(file_get_contents($install_dir . '/tests/module_tables.yaml'));
-        }
     }
 
     private static function compareOid($a, $b)
@@ -335,7 +313,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    private static function resolveModuleDependencies($modules)
+    private static function resolveModuleDependencies(array $modules): array
     {
         // generate a full list of modules
         $full_list = [];
@@ -345,11 +323,8 @@ class ModuleTestHelper
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            if (isset(self::$module_deps[$module])) {
-                $full_list = array_merge($full_list, self::$module_deps[$module]);
-            } else {
-                $full_list[] = $module;
-            }
+            $full_list = array_merge($full_list, Module::fromName($module)->dependencies());
+            $full_list[] = $module;
         }
 
         return array_unique($full_list);
@@ -720,7 +695,6 @@ class ModuleTestHelper
     public function dumpDb($device_id, $modules, $type)
     {
         $data = [];
-        $module_dump_info = $this->getTableData();
 
         // don't dump some modules by default unless they are manually listed
         if (empty($this->modules)) {
@@ -729,82 +703,10 @@ class ModuleTestHelper
 
         // only dump data for the given modules
         foreach ($modules as $module) {
-            foreach ($module_dump_info[$module] ?? [] as $table => $info) {
-                if ($table == 'component') {
-                    $components = $this->collectComponents($device_id);
-                    if (! empty($components)) {
-                        $data[$module][$type][$table] = $components;
-                    }
-                    continue;
-                }
-
-                // check for custom where
-                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
-                $params = [$device_id];
-
-                // build joins
-                $join = '';
-                $select = ["`$table`.*"];
-                foreach ($info['joins'] ?? [] as $join_info) {
-                    if (isset($join_info['custom'])) {
-                        $join .= ' ' . $join_info['custom'];
-
-                        $default_select = [];
-                    } else {
-                        [$left, $lkey] = explode('.', $join_info['left']);
-                        [$right, $rkey] = explode('.', $join_info['right']);
-                        $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
-
-                        $default_select = ["`$right`.*"];
-                    }
-
-                    // build selects
-                    $select = array_merge($select, isset($join_info['select']) ? (array) $join_info['select'] : $default_select);
-                }
-
-                if (isset($info['order_by'])) {
-                    $order_by = " ORDER BY {$info['order_by']}";
-                } else {
-                    $order_by = '';
-                }
-
-                $fields = implode(', ', $select);
-                $rows = dbFetchRows("SELECT $fields FROM `$table` $join $where $order_by", $params);
-
-                // don't include empty tables
-                if (empty($rows)) {
-                    continue;
-                }
-
-                // remove unwanted fields
-                if (isset($info['included_fields'])) {
-                    $keys = array_flip($info['included_fields']);
-                    $rows = array_map(function ($row) use ($keys) {
-                        return array_intersect_key($row, $keys);
-                    }, $rows);
-                } elseif (isset($info['excluded_fields'])) {
-                    $keys = array_flip($info['excluded_fields']);
-                    $rows = array_map(function ($row) use ($keys) {
-                        return array_diff_key($row, $keys);
-                    }, $rows);
-                }
-
-                $data[$module][$type][$table] = $rows;
-            }
+            $data[$module][$type] = Module::fromName($module)->dump(DeviceCache::get($device_id));
         }
 
         return $data;
-    }
-
-    /**
-     * Get list of tables used by a module
-     * Includes a list of fields that will not be considered for testing
-     *
-     * @return array
-     */
-    public function getTableData()
-    {
-        return array_intersect_key(self::$module_tables, array_flip($this->getModules()));
     }
 
     /**
@@ -880,15 +782,5 @@ class ModuleTestHelper
         }
 
         return $this->json_file;
-    }
-
-    private function collectComponents(int $device_id): array
-    {
-        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, function ($item) {
-            return $item['type'] . $item['label'];
-        });
-
-        return array_values($components);
     }
 }
