@@ -85,13 +85,13 @@ if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPh
     $menu_options['sensors'] = 'Health';
 }
 
-if (PortAdsl::where('port_id', $port->port_id)->count()) {
+if (PortAdsl::where('port_id', $port->port_id)->exists()) {
     $menu_options['xdsl'] = 'xDSL';
-} elseif (PortVdsl::where('port_id', $port->port_id)->count()) {
+} elseif (PortVdsl::where('port_id', $port->port_id)->exists()) {
     $menu_options['xdsl'] = 'xDSL';
 }
 
-if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex)->count()) {
+if (DeviceCache::getPrimary()->ports()->where('pagpGroupIfIndex', $port->ifIndex)->exists()) {
     $menu_options['pagp'] = 'PAgP';
 }
 
