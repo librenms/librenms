@@ -80,8 +80,8 @@ class AppServiceProvider extends ServiceProvider
             return "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>";
         });
 
-        Blade::directive('graphImage', function ($vars, $base64 = false) {
-            return "<?php echo \LibreNMS\Util\Graph::get(is_array($vars) ? $vars : \LibreNMS\Util\Url::parseLegacyPathVars($vars), $base64); ?>";
+        Blade::directive('graphImage', function ($vars, $flags = 0) {
+            return "<?php echo \LibreNMS\Util\Graph::get($vars, $flags); ?>";
         });
     }
 

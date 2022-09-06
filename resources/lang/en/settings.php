@@ -625,6 +625,10 @@ return [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
         ],
+        'email_attach_graphs' => [
+            'description' => 'Attach graph images',
+            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
+        ],
         'email_backend' => [
             'description' => 'How to deliver mail',
             'help' => 'The backend to use for sending email, can be mail, sendmail or SMTP',

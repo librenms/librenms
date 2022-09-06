@@ -11,7 +11,6 @@
  */
 
 use LibreNMS\Config;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -439,44 +438,7 @@ function generate_port_image($args)
  */
 function graph_error($text, $color = [128, 0, 0])
 {
-    global $vars;
-
-    $type = Config::get('webui.graph_type');
-    if (! Debug::isEnabled()) {
-        header('Content-type: ' . get_image_type($type));
-    }
-
-    $width = (int) ($vars['width'] ?? 150);
-    $height = (int) ($vars['height'] ?? 60);
-
-    if ($type === 'svg') {
-        $rgb = implode(', ', $color);
-        echo <<<SVG
-<svg xmlns="http://www.w3.org/2000/svg"
-xmlns:xhtml="http://www.w3.org/1999/xhtml"
-viewBox="0 0 $width $height"
-preserveAspectRatio="xMinYMin">
-<foreignObject x="0" y="0" width="$width" height="$height" transform="translate(0,0)">
-      <xhtml:div style="display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
-         <xhtml:div style="display:table-cell; vertical-align:middle;">
-            <xhtml:div style="color:rgb($rgb); text-align:center; font-family:sans-serif; font-size:0.6em;">$text</xhtml:div>
-         </xhtml:div>
-      </xhtml:div>
-   </foreignObject>
-</svg>
-SVG;
-    } else {
-        $img = imagecreate($width, $height);
-        imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
-
-        $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
-        $font = $width < 200 ? 3 : 5;
-        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
-
-        // Output the image
-        imagepng($img);
-        imagedestroy($img);
-    }
+    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
 }
 
 /**
@@ -1035,7 +997,7 @@ function eventlog_severity($eventlog_severity)
  */
 function get_image_type(string $type)
 {
-    return $type === 'svg' ? 'image/svg+xml' : 'image/png';
+    return \LibreNMS\Util\Graph::imageType($type);
 }
 
 function get_oxidized_nodes_list()

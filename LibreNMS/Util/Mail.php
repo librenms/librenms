@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use Exception;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class Mail
@@ -70,7 +71,7 @@ class Mail
      * @param  bool  $html
      * @return bool|string
      */
-    public static function send($emails, $subject, $message, bool $html = false)
+    public static function send($emails, $subject, $message, bool $html = false, ?bool $embedGraphs = null)
     {
         if (is_array($emails) || ($emails = self::parseEmails($emails))) {
             d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
@@ -89,8 +90,11 @@ class Mail
                 $mail->CharSet = 'utf-8';
                 $mail->WordWrap = 76;
                 $mail->Body = $message;
+                if ($embedGraphs ?? Config::get('email_attach_graphs')) {
+                    self::embedGraphs($mail);
+                }
                 if ($html) {
-                    $mail->isHTML(true);
+                    $mail->isHTML();
                 }
                 switch (strtolower(trim(Config::get('email_backend')))) {
                     case 'sendmail':
@@ -123,5 +127,42 @@ class Mail
         }
 
         return 'No contacts found';
+    }
+
+    /**
+     * Search for generated graph links, generate them, attach them to the email and update the url to a cid link
+     */
+    private static function embedGraphs(PHPMailer $mail): void
+    {
+        $body = $mail->Body;
+
+        // search for generated graphs
+        preg_match_all('/ class=\"librenms-graph\" src=\"(.*?)\"/', $body, $match);
+
+        foreach (array_values(array_unique($match[1])) as $attachment_id => $url) {
+            try {
+                $cid = "graph$attachment_id";
+
+                // fetch image, do not debug as it will return the wrong format.
+                $prev = Debug::isEnabled();
+                Debug::set(false);
+                $image = Graph::get(Url::parseLegacyPathVars($url));
+                Debug::set($prev);
+
+                // attach image
+                if (Config::get('webui.graph_type') == 'svg') {
+                    $mail->addStringEmbeddedImage($image, $cid, "$cid.svg", PHPMailer::ENCODING_BASE64, 'image/svg+xml');
+                } else {
+                    $mail->addStringEmbeddedImage($image, $cid, "$cid.png", PHPMailer::ENCODING_BASE64, 'image/png');
+                }
+
+                // update image tag to link to attached image
+                $body = str_replace($url, "cid:$cid", $body);
+            } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
+                report($e);
+            }
+        }
+
+        $mail->Body = $body;
     }
 }

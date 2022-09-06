@@ -1427,6 +1427,13 @@
                 "value": "smtp"
             }
         },
+        "email_attach_graphs": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 4,
+            "type": "boolean"
+        },
         "email_backend": {
             "default": "mail",
             "group": "alerting",
