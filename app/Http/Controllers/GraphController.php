@@ -18,25 +18,35 @@ class GraphController extends Controller
     public function __invoke(Request $request, string $path = ''): Response
     {
         $vars = array_merge(Url::parseLegacyPathVars($request->path()), $request->except(['username', 'password']));
-        $vars['graph_type'] = $vars['graph_type'] ?? Config::get('webui.graph_type');
+        $output = $vars['graph_type'] ?? Config::get('webui.graph_type', 'default');
 
         if (\Auth::check()) {
             // only allow debug for logged in users
             Debug::set(! empty($vars['debug']));
         }
 
-        $headers = [
-            'Content-type' => Graph::imageType($vars['graph_type']),
-        ];
-
         try {
-            return response(Graph::get($vars), 200, Debug::isEnabled() ? [] : $headers);
+            $graph = Graph::get($vars);
+
+            if (Debug::isEnabled()) {
+                return response('<img src="' . $graph->inline() . '" alt="graph" />');
+            }
+
+            $headers = [
+                'Content-type' => $graph->imageType(),
+            ];
+
+            if ($output == 'base64') {
+                return response($graph, 200, $headers);
+            }
+
+            return response($graph->data(), 200, $headers);
         } catch (RrdGraphException $e) {
             if (Debug::isEnabled()) {
                 throw $e;
             }
 
-            return response($e->generateErrorImage(), 500, $headers);
+            return response($e->generateErrorImage(), 500, ['Content-type' => Graph::imageType()]);
         }
     }
 }

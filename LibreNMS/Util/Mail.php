@@ -91,7 +91,7 @@ class Mail
                 $mail->WordWrap = 76;
                 $mail->Body = $message;
                 if ($embedGraphs ?? Config::get('email_attach_graphs')) {
-                    self::embedGraphs($mail);
+                    self::embedGraphs($mail, $html);
                 }
                 if ($html) {
                     $mail->isHTML();
@@ -132,32 +132,37 @@ class Mail
     /**
      * Search for generated graph links, generate them, attach them to the email and update the url to a cid link
      */
-    private static function embedGraphs(PHPMailer $mail): void
+    private static function embedGraphs(PHPMailer $mail, bool $html = false): void
     {
         $body = $mail->Body;
 
         // search for generated graphs
-        preg_match_all('/ class=\"librenms-graph\" src=\"(.*?)\"/', $body, $match);
+        preg_match_all('#<img class=\"librenms-graph\" src=\"(.*?)\" ?/?>#', $body, $matches);
 
-        foreach (array_values(array_unique($match[1])) as $attachment_id => $url) {
+        $count = 0;
+        foreach (array_combine($matches[1], $matches[0]) as $url => $tag) {
             try {
-                $cid = "graph$attachment_id";
+                $cid = 'graph' . ++$count;
 
-                // fetch image, do not debug as it will return the wrong format.
-                $prev = Debug::isEnabled();
-                Debug::set(false);
-                $image = Graph::get(Url::parseLegacyPathVars($url));
-                Debug::set($prev);
+                // fetch image data
+                $image = Graph::getImage($url);
 
                 // attach image
-                if (Config::get('webui.graph_type') == 'svg') {
-                    $mail->addStringEmbeddedImage($image, $cid, "$cid.svg", PHPMailer::ENCODING_BASE64, 'image/svg+xml');
-                } else {
-                    $mail->addStringEmbeddedImage($image, $cid, "$cid.png", PHPMailer::ENCODING_BASE64, 'image/png');
-                }
+                $fileName = substr(Clean::fileName($image->title() ?: $cid), 0, 250);
+                $mail->addStringEmbeddedImage(
+                    $image->data(),
+                    $cid,
+                    $fileName . '.' . $image->fileExtension(),
+                    PHPMailer::ENCODING_BASE64,
+                    $image->imageType()
+                );
 
-                // update image tag to link to attached image
-                $body = str_replace($url, "cid:$cid", $body);
+                // update image tag to link to attached image, or just the image name
+                if ($html) {
+                    $body = str_replace($url, "cid:$cid", $body);
+                } else {
+                    $body = str_replace($tag, "[$fileName]", $body);
+                }
             } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
                 report($e);
             }

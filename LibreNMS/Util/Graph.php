@@ -29,6 +29,7 @@ use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
+use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Exceptions\RrdGraphException;
 use Rrd;
 
@@ -36,19 +37,66 @@ class Graph
 {
     const BASE64_OUTPUT = 1; // BASE64 encoded image data
     const INLINE_BASE64 = 2; // img src inline base64 image
-    const COMMAND_ONLY = 4; // just print the command
+    const IMAGE_PNG = 4; // img src inline base64 image
+    const IMAGE_SVG = 8; // img src inline base64 image
 
     /**
-     * Fetch a graph image (as string) based on the given $vars
-     * Optionally, override the output format to base64
+     * Convenience helper to specify desired image output
      *
      * @param  array|string  $vars
-     * @param  int  $flags  Flags for controlling graph generating options.
+     * @param  int  $flags
      * @return string
+     */
+    public static function getImageData($vars, int $flags = 0): string
+    {
+        if ($flags & self::IMAGE_PNG) {
+            $vars['graph_type'] = 'png';
+        }
+
+        if ($flags & self::IMAGE_SVG) {
+            $vars['graph_type'] = 'svg';
+        }
+
+        if ($flags & self::INLINE_BASE64) {
+            return self::getImage($vars)->inline();
+        }
+
+        if ($flags & self::BASE64_OUTPUT) {
+            return self::getImage($vars)->base64();
+        }
+
+        return self::getImage($vars)->data();
+    }
+
+    /**
+     * Fetch a GraphImage based on the given $vars
+     * Catches errors generated and always returns GraphImage
+     *
+     * @param  array|string  $vars
+     * @return GraphImage
+     */
+    public static function getImage($vars): GraphImage
+    {
+        try {
+            return self::get($vars);
+        } catch (RrdGraphException $e) {
+            if (Debug::isEnabled()) {
+                throw $e;
+            }
+
+            return new GraphImage(self::imageType(), 'Error', $e->generateErrorImage());
+        }
+    }
+
+    /**
+     * Fetch a GraphImage based on the given $vars
+     *
+     * @param  array|string  $vars
+     * @return GraphImage
      *
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
-    public static function get($vars, int $flags = 0): string
+    public static function get($vars): GraphImage
     {
         define('IGNORE_ERRORS', true);
         chdir(base_path());
@@ -80,13 +128,11 @@ class Graph
         $title = $vars['title'] ?? '';
         $vertical = $vars['vertical'] ?? '';
         $legend = $vars['legend'] ?? false;
-        $output = $vars['output'] ?? 'default';
         $from = parse_at_time($vars['from'] ?? '-1d');
         $to = empty($vars['to']) ? time() : parse_at_time($vars['to']);
         $period = ($to - $from);
         $prev_from = ($from - $period);
         $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
-        Config::set('webui.graph_type', $graph_image_type); // set in case accessed elsewhere
         $rrd_options = '';
         $rrd_filename = null;
 
@@ -113,26 +159,6 @@ class Graph
             }
         }
 
-        // command output requested
-        if ($flags & self::COMMAND_ONLY) {
-            $cmd_output = "<div class='infobox'>";
-            $cmd_output .= "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
-            $cmd_output .= "<pre class='rrd-pre'>";
-            $cmd_output .= escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', Config::get('temp_dir') . '/' . strgen(), $rrd_options));
-            $cmd_output .= '</pre>';
-            try {
-                $cmd_output .= Rrd::graph($rrd_options);
-            } catch (RrdGraphException $e) {
-                $cmd_output .= "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
-                $cmd_output .= "<pre class='rrd-pre'>";
-                $cmd_output .= $e->getMessage();
-                $cmd_output .= '</pre>';
-            }
-            $cmd_output .= '</div>';
-
-            return $cmd_output;
-        }
-
         if (empty($rrd_options)) {
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
@@ -141,16 +167,7 @@ class Graph
         try {
             $image_data = Rrd::graph($rrd_options);
 
-            // output the graph int the desired format
-            if (Debug::isEnabled()) {
-                return '<img src="data:' . self::imageType($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
-            } elseif ($flags & self::BASE64_OUTPUT || $output == 'base64') {
-                return base64_encode($image_data);
-            } elseif ($flags & self::INLINE_BASE64 || $output == 'inline-base64') {
-                return 'data:' . self::imageType($graph_image_type) . ';base64,' . base64_encode($image_data);
-            }
-
-            return $image_data; // raw data
+            return new GraphImage(self::imageType($graph_image_type), $title ?? $graph_title, $image_data);
         } catch (RrdGraphException $e) {
             // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (Debug::isEnabled()) {
@@ -237,11 +254,15 @@ class Graph
     /**
      * Get the http content type of the image
      *
-     * @param  string  $type  svg or png
+     * @param  string|null  $type  svg or png
      * @return string
      */
-    public static function imageType(string $type): string
+    public static function imageType(?string $type = null): string
     {
+        if ($type === null) {
+            $type = Config::get('webui.graph_type');
+        }
+
         return $type === 'svg' ? 'image/svg+xml' : 'image/png';
     }
 
