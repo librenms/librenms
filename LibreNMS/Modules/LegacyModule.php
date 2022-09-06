@@ -147,12 +147,12 @@ class LegacyModule implements Module
             if (isset($info['included_fields'])) {
                 $keys = array_flip($info['included_fields']);
                 $rows = array_map(function ($row) use ($keys) {
-                    return array_intersect_key($row, $keys);
+                    return array_intersect_key((array) $row, $keys);
                 }, $rows);
             } elseif (isset($info['excluded_fields'])) {
                 $keys = array_flip($info['excluded_fields']);
                 $rows = array_map(function ($row) use ($keys) {
-                    return array_diff_key($row, $keys);
+                    return array_diff_key((array) $row, $keys);
                 }, $rows);
             }
 

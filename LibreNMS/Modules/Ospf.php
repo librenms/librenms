@@ -238,12 +238,12 @@ class Ospf implements Module
     {
         return [
             'ospf_ports' => $device->ospfPorts()
-                ->leftJoin('ports', 'port_id', 'port_id')
+                ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')
                 ->select(['ospf_ports.*', 'ifIndex'])
-                ->get()->map->makeHidden(['id', 'device_id', 'port_id'])->toArray(),
-            'ospf_instances' => $device->ospfInstances->map->makeHidden(['id', 'device_id'])->toArray(),
-            'ospf_areas' => $device->ospfAreas->map->makeHidden(['id', 'device_id'])->toArray(),
-            'ospf_nbrs' => $device->ospfNbrs->map->makeHidden(['id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
+            'ospf_instances' => $device->ospfInstances->map->makeHidden(['id', 'device_id']),
+            'ospf_areas' => $device->ospfAreas->map->makeHidden(['id', 'device_id']),
+            'ospf_nbrs' => $device->ospfNbrs->map->makeHidden(['id', 'device_id']),
         ];
     }
 }

@@ -101,11 +101,11 @@ class Stp implements Module
     {
         return [
             'stp' => $device->stpInstances()->orderBy('bridgeAddress')
-                ->get()->map->makeHidden(['stp_id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['stp_id', 'device_id']),
             'ports_stp' => $device->portsStp()->orderBy('port_index')
-                ->leftJoin('ports', 'port_id', 'port_id')
+                ->leftJoin('ports', 'ports_stp.port_id', 'ports.port_id')
                 ->select(['ports_stp.*', 'ifIndex'])
-                ->get()->map->makeHidden(['port_stp_id', 'device_id', 'port_id'])->toArray(),
+                ->get()->map->makeHidden(['port_stp_id', 'device_id', 'port_id'])
         ];
     }
 

@@ -28,6 +28,8 @@ namespace LibreNMS\Util;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Device;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -195,10 +197,12 @@ class ModuleTestHelper
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
-        $snmp_oids = [null => [
-            'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-            'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-        ]];
+        $snmp_oids = [
+            null => [
+                'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+                'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+            ]
+        ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
@@ -705,11 +709,27 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id));
             if ($module_data !== false) {
-                $data[$module][$type] = $module_data;
+                $data[$module][$type] = $this->dumpToArray($module_data);
             }
         }
 
         return $data;
+    }
+
+    private function dumpToArray($data): array
+    {
+        $output = [];
+
+        foreach ($data as $table => $table_data) {
+            foreach ($table_data as $item) {
+                $output[$table][] = is_a($item, Model::class)
+                    ? Arr::except($item->getAttributes(), $item->getHidden()) // don't apply accessors
+                    : (array) $item;
+
+            }
+        }
+
+        return $output;
     }
 
     /**

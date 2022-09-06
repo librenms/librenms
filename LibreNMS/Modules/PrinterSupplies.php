@@ -136,7 +136,7 @@ class PrinterSupplies implements Module
     {
         return [
             'printer_supplies' => $device->printerSupplies()->orderBy('supply_oid')->orderBy('supply_index')
-                ->get()->map->withHidden(['device_id', 'supply_id'])->toArray(),
+                ->get()->map->makeHidden(['device_id', 'supply_id']),
         ];
     }
 

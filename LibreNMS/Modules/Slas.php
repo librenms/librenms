@@ -94,7 +94,7 @@ class Slas implements Module
     {
         return [
             'slas' => $device->slas()->orderBy('sla_nr')
-                ->get()->map->withHidden(['device_id', 'sla_id'])->toArray(),
+                ->get()->map->makeHidden(['device_id', 'sla_id']),
         ];
     }
 }

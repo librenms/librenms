@@ -117,7 +117,7 @@ class Os implements Module
             'devices' => Device::where('device_id', $device->device_id)
             ->leftJoin('locations', 'location_id', 'id')
             ->select(['sysName', 'sysObjectID', 'sysDescr', 'sysContact', 'version', 'hardware', 'features', 'location', 'os', 'type', 'serial', 'icon'])
-            ->get()->toArray(),
+            ->get(),
         ];
     }
 

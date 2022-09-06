@@ -179,27 +179,27 @@ class Mpls implements Module
     {
         return [
             'mpls_lsps' => $device->mplsLsps()->orderBy('vrf_oid')->orderBy('lsp_oid')
-                ->get()->map->withHidden(['lsp_id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['lsp_id', 'device_id']),
             'mpls_lsp_paths' => $device->mplsLspPaths()
-                ->leftJoin('mpls_lsps', 'lsp_id', 'lsp_id')
+                ->leftJoin('mpls_lsps', 'mpls_lsp_paths.lsp_id', 'mpls_lsps.lsp_id')
                 ->select(['mpls_lsp_paths.*', 'mpls_lsps.vrf_oid', 'mpls_lsps.lsp_oid'])
                 ->orderBy('vrf_oid')->orderBy('lsp_oid')->orderBy('path_oid')
-                ->get()->map->withHidden(['lsp_path_id', 'device_id', 'lsp_id'])->toArray(),
+                ->get()->map->makeHidden(['lsp_path_id', 'device_id', 'lsp_id']),
             'mpls_sdps' => $device->mplsSdps()->orderBy('sdp_oid')
-                ->get()->map->withHidden(['sdp_id', 'device_id']),
+                ->get()->map->makeHidden(['sdp_id', 'device_id']),
             'mpls_sdp_binds' => $device->mplsSdpBinds()
-                ->leftJoin('mpls_sdps', 'sdp_id', 'sdp_id')
-                ->leftJoin('mpls_services', 'svc_id', 'svc_id')
+                ->leftJoin('mpls_sdps', 'mpls_sdp_binds.sdp_id', 'mpls_sdps.sdp_id')
+                ->leftJoin('mpls_services', 'mpls_sdp_binds.svc_id', 'mpls_services.svc_id')
                 ->orderBy('mpls_sdps.sdp_oid')->orderBy('mpls_services.svc_oid')
                 ->select(['mpls_sdp_binds.*', 'mpls_sdps.sdp_oid', 'mpls_services.svc_oid'])
-                ->get()->map->withHidden(['bind_id', 'sdp_id', 'svc_id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['bind_id', 'sdp_id', 'svc_id', 'device_id']),
             'mpls_services' => $device->mplsServices()->orderBy('svc_oid')
-                ->get()->map->withHidden(['svc_id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['svc_id', 'device_id']),
             'mpls_saps' => $device->mplsSaps()
-                ->leftJoin('mpls_services', 'svc_id', 'svc_id')
+                ->leftJoin('mpls_services', 'mpls_saps.svc_id', 'mpls_services.svc_id')
                 ->orderBy('mpls_services.svc_oid')->orderBy('mpls_saps.sapPortId')->orderBy('mpls_saps.sapEncapValue')
                 ->select(['mpls_saps.*', 'mpls_services.svc_oid'])
-                ->get()->map->withHidden(['sap_id', 'svc_id', 'device_id'])->toArray(),
+                ->get()->map->makeHidden(['sap_id', 'svc_id', 'device_id']),
         ];
     }
 }

@@ -152,7 +152,7 @@ class Mempools implements Module
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
-                ->get()->map->makeHidden(['device_id', 'mempool_id'])->toArray(),
+                ->get()->map->makeHidden(['device_id', 'mempool_id']),
         ];
     }
 
