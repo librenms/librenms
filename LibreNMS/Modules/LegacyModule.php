@@ -96,7 +96,12 @@ class LegacyModule implements Module
     public function dump(Device $device)
     {
         $data = [];
-        foreach ($this->moduleDumpDefinition() as $table => $info) {
+        $dump_rules = $this->moduleDumpDefinition();
+        if (empty($dump_rules)) {
+            return false; // not supported for this legacy module
+        }
+
+        foreach ($dump_rules as $table => $info) {
             if ($table == 'component') {
                 $components = $this->collectComponents($device->device_id);
                 if (! empty($components)) {

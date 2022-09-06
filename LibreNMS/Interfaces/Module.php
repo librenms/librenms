@@ -67,7 +67,7 @@ interface Module
      * Some id fields may need to be joined to tie back to non-transient data.
      * Module may return false if testing is not supported or required.
      *
-     * @return array|bool
+     * @return array|false
      */
     public function dump(Device $device);
 }

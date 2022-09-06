@@ -701,9 +701,12 @@ class ModuleTestHelper
             $modules = array_diff($modules, $this->exclude_from_all);
         }
 
-        // only dump data for the given modules
+        // only dump data for the given modules (and modules that support dumping)
         foreach ($modules as $module) {
-            $data[$module][$type] = Module::fromName($module)->dump(DeviceCache::get($device_id));
+            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id));
+            if ($module_data !== false) {
+                $data[$module][$type] = $module_data;
+            }
         }
 
         return $data;
