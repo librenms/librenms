@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Mempool extends DeviceRelatedModel implements Keyable
 {
