@@ -23,8 +23,7 @@ if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = '';
 }
 
-echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\"
-onclick=\"location.href='device/" . $device['device_id'] . '/port/' . $port['port_id'] . "/'\" style='cursor: pointer;'>
+echo "<tr style=\"background-color: $row_colour; padding: 5px;\" valign=top onmouseover=\"this.style.backgroundColor='" . Config::get('list_colour.highlight') . "';\" onmouseout=\"this.style.backgroundColor='$row_colour';\" style='cursor: pointer;'>
  <td valign=top width=350>";
 echo '        <span class=list-large>
               ' . generate_port_link($port, $port['ifIndex'] . '. ' . $port['label']) . '
