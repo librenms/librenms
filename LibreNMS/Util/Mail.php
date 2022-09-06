@@ -142,7 +142,7 @@ class Mail
         $count = 0;
         foreach (array_combine($matches[1], $matches[0]) as $url => $tag) {
             try {
-                $cid = "graph" . ++$count;
+                $cid = 'graph' . ++$count;
 
                 // fetch image data
                 $image = Graph::getImage($url);
