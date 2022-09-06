@@ -12,8 +12,15 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     }
 
     $agent_start = microtime(true);
-    $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
-    $agent = fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
+    $agent = null;
+    try {
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
+        $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
+    } catch (ErrorException $e) {
+        echo $e->getMessage() . PHP_EOL; // usually connection timed out
+
+        return;
+    }
 
     if (! $agent) {
         echo 'Connection to UNIX agent failed on port ' . $agent_port . '.';
