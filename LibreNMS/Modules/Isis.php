@@ -191,7 +191,8 @@ class Isis implements Module
     public function dump(Device $device)
     {
         return [
-            'isis_adjacencies' => $device->isisAdjacencies->map->makeHidden(['id', 'device_id', 'port_id']),
+            'isis_adjacencies' => $device->isisAdjacencies()->orderBy('index')
+                ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
         ];
     }
 }
