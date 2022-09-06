@@ -64,7 +64,7 @@ class Mail extends Transport
                     'name' => 'attach-graph',
                     'descr' => 'Include graph image data in the email.  Will be embedded if html5, otherwise attached. Template must use @signedGraphTag',
                     'type' => 'checkbox',
-                    'default' => null,
+                    'default' => true,
                 ],
             ],
             'validation' => [
