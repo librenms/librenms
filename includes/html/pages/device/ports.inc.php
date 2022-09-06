@@ -33,14 +33,7 @@ if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '" . $
     $menu_options['neighbours'] = 'Neighbours';
 }
 
-// Check if we have DSL
-$component = new LibreNMS\Component();
-$options['filter']['name'] = ['LIKE', '%dsl'];
-$options['filter']['type'] = ['=', 'ports'];
-$components = $component->getComponents($device['device_id'], $options);
-$dsl = count($components[$device['device_id']]);
-
-if ($dsl > 0) {
+if (DeviceCache::getPrimary()->portsAdsl()->exists() || DeviceCache::getPrimary()->portsVdsl()->exists()) {
     $menu_options['xdsl'] = 'xDSL';
 }
 
