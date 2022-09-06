@@ -71,7 +71,7 @@ class Mail
      * @param  bool  $html
      * @return bool|string
      */
-    public static function send($emails, $subject, $message, bool $html = false)
+    public static function send($emails, $subject, $message, bool $html = false, ?bool $embedGraphs = null)
     {
         if (is_array($emails) || ($emails = self::parseEmails($emails))) {
             d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
@@ -90,7 +90,7 @@ class Mail
                 $mail->CharSet = 'utf-8';
                 $mail->WordWrap = 76;
                 $mail->Body = $message;
-                if (Config::get('email_attach_graphs')) {
+                if ($embedGraphs ?? Config::get('email_attach_graphs')) {
                     self::embedGraphs($mail);
                 }
                 if ($html) {
