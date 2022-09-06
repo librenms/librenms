@@ -144,7 +144,6 @@ switch ($vars['sort'] ?? '') {
         $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
 }
 
-
 foreach ($ports as $port) {
     $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
     $type = \LibreNMS\Util\Rewrite::normalizeIfType($port['ifType']);
