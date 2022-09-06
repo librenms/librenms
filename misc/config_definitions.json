@@ -813,18 +813,6 @@
             "default": 1000,
             "type": "integer"
         },
-        "billing.bill_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.circuit_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.customer_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
