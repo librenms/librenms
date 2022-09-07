@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\OspfArea;
 use App\Models\OspfInstance;
@@ -38,6 +39,14 @@ use SnmpQuery;
 
 class Ospf implements Module
 {
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return ['ports'];
+    }
+
     /**
      * @inheritDoc
      */
@@ -214,11 +223,27 @@ class Ospf implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os): void
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->ospfPorts()->delete();
-        $os->getDevice()->ospfNbrs()->delete();
-        $os->getDevice()->ospfAreas()->delete();
-        $os->getDevice()->ospfInstances()->delete();
+        $device->ospfPorts()->delete();
+        $device->ospfNbrs()->delete();
+        $device->ospfAreas()->delete();
+        $device->ospfInstances()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'ospf_ports' => $device->ospfPorts()
+                ->leftJoin('ports', 'ospf_ports.port_id', 'ports.port_id')
+                ->select(['ospf_ports.*', 'ifIndex'])
+                ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
+            'ospf_instances' => $device->ospfInstances->map->makeHidden(['id', 'device_id']),
+            'ospf_areas' => $device->ospfAreas->map->makeHidden(['id', 'device_id']),
+            'ospf_nbrs' => $device->ospfNbrs->map->makeHidden(['id', 'device_id']),
+        ];
     }
 }

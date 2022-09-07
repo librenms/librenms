@@ -20,6 +20,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\PrinterSupply;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
@@ -37,12 +38,20 @@ class PrinterSupplies implements Module
     use SyncsModels;
 
     /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         $device = $os->getDeviceArray();
 
@@ -61,7 +70,7 @@ class PrinterSupplies implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         $device = $os->getDeviceArray();
         $toner_data = $os->getDevice()->printerSupplies;
@@ -114,12 +123,21 @@ class PrinterSupplies implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  Os  $os
      */
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->printerSupplies()->delete();
+        $device->printerSupplies()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'printer_supplies' => $device->printerSupplies()->orderBy('supply_oid')->orderBy('supply_index')
+                ->get()->map->makeHidden(['device_id', 'supply_id']),
+        ];
     }
 
     private function discoveryLevels($device): Collection
