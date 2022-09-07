@@ -160,7 +160,7 @@ class Mempools implements Module
      * Calculate available memory.  This is free + buffers + cached.
      *
      * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection|void
+     * @return \Illuminate\Support\Collection
      */
     private function calculateAvailable(Collection $mempools)
     {
@@ -206,7 +206,7 @@ class Mempools implements Module
         return $mempools;
     }
 
-    private function printMempool(Mempool $mempool)
+    private function printMempool(Mempool $mempool): void
     {
         echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {

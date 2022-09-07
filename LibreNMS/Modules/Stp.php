@@ -105,7 +105,7 @@ class Stp implements Module
             'ports_stp' => $device->portsStp()->orderBy('port_index')
                 ->leftJoin('ports', 'ports_stp.port_id', 'ports.port_id')
                 ->select(['ports_stp.*', 'ifIndex'])
-                ->get()->map->makeHidden(['port_stp_id', 'device_id', 'port_id'])
+                ->get()->map->makeHidden(['port_stp_id', 'device_id', 'port_id']),
         ];
     }
 

@@ -36,6 +36,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module
 {
+    /** @var array */
     private $module_deps = [
         'arp-table' => ['ports'],
         'cisco-mac-accounting' => ['ports'],
@@ -173,7 +174,6 @@ class LegacyModule implements Module
 
         return $def[$this->name] ?? [];
     }
-
 
     private function collectComponents(int $device_id): array
     {

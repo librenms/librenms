@@ -97,8 +97,6 @@ class Isis implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  Os  $os
      */
     public function cleanup(Device $device): void
     {

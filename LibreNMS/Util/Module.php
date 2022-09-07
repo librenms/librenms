@@ -32,6 +32,7 @@ class Module
     public static function fromName(string $name): \LibreNMS\Interfaces\Module
     {
         $module_class = StringHelpers::toClass($name, '\\LibreNMS\\Modules\\');
+
         return class_exists($module_class) ? new $module_class : new LegacyModule($name);
     }
 }

@@ -281,7 +281,7 @@ class Core implements Module
         }
     }
 
-    protected static function discoveryIsSlow($def): bool
+    protected static function discoveryIsSlow(array $def): bool
     {
         foreach ($def['discovery'] as $item) {
             if (array_key_exists('snmpget', $item) || array_key_exists('snmpwalk', $item)) {

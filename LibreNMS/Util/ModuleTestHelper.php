@@ -42,7 +42,6 @@ class ModuleTestHelper
     private $quiet = false;
     private $modules;
     private $variant;
-    private $os;
     private $snmprec_file;
     private $json_file;
     private $snmprec_dir;
@@ -69,7 +68,6 @@ class ModuleTestHelper
     public function __construct($modules, $os, $variant = '')
     {
         $this->modules = self::resolveModuleDependencies((array) $modules);
-        $this->os = strtolower($os);
         $this->variant = strtolower($variant);
 
         // preset the file names
@@ -77,7 +75,7 @@ class ModuleTestHelper
             $variant = '_' . $this->variant;
         }
         $install_dir = Config::get('install_dir');
-        $this->file_name = $this->os . $variant;
+        $this->file_name = $os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
         $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
         $this->json_dir = "$install_dir/tests/data/";
@@ -201,7 +199,7 @@ class ModuleTestHelper
             null => [
                 'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
                 'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-            ]
+            ],
         ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
@@ -716,6 +714,10 @@ class ModuleTestHelper
         return $data;
     }
 
+    /**
+     * @param  array|\Illuminate\Support\Collection|\stdClass  $data
+     * @return array
+     */
     private function dumpToArray($data): array
     {
         $output = [];
@@ -725,7 +727,6 @@ class ModuleTestHelper
                 $output[$table][] = is_a($item, Model::class)
                     ? Arr::except($item->getAttributes(), $item->getHidden()) // don't apply accessors
                     : (array) $item;
-
             }
         }
 
@@ -770,27 +771,6 @@ class ModuleTestHelper
         }
 
         return $this->poller_output;
-    }
-
-    /**
-     * Get a list of all modules that support capturing data
-     *
-     * @return array
-     */
-    public function getSupportedModules()
-    {
-        return array_keys(self::$module_tables);
-    }
-
-    /**
-     * Get a list of modules to capture data for
-     * If modules is empty, returns all supported modules
-     *
-     * @return array
-     */
-    private function getModules()
-    {
-        return empty($this->modules) ? $this->getSupportedModules() : $this->modules;
     }
 
     public function getTestData()
