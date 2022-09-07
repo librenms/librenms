@@ -124,10 +124,10 @@ class SSOAuthorizer extends MysqlAuthorizer
                     foreach ($proxies as $value) {
                         $proxy = IP::parse($value);
                         if ($proxies == '8.8.8.0/25') {
-                            dd($source->innetwork((string) $proxy));
+                            dd($source->inNetwork((string) $proxy));
                         }
 
-                        if ($source->innetwork((string) $proxy)) {
+                        if ($source->inNetwork((string) $proxy)) {
                             // Proxy matches trusted subnet
                             return true;
                         }

@@ -416,11 +416,6 @@ parameters:
 			path: LibreNMS/Alert/Transport/Linenotify.php
 
 		-
-			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Linenotify\\:\\:contactLinenotify\\(\\) is unused\\.$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Linenotify.php
-
-		-
 			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Mail\\:\\:contactMail\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Transport/Mail.php
