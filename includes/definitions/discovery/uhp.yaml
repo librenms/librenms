@@ -8,7 +8,7 @@ modules:
     data:
       -
         oid: cpuLoad
-        num_oid: '.1.3.6.1.4.1.8000.22.8.2.{{ $index }}'
+        num_oid: .1.3.6.1.4.1.8000.22.8.2.{{ $index }}
         type: uhp
   sensors:
     temperature:
@@ -20,7 +20,6 @@ modules:
           index: 'temperature.{{ $index }}'
           descr: 'Temperature'
           user_func: fahrenheit_to_celsius
-        -
     snr:
       data:
         -
