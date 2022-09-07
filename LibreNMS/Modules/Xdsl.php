@@ -103,11 +103,11 @@ class Xdsl implements Module
     {
         return [
             'ports_adsl' => $device->portsAdsl()->orderBy('port_index')
-                ->leftJoin('ports', 'ports_adsl.port_id', 'ports.port_id')
+                //->leftJoin('ports', 'ports_adsl.port_id', 'ports.port_id')
                 ->select(['ports_adsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['port_adsl_updated', 'port_id']),
             'ports_vdsl' => $device->portsVdsl()->orderBy('port_index')
-                ->leftJoin('ports', 'ports_vdsl.port_id', 'ports.port_id')
+                //->leftJoin('ports', 'ports_vdsl.port_id', 'ports.port_id')
                 ->select(['ports_vdsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['port_vdsl_updated', 'port_id']),
         ];
