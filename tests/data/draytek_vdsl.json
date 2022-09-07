@@ -2357,5 +2357,43 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "xdsl": {
+        "discovery": {
+            "ports_adsl": [
+                {
+                    "adslLineCoding": "2",
+                    "adslLineType": "2",
+                    "adslAtucInvVendorID": "DRAYTEK",
+                    "adslAtucInvVersionNumber": "",
+                    "adslAtucCurrSnrMgn": "0.5",
+                    "adslAtucCurrAtn": "1.3",
+                    "adslAtucCurrOutputPwr": "1.2",
+                    "adslAtucCurrAttainableRate": 113648992,
+                    "adslAtucChanCurrTxRate": 0,
+                    "adslAturInvSerialNumber": ".................",
+                    "adslAturInvVendorID": "",
+                    "adslAturInvVersionNumber": "",
+                    "adslAturChanCurrTxRate": 0,
+                    "adslAturCurrSnrMgn": "0.5",
+                    "adslAturCurrAtn": "1.6",
+                    "adslAturCurrOutputPwr": "0.9",
+                    "adslAturCurrAttainableRate": 34066000,
+                    "ifIndex": 4
+                }
+            ],
+            "ports_vdsl": [
+                {
+                    "xdsl2LineStatusAttainableRateDs": 0,
+                    "xdsl2LineStatusAttainableRateUs": 0,
+                    "xdsl2ChStatusActDataRateXtur": 33029000,
+                    "xdsl2ChStatusActDataRateXtuc": 110162000,
+                    "xdsl2LineStatusActAtpDs": "0.00",
+                    "xdsl2LineStatusActAtpUs": "0.00",
+                    "ifIndex": 4
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

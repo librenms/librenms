@@ -70,6 +70,7 @@ class ModuleTestHelper
         'stp' => ['ports', 'vlans', 'stp'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
+        'xdsl' => ['ports', 'xdsl'],
     ];
 
     /**
