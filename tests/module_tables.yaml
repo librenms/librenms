@@ -34,17 +34,6 @@ ports:
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
-xdsl:
-    ports_adsl:
-        excluded_fields: [port_adsl_updated, port_id]
-        joins:
-            - { left: ports_adsl.port_id, right: ports.port_id, select: [ ifIndex ] }
-        custom_where: WHERE ports.device_id=?
-    ports_vdsl:
-        excluded_fields: [port_vdsl_updated, port_id]
-        joins:
-            - { left: ports_vdsl.port_id, right: ports.port_id, select: [ ifIndex ] }
-        custom_where: WHERE ports.device_id=?
 cipsec-tunnels:
     ipsec_tunnels:
         excluded_fields: [tunnel_id, device_id]

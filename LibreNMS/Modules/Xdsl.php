@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Facades\Rrd;
+use App\Models\Device;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
 use App\Observers\ModuleModelObserver;
@@ -48,6 +49,14 @@ class Xdsl implements Module
     private $vdslTenthValues = ['xdsl2LineStatusActAtpDs', 'xdsl2LineStatusActAtpUs'];
     /** @var string[] */
     private $ifNameMap;
+
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return ['ports'];
+    }
 
     /**
      * @inheritDoc
@@ -81,10 +90,28 @@ class Xdsl implements Module
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os): void
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->portsAdsl()->delete();
-        $os->getDevice()->portsVdsl()->delete();
+        $device->portsAdsl()->delete();
+        $device->portsVdsl()->delete();
+    }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'ports_adsl' => $device->portsAdsl()->orderBy('port_index')
+                ->leftJoin('ports', 'ports_adsl.port_id', 'ports.port_id')
+                ->select(['ports_adsl.*', 'ifIndex'])
+                ->get()->map->makeHidden(['port_adsl_updated', 'port_id']),
+            'ports_vdsl' => $device->portsVdsl()->orderBy('port_index')
+                ->leftJoin('ports', 'ports_vdsl.port_id', 'ports.port_id')
+                ->select(['ports_vdsl.*', 'ifIndex'])
+                ->get()->map->makeHidden(['port_vdsl_updated', 'port_id']),
+        ];
     }
 
     /**
