@@ -96,7 +96,6 @@ class Xdsl implements Module
         $device->portsVdsl()->delete();
     }
 
-
     /**
      * @inheritDoc
      */
