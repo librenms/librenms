@@ -3251,21 +3251,6 @@ parameters:
 			path: LibreNMS/Interfaces/Discovery/SlaDiscovery.php
 
 		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
 			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\MplsPolling\\:\\:pollMplsTunnelArHops\\(\\) has parameter \\$paths with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Interfaces/Polling/MplsPolling.php
@@ -3336,42 +3321,7 @@ parameters:
 			path: LibreNMS/Model.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discoveryIsSlow\\(\\) has parameter \\$def with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:parseAdjacencyTime\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
 
@@ -3384,46 +3334,6 @@ parameters:
 			message: "#^Variable \\$adjacencies in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:calculateAvailable\\(\\) never returns void so it can be removed from the return type\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:printMempool\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
 
 		-
 			message: "#^Variable \\$lsps might not be defined\\.$#"
@@ -3444,21 +3354,6 @@ parameters:
 			message: "#^Variable \\$svcs might not be defined\\.$#"
 			count: 2
 			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
 
 		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
@@ -3491,16 +3386,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryLevels\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
@@ -3509,26 +3394,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryPapers\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:discoverYamlMempools\\(\\) has no return type specified\\.$#"
@@ -5821,27 +5686,7 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_deps has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_tables has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$modules has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os is never read, only written\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
