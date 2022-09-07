@@ -104,10 +104,10 @@ class Xdsl implements Module
         return [
             'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')
                 ->select(['ports_adsl.*', 'ifIndex'])
-                ->get()->map->makeHidden(['port_adsl_updated', 'port_id']),
+                ->get()->map->makeHidden(['laravel_through_key', 'port_adsl_updated', 'port_id']),
             'ports_vdsl' => $device->portsVdsl()->orderBy('ifIndex')
                 ->select(['ports_vdsl.*', 'ifIndex'])
-                ->get()->map->makeHidden(['port_vdsl_updated', 'port_id']),
+                ->get()->map->makeHidden(['laravel_through_key', 'port_vdsl_updated', 'port_id']),
         ];
     }
 
