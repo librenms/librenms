@@ -15,7 +15,7 @@ modules:
       data:
         -
           oid: temperature
-          value: 	temperature
+          value: temperature
           num_oid: .1.3.6.1.4.1.8000.22.2.1.{{ $index }}
           index: 'temperature.{{ $index }}'
           descr: 'Temperature'
@@ -24,7 +24,7 @@ modules:
       data:
         -
           oid: lbandSNR1
-          value: 	lbandSNR1
+          value: lbandSNR1
           num_oid: .1.3.6.1.4.1.8000.22.2.1.{{ $index }}
           index: 'lbandSNR1.{{ $index }}'
           descr: 'Ratio at L-band'
@@ -32,7 +32,7 @@ modules:
           divisor: 10
         -
           oid: lbandSNR2
-          value: 	lbandSNR2
+          value: lbandSNR2
           num_oid: .1.3.6.1.4.1.8000.22.3.1.{{ $index }}
           index: 'lbandSNR2.{{ $index }}'
           descr: 'Ratio at L-band'
@@ -42,7 +42,7 @@ modules:
       data:
         -
           oid: lbandOffset1
-          value: 	lbandOffset1
+          value: lbandOffset1
           num_oid: .1.3.6.1.4.1.8000.22.2.2.{{ $index }}
           index: 'lbandOffset1.{{ $index }}'
           descr: 'PLL and carrier offset'
@@ -50,7 +50,7 @@ modules:
           multiplier: 1000
         -
           oid: lbandOffset2
-          value: 	lbandOffset2
+          value: lbandOffset2
           num_oid: .1.3.6.1.4.1.8000.22.3.2.{{ $index }}
           index: 'lbandOffset2.{{ $index }}'
           descr: 'PLL and carrier offset'
@@ -58,34 +58,34 @@ modules:
           multiplier: 1000
         -
           oid: tdelta
-          value: 	tdelta
+          value: tdelta
           num_oid: .1.3.6.1.4.1.8000.22.5.1.{{ $index }}
           index: 'tdelta.{{ $index }}'
           descr: 'Delta between station and hub'     
           group: 'TTS' 
         -
           oid: hubTTS
-          value: 	hubTTS
+          value: hubTTS
           num_oid: .1.3.6.1.4.1.8000.22.5.1.5.{{ $index }}
           index: 'hubTTS.{{ $index }}'
           descr: 'HUB TTS'
           group: 'TTS' 
         -
           oid: remoteTTS
-          value: 	remoteTTS
+          value: remoteTTS
           num_oid: .1.3.6.1.4.1.8000.22.5.1.7.{{ $index }}
           index: 'remoteTTS.{{ $index }}'
           descr: 'Remote TTS'   
           group: 'TTS'  
         -
           oid: frqOffset
-          value: 	frqOffset
+          value: frqOffset
           num_oid: .1.3.6.1.4.1.8000.22.5.5.7.{{ $index }}
           index: 'frqOffset.{{ $index }}'
           descr: 'Frequency offset'    
         -
           oid: frqAdjust
-          value: 	frqAdjust
+          value: frqAdjust
           num_oid: .1.3.6.1.4.1.8000.22.5.5.7.{{ $index }}
           index: 'frqAdjust.{{ $index }}'
           descr: 'TX frequency adjustment'   
@@ -93,7 +93,7 @@ modules:
       data:
         -
           oid: prioAll
-          value: 	outBytesA
+          value: outBytesA
           num_oid: .1.3.6.1.4.1.8000.22.4.1.1.{{ $index }}
           index: 'outBytesA.{{ $index }}'
           descr: 'Traffic'
@@ -101,7 +101,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP1
-          value: 	outBytesP1
+          value: outBytesP1
           num_oid: .1.3.6.1.4.1.8000.22.4.2.1.{{ $index }}
           index: 'outBytesP1.{{ $index }}'
           descr: 'P1(low) priority traffic'
@@ -109,7 +109,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP2
-          value: 	outBytesP2
+          value: outBytesP2
           num_oid: .1.3.6.1.4.1.8000.22.4.7.1.{{ $index }}
           index: 'outBytesP2.{{ $index }}'
           descr: 'P2 priority traffic'
@@ -117,7 +117,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP3
-          value: 	outBytesP3
+          value: outBytesP3
           num_oid: .1.3.6.1.4.1.8000.22.4.8.1.{{ $index }}
           index: 'outBytesP3.{{ $index }}'
           descr: 'P3 priority traffic'
@@ -125,7 +125,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP4
-          value: 	outBytesP4
+          value: outBytesP4
           num_oid: .1.3.6.1.4.1.8000.22.4.3.1.{{ $index }}
           index: 'outBytesP4.{{ $index }}'
           descr: 'P4(med) priority traffic'
@@ -133,7 +133,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP5
-          value: 	outBytesP5
+          value: outBytesP5
           num_oid: .1.3.6.1.4.1.8000.22.4.9.1.{{ $index }}
           index: 'outBytesP5.{{ $index }}'
           descr: 'P5 priority traffic'
@@ -141,7 +141,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP6
-          value: 	outBytesP6
+          value: outBytesP6
           num_oid: .1.3.6.1.4.1.8000.22.4.10.1.{{ $index }}
           index: 'outBytesP6.{{ $index }}'
           descr: 'P6 priority traffic'
@@ -149,7 +149,7 @@ modules:
           divisor: 8
         -
           oid: outBytesP7
-          value: 	outBytesP7
+          value: outBytesP7
           num_oid: .1.3.6.1.4.1.8000.22.4.4.1.{{ $index }}
           index: 'outBytesP7.{{ $index }}'
           descr: 'P7(high) priority traffic'
@@ -157,7 +157,7 @@ modules:
           divisor: 8
         -
           oid: outBytesC
-          value: 	outBytesC
+          value: outBytesC
           num_oid: .1.3.6.1.4.1.8000.22.4.5.1.{{ $index }}
           index: 'outBytesC.{{ $index }}'
           descr: 'Control traffic'
@@ -165,7 +165,7 @@ modules:
           divisor: 8
         -
           oid: prioAll
-          value: 	queueLenBA
+          value: queueLenBA
           num_oid: .1.3.6.1.4.1.8000.22.4.1.4.{{ $index }}
           index: 'queueLenBA.{{ $index }}'
           descr: 'Queue length'
@@ -173,7 +173,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP1
-          value: 	queueLenBP1
+          value: queueLenBP1
           num_oid: .1.3.6.1.4.1.8000.22.4.2.4.{{ $index }}
           index: 'queueLenBP1.{{ $index }}'
           descr: 'P1(low) queue length'
@@ -181,7 +181,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP2
-          value: 	queueLenBP2
+          value: queueLenBP2
           num_oid: .1.3.6.1.4.1.8000.22.4.7.4.{{ $index }}
           index: 'queueLenBP2.{{ $index }}'
           descr: 'P2 queue length'
@@ -189,7 +189,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP3
-          value: 	queueLenBP3
+          value: queueLenBP3
           num_oid: .1.3.6.1.4.1.8000.22.4.8.4.{{ $index }}
           index: 'queueLenBP3.{{ $index }}'
           descr: 'P3 queue length'
@@ -197,7 +197,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP4
-          value: 	queueLenBP4
+          value: queueLenBP4
           num_oid: .1.3.6.1.4.1.8000.22.4.3.4.{{ $index }}
           index: 'queueLenBP4.{{ $index }}'
           descr: 'P4(med) queue length'
@@ -205,7 +205,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP5
-          value: 	queueLenBP5
+          value: queueLenBP5
           num_oid: .1.3.6.1.4.1.8000.22.4.9.4.{{ $index }}
           index: 'queueLenBP5.{{ $index }}'
           descr: 'P5 queue length'
@@ -213,7 +213,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP6
-          value: 	queueLenBP6
+          value: queueLenBP6
           num_oid: .1.3.6.1.4.1.8000.22.4.10.4.{{ $index }}
           index: 'queueLenBP6.{{ $index }}'
           descr: 'P6 queue length'
@@ -221,7 +221,7 @@ modules:
           group: 'Modulator'
         -
           oid: queueLenBP7
-          value: 	queueLenBP7
+          value: queueLenBP7
           num_oid: .1.3.6.1.4.1.8000.22.4.4.4.{{ $index }}
           index: 'queueLenBP7.{{ $index }}'
           descr: 'P7(high) queue length'
@@ -257,175 +257,175 @@ modules:
       data:
         -
           oid: prioAll
-          value: 	outPktsA
+          value: outPktsA
           num_oid: .1.3.6.1.4.1.8000.22.4.1.2.{{ $index }}
           index: 'outPktsA.{{ $index }}'
           descr: 'Traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsC
-          value: 	outPktsC
+          value: outPktsC
           num_oid: .1.3.6.1.4.1.8000.22.4.5.2.{{ $index }}
           index: 'outPktsC.{{ $index }}'
           descr: 'Control traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP1
-          value: 	outPktsP1
+          value: outPktsP1
           num_oid: .1.3.6.1.4.1.8000.22.4.2.2.{{ $index }}
           index: 'outPktsP1.{{ $index }}'
           descr: 'P1(low) priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP2
-          value: 	outPktsP2
+          value: outPktsP2
           num_oid: .1.3.6.1.4.1.8000.22.4.7.2.{{ $index }}
           index: 'outPktsP2.{{ $index }}'
           descr: 'P2 priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP3
-          value: 	outPktsP3
+          value: outPktsP3
           num_oid: .1.3.6.1.4.1.8000.22.4.8.2.{{ $index }}
           index: 'outPktsP3.{{ $index }}'
           descr: 'P3 priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP4
-          value: 	outPktsP4
+          value: outPktsP4
           num_oid: .1.3.6.1.4.1.8000.22.4.3.2.{{ $index }} 
           index: 'outPktsP4.{{ $index }}'
           descr: 'P4(med) priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP5
-          value: 	outPktsP5
+          value: outPktsP5
           num_oid: .1.3.6.1.4.1.8000.22.4.9.2.{{ $index }}
           index: 'outPktsP5.{{ $index }}'
           descr: 'P5 priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP6
-          value: 	outPktsP6
+          value: outPktsP6
           num_oid: .1.3.6.1.4.1.8000.22.4.10.2.{{ $index }}
           index: 'outPktsP6.{{ $index }}'
           descr: 'P6 priority traffic in packets'
           group: 'Modulator'
         -
           oid: outPktsP7
-          value: 	outPktsP7
+          value: outPktsP7
           num_oid: .1.3.6.1.4.1.8000.22.4.4.2.{{ $index }}
           index: 'outPktsP7.{{ $index }}'
           descr: 'P7(high) priority traffic in packets'
           group: 'Modulator'
         -
           oid: prioAll
-          value: 	dropsA
+          value: dropsA
           num_oid: .1.3.6.1.4.1.8000.22.4.1.3.{{ $index }}
           index: 'dropsA.{{ $index }}'
           descr: 'Dropped packets'
           group: 'Modulator'
         - oid: dropsP1
-          value: 	dropsP1
+          value: dropsP1
           num_oid: .1.3.6.1.4.1.8000.22.4.2.3.{{ $index }}
           index: 'dropsP1.{{ $index }}'
           descr: 'P1(low) dropped packets'
           group: 'Modulator'
         - oid: dropsP2
-          value: 	dropsP2
+          value: dropsP2
           num_oid: .1.3.6.1.4.1.8000.22.4.7.3.{{ $index }}
           index: 'dropsP2.{{ $index }}'
           descr: 'P2 dropped packets'
           group: 'Modulator'
         - oid: dropsP3
-          value: 	dropsP3
+          value: dropsP3
           num_oid: .1.3.6.1.4.1.8000.22.4.8.3.{{ $index }}
           index: 'dropsP3.{{ $index }}'
           descr: 'P3 dropped packets'
           group: 'Modulator'
         - oid: dropsP4
-          value: 	dropsP4
+          value: dropsP4
           num_oid: .1.3.6.1.4.1.8000.22.4.3.3.{{ $index }}
           index: 'dropsP4.{{ $index }}'
           descr: 'P4(med) dropped packets'
           group: 'Modulator'
         - oid: dropsP5
-          value: 	dropsP5
+          value: dropsP5
           num_oid: .1.3.6.1.4.1.8000.22.4.9.3.{{ $index }}
           index: 'dropsP5.{{ $index }}'
           descr: 'P5 dropped packets'
           group: 'Modulator'
         - oid: dropsP6
-          value: 	dropsP6
+          value: dropsP6
           num_oid: .1.3.6.1.4.1.8000.22.4.10.3.{{ $index }}
           index: 'dropsP6.{{ $index }}'
           descr: 'P6 dropped packets'
           group: 'Modulator'
         - oid: dropsP7
-          value: 	dropsP7
+          value: dropsP7
           num_oid: .1.3.6.1.4.1.8000.22.4.4.3.{{ $index }}
           index: 'dropsP7.{{ $index }}'
           descr: 'P7(high) dropped packets'
           group: 'Modulator'
         -
           oid: prioAll
-          value: 	queueLenPA
+          value: queueLenPA
           num_oid: .1.3.6.1.4.1.8000.22.4.2.5.{{ $index }}
           index: 'queueLenPA.{{ $index }}'
           descr: 'Queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP1
-          value: 	queueLenPP1
+          value: queueLenPP1
           num_oid: .1.3.6.1.4.1.8000.22.4.2.5.{{ $index }}
           index: 'queueLenPP1.{{ $index }}'
           descr: 'P1(low) queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP2
-          value: 	queueLenPP2
+          value: queueLenPP2
           num_oid: .1.3.6.1.4.1.8000.22.4.7.5.{{ $index }}
           index: 'queueLenPP2.{{ $index }}'
           descr: 'P2 queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP3
-          value: 	queueLenPP3
+          value: queueLenPP3
           num_oid: .1.3.6.1.4.1.8000.22.4.8.5.{{ $index }}
           index: 'queueLenPP3.{{ $index }}'
           descr: 'P3 queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP4
-          value: 	queueLenPP4
+          value: queueLenPP4
           num_oid: .1.3.6.1.4.1.8000.22.4.3.5.{{ $index }}
           index: 'queueLenPP4.{{ $index }}'
           descr: 'P4(med) queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP5
-          value: 	queueLenPP5
+          value: queueLenPP5
           num_oid: .1.3.6.1.4.1.8000.22.4.9.5.{{ $index }}
           index: 'queueLenPP5.{{ $index }}'
           descr: 'P5 queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP6
-          value: 	queueLenPP6
+          value: queueLenPP6
           num_oid: .1.3.6.1.4.1.8000.22.4.10.5.{{ $index }}
           index: 'queueLenPP6.{{ $index }}'
           descr: 'P6 queue length in packets'
           group: 'Modulator'
         -
           oid: queueLenPP7
-          value: 	queueLenPP7
+          value: queueLenPP7
           num_oid: .1.3.6.1.4.1.8000.22.4.4.5.{{ $index }}
           index: 'queueLenPP7.{{ $index }}'
           descr: 'P7(high) queue length in packets'
           group: 'Modulator'
         -
           oid: prioAll
-          value: 	numStations
+          value: numStations
           num_oid: .1.3.6.1.4.1.8000.22.4.1.6.{{ $index }}
           index: 'numStations.{{ $index }}'
           descr: 'Stations per ACM channel'
@@ -434,7 +434,7 @@ modules:
           oid: unroutedPkts
           num_oid: .1.3.6.1.4.1.8000.22.6.1.{{ $index }}
           index: 'unroutedPkts.{{ $index }}'
-          descr: 'Packets router could not route anywhere'
+          descr: 'Unroutable packets'
         -
           oid: frameDelay
           num_oid: .1.3.6.1.4.1.8000.22.5.2.2.{{ $index }}
