@@ -1,7 +1,7 @@
 os: uhp
 text: 'UHP Networks VSAT Terminal'
 type: wireless
-logo: uhp
+icon: uhp
 discovery:
     -
         sysObjectID: 
