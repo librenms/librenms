@@ -102,12 +102,10 @@ class Xdsl implements Module
     public function dump(Device $device)
     {
         return [
-            'ports_adsl' => $device->portsAdsl()->orderBy('port_index')
-                //->leftJoin('ports', 'ports_adsl.port_id', 'ports.port_id')
+            'ports_adsl' => $device->portsAdsl()->orderBy('ifIndex')
                 ->select(['ports_adsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['port_adsl_updated', 'port_id']),
-            'ports_vdsl' => $device->portsVdsl()->orderBy('port_index')
-                //->leftJoin('ports', 'ports_vdsl.port_id', 'ports.port_id')
+            'ports_vdsl' => $device->portsVdsl()->orderBy('ifIndex')
                 ->select(['ports_vdsl.*', 'ifIndex'])
                 ->get()->map->makeHidden(['port_vdsl_updated', 'port_id']),
         ];
