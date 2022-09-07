@@ -144,25 +144,20 @@ if ($vars['view'] == 'minigraphs') {
 
     $i = '1';
 
-    global $port_cache, $port_index_cache;
+    global $port_index_cache;
 
-    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' AND `disabled` = 0 ORDER BY `ifIndex` ASC", [$device['device_id']]);
+    /** @var \Illuminate\Support\Collection<\App\Models\Port> $ports */
+    $ports = DeviceCache::getPrimary()->ports()->orderBy('ifIndex')->isValid()->get();
+
     // As we've dragged the whole database, lets pre-populate our caches :)
-    // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
-
     foreach ($ports as $key => $port) {
-        $port_cache[$port['port_id']] = $port;
         $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
-        $ports[$key]['ifOctets_rate'] = $port['ifInOctets_rate'] + $port['ifOutOctets_rate'];
     }
 
-    switch ($vars['sort'] ?? '') {
-        case 'traffic':
-            $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
-            break;
-        default:
-            $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
-            break;
+    if (isset($vars['sort']) && $vars['sort'] == 'traffic') {
+        $ports = $ports->sortByDesc(function (Port $port) {
+            return $port->ifInOctets_rate + $port->ifOutOctets_rate;
+        });
     }
 
     foreach ($ports as $port) {

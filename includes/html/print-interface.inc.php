@@ -174,7 +174,7 @@ if (! empty($port_adsl['adslLineCoding'])) {
 
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != '') {
-        echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::readableMac($port['ifPhysAddress']) . '</span>';
+        echo '<span class=box-desc>' . $port->ifPhysAddress . '</span>';
     } else {
         echo '-';
     }

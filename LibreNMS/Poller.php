@@ -36,12 +36,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\PollerException;
-use LibreNMS\Modules\LegacyModule;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
+use LibreNMS\Util\Module;
 use LibreNMS\Util\StringHelpers;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -183,8 +183,7 @@ class Poller
                 $this->logger->info("\n#### Load poller module $module ####");
 
                 try {
-                    $module_class = StringHelpers::toClass($module, '\\LibreNMS\\Modules\\');
-                    $instance = class_exists($module_class) ? new $module_class : new LegacyModule($module);
+                    $instance = Module::fromName($module);
                     $instance->poll($this->os);
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process

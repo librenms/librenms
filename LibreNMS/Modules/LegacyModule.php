@@ -25,12 +25,34 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Component;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Util\Debug;
+use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module
 {
+    /** @var array */
+    private $module_deps = [
+        'arp-table' => ['ports'],
+        'cisco-mac-accounting' => ['ports'],
+        'fdb-table' => ['ports', 'vlans'],
+        'vlans' => ['ports'],
+        'vrf' => ['ports'],
+    ];
+
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return $this->module_deps[$this->name] ?? [];
+    }
+
     /**
      * @var string
      */
@@ -64,8 +86,102 @@ class LegacyModule implements Module
         Debug::enableErrorReporting(); // and back to normal
     }
 
-    public function cleanup(OS $os): void
+    public function cleanup(Device $device): void
     {
         // TODO: Implement cleanup() method.
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        $data = [];
+        $dump_rules = $this->moduleDumpDefinition();
+        if (empty($dump_rules)) {
+            return false; // not supported for this legacy module
+        }
+
+        foreach ($dump_rules as $table => $info) {
+            if ($table == 'component') {
+                $components = $this->collectComponents($device->device_id);
+                if (! empty($components)) {
+                    $data[$table] = $components;
+                }
+                continue;
+            }
+
+            // check for custom where
+            $where = $info['custom_where'] ?? "WHERE `$table`.`device_id`=?";
+            $params = [$device->device_id];
+
+            // build joins
+            $join = '';
+            $select = ["`$table`.*"];
+            foreach ($info['joins'] ?? [] as $join_info) {
+                if (isset($join_info['custom'])) {
+                    $join .= ' ' . $join_info['custom'];
+
+                    $default_select = [];
+                } else {
+                    [$left, $lkey] = explode('.', $join_info['left']);
+                    [$right, $rkey] = explode('.', $join_info['right']);
+                    $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
+
+                    $default_select = ["`$right`.*"];
+                }
+
+                // build selects
+                $select = array_merge($select, isset($join_info['select']) ? (array) $join_info['select'] : $default_select);
+            }
+
+            $order_by = isset($info['order_by']) ? " ORDER BY {$info['order_by']}" : '';
+            $fields = implode(', ', $select);
+            $rows = DB::select("SELECT $fields FROM `$table` $join $where $order_by", $params);
+
+            // don't include empty tables
+            if (empty($rows)) {
+                continue;
+            }
+
+            // remove unwanted fields
+            if (isset($info['included_fields'])) {
+                $keys = array_flip($info['included_fields']);
+                $rows = array_map(function ($row) use ($keys) {
+                    return array_intersect_key((array) $row, $keys);
+                }, $rows);
+            } elseif (isset($info['excluded_fields'])) {
+                $keys = array_flip($info['excluded_fields']);
+                $rows = array_map(function ($row) use ($keys) {
+                    return array_diff_key((array) $row, $keys);
+                }, $rows);
+            }
+
+            $data[$table] = $rows;
+        }
+
+        return $data;
+    }
+
+    private function moduleDumpDefinition(): array
+    {
+        static $def;
+
+        if ($def === null) {
+            // only load the yaml once, then keep it in memory
+            $def = Yaml::parse(file_get_contents(base_path('/tests/module_tables.yaml')));
+        }
+
+        return $def[$this->name] ?? [];
+    }
+
+    private function collectComponents(int $device_id): array
+    {
+        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
+        $components = Arr::sort($components, function ($item) {
+            return $item['type'] . $item['label'];
+        });
+
+        return array_values($components);
     }
 }

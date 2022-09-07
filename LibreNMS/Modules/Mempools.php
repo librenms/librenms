@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
@@ -41,7 +42,15 @@ class Mempools implements Module
 {
     use SyncsModels;
 
-    public function discover(OS $os)
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    public function discover(OS $os): void
     {
         if ($os instanceof MempoolsDiscovery) {
             $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
@@ -64,7 +73,7 @@ class Mempools implements Module
         }
     }
 
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         $mempools = $os->getDevice()->mempools;
 
@@ -131,16 +140,27 @@ class Mempools implements Module
         return $mempools;
     }
 
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->mempools()->delete();
+        $device->mempools()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
+                ->get()->map->makeHidden(['device_id', 'mempool_id']),
+        ];
     }
 
     /**
      * Calculate available memory.  This is free + buffers + cached.
      *
      * @param  \Illuminate\Support\Collection  $mempools
-     * @return \Illuminate\Support\Collection|void
+     * @return \Illuminate\Support\Collection
      */
     private function calculateAvailable(Collection $mempools)
     {
@@ -186,7 +206,7 @@ class Mempools implements Module
         return $mempools;
     }
 
-    private function printMempool(Mempool $mempool)
+    private function printMempool(Mempool $mempool): void
     {
         echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
