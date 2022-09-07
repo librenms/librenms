@@ -23,8 +23,8 @@ class AlertScheduleFactory extends Factory
     public function definition()
     {
         return [
-            'title' => $this->faker->name,
-            'notes' => $this->faker->text,
+            'title' => $this->faker->name(),
+            'notes' => $this->faker->text(),
             'recurring' => 0,
         ];
     }

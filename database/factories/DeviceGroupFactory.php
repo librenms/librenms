@@ -23,7 +23,7 @@ class DeviceGroupFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->domainWord,
+            'name' => $this->faker->domainWord(),
             'desc' => $this->faker->text(255),
             'type' =>'static',
         ];

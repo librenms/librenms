@@ -227,7 +227,7 @@ class SnmpResponse
      */
     public function filterBadLines(): SnmpResponse
     {
-        $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/', '', $this->raw);
+        $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/m', '', $this->raw);
         $this->raw = preg_replace('/\n[^\r\n]+No more variables left[^\r\n]+$/s', '', $this->raw);
 
         return $this;

@@ -1061,11 +1061,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1291,11 +1286,6 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\LdapAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
@@ -1312,11 +1302,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:bind\\(\\) has parameter \\$credentials with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:connect\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizer.php
 
@@ -1431,12 +1416,12 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
@@ -2739,31 +2724,6 @@ parameters:
 			message: "#^Property LibreNMS\\\\Exceptions\\\\JsonAppWrongVersionException\\:\\:\\$parsed_json has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/JsonAppWrongVersionException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$error with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$exit_code with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$image_output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:getImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:\\$image_output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
 
 		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\UnserializableRouteCache\\:\\:__construct\\(\\) has parameter \\$cli_php_version with no type specified\\.$#"
@@ -5616,7 +5576,12 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getTypes\\(\\) has no return type specified\\.$#"
+			message: "#^Result of && is always false\\.$#"
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
@@ -7112,11 +7077,6 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:buildDeviceGraphArrays\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:deviceLinkMenu\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
 
@@ -10834,11 +10794,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Tests\\\\MibTest\\:\\:testMibNameMatches\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/MibTest.php
-
-		-
-			message: "#^Property LibreNMS\\\\Tests\\\\Mocks\\\\SnmpQueryMock\\:\\:\\$context is never read, only written\\.$#"
-			count: 1
-			path: tests/Mocks/SnmpQueryMock.php
 
 		-
 			message: "#^Method LibreNMS\\\\Tests\\\\OSDiscoveryTest\\:\\:checkOS\\(\\) has no return type specified\\.$#"

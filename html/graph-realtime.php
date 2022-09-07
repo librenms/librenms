@@ -30,7 +30,7 @@ $ifnum = @$port['ifIndex'];  // BSD / SNMP interface name / number
 $ifname = $port['label']; //Interface name that will be showed on top right of graph
 $hostname = shorthost($device['hostname']);
 
-if ($_GET['title']) {
+if (isset($_GET['title'])) {
     $ifname = \LibreNMS\Util\Clean::html($_GET['title'], []);
 }
 

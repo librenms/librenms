@@ -225,7 +225,7 @@ if (! Auth::user()->hasGlobalRead()) {
 
     $peer_query = "SELECT * FROM `bgpPeers` AS `B`, `devices` AS `D` WHERE `B`.`device_id` = `D`.`device_id` $where $extra_sql ORDER BY `D`.`hostname`, `B`.`bgpPeerRemoteAs`, `B`.`bgpPeerIdentifier`";
     foreach (dbFetchRows($peer_query) as $peer) {
-        unset($alert, $bg_image);
+        unset($alert);
 
         if ($peer['bgpPeerState'] == 'established') {
             $col = 'green';
@@ -362,7 +362,7 @@ if (! Auth::user()->hasGlobalRead()) {
             $graph_array['height'] = '100';
             $graph_array['width'] = '218';
             $graph_array['to'] = \LibreNMS\Config::get('time.now');
-            echo '<tr></tr><tr class="bgp"' . ($bg_image ? ' background="' . $bg_image . '"' : '') . '"><td colspan="9">';
+            echo '<tr></tr><tr class="bgp"><td colspan="9">';
 
             include 'includes/html/print-graphrow.inc.php';
 

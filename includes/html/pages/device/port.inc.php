@@ -6,32 +6,31 @@ use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
 
-$port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$vars['port']]);
+$port = \App\Models\Port::find($vars['port']);
 
 $port_details = 1;
 
 $hostname = $device['hostname'];
-$hostid = $device['port_id'];
-$ifname = $port['ifDescr'];
-$ifIndex = $port['ifIndex'];
-$speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');
+$ifname = $port->ifDescr;
+$ifIndex = $port->ifIndex;
+$speed = \LibreNMS\Util\Number::formatSi($port->ifSpeed, 2, 3, 'bps');
 
-$ifalias = $port['name'];
+$ifalias = $port->getLabel();
 
-if ($port['ifPhysAddress']) {
-    $mac = "$port[ifPhysAddress]";
+if ($port->ifPhysAddress) {
+    $mac = $port->ifPhysAddress;
 }
 
 $color = 'black';
-if ($port['ifAdminStatus'] == 'down') {
+if ($port->ifAdminStatus == 'down') {
     $status = "<span class='grey'>Disabled</span>";
 }
 
-if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] != 'up') {
+if ($port->ifAdminStatus == 'up' && $port->ifOperStatus != 'up') {
     $status = "<span class='red'>Enabled / Disconnected</span>";
 }
 
-if ($port['ifAdminStatus'] == 'up' && $port['ifOperStatus'] == 'up') {
+if ($port->ifAdminStatus == 'up' && $port->ifOperStatus == 'up') {
     $status = "<span class='green'>Enabled / Connected</span>";
 }
 
@@ -67,7 +66,7 @@ $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
     'tab'    => 'port',
-    'port'   => $port['port_id'],
+    'port'   => $port->port_id,
 ];
 
 $menu_options['graphs'] = 'Graphs';
@@ -78,19 +77,19 @@ $menu_options['fdb'] = 'FDB Table';
 $menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = 'Notes';
 
-if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port['ifIndex']])) {
+if (dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE `device_id` = ? AND `entPhysicalIndex` = ?  AND entPhysicalIndex_measured = 'ports'", [$device['device_id'], $port->ifIndex])) {
     $menu_options['sensors'] = 'Health';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '" . $port['port_id'] . "'")) {
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_adsl` WHERE `port_id` = '" . $port->port_id . "'")) {
     $menu_options['adsl'] = 'ADSL';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '" . $port['ifIndex'] . "' and `device_id` = '" . $device['device_id'] . "'")) {
+if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `pagpGroupIfIndex` = '" . $port->ifIndex . "' and `device_id` = '" . $device['device_id'] . "'")) {
     $menu_options['pagp'] = 'PAgP';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '" . $port['port_id'] . "' and `device_id` = '" . $device['device_id'] . "'")) {
+if (dbFetchCell("SELECT COUNT(*) FROM `ports_vlans` WHERE `port_id` = '" . $port->port_id . "' and `device_id` = '" . $device['device_id'] . "'")) {
     $menu_options['vlans'] = 'VLANs';
 }
 
@@ -104,7 +103,7 @@ if (count($components) > 0) {
     $menu_options['cbqos'] = 'CBQoS';
 }
 
-$portModel = \App\Models\Port::find($port['port_id']);
+$portModel = \App\Models\Port::find($port->port_id);
 
 if (LibreNMS\Plugins::countHooks('port_container') || \PluginManager::hasHooks(PortTabHook::class, ['port' => $portModel])) {
     // Checking if any plugin implements the port_container. If yes, allow to display the menu_option
@@ -128,7 +127,7 @@ foreach ($menu_options as $option => $text) {
 
 unset($sep);
 
-if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port['port_id'] . "'") > '0') {
+if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port->port_id . "'") > '0') {
     echo generate_link($descr, $link_array, ['view' => 'macaccounting', 'graph' => $type]);
 
     echo ' | Mac Accounting : ';
@@ -196,7 +195,7 @@ if (dbFetchCell("SELECT count(*) FROM mac_accounting WHERE port_id = '" . $port[
     echo ')';
 }//end if
 
-if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port_id'] . "'") > '0') {
+if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port->port_id . "'") > '0') {
     // FIXME ATM VPs
     // FIXME URLs BROKEN
     echo ' | ATM VPs : ';
@@ -204,7 +203,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/bits/'>Bits</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/bits/'>Bits</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -214,7 +213,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/packets/'>Packets</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/packets/'>Packets</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -224,7 +223,7 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/cells/'>Cells</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/cells/'>Cells</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
@@ -234,20 +233,20 @@ if (dbFetchCell("SELECT COUNT(*) FROM juniAtmVp WHERE port_id = '" . $port['port
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port['port_id']]) . "/junose-atm-vp/errors/'>Errors</a>";
+    echo "<a href='" . Url::generate(['page' => 'device', 'device' => $device['device_id'], 'tab' => 'port', 'port' => $port->port_id]) . "/junose-atm-vp/errors/'>Errors</a>";
     if ($vars['view'] == 'junose-atm-vp' && $vars['graph'] == 'bits') {
         echo '</span>';
     }
 }//end if
 
 if (Auth::user()->hasGlobalAdmin() && \LibreNMS\Config::get('enable_billing') == 1) {
-    $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port['port_id']]);
+    $bills = dbFetchRows('SELECT `bill_id` FROM `bill_ports` WHERE `port_id`=?', [$port->port_id]);
     if (count($bills) === 1) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bill', 'bill_id' => $bills[0]['bill_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bill</a></span>";
     } elseif (count($bills) > 1) {
         echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills']) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> View Bills</a></span>";
     } else {
-        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port['port_id']]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
+        echo "<span style='float: right;'><a href='" . Url::generate(['page' => 'bills', 'view' => 'add', 'port' => $port->port_id]) . "'><i class='fa fa-money fa-lg icon-theme' aria-hidden='true'></i> Create Bill</a></span>";
     }
 }
 

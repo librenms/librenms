@@ -420,7 +420,7 @@ if (Config::get('enable_ports_poe')) {
     }
 }
 
-if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'] != 'asa') {
+if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
         $pagp_port_stats = snmpwalk_cache_oid($device, $oid, [], 'CISCO-PAGP-MIB');
     }
@@ -821,8 +821,8 @@ foreach ($ports as $port) {
 
             // If we have a valid ifSpeed we should populate the stats for checking
             if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
-                $port['stats']['ifInBits_perc'] = round(($port['stats']['ifInBits_rate'] / $this_port['ifSpeed'] * 100));
-                $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
+                $port['stats']['ifInBits_perc'] = Number::calculatePercent($port['stats']['ifInBits_rate'], $this_port['ifSpeed'], 0);
+                $port['stats']['ifOutBits_perc'] = Number::calculatePercent($port['stats']['ifOutBits_rate'], $this_port['ifSpeed'], 0);
             }
 
             echo 'bps(' . Number::formatSi($port['stats']['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($port['stats']['ifOutBits_rate'], 2, 3, 'bps') . ')';

@@ -40,7 +40,7 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
-if (is_numeric($vars['device_group'])) {
+if (isset($vars['device_group']) && is_numeric($vars['device_group'])) {
     $where .= ' AND D.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $param[] = $vars['device_group'];
 }

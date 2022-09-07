@@ -109,7 +109,7 @@ class Plugins
 
             foreach ((array) $hooks as $hookName) {
                 if ($hookName[0] != '_') {
-                    self::$plugins[$hookName][] = $class;
+                    self::$plugins[$hookName][] = $plugin;
                 }
             }
         }
@@ -183,12 +183,12 @@ class Plugins
 
         ob_start();
         if (! empty(self::$plugins[$hook])) {
-            foreach (self::$plugins[$hook] as $name) {
+            foreach (self::$plugins[$hook] as $plugin) {
                 try {
                     if (! is_array($params)) {
-                        @call_user_func([$name, $hook]);
+                        @call_user_func([$plugin, $hook]);
                     } else {
-                        @call_user_func_array([$name, $hook], $params);
+                        @call_user_func_array([$plugin, $hook], $params);
                     }
                 } catch (\Exception $e) {
                     Log::error($e);

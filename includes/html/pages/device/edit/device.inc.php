@@ -6,7 +6,7 @@ require_once 'includes/html/modal/device_maintenance.inc.php';
 
 $device_model = Device::find($device['device_id']);
 
-if ($_POST['editing']) {
+if (! empty($_POST['editing'])) {
     if (Auth::user()->hasGlobalAdmin()) {
         $reload = false;
         if (isset($_POST['parent_id'])) {
@@ -92,7 +92,7 @@ if ($_POST['editing']) {
 }
 
 $override_sysContact_bool = get_dev_attrib($device, 'override_sysContact_bool');
-$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string');
+$override_sysContact_string = get_dev_attrib($device, 'override_sysContact_string') ?? '';
 $disable_notify = get_dev_attrib($device, 'disable_notify');
 
 ?>
@@ -135,13 +135,13 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip (e.g. '{{ $sysName }}')" >
         <label for="edit-display-input" class="col-sm-2 control-label" >Display Name</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="<?php echo htmlentities($device_model->display); ?>">
+            <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="<?php echo htmlentities($device_model->display ?? ''); ?>">
         </div>
     </div>
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
         <label for="edit-overwrite_ip-input" class="col-sm-2 control-label text-danger" >Overwrite IP (do not use)</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-overwrite_ip-input" name="overwrite_ip" class="form-control" value="<?php echo htmlentities($device_model->overwrite_ip); ?>">
+            <input type="text" id="edit-overwrite_ip-input" name="overwrite_ip" class="form-control" value="<?php echo htmlentities($device_model->overwrite_ip ?? ''); ?>">
         </div>
     </div>
      <div class="form-group">

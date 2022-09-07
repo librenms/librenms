@@ -47,7 +47,7 @@ class Config
     public static function load()
     {
         // don't reload the config if it is already loaded, reload() should be used for that
-        if (! is_null(self::$config)) {
+        if (self::isLoaded()) {
             return self::$config;
         }
 
@@ -565,5 +565,15 @@ class Config
         self::set('db_pass', config("database.connections.$db.password"));
         self::set('db_port', config("database.connections.$db.port", 3306));
         self::set('db_socket', config("database.connections.$db.unix_socket"));
+    }
+
+    /**
+     * Check if the config has been loaded yet
+     *
+     * @return bool
+     */
+    public static function isLoaded(): bool
+    {
+        return ! is_null(self::$config);
     }
 }

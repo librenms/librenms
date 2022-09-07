@@ -71,7 +71,7 @@ trait ActiveDirectoryCommon
             $attributes
         );
         $entries = ldap_get_entries($link_identifier, $result);
-        if ($entries['count'] > 0) {
+        if ((int) $entries['count'] > 0) {
             return $entries[0]['dn'];
         } else {
             return '';
@@ -115,7 +115,7 @@ trait ActiveDirectoryCommon
             $attributes
         );
         $entries = ldap_get_entries($connection, $result);
-        if ($entries['count'] > 0) {
+        if ((int) $entries['count'] > 0) {
             $membername = $entries[0]['name'][0];
         } else {
             $membername = $username;

@@ -23,7 +23,7 @@ class Ipv4NetworkFactory extends Factory
     public function definition()
     {
         return [
-            'ipv4_network' => $this->faker->ipv4 . '/' . $this->faker->numberBetween(0, 32),
+            'ipv4_network' => $this->faker->ipv4() . '/' . $this->faker->numberBetween(0, 32),
         ];
     }
 }
