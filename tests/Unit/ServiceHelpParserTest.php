@@ -11,8 +11,6 @@ class ServiceHelpParserTest extends TestCase
 {
     /**
      * @dataProvider helpData
-     *
-     * @return void
      */
     public function test_example(string $check, string $help, array $expected): void
     {

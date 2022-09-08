@@ -155,9 +155,15 @@ class HelpParser
 
         // if existing, update fields.
         if ($current_param = $this->params->get($key)) {
-            foreach (['short', 'param', 'value', 'description', 'required', 'inclusive_group', 'exclusive_group', 'default'] as $field) {
-                $current_param->$field = $param->$field ?? $current_param->$field;
-            }
+            $current_param->short = $param->short ?? $current_param->short;
+            $current_param->param = $param->param ?? $current_param->param;
+            $current_param->value = $param->value ?? $current_param->value;
+            $current_param->description = $param->description ?? $current_param->description;
+            $current_param->inclusive_group = $param->inclusive_group ?? $current_param->inclusive_group;
+            $current_param->exclusive_group = $param->exclusive_group ?? $current_param->exclusive_group;
+
+            $current_param->required = $param->required || $current_param->required;
+            $current_param->default = $param->default || $current_param->default;
 
             return;
         }
