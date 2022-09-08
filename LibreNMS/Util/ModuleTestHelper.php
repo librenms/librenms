@@ -55,7 +55,9 @@ class ModuleTestHelper
     // Definitions
     // ignore these when dumping all modules
     private $exclude_from_all = ['arp-table', 'fdb-table'];
-
+    private static $module_deps = [
+        'bgp-peers' => ['ports', 'vrfs', 'bgp-peers'],
+    ];
     /**
      * ModuleTester constructor.
      *
