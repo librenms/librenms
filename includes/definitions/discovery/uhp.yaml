@@ -1,9 +1,9 @@
 mib: UHP-MIB
 modules:
   os:
-    hardware: RFC1213-MIB::sysDescr.0 
+    hardware: RFC1213-MIB::sysDescr.0
     version: UHP-MIB::swVersion.0
-    serial: UHP-MIB::serialNumber.0   
+    serial: UHP-MIB::serialNumber.0
   processors:
     data:
       -
