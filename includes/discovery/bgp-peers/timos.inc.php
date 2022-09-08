@@ -44,7 +44,7 @@ if (Config::get('enable_bgp')) {
         unset($bgpPeersCache);
 
         foreach ($bgpPeers as $vrfOid => $vrf) {
-            $vrfId = Vrf::select('vrf_id')->firstWhere('vrf_oid', $vrfOid)->first();
+            $vrfId = Vrf::select('vrf_id')->firstWhere('vrf_oid', $vrfOid);
             d_echo($vrfId);
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
