@@ -10,5 +10,5 @@ foreach ($_POST as $name => $value) {
     $vars[$name] = ($value);
 }
 
-// don't leak login data
-unset($vars['username'], $vars['password'], $uri, $base_url);
+// don't leak login and other data
+unset($vars['username'], $vars['password'], $vars['_token']);

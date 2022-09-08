@@ -128,6 +128,6 @@ var grid = $("#ports").bootgrid({
     url: '<?php echo route('table.ports') ?>'
 });
 
-$(".actionBar").append("<?php echo $output; ?>");
+$(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
 
 </script>

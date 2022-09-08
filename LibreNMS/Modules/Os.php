@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\Location;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
@@ -32,6 +33,14 @@ use LibreNMS\Util\Url;
 
 class Os implements Module
 {
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
     public function discover(\LibreNMS\OS $os): void
     {
         $this->updateLocation($os);
@@ -90,9 +99,26 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function cleanup(\LibreNMS\OS $os): void
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(Device $device): void
     {
-        // no cleanup needed?
+        // no cleanup needed
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        // get data fresh from the database
+        return [
+            'devices' => Device::where('device_id', $device->device_id)
+            ->leftJoin('locations', 'location_id', 'id')
+            ->select(['sysName', 'sysObjectID', 'sysDescr', 'sysContact', 'version', 'hardware', 'features', 'location', 'os', 'type', 'serial', 'icon'])
+            ->get(),
+        ];
     }
 
     private function handleChanges(\LibreNMS\OS $os): void

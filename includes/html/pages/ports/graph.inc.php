@@ -5,6 +5,144 @@ echo '<div class="panel-heading">';
 echo $displayLists;
 echo '</div>';
 echo '<div class="panel-body">';
+echo '<div style="padding-bottom: 10px;">';
+echo stripcslashes($output);
+echo '</div>';
+
+$param = [];
+$where = '';
+$ignore_filter = 0;
+$disabled_filter = 0;
+
+foreach ($vars as $var => $value) {
+    if ($value != '') {
+        switch ($var) {
+            case 'hostname':
+                $where .= ' AND D.hostname LIKE ?';
+                $param[] = '%' . $value . '%';
+                break;
+            case 'location':
+                if (is_int($value)) {
+                    $where .= ' AND L.id = ?';
+                    $param[] = $value;
+                } else {
+                    $where .= ' AND L.location LIKE ?';
+                    $param[] = '%' . $value . '%';
+                }
+                break;
+            case 'device_id':
+                $where .= ' AND D.device_id = ?';
+                $param[] = $value;
+                break;
+            case 'deleted':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND `I`.`deleted` = 1';
+                    $ignore_filter = 1;
+                }
+                break;
+            case 'ignore':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
+                    $ignore_filter = 1;
+                }
+                break;
+            case 'disabled':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= ' AND `I`.`disabled` = 1 AND `I`.`deleted` = 0';
+                    $disabled_filter = 1;
+                }
+                break;
+            case 'ifSpeed':
+                if (is_numeric($value)) {
+                    $where .= " AND I.$var = ?";
+                    $param[] = $value;
+                }
+                break;
+            case 'ifType':
+                $where .= " AND I.$var = ?";
+                $param[] = $value;
+                break;
+            case 'ifAlias':
+            case 'port_descr_type':
+                $where .= " AND I.$var LIKE ?";
+                $param[] = '%' . $value . '%';
+                break;
+            case 'errors':
+                if ($value == 1 || $value == 'yes') {
+                    $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
+                }
+                break;
+            case 'state':
+                if ($value == 'down') {
+                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
+                    $param[] = 'up';
+                    $param[] = 'down';
+                } elseif ($value == 'up') {
+                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
+                    $param[] = 'up';
+                    $param[] = 'up';
+                } elseif ($value == 'admindown') {
+                    $where .= ' AND I.ifAdminStatus = ? AND D.ignore = 0';
+                    $param[] = 'down';
+                }
+                break;
+            case 'group':
+                $where .= ' AND port_id IN (SELECT `port_id` FROM `port_group_port` WHERE `port_group_id` = ?)';
+                $param[] = $vars['group'];
+                break;
+        }
+    }
+}
+
+if ($ignore_filter == 0 && $disabled_filter == 0) {
+    $where .= ' AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0';
+}
+
+$query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
+
+// only grab list of ports for graph pages, table uses ajax
+$ports = array_map(function ($value) {
+    return (array) $value;
+}, DB::select($query, $param));
+
+switch ($vars['sort'] ?? '') {
+    case 'traffic':
+        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
+        break;
+    case 'traffic_in':
+        $ports = array_sort_by_column($ports, 'ifInOctets_rate', SORT_DESC);
+        break;
+    case 'traffic_out':
+        $ports = array_sort_by_column($ports, 'ifOutOctets_rate', SORT_DESC);
+        break;
+    case 'packets':
+        $ports = array_sort_by_column($ports, 'ifUcastPkts_rate', SORT_DESC);
+        break;
+    case 'packets_in':
+        $ports = array_sort_by_column($ports, 'ifInUcastOctets_rate', SORT_DESC);
+        break;
+    case 'packets_out':
+        $ports = array_sort_by_column($ports, 'ifOutUcastOctets_rate', SORT_DESC);
+        break;
+    case 'errors':
+        $ports = array_sort_by_column($ports, 'ifErrors_rate', SORT_DESC);
+        break;
+    case 'speed':
+        $ports = array_sort_by_column($ports, 'ifSpeed', SORT_DESC);
+        break;
+    case 'port':
+        $ports = array_sort_by_column($ports, 'ifDescr', SORT_ASC);
+        break;
+    case 'media':
+        $ports = array_sort_by_column($ports, 'ifType', SORT_ASC);
+        break;
+    case 'descr':
+        $ports = array_sort_by_column($ports, 'ifAlias', SORT_ASC);
+        break;
+    case 'device':
+    default:
+        $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
+}
 
 foreach ($ports as $port) {
     $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 3, 'bps');

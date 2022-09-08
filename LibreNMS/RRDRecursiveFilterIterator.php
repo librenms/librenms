@@ -33,7 +33,7 @@ namespace LibreNMS;
  **/
 class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
 {
-    public function accept()
+    public function accept(): bool
     {
         $filename = $this->current()->getFilename();
         if ($filename[0] === '.') {

@@ -27,6 +27,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -39,12 +40,20 @@ class Mpls implements Module
     use SyncsModels;
 
     /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return ['ports', 'vrf'];
+    }
+
+    /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         if ($os instanceof MplsDiscovery) {
             echo "\nMPLS LSPs: ";
@@ -90,7 +99,7 @@ class Mpls implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         if ($os instanceof MplsPolling) {
             $device = $os->getDevice();
@@ -150,18 +159,47 @@ class Mpls implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  Os  $os
      */
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->mplsLsps()->delete();
-        $os->getDevice()->mplsLspPaths()->delete();
-        $os->getDevice()->mplsSdps()->delete();
-        $os->getDevice()->mplsServices()->delete();
-        $os->getDevice()->mplsSaps()->delete();
-        $os->getDevice()->mplsSdpBinds()->delete();
-        $os->getDevice()->mplsTunnelArHops()->delete();
-        $os->getDevice()->mplsTunnelCHops()->delete();
+        $device->mplsLsps()->delete();
+        $device->mplsLspPaths()->delete();
+        $device->mplsSdps()->delete();
+        $device->mplsServices()->delete();
+        $device->mplsSaps()->delete();
+        $device->mplsSdpBinds()->delete();
+        $device->mplsTunnelArHops()->delete();
+        $device->mplsTunnelCHops()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'mpls_lsps' => $device->mplsLsps()->orderBy('vrf_oid')->orderBy('lsp_oid')
+                ->get()->map->makeHidden(['lsp_id', 'device_id']),
+            'mpls_lsp_paths' => $device->mplsLspPaths()
+                ->leftJoin('mpls_lsps', 'mpls_lsp_paths.lsp_id', 'mpls_lsps.lsp_id')
+                ->select(['mpls_lsp_paths.*', 'mpls_lsps.vrf_oid', 'mpls_lsps.lsp_oid'])
+                ->orderBy('vrf_oid')->orderBy('lsp_oid')->orderBy('path_oid')
+                ->get()->map->makeHidden(['lsp_path_id', 'device_id', 'lsp_id']),
+            'mpls_sdps' => $device->mplsSdps()->orderBy('sdp_oid')
+                ->get()->map->makeHidden(['sdp_id', 'device_id']),
+            'mpls_sdp_binds' => $device->mplsSdpBinds()
+                ->leftJoin('mpls_sdps', 'mpls_sdp_binds.sdp_id', 'mpls_sdps.sdp_id')
+                ->leftJoin('mpls_services', 'mpls_sdp_binds.svc_id', 'mpls_services.svc_id')
+                ->orderBy('mpls_sdps.sdp_oid')->orderBy('mpls_services.svc_oid')
+                ->select(['mpls_sdp_binds.*', 'mpls_sdps.sdp_oid', 'mpls_services.svc_oid'])
+                ->get()->map->makeHidden(['bind_id', 'sdp_id', 'svc_id', 'device_id']),
+            'mpls_services' => $device->mplsServices()->orderBy('svc_oid')
+                ->get()->map->makeHidden(['svc_id', 'device_id']),
+            'mpls_saps' => $device->mplsSaps()
+                ->leftJoin('mpls_services', 'mpls_saps.svc_id', 'mpls_services.svc_id')
+                ->orderBy('mpls_services.svc_oid')->orderBy('mpls_saps.sapPortId')->orderBy('mpls_saps.sapEncapValue')
+                ->select(['mpls_saps.*', 'mpls_services.svc_oid'])
+                ->get()->map->makeHidden(['sap_id', 'svc_id', 'device_id']),
+        ];
     }
 }

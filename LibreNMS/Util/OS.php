@@ -67,7 +67,7 @@ class OS
             $os_defs = unserialize(file_get_contents($cache_file));
             if ($existing) {
                 // remove unneeded os
-                $exists = Device::query()->distinct()->pluck('os')->flip()->all();
+                $exists = Device::query()->whereNotNull('os')->distinct()->pluck('os')->flip()->all();
                 $os_defs = array_intersect_key($os_defs, $exists);
             }
             \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
