@@ -52,7 +52,7 @@
     <div class="form-group">
         <label for="order_by-{{ $id }}" class="control-label">{{ __('Order By') }}</label>
         <select class="form-control" name="order_by" id="order_by-{{ $id }}">
-            <option value="display" @if($order_by == 'display') selected @endif>{{ __('Device Label') }}</option>
+            <option value="label" @if($order_by == 'label') selected @endif>{{ __('Device Label') }}</option>
             <option value="status" @if($order_by == 'status') selected @endif>{{ __('Status') }}</option>
         </select>
     </div>
