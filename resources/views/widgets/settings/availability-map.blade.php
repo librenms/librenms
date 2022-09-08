@@ -15,7 +15,7 @@
     </div>
 
     <div class="form-group" id="color_only_select-group-{{ $id }}" style="display: {{ $type == 0 ? 'block' : 'none' }};">
-        <label for="color_only_select-{{ $id }}" class="control-label">{{ __('Device Label') }}</label>
+        <label for="color_only_select-{{ $id }}" class="control-label">{{ __('Label') }}</label>
         <select class="form-control" name="color_only_select" id="color_only_select-{{ $id }}">
             <option value="1" @if($color_only_select == 1) selected @endif>{{ __('empty') }}</option>
             <option value="4" @if($color_only_select == 4) selected @endunless>{{ __('Display Name') }}</option>
@@ -52,7 +52,7 @@
     <div class="form-group">
         <label for="order_by-{{ $id }}" class="control-label">{{ __('Order By') }}</label>
         <select class="form-control" name="order_by" id="order_by-{{ $id }}">
-            <option value="label" @if($order_by == 'label') selected @endif>{{ __('Device Label') }}</option>
+            <option value="label" @if($order_by == 'label') selected @endif>{{ __('Label') }}</option>
             <option value="status" @if($order_by == 'status') selected @endif>{{ __('Status') }}</option>
         </select>
     </div>
