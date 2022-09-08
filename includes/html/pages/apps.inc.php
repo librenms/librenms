@@ -126,6 +126,17 @@ $graphs['nfs-server'] = [
 $graphs['os-updates'] = [
     'packages',
 ];
+$graphs['opensearch'] = [
+    'status',
+    'c_nodes',
+    'c_data_nodes',
+    'c_pending_tasks',
+    'c_in_fl_fetch',
+    'c_task_max_in_time',
+    'c_act_shards_perc',
+    'mem_all',
+    'time_all',
+];
 $graphs['dhcp-stats'] = [
     'stats',
     'pools_percent',
@@ -309,6 +320,18 @@ $graphs['freeradius'] = [
     'proxy_acct',
     'queue',
 ];
+$graphs['suricata'] = [
+    'alert',
+    'packets',
+    'nasty_delta',
+    'nasty_percent',
+    'dec_proto',
+    'flow_proto',
+    'app_flows',
+    'app_tx',
+    'bytes',
+    'mem_use',
+];
 $graphs['zfs'] = [
     'arc_misc',
     'arc_size',
@@ -375,6 +398,24 @@ $graphs['chronyd'] = [
     'time',
     'frequency',
     'root',
+];
+$graphs['sagan'] = [
+    'after',
+    'bytes_ignored',
+    'bytes',
+    'drop_percent',
+    'drop',
+    'eps',
+    'f_drop_percent',
+    'f_dropped',
+    'f_total',
+    'ignore',
+    'match',
+    'max_bytes_log_line',
+    'threshold',
+    'total',
+    'uptime',
+    'alert',
 ];
 
 echo '<div class="panel panel-default">';

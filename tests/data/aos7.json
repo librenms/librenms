@@ -78359,7 +78359,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78381,7 +78382,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78403,7 +78405,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78425,7 +78428,8 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -78549,7 +78553,8 @@
                     "bgpPeerInUpdateElapsedTime": 4020,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78571,7 +78576,8 @@
                     "bgpPeerInUpdateElapsedTime": 5671281,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78593,7 +78599,8 @@
                     "bgpPeerInUpdateElapsedTime": 6290,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -78615,7 +78622,8 @@
                     "bgpPeerInUpdateElapsedTime": 9518677,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [

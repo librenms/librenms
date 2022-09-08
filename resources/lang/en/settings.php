@@ -331,6 +331,15 @@ return [
             'description' => 'Bind username',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Use STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => 'Disabled',
+                'optional' => 'Optional',
+                'required' => 'Required',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP cache expiration',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
@@ -364,6 +373,10 @@ return [
         'auth_ldap_groups' => [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
+        ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
         ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
@@ -485,8 +498,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
@@ -573,9 +586,6 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -590,6 +600,12 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'distributed_poller' => [
@@ -611,6 +627,10 @@ return [
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
+        ],
+        'email_attach_graphs' => [
+            'description' => 'Attach graph images',
+            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
@@ -796,6 +816,10 @@ return [
                     'help' => 'Sets the primary link in the device dropdown menu',
                 ],
             ],
+        ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
@@ -1074,9 +1098,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -1101,8 +1122,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
@@ -1155,9 +1176,6 @@ return [
             'applications' => [
                 'description' => 'Applications',
             ],
-            'mib' => [
-                'description' => 'MIB',
-            ],
             'stp' => [
                 'description' => 'STP',
             ],
@@ -1172,6 +1190,12 @@ return [
             ],
             'mpls' => [
                 'description' => 'MPLS',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'ports_fdb_purge' => [
@@ -1387,6 +1411,10 @@ return [
                     'description' => 'Disable snmp bulk for OIDs',
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
+                'unordered' => [
+                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
             ],
             'port' => [
                 'description' => 'Port',
@@ -1458,9 +1486,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',
@@ -1592,6 +1617,7 @@ return [
         'boolean' => ':value is not a valid boolean',
         'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
+        'float' => ':value is not an float',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
         'select' => ':value is not an allowed value',

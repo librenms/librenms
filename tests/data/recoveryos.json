@@ -8,7 +8,7 @@
                     "sysDescr": "Linux unitrends 3.10.0-862.14.4.el7.x86_64 #1 SMP Wed Sep 26 15:12:11 UTC 2018 x86_64",
                     "sysContact": "<private>",
                     "version": "3.10.0-862.14.4.el7.x86_64",
-                    "hardware": "VMware, Inc. [VMware Virtual Platform]",
+                    "hardware": "VMware, Inc. VMware Virtual Platform",
                     "features": "RecoveryOS 7",
                     "os": "recoveryos",
                     "type": "server",

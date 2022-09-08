@@ -38,7 +38,7 @@ var outages_grid = $("#outages").bootgrid({
     post: function ()
     {
         return {
-            device: "' . (int) ($vars['device']) . '",
+            device: ' . (empty($vars['device']) ? 'null' : (int) $vars['device']) . ',
             to: "' . addcslashes($vars['to'], '"') . '",
             from: "' . addcslashes($vars['from'], '"') . '",
         };

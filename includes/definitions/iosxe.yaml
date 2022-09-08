@@ -24,6 +24,7 @@ poller_modules:
     ipmi: false
     cisco-vpdn: true
     cisco-qfp: true
+    xdsl: true
 discovery_modules:
     cisco-cef: true
     slas: true
@@ -33,6 +34,7 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
     cisco-qfp: true
+    xdsl: true
 discovery:
     -
         sysDescr:

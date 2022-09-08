@@ -108,4 +108,21 @@ class Number
 
         return $float == $int ? $int : $float;
     }
+
+    /**
+     * Calculate a percent, but make sure to not divide by zero.  In that case, return 0.
+     *
+     * @param  int|float  $part
+     * @param  int|float  $total
+     * @param  int  $precision
+     * @return float
+     */
+    public static function calculatePercent($part, $total, int $precision = 2): float
+    {
+        if ($total == 0) {
+            return 0;
+        }
+
+        return round($part / $total * 100, $precision);
+    }
 }

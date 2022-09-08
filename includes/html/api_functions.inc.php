@@ -37,6 +37,7 @@ use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
@@ -191,12 +192,12 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     return check_port_permission($port['port_id'], $device_id, function () use ($request, $port) {
         $in_rate = $port['ifInOctets_rate'] * 8;
         $out_rate = $port['ifOutOctets_rate'] * 8;
-        $port['in_rate'] = \LibreNMS\Util\Number::formatSi($in_rate, 2, 3, 'bps');
-        $port['out_rate'] = \LibreNMS\Util\Number::formatSi($out_rate, 2, 3, 'bps');
-        $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['in_pps'] = \LibreNMS\Util\Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
-        $port['out_pps'] = \LibreNMS\Util\Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
+        $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
+        $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
+        $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
+        $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
+        $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
+        $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 
         //only return requested columns
         if ($request->has('columns')) {
@@ -457,40 +458,52 @@ function maintenance_device(Illuminate\Http\Request $request)
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
-    // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
+    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
 
-    if (! $device) {
-        return api_error(404, "Device $hostname does not exist");
+    if (is_null($device)) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
     }
 
     $notes = $request->json('notes');
+    $title = $request->json('title') ?? $device->displayName();
     $alert_schedule = new \App\Models\AlertSchedule([
-        'title' => $device->displayName(),
+        'title' => $title,
         'notes' => $notes,
         'recurring' => 0,
-        'start' => date('Y-m-d H:i:s'),
     ]);
 
+    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
     $duration = $request->json('duration');
+
     if (Str::contains($duration, ':')) {
         [$duration_hour, $duration_min] = explode(':', $duration);
-        $alert_schedule->end = \Carbon\Carbon::now()
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours($duration_hour)->addMinutes($duration_min)
             ->format('Y-m-d H:i:00');
     }
 
-    $device->alertSchedules()->save($alert_schedule);
+    $alert_schedule->save();
+    $alert_schedule->devices()->attach($device);
 
     if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
         $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
         $device->save();
     }
 
-    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -1465,7 +1478,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id'])
+             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id', 'purpose', 'notes'])
              ->get();
 
     /** @var Device $device */
@@ -1571,20 +1584,20 @@ function list_bills(Illuminate\Http\Request $request)
         $overuse = '';
 
         if (strtolower($bill['bill_type']) == 'cdr') {
-            $allowed = \LibreNMS\Util\Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
-            $used = \LibreNMS\Util\Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
+            $allowed = Number::formatSi($bill['bill_cdr'], 2, 3, '') . 'bps';
+            $used = Number::formatSi($rate_data['rate_95th'], 2, 3, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
-                $percent = round(($rate_data['rate_95th'] / $bill['bill_cdr']) * 100, 2);
+                $percent = Number::calculatePercent($rate_data['rate_95th'], $bill['bill_cdr']);
             } else {
                 $percent = '-';
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
-            $overuse = (($overuse <= 0) ? '-' : \LibreNMS\Util\Number::formatSi($overuse, 2, 3, ''));
+            $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 3, ''));
         } elseif (strtolower($bill['bill_type']) == 'quota') {
             $allowed = format_bytes_billing($bill['bill_quota']);
             $used = format_bytes_billing($rate_data['total_data']);
             if ($bill['bill_quota'] > 0) {
-                $percent = round(($rate_data['total_data'] / ($bill['bill_quota'])) * 100, 2);
+                $percent = Number::calculatePercent($rate_data['total_data'], $bill['bill_quota']);
             } else {
                 $percent = '-';
             }
@@ -1820,6 +1833,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid' => $bill['bill_custid'],
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes'],
+            'dir_95th' => $bill['dir_95th'],
         ];
         $update = dbUpdate($update_data, 'bills', 'bill_id=?', [$bill_id]);
         if ($update === false || $update < 0) {
@@ -1840,6 +1854,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid',
             'bill_ref',
             'bill_notes',
+            'dir_95th',
         ];
 
         if ($data['bill_type'] == 'quota') {
@@ -1878,6 +1893,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
                 'bill_custid' => $bill['bill_custid'],
                 'bill_ref' => $bill['bill_ref'],
                 'bill_notes' => $bill['bill_notes'],
+                'dir_95th' => $bill['dir_95th'],
             ],
             'bills'
         );
@@ -2126,6 +2142,58 @@ function get_device_groups(Illuminate\Http\Request $request)
     }
 
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' device groups');
+}
+
+function maintenance_devicegroup(Illuminate\Http\Request $request)
+{
+    if (empty($request->json())) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No device group name provided');
+    }
+
+    $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
+
+    if (! $device_group) {
+        return api_error(404, "Device group $name not found");
+    }
+
+    if (! $request->json('duration')) {
+        return api_error(400, 'Duration not provided');
+    }
+
+    $notes = $request->json('notes');
+    $title = $request->json('title') ?? $device_group->name;
+
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $title,
+        'notes' => $notes,
+        'recurring' => 0,
+    ]);
+
+    $start = $request->json('start') ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
+    $duration = $request->json('duration');
+
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
+            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $alert_schedule->save();
+    $alert_schedule->deviceGroups()->attach($device_group);
+
+    if ($request->json('start')) {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function get_devices_by_group(Illuminate\Http\Request $request)

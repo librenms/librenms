@@ -40,7 +40,7 @@ class Python extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         $version = Version::get()->python();
 

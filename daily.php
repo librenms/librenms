@@ -16,11 +16,6 @@ use LibreNMS\Validations\Php;
 
 $options = getopt('df:o:t:r:');
 
-if (isset($options['d'])) {
-    echo "DEBUG\n";
-    Debug::set();
-}
-
 /**
  * Scripts without dependencies
  */
@@ -45,6 +40,11 @@ if ($options['f'] === 'composer_get_plugins') {
 $init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 include_once __DIR__ . '/includes/notifications.php';
+
+if (isset($options['d'])) {
+    echo "DEBUG\n";
+    Debug::set();
+}
 
 if ($options['f'] === 'update') {
     if (! Config::get('update')) {
@@ -126,7 +126,7 @@ if ($options['f'] === 'authlog') {
 }
 
 if ($options['f'] === 'callback') {
-    include_once 'includes/callback.php';
+    \LibreNMS\Util\Stats::submit();
 }
 
 if ($options['f'] === 'device_perf') {
@@ -287,7 +287,7 @@ if ($options['f'] === 'alert_log') {
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    $sql = str_replace('?', strval($purge_duration), $sql);
+    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -378,7 +378,9 @@ if ($options['f'] === 'mac_oui') {
 
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
-    unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    if (is_file(Config::get('install_dir') . '/cache/os_defs.cache')) {
+        unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    }
 }
 
 if ($options['f'] === 'recalculate_device_dependencies') {
@@ -386,8 +388,6 @@ if ($options['f'] === 'recalculate_device_dependencies') {
 
     $lock = Cache::lock('recalculate_device_dependencies', 86000);
     if ($lock->get()) {
-        \LibreNMS\DB\Eloquent::boot();
-
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
             // anonymous recursive function

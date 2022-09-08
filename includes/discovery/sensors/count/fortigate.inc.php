@@ -46,3 +46,50 @@ foreach ($session_rate as $descr => $oid) {
         $result
     );
 }
+
+// Sensors for clusters
+$fgHaSystemMode_txt = 'fgHaSystemMode.0';
+$systemMode = snmp_get($device, $fgHaSystemMode_txt, '-Ovq', 'FORTINET-FORTIGATE-MIB');
+if ($systemMode == 'activePassive' || $systemMode == 'activeActive') {
+    // Contains the indexes of all the cluster members
+    $fgHaStatsIndex_num = '.1.3.6.1.4.1.12356.101.13.2.1.1.1';
+    $fgHaStatsIndex_txt = 'fgHaStatsIndex';
+
+    // Fetch the cluster members
+    $haStatsEntries = snmpwalk_cache_multi_oid($device, $fgHaStatsIndex_txt, [], 'FORTINET-FORTIGATE-MIB');
+
+    // Count of results is the amount of cluster members
+    $clusterMemberCount = count($haStatsEntries);
+
+    // Create a count sensor and set warning to current cluster count
+    discover_sensor(
+        $valid['sensor'],
+        'count',
+        $device,
+        $fgHaStatsIndex_num,
+        $fgHaStatsIndex_txt,
+        'clusterState',
+        'Cluster State',
+        1,
+        1,
+        null,
+        $clusterMemberCount,
+        null,
+        null,
+        $result
+    );
+}
+
+unset(
+    $session_rate,
+    $descr,
+    $oid,
+    $oid_num,
+    $oid_txt,
+    $result,
+    $fgHaSystemMode_txt,
+    $fgHaStatsIndex_num,
+    $fgHaStatsIndex_txt,
+    $haStatsEntries,
+    $clusterMemberCount
+);

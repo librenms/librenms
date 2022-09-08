@@ -10,13 +10,35 @@ IMPORTS
 
 
 snMacAuth MODULE-IDENTITY
-    LAST-UPDATED "200706250000Z" -- June 25, 2007
-    ORGANIZATION "Foundry Networks, Inc"
+    LAST-UPDATED "201006020000Z"  -- 04 June 2010
+    ORGANIZATION "Brocade Communications Systems, Inc."
     CONTACT-INFO
-            ""
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
     DESCRIPTION
-            "Management Information Base module for MAC authentication
-            configuration and statistics."
+             "Management Information Base module for MAC authentication
+              configuration and statistics.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information Base Specification
+              embodies Brocade Communications Systems' confidential and proprietary
+              intellectual property. Brocade Communications Systems retains all
+              title and ownership in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications Systems makes
+              no warranty, either express or implied, as to the use,
+              operation, condition, or performance of the specification, and any unintended
+              consequence it may on the user environment."
+
+    REVISION        "201006020000Z"  -- 04 June 2010
+    DESCRIPTION
+        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
+
     REVISION     "200706250000Z" -- June 25, 2007
     DESCRIPTION
             ""
@@ -32,7 +54,7 @@ snMacAuthClearGlobalCmd OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS     current
 	DESCRIPTION
-		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use. 
+		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use.
 		 clear(1) - represents clear MAC Authentication table for all ports."
 	::= { snMacAuthGlobal 1 }
 
@@ -83,7 +105,7 @@ snMacAuthClearIfCmdAction      OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS     current
 	DESCRIPTION
-		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use. 
+		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use.
 		 clear(1) - represents clearing an MAC Authentication entry for an interface."
 	::= { snMacAuthClearIfCmdEntry 2 }
 
@@ -227,7 +249,7 @@ snMacAuthClearMacSessionAction OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS     current
 	DESCRIPTION
-		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use. 
+		"valid(0) - a SNMP-GET of this mib shows that it is valid command to use.
 		 clear(1) - represents clearing an MAC Session entry indexed by a MAC address."
 	::= { snMacAuthClearMacSessionEntry 3 }
 

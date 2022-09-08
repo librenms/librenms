@@ -1628,7 +1628,7 @@
                     "storage_descr": "/run/user/1000",
                     "storage_size": 60563456,
                     "storage_units": 1024,
-                    "storage_used": 60563456,
+                    "storage_used": 0,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,
@@ -1728,7 +1728,8 @@
                     "discovered": 1,
                     "app_state_prev": null,
                     "app_status": "",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ]
         },
@@ -1740,7 +1741,8 @@
                     "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "18",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ],
             "application_metrics": [

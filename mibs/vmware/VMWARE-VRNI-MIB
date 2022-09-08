@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2016 - 2018 VMware, Inc.  All rights reserved.
+-- Copyright 2016 - 2022 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-VRNI-MIB DEFINITIONS ::= BEGIN
@@ -19,7 +19,7 @@ IMPORTS
        FROM VMWARE-TC-MIB;
 
     vmwNetworkInsightMIB MODULE-IDENTITY
-    LAST-UPDATED "202005200000Z"
+    LAST-UPDATED "202203300000Z"
     ORGANIZATION "VMware, Inc"
     CONTACT-INFO
     "VMware, Inc
@@ -33,6 +33,24 @@ IMPORTS
     DESCRIPTION
     "This MIB module is for VMware vRealize Network Insight as described here:
     https://www.vmware.com/support/pubs/vrealize-network-insight-pubs.html
+    "
+
+    REVISION      "202203300000Z"
+    DESCRIPTION
+    "This is the thirteenth revision of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds twenty four new notifications, see vmwNetworkInsightNotificationGroup13.
+    "
+
+    REVISION      "202110010000Z"
+    DESCRIPTION
+    "This is the twelfth revision of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds five new notifications, see vmwNetworkInsightNotificationGroup12.
+    "
+
+    REVISION      "202105240000Z"
+    DESCRIPTION
+    "This is the eleventh revision of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds nineteen new notifications, see vmwNetworkInsightNotificationGroup11.
     "
 
     REVISION      "202005200000Z"
@@ -3305,6 +3323,405 @@ vmwNSXTEdgeNodeStatusUnknownEvent NOTIFICATION-TYPE
       For more details about this event, please log into vRNI, navigate to Settings -> Events"
    ::= { vmwVRNIEvents 80245}
 
+vmwNsxiApplianceAvailableEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Intelligence Appliance is deployed within NSX-T. NSX-I data collection on the NSX-T Data source can now be enabled.
+      Please visit to vRNI -> Settings -> Data Sources -> NSX-T data souces to enable this data collection.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 974}
+
+vmwNsxiSubscriptionCreateFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Enabling data collection from NSX Intelligence was failed.
+      Please check the NSX-Intelligence appliance and ensure it is reachable and in a healthy state.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 975}
+
+vmwNsxiSubscriptionDeleteFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Cleanup of NSX Intelligence appliance failed.
+      Please check the NSX-Intelligence appliance and ensure it is reachable and in a healthy state
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 976}
+
+vmwNsxiSubscriptionUpdateFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Failed to initiate data collection from NSX Intelligence.
+      Please check the NSX-Intelligence appliance and ensure it is reachable and in a healthy state
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 977}
+
+vmwNsxiSslHandshakeFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Intelligence SSL Handshake Failed.
+      Please check the SSL certificates configured on NSX Intelligence Appliance.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 978}
+
+vmwAnalyticsThresholdCompositeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Alert generated as a result of the specified combination of metric crosses the upper or lower bound specified in the configuration.
+      Please check details and remediation steps mentioned in alert.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 37004}
+
+vmwAnalyticsThresholdCompositeProblemEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Alert generated as a result of the specified combination of metric crosses the upper or lower bound specified in the configuration.
+      Please check details and remediation steps mentioned in alert.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 37006}
+
+vmwLicenseExpiredEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "License of this appliance has expired. Please apply a valid license to continue the data collection.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80537}
+
+vmwInGracePeriodEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Applicance license is in Grace Period. Add valid licenses before grace period ends to continue the data collection.
+      This event will remain open till it is fixed.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80538}
+
+vmwFailedDatasourceOperationEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Data Source Update Operation Failed. Details of the data source and failed operation are mentioned in the event vmwOperatorDesc field.
+      Please check correctness of input data while performing update operations to a data source.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80672}
+
+vmwNsxtNotificationWebhookDisabledEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "The webhook configured to receive push notifications from NSX-T is no longer present in the data source. As a result, notifications received by Network Insight might be delayed.
+      Please log into NSX-T and enable notifications for vRNI.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80670}
+
+vmwNatRuleLargeSubnetEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "IP address mentioned in the NAT Rules have a subnet of size greater than 16. Flows will be impacted due to large subnet size.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80270}
+
+vmwNSXTHostNodeMaintenanceModeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX-T Host Node is in Maintenance Mode.
+      For uninterrupted operations, please disable Maintenance Mode on this Host Node if maintenance activity is completed.
+      This event will be closed once host is host is out of maintenance mode.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80272}
+
+vmwNSXTEdgeNodeMaintenanceModeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX-T Edge Node is in Maintenance Mode.
+      For uninterrupted operations, please disable Maintenance Mode on this edge node if maintenance activity is completed.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 80271}
+
+vmwSDWanLinkTrafficThresholdEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "SD-WAN Link Traffic exceeded the threshold limit configured. Link details are available in event description vmwOperatorDesc field.
+      Please check the Traffic Utilization section on VeloCloud Edge to get the visibility of Applications and clients for the Link.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 90017}
+
+vmwVMCCapacityThresholdBreachEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is raised for VMC on AWS when thresholds of an entity e.g Firewall Rule exceeds.
+      Please log in to VMC, navigate to listings page of entity type mentioned in the event description vmwOperatorDesc field. 
+      Then delete any unused entities to ensure uninterrupted operations.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 100056}
+
+vmwNativeVlanMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Native VLAN ID configuration of the ports on each link should match.
+      Please check mismatch mentioned in the event vmwAffectedObject field and correct the configuration.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 110011}
+
+vmwNativeVlanTaggingMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Native VLAN tagging of the ports on each link should match.
+      Please check mismatch mentioned in the event and correct the configuration.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 110012}
+
+vmwSnapshotNotBuildingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Unable to load latest network map. The last successful network map snapshot was taken over 6 hours ago.
+      Network map functionality may show obsolete state. If this event persists, please contact VMware support.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events"
+   ::= { vmwVRNIEvents 110013}
+
+vmwProtectionActiveEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VMware vRealize Network Insight is experiencing high-system usage. Safe mode has been turned on automatically to keep the system protected and responsive.
+      Please contact VMware support to fix the problem.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 110015}
+
+vmwUnableToSendSNMPTrapsEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "vRNI appliance failed to send SNMP Trap. This could be due to temporary network disruption.
+      If problem persists, please check if SNMP Trap destination is reachable from vRNI appliance.
+      Please note that this trap is only sent if sendto() or getaddrinfo() fails from vRNI appliance.
+      To send a test trap, log into vRNI -> Settings -> Alerts and Definition -> SNMP Trap Destinations page and click 'Send Test Trap'.
+      Also note that ther
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80539}
+
+vmwStreamProcessingFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Realtime stream processing has failed in vRNI appliance.
+      Please contact VMware support immediately to resolve the issue.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80540}
+
+vmwSNOWMandatoryPrivilegesMissingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Required privileges are missing for the user in ServiceNow.
+      Please make sure that the user used in vRNI while adding SNOW account has been necessary privileges in SNOW UI.
+      To check user details, please visit vRNI -> Setting -> Data Sources page.
+      To check required user permissions, please visit https://docs.vmware.com/en/VMware-vRealize-Network-Insight/6.4/com.vmware.vrni.using.doc/GUID-772EC526-DD22-4B3C-87A5-F55CA90ED5AE.html.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80604}
+
+vmwVMCSDDCTGWConnectivityFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is raised when SDDC within SDDC Group loses connectivity with VTGW(VMware Transit Gateway).
+      Please contact VMC on AWS Support.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 38003}
+
+vmwNSXTEdgeDVPGsIPFIXDisabledEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "As a protection mechanism, the flow collection for DVPGs, having NSX-T Edges connected, is disabled.
+      Please enable DFW IPFIX on NSX-T, if not enabled already. Do not enable IPFIX on DVPGs having NSX-T Edge VMs connected.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80273}
+
+vmwUnsupportedNsxAlbVersionEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is triggered while adding the NSX ALB data source and if the version of NSX ALB is < 20.1.3.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80700}
+
+vmwIpfixFlowLagEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is raised to notify users when there are excessive incoming flow records than what can be processed within the stipulated time window, the ipfix processor lags behind. Once the incoming flow records are back within the limits, the alert gets cleared. The time window for each source is defined in ipfix.configuration.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80541}
+
+vmwNSXALBSystemEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "These are the alarms/events reported by NSXALB platform.
+      You can see these alerts in NSX ALB platform under Operations -> All alerts.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 3558}
+
+vmwTkgiKubernetesNotReachableEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is triggered if the Kubernetes Clusters which are managed by TKGI are not reachable from collector.
+      Please verify the Kubernetes Cluster Master hosts are reachable from Collector VM.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80800}
+
+vmwTkgiClustersInsufficientPriviledgesEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is triggered if the Kubernetes Clusters which are managed by TKGI doesn't sufficient privileges for fetching the k8s entities.
+      It must have List and Watch privileges.
+      For more details about this event, please log into vRNI, navigate to Settings -> Events -> Alert Definitions page"
+   ::= { vmwVRNIEvents 80801}
+
+vmwNSXTRouterInterfaceRPFPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "This alert is generated when the RPF packet drop ratio exceeds the threshold value of 1%. Check RPF packet drop on the interface."
+   ::= { vmwVRNIEvents 80274}
+
+vmwChangeEventsDroppedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Realtime processing has stopped due to high system load. Some updates may be delayed. It is a temporary condition. The system should recover and clear the error by itself. If this message persists for more than 12 hours, please contact VMware customer support."
+   ::= { vmwVRNIEvents 80542}
+
+vmwHcxIXServiceStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Interconnect Service is not Up. Please verify HCX IX Service is in healthy state."
+   ::= { vmwVRNIEvents 90501}
+
+vmwHcxNEServiceStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Network Extension Service is not Up. Please verify HCX NE Service is in healthy state."
+   ::= { vmwVRNIEvents 90503}
+
+vmwHcxBMServiceStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Bulk Migration Service is not Up. Please verify HCX Bulk Migration Service is in healthy state."
+   ::= { vmwVRNIEvents 90512}
+
+vmwHcxVMotionServiceStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX vMotion Service is not Up. Please verify HCX VMotion Service is in healthy state."
+   ::= { vmwVRNIEvents 90513}
+
+vmwHcxIXApplianceEncryptionTunnelStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Hybrid Interconnect Service Encryption Tunnel Status is not Up. Please verify HCX IX Appliance Encryption Tunnel is in healthy state."
+   ::= { vmwVRNIEvents 90502}
+
+vmwHcxNEApplianceEncryptionTunnelStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Network Extension Service Encryption Tunnel Status is not Up. Please verify HCX NE Appliance Encryption Tunnel is in healthy state."
+   ::= { vmwVRNIEvents 90504}
+
+vmwHcxIXApplianceServicePipelineStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Hybrid Interconnect Service Pipeline Status is not Up. Please verify Hybrid Interconnect Service Pipeline is in healthy state."
+   ::= { vmwVRNIEvents 90505}
+
+vmwHcxNEApplianceServicePipelineStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "HCX Network Extension Service Pipeline Status is not Up. Please verify HCX Network Extension Service Pipeline is in healthy state."
+   ::= { vmwVRNIEvents 90506}
+
+vmwHcxIXApplianceServiceTransportStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Hybrid Interconnect Service Transport Status is not Up. Please verify Hybrid Interconnect Service Transport is in healthy state."
+   ::= { vmwVRNIEvents 90507}
+
+vmwHcxNEApplianceServiceTransportStatusEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Network Extension Service Transport Status is not Up. Please verify Network Extension Service Transport is in healthy state."
+   ::= { vmwVRNIEvents 90508}
+
+vmwHcxIXApplianceServiceSystemStateEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Hybrid Interconnect Service System State is not Up. Please verify Hybrid Interconnect Service System is in healthy state."
+   ::= { vmwVRNIEvents 90509}
+
+vmwHcxNEApplianceServiceSystemStateEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Network Extension Service System State is not Up. Please verify Network Extension Service System is in healthy state."
+   ::= { vmwVRNIEvents 90510}
+
+vmwHcxIXServiceNotRunningEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Hybrid Interconnect Service is not running. Please verify Hybrid Interconnect Service is in healthy state."
+   ::= { vmwVRNIEvents 90514}
+
+vmwHcxNEServiceNotRunningEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Network Extension Service is not running. Please verify Network Extension Service is in healthy state."
+   ::= { vmwVRNIEvents 90515}
+
+vmwHcxWanOptServiceNotRunningEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "WAN Optimisation Service is not running. Please verify WAN Optimisation Service Service is in healthy state."
+   ::= { vmwVRNIEvents 90516}
+
+vmwPanLogInsightDroppedFlowEvent NOTIFICATION-TYPE
+   OBJECTS { vmwEventSeverity, vmwAffectedObject, vmwOperatorDesc, vmwVrniUrl, vmwTimestamp, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Dropped flows are detected on Palo Alto device through VMware vRealize Log Insight. "
+   ::= { vmwVRNIEvents 80050}
+
 -- **********************************************************
 -- Notification parameters
 -- **********************************************************
@@ -3772,7 +4189,7 @@ vmwNetworkInsightMIBBasicCompliance9 MODULE-COMPLIANCE
     ::= { vmwNetworkInsightMIBCompliances 100 }
 
 vmwNetworkInsightMIBBasicCompliance10 MODULE-COMPLIANCE
-    STATUS     current
+    STATUS     deprecated
     DESCRIPTION
         "The compliance statement for entities which implement
          VMWARE-VRNI-MIB latest version."
@@ -3789,7 +4206,73 @@ vmwNetworkInsightMIBBasicCompliance10 MODULE-COMPLIANCE
                        vmwNetworkInsightNotificationGroup9,
                        vmwNetworkInsightNotificationGroup10
                       }
-    ::= { vmwNetworkInsightMIBCompliances 110 }        
+    ::= { vmwNetworkInsightMIBCompliances 110 }
+
+vmwNetworkInsightMIBBasicCompliance11 MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB latest version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup3,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4,
+                       vmwNetworkInsightNotificationGroup5,
+                       vmwNetworkInsightNotificationGroup6,
+                       vmwNetworkInsightNotificationGroup7,
+                       vmwNetworkInsightNotificationGroup8,
+                       vmwNetworkInsightNotificationGroup9,
+                       vmwNetworkInsightNotificationGroup10,
+                       vmwNetworkInsightNotificationGroup11
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 120 }
+
+vmwNetworkInsightMIBBasicCompliance12 MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB latest version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup3,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4,
+                       vmwNetworkInsightNotificationGroup5,
+                       vmwNetworkInsightNotificationGroup6,
+                       vmwNetworkInsightNotificationGroup7,
+                       vmwNetworkInsightNotificationGroup8,
+                       vmwNetworkInsightNotificationGroup9,
+                       vmwNetworkInsightNotificationGroup10,
+                       vmwNetworkInsightNotificationGroup11,
+                       vmwNetworkInsightNotificationGroup12
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 130 }
+
+vmwNetworkInsightMIBBasicCompliance13 MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB latest version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup3,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4,
+                       vmwNetworkInsightNotificationGroup5,
+                       vmwNetworkInsightNotificationGroup6,
+                       vmwNetworkInsightNotificationGroup7,
+                       vmwNetworkInsightNotificationGroup8,
+                       vmwNetworkInsightNotificationGroup9,
+                       vmwNetworkInsightNotificationGroup10,
+                       vmwNetworkInsightNotificationGroup11,
+                       vmwNetworkInsightNotificationGroup12,
+                       vmwNetworkInsightNotificationGroup13
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 140 }
 
 vmwNetworkInsightNotificationGroup5 NOTIFICATION-GROUP
        NOTIFICATIONS {
@@ -4088,5 +4571,77 @@ vmwNetworkInsightNotificationGroup5 NOTIFICATION-GROUP
        STATUS current
        DESCRIPTION
             "Set of added notifications (traps, informs) for 5.2.0 release."
-        ::= { vmwNetworkInsightMIBGroups 115 } 
+        ::= { vmwNetworkInsightMIBGroups 115 }
+
+  vmwNetworkInsightNotificationGroup11 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vmwNsxiApplianceAvailableEvent,
+          vmwNsxiSubscriptionCreateFailedEvent,
+          vmwNsxiSubscriptionDeleteFailedEvent,
+          vmwNsxiSubscriptionUpdateFailedEvent,
+          vmwNsxiSslHandshakeFailedEvent,
+          vmwAnalyticsThresholdCompositeEvent,
+          vmwAnalyticsThresholdCompositeProblemEvent,
+          vmwLicenseExpiredEvent,
+          vmwInGracePeriodEvent,
+          vmwFailedDatasourceOperationEvent,
+          vmwNsxtNotificationWebhookDisabledEvent,
+          vmwNatRuleLargeSubnetEvent,
+          vmwNSXTHostNodeMaintenanceModeEvent,
+          vmwNSXTEdgeNodeMaintenanceModeEvent,
+          vmwSDWanLinkTrafficThresholdEvent,
+          vmwVMCCapacityThresholdBreachEvent,
+          vmwNativeVlanMismatchEvent,
+          vmwNativeVlanTaggingMismatchEvent,
+          vmwSnapshotNotBuildingEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) for 6.2.0 release."
+        ::= { vmwNetworkInsightMIBGroups 125 }
+
+  vmwNetworkInsightNotificationGroup12 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vmwProtectionActiveEvent,
+          vmwUnableToSendSNMPTrapsEvent,
+          vmwStreamProcessingFailedEvent,
+          vmwSNOWMandatoryPrivilegesMissingEvent,
+          vmwVMCSDDCTGWConnectivityFailedEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) for 6.4.0 release."
+        ::= { vmwNetworkInsightMIBGroups 135 }
+
+  vmwNetworkInsightNotificationGroup13 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+          vmwNSXTEdgeDVPGsIPFIXDisabledEvent,
+          vmwUnsupportedNsxAlbVersionEvent,
+          vmwIpfixFlowLagEvent,
+          vmwNSXALBSystemEvent,
+          vmwTkgiKubernetesNotReachableEvent,
+          vmwTkgiClustersInsufficientPriviledgesEvent,
+          vmwNSXTRouterInterfaceRPFPacketDropEvent,
+          vmwChangeEventsDroppedEvent,
+          vmwHcxIXServiceStatusEvent,
+          vmwHcxNEServiceStatusEvent,
+          vmwHcxBMServiceStatusEvent,
+          vmwHcxVMotionServiceStatusEvent,
+          vmwHcxIXApplianceEncryptionTunnelStatusEvent,
+          vmwHcxNEApplianceEncryptionTunnelStatusEvent,
+          vmwHcxIXApplianceServicePipelineStatusEvent,
+          vmwHcxNEApplianceServicePipelineStatusEvent,
+          vmwHcxIXApplianceServiceTransportStatusEvent,
+          vmwHcxNEApplianceServiceTransportStatusEvent,
+          vmwHcxIXApplianceServiceSystemStateEvent,
+          vmwHcxNEApplianceServiceSystemStateEvent,
+          vmwHcxIXServiceNotRunningEvent,
+          vmwHcxNEServiceNotRunningEvent,
+          vmwHcxWanOptServiceNotRunningEvent,
+          vmwPanLogInsightDroppedFlowEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) for 6.6.0 release."
+        ::= { vmwNetworkInsightMIBGroups 145 }
 END

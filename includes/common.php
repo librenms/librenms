@@ -206,18 +206,6 @@ function get_port_by_id($port_id)
     }
 }
 
-function get_application_by_id($application_id)
-{
-    if (is_numeric($application_id)) {
-        $application = dbFetchRow('SELECT * FROM `applications` WHERE `app_id` = ?', [$application_id]);
-        if (is_array($application)) {
-            return $application;
-        } else {
-            return false;
-        }
-    }
-}
-
 function get_sensor_by_id($sensor_id)
 {
     if (is_numeric($sensor_id)) {
@@ -234,18 +222,6 @@ function get_device_id_by_port_id($port_id)
 {
     if (is_numeric($port_id)) {
         $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
-    }
-}
-
-function get_device_id_by_app_id($app_id)
-{
-    if (is_numeric($app_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `applications` WHERE `app_id` = ?', [$app_id]);
         if (is_numeric($device_id)) {
             return $device_id;
         } else {
@@ -526,7 +502,7 @@ function object_add_cache($section, $obj)
 function object_is_cached($section, $obj)
 {
     global $object_cache;
-    if (array_key_exists($obj, $object_cache)) {
+    if (is_array($object_cache) && array_key_exists($obj, $object_cache)) {
         return $object_cache[$section][$obj];
     } else {
         return false;
@@ -539,26 +515,6 @@ function search_phrase_column($c)
 
     return "$c LIKE '%$searchPhrase%'";
 } // search_phrase_column
-
-/**
- * Constructs the path to an RRD for the Ceph application
- *
- * @param  string  $gtype  The type of rrd we're looking for
- * @return string
- **/
-function ceph_rrd($gtype)
-{
-    global $device;
-    global $vars;
-
-    if ($gtype == 'osd') {
-        $var = $vars['osd'];
-    } else {
-        $var = $vars['pool'];
-    }
-
-    return Rrd::name($device['hostname'], ['app', 'ceph', $vars['id'], $gtype, $var]);
-} // ceph_rrd
 
 /**
  * Parse location field for coordinates
@@ -595,7 +551,7 @@ function version_info($remote = false)
         'db_schema' => vsprintf('%s (%s)', $version->database()),
         'php_ver' => phpversion(),
         'python_ver' => $version->python(),
-        'mysql_ver' => $version->databaseServer(),
+        'database_ver' => $version->databaseServer(),
         'rrdtool_ver' => $version->rrdtool(),
         'netsnmp_ver' => $version->netSnmp(),
     ];

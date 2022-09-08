@@ -1,0 +1,5104 @@
+-- MIB Definition File ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--
+--  Copyright (c) 2004 - 2011 Eaton Corporation, All Rights Reserved.
+--
+--  PURPOSE:      Defines the SNMP interface to the SC200 Controller.
+--
+--  DESCRIPTION:  This file should be able to be compiled with any standard MIB compiler,
+--                however our experience suggests that different compilers perform differently.
+--                This file has been tested with NetSNMP (http://net-snmp.sourceforge.net/) and
+--                MG-Soft MIB Browser (http://www.mg-soft.com/).
+--
+--  NOTE:         Below is the encoding this file was originally released in. Not all MIB compilers
+--                may be able to read the file in this encoding. If your MIB compiler does not support
+--                the original encoding, you may have to convert it to a different encoding. If the target
+--                encoding does not support all characters used in this file, the resulting MIB may not compile.
+--                We recommend that you update the second line below when you change the encoding of this file.
+--                
+--                Original Encoding: ISO-8859-1
+--                Current Encoding:  ISO-8859-1
+--
+--  LAST UPDATED: 2012-05-22 01:36:08Z
+--  XSLT UTILITY: SAXON 9.3.0.5 from Saxonica (http://www.saxonica.com/)
+
+-- MIB Module Name ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+RPS-SC200-MIB DEFINITIONS ::= BEGIN
+
+-- Imported Items ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    IMPORTS
+        enterprises, IpAddress, TimeTicks, OBJECT-TYPE, mib-2,
+                MODULE-IDENTITY, NOTIFICATION-TYPE,
+                OBJECT-IDENTITY, Integer32, Counter32
+            FROM SNMPv2-SMI
+
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        DisplayString
+            FROM RFC-1213;
+
+rps-sc200MibModule MODULE-IDENTITY
+    LAST-UPDATED "201205220136Z"
+    ORGANIZATION "Eaton"
+    CONTACT-INFO ""
+    DESCRIPTION ""
+  ::= { enterprises 1918 2 13 1 }
+
+-- Type Assignments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Signed8 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( -128..127 )
+
+Signed16 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( -32768..32767 )
+
+Signed32 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( -2147483648..2147483647 )
+
+Unsigned8 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( 0..255 )
+
+Unsigned16 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( 0..65535 )
+
+Unsigned31 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( 0..2147483646 )
+
+UnsignedNAN8 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER { notAvailable(255) }
+
+UnsignedNAN16 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER { notAvailable(65535) }
+
+UnsignedNAN32 ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Counter32
+
+Boolean ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER { false(0), true(1) }
+
+Float ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX Integer32 ( -2147483648..2147483647 )
+
+No-Data ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX OCTET STRING(SIZE(0))
+
+TimeIntervalInSeconds ::= TimeTicks
+
+TimeIntervalInMinutes ::= Unsigned31
+
+TimeIntervalInDays ::= Unsigned31
+
+Rectifier-Shutdown-Mode ::= INTEGER {
+  disabled(0),
+  manual(1),
+  automatic(2)
+}
+
+DC-Power ::= UnsignedNAN16
+
+Percentile8NAN ::= UnsignedNAN8
+
+Slave-Type ::= INTEGER {
+  undefined(0),
+  sm20(1),
+  sm50(2),
+  sm30(3),
+  sm30-SLAVE(4),
+  iom(5),
+  cbc(6),
+  weir(7),
+  sm35(8),
+  nes-BATTERY-TRAY(9),
+  sm30-SLAVE-FRONT-PORT(10),
+  sm60(11),
+  sm40(12),
+  sm70-IOB(13),
+  sm70(14),
+  sm45-IOB(15),
+  sm45(16),
+  sm65(17),
+  sc200(18)
+}
+
+Access-Level ::= INTEGER {
+  read-Only(80),
+  read-Write(81)
+}
+
+Enable-State ::= INTEGER {
+  disabled(0),
+  enabled(1)
+}
+
+SNMP-Access-State ::= INTEGER {
+  disabled(0),
+  all(1),
+  read-Only(2),
+  v3-Only(3)
+}
+
+Alarm-Report ::= INTEGER {
+  none(0),
+  warnings-And-Above(1),
+  minor-And-Above(2),
+  major-And-Above(3),
+  critical-Only(4)
+}
+
+Severity-Level ::= INTEGER {
+  warnings-And-Above(1),
+  minor-And-Above(2),
+  major-And-Above(3),
+  none(4),
+  critical-Only(5)
+}
+
+SNMP-Trap-Format ::= INTEGER {
+  eaton(0),
+  x733(1)
+}
+
+SNMP-Trap-Version ::= INTEGER {
+  snmp-V1-Trap(0),
+  snmp-V2-Trap(1),
+  snmp-V3-Trap(2)
+}
+
+Access-Protection ::= INTEGER {
+  unprotected(0),
+  read-Only(1),
+  pin-Protected(2)
+}
+
+Can-Start ::= INTEGER {
+  started(190),
+  can-Start(191),
+  busy(192),
+  disabled(193),
+  alarms-Active(194),
+  sensor-Failed(195),
+  battery-Not-Charged(196),
+  no-Rectifiers-Available(197),
+  rectifier-OVSD(198),
+  no-Battery-Configured(199),
+  load-Current-Too-Low(200),
+  ac-Failed(201),
+  manual-Stop(202),
+  battery-Not-Discharged(203),
+  ac-State-Unavailable(204),
+  system-Overloaded(205)
+}
+
+AVC-State ::= INTEGER {
+  disabled(115),
+  inoperative(116),
+  active(117),
+  lost-Control(118),
+  in-Deadband(119)
+}
+
+TC-State ::= INTEGER {
+  disabled(80),
+  inoperative(81),
+  active(82)
+}
+
+Battery-Test-State ::= INTEGER {
+  disabled(95),
+  inactive(96),
+  active(97),
+  failed(98),
+  locked-Out(99)
+}
+
+Battery-Charge-State ::= INTEGER {
+  float(100),
+  discharge(101),
+  charge(102),
+  unavailable(103)
+}
+
+BCL-State ::= INTEGER {
+  disabled(110),
+  inoperative(111),
+  active(112),
+  inactive(113),
+  lost-Control(114),
+  in-Deadband(115),
+  pending(116)
+}
+
+Engine-Run-State ::= INTEGER {
+  not-Running(85),
+  running(86),
+  unavailable(87),
+  missing(88)
+}
+
+RCP-Slave-State ::= INTEGER {
+  not-Detected(0),
+  detected(1),
+  registered(2),
+  comms-Lost(3),
+  missing(4),
+  rebooting(5)
+}
+
+Trap-Alarm-Keep-Severity ::= INTEGER {
+  critical(1),
+  major(2),
+  minor(3),
+  warning(4),
+  cleared(5)
+}
+
+Alarm-Severity ::= INTEGER {
+  disabled(0),
+  critical(1),
+  major(2),
+  minor(3),
+  warning(4),
+  control(5)
+}
+
+Trap-Receiver-Mode ::= INTEGER {
+  normal-Traps(1),
+  acknowledged-Summary-Trap(2)
+}
+
+Alarm-Active-State ::= INTEGER {
+  not-Active(0),
+  active-Warning(1),
+  active-Major(2),
+  active-Minor(3),
+  reserved(4),
+  active-Critical(5),
+  active-Control(6)
+}
+
+Control-State ::= INTEGER {
+  normal(0),
+  equalize(1),
+  fast-Charge(2),
+  battery-Test(3)
+}
+
+Control-Process-State ::= INTEGER {
+  disabled(0),
+  active(1),
+  inactive(2),
+  pending(3)
+}
+
+Julian-Time-UTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "25t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..25))
+Julian-Time-UTC-25 ::= DisplayString (SIZE(25))
+
+Julian-Date-UTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "25t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..25))
+Julian-Time-UTC-25 ::= DisplayString (SIZE(25))
+
+External-Relay-State ::= INTEGER {
+  active(0),
+  inactive(1),
+  missing(2),
+  disabled(3),
+  conflict(4)
+}
+
+Relay-Control-State ::= INTEGER {
+  active(0),
+  automatic(1),
+  inactive(2)
+}
+
+Rect-Fail-State ::= INTEGER {
+  not-Failed(0),
+  bad-Status(1),
+  bad-Output(2)
+}
+
+Alarm-Type ::= INTEGER {
+  system-Alarm(0),
+  ai-High(1),
+  ai-Low(2),
+  di(3),
+  smart-Alarm(4)
+}
+
+System-State ::= INTEGER {
+  ok(0),
+  failed(1),
+  unavailable(2),
+  missing(3)
+}
+
+Alarm-Operator ::= INTEGER {
+  and(0),
+  or(1),
+  xor(2)
+}
+
+Source-Alarm-Logic ::= INTEGER {
+  equal(0),
+  not(1)
+}
+
+Source-Trigger ::= INTEGER {
+  triggered(0),
+  active(1)
+}
+
+In-Discharge-Alarm-Condition ::= INTEGER {
+  always(0),
+  only-While-AC-Present(1)
+}
+
+Trigger-State ::= INTEGER {
+  active(0),
+  inactive(1),
+  cycle(2),
+  invalid(3)
+}
+
+Threshold-Type ::= INTEGER {
+  high(0),
+  low(1)
+}
+
+System-Value-Source-Value ::= INTEGER {
+  bus-Voltage(0),
+  rectifier-Current(1),
+  load-Current(2),
+  battery-Current(3),
+  battery-Temperature(4),
+  load-Power(5),
+  system-Power(6),
+  ah-Discharged(7),
+  number-Of-Rectifiers-Failed(8),
+  number-Of-Rectifiers-Comms-Lost(9),
+  ac-Voltage(10),
+  battery-Time-Remaining(11),
+  alternative-Source-Current(12),
+  highest-Rectifier-Heatsink-Temperature(13),
+  fuel-Level(14),
+  generator-Backup-Time(15),
+  fuel-Remaining-Time(16)
+}
+
+BTR-State ::= INTEGER {
+  inoperative(0),
+  inactive(1),
+  active(2),
+  characterizing(3),
+  waiting(4),
+  not-Characterized(5)
+}
+
+YesNo ::= INTEGER {
+  yes(1),
+  no(0)
+}
+
+End-Of-Charge-Action ::= INTEGER {
+  set-Ah-Discharged-To-Zero-After-Equalize-And-Fast-Charge(0),
+  set-Ah-Discharged-To-Zero-After-Fast-Charge-Only(1)
+}
+
+System-Alarm ::= INTEGER {
+  low-Float(0),
+  low-Load(1),
+  high-Float(2),
+  high-Load(3),
+  rectifier-Fail(4),
+  multiple-Rectifier-Fail(5),
+  rectifier-Comms-Lost(6),
+  multiple-Rectifier-Comms-Lost(7),
+  partial-AC-Fail(8),
+  ac-Fail(9),
+  system-Overload(10),
+  load-Fuse-Fail(11),
+  battery-Fuse-Fail(12),
+  battery-Test-Fail(13),
+  mov-Fail(14),
+  acd-Fan-Fail(15),
+  lvd1-Disconnected(16),
+  lvd1-Fail(17),
+  lvd1-Manual(18),
+  lvd1-Characterization-Error(47),
+  lvd2-Disconnected(19),
+  lvd2-Fail(20),
+  lvd2-Manual(21),
+  lvd2-Characterization-Error(48),
+  lvd-Disconnected(51),
+  lvd-Fail(52),
+  lvd-Manual(53),
+  lvd-Characterization-Error(54),
+  battery-Temperature-Low(22),
+  battery-Temperature-High(23),
+  sensor-Fail(24),
+  equalize(25),
+  fast-Charge(26),
+  battery-Test(27),
+  auxiliary-Sensor-Fail(28),
+  in-Discharge(29),
+  battery-Current-Limit(30),
+  rectifier-No-Load(31),
+  rectifier-Current-Limit(32),
+  rectifier-Over-Temperature(33),
+  ac-Phase1-Fail(34),
+  ac-Phase1-Voltage(35),
+  ac-Phase2-Fail(36),
+  ac-Phase2-Voltage(37),
+  ac-Phase3-Fail(38),
+  ac-Phase3-Voltage(39),
+  ac-Frequency(40),
+  reserved(41),
+  cabinet-Fan-Fail(42),
+  unmapped-IOB-Found(43),
+  unknown-Hardware(44),
+  iob-Comms-Lost(45),
+  standby-Mode(46),
+  string-Fail(49),
+  generator-Fail(50),
+  configuration-Error(55),
+  wrong-Battery-Polarity(56),
+  characterizing-Battery(57),
+  do-Manual(58),
+  normal-Charge(59)
+}
+
+Energize-State ::= INTEGER {
+  de-Energized(0),
+  energized(1)
+}
+
+Relay-Mapping ::= INTEGER {
+  none(0),
+  digital-Output-1(1),
+  digital-Output-2(2),
+  digital-Output-3(3),
+  digital-Output-4(4),
+  digital-Output-5(5),
+  digital-Output-6(6),
+  digital-Output-7(7),
+  digital-Output-8(8),
+  digital-Output-9(9),
+  digital-Output-10(10),
+  digital-Output-11(11),
+  digital-Output-12(12),
+  digital-Output-13(13),
+  digital-Output-14(14),
+  digital-Output-15(15),
+  digital-Output-16(16),
+  digital-Output-17(17),
+  digital-Output-18(18),
+  digital-Output-19(19),
+  digital-Output-20(20),
+  digital-Output-21(21),
+  digital-Output-22(22),
+  digital-Output-23(23),
+  digital-Output-24(24),
+  digital-Output-25(25),
+  digital-Output-26(26),
+  digital-Output-27(27),
+  digital-Output-28(28),
+  digital-Output-29(29),
+  digital-Output-30(30),
+  digital-Output-31(31),
+  digital-Output-32(32)
+}
+
+Active-State ::= INTEGER {
+  closed(2),
+  open(3)
+}
+
+Digital-Input-State ::= INTEGER {
+  missing(1),
+  closed(2),
+  open(3),
+  disabled(4)
+}
+
+Measurement-Units ::= INTEGER {
+  none(30),
+  volts(31),
+  milli-Amps(32),
+  amps(33),
+  kilo-Amps(34),
+  degree-celsius(35),
+  kilo-Watts(36),
+  percent(37),
+  volts-AC(38),
+  volts-DC(39),
+  amps-AC(40),
+  amps-DC(41),
+  litre(42),
+  litre-Per-Sec(43),
+  cubic-Meter-Per-Hour(44),
+  pascal(45),
+  kilo-Pascal(46),
+  mmH2O(47),
+  percent-Relative-Humidity(48),
+  rpm(49),
+  hertz(50),
+  kilo-Volt-Amps(51),
+  kilo-Watt-Hour(52)
+}
+
+Overload-Alarm-Type ::= INTEGER {
+  total-Capacity(0),
+  redundancy(1)
+}
+
+MPM-State ::= INTEGER {
+  unable-To-Start(0),
+  locked-Out(1),
+  converging(2),
+  stable(3),
+  disabled(4)
+}
+
+MPM-Battery-State ::= INTEGER {
+  ok(0),
+  pending-Fail(1),
+  failed(2),
+  unavailable(3),
+  not-Configured(4)
+}
+
+LVD-State ::= INTEGER {
+  idle(0),
+  connected(1),
+  disconnected(2),
+  manual(3),
+  no-Contactors(4)
+}
+
+LVDC-Type ::= INTEGER {
+  normally-Open(0),
+  normally-Closed(1)
+}
+
+LVDC-State ::= INTEGER {
+  connected(0),
+  disconnected(1),
+  failed(2),
+  missing(3),
+  disabled(4),
+  conflict(5),
+  not-Characterized(6)
+}
+
+Baud-Rate ::= INTEGER {
+  baud-Rate2400(8),
+  baud-Rate4800(9),
+  baud-Rate9600(10),
+  baud-Rate19200(11)
+}
+
+Parity ::= INTEGER {
+  none(0),
+  odd(1),
+  even(2)
+}
+
+Stop-Bits ::= INTEGER {
+  one(1),
+  two(2)
+}
+
+BTR-Characterization-Result ::= INTEGER {
+  not-Yet-Run(0),
+  sensor-Failed(1),
+  not-Fully-Charged(2),
+  unstable-Battery-Current(3),
+  voltage-Step-Detected(4),
+  complete(5),
+  updated(6),
+  user-Canceled(7)
+}
+
+Generator-Startup-Wiring ::= INTEGER {
+  indirect-Start(0),
+  direct-Start(1)
+}
+
+String-10 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "10t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..10))
+Display-10 ::= DisplayString (SIZE(10))
+
+String-17 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "17t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..17))
+Display-17 ::= DisplayString (SIZE(17))
+
+String-20 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "20t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..20))
+Display-20 ::= DisplayString (SIZE(20))
+
+String-30 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "30t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..30))
+Display-30 ::= DisplayString (SIZE(30))
+
+String-32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..32))
+Display-32 ::= DisplayString (SIZE(32))
+
+String-40 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "40t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..40))
+Display-40 ::= DisplayString (SIZE(40))
+
+String-60 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "60t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..60))
+Display-60 ::= DisplayString (SIZE(60))
+
+String-64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..64))
+Display-64 ::= DisplayString (SIZE(64))
+
+MIB-Object-ID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "80t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..80))
+MIB-Object-ID-80 ::= DisplayString (SIZE(80))
+
+String-200 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "200t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..200))
+Display-200 ::= DisplayString (SIZE(200))
+
+String-253 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "253t"
+    STATUS       current
+    DESCRIPTION  ""
+    SYNTAX       OCTET STRING (SIZE(0..253))
+Display-253 ::= DisplayString (SIZE(253))
+
+-- OID Value Assignment and OBJECT-TYPE Construct ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+eaton-chnz OBJECT IDENTIFIER ::= { enterprises 1918 }
+dc-Power-System OBJECT IDENTIFIER ::= { eaton-chnz 2 }
+rps-SC200 OBJECT IDENTIFIER ::= { dc-Power-System 13 }
+
+rps-Objects OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-SC200 10 }
+
+system-Identity OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 10 }
+
+system-Manufacturer OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The manufacturer of the DC power system."
+  DEFVAL { "System Manufacturer" }
+::= { system-Identity 10 }
+
+system-Serial-Number OBJECT-TYPE
+  SYNTAX Display-10
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The DC power system serial number assigned by the manufacturer."
+  DEFVAL { "0000000000" }
+::= { system-Identity 20 }
+
+system-Type OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The DC power system model number assigned by the manufacturer."
+  DEFVAL { "System Type" }
+::= { system-Identity 30 }
+
+system-Location OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Usually the location of the DC power system within the site."
+  DEFVAL { "System Location" }
+::= { system-Identity 40 }
+
+site-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The site designation or code."
+  DEFVAL { "Site Name" }
+::= { system-Identity 50 }
+
+site-Address OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The street address of the site."
+  DEFVAL { "Site Address" }
+::= { system-Identity 60 }
+
+site-Notes OBJECT-TYPE
+  SYNTAX Display-253
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Notes made by the installation or maintenance personnel."
+  DEFVAL { "" }
+::= { system-Identity 70 }
+
+system-Object-ID OBJECT-TYPE
+  SYNTAX MIB-Object-ID-80
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Used to form the return value for the SNMP MIB-2 sysObjectId. These numbers start with a specific enterprise ID (i.e. 1918 for Eaton Christchurch NZ) and are preceded by 1.3.6.1.4.1 to form an object ID for the system type."
+  DEFVAL { "1918.2.13" }
+::= { system-Identity 80 }
+
+trap-Format OBJECT-TYPE
+  SYNTAX SNMP-Trap-Format
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Select Eaton for multiple trap numbers, or X.733 for a single trap number as per ITU X.733."
+  DEFVAL { x733 }
+::= { system-Identity 90 }
+
+configuration-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Name of the configuration in the controller database"
+  DEFVAL { "Configuration Name" }
+::= { system-Identity 100 }
+
+contact OBJECT-TYPE
+  SYNTAX Display-253
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Contact details for the person responsible for this DC power system."
+  DEFVAL { "" }
+::= { system-Identity 110 }
+
+is-Three-Phase-System OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if the system contains three phase rectifiers or single phase rectifiers."
+::= { system-Identity 120 }
+
+controller OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 20 }
+
+manufacturer-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The name of the manufacturer."
+::= { controller 10 }
+
+slave-Type OBJECT-TYPE
+  SYNTAX Slave-Type
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Mandatory command identifying the device."
+::= { controller 20 }
+
+software-Version OBJECT-TYPE
+  SYNTAX Display-10
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Application software version. This is the software version of the main controller application."
+::= { controller 30 }
+
+ldr-Software-Version OBJECT-TYPE
+  SYNTAX Display-10
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Bootloader software version. The bootloader is responsible for loading and running the system support software and the main application. The bootloader software can be upgrading using the normal web upgrade process. However, if power fails during a bootloader upgrade then the controller may need to be returned to base for repair. Without a bootloader, no software can run on the controller."
+::= { controller 50 }
+
+interface-Version OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "S3P interface version. As the embedded software is upgraded, the communications interface may change. This number reflects any such change. This value, along with Compatible Interface Version is used by DCTools to determine how to communicate. Third party applications should also check this version and optionally warn the user if it is dealing with an incompatible interface. While Eaton Corporation does attempt to maintain backwards compatibility with its interfaces, this cannot be guaranteed."
+::= { controller 70 }
+
+hardware-Version OBJECT-TYPE
+  SYNTAX Display-10
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The Product Hardware Version"
+::= { controller 80 }
+
+serial-Number OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The Product Serial Number. This item is not reset by the Reset System Configuration command."
+::= { controller 90 }
+
+ethernet-MAC-Address OBJECT-TYPE
+  SYNTAX Display-17
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The unique ethernet address of the controller."
+::= { controller 100 }
+
+communications OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 30 }
+
+s3P-Access OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether or not the S3P access is allowed."
+  DEFVAL { enabled }
+::= { communications 3 }
+
+http-Access OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, HTTP Web interface access is allowed."
+  DEFVAL { enabled }
+::= { communications 6 }
+
+https-Access OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, HTTPS (SSL) Web interface access is allowed."
+  DEFVAL { enabled }
+::= { communications 7 }
+
+snmp-Access OBJECT-TYPE
+  SYNTAX SNMP-Access-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines how SNMP access is allowed."
+  DEFVAL { all }
+::= { communications 8 }
+
+serial-Server-Access OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enables operation of pass-through from TCP to the serial port."
+  DEFVAL { disabled }
+::= { communications 9 }
+
+s3P-Address OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the controller is connected to a serial S3P bus that supports multiple devices, this address is used to distinguish the devices. Otherwise it should remain at 1."
+  DEFVAL { 1 }
+::= { communications 10 }
+
+ip-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The Internet Protocol (IP) address. This value and the Subnet Mask must be set correctly to communicate using Ethernet. Consult your network administrator."
+  DEFVAL { "1.1.1.1" }
+::= { communications 20 }
+
+subnet-Mask OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Identifies which fragment of the IP address is the sub-network identity. This value and the IP Address must be set correctly to communicate using Ethernet. Consult your network administrator."
+  DEFVAL { "255.255.255.0" }
+::= { communications 30 }
+
+gateway-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Allows access to IP addresses outside your sub-network. Consult your network administrator."
+  DEFVAL { "1.1.1.1" }
+::= { communications 50 }
+
+serial OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { communications 53 }
+
+port-Settings OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { serial 5 }
+
+baud-Rate OBJECT-TYPE
+  SYNTAX Baud-Rate
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Transmission speed of the serial port."
+  DEFVAL { 19200 }
+::= { port-Settings 10 }
+
+parity OBJECT-TYPE
+  SYNTAX Parity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The parity error detect mode."
+  DEFVAL { none }
+::= { port-Settings 20 }
+
+stop-Bits OBJECT-TYPE
+  SYNTAX Stop-Bits
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The number of stop bits."
+  DEFVAL { one }
+::= { port-Settings 30 }
+
+enable-Modem OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether or not the RS232 port is configured to work with a modem."
+  DEFVAL { disabled }
+::= { serial 10 }
+
+alarm-Report OBJECT-TYPE
+  SYNTAX Alarm-Report
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This indicates that the dial-out process will start when an alarm occurs."
+  DEFVAL { none }
+::= { serial 20 }
+
+modem-Set-Up-String OBJECT-TYPE
+  SYNTAX Display-30
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The string sent to the modem on reset. The modem AT command should not be included as it is automatically sent. The Auto-Answer Rings parameter is also sent, so it does not need to be included here. For complete details of appropriate commands, consult your modem documentation."
+  DEFVAL { "" }
+::= { serial 30 }
+
+modem-Auto-Answer-Rings OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Number of rings before an incoming call is answered. Setting this parameter to zero disables incoming calls (the modem can still be used for alarm reporting)."
+  DEFVAL { 2 }
+::= { serial 40 }
+
+modem-Maximum-Retries OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If an alarm report dial-out does not connect with a remote modem, then this number of subsequent alarm report attempts will be made on the current dial-out number before trying the next dial-out number from the Dial Out Number Table. Dialing will stop if none of the numbers in the Dial Out Number Table connect."
+  DEFVAL { 0 }
+::= { serial 50 }
+
+modem-Retry-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If an alarm report dial-out does not connect with a remote modem, then another attempt will be made after this time interval."
+  DEFVAL { 0 }
+::= { serial 60 }
+
+modem-Power-Reset OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If this is enabled, then an attempt will be made to reset a non-operating modem by turning its power supply off and on using digital output 2."
+  DEFVAL { disabled }
+::= { serial 70 }
+
+dial-Out-Number-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Dial-Out-Number-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { serial 80 }
+
+dial-Out-Number-Entry OBJECT-TYPE
+  SYNTAX Dial-Out-Number-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { dial-Out-Number-Index }
+::= { dial-Out-Number-Table 1 }
+
+Dial-Out-Number-Entry ::= SEQUENCE {
+  dial-Out-Number-Index Unsigned8,
+  dial-Out-Number Display-30
+}
+
+dial-Out-Number-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { dial-Out-Number-Entry 1 }
+
+
+dial-Out-Number OBJECT-TYPE
+  SYNTAX Display-30
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The telephone numbers to be called (via a modem) if alarm reporting is enabled. Consult the modem documentation for appropriate dial modifiers to use with the ATD command. Leave blank to prevent dial-out."
+  DEFVAL { "" }
+::= { dial-Out-Number-Entry 10 }
+
+sms-Notification-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF SMS-Notification-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { serial 90 }
+
+sms-Notification-Entry OBJECT-TYPE
+  SYNTAX SMS-Notification-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { sms-Notification-Index }
+::= { sms-Notification-Table 1 }
+
+SMS-Notification-Entry ::= SEQUENCE {
+  sms-Notification-Index Unsigned8,
+  sms-Phone-Name Display-20,
+  sms-Level Severity-Level,
+  sms-Phone-Number Display-30,
+  sms-Prefix Display-60
+}
+
+sms-Notification-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { sms-Notification-Entry 1 }
+
+
+sms-Phone-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "A name to identify this phone."
+  DEFVAL { "" }
+::= { sms-Notification-Entry 10 }
+
+sms-Level OBJECT-TYPE
+  SYNTAX Severity-Level
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Sets the severity of alarms to be reported to this SMS receiver."
+  DEFVAL { none }
+::= { sms-Notification-Entry 20 }
+
+sms-Phone-Number OBJECT-TYPE
+  SYNTAX Display-30
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The phone number for SMS notifications."
+  DEFVAL { "0" }
+::= { sms-Notification-Entry 30 }
+
+sms-Prefix OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This string is prepended to every SMS sent to this number, excluding responses to SMS commands."
+  DEFVAL { "" }
+::= { sms-Notification-Entry 40 }
+
+modbus OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { communications 57 }
+
+modbus-Access OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether or not Modbus/TCP and Modbus/RTU access is allowed."
+  DEFVAL { disabled }
+::= { modbus 10 }
+
+modbus-Address OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The devices address for the Modbus/RTU protocol."
+  DEFVAL { 1 }
+::= { modbus 20 }
+
+modbus-Interface-Version OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "As the embedded software is upgraded, the Modbus register mappings may change. This number reflects any such change."
+::= { modbus 30 }
+
+snmp-Settings OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { communications 60 }
+
+snmp-Read-Community OBJECT-TYPE
+  SYNTAX Display-32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Community that can get items."
+  DEFVAL { "public" }
+::= { snmp-Settings 10 }
+
+snmp-Write-Community OBJECT-TYPE
+  SYNTAX Display-32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Community that can set items."
+  DEFVAL { "private" }
+::= { snmp-Settings 20 }
+
+enable-Trap-Repeat OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If enabled, alarm activation traps will be repeated according to Trap Repeat Rate."
+  DEFVAL { enabled }
+::= { snmp-Settings 30 }
+
+trap-Repeat-Rate OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "How often to send a trap to trap receivers if Enable Trap Repeat is Enabled or the trap receiver's Trap Receiver Mode is Acknowledged Summary Trap."
+  DEFVAL { 1 }
+::= { snmp-Settings 40 }
+
+trap-Version OBJECT-TYPE
+  SYNTAX SNMP-Trap-Version
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Indicates which version of the SNMP protocol will be used to send traps."
+  DEFVAL { snmp-V1-Trap }
+::= { snmp-Settings 45 }
+
+snmp-Trap-Receiver-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF SNMP-Trap-Receiver-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { snmp-Settings 50 }
+
+snmp-Trap-Receiver-Entry OBJECT-TYPE
+  SYNTAX SNMP-Trap-Receiver-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { snmp-Trap-Receiver-Index }
+::= { snmp-Trap-Receiver-Table 1 }
+
+SNMP-Trap-Receiver-Entry ::= SEQUENCE {
+  snmp-Trap-Receiver-Index Unsigned8,
+  trap-Receiver-IP-Address IpAddress,
+  trap-Receiver-Port Unsigned16,
+  trap-Receiver-Name Display-20,
+  trap-Receiver-Level Severity-Level,
+  trap-Receiver-Community Display-32,
+  trap-Receiver-Mode Trap-Receiver-Mode,
+  acknowledge-Alarm-Summary-Trap No-Data
+}
+
+snmp-Trap-Receiver-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { snmp-Trap-Receiver-Entry 1 }
+
+
+trap-Receiver-IP-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SNMP notifications of events are sent to this IP address."
+  DEFVAL { "1.1.1.1" }
+::= { snmp-Trap-Receiver-Entry 20 }
+
+trap-Receiver-Port OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SNMP notifications of events are sent to this UDP port."
+  DEFVAL { 162 }
+::= { snmp-Trap-Receiver-Entry 30 }
+
+trap-Receiver-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Name used to identify the receiver."
+  DEFVAL { "" }
+::= { snmp-Trap-Receiver-Entry 40 }
+
+trap-Receiver-Level OBJECT-TYPE
+  SYNTAX Severity-Level
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Sets the severity of alarms to be reported to this trap receiver."
+  DEFVAL { none }
+::= { snmp-Trap-Receiver-Entry 50 }
+
+trap-Receiver-Community OBJECT-TYPE
+  SYNTAX Display-32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Community to use for traps sent to the receiver."
+  DEFVAL { "public" }
+::= { snmp-Trap-Receiver-Entry 60 }
+
+trap-Receiver-Mode OBJECT-TYPE
+  SYNTAX Trap-Receiver-Mode
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Set to Normal traps to send normal traps to a Network Management System on alarm activation and deactivation. Set to Acknowledged Summary Traps to send summary traps to PowerManagerII. These traps are repeated until PowerManagerII receives the trap, connects to the controller, and downloads alarms and data."
+  DEFVAL { normal-Traps }
+::= { snmp-Trap-Receiver-Entry 70 }
+
+acknowledge-Alarm-Summary-Trap OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command will acknowledge reception of the alarm summary trap."
+::= { snmp-Trap-Receiver-Entry 80 }
+
+snmPv3-User-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The user name used in the SNMPv3 security model."
+  DEFVAL { "snmpuser" }
+::= { snmp-Settings 55 }
+
+snmPv3-SHA-Password OBJECT-TYPE
+  SYNTAX Display-64
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SNMP V3 password for the authentication protocol (SHA). If set to empty, SNMP v3 will use neither authentication nor encryption."
+  DEFVAL { "" }
+::= { snmp-Settings 60 }
+
+snmPv3-DES-Password OBJECT-TYPE
+  SYNTAX Display-64
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SNMP V3 password for the privacy protocol (DES). Only used if authentication password is also set. If set to empty, SNMP v3 will not use encryption."
+  DEFVAL { "" }
+::= { snmp-Settings 70 }
+
+email OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { communications 65 }
+
+email-Notifications OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether or not the controller will send alarm and event notifications via email."
+  DEFVAL { disabled }
+::= { email 10 }
+
+smtp-Server-IP-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SMTP notifications of events will be sent using this SMTP server."
+  DEFVAL { "1.1.1.1" }
+::= { email 20 }
+
+smtp-Server-Port OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "SMTP notifications of events will be sent using this SMTP server."
+  DEFVAL { 25 }
+::= { email 30 }
+
+email-Return-Address OBJECT-TYPE
+  SYNTAX Display-200
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The email return address. If not empty, the controller will arrange to have any delivery failure notifications sent to this address."
+  DEFVAL { "" }
+::= { email 40 }
+
+email-Subject-Prefix OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The generated email subject will be prefixed with this string to allow automatic processing of the email."
+  DEFVAL { "[DC-POWER] " }
+::= { email 50 }
+
+email-Receiver-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Email-Receiver-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { email 60 }
+
+email-Receiver-Entry OBJECT-TYPE
+  SYNTAX Email-Receiver-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { email-Receiver-Index }
+::= { email-Receiver-Table 1 }
+
+Email-Receiver-Entry ::= SEQUENCE {
+  email-Receiver-Index Unsigned8,
+  email-Receiver-Address Display-200,
+  email-Receiver-Level Severity-Level,
+  email-Receiver-Delay TimeIntervalInSeconds,
+  send-Test-Email No-Data,
+  smtp-Result Unsigned16
+}
+
+email-Receiver-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { email-Receiver-Entry 1 }
+
+
+email-Receiver-Address OBJECT-TYPE
+  SYNTAX Display-200
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The receiver's email address."
+  DEFVAL { "" }
+::= { email-Receiver-Entry 10 }
+
+email-Receiver-Level OBJECT-TYPE
+  SYNTAX Severity-Level
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Sets the severity of alarms to be reported to this email receiver."
+  DEFVAL { none }
+::= { email-Receiver-Entry 20 }
+
+email-Receiver-Delay OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller will delay sending an email by this amount of time and collate all events that occur during this time."
+  DEFVAL { 30 }
+::= { email-Receiver-Entry 30 }
+
+send-Test-Email OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This will send an email notification to the receiver."
+::= { email-Receiver-Entry 40 }
+
+smtp-Result OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Result of the last SMTP operation affecting this receiver. SMTP results are usually three-digit numbers with the first digit indicating success or failure severity. (2 = Ok, 4 = Temporary Failure, 5 = Permanent Failure) In addition the controller will set the code 9999 if communications to the SMTP server failed."
+::= { email-Receiver-Entry 50 }
+
+sntp OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { communications 70 }
+
+poll-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Polling interval in seconds. If set 0, the controller will listen to broadcasts from an NTP server on the local network and set its time accordingly; otherwise it will try to contact the primary and secondary (S)NTP server regularly according to the configured value."
+  DEFVAL { 3600 }
+::= { sntp 10 }
+
+udp-Port OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "UDP port of SNTP server."
+  DEFVAL { 123 }
+::= { sntp 20 }
+
+primary-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "IP address of primary SNTP server."
+  DEFVAL { "1.1.1.1" }
+::= { sntp 30 }
+
+backup-Address OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "IP address of backup SNTP server."
+  DEFVAL { "1.1.1.1" }
+::= { sntp 40 }
+
+sntp-Last-Update OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time when the last SNTP update occurred."
+::= { sntp 50 }
+
+web-User-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Web-User-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { communications 80 }
+
+web-User-Entry OBJECT-TYPE
+  SYNTAX Web-User-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { web-User-Index }
+::= { web-User-Table 1 }
+
+Web-User-Entry ::= SEQUENCE {
+  web-User-Index Unsigned8,
+  user-Name Display-40,
+  user-Logon-ID Display-20,
+  user-Logon-Password Display-32,
+  user-Active Boolean,
+  user-Read Boolean,
+  user-Write Boolean,
+  user-Restore Boolean,
+  user-Backup Boolean,
+  user-Execute Boolean,
+  user-Upgrade-Firmware Boolean,
+  user-Edit-User-List Boolean
+}
+
+web-User-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { web-User-Entry 1 }
+
+
+user-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The full name of the user. This is for reference only and is not used in the login process."
+  DEFVAL { "" }
+::= { web-User-Entry 10 }
+
+user-Logon-ID OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The logon name of a user."
+  DEFVAL { "" }
+::= { web-User-Entry 21 }
+
+user-Logon-Password OBJECT-TYPE
+  SYNTAX Display-32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The password for this user."
+  DEFVAL { "" }
+::= { web-User-Entry 31 }
+
+user-Active OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Indicates whether this user is enabled or disabled."
+  DEFVAL { false }
+::= { web-User-Entry 40 }
+
+user-Read OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to read the system information and values."
+  DEFVAL { false }
+::= { web-User-Entry 50 }
+
+user-Write OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to modify configurable values."
+  DEFVAL { false }
+::= { web-User-Entry 60 }
+
+user-Restore OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to upload configurations or snapshots."
+  DEFVAL { false }
+::= { web-User-Entry 70 }
+
+user-Backup OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to download configurations or snapshots."
+  DEFVAL { false }
+::= { web-User-Entry 80 }
+
+user-Execute OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to execute commands."
+  DEFVAL { false }
+::= { web-User-Entry 90 }
+
+user-Upgrade-Firmware OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user is allowed to upgrade firmware (including de-installing optional modules)."
+  DEFVAL { false }
+::= { web-User-Entry 100 }
+
+user-Edit-User-List OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If checked the user can edit this table and other security settings."
+  DEFVAL { false }
+::= { web-User-Entry 110 }
+
+access-Control OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 33 }
+
+ui-Access OBJECT-TYPE
+  SYNTAX Access-Protection
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Controls keypad access to change configuration items, and start or stop processes. This provides protection against unauthorized or accidental modifications of configuration settings."
+  DEFVAL { unprotected }
+::= { access-Control 10 }
+
+s3P-Write-Access-Password OBJECT-TYPE
+  SYNTAX Display-32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If set, S3P requires a password to be used before write access is granted. This password may be used to control remote configuration change or control actions. Note that the password is sent unencrypted."
+  DEFVAL { "" }
+::= { access-Control 20 }
+
+remote-Access-Level OBJECT-TYPE
+  SYNTAX Access-Level
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Shows the level of access granted to remote applications. Remote write access to the configuration and control processes is controlled through the S3P Write Access Password. If set, then it must be used to login using the Remote Access Login before database items may be written."
+::= { access-Control 30 }
+
+ac-input OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 40 }
+
+ac-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The average of the AC voltage measured by all rectifiers."
+::= { ac-input 10 }
+
+phase-1 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The average of all CR-48 phase-1 input voltages."
+::= { ac-input 20 }
+
+phase-2 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The average of all CR-48 phase-2 input voltages."
+::= { ac-input 30 }
+
+phase-3 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The average of all CR-48 phase-3 input voltages."
+::= { ac-input 40 }
+
+dc-output OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 50 }
+
+load-Current OBJECT-TYPE
+  SYNTAX Float
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The total current drawn by all loads. This value may be measured by the load current shunt(s) if present or calculated from the other system currents."
+::= { dc-output 10 }
+
+system-Power OBJECT-TYPE
+  SYNTAX Percentile8NAN
+  UNITS "%"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The output power of the system as a percentage of the total nominal power of the registered rectifiers."
+::= { dc-output 20 }
+
+load-Power OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 kW"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The power being supplied to the load."
+::= { dc-output 30 }
+
+rectifiers OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 60 }
+
+number-Of-Registered-Rectifiers OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The number of registered rectifiers."
+::= { rectifiers 10 }
+
+number-Of-Rectifiers-Failed OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Number of rectifiers that must be replaced or require maintenance."
+::= { rectifiers 13 }
+
+number-Of-Rectifiers-Comms-Lost OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Number of rectifiers that the controller can no longer communicate with. They could have been removed from the system or they could have failed."
+::= { rectifiers 17 }
+
+rectifier-Current OBJECT-TYPE
+  SYNTAX Float
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The total current output by all rectifiers. This value may be measured by the rectifier current shunt(s) if present, calculated from the other system currents or determined from the rectifier reported currents."
+::= { rectifiers 20 }
+
+rectifier-Current-Limit OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "A"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The output current limit of the rectifier. If set to zero then the output current is maximum."
+  DEFVAL { 0 }
+::= { rectifiers 23 }
+
+enable-Current-Share OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "When enabled, the rectifier output voltages are adjusted to even (approximately) their output currents. Disable this function if different rectifiers are supplying independent loads. This function should normally be enabled."
+  DEFVAL { enabled }
+::= { rectifiers 26 }
+
+highest-Rectifier-Heatsink-Temperature OBJECT-TYPE
+  SYNTAX Float
+  UNITS "°C"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The highest heatsink temperature of all registered rectifiers."
+::= { rectifiers 29 }
+
+rectifier-Values-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Rectifier-Values-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { rectifiers 30 }
+
+rectifier-Values-Entry OBJECT-TYPE
+  SYNTAX Rectifier-Values-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { rectifier-Values-Index }
+::= { rectifier-Values-Table 1 }
+
+Rectifier-Values-Entry ::= SEQUENCE {
+  rectifier-Values-Index Unsigned8,
+  rectifier-Serial-Number Counter32,
+  rectifier-Status Unsigned8,
+  rectifier-Maximum-Current-Limit Unsigned8,
+  rectifier-Maximum-Power-Limit DC-Power,
+  rectifier-Minimum-OVSD-Set-Point Float,
+  rectifier-Maximum-OVSD-Set-Point Float,
+  rectifier-Reported-AC-Voltage Float,
+  rectifier-Reported-Voltage Float,
+  rectifier-Reported-Current Float,
+  rectifier-Output-Power Float,
+  rectifier-Heatsink-Temperature Float,
+  rectifier-Registration-State RCP-Slave-State,
+  rectifier-Failed-State Rect-Fail-State,
+  load-Based-Run-Time TimeIntervalInSeconds,
+  shutdown-Rectifier Boolean,
+  rectifier-Has-Been-Shutdown Boolean,
+  rectifier-Phase-1 Float,
+  rectifier-Phase-2 Float,
+  rectifier-Phase-3 Float
+}
+
+rectifier-Values-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { rectifier-Values-Entry 1 }
+
+
+rectifier-Serial-Number OBJECT-TYPE
+  SYNTAX Counter32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Rectifier serial number."
+::= { rectifier-Values-Entry 30 }
+
+rectifier-Status OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The status reported by this rectifier. This value cannot be interpreted without knowing the meaning of the various status bits. This is documented in the RXP command set for rectifiers."
+::= { rectifier-Values-Entry 60 }
+
+rectifier-Maximum-Current-Limit OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The current limit value of the rectifier. Adjust Rectifier Current Limit to set a lower operating current limit."
+::= { rectifier-Values-Entry 70 }
+
+rectifier-Maximum-Power-Limit OBJECT-TYPE
+  SYNTAX DC-Power
+  UNITS "W"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The maximum output power limit value of the rectifier. Adjust Rectifier Current Limit to set a lower operating power limit."
+::= { rectifier-Values-Entry 80 }
+
+rectifier-Minimum-OVSD-Set-Point OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The minimum OVSD set point that the rectifier accepts."
+::= { rectifier-Values-Entry 83 }
+
+rectifier-Maximum-OVSD-Set-Point OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The maximum OVSD set point that the rectifier accepts."
+::= { rectifier-Values-Entry 86 }
+
+rectifier-Reported-AC-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The AC voltage measured by the rectifier."
+::= { rectifier-Values-Entry 90 }
+
+rectifier-Reported-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The output voltage measured by this rectifier. This is measured by the rectifier and reported via the RXP bus."
+::= { rectifier-Values-Entry 95 }
+
+rectifier-Reported-Current OBJECT-TYPE
+  SYNTAX Float
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The current produced by this rectifier. This is measured by the rectifier and reported via the rectifier comms bus."
+::= { rectifier-Values-Entry 100 }
+
+rectifier-Output-Power OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 %"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The current rectifier output power as a percentage of the power limit under the current operating conditions."
+::= { rectifier-Values-Entry 105 }
+
+rectifier-Heatsink-Temperature OBJECT-TYPE
+  SYNTAX Float
+  UNITS "°C"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The measured rectifier heatsink temperature."
+::= { rectifier-Values-Entry 110 }
+
+rectifier-Registration-State OBJECT-TYPE
+  SYNTAX RCP-Slave-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Registration state of this rectifier."
+::= { rectifier-Values-Entry 120 }
+
+rectifier-Failed-State OBJECT-TYPE
+  SYNTAX Rect-Fail-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "A rectifier's failed state."
+::= { rectifier-Values-Entry 130 }
+
+load-Based-Run-Time OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time the rectifier has been operating since it was registered."
+::= { rectifier-Values-Entry 140 }
+
+shutdown-Rectifier OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Shuts down the rectifier or restarts it. Use Rectifier Has Been Shutdown to see whether the command has been sent to the rectifier since it can take some seconds."
+::= { rectifier-Values-Entry 150 }
+
+rectifier-Has-Been-Shutdown OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if the rectifier shutdown command has been sent. Once a Shutdown Rectifier command has been issued some time may elapse before the command is sent to the rectifier. Rectifiers that shut themselves down due to some failure condition are excluded."
+::= { rectifier-Values-Entry 160 }
+
+rectifier-Phase-1 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Rectifier's AC voltage measured at the input connection for phase 1."
+::= { rectifier-Values-Entry 170 }
+
+rectifier-Phase-2 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Rectifier's AC voltage measured at the input connection for phase 2."
+::= { rectifier-Values-Entry 180 }
+
+rectifier-Phase-3 OBJECT-TYPE
+  SYNTAX Float
+  UNITS "V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Rectifier's AC voltage measured at the input connection for phase 3."
+::= { rectifier-Values-Entry 190 }
+
+rectifier-Shutdown-Mode OBJECT-TYPE
+  SYNTAX Rectifier-Shutdown-Mode
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Specifies whether rectifiers may be shutdown and, if so, whether this is through manual intervention or under the autonomy of the controller."
+  DEFVAL { disabled }
+::= { rectifiers 55 }
+
+restart-All-Rectifiers OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Restarts all rectifiers that were shut down by the user or LBRS."
+::= { rectifiers 60 }
+
+load-Based-Rectifier-Shutdown-Config OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rectifiers 70 }
+
+rect-Cycle-Low-Threshold OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Rectifiers will only be shut down by the LBRS process if the load power is below this percentage of total system power."
+  DEFVAL { 40 }
+::= { load-Based-Rectifier-Shutdown-Config 20 }
+
+rect-Cycle-High-Threshold OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Additional rectifiers will be started by the LBRS process if the load power is above this percentage of total system power."
+  DEFVAL { 60 }
+::= { load-Based-Rectifier-Shutdown-Config 30 }
+
+rect-Cycle-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The time interval in minutes that rectifiers are cycled when the LBRS process is active."
+  DEFVAL { 10080 }
+::= { load-Based-Rectifier-Shutdown-Config 40 }
+
+reset-Run-Times OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to reset the Run Time on each individual rectifier."
+::= { load-Based-Rectifier-Shutdown-Config 100 }
+
+ramp-Up-Slope OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%/s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The ramp-up slope of the rectifier, as a percentage of the rectifier rated current."
+  DEFVAL { 20 }
+::= { rectifiers 80 }
+
+ovsd-Set-Point OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Rectifier Over-Voltage Shutdown set point."
+  DEFVAL { 5920 }
+::= { rectifiers 90 }
+
+rectifier-Start-Up-Delay OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The delay from AC turn-on before the rectifier output turns on. This is in addition to the fixed rectifier hardware charge time."
+  DEFVAL { 2 }
+::= { rectifiers 110 }
+
+control-Functions OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 70 }
+
+control-State OBJECT-TYPE
+  SYNTAX Control-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the state of control process, e.g. Equalize, Fast Charge or Normal."
+::= { control-Functions 5 }
+
+voltage-Control OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 10 }
+
+float-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The voltage required to maintain optimum battery charge (at the nominal ambient temperature). Use the value recommended by the battery manufacturer. The bus voltage may be adjusted above or below this value by Temperature Compensation, Fast Charge, Battery Test, Equalize or Battery Current Limit."
+  DEFVAL { 5450 }
+::= { voltage-Control 10 }
+
+maximum-System-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Many control functions adjust the bus voltage depending on their respective conditions. However, under no circumstances will the controller deliberately exceed this value. A failing rectifier may cause the voltage to raise above this threshold before the rectifier will execute an overvoltage shut down."
+  DEFVAL { 5760 }
+::= { voltage-Control 15 }
+
+minimum-System-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Many control functions adjust the bus voltage depending on their respective conditions. However, under no circumstances will the controller deliberately adjust the bus voltage to below this value."
+  DEFVAL { 4260 }
+::= { voltage-Control 17 }
+
+bus-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The system bus voltage from the bus voltage sensor. If the bus voltage sensor has failed, the system bus voltage is determined from the rectifier output voltages."
+::= { voltage-Control 20 }
+
+target-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The voltage maintained by AVC. AVC will set the Base Voltage to attempt to maintain the bus voltage to this value."
+::= { voltage-Control 30 }
+
+enable-Active-Voltage-Control OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "When AVC is enabled the rectifier output voltage is adjusted to maintain the bus voltage at the configured float voltage (plus or minus any adjustments by active control processes) within a predefined dead band. Enable AVC unless there is specific reason to disable."
+  DEFVAL { enabled }
+::= { voltage-Control 35 }
+
+avc-State OBJECT-TYPE
+  SYNTAX AVC-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the Active Voltage Control (AVC) process."
+::= { voltage-Control 40 }
+
+avc-Offset OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The difference between the Target Voltage and the measured bus voltage."
+::= { voltage-Control 50 }
+
+base-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The voltage sent to the rectifiers. This is the Target Voltage plus the AVC Offset. This value is periodically broadcast to all rectifiers. Undetected rectifiers will ignore this value."
+::= { voltage-Control 60 }
+
+temperature-Compensation OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 20 }
+
+enable-Temperature-Compensation OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "When enabled, the battery charge voltage is automatically adjusted based on temperature. This is recommended by battery manufacturers to optimize battery life."
+  DEFVAL { enabled }
+::= { temperature-Compensation 5 }
+
+temperature-Compensation-Allowed OBJECT-TYPE
+  SYNTAX Can-Start
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if Temperature Compensation is allowed to start or not. Temperature compensation cannot start if there are no rectifiers with AC power, or if the temperature sensor has failed."
+::= { temperature-Compensation 7 }
+
+temperature-Compensation-State OBJECT-TYPE
+  SYNTAX TC-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the Temperature Compensation process. To be active, it must be enabled, and the temperature sensor must be working."
+::= { temperature-Compensation 10 }
+
+temperature-Compensation-Slope OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 mV/°C/Cell"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Bus voltage adjustment rate. Use the value specified by the battery manufacturer."
+  DEFVAL { -400 }
+::= { temperature-Compensation 20 }
+
+temperature-Compensation-Reference-Temperature OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 °C"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The temperature where no voltage adjustment is applied. Use the value specified by the battery manufacturer."
+  DEFVAL { 200 }
+::= { temperature-Compensation 30 }
+
+temperature-Compensation-Upper-Limit OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 °C"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "No additional voltage adjustment is made above this temperature."
+  DEFVAL { 500 }
+::= { temperature-Compensation 40 }
+
+temperature-Compensation-Lower-Limit OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 °C"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "No additional voltage adjustment is made below this temperature."
+  DEFVAL { 0 }
+::= { temperature-Compensation 50 }
+
+temperature-Compensation-Offset-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The adjustment to the bus voltage being applied due to the Temperature Compensation. Offset is zero when the battery temperature equals the reference temperature."
+::= { temperature-Compensation 60 }
+
+reset-Battery-State OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command resets controller battery state information (Amp hours discharged) and reverts all control process states to Inactive."
+::= { control-Functions 25 }
+
+equalize OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 30 }
+
+enable-Equalize OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Applies a controlled overcharge to the battery by raising the charge voltage for a set time. This may be required to ensure all cells are fully charged, remove sulphation, or redistribute the electrolyte in flooded cells."
+  DEFVAL { disabled }
+::= { equalize 5 }
+
+equalize-Start-Allowed OBJECT-TYPE
+  SYNTAX Can-Start
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if an Equalize cycle is allowed to start or the reason why not. An Equalize cycle cannot start if there are no rectifiers with AC power."
+::= { equalize 9 }
+
+equalize-State OBJECT-TYPE
+  SYNTAX Control-Process-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the state of the Equalize process: Disabled, Inactive or Active."
+::= { equalize 10 }
+
+equalize-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The bus voltage maintained during an Equalize cycle. The bus voltage is further adjusted by Temperature Compensation."
+  DEFVAL { 5600 }
+::= { equalize 12 }
+
+equalize-Offset-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The adjustment to the bus voltage being applied due to the Equalize process."
+::= { equalize 13 }
+
+periodic-Equalize-First-Date-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The date and time that the first scheduled Equalize will occur. Subsequent Equalize cycles will occur at every Equalize Interval thereafter."
+::= { equalize 15 }
+
+equalize-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInDays
+  UNITS "d"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The time between scheduled Equalize cycles. The interval period begins at the start of an Equalize. Zero disables scheduled Equalizes."
+  DEFVAL { 182 }
+::= { equalize 17 }
+
+next-Equalize-Start-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The start time of the next scheduled Equalize cycle. The value is NaN if Equalize is active or Periodic Equalize function is disabled."
+::= { equalize 20 }
+
+equalize-Duration OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The duration of a scheduled Equalize."
+  DEFVAL { 600 }
+::= { equalize 30 }
+
+equalize-Remaining-Time OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time until the current Equalize cycle will stop. The value is NaN if the Equalize is inactive."
+::= { equalize 40 }
+
+start-Equalize OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to start the Equalize process."
+::= { equalize 100 }
+
+stop-Equalize OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command stops the Equalize process if it is currently active."
+::= { equalize 110 }
+
+equalize-Smart-Alarm OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The smart alarm that will attempt to start and stop Equalize. To disable set to 0."
+  DEFVAL { 0 }
+::= { equalize 120 }
+
+fast-Charge OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 40 }
+
+enable-Fast-Charge OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "After an AC power outage, Fast Charge automatically increases the float voltage of the DC power system to recharge the batteries as quickly as possible. Enable Fast Charge if the site experiences frequent AC power outages."
+  DEFVAL { disabled }
+::= { fast-Charge 5 }
+
+fast-Charge-State OBJECT-TYPE
+  SYNTAX Control-Process-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the state of Fast Charge process: Disabled, Inactive, Active or Pending."
+::= { fast-Charge 10 }
+
+fast-Charge-Start-Allowed OBJECT-TYPE
+  SYNTAX Can-Start
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if a Fast Charge is allowed to start or the reason why not. Fast Charge cannot start if there are no rectifiers with AC power, or the battery is not discharged."
+::= { fast-Charge 12 }
+
+fast-Charge-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The bus voltage maintained during Fast Charge (use the value recommended by the battery manufacturer). Adjustments for Temperature Compensation and Battery Current Limit also apply."
+  DEFVAL { 5600 }
+::= { fast-Charge 15 }
+
+fast-Charge-Offset-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The adjustment to the bus voltage being applied due to the Fast Charge."
+::= { fast-Charge 17 }
+
+fast-Charge-Ah-Discharged OBJECT-TYPE
+  SYNTAX Float
+  UNITS "Ah"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The current level of battery discharge."
+::= { fast-Charge 20 }
+
+fast-Charge-Maximum-Duration OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The maximum duration of a Fast Charge (use the value recommended by the battery manufacturer)."
+  DEFVAL { 1440 }
+::= { fast-Charge 30 }
+
+fast-Charge-Ampere-Hour-Threshold OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the battery has discharged more than this amount during a power outage, then Fast Charge occurs when AC power is restored. The threshold is given as a percentage of installed C10 battery capacity. Fast charge can also be triggered based on the Fast Charge Voltage Threshold."
+  DEFVAL { 25 }
+::= { fast-Charge 35 }
+
+fast-Charge-Voltage-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the bus voltage drops below this value then Fast Charge occurs when AC power is restored. Fast charge can also be triggered based on the Fast Charge Ampere Hour Threshold."
+  DEFVAL { 4800 }
+::= { fast-Charge 40 }
+
+fast-Charge-Recharge-Percentage OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The ratio of recharge ampere-hours required to restore the battery to fully charged status to the ampere-hours discharged."
+  DEFVAL { 110 }
+::= { fast-Charge 45 }
+
+fast-Charge-Ampere-Hour-Stop-Threshold OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Fast charge will only run until the charge removed from the battery falls below this threshold. This mostly useful when fast charge is used to control a generator and the generator should be stopped before the battery has been fully charged. The value given is a percentage of the configured battery capacity. This should normally be set to zero."
+  DEFVAL { 0 }
+::= { fast-Charge 47 }
+
+fast-Charge-Maximum-Time-Remaining OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "This timer is started when a Fast Charge cycle starts and runs while Fast Charge remains active. It is suspended and resumed when Fast Charge is suspended and resumed respectively. The Fast Charge cycle will stop if this timer reaches zero. The value is 0 if Fast Charge is inactive."
+::= { fast-Charge 50 }
+
+stop-Fast-Charge OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command stops the Fast Charge process if it is currently active."
+::= { fast-Charge 100 }
+
+battery-Current-Limit OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 50 }
+
+enable-Battery-Current-Limit OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Protects the batteries from excessive charge current. BCL varies the system voltage in order to maintain battery charge current below the BCL Limit value."
+  DEFVAL { disabled }
+::= { battery-Current-Limit 5 }
+
+bcl-State OBJECT-TYPE
+  SYNTAX BCL-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the Battery Current Limit process."
+::= { battery-Current-Limit 10 }
+
+generator-State OBJECT-TYPE
+  SYNTAX Engine-Run-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether or not the controller believes that the generator is currently running. This information may be based on a digital input (if configured) or derived from other information."
+::= { battery-Current-Limit 20 }
+
+bcl-Limit OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "BCL maintains the battery current below this value, which is a percentage of the installed C10 Battery Capacity."
+  DEFVAL { 10 }
+::= { battery-Current-Limit 30 }
+
+bcl-Offset-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The bus voltage adjustment made by Battery Current Limit is applied to the Operating Voltage to produce the Target Voltage. Target Voltage is used as the input to the AVC function."
+::= { battery-Current-Limit 40 }
+
+bcl-Engine-Run-Limit OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The Battery Current Limit setting when Engine Run is active. BCL maintains the battery current below this value when the Engine Run digital input is active (Engine Run is enabled). This limit is expressed as a percentage of the installed C10 Battery Capacity."
+  DEFVAL { 2 }
+::= { battery-Current-Limit 50 }
+
+battery-Test OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 70 }
+
+enable-Battery-Test OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Periodically tests the condition of the battery by reducing the rectifier voltage and allowing the batteries to discharge into the normal load."
+  DEFVAL { disabled }
+::= { battery-Test 3 }
+
+battery-Test-Start-Allowed OBJECT-TYPE
+  SYNTAX Can-Start
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates if a Battery Test is allowed to start. Battery Tests cannot start within 48 hours of an AC failure, if there are no rectifiers, if Equalize or Fast Charge is active, if any rectifiers are failed or have lost communications, if the battery fuse has failed or if the system is overloaded."
+::= { battery-Test 7 }
+
+battery-Test-Lockout-Remaining OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "How much longer the Battery Test is locked-out. Battery Tests cannot be started within 48 hours of an AC failure. If an immediate test is required, set Battery test Interval to zero (this disables the 48 hour lockout)."
+::= { battery-Test 8 }
+
+battery-Test-State OBJECT-TYPE
+  SYNTAX Battery-Test-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the Battery Test process."
+::= { battery-Test 10 }
+
+battery-Test-First-Date-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The date and time that the first Battery Test will occur. Subsequent tests will occur at every Battery Test Interval after that."
+::= { battery-Test 15 }
+
+battery-Test-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInDays
+  UNITS "d"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The time between scheduled Battery Tests. The interval period begins at the start of a Battery Test. Zero disables scheduled Battery Tests. Zero also disables the 48 hour lockout following an AC failure, allowing an immediate manual test."
+  DEFVAL { 183 }
+::= { battery-Test 17 }
+
+next-Battery-Test-Start-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The start time of the next scheduled Battery Test."
+::= { battery-Test 20 }
+
+battery-Test-Duration OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The maximum time a Battery Test process will be active. The Battery Test will pass if the bus voltage remains above the Battery Test Termination Voltage for the duration of the test."
+  DEFVAL { 30 }
+::= { battery-Test 30 }
+
+battery-Test-Remaining-Time OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time to the end of the currently active Battery Test."
+::= { battery-Test 40 }
+
+battery-Test-Termination-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the bus voltages drops below this value during a Battery Test, then the test fails."
+  DEFVAL { 4750 }
+::= { battery-Test 50 }
+
+battery-Test-Offset-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The adjustment to the bus voltage being applied due to the Battery Test. While a Battery Test is running, the rectifiers are turned down to force the battery to carry the load."
+::= { battery-Test 60 }
+
+start-Battery-Test OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to start the Battery Test process."
+::= { battery-Test 100 }
+
+stop-Battery-Test OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command stops the Battery Test process if it is currently active."
+::= { battery-Test 110 }
+
+lvd OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 75 }
+
+lvd-Inhibit-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The minimum time an LVD stays connected or disconnected before it can change state."
+  DEFVAL { 10 }
+::= { lvd 10 }
+
+allow-Front-Panel-LVD-Control OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This item specifies whether manual LVD control is allowed from the front panel."
+  DEFVAL { true }
+::= { lvd 20 }
+
+lvd-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF LVD-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { lvd 50 }
+
+lvd-Entry OBJECT-TYPE
+  SYNTAX LVD-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { lvd-Index }
+::= { lvd-Table 1 }
+
+LVD-Entry ::= SEQUENCE {
+  lvd-Index Unsigned8,
+  lvd-State LVD-State,
+  lvd-Inhibited Boolean,
+  enable-LVD-Voltage-Disconnect Enable-State,
+  lvd-Disconnect-Voltage Float,
+  lvd-Reconnect-Voltage Float,
+  lvd-Recognition-Period TimeIntervalInSeconds,
+  enable-LVD-AC-Timer Enable-State,
+  lvd-AC-Timer-Disconnect-Delay TimeIntervalInMinutes,
+  enable-LVD-SA-Disconnect Enable-State,
+  lvd-SA-Disconnect-Index Unsigned8,
+  enable-LVD-Chained-To-Previous Enable-State
+}
+
+lvd-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { lvd-Entry 1 }
+
+
+lvd-State OBJECT-TYPE
+  SYNTAX LVD-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this LVD control process."
+::= { lvd-Entry 10 }
+
+lvd-Inhibited OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether this LVD currently cannot change state due to the inhibit time."
+::= { lvd-Entry 15 }
+
+enable-LVD-Voltage-Disconnect OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the LVD will disconnect when the bus voltage falls below the Disconnect Voltage and will not reconnect until it is above the Reconnect Voltage."
+  DEFVAL { enabled }
+::= { lvd-Entry 20 }
+
+lvd-Disconnect-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If voltage based disconnect is enabled, the LVD will disconnect if the bus voltage has been below this voltage for the recognition time."
+  DEFVAL { 4320 }
+::= { lvd-Entry 30 }
+
+lvd-Reconnect-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If voltage based disconnect is enabled, the LVD will reconnect only if the bus voltage has been above this voltage for the recognition time."
+  DEFVAL { 4800 }
+::= { lvd-Entry 40 }
+
+lvd-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The time the bus voltage must be below or above the thresholds before the LVD disconnects or connects."
+  DEFVAL { 10 }
+::= { lvd-Entry 50 }
+
+enable-LVD-AC-Timer OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, during an AC failure the LVD will disconnect after the AC Timer Delay, even if the Disconnect Voltage has not been reached."
+  DEFVAL { disabled }
+::= { lvd-Entry 60 }
+
+lvd-AC-Timer-Disconnect-Delay OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the LVD will disconnect after this delay following an AC failure, unless the Disconnect Voltage is reached or AC is restored first."
+  DEFVAL { 240 }
+::= { lvd-Entry 70 }
+
+enable-LVD-SA-Disconnect OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the LVD will disconnect immediately when the specified smart alarm becomes active."
+  DEFVAL { disabled }
+::= { lvd-Entry 80 }
+
+lvd-SA-Disconnect-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the LVD will disconnect immediately when this smart alarm becomes active."
+  DEFVAL { 1 }
+::= { lvd-Entry 90 }
+
+enable-LVD-Chained-To-Previous OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the LVD will not disconnect until the previous LVD (the LVD numbered one less) has been disconnected for the configured recognition time. This item is ignored by the first LVD and when the previous LVD has no contactors. This applies in reverse when connecting."
+  DEFVAL { disabled }
+::= { lvd-Entry 100 }
+
+lvdc-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF LVDC-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { lvd 60 }
+
+lvdc-Entry OBJECT-TYPE
+  SYNTAX LVDC-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { lvdc-Index }
+::= { lvdc-Table 1 }
+
+LVDC-Entry ::= SEQUENCE {
+  lvdc-Index Unsigned8,
+  lvdc-LVD-Mapping Unsigned8,
+  lvdc-State LVDC-State,
+  enable-LVDC Enable-State,
+  lvdc-IOB-Number Unsigned8,
+  lvdc-IOB-LVD-Number Unsigned8,
+  lvdc-Type LVDC-Type
+}
+
+lvdc-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { lvdc-Entry 1 }
+
+
+lvdc-LVD-Mapping OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The logical LVD that drives this contactor."
+  DEFVAL { 16 }
+::= { lvdc-Entry 10 }
+
+lvdc-State OBJECT-TYPE
+  SYNTAX LVDC-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this contactor."
+::= { lvdc-Entry 20 }
+
+enable-LVDC OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If Enabled, the specified physical contactor is driven by the specified logical LVD."
+  DEFVAL { disabled }
+::= { lvdc-Entry 30 }
+
+lvdc-IOB-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The I/O board number to which this LVD contactor is connected."
+  DEFVAL { 1 }
+::= { lvdc-Entry 40 }
+
+lvdc-IOB-LVD-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The LVD connector on the I/O board that this contactor is connected to."
+  DEFVAL { 1 }
+::= { lvdc-Entry 50 }
+
+lvdc-Type OBJECT-TYPE
+  SYNTAX LVDC-Type
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The type of contactor connected to the I/O board."
+  DEFVAL { normally-Open }
+::= { lvdc-Entry 60 }
+
+generator-Control OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { control-Functions 80 }
+
+generator-Fail-Alarm-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Recognition period for the Generator Fail Alarm. The alarm will activate if the Generator Enable Alarm has been triggered for this period and AC has not been restored."
+  DEFVAL { 300 }
+::= { generator-Control 100 }
+
+generator-On-Fast-Charge OBJECT-TYPE
+  SYNTAX YesNo
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller will activate the generator control relay while fast charge is pending or active."
+  DEFVAL { yes }
+::= { generator-Control 110 }
+
+generator-On-Equalize OBJECT-TYPE
+  SYNTAX YesNo
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller will activate the generator control relay while equalize is pending or active."
+  DEFVAL { no }
+::= { generator-Control 112 }
+
+generator-On-Mains-Failure OBJECT-TYPE
+  SYNTAX YesNo
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller will activate the generator control relay when there is a mains failure."
+  DEFVAL { no }
+::= { generator-Control 116 }
+
+ac-Supply-State OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Calculated AC Supply state."
+::= { generator-Control 120 }
+
+generator-Run-Time-Remaining OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time left for the generator to run following a manual start."
+::= { generator-Control 130 }
+
+generator-State OBJECT-TYPE
+  SYNTAX Engine-Run-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether or not the controller believes that the generator is currently running. This information may be based on a digital input (if configured) or derived from other information."
+::= { generator-Control 140 }
+
+generator-Refuel-Date OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The time and date the generator was last refuelled."
+::= { generator-Control 150 }
+
+generator-Refuel-Volume OBJECT-TYPE
+  SYNTAX Float
+  UNITS "L"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The amount of fuel added to the generator's fuel tank(s) during the last refuel."
+::= { generator-Control 160 }
+
+generator-Backup-Time OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Estimated time for which the generator could continuously run based on the current fuel-level and historic fuel consumption."
+::= { generator-Control 170 }
+
+tank-Empty-Date-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Best current estimate of the date at which the tank will run dry if the current characteristics of generator usage do not change. This is useful for installations that run the generator regularly and with a reasonably constant duty cycle."
+::= { generator-Control 180 }
+
+fuel-Level OBJECT-TYPE
+  SYNTAX Float
+  UNITS "L"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The volume of fuel in the generator's fuel tank(s)."
+::= { generator-Control 190 }
+
+generator-Control-Relay OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The relay used to control generator startup and shutdown. If this is set to None, the generator control process is disabled."
+  DEFVAL { none }
+::= { generator-Control 200 }
+
+generator-Startup-Wiring OBJECT-TYPE
+  SYNTAX Generator-Startup-Wiring
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Choose to match the way the generator control relay is wired."
+  DEFVAL { indirect-Start }
+::= { generator-Control 210 }
+
+manual-Generator-Run-Time OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The maximum time permitted for the generator to run following a manual start."
+  DEFVAL { 0 }
+::= { generator-Control 230 }
+
+fuel-Tank-Volume OBJECT-TYPE
+  SYNTAX Float
+  UNITS "L"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The total volume of the generator's fuel tank(s). A value of 0 disables fuel related estimates."
+  DEFVAL { 0 }
+::= { generator-Control 240 }
+
+manual-Generator-Start OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This causes the generator to run for the configured time unless it is manually stopped."
+::= { generator-Control 260 }
+
+manual-Generator-Stop OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This will end a manual generator run before the time has elapsed. It will not cause the generator to stop if it is running based on fast charge, equalize or AC failure."
+::= { generator-Control 270 }
+
+clear-Fuel-Consumption-History OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller accumulates historic information on the average generator fuel consumption and, in applications that run the generator regularly, the average generator duty cycle. This command will clear this information for instance when the generator has been replaced. This will cause the remaining time estimates to be very inaccurate or not available until enough information about the new generator has been collected."
+::= { generator-Control 280 }
+
+real-Time-Clock OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 80 }
+
+controller-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The current time of the controller's internal battery backed clock."
+::= { real-Time-Clock 10 }
+
+input-Output OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 90 }
+
+system-Analog-Input OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { input-Output 10 }
+
+analog-Input-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Analog-Input-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { system-Analog-Input 30 }
+
+analog-Input-Entry OBJECT-TYPE
+  SYNTAX Analog-Input-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { analog-Input-Index }
+::= { analog-Input-Table 1 }
+
+Analog-Input-Entry ::= SEQUENCE {
+  analog-Input-Index Unsigned8,
+  ai-High-State Alarm-Active-State,
+  ai-Low-State Alarm-Active-State,
+  ai-Value Float,
+  ai-Status Enable-State,
+  ai-Name Display-20,
+  ai-Units Measurement-Units,
+  ai-IOB-Number Unsigned8,
+  input-Number Unsigned8,
+  gain Float,
+  offset Float,
+  hysteresis Float,
+  high-Severity Alarm-Severity,
+  high-Threshold Float,
+  high-DO-Mapping-A Relay-Mapping,
+  high-DO-Mapping-B Relay-Mapping,
+  high-Send-Trap Boolean,
+  low-Severity Alarm-Severity,
+  low-Threshold Float,
+  low-DO-Mapping-A Relay-Mapping,
+  low-DO-Mapping-B Relay-Mapping,
+  low-Send-Trap Boolean,
+  ai-Group Unsigned8,
+  ai-High-Notes Display-60,
+  ai-Low-Notes Display-60
+}
+
+analog-Input-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { analog-Input-Entry 1 }
+
+
+ai-High-State OBJECT-TYPE
+  SYNTAX Alarm-Active-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the selected analog input high alarm."
+::= { analog-Input-Entry 20 }
+
+ai-Low-State OBJECT-TYPE
+  SYNTAX Alarm-Active-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the selected analog input low alarm."
+::= { analog-Input-Entry 30 }
+
+ai-Value OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Analog input value."
+::= { analog-Input-Entry 40 }
+
+ai-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable/disable this analog input channel."
+  DEFVAL { disabled }
+::= { analog-Input-Entry 50 }
+
+ai-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The name of this analog input channel as it will appear on management software such as DCTools or PowerManagerII. This name is not displayed on the controller."
+  DEFVAL { "Bus Voltage" }
+::= { analog-Input-Entry 60 }
+
+ai-Units OBJECT-TYPE
+  SYNTAX Measurement-Units
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Units of this analog input (after scaling)."
+  DEFVAL { none }
+::= { analog-Input-Entry 70 }
+
+ai-IOB-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The I/O board number on which this analog input is located."
+  DEFVAL { 1 }
+::= { analog-Input-Entry 80 }
+
+input-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The input channel on the I/O board of this analog input."
+  DEFVAL { 2 }
+::= { analog-Input-Entry 90 }
+
+gain OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The scaling factor applied to the raw value read from the I/O board."
+  DEFVAL { 100 }
+::= { analog-Input-Entry 100 }
+
+offset OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The offset applied to the raw value read from the I/O board."
+  DEFVAL { 0 }
+::= { analog-Input-Entry 110 }
+
+hysteresis OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The amount of hysteresis applied to the input before an active alarm is deactivated."
+  DEFVAL { 0 }
+::= { analog-Input-Entry 130 }
+
+high-Severity OBJECT-TYPE
+  SYNTAX Alarm-Severity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The severity level associated with the alarm. Control alarms are not displayed, although any configured digital outputs are still activated."
+  DEFVAL { disabled }
+::= { analog-Input-Entry 141 }
+
+high-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "An analog input high alarm is activated if the scaled input is greater than or equal to this value."
+  DEFVAL { 1000 }
+::= { analog-Input-Entry 150 }
+
+high-DO-Mapping-A OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { analog-Input-Entry 160 }
+
+high-DO-Mapping-B OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { analog-Input-Entry 170 }
+
+high-Send-Trap OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If set to true an SNMP trap is sent to every trap receiver with an appropriate trap level whenever this alarm changes state."
+  DEFVAL { true }
+::= { analog-Input-Entry 175 }
+
+low-Severity OBJECT-TYPE
+  SYNTAX Alarm-Severity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The severity level associated with the alarm. Control alarms are not displayed, although any configured digital outputs are still activated."
+  DEFVAL { disabled }
+::= { analog-Input-Entry 181 }
+
+low-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "An analog input low alarm is activated if the scaled input is lower than or equal to this value."
+  DEFVAL { 0 }
+::= { analog-Input-Entry 190 }
+
+low-DO-Mapping-A OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { analog-Input-Entry 200 }
+
+low-DO-Mapping-B OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { analog-Input-Entry 210 }
+
+low-Send-Trap OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If set to true an SNMP trap is sent to every trap receiver with an appropriate trap level whenever this alarm changes state."
+  DEFVAL { true }
+::= { analog-Input-Entry 215 }
+
+ai-Group OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The group tag used by PowerManagerII to group related inputs and outputs for display purposes."
+  DEFVAL { 0 }
+::= { analog-Input-Entry 220 }
+
+ai-High-Notes OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "User notes about this alarm. These notes appear in SNMP traps and can be viewed using DCTools or PowerManagerII."
+  DEFVAL { "" }
+::= { analog-Input-Entry 230 }
+
+ai-Low-Notes OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "User notes about this alarm. These notes appear in SNMP traps and can be viewed using DCTools or PowerManagerII."
+  DEFVAL { "" }
+::= { analog-Input-Entry 240 }
+
+alternative-Energy-Source OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { system-Analog-Input 50 }
+
+alternative-Source-Current OBJECT-TYPE
+  SYNTAX Float
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The total current produced by all alternative energy sources. This value is measured by the alternative energy shunt(s) if present. If none are configured the controller assumes that there are no alternative energy sources present."
+::= { alternative-Energy-Source 10 }
+
+system-States OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { input-Output 15 }
+
+mains-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any Mains Fail digital input is in active state."
+::= { system-States 10 }
+
+fan-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any ACD Fan Fail digital input is in active state."
+::= { system-States 20 }
+
+mov-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any MOV Fail digital input is in active state."
+::= { system-States 30 }
+
+load-Fuse-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any Load Fuse Fail digital input is in active state."
+::= { system-States 40 }
+
+battery-Fuse-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any Battery Fuse Fail digital input is in active state."
+::= { system-States 50 }
+
+phase-Fail OBJECT-TYPE
+  SYNTAX System-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Failed if any Phase Fail digital input is in active state."
+::= { system-States 60 }
+
+digital-Input-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Digital-Input-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { input-Output 40 }
+
+digital-Input-Entry OBJECT-TYPE
+  SYNTAX Digital-Input-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { digital-Input-Index }
+::= { digital-Input-Table 1 }
+
+Digital-Input-Entry ::= SEQUENCE {
+  digital-Input-Index Unsigned8,
+  di-State Alarm-Active-State,
+  di-Value Digital-Input-State,
+  di-Status Enable-State,
+  di-Name Display-20,
+  di-IOB-Number Unsigned8,
+  digital-Input-Number Unsigned8,
+  di-Severity Alarm-Severity,
+  di-Recognition-Period TimeIntervalInSeconds,
+  di-Deactivation-Recognition-Period TimeIntervalInSeconds,
+  di-DO-Mapping-A Relay-Mapping,
+  di-DO-Mapping-B Relay-Mapping,
+  di-Send-Trap Boolean,
+  di-Active-State Active-State,
+  di-Group Unsigned8,
+  di-Notes Display-60
+}
+
+digital-Input-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { digital-Input-Entry 1 }
+
+
+di-State OBJECT-TYPE
+  SYNTAX Alarm-Active-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this digital input alarm."
+::= { digital-Input-Entry 20 }
+
+di-Value OBJECT-TYPE
+  SYNTAX Digital-Input-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this digital input."
+::= { digital-Input-Entry 30 }
+
+di-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable/disable this digital input channel."
+  DEFVAL { disabled }
+::= { digital-Input-Entry 40 }
+
+di-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The name of the digital input."
+  DEFVAL { "Digital Input 1" }
+::= { digital-Input-Entry 50 }
+
+di-IOB-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The I/O board number on which this digital input is located."
+  DEFVAL { 1 }
+::= { digital-Input-Entry 60 }
+
+digital-Input-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The input channel on the I/O board of this digital input."
+  DEFVAL { 1 }
+::= { digital-Input-Entry 70 }
+
+di-Severity OBJECT-TYPE
+  SYNTAX Alarm-Severity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The severity level associated with the alarm. Control alarms are not displayed, although any configured digital outputs are still activated."
+  DEFVAL { disabled }
+::= { digital-Input-Entry 81 }
+
+di-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "A digital input alarm will become active if the input is in the active state for the recognition time."
+  DEFVAL { 10 }
+::= { digital-Input-Entry 85 }
+
+di-Deactivation-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "A digital input alarm will deactivate if the input is in the inactive state for the deactivation recognition time."
+  DEFVAL { 0 }
+::= { digital-Input-Entry 86 }
+
+di-DO-Mapping-A OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this digital input alarm is active."
+  DEFVAL { none }
+::= { digital-Input-Entry 90 }
+
+di-DO-Mapping-B OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this digital input alarm is active."
+  DEFVAL { none }
+::= { digital-Input-Entry 100 }
+
+di-Send-Trap OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If set to true an SNMP trap is sent to every trap receiver with an appropriate trap level whenever this alarm changes state."
+  DEFVAL { true }
+::= { digital-Input-Entry 105 }
+
+di-Active-State OBJECT-TYPE
+  SYNTAX Active-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Selects whether the input should be considered active when closed or open."
+  DEFVAL { closed }
+::= { digital-Input-Entry 110 }
+
+di-Group OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The group Number to be used by SiteManager."
+  DEFVAL { 0 }
+::= { digital-Input-Entry 120 }
+
+di-Notes OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "User notes about this alarm. These notes appear in SNMP traps and can be viewed using DCTools or PowerManagerII."
+  DEFVAL { "" }
+::= { digital-Input-Entry 130 }
+
+digital-Output-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Digital-Output-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { input-Output 50 }
+
+digital-Output-Entry OBJECT-TYPE
+  SYNTAX Digital-Output-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { digital-Output-Index }
+::= { digital-Output-Table 1 }
+
+Digital-Output-Entry ::= SEQUENCE {
+  digital-Output-Index Unsigned8,
+  do-State External-Relay-State,
+  remote-Control-State Relay-Control-State,
+  do-Status Enable-State,
+  do-Name Display-20,
+  do-IOB-Number Unsigned8,
+  do-IOB-DO-Number Unsigned8,
+  do-Active-State Energize-State,
+  do-Group Unsigned8
+}
+
+digital-Output-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { digital-Output-Entry 1 }
+
+
+do-State OBJECT-TYPE
+  SYNTAX External-Relay-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this digital output. Active digital outputs may be energized or de-energized depending on their configuration."
+::= { digital-Output-Entry 20 }
+
+remote-Control-State OBJECT-TYPE
+  SYNTAX Relay-Control-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Allows manual control of the digital output."
+::= { digital-Output-Entry 40 }
+
+do-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable or disable this digital output. If disabled, the digital output is not driven."
+  DEFVAL { disabled }
+::= { digital-Output-Entry 50 }
+
+do-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The name of the digital output."
+  DEFVAL { "Summary Minor" }
+::= { digital-Output-Entry 60 }
+
+do-IOB-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The I/O board number on which this digital output is located."
+  DEFVAL { 1 }
+::= { digital-Output-Entry 70 }
+
+do-IOB-DO-Number OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The number of the digital output channel on the I/O board."
+  DEFVAL { 1 }
+::= { digital-Output-Entry 80 }
+
+do-Active-State OBJECT-TYPE
+  SYNTAX Energize-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Active state of the digital output."
+  DEFVAL { energized }
+::= { digital-Output-Entry 90 }
+
+do-Group OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The Group Number to be used by SiteManager."
+  DEFVAL { 0 }
+::= { digital-Output-Entry 100 }
+
+battery OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 100 }
+
+battery-Capacity OBJECT-TYPE
+  SYNTAX Counter32
+  UNITS "Ah"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The rated 10-hour (C10) capacity of the battery. 0 = no battery is installed."
+  DEFVAL { 100 }
+::= { battery 10 }
+
+cells-Per-String OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The number of 2V battery cells per string. Zero means no battery is installed."
+  DEFVAL { 24 }
+::= { battery 20 }
+
+battery-Temperature OBJECT-TYPE
+  SYNTAX Float
+  UNITS "°C"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The average of all analog inputs configured as battery temperature inputs."
+::= { battery 30 }
+
+battery-Current OBJECT-TYPE
+  SYNTAX Float
+  UNITS "A"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The total current flowing to/from the batteries. If positive, the battery is being charged. This value may be measured by the battery current shunt(s) if present or calculated from the other system currents."
+::= { battery 40 }
+
+battery-Type OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The name or type of the battery."
+  DEFVAL { "" }
+::= { battery 42 }
+
+btr-Time-Remaining OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "An estimate of the time remaining until the average cell discharge voltage reaches the configured end voltage. This value is only available during a discharge if the battery has been characterized."
+::= { battery 43 }
+
+btr-State-Of-Health OBJECT-TYPE
+  SYNTAX Percentile8NAN
+  UNITS "%"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The health of the battery measured as the estimated C10 capacity at the end of the last discharge as a percentage of the configured capacity. The accuracy of this value depends on the depth of the last discharge and it is only updated if the battery is discharged by at least 25% of its estimated capacity."
+  DEFVAL { 255 }
+::= { battery 44 }
+
+battery-Charge-State OBJECT-TYPE
+  SYNTAX Battery-Charge-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the current state of the battery."
+::= { battery 45 }
+
+battery-State-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 A"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The threshold used to determine the battery state. If the battery current is greater than the value, the battery state is Charge. If the battery current is less than the negative of this value, the battery state is Discharge. Otherwise, it is Float. A 10% hysteresis applies."
+  DEFVAL { 10 }
+::= { battery 47 }
+
+end-Of-Charge-Action OBJECT-TYPE
+  SYNTAX End-Of-Charge-Action
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "To ensure that there is no residual AhD error at the end of the charge, AhD can be set to zero after each charge. For new installations, Set Ah Discharged to zero after Equalize and Fast Charge."
+  DEFVAL { set-Ah-Discharged-To-Zero-After-Fast-Charge-Only }
+::= { battery 48 }
+
+midpoint-Monitoring OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { battery 50 }
+
+mpm-Lockout-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Time period from when battery ceases discharging or the completion of Fast Charge, Equalize or Battery Test during which midpoint battery monitoring shall not operate."
+  DEFVAL { 720 }
+::= { midpoint-Monitoring 20 }
+
+mpm-Convergence-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Time period from start of the MPM process. During this period the MPM threshold is calculated via linear interpolation using MPM Start Threshold, Stable Threshold and the Time Running."
+  DEFVAL { 1440 }
+::= { midpoint-Monitoring 30 }
+
+string-Fail-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the midpoint voltage divergence of a battery string is continuously over threshold for this time, the string is deemed faulty."
+  DEFVAL { 60 }
+::= { midpoint-Monitoring 40 }
+
+mpm-Start-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 %"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Midpoint battery monitoring start threshold, defined as percentage of bus voltage."
+  DEFVAL { 80 }
+::= { midpoint-Monitoring 50 }
+
+mpm-Stable-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 %"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Midpoint battery monitoring stable threshold, defined as percentage of bus voltage."
+  DEFVAL { 40 }
+::= { midpoint-Monitoring 60 }
+
+midpoint-Monitoring-String-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Midpoint-Monitoring-String-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { midpoint-Monitoring 70 }
+
+midpoint-Monitoring-String-Entry OBJECT-TYPE
+  SYNTAX Midpoint-Monitoring-String-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { midpoint-Monitoring-String-Index }
+::= { midpoint-Monitoring-String-Table 1 }
+
+Midpoint-Monitoring-String-Entry ::= SEQUENCE {
+  midpoint-Monitoring-String-Index Unsigned8,
+  string-Name Display-20,
+  string-State MPM-Battery-State,
+  midpoint-Voltage Float,
+  imbalance-Percent Float
+}
+
+midpoint-Monitoring-String-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { midpoint-Monitoring-String-Entry 1 }
+
+
+string-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Name of the battery string."
+::= { midpoint-Monitoring-String-Entry 10 }
+
+string-State OBJECT-TYPE
+  SYNTAX MPM-Battery-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the current state of a battery string."
+::= { midpoint-Monitoring-String-Entry 20 }
+
+midpoint-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Midpoint voltage reading for the battery string."
+::= { midpoint-Monitoring-String-Entry 30 }
+
+imbalance-Percent OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 %"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The voltage difference between the first half of the string and the second half of the string expressed in percent of the Bus Voltage."
+::= { midpoint-Monitoring-String-Entry 40 }
+
+mpm-State OBJECT-TYPE
+  SYNTAX MPM-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the current state of the MPM process."
+::= { midpoint-Monitoring 80 }
+
+time-In-This-State OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the time period that the current MPM state has been running for."
+::= { midpoint-Monitoring 90 }
+
+current-MPM-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.1 %"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the current calculated MPM threshold."
+::= { midpoint-Monitoring 100 }
+
+reference-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Midpoint reference voltage."
+::= { midpoint-Monitoring 105 }
+
+clear-String-Fail OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to reset string state."
+::= { midpoint-Monitoring 110 }
+
+battery-Time-Remaining OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { battery 60 }
+
+btr-State OBJECT-TYPE
+  SYNTAX BTR-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of the battery time remaining algorithm."
+::= { battery-Time-Remaining 10 }
+
+btr-End-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V/Cell"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "During a discharge the controller will provide an estimate of the time remaining until the average cell discharge voltage reaches this value."
+  DEFVAL { 180 }
+::= { battery-Time-Remaining 20 }
+
+btr-Characterization-End-Voltage OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V/Cell"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The end voltage that the battery was last characterized to. For the controller to be able to estimate a remaining time, this value must be below the configured end voltage."
+::= { battery-Time-Remaining 30 }
+
+btr-Characterization-Result OBJECT-TYPE
+  SYNTAX BTR-Characterization-Result
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the result of the last characterization."
+::= { battery-Time-Remaining 40 }
+
+btr-Characterization-Time OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "End time of the last characterization."
+::= { battery-Time-Remaining 50 }
+
+btr-Automatic-Characterization OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If enabled, the controller will automatically perform a characterization when all necessary conditions have been met for the characterization delay. If the characterization fails, the controller will retry the characterization twice until a valid characterization is obtained. At the end of the third characterization or when successfully characterized, the controller will automatically disable this function."
+  DEFVAL { disabled }
+::= { battery-Time-Remaining 60 }
+
+btr-Characterization-Delay OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If automatic characterization is enabled, the controller will automatically perform a battery characterization discharge when all conditions have been met for this time."
+  DEFVAL { 2880 }
+::= { battery-Time-Remaining 70 }
+
+btr-Characterization-Start OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "If automatic characterization is enabled and all conditions for a characterization are met, this will indicate the remaining time until the automatic characterization discharge will start."
+::= { battery-Time-Remaining 80 }
+
+btr-Characterize-Battery OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This will cause the controller to discharge the battery at a constant rate until the average cell discharge voltage reaches the configured end voltage."
+::= { battery-Time-Remaining 90 }
+
+btr-Stop-Battery-Characterization OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Stops the current battery characterization discharge."
+::= { battery-Time-Remaining 100 }
+
+btr-Cancel-Waiting OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Cancel the waiting period, returning the LVDs to automatic operation."
+::= { battery-Time-Remaining 105 }
+
+btr-Clear-Battery-Characterization OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Clears the battery characterization data. It is recommended to make a backup of the characterization data first."
+::= { battery-Time-Remaining 110 }
+
+alarms OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 110 }
+
+alarm-States OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { alarms 5 }
+
+summary-Alarm-Critical OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Active if any critical alarm is active."
+::= { alarm-States 10 }
+
+summary-Alarm-Major OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Active if any major alarm is active."
+::= { alarm-States 20 }
+
+summary-Alarm-Minor OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Active if any minor alarm is active."
+::= { alarm-States 30 }
+
+reset-Battery-Test-Failed-Alarm OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to reset Battery Test Failed alarm."
+::= { alarm-States 100 }
+
+reset-Rectifier-Comms-Lost-Alarm OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This command attempts to reset Rectifier Comms Lost alarm and Multiple Rect Comms Lost alarm."
+::= { alarm-States 110 }
+
+alarm-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 10 }
+
+alarm-Entry OBJECT-TYPE
+  SYNTAX Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { alarm-Index }
+::= { alarm-Table 1 }
+
+Alarm-Entry ::= SEQUENCE {
+  alarm-Index System-Alarm,
+  alarm-Name Display-40,
+  alarm-Severity Alarm-Severity,
+  alarm-State Alarm-Active-State,
+  alarm-Notes Display-60
+}
+
+alarm-Index OBJECT-TYPE
+  SYNTAX System-Alarm
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { alarm-Entry 1 }
+
+
+alarm-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The name of the Alarm."
+::= { alarm-Entry 20 }
+
+alarm-Severity OBJECT-TYPE
+  SYNTAX Alarm-Severity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The severity level associated with the alarm. Control alarms are not displayed, although any configured digital outputs are still activated."
+  DEFVAL { major }
+::= { alarm-Entry 31 }
+
+alarm-State OBJECT-TYPE
+  SYNTAX Alarm-Active-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this alarm."
+::= { alarm-Entry 40 }
+
+alarm-Notes OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "User notes about this alarm. These notes appear in SNMP traps and can be viewed using DCTools or PowerManagerII."
+  DEFVAL { "" }
+::= { alarm-Entry 50 }
+
+alarm-Configuration OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { alarms 15 }
+
+enable-Audible-Alarm-Indication OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable/disable audible alarm indication."
+  DEFVAL { enabled }
+::= { alarm-Configuration 10 }
+
+alarm-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "An alarm condition must be continuously active for this period before an alarm is generated."
+  DEFVAL { 10 }
+::= { alarm-Configuration 20 }
+
+ac-Fail-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "An AC fail condition must be continuously active for this period before an AC Fail alarm is generated."
+  DEFVAL { 10 }
+::= { alarm-Configuration 30 }
+
+enable-High-Float-Tracking OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The alarm thresholds will be increased when the operating voltage is raised by a voltage control function."
+  DEFVAL { enabled }
+::= { alarm-Configuration 40 }
+
+high-Float-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "High Float alarm is activated if the bus voltage is above this value."
+  DEFVAL { 5560 }
+::= { alarm-Configuration 50 }
+
+enable-Low-Float-Tracking OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The alarm thresholds will be reduced when the operating voltage is lowered by a voltage control function."
+  DEFVAL { enabled }
+::= { alarm-Configuration 60 }
+
+low-Float-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Low Float alarm is activated when the bus voltage is below this value."
+  DEFVAL { 5280 }
+::= { alarm-Configuration 70 }
+
+high-Load-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "High Load alarm is activated if the bus voltage is above this value."
+  DEFVAL { 5760 }
+::= { alarm-Configuration 80 }
+
+low-Load-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01 V"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The Low Load alarm is activated if the bus voltage is below this value."
+  DEFVAL { 4700 }
+::= { alarm-Configuration 90 }
+
+battery-Temperature-High-Threshold OBJECT-TYPE
+  SYNTAX Signed8
+  UNITS "°C"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Battery Temperature High alarm is activated if the battery temperature is above this value."
+  DEFVAL { 50 }
+::= { alarm-Configuration 130 }
+
+battery-Temperature-Low-Threshold OBJECT-TYPE
+  SYNTAX Signed8
+  UNITS "°C"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Battery Temperature Low alarm is activated if the battery temperature is below this value."
+  DEFVAL { 0 }
+::= { alarm-Configuration 140 }
+
+system-Overload-Type OBJECT-TYPE
+  SYNTAX Overload-Alarm-Type
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The controller can detect a system overload either based on a simple load threshold or based on a redundancy calculation taking into account individual rectifier capacities."
+  DEFVAL { redundancy }
+::= { alarm-Configuration 170 }
+
+system-Overload-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The System Overload alarm activates if the condition (see System Overload Type) has been continuously true for this time. It is normally set to several hours so that the alarm does not operate during a normal battery recharge."
+  DEFVAL { 240 }
+::= { alarm-Configuration 180 }
+
+system-Overload-Threshold OBJECT-TYPE
+  SYNTAX Unsigned8
+  UNITS "%"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The System Overload alarm activates if the load is above this threshold continuously for the System Overload Recognition Period. Measured as a percentage of total rectifier capacity."
+  DEFVAL { 85 }
+::= { alarm-Configuration 190 }
+
+in-Discharge-Alarm-Condition OBJECT-TYPE
+  SYNTAX In-Discharge-Alarm-Condition
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This specifies if AC present is required for In Discharge alarm to be active."
+  DEFVAL { always }
+::= { alarm-Configuration 200 }
+
+battery-Current-Sensor-Fail-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If the battery current sensor continuously does not report a valid current for this time, the battery current sensor will be considered failed."
+  DEFVAL { 60 }
+::= { alarm-Configuration 220 }
+
+smart-Alarm-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Smart-Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 20 }
+
+smart-Alarm-Entry OBJECT-TYPE
+  SYNTAX Smart-Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { smart-Alarm-Index }
+::= { smart-Alarm-Table 1 }
+
+Smart-Alarm-Entry ::= SEQUENCE {
+  smart-Alarm-Index Unsigned8,
+  smart-Alarm-Send-Trap Boolean,
+  smart-Alarm-Name Display-20,
+  smart-Alarm-Severity Alarm-Severity,
+  smart-Alarm-Group Unsigned8,
+  smart-Alarm-Notes Display-60,
+  smart-Alarm-Operator Alarm-Operator,
+  smart-Alarm-Recognition-Period TimeIntervalInSeconds,
+  smart-Alarm-Deactivation-Recognition-Period TimeIntervalInSeconds,
+  smart-Alarm-DO-Mapping-A Relay-Mapping,
+  smart-Alarm-DO-Mapping-B Relay-Mapping,
+  smart-Alarm-State Alarm-Active-State,
+  clear-Smart-Alarm No-Data
+}
+
+smart-Alarm-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { smart-Alarm-Entry 1 }
+
+
+smart-Alarm-Send-Trap OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If set to true an SNMP trap is sent to every trap receiver with an appropriate trap level whenever this alarm changes state."
+  DEFVAL { true }
+::= { smart-Alarm-Entry 10 }
+
+smart-Alarm-Name OBJECT-TYPE
+  SYNTAX Display-20
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Alarm name."
+  DEFVAL { "" }
+::= { smart-Alarm-Entry 20 }
+
+smart-Alarm-Severity OBJECT-TYPE
+  SYNTAX Alarm-Severity
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The severity level associated with the alarm. Control alarms are not displayed, although any configured digital outputs are still activated."
+  DEFVAL { disabled }
+::= { smart-Alarm-Entry 30 }
+
+smart-Alarm-Group OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The group number used by SiteManager. The group only affects the display of this item in SiteManager. It does not affect controller operation."
+  DEFVAL { 0 }
+::= { smart-Alarm-Entry 35 }
+
+smart-Alarm-Notes OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "User notes about this alarm."
+  DEFVAL { "" }
+::= { smart-Alarm-Entry 40 }
+
+smart-Alarm-Operator OBJECT-TYPE
+  SYNTAX Alarm-Operator
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The logic operator used to combine the states of all sources mapped to this smart alarm."
+  DEFVAL { or }
+::= { smart-Alarm-Entry 50 }
+
+smart-Alarm-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "A smart alarm will become active if the logic for this alarm is continuously true for the recognition time."
+  DEFVAL { 10 }
+::= { smart-Alarm-Entry 60 }
+
+smart-Alarm-Deactivation-Recognition-Period OBJECT-TYPE
+  SYNTAX TimeIntervalInSeconds
+  UNITS "s"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "A smart alarm will deactivate if the logic for this alarm is continuously false for the deactivation recognition time."
+  DEFVAL { 0 }
+::= { smart-Alarm-Entry 61 }
+
+smart-Alarm-DO-Mapping-A OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { smart-Alarm-Entry 70 }
+
+smart-Alarm-DO-Mapping-B OBJECT-TYPE
+  SYNTAX Relay-Mapping
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optional digital output activated while this alarm is active."
+  DEFVAL { none }
+::= { smart-Alarm-Entry 80 }
+
+smart-Alarm-State OBJECT-TYPE
+  SYNTAX Alarm-Active-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The state of this alarm."
+::= { smart-Alarm-Entry 100 }
+
+clear-Smart-Alarm OBJECT-TYPE
+  SYNTAX No-Data
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This will temporarily override the alarm logic and force the alarm to deactivate. If this does not cause the trigger conditions for the alarm to change (for instance through a circular dependency), the alarm will reactivate after its recognition time."
+::= { smart-Alarm-Entry 110 }
+
+source-Alarm-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Source-Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 30 }
+
+source-Alarm-Entry OBJECT-TYPE
+  SYNTAX Source-Alarm-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { source-Alarm-Index }
+::= { source-Alarm-Table 1 }
+
+Source-Alarm-Entry ::= SEQUENCE {
+  source-Alarm-Index Unsigned8,
+  smart-Alarm-Alarm-Source-Trigger-State Trigger-State,
+  smart-Alarm-Alarm-Source-Status Enable-State,
+  smart-Alarm-Alarm-Source-Mapping Unsigned8,
+  smart-Alarm-Alarm-Source-Logic Source-Alarm-Logic,
+  smart-Alarm-Alarm-Source-Trigger Source-Trigger,
+  smart-Alarm-Alarm-Source-Type Alarm-Type,
+  smart-Alarm-Alarm-Source-Index Unsigned8
+}
+
+source-Alarm-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { source-Alarm-Entry 1 }
+
+
+smart-Alarm-Alarm-Source-Trigger-State OBJECT-TYPE
+  SYNTAX Trigger-State
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates the trigger state of this source alarm."
+::= { source-Alarm-Entry 10 }
+
+smart-Alarm-Alarm-Source-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable or disable this smart alarm source."
+  DEFVAL { disabled }
+::= { source-Alarm-Entry 20 }
+
+smart-Alarm-Alarm-Source-Mapping OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Index of smart alarm that this source is mapped to."
+  DEFVAL { 32 }
+::= { source-Alarm-Entry 30 }
+
+smart-Alarm-Alarm-Source-Logic OBJECT-TYPE
+  SYNTAX Source-Alarm-Logic
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optionally negates the state of the source alarm as an input to the smart alarm."
+  DEFVAL { equal }
+::= { source-Alarm-Entry 40 }
+
+smart-Alarm-Alarm-Source-Trigger OBJECT-TYPE
+  SYNTAX Source-Trigger
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether the source alarm's recognition time (if any) is taken into account. If the source alarm is itself a smart alarm and the sources of one or more smart alarms form a cyclic dependency, then at least one of these sources must be configured to trigger when its source is active. Such cyclic dependencies can be used to build complex logical functions such as an astable flip-flop using the source's recognition times as delays."
+  DEFVAL { triggered }
+::= { source-Alarm-Entry 41 }
+
+smart-Alarm-Alarm-Source-Type OBJECT-TYPE
+  SYNTAX Alarm-Type
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The alarm table this source alarm is taken from."
+  DEFVAL { system-Alarm }
+::= { source-Alarm-Entry 50 }
+
+smart-Alarm-Alarm-Source-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The index of the source alarm."
+  DEFVAL { 1 }
+::= { source-Alarm-Entry 60 }
+
+source-Schedule-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Source-Schedule-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 40 }
+
+source-Schedule-Entry OBJECT-TYPE
+  SYNTAX Source-Schedule-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { source-Schedule-Index }
+::= { source-Schedule-Table 1 }
+
+Source-Schedule-Entry ::= SEQUENCE {
+  source-Schedule-Index Unsigned8,
+  smart-Alarm-Schedule-Source-Is-Triggered Boolean,
+  smart-Alarm-Schedule-Source-Status Enable-State,
+  smart-Alarm-Schedule-Source-Mapping Unsigned8,
+  smart-Alarm-Schedule-Source-First-Activation Julian-Time-UTC-25,
+  smart-Alarm-Schedule-Source-Duration TimeIntervalInMinutes,
+  smart-Alarm-Schedule-Source-Interval TimeIntervalInMinutes,
+  smart-Alarm-Schedule-Source-Repetitions Counter32,
+  smart-Alarm-Schedule-Source-Next Julian-Time-UTC-25,
+  smart-Alarm-Schedule-Source-End Julian-Time-UTC-25
+}
+
+source-Schedule-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { source-Schedule-Entry 1 }
+
+
+smart-Alarm-Schedule-Source-Is-Triggered OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether or not this schedule is currently considered true or false."
+::= { source-Schedule-Entry 10 }
+
+smart-Alarm-Schedule-Source-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable or disable this smart alarm schedule."
+  DEFVAL { disabled }
+::= { source-Schedule-Entry 20 }
+
+smart-Alarm-Schedule-Source-Mapping OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Index of smart alarm that this schedule is mapped to."
+  DEFVAL { 32 }
+::= { source-Schedule-Entry 30 }
+
+smart-Alarm-Schedule-Source-First-Activation OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The date and time at which this schedule will activate for the first time."
+::= { source-Schedule-Entry 50 }
+
+smart-Alarm-Schedule-Source-Duration OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This source will become active every Interval after the First Activation and remain active for Duration each time."
+  DEFVAL { 60 }
+::= { source-Schedule-Entry 60 }
+
+smart-Alarm-Schedule-Source-Interval OBJECT-TYPE
+  SYNTAX TimeIntervalInMinutes
+  UNITS "min"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "This source will become active every Interval after the First Activation and remain active for Duration each time."
+  DEFVAL { 1440 }
+::= { source-Schedule-Entry 70 }
+
+smart-Alarm-Schedule-Source-Repetitions OBJECT-TYPE
+  SYNTAX Counter32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The number of times this schedule should activate. After the last activation period, this schedule will remain inactive indefinitely. If set to zero, there is no limit on the number of activations."
+  DEFVAL { 0 }
+::= { source-Schedule-Entry 80 }
+
+smart-Alarm-Schedule-Source-Next OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The date and time at which this schedule will activate next."
+::= { source-Schedule-Entry 90 }
+
+smart-Alarm-Schedule-Source-End OBJECT-TYPE
+  SYNTAX Julian-Time-UTC-25
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The date and time at which this schedule will deactivate for the last time."
+::= { source-Schedule-Entry 100 }
+
+system-Value-Source-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF System-Value-Source-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 50 }
+
+system-Value-Source-Entry OBJECT-TYPE
+  SYNTAX System-Value-Source-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { system-Value-Source-Index }
+::= { system-Value-Source-Table 1 }
+
+System-Value-Source-Entry ::= SEQUENCE {
+  system-Value-Source-Index Unsigned8,
+  smart-Alarm-System-Value-Source-Is-Triggered Boolean,
+  smart-Alarm-System-Value-Source-Status Enable-State,
+  smart-Alarm-System-Value-Source-Mapping Unsigned8,
+  smart-Alarm-System-Value-Source-Value System-Value-Source-Value,
+  smart-Alarm-System-Value-Source-Input Float,
+  smart-Alarm-System-Value-Source-Threshold-Type Threshold-Type,
+  smart-Alarm-System-Value-Source-Threshold Float,
+  smart-Alarm-System-Value-Source-Hysteresis Float
+}
+
+system-Value-Source-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { system-Value-Source-Entry 1 }
+
+
+smart-Alarm-System-Value-Source-Is-Triggered OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether or not this analog source is currently considered true or false."
+::= { system-Value-Source-Entry 10 }
+
+smart-Alarm-System-Value-Source-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable or disable this smart alarm analog source."
+  DEFVAL { disabled }
+::= { system-Value-Source-Entry 20 }
+
+smart-Alarm-System-Value-Source-Mapping OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Index of smart alarm that this analog source is mapped to."
+  DEFVAL { 32 }
+::= { system-Value-Source-Entry 30 }
+
+smart-Alarm-System-Value-Source-Value OBJECT-TYPE
+  SYNTAX System-Value-Source-Value
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The system value that is compared with the threshold."
+  DEFVAL { bus-Voltage }
+::= { system-Value-Source-Entry 40 }
+
+smart-Alarm-System-Value-Source-Input OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Shows the actual value of the selected system value that is compared against the threshold."
+::= { system-Value-Source-Entry 45 }
+
+smart-Alarm-System-Value-Source-Threshold-Type OBJECT-TYPE
+  SYNTAX Threshold-Type
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Determines whether the threshold is an upper or lower threshold to the system value."
+  DEFVAL { high }
+::= { system-Value-Source-Entry 50 }
+
+smart-Alarm-System-Value-Source-Threshold OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "The threshold, the system value is compared to."
+  DEFVAL { 0 }
+::= { system-Value-Source-Entry 60 }
+
+smart-Alarm-System-Value-Source-Hysteresis OBJECT-TYPE
+  SYNTAX Float
+  UNITS "0.01"
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "If non-zero, the system value must exceed the threshold +/- this value before the source becomes false again."
+  DEFVAL { 0 }
+::= { system-Value-Source-Entry 70 }
+
+source-Manual-Table OBJECT-TYPE
+  SYNTAX SEQUENCE OF Source-Manual-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+::= { alarms 60 }
+
+source-Manual-Entry OBJECT-TYPE
+  SYNTAX Source-Manual-Entry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION ""
+  INDEX  { source-Manual-Index }
+::= { source-Manual-Table 1 }
+
+Source-Manual-Entry ::= SEQUENCE {
+  source-Manual-Index Unsigned8,
+  smart-Alarm-Is-Manual-Source-Triggered Boolean,
+  smart-Alarm-Source-Manual-Status Enable-State,
+  smart-Alarm-Source-Manual-Trigger Boolean,
+  smart-Alarm-Source-Manual-Mapping Unsigned8,
+  smart-Alarm-Source-Manual-Logic Source-Alarm-Logic
+}
+
+source-Manual-Index OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { source-Manual-Entry 1 }
+
+
+smart-Alarm-Is-Manual-Source-Triggered OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Indicates whether or not this manual source is currently considered true or false."
+::= { source-Manual-Entry 10 }
+
+smart-Alarm-Source-Manual-Status OBJECT-TYPE
+  SYNTAX Enable-State
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Enable or disable this smart alarm manual."
+  DEFVAL { disabled }
+::= { source-Manual-Entry 20 }
+
+smart-Alarm-Source-Manual-Trigger OBJECT-TYPE
+  SYNTAX Boolean
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Trigger input for this manual Alarm."
+::= { source-Manual-Entry 30 }
+
+smart-Alarm-Source-Manual-Mapping OBJECT-TYPE
+  SYNTAX Unsigned8
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Index of smart alarm that this manual is mapped to."
+  DEFVAL { 32 }
+::= { source-Manual-Entry 40 }
+
+smart-Alarm-Source-Manual-Logic OBJECT-TYPE
+  SYNTAX Source-Alarm-Logic
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION "Optionally negates the state of the source as an input to the smart alarm."
+  DEFVAL { equal }
+::= { source-Manual-Entry 50 }
+
+global-Alarms OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-Objects 111 }
+
+trap-Alarm-Origin OBJECT-TYPE
+  SYNTAX Alarm-Type
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The origin of the alarm. This is sent with the SNMP trap."
+::= { global-Alarms 10 }
+
+trap-Alarm-Name OBJECT-TYPE
+  SYNTAX Display-40
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The name of the Alarm. This is sent with the SNMP trap."
+::= { global-Alarms 11 }
+
+trap-Alarm-Number OBJECT-TYPE
+  SYNTAX Unsigned16
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The number for this Alarm. This is sent with the SNMP trap."
+::= { global-Alarms 12 }
+
+trap-Additional-Text OBJECT-TYPE
+  SYNTAX Display-60
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "User notes about this alarm. These notes appear in SNMP traps and can be viewed using DCTools or PowerManagerII."
+::= { global-Alarms 13 }
+
+trap-Alarm-Keep-Severity OBJECT-TYPE
+  SYNTAX Trap-Alarm-Keep-Severity
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "The severity of the alarm. This is sent with the SNMP trap."
+::= { global-Alarms 14 }
+
+rps-Traps OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION ""
+ ::= { rps-SC200 20 }
+
+major-Alarm-Active NOTIFICATION-TYPE
+  OBJECTS {alarm-Index, alarm-Name, system-Location, site-Name, site-Address, alarm-Notes}
+  STATUS current
+  DESCRIPTION "A major alarm is active."
+  --#SUMMARY "Major alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MAJOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "major-Alarm-Active"
+  --&ACTIONS { log, clrdups, major }
+  --&MATCH   { alarm-Index "$1" }
+  --&CLEARS  { "alarm-Inactive" }
+  --&MESG "Major alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 100 }
+
+major-AI-High-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-High-Notes}
+  STATUS current
+  DESCRIPTION "A major analog input high alarm is active."
+  --#SUMMARY "Major alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MAJOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "major-AI-High-Active"
+  --&ACTIONS { log, clrdups, major }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-High-Inactive" }
+  --&MESG "Major alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 101 }
+
+major-AI-Low-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-Low-Notes}
+  STATUS current
+  DESCRIPTION "A major analog input low alarm is active."
+  --#SUMMARY "Major alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MAJOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "major-AI-Low-Active"
+  --&ACTIONS { log, clrdups, major }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-Low-Inactive" }
+  --&MESG "Major alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 102 }
+
+major-DI-Active NOTIFICATION-TYPE
+  OBJECTS {digital-Input-Index, di-Name, system-Location, site-Name, site-Address, di-Notes}
+  STATUS current
+  DESCRIPTION "A major digital input alarm is active."
+  --#SUMMARY "Major alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MAJOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "major-DI-Active"
+  --&ACTIONS { log, clrdups, major }
+  --&MATCH   { digital-Input-Index "$1" }
+  --&CLEARS  { "di-Inactive" }
+  --&MESG "Major alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 103 }
+
+major-Smart-Active NOTIFICATION-TYPE
+  OBJECTS {smart-Alarm-Index, smart-Alarm-Name, system-Location, site-Name, site-Address, smart-Alarm-Notes}
+  STATUS current
+  DESCRIPTION "A major smart alarm is active."
+  --#SUMMARY "Major alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MAJOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "major-Smart-Active"
+  --&ACTIONS { log, clrdups, major }
+  --&MATCH   { smart-Alarm-Index "$1" }
+  --&CLEARS  { "smart-Inactive" }
+  --&MESG "Major alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 104 }
+
+minor-Alarm-Active NOTIFICATION-TYPE
+  OBJECTS {alarm-Index, alarm-Name, system-Location, site-Name, site-Address, alarm-Notes}
+  STATUS current
+  DESCRIPTION "A minor alarm is active."
+  --#SUMMARY "Minor alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MINOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "minor-Alarm-Active"
+  --&ACTIONS { log, clrdups, minor }
+  --&MATCH   { alarm-Index "$1" }
+  --&CLEARS  { "alarm-Inactive" }
+  --&MESG "Minor alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 200 }
+
+minor-AI-High-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-High-Notes}
+  STATUS current
+  DESCRIPTION "A minor analog input high alarm is active."
+  --#SUMMARY "Minor alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MINOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "minor-AI-High-Active"
+  --&ACTIONS { log, clrdups, minor }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-High-Inactive" }
+  --&MESG "Minor alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 201 }
+
+minor-AI-Low-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-Low-Notes}
+  STATUS current
+  DESCRIPTION "A minor analog input low alarm is active."
+  --#SUMMARY "Minor alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MINOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "minor-AI-Low-Active"
+  --&ACTIONS { log, clrdups, minor }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-Low-Inactive" }
+  --&MESG "Minor alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 202 }
+
+minor-DI-Active NOTIFICATION-TYPE
+  OBJECTS {digital-Input-Index, di-Name, system-Location, site-Name, site-Address, di-Notes}
+  STATUS current
+  DESCRIPTION "A minor digital input alarm is active."
+  --#SUMMARY "Minor alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MINOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "minor-DI-Active"
+  --&ACTIONS { log, clrdups, minor }
+  --&MATCH   { digital-Input-Index "$1" }
+  --&CLEARS  { "di-Inactive" }
+  --&MESG "Minor alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 203 }
+
+minor-Smart-Active NOTIFICATION-TYPE
+  OBJECTS {smart-Alarm-Index, smart-Alarm-Name, system-Location, site-Name, site-Address, smart-Alarm-Notes}
+  STATUS current
+  DESCRIPTION "A minor smart alarm is active."
+  --#SUMMARY "Minor alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY MINOR
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "minor-Smart-Active"
+  --&ACTIONS { log, clrdups, minor }
+  --&MATCH   { smart-Alarm-Index "$1" }
+  --&CLEARS  { "smart-Inactive" }
+  --&MESG "Minor alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 204 }
+
+warning-Alarm-Active NOTIFICATION-TYPE
+  OBJECTS {alarm-Index, alarm-Name, system-Location, site-Name, site-Address, alarm-Notes}
+  STATUS current
+  DESCRIPTION "A warning is active."
+  --#SUMMARY "Warning %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY WARNING
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "warning-Alarm-Active"
+  --&ACTIONS { log, clrdups, warning }
+  --&MATCH   { alarm-Index "$1" }
+  --&CLEARS  { "alarm-Inactive" }
+  --&MESG "Warning $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 300 }
+
+warning-AI-High-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-High-Notes}
+  STATUS current
+  DESCRIPTION "An analog input high warning is active."
+  --#SUMMARY "Warning %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY WARNING
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "warning-AI-High-Active"
+  --&ACTIONS { log, clrdups, warning }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-High-Inactive" }
+  --&MESG "Warning $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 301 }
+
+warning-AI-Low-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-Low-Notes}
+  STATUS current
+  DESCRIPTION "An analog input low warning is active."
+  --#SUMMARY "Warning %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY WARNING
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "warning-AI-Low-Active"
+  --&ACTIONS { log, clrdups, warning }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-Low-Inactive" }
+  --&MESG "Warning $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 302 }
+
+warning-DI-Active NOTIFICATION-TYPE
+  OBJECTS {digital-Input-Index, di-Name, system-Location, site-Name, site-Address, di-Notes}
+  STATUS current
+  DESCRIPTION "A digital input warning is active."
+  --#SUMMARY "Warning %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY WARNING
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "warning-DI-Active"
+  --&ACTIONS { log, clrdups, warning }
+  --&MATCH   { digital-Input-Index "$1" }
+  --&CLEARS  { "di-Inactive" }
+  --&MESG "Warning $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 303 }
+
+warning-Smart-Active NOTIFICATION-TYPE
+  OBJECTS {smart-Alarm-Index, smart-Alarm-Name, system-Location, site-Name, site-Address, smart-Alarm-Notes}
+  STATUS current
+  DESCRIPTION "A smart warning is active."
+  --#SUMMARY "Warning %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY WARNING
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "warning-Smart-Active"
+  --&ACTIONS { log, clrdups, warning }
+  --&MATCH   { smart-Alarm-Index "$1" }
+  --&CLEARS  { "smart-Inactive" }
+  --&MESG "Warning $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 304 }
+
+alarm-Inactive NOTIFICATION-TYPE
+  OBJECTS {alarm-Index, alarm-Name, system-Location, site-Name, site-Address, alarm-Notes}
+  STATUS current
+  DESCRIPTION "An alarm has become inactive."
+  --#SUMMARY "Alarm %s has become inactive at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "alarm-Inactive"
+  --&ACTIONS { log, clrdups, normal }
+  --&MATCH   { alarm-Index "$1" }
+  --&CLEARS  { "critical-Alarm-Active", "major-Alarm-Active", "minor-Alarm-Active", "warning-Alarm-Active" }
+  --&MESG "Alarm $'2 has become inactive at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 400 }
+
+ai-High-Inactive NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-High-Notes}
+  STATUS current
+  DESCRIPTION "An analog input high alarm has become inactive."
+  --#SUMMARY "Alarm %s has become inactive at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "ai-High-Inactive"
+  --&ACTIONS { log, clrdups, normal }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "critical-AI-High-Active", "major-AI-High-Active", "minor-AI-High-Active", "warning-AI-High-Active" }
+  --&MESG "Alarm $'2 has become inactive at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 401 }
+
+ai-Low-Inactive NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-Low-Notes}
+  STATUS current
+  DESCRIPTION "An analog input low alarm has become inactive."
+  --#SUMMARY "Alarm %s has become inactive at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "ai-Low-Inactive"
+  --&ACTIONS { log, clrdups, normal }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "critical-AI-Low-Active", "major-AI-Low-Active", "minor-AI-Low-Active", "warning-AI-Low-Active" }
+  --&MESG "Alarm $'2 has become inactive at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 402 }
+
+di-Inactive NOTIFICATION-TYPE
+  OBJECTS {digital-Input-Index, di-Name, system-Location, site-Name, site-Address, di-Notes}
+  STATUS current
+  DESCRIPTION "A digital input alarm has become inactive."
+  --#SUMMARY "Alarm %s has become inactive at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "di-Inactive"
+  --&ACTIONS { log, clrdups, normal }
+  --&MATCH   { digital-Input-Index "$1" }
+  --&CLEARS  { "critical-DI-Active", "major-DI-Active", "minor-DI-Active", "warning-DI-Active" }
+  --&MESG "Alarm $'2 has become inactive at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 403 }
+
+smart-Inactive NOTIFICATION-TYPE
+  OBJECTS {smart-Alarm-Index, smart-Alarm-Name, system-Location, site-Name, site-Address, smart-Alarm-Notes}
+  STATUS current
+  DESCRIPTION "A smart alarm has become inactive."
+  --#SUMMARY "Alarm %s has become inactive at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "smart-Inactive"
+  --&ACTIONS { log, clrdups, normal }
+  --&MATCH   { smart-Alarm-Index "$1" }
+  --&CLEARS  { "critical-Smart-Active", "major-Smart-Active", "minor-Smart-Active", "warning-Smart-Active" }
+  --&MESG "Alarm $'2 has become inactive at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 404 }
+
+alarm-Status-Change NOTIFICATION-TYPE
+  OBJECTS {serial-Number, snmp-Trap-Receiver-Index}
+  STATUS current
+  DESCRIPTION "The status of one or more alarms has changed."
+  --#SUMMARY "The status of one or more alarms has changed. This trap should only be received by PowerManagerII remote management software."
+  --&MESG "$O: The status of one or more alarms has changed. This trap should only be received by PowerManagerII remote management software."
+::= { rps-Traps 500 }
+
+critical-Alarm-Active NOTIFICATION-TYPE
+  OBJECTS {alarm-Index, alarm-Name, system-Location, site-Name, site-Address, alarm-Notes}
+  STATUS current
+  DESCRIPTION "A critical alarm is active."
+  --#SUMMARY "Critical alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY CRITICAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "critical-Alarm-Active"
+  --&ACTIONS { log, clrdups, critical }
+  --&MATCH   { alarm-Index "$1" }
+  --&CLEARS  { "alarm-Inactive" }
+  --&MESG "Critical alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 600 }
+
+critical-AI-High-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-High-Notes}
+  STATUS current
+  DESCRIPTION "A critical analog input high alarm is active."
+  --#SUMMARY "Critical alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY CRITICAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "critical-AI-High-Active"
+  --&ACTIONS { log, clrdups, critical }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-High-Inactive" }
+  --&MESG "Critical alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 601 }
+
+critical-AI-Low-Active NOTIFICATION-TYPE
+  OBJECTS {analog-Input-Index, ai-Name, system-Location, site-Name, site-Address, ai-Low-Notes}
+  STATUS current
+  DESCRIPTION "A critical analog input low alarm is active."
+  --#SUMMARY "Critical alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY CRITICAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "critical-AI-Low-Active"
+  --&ACTIONS { log, clrdups, critical }
+  --&MATCH   { analog-Input-Index "$1" }
+  --&CLEARS  { "ai-Low-Inactive" }
+  --&MESG "Critical alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 602 }
+
+critical-DI-Active NOTIFICATION-TYPE
+  OBJECTS {digital-Input-Index, di-Name, system-Location, site-Name, site-Address, di-Notes}
+  STATUS current
+  DESCRIPTION "A critical digital input alarm is active."
+  --#SUMMARY "Critical alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY CRITICAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "critical-DI-Active"
+  --&ACTIONS { log, clrdups, critical }
+  --&MATCH   { digital-Input-Index "$1" }
+  --&CLEARS  { "di-Inactive" }
+  --&MESG "Critical alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 603 }
+
+critical-Smart-Active NOTIFICATION-TYPE
+  OBJECTS {smart-Alarm-Index, smart-Alarm-Name, system-Location, site-Name, site-Address, smart-Alarm-Notes}
+  STATUS current
+  DESCRIPTION "A critical smart alarm is active."
+  --#SUMMARY "Critical alarm %s active at %s, %s, %s. Notes: %s"
+  --#ARGUMENTS { 1, 3, 2, 4, 5}
+  --#SEVERITY CRITICAL
+  --#CATEGORY "Error Alarms"
+  --&FILTNAME "critical-Smart-Active"
+  --&ACTIONS { log, clrdups, critical }
+  --&MATCH   { smart-Alarm-Index "$1" }
+  --&CLEARS  { "smart-Inactive" }
+  --&MESG "Critical alarm $'2 active at $'4,  $'3,  $'5. Notes: $'6"
+::= { rps-Traps 604 }
+
+global NOTIFICATION-TYPE
+  OBJECTS {trap-Alarm-Number, trap-Alarm-Origin, trap-Alarm-Name, trap-Alarm-Keep-Severity, system-Location, site-Name, site-Address, trap-Additional-Text}
+  STATUS current
+  DESCRIPTION "An alarm has changed state."
+::= { rps-Traps 700 }
+
+
+END

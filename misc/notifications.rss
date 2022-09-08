@@ -83,5 +83,10 @@
     <description>Improvements to routeros wireless polling will lose historical data for 60GHz rate, frequency, and distance wireless sensors. See https://github.com/librenms/librenms/pull/12976 for more information.</description>
     <pubDate>Wed, 19 Oct 2021 18:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>ADSL discovery and polling moved to a new module</title>
+    <description>Adsl statistics are now discovered and polled in a new module. Vdsl stats were also added. `lnms config:set enable_ports_adsl true`is not supported anymore. See https://github.com/librenms/librenms/pull/14207 for more information.</description>
+    <pubDate>Wed, 7 Sept 2022 18:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

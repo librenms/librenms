@@ -31,7 +31,7 @@
                         <tr id="row_{{ $port_group->id }}">
                             <td>{{ $port_group->name }}</td>
                             <td>{{ $port_group->desc }}</td>
-                            <td>{{ $port_group->ports_count }}</td>
+                            <td><a href="{{ url("/ports/group=$port_group->id") }}">{{ $port_group->ports_count }}</a></td>
                             <td>
                                 <a type="button" title="{{ __('edit Port Group') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                    href="{{ route('port-groups.edit', $port_group->id) }}">

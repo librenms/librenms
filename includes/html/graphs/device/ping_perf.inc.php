@@ -27,7 +27,7 @@ if (Config::get('applied_site_style') == 'dark') {
 } else {
     $rrd_options .= ' LINE1.25:ping#36393d:Ping';
 }
-$rrd_options .= ' GPRINT:ping:LAST:%14.2lf  GPRINT:ping:AVERAGE:%6.2lf';
+$rrd_options .= ' GPRINT:ping:LAST:%14.2lf  GPRINT:ping:MIN:%6.2lf';
 $rrd_options .= " GPRINT:ping:MAX:%6.2lf  'GPRINT:ping:AVERAGE:%6.2lf\\n'";
 
 if ($_GET['previous'] == 'yes') {

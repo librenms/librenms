@@ -4,10 +4,11 @@ type: appliance
 icon: primekey
 group: primekey
 mib_dir: primekey
+snmp_bulk: false
 over:
-    - { graph: device_percent, text: "Database Usage" }
     - { graph: device_voltage, text: "HSM Voltage" }
-    - { graph: device_count, text: "Counters" }
+    - { graph: device_temperature, text: "Temperature" }
+    - { graph: device_fanspeed, text: "Fan Speed" }
 poller_modules:
     bgp-peers: false
     ospf: false

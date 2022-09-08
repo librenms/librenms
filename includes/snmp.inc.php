@@ -49,7 +49,7 @@ function get_mib_dir($device)
 {
     $dirs = [];
 
-    if (file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
+    if (isset($device['os']) && file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
         $dirs[] = Config::get('mib_dir') . '/' . $device['os'];
     }
 
@@ -67,7 +67,7 @@ function get_mib_dir($device)
         }
     }
 
-    if ($os_mibdir = Config::get("os.{$device['os']}.mib_dir")) {
+    if (isset($device['os']) && ($os_mibdir = Config::get("os.{$device['os']}.mib_dir"))) {
         $dirs[] = Config::get('mib_dir') . '/' . $os_mibdir;
     }
 
@@ -130,9 +130,11 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
+    $oids = Arr::wrap($oids);
+
     if ($device['snmpver'] == 'v1'
         || (isset($device['os']) && (Config::getOsSetting($device['os'], 'snmp_bulk', true) == false
-                || ! empty(array_intersect(Arr::wrap($oids), Config::getCombined($device['os'], 'oids.no_bulk'))))) // skip for oids that do not work with bulk
+                || ! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
     ) {
         $snmpcmd = [Config::get('snmpwalk')];
     } else {
@@ -141,6 +143,11 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
         if ($max_repeaters > 0) {
             $snmpcmd[] = "-Cr$max_repeaters";
         }
+    }
+
+    // allow unordered responses for specific oids
+    if (! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.unordered', 'snmp.')))) {
+        $snmpcmd[] = '-Cc';
     }
 
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);

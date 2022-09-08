@@ -147,7 +147,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -627,9 +627,9 @@ function is_port_valid($port, $device)
 
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'];
-    $ifAlias = $port['ifAlias'];
+    $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
-    $ifOperStatus = $port['ifOperStatus'];
+    $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
@@ -696,7 +696,7 @@ function is_port_valid($port, $device)
 function port_fill_missing(&$port, $device)
 {
     // When devices do not provide data, populate with other data if available
-    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+    if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
@@ -704,12 +704,12 @@ function port_fill_missing(&$port, $device)
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+    } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
 
-    if ($port['ifName'] == '' || $port['ifName'] == null) {
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
@@ -864,7 +864,7 @@ function dnslookup($device, $type = false, $return = false)
     }
     $record = dns_get_record($device['hostname'], $type);
 
-    return $record[0][$return];
+    return $record[0][$return] ?? null;
 }//end dnslookup
 
 /**
@@ -1268,7 +1268,7 @@ function cache_peeringdb()
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs as $ix) {
+                foreach ($ixs ?? [] as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
                     if ($tmp_ix) {
@@ -1289,7 +1289,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers as $index => $peer) {
+                    foreach ($peers ?? [] as $index => $peer) {
                         $peer_name = get_astext($peer->{'asn'});
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {

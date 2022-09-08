@@ -120,7 +120,11 @@
                         },
                         "location_template": {
                             "type": "string"
-                        }
+                        },
+                        "version_replace": {"$ref": "#/definitions/os_replacements"},
+                        "hardware_replace": {"$ref": "#/definitions/os_replacements"},
+                        "features_replace": {"$ref": "#/definitions/os_replacements"},
+                        "serial_replace": {"$ref": "#/definitions/os_replacements"}
                     },
                     "additionalProperties": false
                 },
@@ -468,6 +472,24 @@
             "required": [
                 "data"
             ]
+        },
+        "os_replacements": {
+            "type": "array",
+            "items": {
+                "oneOf": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "minItems": 2,
+                        "maxItems": 2
+                    },
+                    {
+                        "type": "string"
+                    }
+                ]
+            }
         },
         "skip_values": {
             "anyOf": [

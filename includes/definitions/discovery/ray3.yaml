@@ -55,3 +55,39 @@ modules:
                         - { value: 1, descr: Ok, graph: 0, generic: 0 }
                         - { value: 2, descr: Warning, graph: 0, generic: 2 }
                         - { value: 3, descr: Alarm, graph: 0, generic: 3 }
+
+                -
+                    oid: txModulationIndex
+                    num_oid: '.1.3.6.1.4.1.33555.4.2.1.7.{{ $index }}'
+                    descr: Tx Modulation Rate
+                    state_name: txModulationIndex-ray3
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK_S' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'QPSK' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'QAM16' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'QAM32' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'QAM64' }
+                        - { value: 6, generic: 0, graph: 1, descr: 'QAM128' }
+                        - { value: 7, generic: 0, graph: 1, descr: 'QAM256' }
+                        - { value: 8, generic: 0, graph: 1, descr: 'QAM512' }
+                        - { value: 9, generic: 0, graph: 1, descr: 'QAM1024' }
+                        - { value: 10, generic: 0, graph: 1, descr: 'QAM2048' }
+                        - { value: 11, generic: 0, graph: 1, descr: 'QAM4096' }
+
+                -
+                    oid: rxModulationIndex
+                    num_oid: '.1.3.6.1.4.1.33555.4.2.1.8.{{ $index }}'
+                    descr: Rx Modulation Rate
+                    state_name: rxModulationIndex-ray3
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: 'QPSK_S' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'QPSK' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'QAM16' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'QAM32' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'QAM64' }
+                        - { value: 6, generic: 0, graph: 1, descr: 'QAM128' }
+                        - { value: 7, generic: 0, graph: 1, descr: 'QAM256' }
+                        - { value: 8, generic: 0, graph: 1, descr: 'QAM512' }
+                        - { value: 9, generic: 0, graph: 1, descr: 'QAM1024' }
+                        - { value: 10, generic: 0, graph: 1, descr: 'QAM2048' }
+                        - { value: 11, generic: 0, graph: 1, descr: 'QAM4096' }

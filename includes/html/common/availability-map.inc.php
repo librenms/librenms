@@ -30,7 +30,7 @@ if (Config::get('webui.availability_map_compact') == 1) {
     $compact_tile = $settings['tile_size'];
 }
 
-$show_disabled_ignored = $settings['show_disabled_and_ignored'];
+$show_disabled_ignored = $settings['show_disabled_and_ignored'] ?? false;
 
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
@@ -380,11 +380,9 @@ if (defined('SHOW_SETTINGS')) {
         $serviceClass = 'widget-availability-service';
     }
 
-    if ($show_disabled_ignored == 1) {
-        $disabled_ignored_header = '
+    $disabled_ignored_header = $show_disabled_ignored == 1 ? '
             <span class="label label-default label-font-border label-border">alert-disabled: ' . $host_disable_notify_count . '</span>
-            <span class="label blackbg label-font-border label-border">disabled: ' . $host_disabled_count . '</span>';
-    }
+            <span class="label blackbg label-font-border label-border">disabled: ' . $host_disabled_count . '</span>' : '';
 
     if ($mode == 0 || $mode == 2) {
         $temp_header[] = '

@@ -161,11 +161,13 @@ class PingCheck implements ShouldQueue
             ->orderBy('max_depth');
 
         if ($this->groups) {
-            $query->whereIn('poller_group', $this->groups);
+            $query->whereIntegerInRaw('poller_group', $this->groups);
         }
 
         $this->devices = $query->get()->keyBy(function ($device) {
-            return Device::pollerTarget(json_decode(json_encode($device), true));
+            /** @var Device $device */
+
+            return $device->overwrite_ip ?: $device->hostname;
         });
 
         // working collections

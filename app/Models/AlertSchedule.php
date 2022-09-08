@@ -173,11 +173,12 @@ class AlertSchedule extends Model
     {
         return $query->where(function ($query) {
             $now = CarbonImmutable::now('UTC');
+            $localDayNum = CarbonImmutable::now()->format('N');
             $query->where('start', '<=', $now)
                 ->where('end', '>=', $now)
-                ->where(function ($query) use ($now) {
+                ->where(function ($query) use ($now, $localDayNum) {
                     $query->where('recurring', 0) // Non recurring simply between start and end
-                    ->orWhere(function ($query) use ($now) {
+                    ->orWhere(function ($query) use ($now, $localDayNum) {
                         $query->where('recurring', 1)
                             // Check the time is after the start date and before the end date, or end date is not set
                             ->where(function ($query) use ($now) {
@@ -190,14 +191,14 @@ class AlertSchedule extends Model
                                     // outside, spans days
                                     $query->whereTime('start', '>', DB::raw('time(`end`)'))
                                         ->where(function ($query) use ($now) {
-                                            $query->whereTime('end', '<=', $now->toTimeString())
-                                                ->orWhereTime('start', '>', $now->toTimeString());
+                                            $query->whereTime('start', '<=', $now->toTimeString())
+                                                ->orWhereTime('end', '>', $now->toTimeString());
                                         });
                                 });
                             })
                             // Check we are on the correct day of the week
-                            ->where(function ($query) use ($now) {
-                                $query->where('recurring_day', 'like', $now->format('%N%'))
+                            ->where(function ($query) use ($localDayNum) {
+                                $query->where('recurring_day', 'like', "%${localDayNum}%")
                                     ->orWhereNull('recurring_day');
                             });
                     });

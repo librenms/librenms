@@ -15,8 +15,9 @@ print_optionbar_start();
 
 echo 'Polling Interval: ';
 
+$sep = '';
 foreach ([0.25, 1, 2, 5, 15, 60] as $interval) {
-    echo $thinger;
+    echo $sep;
     if ($vars['interval'] == $interval) {
         echo "<span class='pagemenu-selected'>";
     }
@@ -26,7 +27,7 @@ foreach ([0.25, 1, 2, 5, 15, 60] as $interval) {
         echo '</span>';
     }
 
-    $thinger = ' | ';
+    $sep = ' | ';
 }
 
 print_optionbar_end();

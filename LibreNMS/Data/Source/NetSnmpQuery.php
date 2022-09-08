@@ -87,6 +87,10 @@ class NetSnmpQuery implements SnmpQueryInterface
      * @var \App\Models\Device
      */
     private $device;
+    /**
+     * @var bool
+     */
+    private $abort = false;
 
     public function __construct()
     {
@@ -155,6 +159,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * When walking multiple OIDs, stop if one fails. Used when the first OID indicates if the rest are supported.
+     * OIDs will be walked in order, so you may want to put your OIDs in a specific order.
+     */
+    public function abortOnFailure(): SnmpQueryInterface
+    {
+        $this->abort = true;
 
         return $this;
     }
@@ -243,7 +258,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function walk($oid): SnmpResponse
     {
-        return $this->exec('snmpwalk', $this->parseOid($oid));
+        return $this->execMultiple('snmpwalk', $this->parseOid($oid));
     }
 
     /**
@@ -330,6 +345,24 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
     }
 
+    private function execMultiple(string $command, array $oids): SnmpResponse
+    {
+        $response = new SnmpResponse('');
+
+        foreach ($oids as $oid) {
+            $response = $response->append($this->exec($command, [$oid]));
+
+            // if abort on failure is set, return after first failure
+            if ($this->abort && ! $response->isValid()) {
+                Log::debug("SNMP failed walking $oid of " . implode(',', $oids) . ' aborting.');
+
+                return $response;
+            }
+        }
+
+        return $response;
+    }
+
     private function exec(string $command, array $oids): SnmpResponse
     {
         $measure = Measurement::start($command);
@@ -355,19 +388,26 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function initCommand(string $binary, array $oids): array
     {
-        if ($binary == 'snmpwalk'
-            && $this->device->snmpver !== 'v1'
-            && Config::getOsSetting($this->device->os, 'snmp_bulk', true)
-            && empty(array_intersect($oids, Config::getCombined($this->device->os, 'oids.no_bulk'))) // skip for oids that do not work with bulk
-        ) {
-            $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
-
-            $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
-            if ($max_repeaters > 0) {
-                $snmpcmd[] = "-Cr$max_repeaters";
+        if ($binary == 'snmpwalk') {
+            // allow unordered responses for specific oids
+            if (! empty(array_intersect($oids, Config::getCombined($this->device->os, 'oids.unordered', 'snmp.')))) {
+                $this->allowUnordered();
             }
 
-            return $snmpcmd;
+            // handle bulk settings
+            if ($this->device->snmpver !== 'v1'
+                && Config::getOsSetting($this->device->os, 'snmp_bulk', true)
+                && empty(array_intersect($oids, Config::getCombined($this->device->os, 'oids.no_bulk', 'snmp.'))) // skip for oids that do not work with bulk
+            ) {
+                $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
+
+                $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
+                if ($max_repeaters > 0) {
+                    $snmpcmd[] = "-Cr$max_repeaters";
+                }
+
+                return $snmpcmd;
+            }
         }
 
         return [Config::get($binary, $binary)];

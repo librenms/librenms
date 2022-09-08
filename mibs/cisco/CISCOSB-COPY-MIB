@@ -11,7 +11,7 @@ IMPORTS
     RlSecSdAccessType                       FROM CISCOSB-SECSD-MIB; -- RFC2851
 
  rlCopy   MODULE-IDENTITY
-          LAST-UPDATED "201005110000Z"
+          LAST-UPDATED "202105170000Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO

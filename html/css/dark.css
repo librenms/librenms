@@ -7236,6 +7236,12 @@
     background: #3e444c;
     text-align: center;
   }
+  tr.bgp:nth-child(even) {
+  background: #353a41!important;
+  }
+  tr.iftype:nth-child(even) {
+  background: #353a41!important;
+  }
 
   .interface-upup,
   a.interface-upup {

@@ -3700,7 +3700,7 @@
                     "storage_descr": "/jffs",
                     "storage_size": 4456448,
                     "storage_units": 1024,
-                    "storage_used": 4456448,
+                    "storage_used": 1294336,
                     "storage_free": 0,
                     "storage_perc": 0,
                     "storage_perc_warn": 60,

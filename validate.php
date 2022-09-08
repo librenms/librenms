@@ -160,7 +160,7 @@ LibreNMS  | ${versions['local_ver']}
 DB Schema | ${versions['db_schema']}
 PHP       | ${versions['php_ver']}
 Python    | ${versions['python_ver']}
-MySQL     | ${versions['mysql_ver']}
+Database  | ${versions['database_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}
 ====================================
@@ -172,13 +172,13 @@ EOF;
 // output matches that of ValidationResult
 function print_fail($msg, $fix = null)
 {
-    c_echo("[%RFAIL%n]  $msg");
+    echo "[\033[31;1mFAIL\033[0m]  $msg";
     if ($fix && strlen($msg) > 72) {
         echo PHP_EOL . '       ';
     }
 
     if (! empty($fix)) {
-        c_echo(" [%BFIX%n] %B$fix%n");
+        echo " [\033[34;1mFIX\033[0m] \033[34;1m$fix\033[0m";
     }
     echo PHP_EOL;
 }

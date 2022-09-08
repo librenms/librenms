@@ -46,6 +46,8 @@ if ($results) {
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
     $applications['postfixdetailed'] = 'postfix';
+    $applications['suricata-stats'] = 'suricata';
+    $applications['sagan-stats'] = 'sagan';
 }
 
 d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_EOL);

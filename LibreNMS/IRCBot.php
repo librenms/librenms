@@ -602,7 +602,7 @@ class IRCBot
     {
         if (! Eloquent::isConnected()) {
             try {
-                Eloquent::boot();
+                Eloquent::DB()->statement('SELECT VERSION()');
             } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
 

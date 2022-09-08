@@ -39,6 +39,7 @@ poller_modules:
     cisco-otv: true
     cisco-vpdn: true
     ipmi: false
+    xdsl: true
 discovery_modules:
     cisco-cef: true
     slas: true
@@ -47,3 +48,4 @@ discovery_modules:
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
+    xdsl: true

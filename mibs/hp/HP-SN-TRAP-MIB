@@ -1,4 +1,27 @@
--- SECTION 1: Top Level Definitions
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 HP-SN-TRAP-MIB DEFINITIONS ::= BEGIN
 
@@ -17,6 +40,8 @@ HP-SN-TRAP-MIB DEFINITIONS ::= BEGIN
 -- no warranty, either express or implied, as to the use,
 -- operation, condition, or performance of the Specification.
 
+-- SECTION 1: Top Level Definitions
+
 
 -- Imports
 
@@ -33,33 +58,12 @@ IMPORTS
    snChasFanDescription   FROM HP-SN-AGENT-MIB
    snSwViolatorPortNumber,
    snSwViolatorMacAddress FROM HP-SN-SWITCH-GROUP-MIB
-   snOspfRouterId,
-   snOspfIfStatusIpAddress,
-   snOspfIfStatusState,
-   snOspfVirtIfStatusAreaID,
-   snOspfVirtIfStatusNeighbor,
-   snOspfVirtIfStatusState,
-   snOspfNbrIpAddr,
-   snOspfNbrRtrId,
-   snOspfNbrState,
-   snOspfVirtNbrArea,
-   snOspfVirtNbrRtrId, 
-   snOspfVirtNbrState, 
-   snOspfPacketSrc,
-   snOspfConfigErrorType,
-   snOspfPacketType,
-   snOspfLsdbAreaId,
-   snOspfLsdbType,
-   snOspfLsdbLsId,
-   snOspfLsdbRouterId,
-   snOspfExtLsdbLimit     FROM HP-SN-OSPF-GROUP-MIB
    snL4MaxSessionLimit,
    snL4TcpSynLimit,
    snL4TrapRealServerIP, 
    snL4TrapRealServerName,
    snL4TrapRealServerPort,
    snL4TrapRealServerCurConnections FROM HP-SN-SW-L4-SWITCH-GROUP-MIB;
-
 
 
 -- Textual Conventions
@@ -80,7 +84,24 @@ snTrapChasPwrSupply TRAP-TYPE
    VARIABLES { snChasPwrSupplyStatus }
    DESCRIPTION
        "The SNMP trap that is generated when a power supply fails
-        to operate normally."
+        to operate normally. The value is a packed bit string;
+        the 2 power supplies status are encoded into 4 bits
+        (a nibble). 
+        The following shows the meaning of each bit:
+        (bit 0 is the least significant bit).
+
+        bit position   meaning
+        ------------   -------
+        4-31	 reserved
+        3		 Power  Supply 2 DC (0=bad, 1=good).
+        2		 Power  Supply 1 DC (0=bad, 1=good).
+        1		 Power  Supply 2 present status (0=present, 1=not-present).
+        0		 Power  Supply 1 present status (0=present, 1=not-present)."
+	--#TYPE "Foundry Trap: Power Supply Failure"
+	--#SUMMARY "Power supply fails, error status %d."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
    ::= 1
 
 snTrapLockedAddressViolation TRAP-TYPE
@@ -90,304 +111,14 @@ snTrapLockedAddressViolation TRAP-TYPE
        "The SNMP trap that is generated when more source MAC addresses
         are received from a port than the maximum number of addresses
         configured to that port."
+	--#TYPE "Foundry Trap: MAC Addresses Violation"
+	--#SUMMARY "Lock address violation on Port %d with MAC Address %s."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
    ::= 2
 
-snTrapOspfIfStateChange TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfIfStatusIpAddress,
-                snOspfIfStatusState   -- The new state
-              }
-   DESCRIPTION
-      "An ospfIfStateChange trap signifies that there
-      has been a change in the state of a non-virtual
-      OSPF interface. This trap should  be  generated
-      when  the interface state regresses (e.g., goes
-      from Dr to Down) or progresses  to  a  terminal
-      state  (i.e.,  Point-to-Point, DR Other, Dr, or
-      Backup)."
-   ::= 3
-
-snTrapOspfVirtIfStateChange TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtIfStatusAreaID,
-                snOspfVirtIfStatusNeighbor,
-                snOspfVirtIfStatusState  -- The new state
-              }
-   DESCRIPTION
-      "An ospfIfStateChange trap signifies that there
-      has  been a change in the state of an OSPF vir-
-      tual interface.
-      This trap should be generated when  the  inter-
-      face  state  regresses  (e.g., goes from Point-
-      to-Point to Down) or progresses to  a  terminal
-      state (i.e., Point-to-Point)."
-   ::= 4
-
-
-snOspfNbrStateChange TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfNbrIpAddr,
-                snOspfNbrRtrId,
-                snOspfNbrState  -- The new state
-              }
-    DESCRIPTION
-       "An  ospfNbrStateChange  trap  signifies   that
-       there  has been a change in the state of a non-
-       virtual OSPF neighbor.   This  trap  should  be
-       generated  when  the  neighbor  state regresses
-       (e.g., goes from Attempt or Full  to  1-Way  or
-       Down)  or progresses to a terminal state (e.g.,
-       2-Way or Full).  When an  neighbor  transitions
-       from  or  to Full on non-broadcast multi-access
-       and broadcast networks, the trap should be gen-
-       erated  by the designated router.  A designated
-       router transitioning to Down will be  noted  by
-       ospfIfStateChange."
-   ::= 5
-
-
-snOspfVirtNbrStateChange TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtNbrArea,
-                snOspfVirtNbrRtrId,
-                snOspfVirtNbrState  -- The new state
-              }
-    DESCRIPTION
-       "An ospfIfStateChange trap signifies that there
-       has  been a change in the state of an OSPF vir-
-       tual neighbor.  This trap should  be  generated
-       when  the  neighbor state regresses (e.g., goes
-       from Attempt or  Full  to  1-Way  or  Down)  or
-       progresses to a terminal state (e.g., Full)."
-   ::= 6
-
-
-
-snOspfIfConfigError TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfIfStatusIpAddress,
-                snOspfPacketSrc,  -- The source IP address
-                snOspfConfigErrorType, -- Type of error
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfIfConfigError  trap  signifies  that  a
-       packet  has  been received on a non-virtual in-
-       terface  from  a  router  whose   configuration
-       parameters  conflict  with this router's confi-
-       guration parameters.  Note that the  event  op-
-       tionMismatch  should  cause  a  trap only if it
-       prevents an adjacency from forming."
-   ::= 7
-
-
-snOspfVirtIfConfigError TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtIfStatusAreaID,
-                snOspfVirtIfStatusNeighbor,
-                snOspfConfigErrorType, -- Type of error
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfConfigError trap signifies that a pack-
-       et  has  been  received  on a virtual interface
-       from a router  whose  configuration  parameters
-       conflict   with   this  router's  configuration
-       parameters.  Note that the event optionMismatch
-       should  cause a trap only if it prevents an ad-
-       jacency from forming."
-   ::= 8
-
-
-snOspfIfAuthFailure TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfIfStatusIpAddress,
-                snOspfPacketSrc,  -- The source IP address
-                snOspfConfigErrorType, -- authTypeMismatch or
-                                     -- authFailure
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfIfAuthFailure  trap  signifies  that  a
-       packet  has  been received on a non-virtual in-
-       terface from a router whose authentication  key
-       or  authentication  type  conflicts  with  this
-       router's authentication key  or  authentication
-       type."
-   ::= 9
-
-
-snOspfVirtIfAuthFailure TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtIfStatusAreaID,
-                snOspfVirtIfStatusNeighbor,
-                snOspfConfigErrorType, -- authTypeMismatch or
-                                     -- authFailure
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfVirtIfAuthFailure trap signifies that a
-       packet has been received on a virtual interface
-       from a router whose authentication key  or  au-
-       thentication  type conflicts with this router's
-       authentication key or authentication type."
-   ::= 10
-
-
-snOspfIfRxBadPacket TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfIfStatusIpAddress,
-                snOspfPacketSrc,  -- The source IP address
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfIfRxBadPacket trap  signifies  that  an
-       OSPF  packet has been received on a non-virtual
-       interface that cannot be parsed."
-   ::= 11
-
-
-snOspfVirtIfRxBadPacket TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtIfStatusAreaID,
-                snOspfVirtIfStatusNeighbor,
-                snOspfPacketType
-              }
-    DESCRIPTION
-       "An ospfRxBadPacket trap signifies that an OSPF
-       packet has been received on a virtual interface
-       that cannot be parsed."
-   ::= 12
-
-
-snOspfTxRetransmit TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfIfStatusIpAddress,
-                snOspfNbrRtrId, -- Destination
-                snOspfPacketType,
-                snOspfLsdbType,
-                snOspfLsdbLsId,
-                snOspfLsdbRouterId
-              }
-    DESCRIPTION
-       "An ospfTxRetransmit  trap  signifies  than  an
-       OSPF  packet  has  been retransmitted on a non-
-       virtual interface.  All packets that may be re-
-       transmitted  are associated with an LSDB entry.
-       The LS type, LS ID, and Router ID are  used  to
-       identify the LSDB entry."
-   ::= 13
-
-
-ospfVirtIfTxRetransmit TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfVirtIfStatusAreaID,
-                snOspfVirtIfStatusNeighbor,
-                snOspfPacketType,
-                snOspfLsdbType,
-                snOspfLsdbLsId,
-                snOspfLsdbRouterId
-              }
-
-    DESCRIPTION
-       "An ospfTxRetransmit  trap  signifies  than  an
-       OSPF packet has been retransmitted on a virtual
-       interface.  All packets that may be retransmit-
-       ted  are  associated with an LSDB entry. The LS
-       type, LS ID, and Router ID are used to identify
-       the LSDB entry."
-   ::= 14
-
-
-snOspfOriginateLsa TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
-                snOspfLsdbType,
-                snOspfLsdbLsId,
-                snOspfLsdbRouterId
-              }
-    DESCRIPTION
-       "An ospfOriginateLsa trap signifies that a  new
-       LSA  has  been originated by this router.  This
-       trap should not be invoked for simple refreshes
-       of  LSAs  (which happesn every 30 minutes), but
-       instead will only be invoked  when  an  LSA  is
-       (re)originated due to a topology change.  Addi-
-       tionally, this trap does not include LSAs  that
-       are  being  flushed  because  they have reached
-       MaxAge."
-   ::= 15
-
-
-snOspfMaxAgeLsa TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfLsdbAreaId,  -- 0.0.0.0 for AS Externals
-                snOspfLsdbType,
-                snOspfLsdbLsId,
-                snOspfLsdbRouterId
-              }
-    DESCRIPTION
-       "An ospfMaxAgeLsa trap signifies  that  one  of
-       the LSA in the router's link-state database has
-       aged to MaxAge."
-   ::= 16
-
-
-
-snOspfLsdbOverflow TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfExtLsdbLimit
-              }
-    DESCRIPTION
-       "An ospfLsdbOverflow trap  signifies  that  the
-       number of LSAs in the router's link-state data-
-       base has exceeded ospfExtLsdbLimit."
-   ::= 17
-
-
-snOspfLsdbApproachingOverflow TRAP-TYPE
-   ENTERPRISE hp
-   VARIABLES {
-                snOspfRouterId, -- The originator of the trap
-                snOspfExtLsdbLimit
-              }
-    DESCRIPTION
-       "An ospfLsdbApproachingOverflow trap  signifies
-       that  the  number of LSAs in the router's link-
-       state database has exceeded ninety  percent  of
-       ospfExtLsdbLimit."
-   ::= 18
-
+-- Trap IDs from 3 through 18 are used by OSPF. See Router Trap mib for definitions.
 
 snTrapL4MaxSessionLimitReached TRAP-TYPE
    ENTERPRISE hp
@@ -395,6 +126,11 @@ snTrapL4MaxSessionLimitReached TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the maximum number
        of connections reached."
+	--#TYPE "Foundry Trap: L4 Session Limit"
+	--#SUMMARY "SLB maximum number of connections  %d has been reached."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 19
 
 
@@ -404,6 +140,11 @@ snTrapL4TcpSynLimitReached TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the number of TCP
        SYN limits reached."
+	--#TYPE "Foundry Trap: L4 TCP Syn Limit"
+	--#SUMMARY "SLB TCP Syn limits %d has been reached."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 20
 
 
@@ -413,6 +154,11 @@ snTrapL4RealServerUp TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the load balancing
        real server is up."
+	--#TYPE "Foundry Trap: L4 Real Server Up"
+	--#SUMMARY "SLB real server %s %s is up."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 21
 
 
@@ -422,6 +168,11 @@ snTrapL4RealServerDown TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the load balancing
        real server is down."
+	--#TYPE "Foundry Trap: L4 Real Server Down"
+	--#SUMMARY "SLB real server %s %s is down."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 22
 
 
@@ -431,6 +182,11 @@ snTrapL4RealServerPortUp TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the load balancing
        real server TCP port is up."
+	--#TYPE "Foundry Trap: L4 Real Server Port Up"
+	--#SUMMARY "SLB real server port %s %s %d is up."
+	--#ARGUMENTS { 0, 1, 2 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 23
 
 
@@ -440,6 +196,11 @@ snTrapL4RealServerPortDown TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the load balancing
        real server TCP port is down."
+	--#TYPE "Foundry Trap: L4 Real Server Port Down"
+	--#SUMMARY "SLB real server port %s %s %d is down."
+	--#ARGUMENTS { 0, 1, 2 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 24
 
 
@@ -449,6 +210,11 @@ snTrapL4RealServerMaxConnectionLimitReached TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the real server reaches
        maximum number of connections."
+	--#TYPE "Foundry Trap: L4 Real Server Max Connection Limit"
+	--#SUMMARY "SLB real server %s %s maximum connection %d has been reached."
+	--#ARGUMENTS { 0, 1, 2 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 25
 
 
@@ -457,6 +223,11 @@ snTrapL4BecomeStandby TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the server load
        balancing switch changes state from active to standby."
+	--#TYPE "Foundry Trap: L4 Server On Standby"
+	--#SUMMARY "SLB changes state from active to standby."
+	--#ARGUMENTS { }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 26
 
 
@@ -465,6 +236,11 @@ snTrapL4BecomeActive TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the server load
        balancing switch changes state from standby to active."
+	--#TYPE "Foundry Trap: L4 Server Active"
+	--#SUMMARY "SLB changes state from standby to active."
+	--#ARGUMENTS { }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 27
 
 
@@ -474,6 +250,11 @@ snTrapModuleInserted TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a module was inserted
        to the chassis during system running."
+	--#TYPE "Foundry Trap: Module Inserted"
+	--#SUMMARY "Module %d was inserted to the chassis during system running."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 28
 
 
@@ -483,6 +264,11 @@ snTrapModuleRemoved TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a module was removed
        from the chassis during system running."
+	--#TYPE "Foundry Trap: Module Removed"
+	--#SUMMARY "Module %d was removed from the chassis during system running."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 29
 
 
@@ -490,8 +276,13 @@ snTrapChasPwrSupplyFailed TRAP-TYPE
    ENTERPRISE hp
    VARIABLES { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
    DESCRIPTION
-       "The SNMP trap that is generated when a power supply fails
-        to operate normally."
+       "The SNMP trap that is generated when a power supply operational
+        status changed from normal to failure."
+	--#TYPE "Foundry Trap: Power Supply Failure"
+	--#SUMMARY "Power supply %d (%s)  failed."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
    ::= 30
 
 
@@ -501,6 +292,11 @@ snTrapChasFanFailed TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a fan fails
         to operate normally."
+	--#TYPE "Foundry Trap: Fan Failure"
+	--#SUMMARY "Fan  %d (%s)  failed."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
    ::= 31
 
 
@@ -511,6 +307,11 @@ snTrapLockedAddressViolation2 TRAP-TYPE
        "The SNMP trap that is generated when more source MAC addresses
         are received from a port than the maximum number of addresses
         configured to that port."
+	--#TYPE "Foundry Trap: Lock Address Violation"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
    ::= 32
 
 
@@ -520,6 +321,11 @@ snTrapFsrpIfStateChange TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a FSRP routing device
        changed state from active to standby or vice-versa."
+	--#TYPE "Foundry Trap: FSRP Interface Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
    ::= 33
 
 snTrapVrrpIfStateChange TRAP-TYPE
@@ -527,7 +333,12 @@ snTrapVrrpIfStateChange TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when a VRRP routing device
-       changed state from master to backup or vice-versa."
+       switched between states master, backup, intialized or uknown."
+	--#TYPE "Foundry Trap: VRRP Interface Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 34
 
 
@@ -537,6 +348,11 @@ snTrapMgmtModuleRedunStateChange TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the management module
        changes redundancy state."
+	--#TYPE "Foundry Trap: Management Module Change State"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 35
 
 
@@ -546,6 +362,11 @@ snTrapTemperatureWarning TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when the actual temperature
        reading is above the warning temperature threshold."
+	--#TYPE "Foundry Trap: Temperature Warning"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE OPERATIONAL
    ::= 36
 
 snTrapAccessListDeny TRAP-TYPE
@@ -554,6 +375,11 @@ snTrapAccessListDeny TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a packet was denied
        by an access list."
+	--#TYPE "Foundry Trap: Deny from ACL"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 37
 
 snTrapMacFilterDeny TRAP-TYPE
@@ -562,6 +388,11 @@ snTrapMacFilterDeny TRAP-TYPE
    DESCRIPTION
        "The SNMP trap that is generated when a packet was denied
        by a MAC address filter."
+	--#TYPE "Foundry Trap: Deny from MAC Filter"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 38
 
 snTrapL4GslbRemoteUp TRAP-TYPE
@@ -569,6 +400,11 @@ snTrapL4GslbRemoteUp TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when the connection to the remote SI is established."
+	--#TYPE "Foundry Trap: Remote SI Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 39
 
 snTrapL4GslbRemoteDown TRAP-TYPE
@@ -576,6 +412,11 @@ snTrapL4GslbRemoteDown TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when the connection to the remote SI is down."
+	--#TYPE "Foundry Trap: Remote SI Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 40
 
 snTrapL4GslbRemoteControllerUp TRAP-TYPE
@@ -583,6 +424,11 @@ snTrapL4GslbRemoteControllerUp TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when the connection to the GSLB SI is established."
+	--#TYPE "Foundry Trap: Remote GSLB SI Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 41
 
 snTrapL4GslbRemoteControllerDown TRAP-TYPE
@@ -590,6 +436,11 @@ snTrapL4GslbRemoteControllerDown TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when the connection to the GSLB SI is down."
+	--#TYPE "Foundry Trap: Remote GSLB SI Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 42
 
 snTrapL4GslbHealthCheckIpUp TRAP-TYPE
@@ -597,7 +448,12 @@ snTrapL4GslbHealthCheckIpUp TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when GSLB health check for an address transitions
-           from down to active state."
+	   from down to active state."
+	--#TYPE "Foundry Trap: GSLB HealtCheck Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 43
 
 snTrapL4GslbHealthCheckIpDown TRAP-TYPE
@@ -605,7 +461,12 @@ snTrapL4GslbHealthCheckIpDown TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when GSLB health check for an address transitions
-           from active to down state."
+	   from active to down state."
+	--#TYPE "Foundry Trap: GSLB HealthCheck Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 44
 
 snTrapL4GslbHealthCheckIpPortUp TRAP-TYPE
@@ -613,6 +474,11 @@ snTrapL4GslbHealthCheckIpPortUp TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when a given port for a health check address is up."
+	--#TYPE "Foundry Trap: GSLB HealthCheck Port Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 45
 
 snTrapL4GslbHealthCheckIpPortDown TRAP-TYPE
@@ -620,6 +486,462 @@ snTrapL4GslbHealthCheckIpPortDown TRAP-TYPE
    VARIABLES { snAgGblTrapMessage }
    DESCRIPTION
        "The SNMP trap that is generated when a given port for a health check address is down."
+	--#TYPE "Foundry Trap: GSLB HealthCheck Port Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
    ::= 46
+
+snTrapL4FirewallBecomeStandby TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "The SNMP trap that is generated when the server load
+       balancing switch Firewall changes state from active to standby."
+	--#TYPE "Foundry Trap: Firewall Standby"
+	--#SUMMARY "Firewall changes state from active to standby."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 47
+
+
+snTrapL4FirewallBecomeActive TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "The SNMP trap that is generated when the server load
+       balancing switch Firewall changes state from standby to active."
+	--#TYPE "Foundry Trap: Firewall Active"
+	--#SUMMARY "Firewall changes state from standby to active."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 48
+
+snTrapL4FirewallPathUp TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "The SNMP trap that is generated when the server load
+       balancing switch Firewall path is up."
+	--#TYPE "Foundry Trap: Firewall Path Up"
+	--#SUMMARY "Firewall path is up."
+	--#ARGUMENTS { }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 49
+
+
+snTrapL4FirewallPathDown TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "The SNMP trap that is generated when the server load
+       balancing switch Firewall path is down."
+	--#TYPE "Foundry Trap: Firewall Path Down"
+	--#SUMMARY "Firewall path is down."
+	--#ARGUMENTS { }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 50
+
+snTrapIcmpLocalExceedBurst TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when incoming ICMP exceeds burst-MAX."
+	--#TYPE "Foundry Trap: ICMP Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 51
+
+snTrapIcmpTransitExceedBurst TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when transit ICMP exceeds burst-MAX."
+	--#TYPE "Foundry Trap: Transit ICMP Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 52
+
+snTrapTcpLocalExceedBurst TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when incoming TCP SYN exceeds burst-MAX."
+	--#TYPE "Foundry Trap: TCP SYN Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 53
+
+snTrapTcpTransitExceedBurst TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when transit TCP exceeds burst-MAX."
+	--#TYPE "Foundry Trap: Transit TCP SYN Burst Exceeded"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 54
+
+snTrapL4ContentVerification TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "The SNMP trap that is generated when the HTTP match-list pattern
+       is found."
+	--#TYPE "Foundry Trap: HTTP Match"
+	--#SUMMARY "HTTP match-list pattern is found."
+	--#ARGUMENTS { }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 55
+
+snTrapDuplicateIp TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "Duplicate IP address detected."
+	--#TYPE "Foundry Trap: Duplicate IP"
+	--#SUMMARY "Duplicate IP address detect."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 56
+
+snTrapMplsProblem TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "MPLS Problem Detected."
+	--#TYPE "Foundry Trap: MPLS Problem"
+	--#SUMMARY "MPLS Problem detect."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 57
+
+snTrapMplsException TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "MPLS Exception Detected."
+	--#TYPE "Foundry Trap: MPLS Exception"
+	--#SUMMARY "MPLS Exception detect."
+	--#ARGUMENTS { }
+	--#SEVERITY MAJOR
+	--#STATE OPERATIONAL
+   ::= 58
+   
+snTrapMplsAudit TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "MPLS Audit Trap."
+	--#TYPE "Foundry Trap: MPLS Audit"
+	--#SUMMARY "MPLS Audit Trap."
+	--#ARGUMENTS { }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 59
+   
+snTrapMplsDeveloper TRAP-TYPE
+   ENTERPRISE hp
+   DESCRIPTION
+       "MPLS Developer Trap."
+	--#TYPE "Foundry Trap: MPLS Developer"
+	--#SUMMARY "MPLS Developer Trap."
+	--#ARGUMENTS { }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 60
+
+snTrapNoBmFreeQueue TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when no free queue is available in buffer manager."
+	--#TYPE "Foundry Trap: No BM Free Queue"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 61
+
+snTrapSmcDmaDrop TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when SMC DMA packet is dropped."
+	--#TYPE "Foundry Trap: SMC DMA Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 62
+
+snTrapSmcBpDrop TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when SMC BackPlane packet is dropped."
+	--#TYPE "Foundry Trap: SMC BP Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 63
+
+snTrapBmWriteSeqDrop TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when BM write sequence packet is dropped."
+	--#TYPE "Foundry Trap: BM Write Sequence Packet Dropped"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 64
+
+snTrapBgpPeerUp TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the bgp peer is up."
+	--#TYPE "Foundry Trap: BGP Peer Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 65
+
+snTrapBgpPeerDown TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the bgp peer is down."
+	--#TYPE "Foundry Trap: BGP Peer Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 66
+
+snTrapL4RealServerResponseTimeLowerLimit TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the real server average response time exceeds lower threshold."
+	--#TYPE "Foundry Trap: L4 Real Server Response Exceeds Lower Threshold"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 67
+
+snTrapL4RealServerResponseTimeUpperLimit TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the real server average response time exceeds upper threshold."
+	--#TYPE "Foundry Trap: L4 Real Server Response Exceeds Upper Threshold"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 68
+
+snTrapL4TcpAttackRateExceedMax TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the TCP attack rate exceeds configured maximum."
+	--#TYPE "Foundry Trap: L4 TCP Attack Rate Exceed Max"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE OPERATIONAL
+   ::= 69
+
+snTrapL4TcpAttackRateExceedThreshold TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the TCP attack rate exceeds 80% of configured maximum."
+	--#TYPE "Foundry Trap: L4 TCP Attack Rate Exceed Threshold"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 70
+
+snTrapL4ConnectionRateExceedMax TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the L4 connection rate exceeds configured maximum."
+	--#TYPE "Foundry Trap: L4 Connection Rate Exceed Max"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE OPERATIONAL
+   ::= 71
+
+snTrapL4ConnectionRateExceedThreshold TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the L4 connection rate exceeds 80% of configured maximum"
+	--#TYPE "Foundry Trap: L4 Connection Rate Exceed Threshold"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 72
+
+snTrapRunningConfigChanged TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the running configuration
+        was changed."
+	--#TYPE "Foundry Trap: Running Configuration Changed"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 73
+
+snTrapStartupConfigChanged TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when the startup configuration
+        was changed."
+	--#TYPE "Foundry Trap: Startup Configuration Changed"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 74
+
+snTrapUserLogin TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when user login."
+	--#TYPE "Foundry Trap: User Login"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 75
+
+snTrapUserLogout TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when user logout."
+	--#TYPE "Foundry Trap: User Logout"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+   ::= 76
+
+snTrapPortSecurityViolation TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when insecure MAC addresses
+        are received from a port with MAC security feature enabled."
+	--#TYPE "Foundry Trap: Port Security Violation"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 77
+
+snTrapPortSecurityShutdown TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when insecure MAC addresses
+        are received from a port caused the port to shutdown."
+	--#TYPE "Foundry Trap: Port Security Violation Cause Shutdown"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 78
+
+snTrapMrpStateChange TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when a MRP switching and routing device
+       changed state to  disabled, blocking, preforwarding, forwarding, uknown."
+	--#TYPE "Foundry Trap: MRP Interface Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 79
+
+snTrapMrpCamError TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when a MRP Cam Error occurs."
+	--#TYPE "Foundry Trap: MRP Cam Error"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 80
+
+snTrapChasPwrSupplyOK TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snChasPwrSupplyIndex, snChasPwrSupplyDescription }
+   DESCRIPTION
+       "The SNMP trap that is generated when a power supply operational
+        status changed from failure to normal."
+	--#TYPE "Foundry Trap: Power Supply OK"
+	--#SUMMARY "Power supply %d (%s)  OK."
+	--#ARGUMENTS { 0, 1 }
+	--#SEVERITY MINOR
+	--#STATE OPERATIONAL
+   ::= 81
+
+
+snTrapVrrpeIfStateChange TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when a VRRPE routing device
+       switched between states master, backup, intialized or uknown."
+	--#TYPE "Foundry Trap: VRRPE Interface Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 82
+
+snTrapVsrpIfStateChange TRAP-TYPE
+   ENTERPRISE hp
+   VARIABLES { snAgGblTrapMessage }
+   DESCRIPTION
+       "The SNMP trap that is generated when a VSRP switching and routing device
+       switched between states master, backup, intialized or uknown."
+	--#TYPE "Foundry Trap: VSRP Interface Change"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY WARNING
+	--#STATE OPERATIONAL
+   ::= 83
+
 
 END

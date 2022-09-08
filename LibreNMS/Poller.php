@@ -36,12 +36,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\PollerException;
-use LibreNMS\Modules\LegacyModule;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
+use LibreNMS\Util\Module;
 use LibreNMS\Util\StringHelpers;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -153,6 +153,14 @@ class Poller
         return $polled;
     }
 
+    /**
+     * Get the total number of devices to poll.
+     */
+    public function totalDevices(): int
+    {
+        return $this->buildDeviceQuery()->count();
+    }
+
     private function pollModules(): void
     {
         $this->filterModules();
@@ -175,13 +183,13 @@ class Poller
                 $this->logger->info("\n#### Load poller module $module ####");
 
                 try {
-                    $module_class = StringHelpers::toClass($module, '\\LibreNMS\\Modules\\');
-                    $instance = class_exists($module_class) ? new $module_class : new LegacyModule($module);
+                    $instance = Module::fromName($module);
                     $instance->poll($this->os);
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                     \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
+                    report($e);
                 }
 
                 app(MeasurementManager::class)->printChangedStats();
@@ -362,7 +370,7 @@ Commit SHA: %s
 Commit Date: %s
 DB Schema: %s
 PHP: %s
-MySQL: %s
+Database: %s
 RRDTool: %s
 SNMP: %s
 ==================================
@@ -371,7 +379,7 @@ EOH,
                 Git::localDate(),
                 vsprintf('%s (%s)', $version->database()),
                 phpversion(),
-                \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?',
+                $version->databaseServer(),
                 $version->rrdtool(),
                 $version->netSnmp()
             ));
