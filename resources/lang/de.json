@@ -363,7 +363,7 @@
     "Groups": "Gruppen",
     "Performance": "Performance",
     "History": "Historie",
-    "Device Label": "Anzeigewert"
+    "Display Name": "Anzeigename",
     "Status, Hostname": "Status, Hostname",
     "Status, Display Name": "Status, Anzeigename"
 }
