@@ -62,7 +62,7 @@ class AutonomousSystem
             }
 
             try {
-                $result = dns_get_record("AS$this->asn.asn.cymru.com", DNS_TXT);
+                $result = @dns_get_record("AS$this->asn.asn.cymru.com", DNS_TXT);
 
                 if (! empty($result[0]['txt'])) {
                     $txt = explode('|', $result[0]['txt']);
