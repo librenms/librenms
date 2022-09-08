@@ -22,11 +22,10 @@
  * @copyright  2022 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
 $oids = SnmpQuery::allowUnordered()->hideMib()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(2);
 if (! empty($oids)) {
     $insert = [];
-    d_echo("Jetstream: FDB Table");
+    d_echo('Jetstream: FDB Table');
     foreach ($oids as $vlan => $oidData) {
         foreach ($oidData as $mac => $macData) {
             $port = $macData['dot1qTpFdbPort'];
