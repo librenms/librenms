@@ -1922,7 +1922,7 @@ function update_device(Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode($request->getContent(), true);
-    $bad_fields = ['device_id', 'hostname'];
+    $bad_fields = ['device_id', 'hostname', 'location'];
     if (empty($data['field'])) {
         return api_error(400, 'Device field to patch has not been supplied');
     } elseif (in_array($data['field'], $bad_fields)) {
