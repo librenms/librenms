@@ -10,11 +10,11 @@
                     "version": "6.10.007",
                     "hardware": "WS6-DGS-1210-52MP/F1",
                     "features": null,
+                    "location": null,
                     "os": "dlink",
                     "type": "network",
                     "serial": null,
-                    "icon": "dlink.svg",
-                    "location": null
+                    "icon": "dlink.svg"
                 }
             ]
         },

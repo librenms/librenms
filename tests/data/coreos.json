@@ -10,11 +10,11 @@
                     "version": "4.14.48-coreos-r2",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": null,
                     "os": "coreos",
                     "type": "server",
                     "serial": null,
-                    "icon": "coreos.svg",
-                    "location": null
+                    "icon": "coreos.svg"
                 }
             ]
         },

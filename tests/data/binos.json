@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "binos",
                     "type": "network",
                     "serial": null,
-                    "icon": "telco-systems.png",
-                    "location": null
+                    "icon": "telco-systems.png"
                 }
             ]
         },

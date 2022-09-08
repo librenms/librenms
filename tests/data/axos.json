@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "axos",
                     "type": "network",
                     "serial": null,
-                    "icon": "calix.svg",
-                    "location": null
+                    "icon": "calix.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "ciscoSB.23.1.1.1.3",
                     "features": null,
+                    "location": null,
                     "os": "ciscospa",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

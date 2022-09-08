@@ -28,11 +28,11 @@
                     "version": "6.07p1",
                     "hardware": "V5812G",
                     "features": null,
+                    "location": null,
                     "os": "dasan-nos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dasan.png",
-                    "location": null
+                    "icon": "dasan.png"
                 }
             ]
         },

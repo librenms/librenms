@@ -42,11 +42,11 @@
                     "version": null,
                     "hardware": "SuperStack 3",
                     "features": null,
+                    "location": null,
                     "os": "3com",
                     "type": "network",
                     "serial": null,
-                    "icon": "3com.png",
-                    "location": null
+                    "icon": "3com.png"
                 }
             ]
         },

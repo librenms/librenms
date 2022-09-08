@@ -10,11 +10,11 @@
                     "version": "AOS v3.7.3 / App v3.7.2",
                     "hardware": "Smart-UPS 1500 RM 617.3.I",
                     "features": null,
+                    "location": "<private>",
                     "os": "apc",
                     "type": "power",
                     "serial": "FFFFFFFFFFFF",
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

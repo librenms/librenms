@@ -10,11 +10,11 @@
                     "version": "5.90.1.2",
                     "hardware": " AXIS P1354",
                     "features": null,
+                    "location": null,
                     "os": "axiscam",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "axis.svg",
-                    "location": null
+                    "icon": "axis.svg"
                 }
             ]
         },

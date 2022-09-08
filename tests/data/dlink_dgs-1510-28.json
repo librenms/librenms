@@ -10,11 +10,11 @@
                     "version": "1.50.021",
                     "hardware": "DGS-1510-28",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": null,
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "Software 2.5.9.13, Bootldr 3.5.7.13, Firmware 3.5.7.13",
                     "hardware": "SG550XG-8F8T V01",
                     "features": "SG550XG-8F8T-K9",
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "DNI22280CSN",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

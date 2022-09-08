@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "apsoluteos",
                     "type": "network",
                     "serial": null,
-                    "icon": "radware.svg",
-                    "location": null
+                    "icon": "radware.svg"
                 }
             ]
         },

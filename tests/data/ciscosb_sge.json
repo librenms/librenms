@@ -10,11 +10,11 @@
                     "version": "Software 3.0.0.18, Firmware 2.0.0.03",
                     "hardware": "SGE2010-48 00.00.01",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "DNI1446B72Z",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

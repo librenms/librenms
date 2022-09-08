@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "cmm4",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": null
+                    "icon": "cambium.svg"
                 }
             ]
         },

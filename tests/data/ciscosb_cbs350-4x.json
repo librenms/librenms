@@ -10,11 +10,11 @@
                     "version": "Software 3.1.1.4, Bootldr 3.0.0.40, Firmware 3.0.0.40",
                     "hardware": "CBS350-24P-4X V01",
                     "features": "CBS350-24P-4X",
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "FOC2506LLVF",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

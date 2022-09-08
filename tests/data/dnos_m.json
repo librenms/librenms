@@ -28,11 +28,11 @@
                     "version": "9.11(2.6)",
                     "hardware": "PE-FN-2210S-IOM",
                     "features": null,
+                    "location": null,
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
+                    "icon": "dell.svg"
                 }
             ]
         },

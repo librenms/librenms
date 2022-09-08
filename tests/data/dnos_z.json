@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
+                    "icon": "dell.svg"
                 }
             ]
         },

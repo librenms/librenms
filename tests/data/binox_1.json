@@ -28,11 +28,11 @@
                     "version": "2.4.R3.1.1",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "binox",
                     "type": "network",
                     "serial": null,
-                    "icon": "telco-systems.png",
-                    "location": "<private>"
+                    "icon": "telco-systems.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "4.0.1.07",
                     "hardware": "AT-TQ4600",
                     "features": null,
+                    "location": "<private>",
                     "os": "allied-tq",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

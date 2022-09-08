@@ -10,11 +10,11 @@
                     "version": "4.04.B005",
                     "hardware": "DGS-3000-28X Rev. B1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "SY321IA000068",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

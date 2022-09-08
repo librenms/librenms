@@ -10,11 +10,11 @@
                     "version": "AOS v3.5.9 / App v3.5.6",
                     "hardware": "Web/SNMP Management Card",
                     "features": null,
+                    "location": null,
                     "os": "apc",
                     "type": "power",
                     "serial": null,
-                    "icon": "apc.svg",
-                    "location": null
+                    "icon": "apc.svg"
                 }
             ]
         },

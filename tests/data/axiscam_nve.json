@@ -10,11 +10,11 @@
                     "version": "5.75.1",
                     "hardware": " AXIS M7011",
                     "features": null,
+                    "location": null,
                     "os": "axiscam",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "axis.svg",
-                    "location": null
+                    "icon": "axis.svg"
                 }
             ]
         },
