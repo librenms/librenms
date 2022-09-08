@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Events\ServicePolled;
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
@@ -53,6 +55,9 @@ class ServicesPoll extends LnmsCommand
         $this->newLine();
         $poller_start = microtime(true);
         $polled_services = 0;
+        Event::listen(ServicePolled::class, function () use (&$polled_services) {
+            $polled_services++;
+        });
 
         Device::when($this->argument('device spec'), function ($query, $host) {
             if (is_numeric($host)) {
@@ -66,7 +71,7 @@ class ServicesPoll extends LnmsCommand
             Log::info("Device: {$device['hostname']}");
             $os = \LibreNMS\OS::make($device);
             $services = new \LibreNMS\Modules\Services();
-            $polled_services += $services->poll($os);
+            $services->poll($os);
         });
 
         $poller_end = microtime(true);

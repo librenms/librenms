@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Events\ServicePolled;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Models\Device;
 use App\Models\Service;
@@ -41,6 +42,11 @@ use Symfony\Component\Process\Process;
 
 class Services implements Module
 {
+    public function dependencies(): array
+    {
+        return [];
+    }
+
     public function discover(OS $os): void
     {
         if (Config::get('discover_services_templates')) {
@@ -90,9 +96,8 @@ class Services implements Module
         }
     }
 
-    public function poll(OS $os): int
+    public function poll(OS $os): void
     {
-        $count = 0;
         $device = $os->getDevice();
 
         /** @var Service $service */
@@ -113,15 +118,25 @@ class Services implements Module
             $this->saveMetrics($response->metrics, $service, $os);
 
             $service->save(); // save if changed
-            $count++;
-        }
 
-        return $count;
+            ServicePolled::dispatch($service);
+        }
     }
 
-    public function cleanup(OS $os): void
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->services()->delete();
+        $device->services()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'services' => $device->services()->orderBy('service_type')->orderBy('service_ip')
+                ->get()->map->makeHidden(['service_id', 'device_id'])
+        ];
     }
 
     public function checkService(Service $service): ServiceCheckResponse
@@ -230,5 +245,4 @@ class Services implements Module
         $metrics[$normalized_ds] = true;
         return $normalized_ds;
     }
-
 }
