@@ -1,6 +1,8 @@
 <?php
 
 // This file prints a table row for each interface
+use app\Models\Ipv4Address;
+use app\Models\Ipv6Address;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -35,12 +37,12 @@ if ($port['ifAlias']) {
 
 $break = '';
 if ($port_details) {
-    foreach (dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip) {
+    foreach (Ipv4Address::where('port_id', (string) $port['port_id']) as $ip) {
         echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip['ipv4_address'] . "')\">" . $ip['ipv4_address'] . '/' . $ip['ipv4_prefixlen'] . '</a>';
         $break = ',';
     }
 
-    foreach (dbFetchRows('SELECT * FROM `ipv6_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip6) {
+    foreach (Ipv6Address::where('port_id', (string) $port['port_id']) as $ip6) {
         echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=" . $ip6['ipv6_address'] . "')\">" . IP::parse($ip6['ipv6_address'], true) . '/' . $ip6['ipv6_prefixlen'] . '</a>';
         $break = ',';
     }
@@ -63,9 +65,9 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . \LibreNMS\Util\Number::formatSi($port['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAturChanCurrTxRate'], 2, 3, 'bps');
+echo '' . \LibreNMS\Util\Number::formatSi($port['xdsl2ChStatusActDataRateXtur'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['xdsl2ChStatusActDataRateXtuc'], 2, 3, 'bps');
 echo '<br />';
-$port['graph_type'] = 'port_adsl_speed';
+$port['graph_type'] = 'port_vdsl_speed';
 echo generate_port_link(
     $port,
     "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
@@ -73,9 +75,9 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . \LibreNMS\Util\Number::formatSi($port['adslAturCurrAttainableRate'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['adslAtucCurrAttainableRate'], 2, 3, 'bps');
+echo '' . \LibreNMS\Util\Number::formatSi($port['xdsl2LineStatusAttainableRateDs'], 2, 3, 'bps') . '/' . \LibreNMS\Util\Number::formatSi($port['xdsl2LineStatusAttainableRateUs'], 2, 3, 'bps');
 echo '<br />';
-$port['graph_type'] = 'port_adsl_attainable';
+$port['graph_type'] = 'port_vdsl_attainable';
 echo generate_port_link(
     $port,
     "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
@@ -83,29 +85,29 @@ echo generate_port_link(
 );
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrAtn'] . 'dB/' . $port['adslAtucCurrAtn'] . 'dB';
-echo '<br />';
-$port['graph_type'] = 'port_adsl_attenuation';
-echo generate_port_link(
-    $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
-    $port['graph_type']
-);
+//echo '' . $port['adslAturCurrAtn'] . 'dB/' . $port['adslAtucCurrAtn'] . 'dB';
+//echo '<br />';
+//$port['graph_type'] = 'port_adsl_attenuation';
+//echo generate_port_link(
+//    $port,
+//    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+//    $port['graph_type']
+//);
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrSnrMgn'] . 'dB/' . $port['adslAtucCurrSnrMgn'] . 'dB';
-echo '<br />';
-$port['graph_type'] = 'port_adsl_snr';
-echo generate_port_link(
-    $port,
-    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
-    $port['graph_type']
-);
+//echo '' . $port['adslAturCurrSnrMgn'] . 'dB/' . $port['adslAtucCurrSnrMgn'] . 'dB';
+//echo '<br />';
+//$port['graph_type'] = 'port_adsl_snr';
+//echo generate_port_link(
+//    $port,
+//    "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",
+//    $port['graph_type']
+//);
 
 echo '</td><td width=135>';
-echo '' . $port['adslAturCurrOutputPwr'] . 'dBm/' . $port['adslAtucCurrOutputPwr'] . 'dBm';
+echo '' . $port['xdsl2LineStatusActAtpDs'] . 'dBm/' . $port['xdsl2LineStatusActAtpUs'] . 'dBm';
 echo '<br />';
-$port['graph_type'] = 'port_adsl_power';
+$port['graph_type'] = 'port_vdsl_power';
 echo generate_port_link(
     $port,
     "<img src='graph.php?type=" . $port['graph_type'] . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . Config::get('time.now') . '&amp;width=' . $width . '&amp;height=' . $height . '&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "'>",

@@ -33,8 +33,8 @@ if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '" . $
     $menu_options['neighbours'] = 'Neighbours';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'")) {
-    $menu_options['adsl'] = 'ADSL';
+if (DeviceCache::getPrimary()->portsAdsl()->exists() || DeviceCache::getPrimary()->portsVdsl()->exists()) {
+    $menu_options['xdsl'] = 'xDSL';
 }
 
 $sep = '';
@@ -123,7 +123,7 @@ if ($vars['view'] == 'minigraphs') {
     }
 
     echo '</div>';
-} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
+} elseif ($vars['view'] == 'arp' || $vars['view'] == 'xdsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
     include 'ports/' . $vars['view'] . '.inc.php';
 } else {
     if ($vars['view'] == 'details') {
