@@ -106,8 +106,8 @@ class AvailabilityMapController extends WidgetController
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         $data = [];
 
-        // add another field for the selected display text
-        $display_text_int = $settings['color_only_select'];
+        // add another field for the selected device label
+        $label_type = $settings['color_only_select'];
 
         foreach ($devices as $device) {
             $row = ['device' => $device];
@@ -140,36 +140,38 @@ class AvailabilityMapController extends WidgetController
                 $totals['maintenance']++;
             }
 
-            if ($display_text_int == 1) {
-                $row['displayText'] = null;
-            } elseif ($display_text_int == 4) {
-                $row['displayText'] = strtolower($device->shortDisplayName());
-            } elseif ($display_text_int == 2) {
-                $row['displayText'] = strtolower($device->hostname);
-            } elseif ($display_text_int == 3) {
-                $row['displayText'] = strtolower($device->sysName);
+
+
+            if ($label_type == 1) {
+                $row['label'] = null;
+            } elseif ($label_type == 4) {
+                $row['label'] = strtolower($device->shortDisplayName());
+            } elseif ($label_type == 2) {
+                $row['label'] = strtolower($device->hostname);
+            } elseif ($label_type == 3) {
+                $row['label'] = strtolower($device->sysName);
             } else {
-                $row['displayText'] = $device->status;
+                $row['label'] = $device->status;
             }
 
             $data[] = $row;
         }
 
-        // now apply sorting, depending on the selected Display Text
+        // now apply sorting, depending on the selected device label
         $order_by = $settings['order_by'];
 
         if ($order_by == 'status') {
             usort($data, function ($l, $r) {
                 $retval = $l['device']->status <=> $r['device']->status;
                 if ($retval == 0) {
-                    $retval = $l['displayText'] <=> $r['displayText'];
+                    $retval = $l['label'] <=> $r['label'];
                 }
 
                 return $retval;
             });
-        } elseif ($order_by == 'display') {
+        } elseif ($order_by == 'label') {
             usort($data, function ($l, $r) {
-                return $l['displayText'] <=> $r['displayText'];
+                return $l['label'] <=> $r['label'];
             });
         }
 
