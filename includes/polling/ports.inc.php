@@ -331,15 +331,6 @@ if (file_exists($os_file)) {
     require $os_file;
 }
 
-if (Config::get('enable_ports_adsl')) {
-    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl','vdsl2')", [$device['device_id']]);
-}
-
-if ($device['xdsl_count'] > '0') {
-    echo 'ADSL ';
-    $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1', $port_stats, 'ADSL-LINE-MIB');
-}//end if
-
 if (Config::get('enable_ports_poe')) {
     // Code by OS device
 
@@ -911,11 +902,6 @@ foreach ($ports as $port) {
             // Do EtherLike-MIB
             if (Config::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';
-            }
-
-            // Do ADSL MIB
-            if (Config::get('enable_ports_adsl')) {
-                include 'ports/port-adsl.inc.php';
             }
 
             // Do PoE MIBs

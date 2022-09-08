@@ -10,3 +10,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.6368.2
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

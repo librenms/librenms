@@ -99,13 +99,15 @@ class AvailabilityMapController extends WidgetController
         if (! $settings['show_disabled_and_ignored']) {
             $device_query->isNotDisabled();
         }
-        $device_query->orderBy($settings['order_by']);
         $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
 
         // process status
-        $uptime_warn = Config::get('uptime_warning', 84600);
+        $uptime_warn = Config::get('uptime_warning', 86400);
         $totals = ['warn' => 0, 'up' => 0, 'down' => 0, 'maintenance' => 0, 'ignored' => 0, 'disabled' => 0];
         $data = [];
+
+        // add another field for the selected device label
+        $label_type = $settings['color_only_select'];
 
         foreach ($devices as $device) {
             $row = ['device' => $device];
@@ -137,7 +139,38 @@ class AvailabilityMapController extends WidgetController
                 $row['labelClass'] = 'label-default';
                 $totals['maintenance']++;
             }
+
+            if ($label_type == 1) {
+                $row['label'] = null;
+            } elseif ($label_type == 4) {
+                $row['label'] = strtolower($device->shortDisplayName());
+            } elseif ($label_type == 2) {
+                $row['label'] = strtolower($device->hostname);
+            } elseif ($label_type == 3) {
+                $row['label'] = strtolower($device->sysName);
+            } else {
+                $row['label'] = $device->status;
+            }
+
             $data[] = $row;
+        }
+
+        // now apply sorting, depending on the selected device label
+        $order_by = $settings['order_by'];
+
+        if ($order_by == 'status') {
+            usort($data, function ($l, $r) {
+                $retval = $l['device']->status <=> $r['device']->status;
+                if ($retval == 0) {
+                    $retval = $l['label'] <=> $r['label'];
+                }
+
+                return $retval;
+            });
+        } elseif ($order_by == 'label') {
+            usort($data, function ($l, $r) {
+                return $l['label'] <=> $r['label'];
+            });
         }
 
         return [$data, $totals];

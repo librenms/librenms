@@ -74,7 +74,7 @@ $config['poller_modules']['ports']                       = true;
 $config['poller_modules']['nac']                         = false;
 $config['poller_modules']['bgp-peers']                   = true;
 $config['poller_modules']['junose-atm-vp']               = false;
-$config['poller_modules']['toner']                       = false;
+$config['poller_modules']['printer-supplies']            = false;
 $config['poller_modules']['ucd-diskio']                  = true;
 $config['poller_modules']['wireless']                    = true;
 $config['poller_modules']['ospf']                        = true;
@@ -101,6 +101,7 @@ $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['services']                    = true;
 $config['poller_modules']['loadbalancers']               = false;
+$config['poller_modules']['mef']                         = false;
 $config['poller_modules']['mef']                         = false;
 ```
 
@@ -149,13 +150,15 @@ $config['os']['linux']['poller_modules']['unix-agent'] = true;
 `ports`: This module will detect all ports on a device excluding ones
 configured to be ignored by config options.
 
+`xdsl`: This module will collect more metrics for xdsl interfaces.
+
 `nac`: Network Access Control (NAC) or 802.1X support.
 
 `bgp-peers`: BGP detection and support.
 
 `junose-atm-vp`: Juniper ATM support.
 
-`toner`: Toner levels support.
+`printer-supplies`: Toner levels support.
 
 `ucd-diskio`: Disk I/O support.
 

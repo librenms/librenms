@@ -6,6 +6,8 @@ $(function () {
 <?php
 
 use App\Models\Port;
+use App\Models\PortAdsl;
+use App\Models\PortVdsl;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
@@ -30,7 +32,8 @@ if (isset($int_colour)) {
     $i++;
 }
 
-$port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', [$port['port_id']]);
+$port_adsl = PortAdsl::where('port_id', '=', $port['port_id']);
+$port_vdsl = PortVdsl::where('port_id', '=', $port['port_id']);
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
@@ -141,22 +144,30 @@ if ($vlan_count > 1) {
     echo "<p style='color: green;'>" . $vrf['vrf_name'] . '</p>';
 }//end if
 
-if (! empty($port_adsl['adslLineCoding'])) {
+if (! empty($port_adsl->adslLineCoding)) {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo $port_adsl['adslLineCoding'] . '/' . rewrite_adslLineType($port_adsl['adslLineType']);
+    echo $port_adsl->adslLineCoding . '/' . rewrite_adslLineType($port_adsl->adslLineType);
     echo '<br />';
     // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
     // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
-    echo 'Sync:' . Number::formatSi($port_adsl['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAturChanCurrTxRate'], 2, 3, 'bps');
+    echo 'Sync:' . Number::formatSi($port_adsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($port_adsl->adslAturChanCurrTxRate, 2, 3, 'bps');
     echo '<br />';
     // This is the Receive Max AttainableRate, so :
     //    adslAturCurrAttainableRate is DownloadMaxRate
     //    adslAtucCurrAttainableRate is UploadMaxRate
-    echo 'Max:' . Number::formatSi($port_adsl['adslAturCurrAttainableRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAtucCurrAttainableRate'], 2, 3, 'bps');
+    echo 'Max:' . Number::formatSi($port_adsl->adslAturCurrAttainableRate, 2, 3, 'bps') . '/' . Number::formatSi($port_adsl->adslAtucCurrAttainableRate, 2, 3, 'bps');
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
+    echo 'Atten:' . $port_adsl->adslAturCurrAtn . 'dB/' . $port_adsl->adslAtucCurrAtn . 'dB';
     echo '<br />';
-    echo 'SNR:' . $port_adsl['adslAturCurrSnrMgn'] . 'dB/' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB';
+    echo 'SNR:' . $port_adsl->adslAturCurrSnrMgn . 'dB/' . $port_adsl->adslAtucCurrSnrMgn . 'dB';
+} elseif (! empty($port_vdsl->xdsl2LineStatusAttainableRateDs)) {
+    echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
+    echo '<br />';
+    // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
+    // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
+    echo 'Sync:' . Number::formatSi($port_vdsl->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps');
+    echo '<br />';
+    echo 'Max:' . Number::formatSi($port_vdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps');
 } else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {

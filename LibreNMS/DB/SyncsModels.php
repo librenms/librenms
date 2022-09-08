@@ -25,6 +25,7 @@
 
 namespace LibreNMS\DB;
 
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Collection;
 
 trait SyncsModels
@@ -63,7 +64,13 @@ trait SyncsModels
         }
 
         $new = $models->diffKeys($existing);
-        $device->$relationship()->saveMany($new);
+        if (is_a($device->$relationship(), HasManyThrough::class)) {
+            // if this is a distant relation, the models need the intermediate relationship set
+            // just save assuming things are correct
+            $new->each->save();
+        } else {
+            $device->$relationship()->saveMany($new);
+        }
 
         return $existing->map->first()->merge($new);
     }

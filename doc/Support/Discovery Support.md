@@ -93,7 +93,7 @@ $config['discovery_modules']['bgp-peers']            = true;
 $config['discovery_modules']['vlans']                = true;
 $config['discovery_modules']['vmware-vminfo']        = false;
 $config['discovery_modules']['libvirt-vminfo']       = false;
-$config['discovery_modules']['toner']                = false;
+$config['discovery_modules']['printer-supplies']     = false;
 $config['discovery_modules']['ucd-diskio']           = true;
 $config['discovery_modules']['applications']         = false;
 $config['discovery_modules']['services']             = true;
@@ -103,6 +103,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['xdsl']                 = false;
 ```
 
 ## OS based Discovery config
@@ -129,6 +130,8 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 configured to be ignored by config options.
 
 `ports-stack`: Same as ports except for stacks.
+
+`xdsl`: Module to collect more metrics for xDSL interfaces.
 
 `entity-physical`: Module to pick up the devices hardware support.
 
@@ -181,7 +184,7 @@ device, with history data.
 
 `libvirt-vminfo`: Detection of libvirt guests.
 
-`toner`: Toner levels support.
+`printer-supplies`: Toner levels support.
 
 `ucd-diskio`: Disk I/O support.
 
