@@ -431,7 +431,7 @@ class Cisco extends OS implements
 
             // Lets process each SLA
             $unixtime = intval(($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset));
-            $time = strftime('%Y-%m-%d %H:%M:%S', $unixtime);
+            $time = date('Y-m-d H:i:s', $unixtime);
 
             // Save data
             $sla->rtt = $data[$sla_nr]['rttMonLatestRttOperCompletionTime'];
