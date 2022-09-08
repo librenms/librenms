@@ -56,7 +56,6 @@ if (Config::get('enable_bgp')) {
 
                 if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                     $row = [
-                        'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
                         'bgpPeerIdentifier' => $address,
                         'bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'],
@@ -72,7 +71,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                    BgpPeer::create($row);
+                    DeviceCache::getPrimary()->bgppeers()->create($row);
 
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
