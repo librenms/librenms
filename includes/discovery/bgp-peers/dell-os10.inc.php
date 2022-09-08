@@ -40,7 +40,7 @@ if (Config::get('enable_bgp')) {
             $bgpPeers[$vrfInstance][$address] = $value;
         }
         unset($bgpPeersCache);
-        
+
         $vrfs = DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid');
 
         foreach ($bgpPeers as $vrfInstance => $peer) {
