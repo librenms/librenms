@@ -20,7 +20,7 @@
             <option value="1" @if($color_only_select == 1) selected @endif>{{ __('empty') }}</option>
             <option value="4" @if($color_only_select == 4) selected @endunless>{{ __('Display Name') }}</option>
             <option value="2" @if($color_only_select == 2) selected @endunless>{{ __('Hostname') }}</option>
-            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('System Name') }}</option>
+            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('SNMP sysName') }}</option>
             <option value="0" @unless($color_only_select) selected @endunless>{{ __('Device Status') }}</option>
         </select>
     </div>
