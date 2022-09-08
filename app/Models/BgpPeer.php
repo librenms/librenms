@@ -36,7 +36,7 @@ class BgpPeer extends DeviceRelatedModel
     protected $table = 'bgpPeers';
     protected $primaryKey = 'bgpPeer_id';
     protected $fillable = [
-        'device_id',
+//        'device_id',
         'vrf_id',
         'bgpPeerIdentifier',
         'bgpPeerRemoteAs',
