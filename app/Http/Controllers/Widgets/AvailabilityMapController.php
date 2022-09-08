@@ -140,8 +140,6 @@ class AvailabilityMapController extends WidgetController
                 $totals['maintenance']++;
             }
 
-
-
             if ($label_type == 1) {
                 $row['label'] = null;
             } elseif ($label_type == 4) {
