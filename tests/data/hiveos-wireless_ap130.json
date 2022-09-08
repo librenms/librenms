@@ -10,11 +10,11 @@
                     "version": "8.1r2a build-178408",
                     "hardware": "AP130",
                     "features": null,
+                    "location": "<private>",
                     "os": "hiveos-wireless",
                     "type": "wireless",
                     "serial": "01301603336863",
-                    "icon": "aerohive.svg",
-                    "location": "<private>"
+                    "icon": "aerohive.svg"
                 }
             ]
         },

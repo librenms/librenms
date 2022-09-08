@@ -10,11 +10,11 @@
                     "version": "2.30.0004",
                     "hardware": "93PS 20kW",
                     "features": "Network Management Card V6.00 LD",
+                    "location": "<private>",
                     "os": "eaton-mgeups",
                     "type": "power",
                     "serial": "H2652000009",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

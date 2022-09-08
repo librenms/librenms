@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "48G",
                     "features": null,
+                    "location": null,
                     "os": "powerconnect",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
+                    "icon": "dell.svg"
                 }
             ]
         },

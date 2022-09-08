@@ -10,11 +10,11 @@
                     "version": "CS121 v 4.26.14",
                     "hardware": "Rittal RITTAL PMC Extension",
                     "features": null,
+                    "location": "<private>",
                     "os": "generex-ups",
                     "type": "power",
                     "serial": null,
-                    "icon": "generex-ups.svg",
-                    "location": "<private>"
+                    "icon": "generex-ups.svg"
                 }
             ]
         },

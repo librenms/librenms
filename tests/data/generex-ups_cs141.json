@@ -10,11 +10,11 @@
                     "version": "CS141-SNMP V1.80.17 190618",
                     "hardware": "Multimatic Upscale",
                     "features": null,
+                    "location": "<private>",
                     "os": "generex-ups",
                     "type": "power",
                     "serial": null,
-                    "icon": "generex-ups.svg",
-                    "location": "<private>"
+                    "icon": "generex-ups.svg"
                 }
             ]
         },

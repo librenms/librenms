@@ -10,11 +10,11 @@
                     "version": "3.20.0 Build 20200730 Rel.32643",
                     "hardware": "TL-SG2210P 3.20",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetstream",
                     "type": "network",
                     "serial": "22064D8000919",
-                    "icon": "tplink.svg",
-                    "location": "<private>"
+                    "icon": "tplink.svg"
                 }
             ]
         },

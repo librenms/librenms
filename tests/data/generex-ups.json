@@ -10,11 +10,11 @@
                     "version": "5.14.50",
                     "hardware": "CS121",
                     "features": null,
+                    "location": null,
                     "os": "generex-ups",
                     "type": "power",
                     "serial": null,
-                    "icon": "generex-ups.svg",
-                    "location": null
+                    "icon": "generex-ups.svg"
                 }
             ]
         },

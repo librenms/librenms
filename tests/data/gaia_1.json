@@ -10,11 +10,11 @@
                     "version": "R80.20",
                     "hardware": "Standard PC (i440FX + PIIX, 1996)",
                     "features": null,
+                    "location": "<private>",
                     "os": "gaia",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },

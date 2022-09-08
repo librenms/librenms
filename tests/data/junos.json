@@ -10,11 +10,11 @@
                     "version": "12.3R11.2",
                     "hardware": "Juniper SRX100H2",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

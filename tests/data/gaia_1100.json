@@ -10,11 +10,11 @@
                     "version": "R77.20",
                     "hardware": "CP 1100",
                     "features": null,
+                    "location": null,
                     "os": "gaia",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "checkpoint.png",
-                    "location": null
+                    "icon": "checkpoint.png"
                 }
             ]
         },

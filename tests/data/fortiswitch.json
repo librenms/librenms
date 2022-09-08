@@ -28,11 +28,11 @@
                     "version": "3.3.3",
                     "hardware": "FortiSwitch-248D-FPOE",
                     "features": null,
+                    "location": null,
                     "os": "fortiswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fortinet.svg",
-                    "location": null
+                    "icon": "fortinet.svg"
                 }
             ]
         },

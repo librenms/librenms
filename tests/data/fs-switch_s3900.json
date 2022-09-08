@@ -10,11 +10,11 @@
                     "version": "1.6.9R2",
                     "hardware": "S3900-24T4S",
                     "features": null,
+                    "location": "<private>",
                     "os": "fs-switch",
                     "type": "network",
                     "serial": "CG1906181563N0093",
-                    "icon": "fs.svg",
-                    "location": "<private>"
+                    "icon": "fs.svg"
                 }
             ]
         },

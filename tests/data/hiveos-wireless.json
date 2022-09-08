@@ -10,11 +10,11 @@
                     "version": "8.1r2a build-178408",
                     "hardware": "AP250",
                     "features": null,
+                    "location": "<private>",
                     "os": "hiveos-wireless",
                     "type": "wireless",
                     "serial": "02501608254257",
-                    "icon": "aerohive.svg",
-                    "location": "<private>"
+                    "icon": "aerohive.svg"
                 }
             ]
         },

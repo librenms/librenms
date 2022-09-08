@@ -28,11 +28,11 @@
                     "version": "6.6.0.0-22530",
                     "hardware": "MSM765",
                     "features": null,
+                    "location": null,
                     "os": "hpmsm",
                     "type": "wireless",
                     "serial": "FFFFFFFFFF",
-                    "icon": "hp.svg",
-                    "location": null
+                    "icon": "hp.svg"
                 }
             ]
         },

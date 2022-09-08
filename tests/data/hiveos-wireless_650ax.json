@@ -10,11 +10,11 @@
                     "version": "10.0r7a build-232353",
                     "hardware": "AP650X",
                     "features": null,
+                    "location": "<private>",
                     "os": "hiveos-wireless",
                     "type": "wireless",
                     "serial": "16501810030163",
-                    "icon": "aerohive.svg",
-                    "location": "<private>"
+                    "icon": "aerohive.svg"
                 }
             ]
         },

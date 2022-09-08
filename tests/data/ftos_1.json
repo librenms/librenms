@@ -39,11 +39,11 @@
                     "version": "8.3.2.0",
                     "hardware": "C300",
                     "features": null,
+                    "location": null,
                     "os": "ftos",
                     "type": "network",
                     "serial": null,
-                    "icon": "force10.svg",
-                    "location": null
+                    "icon": "force10.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.0.0.45",
                     "hardware": "PowerConnect 2824",
                     "features": "24-port 10/100/1000 Gigabit Switch",
+                    "location": "<private>",
                     "os": "powerconnect",
                     "type": "network",
                     "serial": "CN000000000000000000000",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

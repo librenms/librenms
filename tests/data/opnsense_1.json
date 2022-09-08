@@ -10,11 +10,11 @@
                     "version": "20.1.2",
                     "hardware": "amd64/OpenSSL",
                     "features": null,
+                    "location": null,
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.svg",
-                    "location": null
+                    "icon": "opnsense.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "R80.20",
                     "hardware": "Check Point 15600",
                     "features": null,
+                    "location": "<private>",
                     "os": "gaia",
                     "type": "firewall",
                     "serial": "LR201805015955",
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },

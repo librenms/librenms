@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "poweralert",
                     "type": "power",
                     "serial": null,
-                    "icon": "tripplite.svg",
-                    "location": "<private>"
+                    "icon": "tripplite.svg"
                 }
             ]
         },

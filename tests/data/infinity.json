@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "NFT 2N",
                     "features": null,
+                    "location": null,
                     "os": "infinity",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ligowave.png",
-                    "location": null
+                    "icon": "ligowave.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "W.15.08.0012",
                     "hardware": "J9146A E2910al-24G-PoE",
                     "features": null,
+                    "location": "<private>",
                     "os": "procurve",
                     "type": "network",
                     "serial": "AB123CD45E",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

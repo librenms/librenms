@@ -10,11 +10,11 @@
                     "version": "5.170 (V200R009C00SPC500) [ARV200R009SPH025]",
                     "hardware": "AR169F",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": "21500101573GK1000299",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "12.06.0069",
                     "hardware": "SMART1500RMXL2UA",
                     "features": "Envirosense",
+                    "location": "location1",
                     "os": "poweralert",
                     "type": "power",
                     "serial": "upsserialnum",
-                    "icon": "tripplite.svg",
-                    "location": "location1"
+                    "icon": "tripplite.svg"
                 }
             ]
         },

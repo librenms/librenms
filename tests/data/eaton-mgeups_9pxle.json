@@ -10,11 +10,11 @@
                     "version": "01.16.4638",
                     "hardware": "Eaton 9PX 1000i RT 2U",
                     "features": "Network Management Card V6.00 LE",
+                    "location": "<private>",
                     "os": "eaton-mgeups",
                     "type": "power",
                     "serial": "GA10J05109",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

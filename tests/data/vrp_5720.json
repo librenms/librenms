@@ -10,11 +10,11 @@
                     "version": "5.170 (V200R010C00SPC600) [4]",
                     "hardware": "S5720-56C-PWR-EI-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": "12345678",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

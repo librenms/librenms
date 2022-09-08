@@ -10,11 +10,11 @@
                     "version": "14.1X53-D40.8",
                     "hardware": "Juniper QFX5100-48S-6Q Switch",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "TA3716123456",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

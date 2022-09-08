@@ -10,11 +10,11 @@
                     "version": "V210R220",
                     "hardware": "S4800 FiberHome INP",
                     "features": "N/A",
+                    "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": "<private>"
+                    "icon": "fiberhome.svg"
                 }
             ]
         },

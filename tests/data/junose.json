@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "Juniper ERX-1400",
                     "features": null,
+                    "location": null,
                     "os": "junose",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": null
+                    "icon": "junos.png"
                 }
             ]
         },

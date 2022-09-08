@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "moxa-etherdevice",
                     "type": "network",
                     "serial": null,
-                    "icon": "moxa.svg",
-                    "location": null
+                    "icon": "moxa.svg"
                 }
             ]
         },

@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "eltex-olt",
                     "type": "network",
                     "serial": null,
-                    "icon": "eltex.png",
-                    "location": null
+                    "icon": "eltex.png"
                 }
             ]
         },

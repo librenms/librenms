@@ -10,11 +10,11 @@
                     "version": "V210R240",
                     "hardware": "S5800 FHN USP",
                     "features": "2.0",
+                    "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": "<private>"
+                    "icon": "fiberhome.svg"
                 }
             ]
         },

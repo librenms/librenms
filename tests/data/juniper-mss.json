@@ -28,11 +28,11 @@
                     "version": "7.7.4.4",
                     "hardware": "WLC880R",
                     "features": null,
+                    "location": null,
                     "os": "juniper-mss",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": null
+                    "icon": "junos.png"
                 }
             ]
         },

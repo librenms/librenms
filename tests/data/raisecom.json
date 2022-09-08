@@ -10,11 +10,11 @@
                     "version": "8.2.29_20180611",
                     "hardware": "RAX711-C-DC/D-02 version A.02",
                     "features": null,
+                    "location": "<private>",
                     "os": "raisecom",
                     "type": "network",
                     "serial": "123002030702S18B08S0001G",
-                    "icon": "raisecom.png",
-                    "location": "<private>"
+                    "icon": "raisecom.png"
                 }
             ]
         },
