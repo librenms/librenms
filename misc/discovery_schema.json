@@ -365,7 +365,8 @@
         "oids": {
             "type": ["string", "array"],
             "items": {
-                "type": "string"
+                "type": "string",
+                "pattern": "^((?!sysDescr\\.0|1\\.3\\.6\\.1\\.2\\.1\\.1\\.1\\.0).)*$"
             }
         },
         "pre-cache": {
