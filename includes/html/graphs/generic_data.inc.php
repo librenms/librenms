@@ -88,9 +88,9 @@ if ($previous == 'yes') {
     $rrd_options .= ' VDEF:totoutX=outoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
     if ($percentile) {
-        $rrd_options .= ' CDEF:dpercentile_outnX=doutbitsX,' . $stacked['stacked'] . ',*';
+        $rrd_options .= ' CDEF:dpercentile_outnX=doutbits_maxX,' . $stacked['stacked'] . ',*';
         $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . $percentile . ',PERCENTNAN';
-        $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbitsX,doutbitsX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
+        $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbits_maxX,doutbits_maxX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
         $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
     }
 }
@@ -109,30 +109,30 @@ $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 if ($percentile) {
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits_max,' . $stacked['stacked'] . ',*';
     $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENTNAN';
-    $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
+    $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits_max,doutbits_max,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 }
 
 if ($format == 'octets' || $format == 'bytes') {
     if ($percentile) {
-        $rrd_options .= ' VDEF:percentile_in=inoctets,' . $percentile . ',PERCENTNAN';
-        $rrd_options .= ' VDEF:percentile_out=outoctets,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_in=inoctets_max,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_out=outoctets_max,' . $percentile . ',PERCENTNAN';
         if ($previous == 'yes') {
-            $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . $percentile . ',PERCENTNAN';
-            $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . $percentile . ',PERCENTNAN';
+            $rrd_options .= ' VDEF:percentile_inX=inoctets_maxX,' . $percentile . ',PERCENTNAN';
+            $rrd_options .= ' VDEF:percentile_outX=outoctets_maxX,' . $percentile . ',PERCENTNAN';
         }
     }
     $units = 'Bps';
     $format = 'octets';
 } else {
     if ($percentile) {
-        $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENTNAN';
-        $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_in=inbits_max,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_out=outbits_max,' . $percentile . ',PERCENTNAN';
         if ($previous == 'yes') {
-            $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENTNAN';
-            $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENTNAN';
+            $rrd_options .= ' VDEF:percentile_inX=inbits_maxX,' . $percentile . ',PERCENTNAN';
+            $rrd_options .= ' VDEF:percentile_outX=outbits_maxX,' . $percentile . ',PERCENTNAN';
         }
     }
     $units = 'bps';

@@ -18,10 +18,10 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 $length = 10;
-$percentile = Config::get('percentile_value');
+$percentile = \LibreNMS\Config::get('percentile_value');
 $print_total = $print_total ?? false;
 
-if (! isset($percentile)) {
+if ($percentile) {
     $length += 2;
 }
 
@@ -51,9 +51,11 @@ if ($print_total) {
 }
 
 if ($percentile) {
-    $rrd_options .= ' VDEF:percentile_in=in,' . $percentile . ',PERCENTNAN';
-    $rrd_options .= ' VDEF:percentile_out=out,' . $percentile . ',PERCENTNAN';
-    $rrd_options .= ' VDEF:dpercentile_out=dout,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:percentile_in=in_max,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:percentile_out=out_max,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:dpercentile_outnp=out_max,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' CDEF:dpercentile_outnpn=dout_max,dout_max,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
+    $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 }
 
 if (! empty($graph_max)) {
@@ -81,9 +83,12 @@ if (isset($_GET['previous']) && $_GET['previous'] == 'yes') {
     }
 
     if ($percentile) {
-        $rrd_options .= ' VDEF:percentile_inX=inX,' . $percentile . ',PERCENTNAN';
-        $rrd_options .= ' VDEF:percentile_outX=outX,' . $percentile . ',PERCENTNAN';
-        $rrd_options .= ' VDEF:dpercentile_outX=doutX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_inX=in_maxX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_outX=out_maxX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' CDEF:dpercentile_outnX=dout_maxX,' . $stacked['stacked'] . ',*';
+        $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' CDEF:dpercentile_outnpnX=dout_maxX,dout_maxX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
+        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
     }
 
     if ($graph_max) {
@@ -128,16 +133,20 @@ if ($print_total) {
     $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%s)\l'";
 }
 
-if ($percentile && Config::get('percentile_line')) {
+if ($percentile && \LibreNMS\Config::get('percentile_line')) {
     $rrd_options .= ' LINE1:percentile_in#aa0000';
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 }
 
 if (isset($_GET['previous']) && $_GET['previous'] == 'yes') {
-    $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
+    $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\n'";
     $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#666666:'Prev Out'";
     $rrd_options .= ' AREA:dout' . $format . 'X#99999966' . $stacked['transparency'] . ':';
+    if ($percentile && \LibreNMS\Config::get('percentile_line')) {
+        $rrd_options .= ' LINE1:percentile_inX#00aaaa';
+        $rrd_options .= ' LINE1:dpercentile_outX#00aaaa';
+    }
 }
 
 $rrd_options .= ' HRULE:0#999999';

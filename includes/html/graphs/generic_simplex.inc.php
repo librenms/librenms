@@ -6,7 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $multiplier = $multiplier ?? false;
 $print_total = $print_total ?? false;
-$percentile = Config::get('percentile_value');
+$percentile = \LibreNMS\Config::get('percentile_value');
 $unit_text = $unit_text ?? '';
 $line_text = $line_text ?? '';
 $previous = $_GET['previous'] ?? 'no';
@@ -21,8 +21,11 @@ if ($multiplier) {
 
     $rrd_options .= ' DEF:' . $ds . '_o=' . $rrd_filename . ':' . $ds . ':AVERAGE';
     $rrd_options .= ' CDEF:' . $ds . '=' . $ds . "_o,$multiplier,$multiplier_action";
+    $rrd_options .= ' DEF:' . $ds . '_o_max=' . $rrd_filename . ':' . $ds . ':MAX';
+    $rrd_options .= ' CDEF:' . $ds . '_max=' . $ds . "_o_max,$multiplier,$multiplier_action";
 } else {
     $rrd_options .= ' DEF:' . $ds . '=' . $rrd_filename . ':' . $ds . ':AVERAGE';
+    $rrd_options .= ' DEF:' . $ds . '_max=' . $rrd_filename . ':' . $ds . ':MAX';
 }
 
 if ($print_total) {
@@ -30,7 +33,7 @@ if ($print_total) {
 }
 
 if ($percentile) {
-    $rrd_options .= ' VDEF:' . $ds . '_percentile=' . $ds . ',' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:' . $ds . '_percentile=' . $ds . '_max,' . $percentile . ',PERCENTNAN';
 }
 
 if ($previous == 'yes') {
@@ -42,9 +45,14 @@ if ($previous == 'yes') {
         $rrd_options .= ' DEF:' . $ds . '_oX=' . $rrd_filename . ':' . $ds . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $ds . "_oX:$period";
         $rrd_options .= ' CDEF:' . $ds . 'X=' . $ds . "_oX,$multiplier,*";
+        $rrd_options .= ' DEF:' . $ds . '_o_maxX=' . $rrd_filename . ':' . $ds . ':MAX:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' SHIFT:' . $ds . "_o_maxX:$period";
+        $rrd_options .= ' CDEF:' . $ds . '_maxX=' . $ds . "_oX,$multiplier,*";
     } else {
         $rrd_options .= ' DEF:' . $ds . 'X=' . $rrd_filename . ':' . $ds . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $ds . "X:$period";
+        $rrd_options .= ' DEF:' . $ds . '_maxX=' . $rrd_filename . ':' . $ds . ':MAX:start=' . $prev_from . ':end=' . $from;
+        $rrd_options .= ' SHIFT:' . $ds . "_maxX:$period";
     }
 
     if ($print_total) {
@@ -52,7 +60,7 @@ if ($previous == 'yes') {
     }
 
     if ($percentile) {
-        $rrd_options .= ' VDEF:' . $ds . '_percentileX=' . $ds . ',' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:' . $ds . '_percentileX=' . $ds . '_maxX,' . $percentile . ',PERCENTNAN';
     }
 }//end if
 
@@ -81,11 +89,18 @@ if ($print_total) {
     $rrd_options .= ' GPRINT:' . $ds . '_total:Total" %6.' . $float_precision . 'lf%s"\\l';
 }
 
-if ($percentile && Config::get('percentile_line')) {
+if ($percentile && \LibreNMS\Config::get('percentile_line')) {
     $rrd_options .= ' LINE1:' . $ds . '_percentile#aa0000';
 }
 
 if ($previous == 'yes') {
-    $rrd_options .= ' LINE1.25:' . $ds . "X#666666:'Prev \\n'";
+    $rrd_options .= ' LINE1.25:' . $ds . "X#666666:'Prev        '";
     $rrd_options .= ' AREA:' . $ds . 'X#99999966:';
+    $rrd_options .= ' GPRINT:' . $ds . 'X:LAST:%6.' . $float_precision . 'lf%s';
+    $rrd_options .= ' GPRINT:' . $ds . 'X:AVERAGE:%6.' . $float_precision . 'lf%s';
+    $rrd_options .= ' GPRINT:' . $ds . 'X:MAX:%6.' . $float_precision . 'lf%s';
+    if ($percentile) {
+        $rrd_options .= ' GPRINT:' . $ds . '_percentileX:%6.' . $float_precision . 'lf%s';
+    }
+    $rrd_options .= '\\n';
 }
