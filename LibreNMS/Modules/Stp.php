@@ -29,11 +29,7 @@ use App\Models\Device;
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
-use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Module;
-use LibreNMS\Interfaces\Polling\StpInstancePolling;
-use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS;
 
 class Stp implements Module
@@ -52,40 +48,33 @@ class Stp implements Module
     {
         $device = $os->getDevice();
 
-        if ($os instanceof StpInstanceDiscovery) {
-            echo 'Instances: ';
-            $instances = $os->discoverStpInstances();
-            ModuleModelObserver::observe(\App\Models\Stp::class);
-            $this->syncModels($device, 'stpInstances', $instances);
+        echo 'Instances: ';
+        $instances = $os->discoverStpInstances();
+        ModuleModelObserver::observe(\App\Models\Stp::class);
+        $this->syncModels($device, 'stpInstances', $instances);
 
-            if ($os instanceof StpPortDiscovery) {
-                echo "\nPorts: ";
-                $ports = $os->discoverStpPorts($instances);
-                ModuleModelObserver::observe(PortStp::class);
-                $this->syncModels($device, 'stpPorts', $ports);
-            }
-            echo PHP_EOL;
-        }
+        echo "\nPorts: ";
+        $ports = $os->discoverStpPorts($instances);
+        ModuleModelObserver::observe(PortStp::class);
+        $this->syncModels($device, 'stpPorts', $ports);
+
+        echo PHP_EOL;
     }
 
     public function poll(OS $os): void
     {
         $device = $os->getDevice();
 
-        if ($os instanceof StpInstancePolling) {
-            echo 'Instances: ';
-            $instances = $device->stpInstances;
-            $instances = $os->pollStpInstances($instances);
-            ModuleModelObserver::observe(\App\Models\Stp::class);
-            $this->syncModels($device, 'stpInstances', $instances);
-        }
+        echo 'Instances: ';
+        $instances = $device->stpInstances;
+        $instances = $os->pollStpInstances($instances);
+        ModuleModelObserver::observe(\App\Models\Stp::class);
+        $this->syncModels($device, 'stpInstances', $instances);
 
-        if ($os instanceof StpPortPolling) {
-            echo "\nPorts: ";
-            $ports = $device->stpPorts;
-            ModuleModelObserver::observe(PortStp::class);
-            $this->syncModels($device, 'stpPorts', $ports);
-        }
+        echo "\nPorts: ";
+        $ports = $device->stpPorts;
+        ModuleModelObserver::observe(PortStp::class);
+        $this->syncModels($device, 'stpPorts', $ports);
     }
 
     public function cleanup(Device $device): void

@@ -27,7 +27,7 @@ class Twilio extends Transport
         $twilio_opts['sender'] = $this->config['twilio-sender'];
         $twilio_opts['to'] = $this->config['twilio-to'];
 
-        return $this->contacttwilio($obj, $twilio_opts);
+        return $this->contactTwilio($obj, $twilio_opts);
     }
 
     public static function contactTwilio($obj, $opts)
