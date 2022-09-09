@@ -39,23 +39,23 @@
                         }
                     },
                     "when": {
-                        "properties": {
-                            "setting": {
-                                "type": "string"
-                            },
-                            "operator": {
-                                "type": "string",
-                                "enum": [
-                                    "equals",
-                                    "in",
-                                    "not_equals"
-                                ]
-                            },
-                            "value": {
-                                "type": ["string", "array", "integer", "boolean"]
+                        "anyOf": [
+                            {"$ref": "#/definitions/when"},
+                            {
+                                "type": "object",
+                                "properties": {
+                                    "and": {
+                                        "type": "array",
+                                        "items": {"$ref": "#/definitions/when"}
+                                    },
+                                    "or": {
+                                        "type": "array",
+                                        "items": {"$ref": "#/definitions/when"}
+                                    }
+                                },
+                                "additionalProperties": false
                             }
-                        },
-                        "required": ["setting", "operator", "value"]
+                        ]
                     },
                     "disabled": {
                         "type": "boolean"
@@ -134,5 +134,37 @@
         }
     },
     "required": ["Warning!", "config"],
-    "additionalProperties": false
+    "additionalProperties": false,
+    "definitions": {
+        "when": {
+            "type": "object",
+            "properties": {
+                "setting": {
+                    "type": "string"
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "equals",
+                        "in",
+                        "not_equals"
+                    ]
+                },
+                "value": {
+                    "type": [
+                        "string",
+                        "array",
+                        "integer",
+                        "boolean"
+                    ]
+                }
+            },
+            "required": [
+                "setting",
+                "operator",
+                "value"
+            ],
+            "additionalProperties": false
+        }
+    }
 }
