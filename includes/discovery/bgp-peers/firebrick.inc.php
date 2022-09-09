@@ -65,7 +65,6 @@ foreach ($bgpPeers as $vrfId => $vrf) {
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
         if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
             $peers = [
-                'device_id' => $device['device_id'],
                 'vrf_id' => $vrfId,
                 'bgpPeerIdentifier' => $address,
                 'bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'],
@@ -81,14 +80,24 @@ foreach ($bgpPeers as $vrfId => $vrf) {
                 'bgpPeerInUpdateElapsedTime' => 0,
                 'astext' => $astext,
             ];
-            BgpPeer::create($peers);
+
+            DeviceCache::getPrimary()->bgppeers()->create($peers);
+
             if (Config::get('autodiscovery.bgp')) {
                 $name = gethostbyaddr($address);
                 discover_new_device($name, $device, 'BGP');
             }
             echo '+';
         } else {
-            dbUpdate(['bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+            $peers = [
+                'bgpPeerRemoteAs' => $value['fbBgpPeerRemoteAS'],
+                'astext' => $astext,
+            ];
+            DeviceCache::getPrimary()->bgppeers()->update([
+                'bgpPeerIdentifier' => $address,
+                'vrf_id' => $vrfId,
+            ],
+                $peers);
             echo '.';
         }
     }
