@@ -36,7 +36,8 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     // fetch vlan data
     $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts')->table(2);
     $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts')->table(2, $vlans);
-    if (empty($vlans)) {
+    // Q-BRIDGE-MIB::dot1qVlanCurrentX returns incorrect data for ICX64XX with v08.0.30uT313 
+    if (empty($vlans) || $device['version'] == '08.0.30uT313') {
         // fall back to static
         $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1, $vlans);
         $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1, $vlans);
