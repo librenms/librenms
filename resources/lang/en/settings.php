@@ -1032,12 +1032,12 @@ return [
             ],
         ],
         'percentile_line' => [
-            'description' => 'Show Line',
-            'help' => 'Draw the percentile line on graphs',
+            'description' => 'Show percentile line',
+            'help' => 'Draw the percentile line on relevant graphs',
         ],
         'percentile_value' => [
-            'description' => 'Percentile Value',
-            'help' => 'Percentile value for percentile calculation on relevant graphs',
+            'description' => 'Percentile value',
+            'help' => 'Percentile value for percentile calculation on relevant graphs. 0 disables percentile',
         ],
         'peeringdb' => [
             'enabled' => [
