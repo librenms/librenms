@@ -1938,7 +1938,15 @@ function update_device(Illuminate\Http\Request $request)
         if (count($data['field']) == count($data['data'])) {
             $update = [];
             for ($x = 0; $x < count($data['field']); $x++) {
-                $update[$data['field'][$x]] = $data['data'][$x];
+                $field = $data['field'][$x];
+                $field_data = $data['data'][$x];
+
+                if ($field == 'location') {
+                    $field = 'location_id';
+                    $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
+                }
+
+                $update[$field] = $field_data;
             }
             if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
                 return api_success_noresult(200, 'Device fields have been updated');
