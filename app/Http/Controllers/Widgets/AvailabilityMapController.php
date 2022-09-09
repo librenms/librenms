@@ -159,7 +159,7 @@ class AvailabilityMapController extends WidgetController
             }
 
             $data[] = [
-                'status' => $service->status,
+                'status' => $service->service_status,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
                 'label' => $this->getServiceLabel($service, $state_name),
