@@ -47,7 +47,13 @@
                                     "and": {
                                         "type": "array",
                                         "items": {"$ref": "#/definitions/when"}
-                                    },
+                                    }
+                                },
+                                "additionalProperties": false
+                            },
+                            {
+                                "type": "object",
+                                "properties": {
                                     "or": {
                                         "type": "array",
                                         "items": {"$ref": "#/definitions/when"}
