@@ -103,15 +103,6 @@ $rrd_options .= ' CDEF:doutbits_max=doutoctets_max,8,*';
 $rrd_options .= ' CDEF:inbits=inoctets,8,*';
 $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 
-if ($percentile) {
-    $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
-    $rrd_options .= ' VDEF:percentilehigh=highbits,' . $percentile . ',PERCENT';
-    if ($previous == 'yes') {
-        $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX,8,*';
-        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . $percentile . ',PERCENT';
-    }
-}
-
 $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
@@ -157,11 +148,6 @@ $rrd_options .= ' GPRINT:out' . $format . ':LAST:%6.' . $float_precision . 'lf%s
 $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
-
-if ($percentile) {
-    $rrd_options .= ' HRULE:percentilehigh#FF0000:"Highest"';
-    $rrd_options .= ' GPRINT:percentilehigh:"%30.' . $float_precision . 'lf%s\\n"';
-}
 
 $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%sB'";
 $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%sB'";
