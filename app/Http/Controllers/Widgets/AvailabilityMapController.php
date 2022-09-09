@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
 
@@ -55,8 +56,8 @@ class AvailabilityMapController extends WidgetController
     {
         $data = $this->getSettings();
 
-        [$devices, $device_totals] = $this->getDevices($request);
-        [$services, $services_totals] = $this->getServices($request);
+        [$devices, $device_totals] = $this->getDevices();
+        [$services, $services_totals] = $this->getServices();
 
         $data['devices'] = $devices;
         $data['device_totals'] = $device_totals;
@@ -71,7 +72,7 @@ class AvailabilityMapController extends WidgetController
         return view('widgets.settings.availability-map', $this->getSettings(true));
     }
 
-    private function getDevices(Request $request): array
+    private function getDevices(): array
     {
         $settings = $this->getSettings();
 
@@ -81,9 +82,9 @@ class AvailabilityMapController extends WidgetController
 
         // filter for by device group or show all
         if ($settings['device_group']) {
-            $device_query = DeviceGroup::find($settings['device_group'])->devices()->hasAccess($request->user());
+            $device_query = DeviceGroup::find($settings['device_group'])->devices()->hasAccess(Auth::user());
         } else {
-            $device_query = Device::hasAccess($request->user());
+            $device_query = Device::hasAccess(Auth::user());
         }
 
         if (! $settings['show_disabled_and_ignored']) {
@@ -125,7 +126,7 @@ class AvailabilityMapController extends WidgetController
         return [$data, $totals];
     }
 
-    private function getServices($request): array
+    private function getServices(): array
     {
         $settings = $this->getSettings();
 
@@ -135,9 +136,9 @@ class AvailabilityMapController extends WidgetController
 
         // filter for by device group or show all
         if ($settings['device_group']) {
-            $services_query = DeviceGroup::find($settings['device_group'])->services()->hasAccess($request->user());
+            $services_query = DeviceGroup::find($settings['device_group'])->services()->hasAccess(Auth::user());
         } else {
-            $services_query = Service::hasAccess($request->user());
+            $services_query = Service::hasAccess(Auth::user());
         }
 
         $services = $services_query->with([
