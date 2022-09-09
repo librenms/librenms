@@ -18,7 +18,7 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 $length = 10;
-$percentile = $percentile ?? false;
+$percentile = Config::get('rrdgraph_real_percentile') ? Config::get('percentile_value') : 0;
 $print_total = $print_total ?? false;
 
 if (! isset($percentile)) {

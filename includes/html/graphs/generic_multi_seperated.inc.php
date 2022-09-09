@@ -17,6 +17,7 @@ use LibreNMS\Config;
 
 require 'includes/html/graphs/common.inc.php';
 
+$percentile = Config::get('percentile_value');
 $format = $format ?? '';
 $previous = $_GET['previous'] ?? 'no';
 $transparency = $transparency ?? false;
@@ -203,10 +204,10 @@ if ($previous == 'yes') {
     $rrd_options .= ' CDEF:outbitsX=outBX,8,*';
     $rrd_options .= ' CDEF:bitsX=inbitsX,outbitsX,+';
     $rrd_options .= ' CDEF:doutbitsX=doutBX,8,*';
-    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,' . $percentile . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,-1,*,+';
     $rrd_options .= ' VDEF:dpercentile_outXpercn=dpercentile_outXnd,FIRST';
     $rrd_options .= ' VDEF:totinX=inBX,TOTAL';
@@ -232,10 +233,10 @@ if (! $nototal) {
     $rrd_options .= ' CDEF:outbits=outB,8,*';
     $rrd_options .= ' CDEF:bits=inbits,outbits,+';
     $rrd_options .= ' CDEF:doutbits=doutB,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inB,TOTAL';

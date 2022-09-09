@@ -6,7 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $multiplier = $multiplier ?? false;
 $print_total = $print_total ?? false;
-$percentile = $percentile ?? false;
+$percentile = Config::get('rrdgraph_real_percentile') ? Config::get('percentile_value') : 0;
 $unit_text = $unit_text ?? '';
 $line_text = $line_text ?? '';
 $previous = $_GET['previous'] ?? 'no';

@@ -4398,6 +4398,14 @@
             "type": "integer",
             "validate": {
                 "value": "integer|between:0,100"
+            },
+            "group": "webui",
+            "section": "graph",
+            "order": 41,
+            "when": {
+                "setting": "rrdgraph_real_percentile",
+                "operator": "equals",
+                "value": true
             }
         },
         "permission.device_group.allow_dynamic": {
@@ -4952,8 +4960,11 @@
             "type": "color"
         },
         "rrdgraph_real_percentile": {
-            "default": false,
-            "type": "boolean"
+            "default": true,
+            "type": "boolean",
+            "group": "webui",
+            "section": "graph",
+            "order": 40
         },
         "rrdtool": {
             "default": "rrdtool",

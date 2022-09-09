@@ -51,9 +51,10 @@
                                 ]
                             },
                             "value": {
-                                "type": ["string", "array"]
+                                "type": ["string", "array", "boolean"]
                             }
-                        }
+                        },
+                        "required": ["setting", "operator", "value"]
                     },
                     "disabled": {
                         "type": "boolean"

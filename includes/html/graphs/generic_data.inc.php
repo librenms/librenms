@@ -19,6 +19,7 @@ use LibreNMS\Util\Number;
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$percentile = Config::get('rrdgraph_real_percentile') ? Config::get('percentile_value') : 0;
 $inverse = $inverse ?? false;
 $multiplier = $multiplier ?? false;
 $format = $format ?? '';
@@ -87,7 +88,7 @@ if ($previous == 'yes') {
     $rrd_options .= ' VDEF:totoutX=outoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
     $rrd_options .= ' CDEF:dpercentile_outnX=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . $percentile . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbitsX,doutbitsX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
 }
@@ -102,12 +103,12 @@ $rrd_options .= ' CDEF:doutbits_max=doutoctets_max,8,*';
 $rrd_options .= ' CDEF:inbits=inoctets,8,*';
 $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 
-if (Config::get('rrdgraph_real_percentile')) {
+if ($percentile) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
-    $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentilehigh=highbits,' . $percentile . ',PERCENT';
     if ($previous == 'yes') {
         $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX,8,*';
-        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . $percentile . ',PERCENT';
     }
 }
 
@@ -115,31 +116,31 @@ $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
+$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT';
 $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
 $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
 if ($format == 'octets' || $format == 'bytes') {
-    $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inoctets,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outoctets,' . $percentile . ',PERCENT';
     if ($previous == 'yes') {
-        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . $percentile . ',PERCENT';
     }
     $units = 'Bps';
     $format = 'octets';
 } else {
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
     if ($previous == 'yes') {
-        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENT';
     }
     $units = 'bps';
     $format = 'bits';
 }
 
-$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . Config::get('percentile_value') . "th %\\n'";
+$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . $percentile . "th %\\n'";
 
 $rrd_options .= ' AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
 $rrd_options .= ' AREA:in' . $format . '#90B040' . $stacked['transparency'] . ':';
@@ -157,7 +158,7 @@ $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'l
 $rrd_options .= ' GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
 
-if (Config::get('rrdgraph_real_percentile')) {
+if ($percentile) {
     $rrd_options .= ' HRULE:percentilehigh#FF0000:"Highest"';
     $rrd_options .= ' GPRINT:percentilehigh:"%30.' . $float_precision . 'lf%s\\n"';
 }

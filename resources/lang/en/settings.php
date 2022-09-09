@@ -1031,6 +1031,10 @@ return [
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
         ],
+        'percentile_value' => [
+            'description' => 'Percentile Value',
+            'help' => 'Percentile value for percentile calculation on relevant graphs',
+        ],
         'peeringdb' => [
             'enabled' => [
                 'description' => 'Enable PeeringDB lookup',
@@ -1265,6 +1269,10 @@ return [
         'rrd_dir' => [
             'description' => 'RRD Location',
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
+        ],
+        'rrdgraph_real_percentile' => [
+            'description' => 'Show percentile',
+            'help' => 'Show percentile on relevant graphs. By default 95th percentile.',
         ],
         'rrd_purge' => [
             'description' => 'RRD Files entries older than',

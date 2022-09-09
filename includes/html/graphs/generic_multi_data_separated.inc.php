@@ -16,6 +16,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$percentile = \LibreNMS\Config::get('percentile_value');
 
 $i = 0;
 if ($width > '500') {
@@ -117,9 +118,9 @@ if (! $nototal) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
     $rrd_options .= ' VDEF:tot=octets,TOTAL';
