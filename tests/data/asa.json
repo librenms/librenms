@@ -3525,7 +3525,6 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "<private>",
-                    "local_addr": "<private>",
                     "local_port": 0,
                     "tunnel_name": "<private>",
                     "tunnel_status": ""
