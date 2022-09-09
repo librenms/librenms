@@ -19,6 +19,10 @@ use LibreNMS\Util\Number;
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$inverse = $inverse ?? false;
+$multiplier = $multiplier ?? false;
+$format = $format ?? '';
+$previous = $_GET['previous'] ?? 'no';
 
 if ($rrd_filename) {
     $rrd_filename_out = $rrd_filename;
@@ -49,7 +53,7 @@ if ($multiplier) {
     $rrd_options .= ' DEF:' . $in . 'octets_max=' . $rrd_filename_in . ':' . $ds_in . ':MAX';
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($previous == 'yes') {
     if ($multiplier) {
         $rrd_options .= ' DEF:p' . $out . 'octetsX=' . $rrd_filename_out . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' DEF:p' . $in . 'octetsX=' . $rrd_filename_in . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
@@ -101,7 +105,7 @@ $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 if (Config::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
     $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
-    if ($_GET['previous'] == 'yes') {
+    if ($previous == 'yes') {
         $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX,8,*';
         $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
     }
@@ -118,7 +122,7 @@ $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 if ($format == 'octets' || $format == 'bytes') {
     $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
-    if ($_GET['previous'] == 'yes') {
+    if ($previous == 'yes') {
         $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
         $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
     }
@@ -127,7 +131,7 @@ if ($format == 'octets' || $format == 'bytes') {
 } else {
     $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
-    if ($_GET['previous'] == 'yes') {
+    if ($previous == 'yes') {
         $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
         $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
     }
@@ -182,7 +186,7 @@ if ($to > time()) {
     $rrd_options .= " LINE2:olsl#4400dd:'Out Linear Prediction\\n':dashes=8";
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($previous == 'yes') {
     $rrd_options .= " COMMENT:' \\n'";
     $rrd_options .= ' LINE1.25:in' . $format . "X#333300:'Prev In '\t";
     $rrd_options .= ' GPRINT:in' . $format . 'X:AVERAGE:%6.' . $float_precision . 'lf%s';

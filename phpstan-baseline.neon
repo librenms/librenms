@@ -416,11 +416,6 @@ parameters:
 			path: LibreNMS/Alert/Transport/Linenotify.php
 
 		-
-			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Linenotify\\:\\:contactLinenotify\\(\\) is unused\\.$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Linenotify.php
-
-		-
 			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Mail\\:\\:contactMail\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Transport/Mail.php
@@ -1061,11 +1056,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1291,11 +1281,6 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\LdapAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
@@ -1312,11 +1297,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:bind\\(\\) has parameter \\$credentials with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:connect\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizer.php
 
@@ -1431,12 +1411,7 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/TwoFactor.php
-
-		-
-			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
@@ -2741,31 +2716,6 @@ parameters:
 			path: LibreNMS/Exceptions/JsonAppWrongVersionException.php
 
 		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$error with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$exit_code with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$image_output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:getImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:\\$image_output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\UnserializableRouteCache\\:\\:__construct\\(\\) has parameter \\$cli_php_version with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/UnserializableRouteCache.php
@@ -3291,21 +3241,6 @@ parameters:
 			path: LibreNMS/Interfaces/Discovery/SlaDiscovery.php
 
 		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
 			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\MplsPolling\\:\\:pollMplsTunnelArHops\\(\\) has parameter \\$paths with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Interfaces/Polling/MplsPolling.php
@@ -3376,42 +3311,7 @@ parameters:
 			path: LibreNMS/Model.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discoveryIsSlow\\(\\) has parameter \\$def with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:parseAdjacencyTime\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
 
@@ -3424,46 +3324,6 @@ parameters:
 			message: "#^Variable \\$adjacencies in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:calculateAvailable\\(\\) never returns void so it can be removed from the return type\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:printMempool\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
 
 		-
 			message: "#^Variable \\$lsps might not be defined\\.$#"
@@ -3484,21 +3344,6 @@ parameters:
 			message: "#^Variable \\$svcs might not be defined\\.$#"
 			count: 2
 			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
 
 		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
@@ -3531,16 +3376,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryLevels\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
@@ -3549,26 +3384,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryPapers\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:discoverYamlMempools\\(\\) has no return type specified\\.$#"
@@ -5616,7 +5431,12 @@ parameters:
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getTypes\\(\\) has no return type specified\\.$#"
+			message: "#^Result of && is always false\\.$#"
+			count: 1
+			path: LibreNMS/Util/Graph.php
+
+		-
+			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
@@ -5856,27 +5676,7 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_deps has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_tables has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$modules has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os is never read, only written\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
@@ -6286,7 +6086,7 @@ parameters:
 			path: LibreNMS/Util/Snmpsim.php
 
 		-
-			message: "#^Anonymous function should return non\\-empty\\-string but returns string\\.$#"
+			message: "#^Anonymous function should return non\\-falsy\\-string but returns string\\.$#"
 			count: 1
 			path: LibreNMS/Util/StringHelpers.php
 
@@ -7829,16 +7629,6 @@ parameters:
 			message: "#^Property App\\\\Http\\\\Controllers\\\\UserPreferencesController\\:\\:\\$cachedPreferences has no type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/UserPreferencesController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has parameter \\$request with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\DeviceSummaryController\\:\\:getData\\(\\) has no return type specified\\.$#"

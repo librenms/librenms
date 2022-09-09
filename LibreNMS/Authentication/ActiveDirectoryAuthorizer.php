@@ -78,11 +78,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         if ($result == false || $result['count'] !== 1) {
             if (Config::get('auth_ad_debug', false)) {
                 if ($result == false) {
-                    // FIXME: what went wrong?
-                    throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter'");
-                } elseif ($result['count'] == 0) {
+                    throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter', last LDAP error: " . ldap_error($connection));
+                } elseif ((int) $result['count'] == 0) {
                     throw new AuthenticationException("Failed to find group matching '$groupname' using filter '$search_filter'");
-                } elseif ($result['count'] > 1) {
+                } elseif ((int) $result['count'] > 1) {
                     throw new AuthenticationException("Multiple groups returned for '$groupname' using filter '$search_filter'");
                 }
             }
@@ -103,7 +102,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         );
         $entries = ldap_get_entries($connection, $search);
 
-        return $entries['count'] > 0;
+        return (int) $entries['count'] > 0;
     }
 
     public function userExists($username, $throw_exception = false)

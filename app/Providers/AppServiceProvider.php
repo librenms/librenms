@@ -70,6 +70,19 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
         });
+
+        // Graphing
+        Blade::directive('signedGraphUrl', function ($vars) {
+            return "<?php echo \LibreNMS\Util\Url::forExternalGraph($vars); ?>";
+        });
+
+        Blade::directive('signedGraphTag', function ($vars) {
+            return "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>";
+        });
+
+        Blade::directive('graphImage', function ($vars, $flags = 0) {
+            return "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>";
+        });
     }
 
     private function configureMorphAliases()

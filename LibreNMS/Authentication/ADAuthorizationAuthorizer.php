@@ -31,7 +31,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         // Set up connection to LDAP server
         $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
         if (! $this->ldap_connection) {
-            throw new AuthenticationException('Fatal error while connecting to AD url ' . Config::get('auth_ad_url') . ': ' . ldap_error($this->ldap_connection));
+            throw new AuthenticationException('Fatal error while connecting to AD, uri not valid: ' . Config::get('auth_ad_url'));
         }
 
         // disable referrals and force ldap version to 3

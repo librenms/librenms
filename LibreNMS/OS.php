@@ -240,11 +240,7 @@ class OS implements
         if (isset($device['os'])) {
             // load os definition and populate os_group
             \LibreNMS\Util\OS::loadDefinition($device['os']);
-            if ($os_group = Config::get("os.{$device['os']}.group")) {
-                $device['os_group'] = $os_group;
-            } else {
-                $device['os_group'] = null;
-            }
+            $device['os_group'] = Config::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
             d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);

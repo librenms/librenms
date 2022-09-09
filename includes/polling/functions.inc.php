@@ -315,6 +315,12 @@ function poll_device($device, $force_module = false)
         $measurements->checkpoint(); // don't count previous stats
 
         foreach (Config::get('poller_modules') as $module => $module_status) {
+            if (! is_file("includes/polling/$module.inc.php")) {
+                echo "Module $module does not exist, please remove it from your configuration";
+
+                continue;
+            }
+
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));

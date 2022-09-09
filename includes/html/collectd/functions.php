@@ -38,18 +38,7 @@ function read_var($name, &$array, $default = null)
 {
     if (isset($array[$name])) {
         if (is_array($array[$name])) {
-            if (get_magic_quotes_gpc()) {
-                $ret = [];
-                foreach ($array[$name] as $k => $v) {
-                    $ret[stripslashes($k)] = stripslashes($v);
-                }
-
-                return $ret;
-            } else {
-                return $array[$name];
-            }
-        } elseif (is_string($array[$name]) && get_magic_quotes_gpc()) {
-            return stripslashes($array[$name]);
+            return $array[$name];
         } else {
             return $array[$name];
         }

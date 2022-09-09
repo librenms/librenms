@@ -3,23 +3,23 @@
 use LibreNMS\Config;
 use LibreNMS\Util\Clean;
 
-if ($_GET['from']) {
+if (isset($_GET['from']) && $_GET['from']) {
     $from = parse_at_time($_GET['from']);
 }
 
-if ($_GET['to']) {
+if (isset($_GET['to']) && $_GET['to']) {
     $to = parse_at_time($_GET['to']);
 }
 
-if ($_GET['width']) {
+if (isset($_GET['width']) && $_GET['width']) {
     $width = (int) $_GET['width'];
 }
 
-if ($_GET['height']) {
+if (isset($_GET['height']) && $_GET['height']) {
     $height = (int) $_GET['height'];
 }
 
-if ($_GET['inverse']) {
+if (! empty($_GET['inverse'])) {
     $in = 'out';
     $out = 'in';
     $inverse = true;
@@ -28,7 +28,7 @@ if ($_GET['inverse']) {
     $out = 'out';
 }
 
-if ($_GET['legend'] == 'no') {
+if (isset($_GET['legend']) && $_GET['legend'] == 'no') {
     $rrd_options .= ' -g';
 }
 
@@ -50,7 +50,7 @@ if (isset($_GET['noagg'])) {
     $noagg = true;
 }
 
-if ($_GET['title'] == 'yes') {
+if (isset($_GET['title']) && $_GET['title'] == 'yes') {
     $rrd_options .= " --title='" . $graph_title . "' ";
 }
 
@@ -90,15 +90,15 @@ if (Config::get('applied_site_style') == 'dark') {
     $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
 }
 
-if ($_GET['bg']) {
+if (! empty($_GET['bg'])) {
     $rrd_options .= ' -c CANVAS#' . Clean::alphaDash($_GET['bg']) . ' ';
 }
 
-if ($_GET['bbg']) {
+if (! empty($_GET['bbg'])) {
     $rrd_options .= ' -c BACK#' . Clean::alphaDash($_GET['bbg']) . ' ';
 }
 
-if ($_GET['font']) {
+if (! empty($_GET['font'])) {
     $rrd_options .= ' -c FONT#' . Clean::alphaDash($_GET['font']) . ' ';
 }
 

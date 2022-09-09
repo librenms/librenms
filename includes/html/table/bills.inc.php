@@ -143,7 +143,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
     $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>${bill['bill_name']}</span></a><br />" .
-                    strftime('%F', strtotime($datefrom)) . ' to ' . strftime('%F', strtotime($dateto));
+                    date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
     $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
     $actions = '';
 
