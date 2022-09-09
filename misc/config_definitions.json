@@ -4390,11 +4390,8 @@
             "type": "boolean"
         },
         "percentile_line": {
-            "default": 95,
-            "type": "integer",
-            "validate": {
-                "value": "integer|between:0,100"
-            },
+            "default": false,
+            "type": "boolean",
             "group": "webui",
             "section": "graph",
             "order": 41,

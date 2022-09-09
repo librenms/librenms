@@ -106,16 +106,18 @@ if ($i) {
         $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:inbits:MAX:%6.' . $float_precision . 'lf%s';
         if ($percentile) {
-            $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
+            $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s';
         }
+        $rrd_options .= '\\n';
         $rrd_options .= ' AREA:doutbits#' . $colour_area_out . $stacked['transparency'] . ':';
         $rrd_options .= ' LINE1.25:doutbits#' . $colour_line_out . ':Out';
         $rrd_options .= ' GPRINT:outbits:LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:outbits:MAX:%6.' . $float_precision . 'lf%s';
         if ($percentile) {
-            $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
+            $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s';
         }
+        $rrd_options .= '\\n';
     }
 
     if ($percentile && Config::get('percentile_line')) {
