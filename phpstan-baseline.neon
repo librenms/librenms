@@ -1416,11 +1416,6 @@ parameters:
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/TwoFactor.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\TwoFactor\\:\\:\\$base32 has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
@@ -6091,7 +6086,7 @@ parameters:
 			path: LibreNMS/Util/Snmpsim.php
 
 		-
-			message: "#^Anonymous function should return non\\-empty\\-string but returns string\\.$#"
+			message: "#^Anonymous function should return non\\-falsy\\-string but returns string\\.$#"
 			count: 1
 			path: LibreNMS/Util/StringHelpers.php
 
