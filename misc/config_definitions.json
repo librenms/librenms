@@ -4148,10 +4148,6 @@
             "default": "misc/notifications.rss",
             "type": "text"
         },
-        "old_graphs": {
-            "default": true,
-            "type": "boolean"
-        },
         "opentsdb.enable": {
             "default": false,
             "type": "boolean",
@@ -4393,7 +4389,7 @@
             "order": 0,
             "type": "boolean"
         },
-        "percentile_value": {
+        "percentile_line": {
             "default": 95,
             "type": "integer",
             "validate": {
@@ -4403,10 +4399,20 @@
             "section": "graph",
             "order": 41,
             "when": {
-                "setting": "rrdgraph_real_percentile",
-                "operator": "equals",
-                "value": true
+                "setting": "percentile_value",
+                "operator": "not_equals",
+                "value": 0
             }
+        },
+        "percentile_value": {
+            "default": 95,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            },
+            "group": "webui",
+            "section": "graph",
+            "order": 40
         },
         "permission.device_group.allow_dynamic": {
             "default": false,
@@ -4958,13 +4964,6 @@
         "rrdgraph_def_text_color_dark": {
             "default": "bfc0c0",
             "type": "color"
-        },
-        "rrdgraph_real_percentile": {
-            "default": true,
-            "type": "boolean",
-            "group": "webui",
-            "section": "graph",
-            "order": 40
         },
         "rrdtool": {
             "default": "rrdtool",

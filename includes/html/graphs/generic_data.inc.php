@@ -19,7 +19,7 @@ use LibreNMS\Util\Number;
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
-$percentile = Config::get('rrdgraph_real_percentile') ? Config::get('percentile_value') : 0;
+$percentile = Config::get('percentile_value');
 $inverse = $inverse ?? false;
 $multiplier = $multiplier ?? false;
 $format = $format ?? '';
@@ -88,7 +88,7 @@ if ($previous == 'yes') {
     $rrd_options .= ' VDEF:totoutX=outoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
     $rrd_options .= ' CDEF:dpercentile_outnX=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . $percentile . ',PERCENTNAN';
     $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbitsX,doutbitsX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
 }
@@ -107,25 +107,25 @@ $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT';
+$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENTNAN';
 $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
 $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
 if ($format == 'octets' || $format == 'bytes') {
-    $rrd_options .= ' VDEF:percentile_in=inoctets,' . $percentile . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outoctets,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inoctets,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:percentile_out=outoctets,' . $percentile . ',PERCENTNAN';
     if ($previous == 'yes') {
-        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . $percentile . ',PERCENTNAN';
     }
     $units = 'Bps';
     $format = 'octets';
 } else {
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENTNAN';
     if ($previous == 'yes') {
-        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENTNAN';
     }
     $units = 'bps';
     $format = 'bits';
@@ -152,8 +152,11 @@ $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
 $rrd_options .= " GPRINT:tot:'Total %6." . $float_precision . "lf%sB'";
 $rrd_options .= " GPRINT:totin:'(In %6." . $float_precision . "lf%sB'";
 $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%sB)\\l'";
-$rrd_options .= ' LINE1:percentile_in#aa0000';
-$rrd_options .= ' LINE1:dpercentile_out#aa0000';
+
+if (Config::get('percentile_line')) {
+    $rrd_options .= ' LINE1:percentile_in#aa0000';
+    $rrd_options .= ' LINE1:dpercentile_out#aa0000';
+}
 
 if (! empty($port['ifSpeed'])) {
     $speed_line_type = ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';

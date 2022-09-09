@@ -70,6 +70,3 @@ $colour_area_in = '91B13C';
 $colour_area_out = '8080BD';
 
 require 'includes/html/graphs/generic_multi_seperated.inc.php';
-
-// include("includes/html/graphs/generic_multi_bits_separated.inc.php");
-// include("includes/html/graphs/generic_multi_data_separated.inc.php");

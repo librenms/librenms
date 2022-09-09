@@ -131,6 +131,8 @@
                 switch (logic.operator) {
                     case 'equals':
                         return this.settings[logic.setting].value === logic.value;
+                    case 'not_equals':
+                        return this.settings[logic.setting].value !== logic.value;
                     case 'in':
                         return logic.value.includes(this.settings[logic.setting].value);
                     default:

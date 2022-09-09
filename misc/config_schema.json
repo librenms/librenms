@@ -47,11 +47,12 @@
                                 "type": "string",
                                 "enum": [
                                     "equals",
-                                    "in"
+                                    "in",
+                                    "not_equals"
                                 ]
                             },
                             "value": {
-                                "type": ["string", "array", "boolean"]
+                                "type": ["string", "array", "integer", "boolean"]
                             }
                         },
                         "required": ["setting", "operator", "value"]

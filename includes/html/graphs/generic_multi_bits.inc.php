@@ -67,12 +67,14 @@ if ($i) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'];
-    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+';
-    $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
+    if ($percentile) {
+        $rrd_options .= ' VDEF:percentile_in=inbits,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_out=outbits,' . $percentile . ',PERCENT';
+        $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'];
+        $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . $percentile . ',PERCENT';
+        $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+';
+        $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
+    }
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' CDEF:' . $in . 'octetsX=' . $in_thingX . $pluses;
@@ -81,12 +83,14 @@ if ($i) {
         $rrd_options .= ' CDEF:inbitsX=inoctetsX,8,*';
         $rrd_options .= ' CDEF:outbitsX=outoctetsX,8,*';
         $rrd_options .= ' CDEF:doutbitsX=doutoctetsX,8,*';
-        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . $percentile . ',PERCENT';
-        $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
-        $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+        if ($percentile) {
+            $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . $percentile . ',PERCENT';
+            $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . $percentile . ',PERCENT';
+            $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
+            $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,' . $percentile . ',PERCENT';
+            $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,doutbitsX,-,dpercentile_outX,' . $stacked['stacked'] . ',*,+';
+            $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outXn,FIRST';
+        }
     }
 
     if ($legend == 'no' || $legend == '1') {
@@ -96,22 +100,28 @@ if ($i) {
         $rrd_options .= ' LINE1.25:doutbits#' . $colour_line_out . ':';
     } else {
         $rrd_options .= ' AREA:inbits#' . $colour_area_in . $stacked['transparency'] . ':';
-        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . $percentile . "th %\\n'";
+        $rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . ($percentile ? $percentile . "th %" : ''). "\\n'";
         $rrd_options .= ' LINE1.25:inbits#' . $colour_line_in . ':In\ ';
         $rrd_options .= ' GPRINT:inbits:LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:inbits:MAX:%6.' . $float_precision . 'lf%s';
-        $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
+        if ($percentile) {
+            $rrd_options .= ' GPRINT:percentile_in:%6.' . $float_precision . 'lf%s\\\\n';
+        }
         $rrd_options .= ' AREA:doutbits#' . $colour_area_out . $stacked['transparency'] . ':';
         $rrd_options .= ' LINE1.25:doutbits#' . $colour_line_out . ':Out';
         $rrd_options .= ' GPRINT:outbits:LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options .= ' GPRINT:outbits:MAX:%6.' . $float_precision . 'lf%s';
-        $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
+        if ($percentile) {
+            $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\\\n';
+        }
     }
 
-    $rrd_options .= ' LINE1:percentile_in#aa0000';
-    $rrd_options .= ' LINE1:dpercentile_out#aa0000';
+    if ($percentile && Config::get('percentile_line')) {
+        $rrd_options .= ' LINE1:percentile_in#aa0000';
+        $rrd_options .= ' LINE1:dpercentile_out#aa0000';
+    }
 
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= ' AREA:inbitsX#9999966' . $stacked['transparency'] . ':';

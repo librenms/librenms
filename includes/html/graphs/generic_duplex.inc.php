@@ -18,7 +18,7 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 $length = 10;
-$percentile = Config::get('rrdgraph_real_percentile') ? Config::get('percentile_value') : 0;
+$percentile = Config::get('percentile_value');
 $print_total = $print_total ?? false;
 
 if (! isset($percentile)) {
@@ -51,9 +51,9 @@ if ($print_total) {
 }
 
 if ($percentile) {
-    $rrd_options .= ' VDEF:percentile_in=in,' . $percentile . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=out,' . $percentile . ',PERCENT';
-    $rrd_options .= ' VDEF:dpercentile_out=dout,' . $percentile . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=in,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:percentile_out=out,' . $percentile . ',PERCENTNAN';
+    $rrd_options .= ' VDEF:dpercentile_out=dout,' . $percentile . ',PERCENTNAN';
 }
 
 if (! empty($graph_max)) {
@@ -81,9 +81,9 @@ if (isset($_GET['previous']) && $_GET['previous'] == 'yes') {
     }
 
     if ($percentile) {
-        $rrd_options .= ' VDEF:percentile_inX=inX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outX,' . $percentile . ',PERCENT';
-        $rrd_options .= ' VDEF:dpercentile_outX=doutX,' . $percentile . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:percentile_outX=outX,' . $percentile . ',PERCENTNAN';
+        $rrd_options .= ' VDEF:dpercentile_outX=doutX,' . $percentile . ',PERCENTNAN';
     }
 
     if ($graph_max) {
@@ -128,7 +128,7 @@ if ($print_total) {
     $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%s)\l'";
 }
 
-if ($percentile) {
+if ($percentile && Config::get('percentile_line')) {
     $rrd_options .= ' LINE1:percentile_in#aa0000';
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 }
