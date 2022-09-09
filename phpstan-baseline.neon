@@ -7631,16 +7631,6 @@ parameters:
 			path: app/Http/Controllers/UserPreferencesController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has parameter \\$request with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\DeviceSummaryController\\:\\:getData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Widgets/DeviceSummaryController.php
