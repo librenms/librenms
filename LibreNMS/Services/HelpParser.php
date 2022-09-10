@@ -45,19 +45,24 @@ class HelpParser
      */
     public function parse(string $check): Collection
     {
+        $usage_found = false;
+
         foreach (explode("\n", $this->fetchHelp($check)) as $line) {
             // parse usage section, includes optional/required information
-            if (preg_match("/^(Usage:)?\s*$check [-[{]/", $line)) {
-                if (isset($usage)) {
-                    $this->parseUsage($usage);
-                }
-                $usage = trim($line);
-            } elseif (isset($usage)) {
-                if (empty($line)) {
-                    $this->parseUsage($usage);
-                    unset($usage);
-                } else {
-                    $usage .= ' ' . trim($line);
+            if (! $usage_found) { // only find usage once
+                if (preg_match("/^(Usage:)?\s*$check [-[{]/", $line)) {
+                    if (isset($usage)) {
+                        $this->parseUsage($usage);
+                    }
+                    $usage = trim($line);
+                } elseif (isset($usage)) {
+                    if (empty($line)) {
+                        $this->parseUsage($usage);
+                        $usage_found = true;
+                        unset($usage);
+                    } else {
+                        $usage .= ' ' . trim($line);
+                    }
                 }
             }
 
