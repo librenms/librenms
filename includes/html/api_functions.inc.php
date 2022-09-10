@@ -1932,8 +1932,12 @@ function update_device(Illuminate\Http\Request $request)
     // { field: ["name1"], data: "value1"}
     // ...
     // Convert both to array to make processing simpler
-    if (!is_array($data['field'])) { $data['field'] = array($data['field']); }
-    if (!is_array($data['data'])) { $data['data'] = array($data['data']); }
+    if (!is_array($data['field'])) { 
+        $data['field'] = array($data['field']); 
+    }
+    if (!is_array($data['data'])) { 
+        $data['data'] = array($data['data']); 
+    }
 
     $bad_fields = ['device_id', 'hostname'];
     foreach ($data['field'] as $tmp_field) {
