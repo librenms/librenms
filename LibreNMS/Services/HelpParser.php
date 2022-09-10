@@ -67,7 +67,7 @@ class HelpParser
             }
 
             // parse option lines
-            if (preg_match('/^\s*((?<short>-\w)[, ]*|\(?(?<param>--[\w-]+)\)?){1,2}(\s*=\s*(?<value>.+))?$/', $line, $param_matches)) {
+            if (preg_match('/^\s*((?<short>-\w)[, ]*|\(?(?<param>--[\w-]+)\)?){1,2}(\s*=\s*(?<value>.+?))?(, --|$)/', $line, $param_matches)) {
                 if (isset($pending)) {
                     $this->setParameter($pending);
                     unset($pending);
