@@ -1922,44 +1922,47 @@ function update_device(Illuminate\Http\Request $request)
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $data = json_decode($request->getContent(), true);
-    $bad_fields = ['device_id', 'hostname'];
     if (empty($data['field'])) {
         return api_error(400, 'Device field to patch has not been supplied');
-    } elseif (in_array($data['field'], $bad_fields)) {
-        return api_error(500, 'Device field is not allowed to be updated');
     }
 
-    if (is_array($data['field']) && is_array($data['data'])) {
-        foreach ($data['field'] as $tmp_field) {
-            if (in_array($tmp_field, $bad_fields)) {
-                return api_error(500, 'Device field is not allowed to be updated');
-            }
+    // API allows:
+    // { field: "name", data: "value"}
+    // { field: ["name1", "name2"], data: ["value1", "value2"]}
+    // { field: ["name1"], data: "value1"}
+    // ...
+    // Convert both to array to make processing simpler
+    if (!is_array($data['field'])) { $data['field'] = array($data['field']); }
+    if (!is_array($data['data'])) { $data['data'] = array($data['data']); }
+
+    $bad_fields = ['device_id', 'hostname'];
+    foreach ($data['field'] as $tmp_field) {
+        if (in_array($tmp_field, $bad_fields)) {
+            return api_error(500, 'Device field is not allowed to be updated: '.$tmp_field);
         }
-        if (count($data['field']) == count($data['data'])) {
-            $update = [];
-            for ($x = 0; $x < count($data['field']); $x++) {
-                $field = $data['field'][$x];
-                $field_data = $data['data'][$x];
+    }
+    if (count($data['field']) == count($data['data'])) {
+        $update = [];
+        for ($x = 0; $x < count($data['field']); $x++) {
+            $field = $data['field'][$x];
+            $field_data = $data['data'][$x];
 
-                if ($field == 'location') {
-                    $field = 'location_id';
-                    $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
-                }
+            if ($field == 'location') {
+                $field = 'location_id';
+                $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
+            }
 
-                $update[$field] = $field_data;
-            }
-            if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
-                return api_success_noresult(200, 'Device fields have been updated');
-            } else {
-                return api_error(500, 'Device fields failed to be updated');
-            }
+            $update[$field] = $field_data;
+        }
+        if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
+            return ( count($data['field']) == 1 )
+                ? api_success_noresult(200, 'Device ' . $data['field'][0] . ' field has been updated') // for compatibility
+                : api_success_noresult(200, 'Device fields have been updated');
         } else {
-            return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
+            return api_error(500, 'Device fields failed to be updated');
         }
-    } elseif (dbUpdate([$data['field'] => $data['data']], 'devices', '`device_id`=?', [$device_id]) >= 0) {
-        return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
     } else {
-        return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
+        return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
     }
 }
 
