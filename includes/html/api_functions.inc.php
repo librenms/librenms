@@ -1932,17 +1932,17 @@ function update_device(Illuminate\Http\Request $request)
     // { field: ["name1"], data: "value1"}
     // ...
     // Convert both to array to make processing simpler
-    if (!is_array($data['field'])) { 
-        $data['field'] = array($data['field']); 
+    if (! is_array($data['field'])) {
+        $data['field'] = [$data['field']];
     }
-    if (!is_array($data['data'])) { 
-        $data['data'] = array($data['data']); 
+    if (! is_array($data['data'])) {
+        $data['data'] = [$data['data']];
     }
 
     $bad_fields = ['device_id', 'hostname'];
     foreach ($data['field'] as $tmp_field) {
         if (in_array($tmp_field, $bad_fields)) {
-            return api_error(500, 'Device field is not allowed to be updated: '.$tmp_field);
+            return api_error(500, 'Device field is not allowed to be updated: ' . $tmp_field);
         }
     }
     if (count($data['field']) == count($data['data'])) {
@@ -1959,7 +1959,7 @@ function update_device(Illuminate\Http\Request $request)
             $update[$field] = $field_data;
         }
         if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
-            return ( count($data['field']) == 1 )
+            return (count($data['field']) == 1)
                 ? api_success_noresult(200, 'Device ' . $data['field'][0] . ' field has been updated') // for compatibility
                 : api_success_noresult(200, 'Device fields have been updated');
         } else {
