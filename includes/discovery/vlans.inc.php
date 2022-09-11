@@ -25,7 +25,7 @@ foreach ($tmp_base_indexes as $index => $array) {
     // Broken SNMP servers can return the wrong data when OID doesn't exist
     // So lets sanity check
     if (! array_key_exists('dot1dBasePortIfIndex', $array)) {
-      continue;
+        continue;
     }    
     $base_to_index[$index] = $array['dot1dBasePortIfIndex'];
 }
