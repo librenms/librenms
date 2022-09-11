@@ -95,7 +95,6 @@ class DevService extends LnmsCommand
         $this->line('                    ' . $code . ',');
     }
 
-
     private function quoteText(string $text): string
     {
         if (Str::contains($text, ["\n"])) {
