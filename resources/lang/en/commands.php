@@ -50,6 +50,15 @@ return [
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
     ],
+    'dev:service' => [
+        'description' => 'Tool to help debug service help parsing',
+        'arguments' => [
+            'check' => 'Check name to work with, must exist in the checks directory. Example: check_icmp',
+        ],
+        'options' => [
+            'test-lines' => 'Print out lines to add to ServiceHelpParserTest for this check',
+        ],
+    ],
     'dev:simulate' => [
         'description' => 'Simulate devices using test data',
         'arguments' => [

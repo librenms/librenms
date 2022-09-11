@@ -26,6 +26,7 @@
 namespace LibreNMS\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
@@ -50,7 +51,7 @@ class HelpParser
         foreach (explode("\n", $this->fetchHelp($check)) as $line) {
             // parse usage section, includes optional/required information
             if (! $usage_found) { // only find usage once
-                if (preg_match("/^(Usage:)?\s*$check [-[{]/", $line)) {
+                if (preg_match("/^(Usage:)?\s*$check [-[{][-\w]/", $line)) {
                     if (isset($usage)) {
                         $this->parseUsage($usage);
                     }
@@ -86,9 +87,9 @@ class HelpParser
         return $this->params;
     }
 
-    protected function fetchHelp(string $check): string
+    public function fetchHelp(string $check): string
     {
-        $command = [Config::get('nagios_plugins') . '/' . $check, '--help'];
+        $command = [Str::finish(Config::get('nagios_plugins'), '/') . $check, '--help'];
         $process = new Process($command);
         $process->run();
 
