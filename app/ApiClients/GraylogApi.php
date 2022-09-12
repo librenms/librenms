@@ -135,9 +135,9 @@ class GraylogApi
     public function getAddresses(Device $device)
     {
         $addresses = collect([
-            $device->displayName(),
             gethostbyname($device->hostname),
             $device->hostname,
+            $device->displayName(),
             $device->ip,
         ]);
 
