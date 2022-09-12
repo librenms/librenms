@@ -190,7 +190,7 @@ class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProv
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
         // report errors if they are allowed
-        if ($this->errorReportingLevel & $level) {
+        if (error_reporting() & $level && $this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));
         }
 
