@@ -39,7 +39,8 @@ echo '<table cellpadding=5 cellspacing=0 class=devicetable width=100%>';
 foreach (dbFetchRows('SELECT * FROM pseudowires AS P, ports AS I, devices AS D WHERE P.port_id = I.port_id AND I.device_id = D.device_id ORDER BY D.hostname,I.ifDescr') as $pw_a) {
     $pw_a = cleanPort($pw_a);
     $i = 0;
-    while ($i < count($linkdone)) {
+//    while ($i < count($linkdone)) { //php8 needed this line changed -st
+    while ($i < count((array)$linkdone)) {
         $thislink = $pw_a['device_id'] . $pw_a['port_id'];
         if ($linkdone[$i] == $thislink) {
             $skip = 'yes';
