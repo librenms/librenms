@@ -78,7 +78,11 @@ class Smokeping
     public function generateFileName($file = '')
     {
         if (Config::get('smokeping.integration') === true) {
-            return Config::get('smokeping.dir') . '/' . $this->device->type . '/' . $file;
+            if ($this->device->type == "") {
+                return Config::get('smokeping.dir') . '/Ungrouped/' . $file;
+            } else {
+                return Config::get('smokeping.dir') . '/' . $this->device->type . '/' . $file;
+            }
         } else {
             return Config::get('smokeping.dir') . '/' . $file;
         }
