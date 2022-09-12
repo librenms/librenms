@@ -3,26 +3,25 @@ includes:
     - phpstan-baseline-deprecated.neon
 
 parameters:
-    phpVersion: 70300
 
     customRulesetUsed: true
     reportUnmatchedIgnoredErrors: false
     resultCachePath: %tmpDir%/resultCache-deprecated.php
 
     paths:
-        - LibreNMS
+        - app
         - bootstrap
         - cache
-        - html
-        - storage
-        - app
         - config
         - database
         - doc
+        - html
         - includes
+        - LibreNMS
         - licenses
         - misc
         - resources
         - routes
         - sql-schema
+        - storage
         - tests

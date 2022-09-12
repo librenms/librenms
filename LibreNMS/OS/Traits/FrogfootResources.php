@@ -40,7 +40,7 @@ trait FrogfootResources
         return [
             Processor::discover(
                 $this->getName(),
-                $this->getDeviceID(),
+                $this->getDeviceId(),
                 '1.3.6.1.4.1.10002.1.1.1.4.2.1.3.2',
                 0
             ),

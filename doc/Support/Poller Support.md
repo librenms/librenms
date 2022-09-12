@@ -194,8 +194,6 @@ configured to be ignored by config options.
 
 `cisco-asa-firewall`: Cisco ASA firewall support.
 
-`mib`: Support for generic MIB parsing.
-
 ## Running
 
 Here are some examples of running poller from within your install directory.

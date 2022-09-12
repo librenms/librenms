@@ -76,8 +76,8 @@ jobs:
 
       -
         name: Run PHPStan (Deprecated functions)
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G --configuration=phpstan-deprecated.neon
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G --configuration=phpstan-deprecated.neon
 
       -
         name: Run PHPStan
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G

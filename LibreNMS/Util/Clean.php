@@ -75,7 +75,6 @@ class Clean
      */
     public static function html($value, $purifier_config = [])
     {
-        /** @var HTMLPurifier $purifier */
         static $purifier;
 
         // If $purifier_config is non-empty then we don't want

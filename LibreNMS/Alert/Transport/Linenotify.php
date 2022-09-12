@@ -16,7 +16,7 @@ class Linenotify extends Transport
     {
         $opts['line-notify-access-token'] = $this->config['line-notify-access-token'];
 
-        return $this->contactLineNotify($obj, $opts);
+        return $this->contactLinenotify($obj, $opts);
     }
 
     private function contactLinenotify($obj, $opts)
