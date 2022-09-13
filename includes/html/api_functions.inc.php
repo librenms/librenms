@@ -1947,7 +1947,7 @@ function update_device(Illuminate\Http\Request $request)
 
     // location field convenience
     if (isset($update['location'])) {
-        $update['location_id'] = \App\Models\Location::firstOrCreate(['location' => $update['location']])->id;
+        $update['location_id'] = $update['location'] ? \App\Models\Location::firstOrCreate(['location' => $update['location']])->id : null;
         unset($update['location']);
     }
 
