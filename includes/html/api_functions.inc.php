@@ -1945,7 +1945,7 @@ function update_device(Illuminate\Http\Request $request)
 
     $update = array_combine($fields, $data);
 
-    // location field convenience
+    // location field compatability
     if (isset($update['location'])) {
         $update['location_id'] = $update['location'] ? \App\Models\Location::firstOrCreate(['location' => $update['location']])->id : null;
         unset($update['location']);
