@@ -81,7 +81,7 @@ been up for 30344 seconds`.
   this is the equivalent of the default used and must be encased in `{{ }}`
 - State: `$alert->state`
 - Severity: `$alert->severity`
-- Rule: `$alert->rule`
+- Rule: `$alert->rule_id`
 - Rule-Name: `$alert->name`
 - Procedure URL: `$alert->proc`
 - Timestamp: `$alert->timestamp`
@@ -148,7 +148,7 @@ Severity: {{ $alert->severity }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }}
 Unique-ID: {{ $alert->uid }}
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule_id }} @endif
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
   {{ $key }}: {{ $value['string'] }}
@@ -168,7 +168,7 @@ Device Name: {{ $alert->hostname }}
 Severity: {{ $alert->severity }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }}
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule_id }} @endif
 @foreach ($alert->faults as $key => $value)
 Physical Interface: {{ $value['ifDescr'] }}
 Interface Description: {{ $value['ifAlias'] }}
@@ -217,7 +217,7 @@ Description: {{ $alert->description }}
 Features: {{ $alert->features }}
 Notes: {{ $alert->notes }}
 
-Rule: {{ $alert->name ?? $alert->rule }}
+Rule: {{ $alert->name ?? $alert->rule_id }}
 @if ($alert->faults)
 Faults:
 @foreach ($alert->faults as $key => $value)
@@ -361,7 +361,7 @@ could be queried using a template such as:
 Severity: {{ $alert->severity }}
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }}
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule_id }} @endif
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
   Local interface: {{ \App\Models\Port::find($value['port_id'])->ifName }}
@@ -402,7 +402,7 @@ Severity: {{ $alert->severity }}  <br>
 @if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Timestamp: {{ $alert->timestamp }} <br>
 Alert-ID: {{ $alert->id }} <br>
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule_id }} @endif <br>
 @if ($alert->faults) Faults:
 @foreach ($alert->faults as $key => $value)
 {{ $key }}: {{ $value['string'] }}<br>
@@ -446,7 +446,7 @@ The included templates apart from the default template are:
 @if ($alert->name)
 **Rule:** {{ $alert->name }}
 @else
-**Rule:** {{ $alert->rule }}
+**Rule:** {{ $alert->rule_id }}
 @endif
 @if ($alert->faults)
 **Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}
@@ -486,7 +486,7 @@ The included templates apart from the default template are:
 @else
                 {
                     "name": "Rule:",
-                    "value": "[{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                    "value": "[{{ $alert->rule_id }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
                 },
 @endif
                 {
