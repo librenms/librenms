@@ -1078,7 +1078,7 @@ function search_ports(Illuminate\Http\Request $request)
     if ($validate = validate_column_list($columns, 'ports') !== true) {
         return $validate;
     }
-    
+
     $query = Port::hasAccess(Auth::user())
          ->select(['device_id', 'port_id', 'ifIndex', 'ifName', $columns]);
 
