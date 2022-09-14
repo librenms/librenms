@@ -1,11 +1,38 @@
 <?php
 
+/* Copyright (C) 2015 Daniel Preussker <f0o@devilcode.org>
+ ** This program is free software: you can redistribute it and/or modify
+ ** it under the terms of the GNU General Public License as published by
+ ** the Free Software Foundation, either version 3 of the License, or
+ ** (at your option) any later version.
+ **
+ ** This program is distributed in the hope that it will be useful,
+ ** but WITHOUT ANY WARRANTY; without even the implied warranty of
+ ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ ** GNU General Public License for more details.
+ **
+ ** You should have received a copy of the GNU General Public License
+ ** along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+/**
+ ** SNMP Trap Transport
+ **
+ ** @author Cloud Delivery Team <ttc-cloud-delivery@millicom.com>
+ ** @copyright 2022 Cloud Delivery Team, Tigo Technology Center
+ ** @license GPL
+ **/
+
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 
 class Snmptrap extends Transport
 {
+	/**
+	 * @param  array  $obj
+	 * @param  array  $opts
+	 */
 	public function deliverAlert($obj, $opts)
 	{
 		$host = $this->config['snmptrap-destination-host'];
@@ -23,10 +50,17 @@ class Snmptrap extends Transport
 		$mibdir = $this->config['mib-dir'];
 
 
+		/**
+		 * @param array $obj
+		 */
 		return $this->contactSnmptrap($binary,$mibdir,$transport,$host,$port,$community,$trapdefinition,$pdu,$obj);
 	}
 
-	private function contactSnmptrap($binary,$mibdir,$transport,$host,$port,$community,$trapdefinition,$pdu,$obj)
+	/**
+	 * Returns if the call was successful
+	 * @return bool
+	 */
+	private function contactSnmptrap(string $binary,string $mibdir,string $transport,string $host,string $port,string $community,string $trapdefinition,string $pdu,array $obj)
 	{
 		$binary_opts = "";
 		switch ($pdu) {
