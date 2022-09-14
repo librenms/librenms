@@ -2855,7 +2855,7 @@ function del_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = get_location_id_by_name($location);
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
     if (empty($location_id)) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }

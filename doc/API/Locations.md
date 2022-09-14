@@ -65,9 +65,9 @@ Output:
 
 Deletes an existing location
 
-Route: `/api/v0/locations/location`
+Route: `/api/v0/locations/:location`
 
-- location: name of the location to delete
+- location: name or id of the location to delete
 
 Example:
 
@@ -89,9 +89,9 @@ Output:
 
 Edits a location
 
-Route: `/api/v0/locations/location`
+Route: `/api/v0/locations/:location`
 
-- location: name of the location to edit
+- location: name or id of the location to edit
 
 Input:
 
