@@ -27,7 +27,6 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 
-
 class Snmptrap extends Transport
 {
     /**
@@ -47,7 +46,7 @@ class Snmptrap extends Transport
         $trapdefinition = $this->config['snmptrap-definition'];
         $pdu = $this->config['snmptrap-pdu'];
         $community = $this->config['snmptrap-community'];
-	$binary = implode([Config::get('snmptrap')]);
+        $binary = implode([Config::get('snmptrap')]);
         $mibdir = $this->config['mib-dir'];
 
         /**
