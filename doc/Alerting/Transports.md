@@ -719,7 +719,6 @@ A new MIB file describing the structures has been contributed by Tigo Technology
 | Community | out-community |
 | Trap Definition | TTC-NOTIFICATIONS-MIB::daEvent |
 | PDU | TRAPv2 |
-| Binary path | /usr/bin/snmptrap |
 | MIB file directory | /opt/librenms/mibs/ttc |
 
 ### Templates
