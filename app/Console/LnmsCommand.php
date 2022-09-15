@@ -36,7 +36,7 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
-    /** @var string[][]|callable[]|null */
+    /** @var string[][]|callable[][]|null */
     protected $optionValues;
 
     /**
@@ -169,12 +169,8 @@ abstract class LnmsCommand extends Command
             return $values;
         }
 
-        if (is_array($values)) {
-            return function () use ($values) {
-                return $values;
-            };
-        }
-
-        return null;
+        return function () use ($values) {
+            return $values;
+        };
     }
 }
