@@ -128,22 +128,7 @@ var grid = $("#ports").bootgrid({
     url: '<?php echo route('table.ports') ?>'
 });
 
-$("#device_id").select2({
-    allowClear: true,
-    placeholder: "All Devices",
-    ajax: {
-        url: 'ajax_list.php',
-        delay: 250,
-        data: function (params) {
-            return {
-                type: 'devices',
-                search: params.term,
-                limit: 8,
-                page: params.page || 1
-            };
-        }
-    }
-});
+init_select2("#device_id", "device", {field: "device_id"}, <?php echo $device_selected; ?>, "All Devices");
 
 $(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
 
