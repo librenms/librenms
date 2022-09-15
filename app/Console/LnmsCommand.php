@@ -36,7 +36,7 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
-    /** @var string[][]|null */
+    /** @var string[][]|callable[]|null */
     protected $optionValues;
 
     /**
@@ -158,11 +158,7 @@ abstract class LnmsCommand extends Command
         }
     }
 
-    /**
-     * @param $name
-     * @return callable|null
-     */
-    private function getValuesCallable($name)
+    private function getValuesCallable(string $name): ?callable
     {
         if (empty($this->optionValues[$name])) {
             return null;
