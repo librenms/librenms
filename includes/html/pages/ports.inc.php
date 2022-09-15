@@ -92,10 +92,10 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
     
-    if(isset($vars['device_id'])){
+    if (isset($vars['device_id'])) {
         $device = Device::find($vars['device_id']);
         $device_selected = json_encode(['id' => $vars['device_id'], 'text' => $device->hostname]);
-    }else{
+    } else {
         $device_selected = '""';
     }
 
