@@ -217,6 +217,7 @@ LibreNMS contributors:
 - Jason Cheng <sanyu3u@gmail.com> (jasoncheng7115)
 - Daniel Baeza <doctoruve@gmail.com> (TheGreatDoc)
 - Thom Cleary <me@thomcat.rocks> (thomcatdotrocks)
+- Kayck Matias <kayckmatias04@gmail.com> [KayckMatias](https://github.com/KayckMatias/)
 
 Observium was written by:
 - Adam Armstrong
