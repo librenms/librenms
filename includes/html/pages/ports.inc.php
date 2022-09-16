@@ -13,7 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -90,16 +89,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= addslashes(csrf_field());
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
     $output .= "<div class='form-group'>";
-    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
-
-    if (isset($vars['device_id'])) {
-        $device = Device::find($vars['device_id']);
-        $device_selected = json_encode(['id' => $vars['device_id'], 'text' => $device->hostname]);
-    } else {
-        $device_selected = '""';
-    }
-
-    $output .= '</select>&nbsp;';
+    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
     $hasvalue = ! empty($vars['hostname']) ? "value='" . $vars['hostname'] . "'" : '';
 

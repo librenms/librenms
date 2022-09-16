@@ -16,6 +16,8 @@
 $details_visible = var_export($vars['format'] == 'list_detail', 1);
 $errors_visible = var_export($vars['format'] == 'list_detail' || isset($vars['errors']), 1);
 $no_refresh = true;
+$device = DeviceCache::get((int) $vars['device_id']);
+$device_selected = json_encode($device->exists() ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 
 if (isset($vars['errors'])) {
     $error_sort = ' data-order="desc"';
@@ -128,8 +130,8 @@ var grid = $("#ports").bootgrid({
     url: '<?php echo route('table.ports') ?>'
 });
 
-init_select2("#device_id", "device", {field: "device_id"}, <?php echo $device_selected; ?>, "All Devices");
-
 $(".actionBar").append("<div class=\"pull-left\"><?php echo $output; ?></div>");
+
+init_select2('#device_id', 'device', {}, <?php echo $device_selected ?>, 'All Devices');
 
 </script>
