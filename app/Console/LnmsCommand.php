@@ -36,7 +36,7 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
-    /** @var string[][]|null */
+    /** @var string[][]|callable[][]|null */
     protected $optionValues;
 
     /**
@@ -101,11 +101,8 @@ abstract class LnmsCommand extends Command
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 
-        if (isset($this->optionValues[$name])) {
-            $description .= ' [' . implode(', ', $this->optionValues[$name]) . ']';
-        }
-
-        parent::addOption($name, $shortcut, $mode, $description, $default);
+        // inject our custom InputOption to allow callable option enums
+        $this->getDefinition()->addOption(new DynamicInputOption($name, $shortcut, $mode, $description, $default, $this->getValuesCallable($name)));
 
         return $this;
     }
@@ -118,8 +115,10 @@ abstract class LnmsCommand extends Command
     {
         // auto create option value rules if they don't exist
         if (isset($this->optionValues)) {
-            foreach ($this->optionValues as $option => $values) {
-                if (empty($rules[$option])) {
+            foreach (array_keys($this->optionValues) as $option) {
+                $callable = $this->getValuesCallable($option);
+                if (empty($rules[$option]) && $callable) {
+                    $values = call_user_func($callable);
                     $rules[$option] = Rule::in($values);
                     $messages[$option . '.in'] = trans('commands.lnms.validation-errors.optionValue', [
                         'option' => $option,
@@ -157,5 +156,21 @@ abstract class LnmsCommand extends Command
                 Debug::setVerbose();
             }
         }
+    }
+
+    private function getValuesCallable(string $name): ?callable
+    {
+        if (empty($this->optionValues[$name])) {
+            return null;
+        }
+
+        $values = $this->optionValues[$name];
+        if (is_callable($values)) {
+            return $values;
+        }
+
+        return function () use ($values) {
+            return $values;
+        };
     }
 }

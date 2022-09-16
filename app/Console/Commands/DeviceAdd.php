@@ -42,9 +42,9 @@ class DeviceAdd extends LnmsCommand
 
         $this->optionValues = [
             'transport' => ['udp', 'udp6', 'tcp', 'tcp6'],
-            'port-association-mode' => PortAssociationMode::getModes(),
-            'auth-protocol' => \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms(),
-            'privacy-protocol' => \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms(),
+            'port-association-mode' => [PortAssociationMode::class, 'getModes'],
+            'auth-protocol' => [\LibreNMS\SNMPCapabilities::class, 'supportedAuthAlgorithms'],
+            'privacy-protocol' => [\LibreNMS\SNMPCapabilities::class, 'supportedCryptoAlgorithms'],
         ];
 
         $this->addArgument('device spec', InputArgument::REQUIRED);
