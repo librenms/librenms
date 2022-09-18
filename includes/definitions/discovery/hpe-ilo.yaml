@@ -111,6 +111,41 @@ modules:
                         - { descr: degraded, graph: 1, value: 3, generic: 1 }
                         - { descr: degradedModuleIndexUnknown, graph: 1, value: 4, generic: 1 }
                 -
+                    oid: cpqHeSysBatteryTable
+                    value: cpqHeSysBatteryCondition
+                    num_oid: '.1.3.6.1.4.1.232.6.2.17.2.1.4.0.1'
+                    descr: 'Battery Condition ({{ $cpqHeSysBatteryCapacityMaximum }}W {{ $cpqHeSysBatteryModel }})'
+                    index: 'cpqHeSysBatteryCondition.{{ $index }}'
+                    state_name: cpqHeSysBatteryCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 2 }
+                        - { descr: failed, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: cpqHeSysBatteryTable
+                    value: cpqHeSysBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.232.6.2.17.2.1.5.0.1'
+                    descr: 'Battery Status ({{ $cpqHeSysBatteryCapacityMaximum }}W {{ $cpqHeSysBatteryModel }})'
+                    index: 'cpqHeSysBatteryStatus.{{ $index }}'
+                    state_name: cpqHeSysBatteryStatus
+                    states:
+                        - { descr: ok, graph: 1, value: 1, generic: 0 }
+                        - { descr: generalFailure, graph: 1, value: 2, generic: 2 }
+                        - { descr: shutdownHighResistance, graph: 3, value: 3, generic: 2 }
+                        - { descr: shutdownLowVoltage, graph: 1, value: 4, generic: 2 }
+                        - { descr: shutdownShortCircuit, graph: 1, value: 5, generic: 2 }
+                        - { descr: shutdownChargeTimeout, graph: 1, value: 6, generic: 2 }
+                        - { descr: shutdownOverTemperature, graph: 1, value: 7, generic: 2 }
+                        - { descr: shutdownDischargeMinVoltage, graph: 1, value: 8, generic: 2 }
+                        - { descr: shutdownDischargeCurrent, graph: 1, value: 9, generic: 2 }
+                        - { descr: shutdownLoadCountHigh, graph: 1, value: 10, generic: 2 }
+                        - { descr: shutdownEnablePin, graph: 1, value: 11, generic: 2 }
+                        - { descr: shutdownOverCurrent, graph: 1, value: 12, generic: 2 }
+                        - { descr: shutdownPermanentFailure, graph: 1, value: 13, generic: 2 }
+                        - { descr: shutdownBackupTimeExceeded, graph: 1, value: 14, generic: 2 }
+                        - { descr: predictiveFailure, graph: 1, value: 15, generic: 2 }
+                -
                     oid: cpqDaCntlrTable
                     value: cpqDaCntlrCondition
                     num_oid:  '.1.3.6.1.4.1.232.3.2.2.1.1.6.{{ $index }}'
@@ -122,6 +157,21 @@ modules:
                         - { descr: ok, graph: 1, value: 2, generic: 0 }
                         - { descr: degraded, graph: 1, value: 3, generic: 1 }
                         - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqDaAccelTable
+                    value: cpqDaAccelBattery
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.2.2.1.9.{{ $index }}'
+                    descr: 'Cache Module Board {{ $cpqDaAccelCntlrIndex }} Battery'
+                    index: 'cpqDaAccelBattery.{{ $index }}'
+                    state_name: cpqDaAccelBattery
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: recharging, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                        - { descr: degraded, graph: 1, value: 5, generic: 1 }
+                        - { descr: notPresent, graph: 1, value: 6, generic: 3 }
+                        - { descr: capacitorFailed, graph: 1, value: 7, generic: 1 }
                 -
                     oid: cpqDaLogDrvTable
                     value: cpqDaLogDrvCondition

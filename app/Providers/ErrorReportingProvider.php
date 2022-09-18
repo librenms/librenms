@@ -46,6 +46,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
 
     public function boot(): void
     {
+        /* @phpstan-ignore-next-line */
         if (! method_exists(\Facade\FlareClient\Flare::class, 'filterReportsUsing')) {
             Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
 

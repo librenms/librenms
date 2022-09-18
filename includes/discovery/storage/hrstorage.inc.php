@@ -25,6 +25,10 @@ if (is_array($hrstorage_array)) {
     ];
 
     foreach ($hrstorage_array as $index => $storage) {
+        if (! is_array($storage)) {
+          continue;
+        }
+
         $fstype = $storage['hrStorageType'] ?? null;
         $descr = $storage['hrStorageDescr'];
         $storage['hrStorageSize'] = fix_integer_value($storage['hrStorageSize']);

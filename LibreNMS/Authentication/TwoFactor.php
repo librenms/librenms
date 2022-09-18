@@ -110,13 +110,13 @@ class TwoFactor
         $bin = '';
         $x = -1;
         while (++$x < $len) {
-            $bin .= str_pad(base_convert(ord($raw[$x]), 10, 2), 8, '0', STR_PAD_LEFT);
+            $bin .= str_pad(base_convert((string) ord($raw[$x]), 10, 2), 8, '0', STR_PAD_LEFT);
         }
         $bin = str_split($bin, 5);
         $ret = '';
         $x = -1;
         while (++$x < sizeof($bin)) {
-            $ret .= self::$base32_enc[base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
+            $ret .= self::$base32_enc[(int) base_convert(str_pad($bin[$x], 5, '0'), 2, 10)];
         }
 
         return $ret;

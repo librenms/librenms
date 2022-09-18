@@ -30,7 +30,6 @@ use App\Models\Mempool;
 use App\Observers\MempoolObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
@@ -52,25 +51,23 @@ class Mempools implements Module
 
     public function discover(OS $os): void
     {
-        if ($os instanceof MempoolsDiscovery) {
-            $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
-                if ($mempool->isValid()) {
-                    return true;
-                }
-                Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
+        $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
+            if ($mempool->isValid()) {
+                return true;
+            }
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: Invalid total value");
 
-                return false;
-            });
-            $this->calculateAvailable($mempools);
+            return false;
+        });
+        $this->calculateAvailable($mempools);
 
-            MempoolObserver::observe('\App\Models\Mempool');
-            $this->syncModels($os->getDevice(), 'mempools', $mempools);
+        MempoolObserver::observe('\App\Models\Mempool');
+        $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
-            echo PHP_EOL;
-            $mempools->each(function ($mempool) {
-                $this->printMempool($mempool);
-            });
-        }
+        echo PHP_EOL;
+        $mempools->each(function ($mempool) {
+            $this->printMempool($mempool);
+        });
     }
 
     public function poll(OS $os): void

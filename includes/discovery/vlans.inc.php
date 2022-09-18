@@ -22,6 +22,11 @@ $base_to_index = [];
 $tmp_base_indexes = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', [], 'BRIDGE-MIB');
 // flatten the array
 foreach ($tmp_base_indexes as $index => $array) {
+    // Broken SNMP servers can return the wrong data when OID doesn't exist
+    // So lets sanity check
+    if (! array_key_exists('dot1dBasePortIfIndex', $array)) {
+        continue;
+    }
     $base_to_index[$index] = $array['dot1dBasePortIfIndex'];
 }
 $index_to_base = array_flip($base_to_index);

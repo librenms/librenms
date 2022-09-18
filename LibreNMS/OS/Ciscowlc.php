@@ -92,7 +92,7 @@ class Ciscowlc extends Cisco implements
                 d_echo($ap->toArray());
 
                 // if there is a numeric channel, assume the rest of the data is valid, I guess
-                if (! is_numeric($ap->channel)) {
+                if (! is_numeric($channel)) {
                     continue;
                 }
 
