@@ -5,16 +5,16 @@
 1.3.6.1.2.1.1.5.0|4|<private>
 1.3.6.1.2.1.1.6.0|4|<private>
 1.3.6.1.2.1.2.2.1.2.1|4|system, Loopback IP interface
-1.3.6.1.2.1.2.2.1.2.2|4|PtP-OC-Loopback, Loopback IP interface, \IP interface\
+1.3.6.1.2.1.2.2.1.2.2|4|PtP-OC-Loopback, Loopback IP interface, IP interface\
 1.3.6.1.2.1.2.2.1.2.5|4|to-SITEA-7750-1-1-8, IP interface
 1.3.6.1.2.1.2.2.1.2.39878656|4|1/3/1, 10/100/Gig Ethernet SFP
-1.3.6.1.2.1.2.2.1.2.39911424|4|1/3/2, 10/100/Gig Ethernet SFP, \Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]\
+1.3.6.1.2.1.2.2.1.2.39911424|4|1/3/2, 10/100/Gig Ethernet SFP, Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]
 1.3.6.1.2.1.2.2.1.2.39944192|4|1/3/3, 10/100/Gig Ethernet SFP
-1.3.6.1.2.1.2.2.1.2.39976960|4|1/3/4, 10/100/Gig Ethernet SFP, \Temoprary-to-SITEB-7750 1/1/12\
-1.3.6.1.2.1.2.2.1.2.40009728|4|1/3/5, 10/100/Gig Ethernet SFP, \Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]\
-1.3.6.1.2.1.2.2.1.2.40042496|4|1/3/6, 10/100/Gig Ethernet SFP, \Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)\
-1.3.6.1.2.1.2.2.1.2.40075264|4|1/3/7, 10/100/Gig Ethernet SFP, \to-TEST-CISCO-2911\
-1.3.6.1.2.1.2.2.1.2.40108032|4|1/3/8, 10/100/Gig Ethernet SFP, \SAR: to-SITEA-7750 1/1/8\
+1.3.6.1.2.1.2.2.1.2.39976960|4|1/3/4, 10/100/Gig Ethernet SFP, Temoprary-to-SITEB-7750 1/1/12
+1.3.6.1.2.1.2.2.1.2.40009728|4|1/3/5, 10/100/Gig Ethernet SFP, Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]
+1.3.6.1.2.1.2.2.1.2.40042496|4|1/3/6, 10/100/Gig Ethernet SFP, Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)
+1.3.6.1.2.1.2.2.1.2.40075264|4|1/3/7, 10/100/Gig Ethernet SFP, to-TEST-CISCO-2911
+1.3.6.1.2.1.2.2.1.2.40108032|4|1/3/8, 10/100/Gig Ethernet SFP, SAR: to-SITEA-7750 1/1/8
 1.3.6.1.2.1.2.2.1.2.41975808|4|1/4/1, 10/100/Gig Ethernet SFP
 1.3.6.1.2.1.2.2.1.2.42008576|4|1/4/2, 10/100/Gig Ethernet SFP
 1.3.6.1.2.1.2.2.1.2.42041344|4|1/4/3, 10/100/Gig Ethernet SFP
