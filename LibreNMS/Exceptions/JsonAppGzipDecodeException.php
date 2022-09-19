@@ -4,7 +4,7 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppPollingGzipDecodeException extends JsonAppException
+class JsonAppGzipDecodeException extends JsonAppException
 {
     /**
      * @var string
