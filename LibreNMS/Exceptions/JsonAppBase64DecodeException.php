@@ -4,14 +4,14 @@ namespace LibreNMS\Exceptions;
 
 use Throwable;
 
-class JsonAppPollingBase64DecodeException extends JsonAppException
+class JsonAppBase64DecodeException extends JsonAppException
 {
     private $output;
 
     /**
-     * @param  string  The message.
-     * @param  string  The return from snmpget.
-     * @param  int     Error code.
+     * @param  string  $message  The message.
+     * @param  string  $output   The return from snmpget.
+     * @param  int     $code     Error code.
      * @return static
      */
     public function __construct($message, $output, $code = 0, Throwable $previous = null)
