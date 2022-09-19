@@ -130,7 +130,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
+        $http_options = stream_context_create(array('http' => array('header'=>'Connection: close\r\n','timeout'=>'10')));
+        $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json', false, $http_options), true);
 
         if (! empty($node_info['last']['start'])) {
             $node_info['last']['start'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
@@ -150,12 +151,12 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-                $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
+                $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json', false, $http_options), true);
             }
         }
 
         if (Config::get('oxidized.features.versioning') === true) { // fetch a list of versions
-            $config_versions = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
+            $config_versions = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json', false, $http_options), true);
         }
 
         $config_total = 1;
@@ -199,13 +200,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
                 $url .= '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&oid2=' . $previous_config['oid'] . '&format=text';
 
-                $text = file_get_contents($url); // fetch diff
+                $text = file_get_contents($url, false, $http_options); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents(Config::get('oxidized.url') . '/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
+                $text = file_get_contents(Config::get('oxidized.url') . '/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text', false, $http_options);
             }
         } else {  // just fetch the only version
-            $text = file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
+            $text = file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname, false, $http_options);
         }
 
         if (is_array($node_info) || $config_total > 1) {
