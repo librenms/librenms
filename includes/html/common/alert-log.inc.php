@@ -55,7 +55,7 @@ $common_output[] = '<div class="panel panel-default panel-condensed">
             ';
 
 $device = DeviceCache::get((int) $vars['device_id']);
-$device_selected = json_encode($device->exists() ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
+$device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 
 if (isset($_POST['state'])) {
     $selected_state = '<option value="' . htmlspecialchars($_POST['state']) . '" selected="selected">';
