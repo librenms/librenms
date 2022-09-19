@@ -596,16 +596,20 @@ function update_application($app, $response, $metrics = [], $status = '')
  * -4 : Empty JSON parsed, meaning blank JSON was returned.
  * -5 : Valid json, but missing required keys
  * -6 : Returned version is less than the min version.
+ * -7 : Base64 decode failure.
+ * -8 : Gzip decode failure.
  *
  * Error checking may also be done via checking the exceptions listed below.
- *   JsonAppPollingFailedException, -2 : Empty return from SNMP.
- *   JsonAppParsingFailedException, -3 : Could not parse the JSON.
- *   JsonAppBlankJsonException, -4     : Blank JSON.
- *   JsonAppMissingKeysException, -5   : Missing required keys.
- *   JsonAppWrongVersionException , -6 : Older version than supported.
- *   JsonAppExtendErroredException     : Polling and parsing was good, but the returned data has an error set.
- *                                       This may be checked via $e->getParsedJson() and then checking the
- *                                       keys error and errorString.
+ *   JsonAppPollingFailedException, -2        : Empty return from SNMP.
+ *   JsonAppParsingFailedException, -3        : Could not parse the JSON.
+ *   JsonAppBlankJsonException, -4            : Blank JSON.
+ *   JsonAppMissingKeysException, -5          : Missing required keys.
+ *   JsonAppWrongVersionException , -6        : Older version than supported.
+ *   JsonAppExtendErroredException            : Polling and parsing was good, but the returned data has an error set.
+ *                                              This may be checked via $e->getParsedJson() and then checking the
+ *                                              keys error and errorString.
+ *   JsonAppPollingBase64DecodeException , -7 : Base64 decoding failed.
+ *   JsonAppPollingGzipDecodeException , -8   : Gzip decoding failed.
  * The error value can be accessed via $e->getCode()
  * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
  * The parsed JSON can be access via $e->getParsedJson()
@@ -641,7 +645,13 @@ function json_app_get($device, $extend, $min_version = 1)
     // checks for base64 decoding and converts it to non-base64 so it can gunzip
     if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
         $output = base64_decode($output);
+        if ( ! $output ) {
+            throw new JsonAppPollingBase64DecodeException('Base64 decode failed.', -7);
+        }
         $output = gzdecode($output);
+        if ( ! $output ) {
+            throw new JsonAppPollingGzipDecodeException('Gzip decode failed.', -8);
+        }
     }
 
     //  turn the JSON into a array
