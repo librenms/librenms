@@ -30,11 +30,14 @@ use Symfony\Component\Console\Input\InputOption;
 class DynamicInputOption extends InputOption
 {
     /** @var callable|null */
-    private $valuesCallable;
+    private $descriptionCallable;
+    /** @var callable|null */
+    private $defaultCallable;
 
-    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null, ?callable $valuesCallable = null)
+    public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null, ?callable $defaultCallable = null, ?callable $descriptionCallable = null)
     {
-        $this->valuesCallable = $valuesCallable;
+        $this->descriptionCallable = $descriptionCallable;
+        $this->defaultCallable = $defaultCallable;
 
         parent::__construct($name, $shortcut, $mode, $description, $default);
     }
@@ -43,10 +46,19 @@ class DynamicInputOption extends InputOption
     {
         $description = parent::getDescription();
 
-        if (is_callable($this->valuesCallable)) {
-            $description .= ' [' . implode(', ', call_user_func($this->valuesCallable)) . ']';
+        if (is_callable($this->descriptionCallable)) {
+            $description .= ' [' . implode(', ', call_user_func($this->descriptionCallable)) . ']';
         }
 
         return $description;
+    }
+
+    public function getDefault()
+    {
+        if (is_callable($this->defaultCallable)) {
+            return call_user_func($this->defaultCallable);
+        }
+
+        return parent::getDefault();
     }
 }
