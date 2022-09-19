@@ -127,14 +127,16 @@ class PingCheck implements ShouldQueue
                 continue;
             }
 
-            if (preg_match(
-                '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/',
-                $line,
-                $captured
-            )) {
-                $this->recordData($captured);
+            foreach (preg_split("/((\r?\n)|(\r\n?))/", $line) as $oneline) {
+                if (preg_match(
+                    '/^(?<hostname>[^\s]+) is (?<status>alive|unreachable)(?: \((?<rtt>[\d.]+) ms\))?/',
+                    $oneline,
+                    $captured
+                )) {
+                    $this->recordData($captured);
 
-                $this->processTier();
+                    $this->processTier();
+                }
             }
         }
 
