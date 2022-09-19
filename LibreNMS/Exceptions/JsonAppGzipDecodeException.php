@@ -10,8 +10,8 @@ class JsonAppPollingGzipDecodeException extends JsonAppException
 
     /**
      * @param  string  $message  The message.
-     * @param  string  $output   The return from snmpget.
-     * @param  int     $code     Error code.
+     * @param  string  $output  The return from snmpget.
+     * @param  int  $code  Error code.
      * @return static
      */
     public function __construct($message, $output, $code = 0, Throwable $previous = null)
