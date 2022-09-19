@@ -221,6 +221,6 @@ class SocialiteController extends Controller
             return;
         }
 
-        (new $listener)->handle(new \SocialiteProviders\Manager\SocialiteWasCalled());
+        (new $listener)->handle(app(\SocialiteProviders\Manager\SocialiteWasCalled::class));
     }
 }
