@@ -6,6 +6,9 @@ use Throwable;
 
 class JsonAppBase64DecodeException extends JsonAppException
 {
+    /**
+     * @var string
+     */
     private $output;
 
     /**

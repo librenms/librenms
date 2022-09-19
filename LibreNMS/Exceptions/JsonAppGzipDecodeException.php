@@ -6,6 +6,9 @@ use Throwable;
 
 class JsonAppPollingGzipDecodeException extends JsonAppException
 {
+    /**
+     * @var string
+     */
     private $output;
 
     /**
