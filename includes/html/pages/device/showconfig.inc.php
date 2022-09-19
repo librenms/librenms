@@ -130,7 +130,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $http_options = stream_context_create(array('http' => array('header'=>'Connection: close\r\n','timeout'=>'10')));
+        $http_options = stream_context_create(['http' => ['header'=>'Connection: close\r\n', 'timeout'=>'10']]);
         $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json', false, $http_options), true);
 
         if (! empty($node_info['last']['start'])) {
