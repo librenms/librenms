@@ -24,12 +24,6 @@ class DeviceAdd extends LnmsCommand
      * @var string
      */
     protected $name = 'device:add';
-    /**
-     * Valid values for options
-     *
-     * @var string[][]|null
-     */
-    protected $optionValues;
 
     /**
      * Create a new command instance.
@@ -47,13 +41,29 @@ class DeviceAdd extends LnmsCommand
             'privacy-protocol' => [\LibreNMS\SNMPCapabilities::class, 'supportedCryptoAlgorithms'],
         ];
 
+        $this->optionDefaults = [
+            'port' => function () {
+                return Config::get('snmp.port', 161);
+            },
+            'transport' => function () {
+                return Config::get('snmp.transports.0', 'udp');
+            },
+            'poller-group' => function () {
+                return Config::get('default_poller_group');
+            },
+            'port-association-mode' => function () {
+                return Config::get('default_port_association_mode');
+            },
+
+        ];
+
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('v1', '1', InputOption::VALUE_NONE);
         $this->addOption('v2c', '2', InputOption::VALUE_NONE);
         $this->addOption('v3', '3', InputOption::VALUE_NONE);
         $this->addOption('community', 'c', InputOption::VALUE_REQUIRED);
-        $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, Config::get('snmp.port', 161));
-        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, Config::get('snmp.transports.0', 'udp'));
+        $this->addOption('port', 'r', InputOption::VALUE_REQUIRED);
+        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED);
         $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
         $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, null, 'root');
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
@@ -62,8 +72,8 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, null, 'AES');
         $this->addOption('force', 'f', InputOption::VALUE_NONE);
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
-        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED, null, Config::get('default_poller_group'));
-        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, Config::get('default_port_association_mode'));
+        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED);
+        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED);
         $this->addOption('ping-only', 'P', InputOption::VALUE_NONE);
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('hardware', 'w', InputOption::VALUE_REQUIRED);
