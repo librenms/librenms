@@ -1,10 +1,9 @@
 <?php
 
 $hrDevice_oids = [
-    'hrDeviceEntry',
-    'hrProcessorEntry',
+    'hrDeviceTable',
+    'hrProcessorTable',
 ];
-d_echo($hrDevices);
 
 $hrDevices = [];
 foreach ($hrDevice_oids as $oid) {
@@ -20,8 +19,8 @@ if (is_array($hrDevices)) {
                 $update_array = [
                     'hrDeviceType'   => $hrDevice['hrDeviceType'],
                     'hrDeviceDescr'  => $hrDevice['hrDeviceDescr'],
-                    'hrDeviceStatus' => $hrDevice['hrDeviceStatus'],
-                    'hrDeviceErrors' => $hrDevice['hrDeviceErrors'],
+                    'hrDeviceStatus' => $hrDevice['hrDeviceStatus'] ?? 'unknown',
+                    'hrDeviceErrors' => $hrDevice['hrDeviceErrors'] ?? 0,
                 ];
                 if ($hrDevice['hrDeviceType'] == 'hrDeviceProcessor') {
                     $update_array['hrProcessorLoad'] = $hrDevice['hrProcessorLoad'];

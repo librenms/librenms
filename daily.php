@@ -287,7 +287,7 @@ if ($options['f'] === 'alert_log') {
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    $sql = str_replace('?', strval($purge_duration), $sql);
+    $sql = preg_replace('/\?/', strval($purge_duration), $sql, 1);
     lock_and_purge_query($table, $sql, $msg);
 }
 
@@ -378,7 +378,9 @@ if ($options['f'] === 'mac_oui') {
 
 if ($options['f'] === 'refresh_os_cache') {
     echo 'Clearing OS cache' . PHP_EOL;
-    unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    if (is_file(Config::get('install_dir') . '/cache/os_defs.cache')) {
+        unlink(Config::get('install_dir') . '/cache/os_defs.cache');
+    }
 }
 
 if ($options['f'] === 'recalculate_device_dependencies') {

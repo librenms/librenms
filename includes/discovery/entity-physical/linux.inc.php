@@ -1,9 +1,10 @@
 <?php
 
-$controller_array = snmpwalk_cache_multi_oid($device, 'adapterInfoTable', $controller_array, 'LSI-MegaRAID-SAS-MIB');
-$enclosures = snmpwalk_cache_multi_oid($device, 'enclosureTable', $enclosures, 'LSI-MegaRAID-SAS-MIB');
-$drives = snmpwalk_cache_multi_oid($device, 'physicalDriveTable', $drives, 'LSI-MegaRAID-SAS-MIB');
-$bbus = snmpwalk_cache_multi_oid($device, 'bbuTable', $bbus, 'LSI-MegaRAID-SAS-MIB');
+$controller_array = snmpwalk_cache_multi_oid($device, 'adapterInfoTable', [], 'LSI-MegaRAID-SAS-MIB');
+$enclosures = snmpwalk_cache_multi_oid($device, 'enclosureTable', [], 'LSI-MegaRAID-SAS-MIB');
+$drives = snmpwalk_cache_multi_oid($device, 'physicalDriveTable', [], 'LSI-MegaRAID-SAS-MIB');
+$bbus = snmpwalk_cache_multi_oid($device, 'bbuTable', [], 'LSI-MegaRAID-SAS-MIB');
+$entity_array = [];
 
 foreach ($controller_array as $controller) {
     // Discover the chassis

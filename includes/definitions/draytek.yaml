@@ -13,3 +13,7 @@ discovery:
     -
         sysDescr_regex:
             - '/^DrayTek/'
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

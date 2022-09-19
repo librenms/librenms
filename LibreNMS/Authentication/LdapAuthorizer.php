@@ -330,7 +330,7 @@ class LdapAuthorizer extends AuthorizerBase
      * @internal
      *
      * @param  bool  $skip_bind  do not attempt to bind on connection
-     * @return false|resource
+     * @return \LDAP\Connection
      *
      * @throws AuthenticationException
      */
@@ -366,7 +366,7 @@ class LdapAuthorizer extends AuthorizerBase
         ];
     }
 
-    private function connect()
+    private function connect(): void
     {
         if ($this->ldap_connection) {
             return;

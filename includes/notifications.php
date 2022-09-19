@@ -87,7 +87,7 @@ function parse_rss($feed)
             'title'=>$item['title'],
             'body'=>$item['description'],
             'checksum'=>hash('sha512', $item['title'] . $item['description']),
-            'datetime'=>strftime('%F', strtotime($item['pubDate']) ?: time()),
+            'datetime'=>date('Y-m-d', strtotime($item['pubDate']) ?: time()),
         ];
     }
 
@@ -111,7 +111,7 @@ function parse_atom($feed)
             'title'=>$item['title'],
             'body'=>$item['content'],
             'checksum'=>hash('sha512', $item['title'] . $item['content']),
-            'datetime'=>strftime('%F', strtotime($item['updated']) ?: time()),
+            'datetime'=>date('Y-m-d', strtotime($item['updated']) ?: time()),
         ];
     }
 
@@ -136,7 +136,7 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
         'severity' => $severity,
         'source' => $source,
         'checksum' => hash('sha512', $title . $message),
-        'datetime' => strftime('%F', is_null($date) ? time() : strtotime($date)),
+        'datetime' => date('Y-m-d', is_null($date) ? time() : strtotime($date)),
     ];
 
     if (dbFetchCell('SELECT 1 FROM `notifications` WHERE `checksum` = ?', [$notif['checksum']]) != 1) {

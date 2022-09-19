@@ -14,21 +14,22 @@ if (session('widescreen')) {
     $thumb_width = 113;
 }
 
-$vars['from'] = parse_at_time($vars['from']) ?: Config::get('time.day');
-$vars['to'] = parse_at_time($vars['to']) ?: Config::get('time.now');
+$vars['from'] = parse_at_time($vars['from'] ?? '') ?: Config::get('time.day');
+$vars['to'] = parse_at_time($vars['to'] ?? '') ?: Config::get('time.now');
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
 $type = basename($graphtype['type']);
 $subtype = basename($graphtype['subtype']);
-$id = $vars['id'];
+$id = $vars['id'] ?? null;
 
-if (is_numeric($vars['device'])) {
-    $device = device_by_id_cache($vars['device']);
-} elseif (! empty($vars['device'])) {
-    $device = device_by_name($vars['device']);
+if (isset($vars['device'])) {
+    $device = is_numeric($vars['device'])
+        ? device_by_id_cache($vars['device'])
+        : device_by_name($vars['device']);
 }
 
+$auth = false;
 if (is_file('includes/html/graphs/' . $type . '/auth.inc.php')) {
     require 'includes/html/graphs/' . $type . '/auth.inc.php';
 }
@@ -128,7 +129,7 @@ if (! $auth) {
 
     echo '<div style="padding-top: 5px";></div>';
     echo '<center>';
-    if ($vars['legend'] == 'no') {
+    if (isset($vars['legend']) && $vars['legend'] == 'no') {
         echo generate_link('Show Legend', $vars, ['page' => 'graphs', 'legend' => null]);
     } else {
         echo generate_link('Hide Legend', $vars, ['page' => 'graphs', 'legend' => 'no']);
@@ -138,7 +139,7 @@ if (! $auth) {
     //  if ($type == "port" && $subtype == "bits")
     //  {
     echo ' | ';
-    if ($vars['previous'] == 'yes') {
+    if (isset($vars['previous']) && $vars['previous'] == 'yes') {
         echo generate_link('Hide Previous', $vars, ['page' => 'graphs', 'previous' => null]);
     } else {
         echo generate_link('Show Previous', $vars, ['page' => 'graphs', 'previous' => 'yes']);
@@ -146,7 +147,7 @@ if (! $auth) {
     //  }
 
     echo ' | ';
-    if ($vars['showcommand'] == 'yes') {
+    if (isset($vars['showcommand']) && $vars['showcommand'] == 'yes') {
         echo generate_link('Hide RRD Command', $vars, ['page' => 'graphs', 'showcommand' => null]);
     } else {
         echo generate_link('Show RRD Command', $vars, ['page' => 'graphs', 'showcommand' => 'yes']);
@@ -186,7 +187,7 @@ if (! $auth) {
         print_optionbar_end();
     }
 
-    if ($vars['showcommand']) {
+    if (! empty($vars['showcommand'])) {
         $_GET = $graph_array;
         $command_only = 1;
 

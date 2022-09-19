@@ -28,7 +28,6 @@ namespace LibreNMS\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\Model;
@@ -142,7 +141,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $processors = self::processYaml($os);
 
         // if no processors found, check OS discovery (which will fall back to HR and UCD if not implemented
-        if (empty($processors) && $os instanceof ProcessorDiscovery) {
+        if (empty($processors)) {
             $processors = $os->discoverProcessors();
         }
 

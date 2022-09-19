@@ -25,7 +25,7 @@ class OspfPortFactory extends Factory
         return [
             'id' => $this->faker->randomDigit(),
             'ospf_port_id' => $this->faker->randomDigit(),
-            'ospfIfIpAddress' => $this->faker->ipv4,
+            'ospfIfIpAddress' => $this->faker->ipv4(),
             'ospfAddressLessIf' => $this->faker->randomDigit(),
             'ospfIfAreaId' => '0.0.0.0',
         ];

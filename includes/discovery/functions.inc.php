@@ -76,18 +76,14 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
     }
 
     try {
-        $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('default_poller_group'));
+        $remote_device_id = addHost($hostname, '', '161', 'udp', $device['poller_group']); // discover with actual poller group
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
         discover_device($remote_device);
         device_by_id_cache($remote_device_id, 1);
 
         if ($remote_device_id && is_array($device) && ! empty($method)) {
-            $extra_log = '';
-            $int = cleanPort($interface);
-            if (is_array($int)) {
-                $extra_log = ' (port ' . $int['label'] . ') ';
-            }
+            $extra_log = is_array($interface) ? ' (port ' . cleanPort($interface)['label'] . ') ' : '';
 
             log_event('Device ' . $remote_device['hostname'] . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $remote_device_id, 'discovery', 1);
         } else {
@@ -159,6 +155,7 @@ function discover_device(&$device, $force_module = false)
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 Log::event("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
+                report($e);
             }
 
             $module_time = microtime(true) - $module_start;
@@ -949,7 +946,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
-                        $sensor_name = $data['state_name'] ?: $data['oid'];
+                        $sensor_name = $data['state_name'] ?? $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
@@ -1022,7 +1019,7 @@ function build_bgp_peers($device, $data, $peer2)
 
     $peerlist = [];
     $ver = '';
-    foreach (explode("\n", $peers) as $peer) {
+    foreach ($peers ? explode("\n", $peers) : [] as $peer) {
         $local_ip = null;
         if ($peer2 === true) {
             [$ver, $peer] = explode('.', $peer, 2);

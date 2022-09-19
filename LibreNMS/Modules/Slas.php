@@ -20,6 +20,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\Sla;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\DB\SyncsModels;
@@ -33,12 +34,20 @@ class Slas implements Module
     use SyncsModels;
 
     /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         if ($os instanceof SlaDiscovery) {
             $slas = $os->discoverSlas();
@@ -54,7 +63,7 @@ class Slas implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         if ($os instanceof SlaPolling) {
             // Gather our SLA's from the DB.
@@ -72,11 +81,20 @@ class Slas implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  \LibreNMS\OS  $os
      */
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->slas()->delete();
+        $device->slas()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'slas' => $device->slas()->orderBy('sla_nr')
+                ->get()->map->makeHidden(['device_id', 'sla_id']),
+        ];
     }
 }

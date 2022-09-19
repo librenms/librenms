@@ -30,9 +30,10 @@ APP_TRUSTED_PROXIES=192.168.1.0/24,192.167.8.20
 
 ## Base url
 
-Set the base url for generated urls. Do not set this if it is not needed.
+Set the base url for generated urls.
 
-You may need to set this when using reverse proxies combined with a subdirectory.
+This will be needed when using signed graph urls for alerting. It may
+be needed when using reverse proxies combined with a subdirectory.
 
 Generally, LibreNMS will make correct URLs (especially if you have set
 up your proxy variables correctly)

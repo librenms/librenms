@@ -534,6 +534,16 @@
     "severity":"critical"
   },
   {
+    "rule": "applications.app_type = \"opensearch\" && application_metrics.metric = \".status\" && application_metrics.value = \"1\"",
+    "name": "Opensearch/Elasticsearch Cluster Status Yellow",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"opensearch\" && application_metrics.metric = \".status\" && application_metrics.value = \"2\"",
+    "name": "Opensearch/Elasticsearch Cluster Status Red",
+    "severity": "critical"
+  },
+  {
     "rule": "applications.app_type = \"sagan\" && application_metrics.metric = \".total_alert\" && application_metrics.value = \"1\"",
     "name": "Sagan has a WARNING alert",
     "severity": "warning"

@@ -9,3 +9,7 @@ over:
 discovery:
     -
         sysObjectID: [ .1.3.6.1.4.1.3902.1004., .1.3.6.1.4.1.3902.1015. ]
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true
