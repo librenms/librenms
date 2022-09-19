@@ -645,11 +645,11 @@ function json_app_get($device, $extend, $min_version = 1)
     // checks for base64 decoding and converts it to non-base64 so it can gunzip
     if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
         $output = base64_decode($output);
-        if (! $output ) {
+        if (! $output) {
             throw new JsonAppBase64DecodeException('Base64 decode failed.', $orig_output, -7);
         }
         $output = gzdecode($output);
-        if (! $output ) {
+        if (! $output) {
             throw new JsonAppGzipDecodeException('Gzip decode failed.', $orig_output, -8);
         }
     }
