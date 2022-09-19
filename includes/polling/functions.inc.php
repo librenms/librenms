@@ -646,11 +646,11 @@ function json_app_get($device, $extend, $min_version = 1)
     if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
         $output = base64_decode($output);
         if ( ! $output ) {
-            throw new JsonAppPollingBase64DecodeException('Base64 decode failed.', -7);
+            throw new JsonAppPollingBase64DecodeException('Base64 decode failed.', $orig_output, -7);
         }
         $output = gzdecode($output);
         if ( ! $output ) {
-            throw new JsonAppPollingGzipDecodeException('Gzip decode failed.', -8);
+            throw new JsonAppPollingGzipDecodeException('Gzip decode failed.', $orig_output, -8);
         }
     }
 
