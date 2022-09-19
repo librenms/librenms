@@ -39,7 +39,7 @@ class BaseApi
             $this->client = Http::withOptions([
                 'proxy' => Proxy::forGuzzle($this->base_uri),
             ])->baseUrl($this->base_uri)
-            ->timeout(3);
+            ->timeout(10);
         }
 
         return $this->client;
