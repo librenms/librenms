@@ -32,7 +32,6 @@ use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
-use Log;
 
 class SocialiteController extends Controller
 {
@@ -41,6 +40,7 @@ class SocialiteController extends Controller
 
     public function __construct()
     {
+        app()->register(\SocialiteProviders\Manager\ServiceProvider::class);
         $this->injectConfig();
     }
 
@@ -49,7 +49,6 @@ class SocialiteController extends Controller
      */
     public function redirect(Request $request, string $provider)
     {
-        $this->registerProvider($provider);
         // Re-store target url since it will be forgotten after the redirect
         $request->session()->put('url.intended', redirect()->intended()->getTargetUrl());
 
@@ -58,7 +57,6 @@ class SocialiteController extends Controller
 
     public function callback(Request $request, string $provider): RedirectResponse
     {
-        $this->registerProvider($provider);
         $this->socialite_user = Socialite::driver($provider)->user();
 
         // If we already have a valid session, user is trying to pair their account
@@ -76,7 +74,6 @@ class SocialiteController extends Controller
      */
     public function metadata(Request $request, string $provider): \Illuminate\Http\Response
     {
-        $this->registerProvider($provider);
         $socialite = Socialite::driver($provider);
 
         if (method_exists($socialite, 'getServiceProviderMetadata')) {
@@ -204,23 +201,5 @@ class SocialiteController extends Controller
         if (! Config::has("services.$provider.client_secret")) {
             Config::set("services.$provider.client_secret", '');
         }
-    }
-
-    private function registerProvider(string $provider): void
-    {
-        $listener = LibreNMSConfig::get("auth.socialite.configs.$provider.listener");
-
-        // Treat not set as "disabled"
-        if (empty($listener)) {
-            return;
-        }
-
-        if (! class_exists($listener)) {
-            Log::error("Wrong value set for auth.socialite.configs.$provider.listener, class: '$listener' does not exist!");
-
-            return;
-        }
-
-        (new $listener)->handle(app(\SocialiteProviders\Manager\SocialiteWasCalled::class));
     }
 }

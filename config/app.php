@@ -173,7 +173,6 @@ return [
         /*
          * Package Service Providers...
          */
-        \SocialiteProviders\Manager\ServiceProvider::class,
 
         /*
          * LibreNMS Service Providers...
