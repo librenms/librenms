@@ -294,7 +294,7 @@ class PingCheck implements ShouldQueue
     /**
      * Defer this data processing until all parent devices are complete
      */
-    private function defer(string $hostname, string $status, int $rtt): void
+    private function defer(string $hostname, string $status, float $rtt): void
     {
         $device = $this->devices->get($hostname);
 
