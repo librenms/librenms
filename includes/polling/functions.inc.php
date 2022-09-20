@@ -13,6 +13,7 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -648,11 +649,20 @@ function json_app_get($device, $extend, $min_version = 1)
     if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output)) {
         $output = base64_decode($output);
         if (! $output) {
+            if (Debug::isEnabled()) {
+                echo "Decoding Base64 Failed...\n\n";
+            }
             throw new JsonAppBase64DecodeException('Base64 decode failed.', $orig_output, -7);
         }
         $output = gzdecode($output);
         if (! $output) {
+            if (Debug::isEnabled()) {
+                echo "Decoding GZip failed...\n\n";
+            }
             throw new JsonAppGzipDecodeException('Gzip decode failed.', $orig_output, -8);
+        }
+        if (Debug::isVerbose()) {
+            echo "Decoded Base64+GZip Output: " . $output . "\n\n";
         }
     }
 
