@@ -58,7 +58,7 @@ class Sensor implements DiscoveryModule, PollerModule
     private $low_warn;
     private $entPhysicalIndex;
     private $entPhysicalMeasured;
-    private $rrd_type = 'GAUGE';
+    private string $rrd_type = 'GAUGE';
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
