@@ -72,6 +72,8 @@ class Oxidized extends BaseApi
     {
         if ($this->enabled) {
             return $this->getClient()->get($uri);
+        } else {
+            return "";
         }
     }
 }
