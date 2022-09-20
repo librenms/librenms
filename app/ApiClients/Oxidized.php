@@ -66,4 +66,15 @@ class Oxidized extends BaseApi
 
         return false;
     }
+    
+    /**
+    * Get content of the page
+    */
+    public function getContent(string $uri): string
+    {
+        if ($this->enabled) {
+            return $this->getClient()->get($uri);
+        }
+    }
+ }
 }
