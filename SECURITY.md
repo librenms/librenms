@@ -19,3 +19,10 @@ get back to as quick as we can, this is usually within 24 hours.
 We are happy to attribute credit to the findings, but we ask that we're
 given a chance to patch any vulnerability before public disclosure so
 that our users can update as soon as a fix is available.
+
+
+# Reporting a Vulnerability
+
+If you discover a security vulnerability in librenms please disclose it via [our huntr page](https://huntr.dev/repos/librenms/librenms/). Bounty eligibility, CVE assignment, response times and past reports are all there.
+
+Thank you for improving the security of librenms.

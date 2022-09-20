@@ -13,7 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -90,36 +89,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= addslashes(csrf_field());
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
     $output .= "<div class='form-group'>";
-    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
-    $output .= "<option value=''>All Devices</option>";
-
-//    if (Auth::user()->hasGlobalRead()) {
-    $results = Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName')->orderBy('hostname');
-//    } else {
-//        $results = dbFetchRows('SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`', [Auth::id()]);
-//    }
-    foreach ($results as $data) {
-        $deviceselected = isset($vars['device_id']) && $data['device_id'] == $vars['device_id'] ? 'selected' : '';
-        $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . '...' : format_hostname($data);
-        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . '>' . $ui_device . '</option>';
-    }
-
-    if (! Auth::user()->hasGlobalRead()) {
-        $results = dbFetchRows('SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`', [Auth::id()]);
-    } else {
-        $results = [];
-    }
-
-    foreach ($results as $data) {
-        if ($data['device_id'] == $vars['device_id']) {
-            $deviceselected = 'selected';
-        } else {
-            $deviceselected = '';
-        }
-        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . '>' . format_hostname($data) . '</option>';
-    }
-
-    $output .= '</select>&nbsp;';
+    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
     $hasvalue = ! empty($vars['hostname']) ? "value='" . $vars['hostname'] . "'" : '';
 

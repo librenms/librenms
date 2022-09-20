@@ -144,7 +144,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             echo "\n";
         }
 
-        foreach (array_keys($agent_data['app']) as $key) {
+        foreach (array_keys($agent_data['app'] ?? []) as $key) {
             if (file_exists("includes/polling/applications/$key.inc.php")) {
                 d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
 
