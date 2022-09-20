@@ -149,7 +149,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-+                $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+                $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
             }
         }
 
