@@ -662,7 +662,7 @@ function json_app_get($device, $extend, $min_version = 1)
             throw new JsonAppGzipDecodeException('Gzip decode failed.', $orig_output, -8);
         }
         if (Debug::isVerbose()) {
-            echo "Decoded Base64+GZip Output: " . $output . "\n\n";
+            echo 'Decoded Base64+GZip Output: ' . $output . "\n\n";
         }
     }
 
