@@ -149,11 +149,13 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // Try Oxidized again with new hostname, if it has changed
             if ($oxidized_hostname != $device['hostname']) {
-+                $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);            }
++                $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+            }
         }
 
         if (Config::get('oxidized.features.versioning') === true) { // fetch a list of versions
-            (string) $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);        }
+            (string) $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
+        }
 
         $config_total = 1;
         if (is_array($config_versions)) {
