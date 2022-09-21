@@ -31,7 +31,7 @@ use LibreNMS\Util\Proxy;
 class BaseApi
 {
     protected $base_uri;
-    /** @var int $timeout */
+    /** @var int */
     protected $timeout;
     private $client;
 
