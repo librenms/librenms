@@ -330,6 +330,7 @@ foreach ($VMs as $vm) {
 
     $app_data['VMifs'][$vm] = $vm_ifs;
 }
+
 //
 // all done so update the app metrics and app_data
 //
