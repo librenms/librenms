@@ -31,7 +31,13 @@ use LibreNMS\Util\Proxy;
 class BaseApi
 {
     protected $base_uri;
+    protected int $timeout;
     private $client;
+
+    public function __construct(int $timeout = 3)
+    {
+        $this->$timeout = $timeout;
+    }
 
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
@@ -39,7 +45,7 @@ class BaseApi
             $this->client = Http::withOptions([
                 'proxy' => Proxy::forGuzzle($this->base_uri),
             ])->baseUrl($this->base_uri)
-            ->timeout(3);
+            ->timeout($this->timeout);
         }
 
         return $this->client;
