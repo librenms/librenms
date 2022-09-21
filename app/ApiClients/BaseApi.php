@@ -36,7 +36,7 @@ class BaseApi
 
     public function __construct(int $timeout = 3)
     {
-        $this->$timeout = $timeout;
+        $this->timeout = $timeout;
     }
 
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
