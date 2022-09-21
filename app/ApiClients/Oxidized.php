@@ -38,6 +38,7 @@ class Oxidized extends BaseApi
     {
         $this->base_uri = Config::get('oxidized.url');
         $this->enabled = Config::get('oxidized.enabled') === true && $this->base_uri;
+        $this->timeout = 90;
     }
 
     /**
