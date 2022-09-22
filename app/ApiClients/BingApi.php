@@ -37,11 +37,6 @@ class BingApi extends BaseApi implements Geocoder
     protected $base_uri = 'http://dev.virtualearth.net';
     protected $geocoding_uri = '/REST/v1/Locations';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Get latitude and longitude from geocode response
      *
