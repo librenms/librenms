@@ -37,11 +37,6 @@ class MapquestApi extends BaseApi implements Geocoder
     protected $base_uri = 'https://open.mapquestapi.com';
     protected $geocoding_uri = '/geocoding/v1/address';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Get latitude and longitude from geocode response
      *
