@@ -37,11 +37,6 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected $base_uri = 'https://maps.googleapis.com';
     protected $geocoding_uri = '/maps/api/geocode/json';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Get latitude and longitude from geocode response
      *
