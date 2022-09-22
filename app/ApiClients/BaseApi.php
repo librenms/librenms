@@ -32,13 +32,8 @@ class BaseApi
 {
     protected $base_uri;
     /** @var int */
-    protected $timeout;
+    protected $timeout = 3;
     private $client;
-
-    public function __construct(int $timeout = 3)
-    {
-        $this->timeout = $timeout;
-    }
 
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
