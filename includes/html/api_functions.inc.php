@@ -1169,20 +1169,20 @@ function list_alert_rules(Illuminate\Http\Request $request)
 
     $i = 0;
     foreach ($rules as $rule) {
-        if ($rule["devices"] == null) {
-            unset($rules[$i]["devices"]);
+        if ($rule['devices'] == null) {
+            unset($rules[$i]['devices']);
         } else {
-            $rules[$i]["devices"] = array_map('intval', explode(',', $rules[$i]["devices"]));
+            $rules[$i]['devices'] = array_map('intval', explode(',', $rules[$i]['devices']));
         }
-        if ($rule["groups"] == null) {
-            unset($rules[$i]["groups"]);
+        if ($rule['groups'] == null) {
+            unset($rules[$i]['groups']);
         } else {
-            $rules[$i]["groups"] = array_map('intval', explode(',', $rules[$i]["groups"]));
+            $rules[$i]['groups'] = array_map('intval', explode(',', $rules[$i]['groups']));
         }
-        if ($rule["locations"] == null) {
-            unset($rules[$i]["locations"]);
+        if ($rule['locations'] == null) {
+            unset($rules[$i]['locations']);
         } else {
-            $rules[$i]["locations"] = array_map('intval', explode(',', $rules[$i]["locations"]));
+            $rules[$i]['locations'] = array_map('intval', explode(',', $rules[$i]['locations']));
         }
         $i++;
     }
