@@ -34,11 +34,6 @@ class NominatimApi extends BaseApi implements Geocoder
     protected $base_uri = 'https://nominatim.openstreetmap.org';
     protected $geocoding_uri = '/search';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Get latitude and longitude from geocode response
      *
