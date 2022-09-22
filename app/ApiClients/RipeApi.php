@@ -35,11 +35,6 @@ class RipeApi extends BaseApi
     protected $whois_uri = '/data/whois/data.json';
     protected $abuse_uri = '/data/abuse-contact-finder/data.json';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     /**
      * Get whois info
      *
