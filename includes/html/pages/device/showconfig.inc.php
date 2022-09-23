@@ -130,7 +130,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        (string) $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+        string $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
         if (! empty($node_info['last']['start'])) {
             $node_info['last']['start'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
         }
@@ -154,7 +154,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
 
         if (Config::get('oxidized.features.versioning') === true) { // fetch a list of versions
-            (string) $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
+            string $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
         }
 
         $config_total = 1;
