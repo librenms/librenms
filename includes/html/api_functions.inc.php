@@ -993,7 +993,7 @@ function get_port_graphs(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $columns = $request->get('columns', 'ifName');
 
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 
@@ -1075,7 +1075,7 @@ function search_ports(Illuminate\Http\Request $request)
     $field = $request->route('field');
     $search = $request->route('search');
     $columns = $request->get('columns');
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 
@@ -1104,7 +1104,7 @@ function search_ports(Illuminate\Http\Request $request)
 function get_all_ports(Illuminate\Http\Request $request)
 {
     $columns = $request->get('columns', 'port_id, ifName');
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 
