@@ -45,7 +45,6 @@ class Notifications
                 Notification::create($notif);
                 echo '.';
             }
-
         }
         echo ' Done' . PHP_EOL;
     }
@@ -63,6 +62,7 @@ class Notifications
     public static function create(string $title, string $message, string $source, int $severity = 0, ?string $date = null): bool
     {
         $checksum = hash('sha512', $title . $message);
+
         return Notification::firstOrCreate([
             'checksum' => $checksum,
         ], [

@@ -191,11 +191,11 @@ class Plugins
                     } else {
                         @call_user_func_array([$plugin, $hook], $params);
                     }
-                } catch (\Exception | \Error $e) {
+                } catch (\Exception|\Error $e) {
                     Log::error($e);
 
-                    if (property_exists($plugin, 'name')) {
-                        $class = get_class($plugin);
+                    $class = get_class($plugin);
+                    if (property_exists($class, 'name')) {
                         $name = $class::$name;
 
                         Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);

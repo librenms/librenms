@@ -37,11 +37,12 @@ class Notification extends Model
         'datetime',
     ];
 
-    public static function boot() {
+    public static function boot()
+    {
         parent::boot();
 
         // delete attribs for this notification
-        static::deleting(function(Notification $notification) {
+        static::deleting(function (Notification $notification) {
             $notification->attribs()->delete();
         });
     }
