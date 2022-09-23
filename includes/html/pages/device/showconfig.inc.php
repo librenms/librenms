@@ -192,16 +192,16 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($previous_config)) {
-                (string) $uri = '/node/version/diffs?node=' . $oxidized_hostname;
+                string $uri = '/node/version/diffs?node=' . $oxidized_hostname;
                 if (! empty($node_info['group'])) {
                     $uri .= '&group=' . $node_info['group'];
                 }
                 $uri .= '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&oid2=' . $previous_config['oid'] . '&format=text';
 
-                (string) $text = (new \App\ApiClients\Oxidized())->getContent($uri); // fetch diff
+                string $text = (new \App\ApiClients\Oxidized())->getContent($uri); // fetch diff
             } else {
                 // fetch current_version
-                (string) $text = (new \App\ApiClients\Oxidized())->getContent('/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
+                string $text = (new \App\ApiClients\Oxidized())->getContent('/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
             }
         } else {  // just fetch the only version
             $text = (new \App\ApiClients\Oxidized())->getContent('/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
