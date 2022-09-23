@@ -6,6 +6,7 @@ use App\Models\Plugin;
 use App\Plugins\Hooks\SettingsHook;
 use App\Plugins\PluginManager;
 use Illuminate\Http\Request;
+use LibreNMS\Util\Notifications;
 
 class PluginSettingsController extends Controller
 {
@@ -31,12 +32,17 @@ class PluginSettingsController extends Controller
 
     public function update(Request $request, Plugin $plugin): \Illuminate\Http\RedirectResponse
     {
-        $validated = $this->validate($request, [
+        $plugin->fill($this->validate($request, [
             'plugin_active' => 'in:0,1',
             'settings' => 'array',
-        ]);
+        ]));
 
-        $plugin->fill($validated)->save();
+        if ($plugin->isDirty('plugin_active') && $plugin->plugin_active == 1) {
+            // enabling plugin delete notifications assuming they are fixed
+            Notifications::remove("Plugin $plugin->plugin_name disabled");
+        }
+
+        $plugin->save();
 
         return redirect()->back();
     }
