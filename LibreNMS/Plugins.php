@@ -194,13 +194,11 @@ class Plugins
                 } catch (\Exception|\Error $e) {
                     Log::error($e);
 
-                    $class = get_class($plugin);
-                    if (property_exists($class, 'name')) {
-                        $name = $class::$name;
+                    $class = (string) get_class($plugin);
+                    $name = property_exists($class, 'name') ? $class::$name : basename(str_replace('\\', '/', $class));
 
-                        Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);
-                        Plugin::where('plugin_name', $name)->update(['plugin_active' => 0]);
-                    }
+                    Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);
+                    Plugin::where('plugin_name', $name)->update(['plugin_active' => 0]);
                 }
             }
         }
