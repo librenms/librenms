@@ -2,15 +2,17 @@
 
 unset($port_stats);
 
-$sfp_stats = snmpwalk_group($device, 'ubntSfps', 'UBNT-UFIBER-MIB', 1, $sfp_stats);
+$sfp_stats = snmpwalk_group($device, 'ubntSfpsTable', 'UBNT-UFIBER-MIB');
 
-$index = 0;
-for ($index = 0; $index < count($sfp_stats); $index++) {
-    $port_stats[$index + 1]['ifDescr'] = $sfp_stats[$index]['ubntSfpName'];
-    $port_stats[$index + 1]['ifName'] = $sfp_stats[$index]['ubntSfpName'];
-    $port_stats[$index + 1]['ifInOctets'] = $sfp_stats[$index]['ubntSfpRxBytes'];
-    $port_stats[$index + 1]['ifOutOctets'] = $sfp_stats[$index]['ubntSfpTxBytes'];
-    $port_stats[$index + 1]['ifOperStatus'] = ($sfp_stats[$index]['ubntSfpUp'] == 1 ? 'up' : 'down');
+$offset = '1000';
+
+foreach ($sfp_stats as $index => $sfpport_stats) {
+    $curIfIndex = $offset + $index;
+    $port_stats[$curIfIndex]['ifDescr'] = $sfpport_stats['ubntSfpName'];
+    $port_stats[$curIfIndex]['ifName'] = $sfpport_stats['ubntSfpName'];
+    $port_stats[$curIfIndex]['ifInOctets'] = $sfpport_stats['ubntSfpRxBytes'];
+    $port_stats[$curIfIndex]['ifOutOctets'] = $sfpport_stats['ubntSfpTxBytes'];
+    $port_stats[$curIfIndex]['ifOperStatus'] = ($sfpport_stats['ubntSfpUp'] == 1 ? 'up' : 'down');
 }
 
 unset($sfp_stats);
