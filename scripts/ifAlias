@@ -85,7 +85,7 @@ alias_from_interfaces_config_file()
     if [ -x "$DISTRO_BIN" ]
     then
         case "$("$DISTRO_BIN" | cut -d " " -f 1)" in
-            Debian)
+            Debian|Ubuntu|Raspbian)
                 CONFIG_FILE="/etc/network/interfaces"
             ;;
             Gentoo)
