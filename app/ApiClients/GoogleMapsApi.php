@@ -34,7 +34,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'https://maps.googleapis.com';
+    protected ?string $base_uri = 'https://maps.googleapis.com';
     protected $geocoding_uri = '/maps/api/geocode/json';
 
     /**
