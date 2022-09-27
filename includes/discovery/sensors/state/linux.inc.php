@@ -27,7 +27,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
                 $descr = 'WMV9 codec';
                 break;
         }
-        $value = current($pre_cache['raspberry_pi_sensors']['raspberry.' . $codec]);
+        $value = (string) current($pre_cache['raspberry_pi_sensors']['raspberry.' . $codec] ?? []);
         if (stripos($value, 'abled') !== false) {
             $states = [
                 ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'enabled'],
