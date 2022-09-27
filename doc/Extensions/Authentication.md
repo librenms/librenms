@@ -87,7 +87,7 @@ DB_PASSWORD="DBPASS"
 
 Config option: `active_directory`
 
-Install __php_ldap__  or __php7.0-ldap__, making sure to install the
+Install __php-ldap__  or __php8.1-ldap__, making sure to install the
 same version as PHP.
 
 If you have issues with secure LDAP try setting
