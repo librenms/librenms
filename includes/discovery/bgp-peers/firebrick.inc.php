@@ -42,6 +42,7 @@ foreach ($bgpPeersCache as $key => $value) {
 }
 unset($bgpPeersCache);
 
+$bgpLocalAs = null;
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
@@ -60,6 +61,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
         }
     }
     foreach ($vrf as $address => $value) {
+        $bgpLocalAs = $value['fbBgpPeerLocalAS'] ?? $bgpLocalAs;
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
         if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]) < '1') {
             $peers = [
@@ -116,6 +118,3 @@ foreach ($peers as $value) {
         echo str_repeat('-', $deleted);
     }
 }
-
-// TODO: Fix me to use the local AS as published
-$bgpLocalAs = $bgpPeers[0][array_keys($bgpPeers[0])[0]]['fbBgpPeerRemoteAS'];
