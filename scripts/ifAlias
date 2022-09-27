@@ -41,7 +41,7 @@ interface_id()
 {
     local N=
     local L=
-    local ID="${GET_OID#${BASE}.}"
+    local ID="${GET_OID#"${BASE}".}"
 
     case "$GET_TYPE" in
         -g)
