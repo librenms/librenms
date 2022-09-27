@@ -95,7 +95,7 @@ alias_from_interfaces_config_file()
                 CONFIG_FILE=("/etc/sysconfig/network-scripts/ifcfg-$IFACE")
             ;;
             Archlinux)
-		CONFIG_FILE=("/etc/conf.d/net-conf-$IFACE")
+                CONFIG_FILE=("/etc/conf.d/net-conf-$IFACE")
             ;;
         esac
     fi
