@@ -1176,7 +1176,7 @@ return [
             'help' => 'Очистка виконується daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Записи портів старші за',
+            'description' => 'Порти очищення видалено',
             'help' => 'Очистка виконується daily.sh',
         ],
         'prometheus' => [

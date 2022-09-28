@@ -1185,7 +1185,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than',
+            'description' => 'Elimina le porte',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
