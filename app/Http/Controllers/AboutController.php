@@ -68,7 +68,7 @@ class AboutController extends Controller
 
             'db_schema' => vsprintf('%s (%s)', $version->database()),
             'git_log' => $version->gitChangelog(),
-            'git_date' => $version->gitDate(),
+            'git_date' => $version->localDate(),
             'project_name' => Config::get('project_name'),
 
             'version_local' => $version->local(),
