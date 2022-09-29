@@ -72,9 +72,9 @@ class Version
 
     public function isGitInstall(): bool
     {
-        return $this->cacheGet('is_git_install', function () {
-            return Git::repoPresent() && Git::binaryExists();
-        });
+        return $this->cacheGet('install_type', function () {
+            return (Git::repoPresent() && Git::binaryExists()) ? 'git' : 'other';
+        }) == 'git';
     }
 
     /**
