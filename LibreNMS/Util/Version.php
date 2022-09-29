@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use DB;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -43,7 +44,11 @@ class Version
 
     public static function get(): Version
     {
-        return app('version');
+        try {
+            return app()->make('version');
+        } catch (BindingResolutionException $e) {
+            return new static; // no container, just return a fresh instance
+        }
     }
 
     public function release(): string
@@ -111,7 +116,7 @@ class Version
                 return '';
             }
 
-            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], base_path());
+            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], Config::get('install_dir'));
             $branch_process->run();
 
             return rtrim($branch_process->getOutput());
@@ -268,7 +273,7 @@ class Version
     private function localCommitData(): array
     {
         return explode('|', $this->cacheGet('local_commit_data', function () {
-            $install_dir = base_path();
+            $install_dir = Config::get('install_dir');
             $version_process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], $install_dir);
             $version_process->run();
 
