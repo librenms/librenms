@@ -48,6 +48,7 @@ class LinkUp implements SnmptrapHandler
 
         if (! $port) {
             Log::warning("Snmptrap linkUp: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+
             return;
         }
 
