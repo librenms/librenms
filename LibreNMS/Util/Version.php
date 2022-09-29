@@ -113,6 +113,7 @@ class Version
 
             $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], base_path());
             $branch_process->run();
+
             return rtrim($branch_process->getOutput());
         });
     }

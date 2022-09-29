@@ -541,6 +541,7 @@ function parse_location($location)
 function version_info($remote = false)
 {
     $version = \LibreNMS\Util\Version::get();
+
     return [
         'local_ver' => $version->local(),
         'local_sha' => $version->localCommitSha(),
