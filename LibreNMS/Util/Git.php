@@ -56,7 +56,7 @@ class Git
     public function isAvailable(): bool
     {
         return $this->cacheGet('isAvailable', function () {
-            return ($this->repoPresent() && $this->binaryExists());
+            return $this->repoPresent() && $this->binaryExists();
         });
     }
 
@@ -67,7 +67,6 @@ class Git
 
             return file_exists("$install_dir/.git");
         });
-
     }
 
     public function binaryExists(): bool
@@ -199,7 +198,7 @@ class Git
 
     public function log(int $lines = 10)
     {
-        return $this->cacheGet('changelog' . $lines, function () use ($lines) {
+        return $this->cacheGet('changelog' . $lines, function () {
             return $this->isAvailable()
                 ? rtrim(shell_exec('git log -10'))
                 : '';

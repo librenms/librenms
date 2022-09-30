@@ -70,7 +70,6 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
             return \LibreNMS\Util\Version::VERSION;
         });
 
-
         // add git information, but cache it unlike the upstream provider
         Flare::registerMiddleware(AddGitInformation::class);
 
