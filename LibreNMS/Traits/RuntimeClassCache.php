@@ -46,7 +46,7 @@ trait RuntimeClassCache
         if (! array_key_exists($name, $this->runtimeCache)) {
             $this->runtimeCache[$name] = $this->runtimeCacheExternalTTL && Laravel::isBooted()
                 ? Cache::remember('runtimeCache' . __CLASS__ . $name, $this->runtimeCacheExternalTTL, $actual)
-                : $actual($name);
+                : $actual();
         }
 
         return $this->runtimeCache[$name];
