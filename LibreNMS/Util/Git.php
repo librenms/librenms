@@ -36,9 +36,13 @@ class Git
 {
     use RuntimeClassCache;
 
+    /** @var string */
+    private $install_dir;
+
     public function __construct(int $cache = 0)
     {
         $this->runtimeCacheExternalTTL = $cache;
+        $this->install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
     }
 
     public static function make(int $cache = 0): Git
@@ -63,40 +67,32 @@ class Git
     public function repoPresent(): bool
     {
         return $this->cacheGet('repoPresent', function () {
-            $install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
-
-            return file_exists("$install_dir/.git");
+            return file_exists("$this->install_dir/.git");
         });
     }
 
     public function binaryExists(): bool
     {
         return $this->cacheGet('binaryExists', function () {
-            exec('git > /dev/null 2>&1', $response, $exit_code);
-
-            return $exit_code === 1;
+            return $this->run('help', [])->isSuccessful();
         });
     }
 
     public function tag(): string
     {
         return $this->cacheGet('tag', function () {
-            if (! $this->isAvailable()) {
-                return '';
-            }
-
-            return rtrim(shell_exec('git describe --tags 2>/dev/null'));
+            return $this->isAvailable()
+                ? rtrim($this->run('describe', ['--tags'])->getOutput())
+                : '';
         });
     }
 
     public function shortTag(): string
     {
         return $this->cacheGet('shortTag', function () {
-            if (! $this->isAvailable()) {
-                return '';
-            }
-
-            return rtrim(shell_exec('git describe --tags --abbrev=0 2>/dev/null'));
+            return $this->isAvailable()
+                ? rtrim($this->run('describe', ['--tags', '--abbrev=0'])->getOutput())
+                : '';
         });
     }
 
@@ -122,14 +118,9 @@ class Git
     public function branch(): string
     {
         return $this->cacheGet('branch', function () {
-            if (! $this->isAvailable()) {
-                return '';
-            }
-
-            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], Config::get('install_dir'));
-            $branch_process->run();
-
-            return rtrim($branch_process->getOutput());
+            return $this->isAvailable()
+                ? rtrim($this->run('rev-parse', ['--abbrev-ref', 'HEAD'])->getOutput())
+                : '';
         });
     }
 
@@ -139,11 +130,7 @@ class Git
     public function hasChanges(): bool
     {
         return $this->cacheGet('hasChanges', function () {
-            $process = new Process(['git', 'diff-index', '--quiet', 'HEAD']);
-            $process->disableOutput();
-            $process->run();
-
-            return $process->getExitCode() !== 0;
+            return $this->isAvailable() && ! $this->run('diff-index', ['--quiet', 'HEAD'])->isSuccessful();
         });
     }
 
@@ -157,19 +144,9 @@ class Git
                 return false;
             }
 
-            $hash = $this->commitHash();
-            $remote = 'origin/master';
+            $process = $this->run('branch', ['--remotes', '--contains', $this->commitHash(), 'origin/master']);
 
-            $process = new Process(['git', 'branch', '--remotes', '--contains', $hash, $remote]);
-            $process->run();
-
-            if ($process->isSuccessful()) {
-                if (trim($process->getOutput()) == $remote) {
-                    return true;
-                }
-            }
-
-            return false;
+            return $process->isSuccessful() && trim($process->getOutput()) == 'origin/master';
         });
     }
 
@@ -179,28 +156,26 @@ class Git
     public function remoteUrl(): string
     {
         return $this->cacheGet('remoteUrl', function () {
-            $process = new Process(['git', 'ls-remote', '--get-url', 'origin']);
-            $process->run();
-
-            return trim($process->getOutput());
+            return $this->isAvailable()
+                ? rtrim($this->run('ls-remote', ['--get-url', 'origin'])->getOutput())
+                : '';
         });
     }
 
-    public function message()
+    public function message(): string
     {
         return $this->cacheGet('remoteUrl', function () {
-            $process = new Process(['git', 'ls-remote', '--get-url', 'origin']);
-            $process->run();
-
-            return trim($process->getOutput());
+            return $this->isAvailable()
+                ? rtrim($this->run('log', ['--pretty=format:%s', '-n', '1'])->getOutput())
+                : '';
         });
     }
 
-    public function log(int $lines = 10)
+    public function log(int $lines = 10): string
     {
-        return $this->cacheGet('changelog' . $lines, function () {
+        return $this->cacheGet('changelog' . $lines, function () use ($lines) {
             return $this->isAvailable()
-                ? rtrim(shell_exec('git log -10'))
+                ? rtrim($this->run('log', ['-' . $lines])->getOutput())
                 : '';
         });
     }
@@ -237,17 +212,23 @@ class Git
                 return [];
             }
 
-            $install_dir = Config::get('install_dir');
-            $version_process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], $install_dir);
-            $version_process->run();
+            $version_process = $this->run('show', ['--quiet', '--pretty=%H|%ct']);
 
             // failed due to permissions issue
             if ($version_process->getExitCode() == 128 && Str::startsWith($version_process->getErrorOutput(), 'fatal: unsafe repository')) {
-                (new Process(['git', 'config', '--global', '--add', 'safe.directory', $install_dir]))->run();
-                $version_process->run();
+                $this->run('config', ['--global', '--add', 'safe.directory', $this->install_dir]); // try to fix
+                $version_process = $this->run('show', ['--quiet', '--pretty=%H|%ct']); // and try again
             }
 
             return explode('|', rtrim($version_process->getOutput()));
         });
+    }
+
+    private function run(string $command, array $options): Process
+    {
+        $version_process = new Process(array_merge(['git', $command], $options), $this->install_dir);
+        $version_process->run();
+
+        return $version_process;
     }
 }
