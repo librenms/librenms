@@ -314,7 +314,6 @@ modules:
                     descr: System Output Current
                     index: 'current.{{ $index }}'
                     group: Output
-                    divisor: 10
                     warn_limit: rectifiersCurrentMinorAlarmLevel
                     high_limit: rectifiersCurrentMajorAlarmLevel
                 -

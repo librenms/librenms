@@ -4781,9 +4781,8 @@
             "group": "system",
             "section": "cleanup",
             "order": 9,
-            "units": "days",
-            "default": "10",
-            "type": "integer"
+            "default": true,
+            "type": "boolean"
         },
         "project_home": {
             "default": "https://www.librenms.org/",

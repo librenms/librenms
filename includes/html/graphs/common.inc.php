@@ -59,7 +59,7 @@ if (isset($_GET['graph_title'])) {
 }
 
 if (! isset($scale_min) && ! isset($scale_max)) {
-    $rrd_options .= ' --alt-autoscale-max';
+    $rrd_options .= ' --alt-autoscale-max --alt-y-grid';
 }
 
 if (! isset($scale_min) && ! isset($scale_max) && ! isset($norigid)) {
