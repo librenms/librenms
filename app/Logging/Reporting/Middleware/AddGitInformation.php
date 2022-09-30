@@ -32,7 +32,7 @@ class AddGitInformation
 {
     /**
      * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next next in the pipeline
+     * @param  callable  $next  next in the pipeline
      * @return mixed
      */
     public function handle(Report $report, $next)
