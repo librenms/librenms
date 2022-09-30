@@ -1,6 +1,6 @@
 <?php
 /**
- * SetGroups.php
+ * UsesRuntimeCache.php
  *
  * -Description-
  *
@@ -23,40 +23,32 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Logging\Reporting\Middleware;
+namespace LibreNMS\Traits;
 
-use Facade\FlareClient\Report;
-use LibreNMS\Util\Version;
+use Illuminate\Support\Facades\Cache;
+use LibreNMS\Util\Laravel;
 
-class SetGroups
+trait RuntimeClassCache
 {
+    /** @var array */
+    private $runtimeCache = [];
+
+    /** @var int Setting this installs the data in the external cache to be shared across instances */
+    protected $runtimeCacheExternalTTL = 0;
+
     /**
-     * Middleware to set LibreNMS and Tools grouping data
+     * We want these each runtime, so don't use the global cache
      *
-     * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
      * @return mixed
      */
-    public function handle(Report $report, $next)
+    protected function cacheGet(string $name, callable $actual)
     {
-        try {
-            $version = Version::get();
-
-            $report->group('LibreNMS', [
-                'Git version' => $version->name(),
-                'App version' => Version::VERSION,
-            ]);
-
-            $report->group('Tools', [
-                'Database' => $version->databaseServer(),
-                'Net-SNMP' => $version->netSnmp(),
-                'Python' => $version->python(),
-                'RRDtool' => $version->rrdtool(),
-
-            ]);
-        } catch (\Exception $e) {
+        if (! array_key_exists($name, $this->runtimeCache)) {
+            $this->runtimeCache[$name] = $this->runtimeCacheExternalTTL && Laravel::isBooted()
+                ? Cache::remember('runtimeCache' . __CLASS__ . $name, $this->runtimeCacheExternalTTL, $actual)
+                : $actual($name);
         }
 
-        return $next($report);
+        return $this->runtimeCache[$name];
     }
 }

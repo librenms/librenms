@@ -27,20 +27,26 @@ namespace LibreNMS\Util;
 
 use DB;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Traits\RuntimeClassCache;
 use Symfony\Component\Process\Process;
 
 class Version
 {
-    // Update this on release
+    use RuntimeClassCache;
+
+    /** @var string Update this on release */
     public const VERSION = '22.9.0';
 
-    /** @var array */
-    protected $cache = [];
+    /** @var Git convenience instance */
+    public $git;
+
+    public function __construct()
+    {
+        $this->git = Git::make();
+    }
 
     public static function get(): Version
     {
@@ -56,90 +62,14 @@ class Version
         return Config::get('update_channel') == 'master' ? 'master' : self::VERSION;
     }
 
-    public function local(): string
+    public function date(string $format = 'c'): string
     {
-        return $this->cacheGet('local_version', function () {
-            if ($this->isGitInstall()) {
-                $version = rtrim(shell_exec('git describe --tags 2>/dev/null'));
-                if ($version) {
-                    return $version;
-                }
-            }
-
-            return self::VERSION;
-        });
+        return date($format, $this->git->commitDate() ?: filemtime(__FILE__));  // approximate date for non-git installs
     }
 
-    public function isGitInstall(): bool
+    public function name(): string
     {
-        return $this->cacheGet('install_type', function () {
-            return (Git::repoPresent() && Git::binaryExists()) ? 'git' : 'other';
-        }) == 'git';
-    }
-
-    /**
-     * Compiles local commit data
-     *
-     * @return array with keys sha, date, and branch
-     */
-    public function localCommit(): array
-    {
-        return [
-            'sha' => $this->localCommitSha(),
-            'date' => $this->localDate(),
-            'branch' => $this->localBranch(),
-        ];
-    }
-
-    public function localCommitSha(): string
-    {
-        return $this->cacheGet('local_commit_sha', function () {
-            if (! $this->isGitInstall()) {
-                return '';
-            }
-
-            return $this->localCommitData()[0] ?? '';
-        });
-    }
-
-    public function localDate(): string
-    {
-        return $this->cacheGet('local_commit_date', function () {
-            return $this->localCommitData()[1] ?? '';
-        });
-    }
-
-    public function localBranch(): string
-    {
-        return $this->cacheGet('local_branch', function () {
-            if (! $this->isGitInstall()) {
-                return '';
-            }
-
-            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], Config::get('install_dir'));
-            $branch_process->run();
-
-            return rtrim($branch_process->getOutput());
-        });
-    }
-
-    /**
-     * Fetches the remote commit from the github api if on the daily release channel
-     *
-     * @return array
-     */
-    public function remoteCommit(): array
-    {
-        return json_decode($this->cacheGet('remote_commit', function () {
-            if ($this->isGitInstall()) {
-                try {
-                    return \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master')->body();
-                } catch (ConnectionException $e) {
-                }
-            }
-
-            return '[]';
-        }), true);
+        return $this->git->tag() ?: self::VERSION;
     }
 
     public function databaseServer(): string
@@ -160,6 +90,11 @@ class Version
         }
     }
 
+    /**
+     * Get the db schema information
+     *
+     * @return array ['last' => the name of the last migration applied, 'total' => number of migrations applied]
+     */
     public function database(): array
     {
         if (Eloquent::isConnected()) {
@@ -176,15 +111,6 @@ class Version
         }
 
         return ['last' => 'Not Connected', 'total' => 0];
-    }
-
-    public function gitChangelog(): string
-    {
-        return $this->cacheGet('changelog', function () {
-            return $this->isGitInstall()
-                ? rtrim(shell_exec('git log -10'))
-                : '';
-        });
     }
 
     public function python(): string
@@ -259,31 +185,32 @@ class Version
     }
 
     /**
-     * We want these each runtime, so don't use the global cache
+     * Get a formatted header to print out to the user.
      */
-    private function cacheGet(string $name, callable $actual): string
+    public function header(): string
     {
-        if (! array_key_exists($name, $this->cache)) {
-            $this->cache[$name] = $actual($name);
-        }
+        return sprintf(<<<'EOH'
+===========================================
+Component | Version
+--------- | -------
+LibreNMS  | %s (%s)
+DB Schema | %s
+PHP       | %s
+Python    | %s
+Database  | %s
+RRDTool   | %s
+SNMP      | %s
+===========================================
 
-        return $this->cache[$name];
-    }
-
-    private function localCommitData(): array
-    {
-        return explode('|', $this->cacheGet('local_commit_data', function () {
-            $install_dir = Config::get('install_dir');
-            $version_process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], $install_dir);
-            $version_process->run();
-
-            // failed due to permissions issue
-            if ($version_process->getExitCode() == 128 && Str::startsWith($version_process->getErrorOutput(), 'fatal: unsafe repository')) {
-                (new Process(['git', 'config', '--global', '--add', 'safe.directory', $install_dir]))->run();
-                $version_process->run();
-            }
-
-            return rtrim($version_process->getOutput());
-        }));
+EOH,
+            $this->name(),
+            $this->date(),
+            vsprintf('%s (%s)', $this->database()),
+            phpversion(),
+            $this->python(),
+            $this->databaseServer(),
+            $this->rrdtool(),
+            $this->netSnmp()
+        );
     }
 }

@@ -40,9 +40,9 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
-use LibreNMS\Util\Git;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -362,27 +362,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
     private function printHeader(): void
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
-            $version = \LibreNMS\Util\Version::get();
-            $this->logger->info(sprintf(<<<'EOH'
-===================================
-Version info:
-Commit SHA: %s
-Commit Date: %s
-DB Schema: %s
-PHP: %s
-Database: %s
-RRDTool: %s
-SNMP: %s
-==================================
-EOH,
-                Git::localCommit(),
-                Git::localDate(),
-                vsprintf('%s (%s)', $version->database()),
-                phpversion(),
-                $version->databaseServer(),
-                $version->rrdtool(),
-                $version->netSnmp()
-            ));
+            $this->logger->info(Version::get()->header());
         }
     }
 }

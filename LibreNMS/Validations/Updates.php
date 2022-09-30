@@ -32,7 +32,6 @@ use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
-use LibreNMS\Util\Version;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Process\Process;
@@ -47,14 +46,14 @@ class Updates extends BaseValidation
             return;
         }
 
-        if (! Git::repoPresent()) {
+        if (! Git::make()->repoPresent()) {
             $validator->warn('Non-git install, updates are manual or from package');
 
             return;
         }
 
         // if git is not available, we cannot do the other tests
-        if (! Git::binaryExists()) {
+        if (! Git::make()->binaryExists()) {
             $validator->warn('Unable to locate git. This should probably be installed.');
 
             return;
@@ -62,10 +61,9 @@ class Updates extends BaseValidation
 
         // check if users on master update channel are up to date
         if (Config::get('update_channel') == 'master') {
-            $local_ver = Version::get()->localCommit();
-            $remote_ver = Version::get()->remoteCommit();
-            if ($local_ver['sha'] != ($remote_ver['sha'] ?? null)) {
-                if (empty($local_ver['date'])) {
+            $git = Git::make();
+            if ($git->commitHash() != $git->remoteHash()) {
+                if (! $git->commitDate()) {
                     $process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], base_path());
                     $process->run();
                     $error = rtrim($process->getErrorOutput());
@@ -73,7 +71,7 @@ class Updates extends BaseValidation
                     $validator->fail('Failed to fetch version from local git: ' . $error);
                 } else {
                     try {
-                        $commit_date = new DateTime('@' . $local_ver['date'], new DateTimeZone(date_default_timezone_get()));
+                        $commit_date = new DateTime('@' . $git->commitDate(), new DateTimeZone(date_default_timezone_get()));
                         if ($commit_date->diff(new DateTime())->days > 0) {
                             $validator->warn(
                                 'Your install is over 24 hours out of date, last update: ' . $commit_date->format('r'),
@@ -86,13 +84,14 @@ class Updates extends BaseValidation
                 }
             }
 
-            if ($local_ver['branch'] != 'master') {
-                if ($local_ver['branch'] == 'php53') {
+            $branch = $git->branch();
+            if ($branch != 'master') {
+                if ($branch == 'php53') {
                     $validator->warn(
                         'You are on the PHP 5.3 support branch, this will prevent automatic updates.',
                         'Update to PHP 5.6.4 or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'
                     );
-                } elseif ($local_ver['branch'] == 'php56') {
+                } elseif ($branch == 'php56') {
                     $validator->warn(
                         'You are on the PHP 5.6/7.0 support branch, this will prevent automatic updates.',
                         'Update to PHP ' . Php::PHP_MIN_VERSION . ' or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'
