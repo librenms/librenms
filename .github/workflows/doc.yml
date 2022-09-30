@@ -16,6 +16,9 @@ on:
       - 'doc/**'
       - 'mkdocs.yml'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   publish:
     runs-on: ubuntu-latest

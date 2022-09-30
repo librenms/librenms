@@ -36,8 +36,10 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
-    /** @var string[][]|callable[][]|null */
+    /** @var string[][]|callable[]|null */
     protected $optionValues;
+    /** @var string[][]|callable[]|null */
+    protected $optionDefaults;
 
     /**
      * Create a new command instance.
@@ -102,7 +104,17 @@ abstract class LnmsCommand extends Command
         }
 
         // inject our custom InputOption to allow callable option enums
-        $this->getDefinition()->addOption(new DynamicInputOption($name, $shortcut, $mode, $description, $default, $this->getValuesCallable($name)));
+        $this->getDefinition()->addOption(
+            new DynamicInputOption(
+                $name,
+                $shortcut,
+                $mode,
+                $description,
+                $default,
+                $this->getCallable('Defaults', $name),
+                $this->getCallable('Values', $name),
+            )
+        );
 
         return $this;
     }
@@ -116,7 +128,7 @@ abstract class LnmsCommand extends Command
         // auto create option value rules if they don't exist
         if (isset($this->optionValues)) {
             foreach (array_keys($this->optionValues) as $option) {
-                $callable = $this->getValuesCallable($option);
+                $callable = $this->getCallable('Values', $option);
                 if (empty($rules[$option]) && $callable) {
                     $values = call_user_func($callable);
                     $rules[$option] = Rule::in($values);
@@ -158,13 +170,13 @@ abstract class LnmsCommand extends Command
         }
     }
 
-    private function getValuesCallable(string $name): ?callable
+    private function getCallable(string $type, string $name): ?callable
     {
-        if (empty($this->optionValues[$name])) {
+        if (empty($this->{'option' . $type}[$name])) {
             return null;
         }
 
-        $values = $this->optionValues[$name];
+        $values = $this->{'option' . $type}[$name];
         if (is_callable($values)) {
             return $values;
         }

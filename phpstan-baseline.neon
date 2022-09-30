@@ -7826,22 +7826,12 @@ parameters:
 			path: app/Jobs/PingCheck.php
 
 		-
-			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:defer\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
 			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:fetchDevices\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 
 		-
 			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:processTier\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:recordData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 

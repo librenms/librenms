@@ -43,6 +43,7 @@ foreach ($bgpPeersCache as $key => $value) {
 }
 unset($bgpPeersCache);
 
+$bgpLocalAs = null;
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
@@ -61,6 +62,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
         }
     }
     foreach ($vrf as $address => $value) {
+        $bgpLocalAs = $value['fbBgpPeerLocalAS'] ?? $bgpLocalAs;
         $astext = get_astext($value['fbBgpPeerRemoteAS']);
         if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
             $peers = [
@@ -122,6 +124,3 @@ foreach ($peers as $value) {
         echo str_repeat('-', $deleted);
     }
 }
-
-// TODO: Fix me to use the local AS as published
-$bgpLocalAs = $bgpPeers[0][array_keys($bgpPeers[0])[0]]['fbBgpPeerRemoteAS'];
