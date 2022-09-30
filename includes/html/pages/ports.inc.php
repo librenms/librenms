@@ -24,8 +24,7 @@ if (! isset($vars['format'])) {
     $vars['format'] = 'list_basic';
 }
 
-$displayLists = '';
-$displayLists .= '<span style="font-weight: bold;">Ports lists</span> &#187; ';
+$displayLists = '<span style="font-weight: bold;">Ports lists</span> &#187; ';
 
 $menu_options = ['basic' => 'Basic', 'detail' => 'Detail'];
 
@@ -86,41 +85,11 @@ $displayLists .= '<a href="ports/deleted=1/purge=all" title="Delete ports"> Purg
 $displayLists .= '</div>';
 
 if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars['searchbar'])) {
-    $output = "<div class='pull-left'>";
-    $output .= "<form method='post' action='' class='form-inline' role='form'>";
+    $output = "<form method='post' action='' class='form-inline' role='form'>";
     $output .= addslashes(csrf_field());
     $output .= "<div style='margin-bottom:4px;text-align:left;'>";
     $output .= "<div class='form-group'>";
-    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'>";
-    $output .= "<option value=''>All Devices</option>";
-
-    if (Auth::user()->hasGlobalRead()) {
-        $results = dbFetchRows('SELECT `device_id`,`hostname`, `sysName` FROM `devices` ORDER BY `hostname`');
-    } else {
-        $results = dbFetchRows('SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysname` FROM `devices` AS `D`, `devices_perms` AS `P` WHERE `P`.`user_id` = ? AND `P`.`device_id` = `D`.`device_id` ORDER BY `hostname`', [Auth::id()]);
-    }
-    foreach ($results as $data) {
-        $deviceselected = isset($vars['device_id']) && $data['device_id'] == $vars['device_id'] ? 'selected' : '';
-        $ui_device = strlen(format_hostname($data)) > 15 ? substr(format_hostname($data), 0, 15) . '...' : format_hostname($data);
-        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . '>' . $ui_device . '</option>';
-    }
-
-    if (! Auth::user()->hasGlobalRead()) {
-        $results = dbFetchRows('SELECT `D`.`device_id`,`D`.`hostname`, `D`.`sysName` FROM `ports` AS `I` JOIN `devices` AS `D` ON `D`.`device_id`=`I`.`device_id` JOIN `ports_perms` AS `PP` ON `PP`.`port_id`=`I`.`port_id` WHERE `PP`.`user_id` = ? AND `PP`.`port_id` = `I`.`port_id` ORDER BY `hostname`', [Auth::id()]);
-    } else {
-        $results = [];
-    }
-
-    foreach ($results as $data) {
-        if ($data['device_id'] == $vars['device_id']) {
-            $deviceselected = 'selected';
-        } else {
-            $deviceselected = '';
-        }
-        $output .= "<option value='" . $data['device_id'] . "' " . $deviceselected . '>' . format_hostname($data) . '</option>';
-    }
-
-    $output .= '</select>&nbsp;';
+    $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
     $hasvalue = ! empty($vars['hostname']) ? "value='" . $vars['hostname'] . "'" : '';
 
@@ -232,24 +201,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div style='text-align:left;'>";
 
     $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>&nbsp;";
-    $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'>&nbsp;";
-    $output .= "<option value=''>All Locations</option>";
-
-    foreach (getlocations() as $location_row) {
-        $location = $location_row['location'];
-        $location_id = $location_row['id'];
-        if ($location) {
-            if (isset($vars['location']) && $location_id == $vars['location']) {
-                $locationselected = 'selected';
-            } else {
-                $locationselected = '';
-            }
-            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . '...' : $location;
-            $output .= "<option value='$location_id' $locationselected>" . clean_bootgrid($ui_location) . '</option>';
-        }
-    }
-
-    $output .= '</select>&nbsp;';
+    $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'></select>&nbsp;";
 
     $ignorecheck = isset($vars['ignore']) ? 'checked' : '';
     $disabledcheck = isset($vars['disabled']) ? 'checked' : '';
@@ -268,10 +220,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= '</div>';
 
     $output .= '</form>';
-    $output .= '</div>';
 }
-
-$param = [];
 
 if (! isset($vars['ignore'])) {
     $vars['ignore'] = '0';
@@ -283,157 +232,25 @@ if (! isset($vars['deleted'])) {
     $vars['deleted'] = '0';
 }
 
-$where = '';
-$ignore_filter = 0;
-$disabled_filter = 0;
-
-foreach ($vars as $var => $value) {
-    if ($value != '') {
-        switch ($var) {
-            case 'hostname':
-                $where .= ' AND D.hostname LIKE ?';
-                $param[] = '%' . $value . '%';
-                break;
-            case 'location':
-                if (is_int($value)) {
-                    $where .= ' AND L.id = ?';
-                    $param[] = $value;
-                } else {
-                    $where .= ' AND L.location LIKE ?';
-                    $param[] = '%' . $value . '%';
-                }
-                break;
-            case 'device_id':
-                $where .= ' AND D.device_id = ?';
-                $param[] = $value;
-                break;
-            case 'deleted':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND `I`.`deleted` = 1';
-                    $ignore_filter = 1;
-                }
-                break;
-            case 'ignore':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND (I.ignore = 1 OR D.ignore = 1) AND I.deleted = 0';
-                    $ignore_filter = 1;
-                }
-                break;
-            case 'disabled':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= ' AND `I`.`disabled` = 1 AND `I`.`deleted` = 0';
-                    $disabled_filter = 1;
-                }
-                break;
-            case 'ifSpeed':
-                if (is_numeric($value)) {
-                    $where .= " AND I.$var = ?";
-                    $param[] = $value;
-                }
-                break;
-            case 'ifType':
-                $where .= " AND I.$var = ?";
-                $param[] = $value;
-                break;
-            case 'ifAlias':
-            case 'port_descr_type':
-                $where .= " AND I.$var LIKE ?";
-                $param[] = '%' . $value . '%';
-                break;
-            case 'errors':
-                if ($value == 1 || $value == 'yes') {
-                    $where .= " AND (I.`ifInErrors_delta` > '0' OR I.`ifOutErrors_delta` > '0')";
-                }
-                break;
-            case 'state':
-                if ($value == 'down') {
-                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
-                    $param[] = 'up';
-                    $param[] = 'down';
-                } elseif ($value == 'up') {
-                    $where .= ' AND I.ifAdminStatus = ? AND I.ifOperStatus = ?';
-                    $param[] = 'up';
-                    $param[] = 'up';
-                } elseif ($value == 'admindown') {
-                    $where .= ' AND I.ifAdminStatus = ? AND D.ignore = 0';
-                    $param[] = 'down';
-                }
-                break;
-            case 'purge':
-                if ($vars['purge'] === 'all') {
-                    Port::hasAccess(Auth::user())->with(['device' => function ($query) {
-                        $query->select('device_id', 'hostname');
-                    }])->isDeleted()->chunk(100, function ($ports) {
-                        foreach ($ports as $port) {
-                            $port->delete();
-                        }
-                    });
-                } else {
-                    try {
-                        Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
-                    } catch (ModelNotFoundException $e) {
-                        echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
-                    }
-                }
-                break;
-            case 'group':
-                $where .= ' AND port_id IN (SELECT `port_id` FROM `port_group_port` WHERE `port_group_id` = ?)';
-                $param[] = $vars['group'];
-                break;
+if (isset($vars['purge'])) {
+    if ($vars['purge'] === 'all') {
+        Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+            $query->select('device_id', 'hostname');
+        }])->isDeleted()->chunk(100, function ($ports) {
+            foreach ($ports as $port) {
+                $port->delete();
+            }
+        });
+    } else {
+        try {
+            Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
+        } catch (ModelNotFoundException $e) {
+            echo "<div class='alert alert-danger'>Port ID {$vars['purge']} not found! Could not purge port.</div>";
         }
     }
 }
 
-if ($ignore_filter == 0 && $disabled_filter == 0) {
-    $where .= ' AND `I`.`ignore` = 0 AND `I`.`disabled` = 0 AND `I`.`deleted` = 0';
-}
-
-$query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
-$row = 1;
-
 [$format, $subformat] = explode('_', basename($vars['format']));
-
-// only grab list of ports for graph pages, table uses ajax
-$ports = $format == 'graph' ? dbFetchRows($query, $param) : [];
-
-switch ($vars['sort'] ?? '') {
-    case 'traffic':
-        $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
-        break;
-    case 'traffic_in':
-        $ports = array_sort_by_column($ports, 'ifInOctets_rate', SORT_DESC);
-        break;
-    case 'traffic_out':
-        $ports = array_sort_by_column($ports, 'ifOutOctets_rate', SORT_DESC);
-        break;
-    case 'packets':
-        $ports = array_sort_by_column($ports, 'ifUcastPkts_rate', SORT_DESC);
-        break;
-    case 'packets_in':
-        $ports = array_sort_by_column($ports, 'ifInUcastOctets_rate', SORT_DESC);
-        break;
-    case 'packets_out':
-        $ports = array_sort_by_column($ports, 'ifOutUcastOctets_rate', SORT_DESC);
-        break;
-    case 'errors':
-        $ports = array_sort_by_column($ports, 'ifErrors_rate', SORT_DESC);
-        break;
-    case 'speed':
-        $ports = array_sort_by_column($ports, 'ifSpeed', SORT_DESC);
-        break;
-    case 'port':
-        $ports = array_sort_by_column($ports, 'ifDescr', SORT_ASC);
-        break;
-    case 'media':
-        $ports = array_sort_by_column($ports, 'ifType', SORT_ASC);
-        break;
-    case 'descr':
-        $ports = array_sort_by_column($ports, 'ifAlias', SORT_ASC);
-        break;
-    case 'device':
-    default:
-        $ports = array_sort_by_column($ports, 'hostname', SORT_ASC);
-}
 
 if (file_exists('includes/html/pages/ports/' . $format . '.inc.php')) {
     require 'includes/html/pages/ports/' . $format . '.inc.php';

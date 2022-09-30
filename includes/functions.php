@@ -501,26 +501,7 @@ function snmp2ipv6($ipv6_snmp)
 
 function get_astext($asn)
 {
-    global $cache;
-
-    if (Config::has("astext.$asn")) {
-        return Config::get("astext.$asn");
-    }
-
-    if (isset($cache['astext'][$asn])) {
-        return $cache['astext'][$asn];
-    }
-
-    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
-    if (! empty($result[0]['txt'])) {
-        $txt = explode('|', $result[0]['txt']);
-        $result = trim($txt[4], ' "');
-        $cache['astext'][$asn] = $result;
-
-        return $result;
-    }
-
-    return '';
+    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
 
 /**

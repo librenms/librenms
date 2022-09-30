@@ -33,8 +33,8 @@ if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '" . $
     $menu_options['neighbours'] = 'Neighbours';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'")) {
-    $menu_options['adsl'] = 'ADSL';
+if (DeviceCache::getPrimary()->portsAdsl()->exists() || DeviceCache::getPrimary()->portsVdsl()->exists()) {
+    $menu_options['xdsl'] = 'xDSL';
 }
 
 $sep = '';
@@ -123,7 +123,7 @@ if ($vars['view'] == 'minigraphs') {
     }
 
     echo '</div>';
-} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
+} elseif ($vars['view'] == 'arp' || $vars['view'] == 'xdsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
     include 'ports/' . $vars['view'] . '.inc.php';
 } else {
     if ($vars['view'] == 'details') {
@@ -144,25 +144,20 @@ if ($vars['view'] == 'minigraphs') {
 
     $i = '1';
 
-    global $port_cache, $port_index_cache;
+    global $port_index_cache;
 
-    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' AND `disabled` = 0 ORDER BY `ifIndex` ASC", [$device['device_id']]);
+    /** @var \Illuminate\Support\Collection<\App\Models\Port> $ports */
+    $ports = DeviceCache::getPrimary()->ports()->orderBy('ifIndex')->isValid()->get();
+
     // As we've dragged the whole database, lets pre-populate our caches :)
-    // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
-
     foreach ($ports as $key => $port) {
-        $port_cache[$port['port_id']] = $port;
         $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
-        $ports[$key]['ifOctets_rate'] = $port['ifInOctets_rate'] + $port['ifOutOctets_rate'];
     }
 
-    switch ($vars['sort'] ?? '') {
-        case 'traffic':
-            $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
-            break;
-        default:
-            $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
-            break;
+    if (isset($vars['sort']) && $vars['sort'] == 'traffic') {
+        $ports = $ports->sortByDesc(function (Port $port) {
+            return $port->ifInOctets_rate + $port->ifOutOctets_rate;
+        });
     }
 
     foreach ($ports as $port) {

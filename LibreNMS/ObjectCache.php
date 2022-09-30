@@ -70,10 +70,10 @@ class ObjectCache implements ArrayAccess
     /**
      * Check if data exists
      *
-     * @param  string  $obj  Name of Data-Object
+     * @param  mixed  $obj  Name of Data-Object
      * @return bool
      */
-    public function offsetExists($obj)
+    public function offsetExists($obj): bool
     {
         if (isset($this->data[$obj])) {
             return true;
@@ -87,9 +87,10 @@ class ObjectCache implements ArrayAccess
     /**
      * Get Data-Object
      *
-     * @param  string  $obj  Name of Data-Object
+     * @param  mixed  $obj  Name of Data-Object
      * @return mixed
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($obj)
     {
         if (isset($this->data[$obj])) {
@@ -113,19 +114,17 @@ class ObjectCache implements ArrayAccess
     /**
      * Overrides internal Cache-Object
      *
-     * @param  string  $obj  Name of Data-Object
+     * @param  mixed  $obj  Name of Data-Object
      * @param  mixed  $value  Value
-     * @return bool
+     * @return void
      */
-    public function offsetSet($obj, $value)
+    public function offsetSet($obj, $value): void
     {
         if (! isset($this->data[$obj])) {
             $this->data[$obj] = [];
         }
 
         $this->data[$obj]['value'] = $value;
-
-        return $this->data[$obj]['value'];
     }
 
     //end offsetSet()
@@ -133,14 +132,12 @@ class ObjectCache implements ArrayAccess
     /**
      * Reset Data-Object
      *
-     * @param  string  $obj  Name of Data-Object
-     * @return mixed
+     * @param  mixed  $obj  Name of Data-Object
+     * @return void
      */
-    public function offsetUnset($obj)
+    public function offsetUnset($obj): void
     {
         unset($this->data[$obj]['value']);
-
-        return true;
     }
 
     //end offsetUnset()

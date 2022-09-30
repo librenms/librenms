@@ -1,0 +1,717 @@
+mib: UHP-MIB
+modules:
+  os:
+    version: UHP-MIB::swVersion.0
+    serial: UHP-MIB::serialNumber.0
+  processors:
+    data:
+      -
+        oid: cpuLoad
+        num_oid: .1.3.6.1.4.1.8000.22.8.2.{{ $index }}
+        type: uhp
+  sensors:
+    temperature:
+      data:
+        -
+          oid: temperature
+          value: temperature
+          num_oid: .1.3.6.1.4.1.8000.22.2.1.{{ $index }}
+          index: 'temperature.{{ $index }}'
+          descr: 'Temperature'
+          user_func: fahrenheit_to_celsius
+    snr:
+      data:
+        -
+          oid: lbandSNR1
+          value: lbandSNR1
+          num_oid: .1.3.6.1.4.1.8000.22.2.1.{{ $index }}
+          index: 'lbandSNR1.{{ $index }}'
+          descr: 'Ratio at L-band'
+          group: 'Demodulator 1'
+          divisor: 10
+        -
+          oid: lbandSNR2
+          value: lbandSNR2
+          num_oid: .1.3.6.1.4.1.8000.22.3.1.{{ $index }}
+          index: 'lbandSNR2.{{ $index }}'
+          descr: 'Ratio at L-band'
+          group: 'Demodulator 2'
+          divisor: 10
+    frequency:
+      data:
+        -
+          oid: lbandOffset1
+          value: lbandOffset1
+          num_oid: .1.3.6.1.4.1.8000.22.2.2.{{ $index }}
+          index: 'lbandOffset1.{{ $index }}'
+          descr: 'PLL and carrier offset'
+          group: 'Demodulator 1'
+          multiplier: 1000
+        -
+          oid: lbandOffset2
+          value: lbandOffset2
+          num_oid: .1.3.6.1.4.1.8000.22.3.2.{{ $index }}
+          index: 'lbandOffset2.{{ $index }}'
+          descr: 'PLL and carrier offset'
+          group: 'Demodulator 2'
+          multiplier: 1000
+        -
+          oid: tdelta
+          value: tdelta
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.{{ $index }}
+          index: 'tdelta.{{ $index }}'
+          descr: 'Delta between station and hub'     
+          group: 'TTS' 
+        -
+          oid: hubTTS
+          value: hubTTS
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.5.{{ $index }}
+          index: 'hubTTS.{{ $index }}'
+          descr: 'HUB TTS'
+          group: 'TTS' 
+        -
+          oid: remoteTTS
+          value: remoteTTS
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.7.{{ $index }}
+          index: 'remoteTTS.{{ $index }}'
+          descr: 'Remote TTS'   
+          group: 'TTS'  
+        -
+          oid: frqOffset
+          value: frqOffset
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.7.{{ $index }}
+          index: 'frqOffset.{{ $index }}'
+          descr: 'Frequency offset'    
+        -
+          oid: frqAdjust
+          value: frqAdjust
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.7.{{ $index }}
+          index: 'frqAdjust.{{ $index }}'
+          descr: 'TX frequency adjustment'   
+    bitrate:
+      data:
+        -
+          oid: prioAll
+          value: outBytesA
+          num_oid: .1.3.6.1.4.1.8000.22.4.1.1.{{ $index }}
+          index: 'outBytesA.{{ $index }}'
+          descr: 'Traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP1
+          value: outBytesP1
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.1.{{ $index }}
+          index: 'outBytesP1.{{ $index }}'
+          descr: 'P1(low) priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP2
+          value: outBytesP2
+          num_oid: .1.3.6.1.4.1.8000.22.4.7.1.{{ $index }}
+          index: 'outBytesP2.{{ $index }}'
+          descr: 'P2 priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP3
+          value: outBytesP3
+          num_oid: .1.3.6.1.4.1.8000.22.4.8.1.{{ $index }}
+          index: 'outBytesP3.{{ $index }}'
+          descr: 'P3 priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP4
+          value: outBytesP4
+          num_oid: .1.3.6.1.4.1.8000.22.4.3.1.{{ $index }}
+          index: 'outBytesP4.{{ $index }}'
+          descr: 'P4(med) priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP5
+          value: outBytesP5
+          num_oid: .1.3.6.1.4.1.8000.22.4.9.1.{{ $index }}
+          index: 'outBytesP5.{{ $index }}'
+          descr: 'P5 priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP6
+          value: outBytesP6
+          num_oid: .1.3.6.1.4.1.8000.22.4.10.1.{{ $index }}
+          index: 'outBytesP6.{{ $index }}'
+          descr: 'P6 priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesP7
+          value: outBytesP7
+          num_oid: .1.3.6.1.4.1.8000.22.4.4.1.{{ $index }}
+          index: 'outBytesP7.{{ $index }}'
+          descr: 'P7(high) priority traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: outBytesC
+          value: outBytesC
+          num_oid: .1.3.6.1.4.1.8000.22.4.5.1.{{ $index }}
+          index: 'outBytesC.{{ $index }}'
+          descr: 'Control traffic'
+          group: 'Modulator'
+          divisor: 8
+        -
+          oid: prioAll
+          value: queueLenBA
+          num_oid: .1.3.6.1.4.1.8000.22.4.1.4.{{ $index }}
+          index: 'queueLenBA.{{ $index }}'
+          descr: 'Queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP1
+          value: queueLenBP1
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.4.{{ $index }}
+          index: 'queueLenBP1.{{ $index }}'
+          descr: 'P1(low) queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP2
+          value: queueLenBP2
+          num_oid: .1.3.6.1.4.1.8000.22.4.7.4.{{ $index }}
+          index: 'queueLenBP2.{{ $index }}'
+          descr: 'P2 queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP3
+          value: queueLenBP3
+          num_oid: .1.3.6.1.4.1.8000.22.4.8.4.{{ $index }}
+          index: 'queueLenBP3.{{ $index }}'
+          descr: 'P3 queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP4
+          value: queueLenBP4
+          num_oid: .1.3.6.1.4.1.8000.22.4.3.4.{{ $index }}
+          index: 'queueLenBP4.{{ $index }}'
+          descr: 'P4(med) queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP5
+          value: queueLenBP5
+          num_oid: .1.3.6.1.4.1.8000.22.4.9.4.{{ $index }}
+          index: 'queueLenBP5.{{ $index }}'
+          descr: 'P5 queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP6
+          value: queueLenBP6
+          num_oid: .1.3.6.1.4.1.8000.22.4.10.4.{{ $index }}
+          index: 'queueLenBP6.{{ $index }}'
+          descr: 'P6 queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: queueLenBP7
+          value: queueLenBP7
+          num_oid: .1.3.6.1.4.1.8000.22.4.4.4.{{ $index }}
+          index: 'queueLenBP7.{{ $index }}'
+          descr: 'P7(high) queue length'
+          divisor: 8
+          group: 'Modulator'
+        -
+          oid: sectionBW
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.3.{{ $index }}
+          index: 'sectionBW.{{ $index }}'
+          descr: 'Bandwidth of single slot in frame'
+          divisor: 8
+        -
+          oid: inBytes1
+          num_oid: .1.3.6.1.4.1.8000.22.2.4{{ $index }}
+          index: 'inBytes1.{{ $index }}'
+          descr: 'Traffic'
+          group: 'Demodulator 1'
+          divisor: 8
+        -
+          oid: inBytes2
+          num_oid: .1.3.6.1.4.1.8000.22.3.4{{ $index }}
+          index: 'inBytes2.{{ $index }}'
+          descr: 'Traffic'
+          group: 'Demodulator 2'
+          divisor: 8
+        -
+          oid: sectionBW
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.3.{{ $index }}
+          index: 'sectionBW.{{ $index }}'
+          descr: 'Bandwidth of single slot in frame'
+          divisor: 8
+    count:
+      data:
+        -
+          oid: prioAll
+          value: outPktsA
+          num_oid: .1.3.6.1.4.1.8000.22.4.1.2.{{ $index }}
+          index: 'outPktsA.{{ $index }}'
+          descr: 'Traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsC
+          value: outPktsC
+          num_oid: .1.3.6.1.4.1.8000.22.4.5.2.{{ $index }}
+          index: 'outPktsC.{{ $index }}'
+          descr: 'Control traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP1
+          value: outPktsP1
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.2.{{ $index }}
+          index: 'outPktsP1.{{ $index }}'
+          descr: 'P1(low) priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP2
+          value: outPktsP2
+          num_oid: .1.3.6.1.4.1.8000.22.4.7.2.{{ $index }}
+          index: 'outPktsP2.{{ $index }}'
+          descr: 'P2 priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP3
+          value: outPktsP3
+          num_oid: .1.3.6.1.4.1.8000.22.4.8.2.{{ $index }}
+          index: 'outPktsP3.{{ $index }}'
+          descr: 'P3 priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP4
+          value: outPktsP4
+          num_oid: .1.3.6.1.4.1.8000.22.4.3.2.{{ $index }} 
+          index: 'outPktsP4.{{ $index }}'
+          descr: 'P4(med) priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP5
+          value: outPktsP5
+          num_oid: .1.3.6.1.4.1.8000.22.4.9.2.{{ $index }}
+          index: 'outPktsP5.{{ $index }}'
+          descr: 'P5 priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP6
+          value: outPktsP6
+          num_oid: .1.3.6.1.4.1.8000.22.4.10.2.{{ $index }}
+          index: 'outPktsP6.{{ $index }}'
+          descr: 'P6 priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: outPktsP7
+          value: outPktsP7
+          num_oid: .1.3.6.1.4.1.8000.22.4.4.2.{{ $index }}
+          index: 'outPktsP7.{{ $index }}'
+          descr: 'P7(high) priority traffic in packets'
+          group: 'Modulator'
+        -
+          oid: prioAll
+          value: dropsA
+          num_oid: .1.3.6.1.4.1.8000.22.4.1.3.{{ $index }}
+          index: 'dropsA.{{ $index }}'
+          descr: 'Dropped packets'
+          group: 'Modulator'
+        - oid: dropsP1
+          value: dropsP1
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.3.{{ $index }}
+          index: 'dropsP1.{{ $index }}'
+          descr: 'P1(low) dropped packets'
+          group: 'Modulator'
+        - oid: dropsP2
+          value: dropsP2
+          num_oid: .1.3.6.1.4.1.8000.22.4.7.3.{{ $index }}
+          index: 'dropsP2.{{ $index }}'
+          descr: 'P2 dropped packets'
+          group: 'Modulator'
+        - oid: dropsP3
+          value: dropsP3
+          num_oid: .1.3.6.1.4.1.8000.22.4.8.3.{{ $index }}
+          index: 'dropsP3.{{ $index }}'
+          descr: 'P3 dropped packets'
+          group: 'Modulator'
+        - oid: dropsP4
+          value: dropsP4
+          num_oid: .1.3.6.1.4.1.8000.22.4.3.3.{{ $index }}
+          index: 'dropsP4.{{ $index }}'
+          descr: 'P4(med) dropped packets'
+          group: 'Modulator'
+        - oid: dropsP5
+          value: dropsP5
+          num_oid: .1.3.6.1.4.1.8000.22.4.9.3.{{ $index }}
+          index: 'dropsP5.{{ $index }}'
+          descr: 'P5 dropped packets'
+          group: 'Modulator'
+        - oid: dropsP6
+          value: dropsP6
+          num_oid: .1.3.6.1.4.1.8000.22.4.10.3.{{ $index }}
+          index: 'dropsP6.{{ $index }}'
+          descr: 'P6 dropped packets'
+          group: 'Modulator'
+        - oid: dropsP7
+          value: dropsP7
+          num_oid: .1.3.6.1.4.1.8000.22.4.4.3.{{ $index }}
+          index: 'dropsP7.{{ $index }}'
+          descr: 'P7(high) dropped packets'
+          group: 'Modulator'
+        -
+          oid: prioAll
+          value: queueLenPA
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.5.{{ $index }}
+          index: 'queueLenPA.{{ $index }}'
+          descr: 'Queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP1
+          value: queueLenPP1
+          num_oid: .1.3.6.1.4.1.8000.22.4.2.5.{{ $index }}
+          index: 'queueLenPP1.{{ $index }}'
+          descr: 'P1(low) queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP2
+          value: queueLenPP2
+          num_oid: .1.3.6.1.4.1.8000.22.4.7.5.{{ $index }}
+          index: 'queueLenPP2.{{ $index }}'
+          descr: 'P2 queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP3
+          value: queueLenPP3
+          num_oid: .1.3.6.1.4.1.8000.22.4.8.5.{{ $index }}
+          index: 'queueLenPP3.{{ $index }}'
+          descr: 'P3 queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP4
+          value: queueLenPP4
+          num_oid: .1.3.6.1.4.1.8000.22.4.3.5.{{ $index }}
+          index: 'queueLenPP4.{{ $index }}'
+          descr: 'P4(med) queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP5
+          value: queueLenPP5
+          num_oid: .1.3.6.1.4.1.8000.22.4.9.5.{{ $index }}
+          index: 'queueLenPP5.{{ $index }}'
+          descr: 'P5 queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP6
+          value: queueLenPP6
+          num_oid: .1.3.6.1.4.1.8000.22.4.10.5.{{ $index }}
+          index: 'queueLenPP6.{{ $index }}'
+          descr: 'P6 queue length in packets'
+          group: 'Modulator'
+        -
+          oid: queueLenPP7
+          value: queueLenPP7
+          num_oid: .1.3.6.1.4.1.8000.22.4.4.5.{{ $index }}
+          index: 'queueLenPP7.{{ $index }}'
+          descr: 'P7(high) queue length in packets'
+          group: 'Modulator'
+        -
+          oid: prioAll
+          value: numStations
+          num_oid: .1.3.6.1.4.1.8000.22.4.1.6.{{ $index }}
+          index: 'numStations.{{ $index }}'
+          descr: 'Stations per ACM channel'
+          group: 'Modulator'
+        -
+          oid: unroutedPkts
+          num_oid: .1.3.6.1.4.1.8000.22.6.1.{{ $index }}
+          index: 'unroutedPkts.{{ $index }}'
+          descr: 'Unroutable packets'
+        -
+          oid: frameDelay
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.2.{{ $index }}
+          index: 'frameDelay.{{ $index }}'
+          descr: 'TX-RX processing delay'
+        -
+          oid: netRequest
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.4.{{ $index }}
+          index: 'netRequest.{{ $index }}'
+          descr: 'Requests of all stations'
+        -
+          oid: freeSlots
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.5.{{ $index }}
+          index: 'freeSlots.{{ $index }}'
+          descr: 'Free-allocated slots in current frame'
+        -
+          oid: frameDuration
+          num_oid: .1.3.6.1.4.1.8000.22.5.3.2.{{ $index }}
+          index: 'frameDuration.{{ $index }}'
+          descr: 'Frame duration'
+        -
+          oid: outVlanBytes
+          num_oid: .1.3.6.1.4.1.8000.22.6.4.{{ $index }}
+          index: 'outVlanBytes.{{ $index }}'
+          descr: 'Bytes transmitted via VLAN {{ $index }}'
+          group: 'VLAN {{ $index }}'
+        -
+          oid: inVlanBytes
+          num_oid: .1.3.6.1.4.1.8000.22.6.5.{{ $index }}
+          index: 'inVlanBytes.{{ $index }}'
+          descr: 'Bytes received via VLAN {{ $index }}'
+          group: 'VLAN {{ $index }}'
+        -
+          oid: outSvlanBytes
+          num_oid: .1.3.6.1.4.1.8000.22.6.5.{{ $index }}
+          index: 'outSvlanBytes.{{ $index }}'
+          descr: 'Bytes tranmitted via SVLAN {{ $index }}'
+          group: 'VLAN {{ $index }}'
+        -
+          oid: inSvlanBytes
+          num_oid: .1.3.6.1.4.1.8000.22.6.7.{{ $index }}
+          index: 'inSvlanBytes.{{ $index }}'
+          descr: 'Bytes received via SVLAN {{ $index }}'
+          group: 'VLAN {{ $index }}'
+        -
+          oid: inSvlanPackets
+          num_oid: .1.3.6.1.4.1.8000.22.6.8.{{ $index }}
+          index: 'inSvlanBytes.{{ $index }}'
+          descr: 'Packets received via SVLAN {{ $index }}'
+          group: 'VLAN {{ $index }}'
+        -
+          oid: tdtConfidence
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.2.{{ $index }}
+          index: 'tdtConfidence.{{ $index }}'
+          descr: 'Tdelta confidence 0-64'
+          group: 'TTS' 
+        -
+          oid: softErrors
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.3.{{ $index }}
+          index: 'softErrors.{{ $index }}'
+          descr: 'Soft errors of TTS/Tdelta'
+          group: 'TTS' 
+        -
+          oid: hardErrors
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.4.{{ $index }}
+          index: 'hardErrors.{{ $index }}'
+          descr: 'Hard errors of TTS/Tdelta'
+          group: 'TTS' 
+        -
+          oid: hubTTSconfidence
+          num_oid: .1.3.6.1.4.1.8000.22.5.1.6.{{ $index }}
+          index: 'hubTTSconfidence.{{ $index }}'
+          descr: 'HUB TTS confidence 0-64'
+          group: 'TTS' 
+        -
+          oid: remnrtRequest
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.2.{{ $index }}
+          index: 'remnrtRequest.{{ $index }}'
+          descr: 'Request for non-real-time bandwidth'
+        -
+          oid: remrtRequest
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.3.{{ $index }}
+          index: 'remrtRequest.{{ $index }}'
+          descr: 'Request for real-time bandwidth'
+        -
+          oid: fpLost
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.4.{{ $index }}
+          index: 'fpLost.{{ $index }}'
+          descr: 'Lost frame plans'
+        -
+          oid: lvlOffset
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.5.{{ $index }}
+          index: 'lvlOffset.{{ $index }}'
+          descr: 'Reference level C/N level offset'
+        -
+          oid: timeOffset
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.9.{{ $index }}
+          index: 'timeOffset.{{ $index }}'
+          descr: 'Timing offset'
+          divisor: 100000000
+        -
+          oid: timeAdjust
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.10.{{ $index }}
+          index: 'timeAdjust.{{ $index }}'
+          descr: 'TX timing adjustment'
+          divisor: 100000000
+    dbm:
+      data:
+        -
+          oid: txLevel
+          num_oid: .1.3.6.1.4.1.8000.22.4.6.1.{{ $index }}
+          index: txLevel.{{ $index }}
+          descr: 'TX level'
+          group: 'Modulator'
+          divisor: 10
+        -
+          oid: txLevelDelta
+          num_oid: .1.3.6.1.4.1.8000.22.4.6.2.{{ $index }}
+          index: txLevelDelta.{{ $index }}
+          descr: 'TX level delta'
+          group: 'Modulator'
+          divisor: 10
+        -
+          oid: txMaxLevel
+          num_oid: .1.3.6.1.4.1.8000.22.4.6.3.{{ $index }}
+          index: txMaxLevel.{{ $index }}
+          descr: 'Max TLC level'
+          group: 'Modulator'
+          divisor: 10
+        -
+          oid: inLvl1
+          num_oid: .1.3.6.1.4.1.8000.22.2.3.{{ $index }}
+          index: inLvl1.{{ $index }}
+          descr: 'Input level'
+          group: 'Demodulator 1'
+          divisor: 10
+        -
+          oid: inLvl2
+          num_oid: .1.3.6.1.4.1.8000.22.3.3.{{ $index }}
+          index: inLvl2.{{ $index }}
+          descr: 'Input level'
+          group: 'Demodulator 2'
+          divisor: 10
+        -
+          oid: lvlAdjust
+          num_oid: .1.3.6.1.4.1.8000.22.5.5.6.{{ $index }}
+          index: lvlAdjust.{{ $index }}
+          descr: 'TX power level adjustment'
+          divisor: 10
+        -
+          oid: inputLevel
+          num_oid: .1.3.6.1.4.1.8000.22.9.3.0.{{ $index }}
+          index: inputLevel.{{ $index }}
+          descr: 'Input baseband RF'
+          divisor: 10
+    state:
+      data:
+        -
+          oid: netState
+          num_oid: '.1.3.6.1.4.1.8000.22.5.2.1.{{ $index }}'
+          descr: 'Operation status'
+          index: 'netState.{{ $index }}'
+          state_name: Operation sequence level
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'off' }
+              - { value: 1, generic: 0, graph: 0, descr: 'init' }
+              - { value: 2, generic: 0, graph: 0, descr: 'noConfig' }
+              - { value: 3, generic: 0, graph: 0, descr: 'useConfig' }
+              - { value: 4, generic: 0, graph: 0, descr: 'redundant' }
+              - { value: 5, generic: 0, graph: 0, descr: 'startRX' }
+              - { value: 6, generic: 0, graph: 0, descr: 'cotmPointing' }
+              - { value: 7, generic: 0, graph: 0, descr: 'startHubTX' }
+              - { value: 8, generic: 0, graph: 0, descr: 'noRX' }
+              - { value: 9, generic: 0, graph: 0, descr: 'identify' }
+              - { value: 10, generic: 0, graph: 0, descr: 'getNetConfig' }
+              - { value: 11, generic: 0, graph: 0, descr: 'calcDelays' }
+              - { value: 12, generic: 0, graph: 0, descr: 'startTDMA' }
+              - { value: 13, generic: 0, graph: 0, descr: 'startTX' }
+              - { value: 14, generic: 0, graph: 0, descr: 'acquisition' }
+              - { value: 15, generic: 0, graph: 0, descr: 'adjustment' }
+              - { value: 16, generic: 0, graph: 0, descr: 'noStations' }
+              - { value: 17, generic: 0, graph: 0, descr: 'operation' }
+        -
+          oid: serverStatus
+          num_oid: '.1.3.6.1.4.1.8000.22.5.3.1.{{ $index }}'
+          descr: 'Server reply status'
+          index: 'serverStatus.{{ $index }}'
+          state_name: Server reply status
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'off' }
+              - { value: 1, generic: 0, graph: 0, descr: 'init' }
+              - { value: 2, generic: 0, graph: 0, descr: 'noConfig' }
+              - { value: 3, generic: 0, graph: 0, descr: 'useConfig' }
+              - { value: 4, generic: 0, graph: 0, descr: 'redundant' }
+              - { value: 5, generic: 0, graph: 0, descr: 'startRX' }
+              - { value: 6, generic: 0, graph: 0, descr: 'cotmPointing' }
+              - { value: 7, generic: 0, graph: 0, descr: 'startHubTX' }
+              - { value: 8, generic: 0, graph: 0, descr: 'noRX' }
+              - { value: 9, generic: 0, graph: 0, descr: 'identify' }
+              - { value: 10, generic: 0, graph: 0, descr: 'getNetConfig' }
+              - { value: 11, generic: 0, graph: 0, descr: 'calcDelays' }
+              - { value: 12, generic: 0, graph: 0, descr: 'startTDMA' }
+              - { value: 13, generic: 0, graph: 0, descr: 'startTX' }
+              - { value: 14, generic: 0, graph: 0, descr: 'acquisition' }
+              - { value: 15, generic: 0, graph: 0, descr: 'adjustment' }
+              - { value: 16, generic: 0, graph: 0, descr: 'noStations' }
+              - { value: 17, generic: 0, graph: 0, descr: 'operation' }
+        -
+          oid: stationState
+          num_oid: '.1.3.6.1.4.1.8000.22.5.5.1.{{ $index }}'
+          descr: 'Remote status'
+          index: 'stationState.{{ $index }}'
+          state_name: Remote initialization sequence level
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'off' }
+              - { value: 1, generic: 0, graph: 0, descr: 'init' }
+              - { value: 2, generic: 0, graph: 0, descr: 'noConfig' }
+              - { value: 3, generic: 0, graph: 0, descr: 'useConfig' }
+              - { value: 4, generic: 0, graph: 0, descr: 'redundant' }
+              - { value: 5, generic: 0, graph: 0, descr: 'startRX' }
+              - { value: 6, generic: 0, graph: 0, descr: 'cotmPointing' }
+              - { value: 7, generic: 0, graph: 0, descr: 'startHubTX' }
+              - { value: 8, generic: 0, graph: 0, descr: 'noRX' }
+              - { value: 9, generic: 0, graph: 0, descr: 'identify' }
+              - { value: 10, generic: 0, graph: 0, descr: 'getNetConfig' }
+              - { value: 11, generic: 0, graph: 0, descr: 'calcDelays' }
+              - { value: 12, generic: 0, graph: 0, descr: 'startTDMA' }
+              - { value: 13, generic: 0, graph: 0, descr: 'startTX' }
+              - { value: 14, generic: 0, graph: 0, descr: 'acquisition' }
+              - { value: 15, generic: 0, graph: 0, descr: 'adjustment' }
+              - { value: 16, generic: 0, graph: 0, descr: 'noStations' }
+              - { value: 17, generic: 0, graph: 0, descr: 'operation' }
+        -
+          oid: redundancy
+          num_oid: '.1.3.6.1.4.1.8000.22.8.4.{{ $index }}'
+          descr: 'Redundancy status'
+          index: 'redundancy.{{ $index }}'
+          state_name: Current redundancy state
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'idle' }
+              - { value: 1, generic: 0, graph: 0, descr: 'backup' }
+              - { value: 2, generic: 0, graph: 0, descr: 'faults' }
+              - { value: 3, generic: 0, graph: 0, descr: 'trying' }
+              - { value: 4, generic: 0, graph: 0, descr: 'active' }
+              - { value: 5, generic: 0, graph: 0, descr: 'off' }
+        -
+          oid: rxState
+          num_oid: '.1.3.6.1.4.1.8000.22.9.4.{{ $index }}'
+          descr: 'RX status'
+          index: 'rxState.{{ $index }}'
+          state_name: Current redundancy state
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'no RX lock' }
+              - { value: 1, generic: 0, graph: 0, descr: 'absence of coordinates' }
+              - { value: 2, generic: 0, graph: 0, descr: 'absence of TX status' }
+        -
+          oid: txControl
+          num_oid: '.1.3.6.1.4.1.8000.22.9.6.{{ $index }}'
+          descr: 'TX status'
+          index: 'txControl.{{ $index }}'
+          state_name: Current TX status
+          states:
+              - { value: 0, generic: 0, graph: 0, descr: 'off' }
+              - { value: 1, generic: 0, graph: 0, descr: 'on' }
+    percent:
+      data:
+        -
+          oid: netLoad
+          num_oid: .1.3.6.1.4.1.8000.22.5.2.6.{{ $index }}
+          index: 'netLoad.{{ $index }}'
+          descr: 'Network load'
+        -
+          oid: buffers
+          num_oid: .1.3.6.1.4.1.8000.22.8.3.{{ $index }}
+          index: 'buffers.{{ $index }}'
+          descr: 'Buffer usage'
+        -
+          oid: searchState
+          num_oid: .1.3.6.1.4.1.8000.22.9.5.{{ $index }}
+          index: 'searchState.{{ $index }}'
+          descr: 'Search state'

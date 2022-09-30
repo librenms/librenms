@@ -194,8 +194,8 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
         $out_rate = $port['ifOutOctets_rate'] * 8;
         $port['in_rate'] = Number::formatSi($in_rate, 2, 3, 'bps');
         $port['out_rate'] = Number::formatSi($out_rate, 2, 3, 'bps');
-        $port['in_perc'] = number_format($in_rate / $port['ifSpeed'] * 100, 2, '.', '');
-        $port['out_perc'] = number_format($out_rate / $port['ifSpeed'] * 100, 2, '.', '');
+        $port['in_perc'] = Number::calculatePercent($in_rate, $port['ifSpeed']);
+        $port['out_perc'] = Number::calculatePercent($out_rate, $port['ifSpeed']);
         $port['in_pps'] = Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, '');
         $port['out_pps'] = Number::formatBi($port['ifOutUcastPkts_rate'], 2, 3, '');
 
@@ -1833,6 +1833,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid' => $bill['bill_custid'],
             'bill_ref' => $bill['bill_ref'],
             'bill_notes' => $bill['bill_notes'],
+            'dir_95th' => $bill['dir_95th'],
         ];
         $update = dbUpdate($update_data, 'bills', 'bill_id=?', [$bill_id]);
         if ($update === false || $update < 0) {
@@ -1853,6 +1854,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
             'bill_custid',
             'bill_ref',
             'bill_notes',
+            'dir_95th',
         ];
 
         if ($data['bill_type'] == 'quota') {
@@ -1891,6 +1893,7 @@ function create_edit_bill(Illuminate\Http\Request $request)
                 'bill_custid' => $bill['bill_custid'],
                 'bill_ref' => $bill['bill_ref'],
                 'bill_notes' => $bill['bill_notes'],
+                'dir_95th' => $bill['dir_95th'],
             ],
             'bills'
         );
@@ -1935,7 +1938,15 @@ function update_device(Illuminate\Http\Request $request)
         if (count($data['field']) == count($data['data'])) {
             $update = [];
             for ($x = 0; $x < count($data['field']); $x++) {
-                $update[$data['field'][$x]] = $data['data'][$x];
+                $field = $data['field'][$x];
+                $field_data = $data['data'][$x];
+
+                if ($field == 'location') {
+                    $field = 'location_id';
+                    $field_data = \App\Models\Location::firstOrCreate(['location' => $field_data])->id;
+                }
+
+                $update[$field] = $field_data;
             }
             if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
                 return api_success_noresult(200, 'Device fields have been updated');
@@ -2844,7 +2855,7 @@ function del_location(Illuminate\Http\Request $request)
     if (empty($location)) {
         return api_error(400, 'No location has been provided to delete');
     }
-    $location_id = get_location_id_by_name($location);
+    $location_id = ctype_digit($location) ? $location : get_location_id_by_name($location);
     if (empty($location_id)) {
         return api_error(400, "Failed to delete $location (Does not exists)");
     }

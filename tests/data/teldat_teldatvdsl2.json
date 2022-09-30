@@ -4962,5 +4962,72 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "xdsl": {
+        "discovery": {
+            "ports_adsl": [
+                {
+                    "adslLineCoding": "2",
+                    "adslLineType": "0",
+                    "adslAtucInvVendorID": "",
+                    "adslAtucInvVersionNumber": "",
+                    "adslAtucCurrSnrMgn": "0.0",
+                    "adslAtucCurrAtn": "0.0",
+                    "adslAtucCurrOutputPwr": "0.0",
+                    "adslAtucCurrAttainableRate": 0,
+                    "adslAtucChanCurrTxRate": 0,
+                    "adslAturInvSerialNumber": "<private>",
+                    "adslAturInvVendorID": "",
+                    "adslAturInvVersionNumber": "",
+                    "adslAturChanCurrTxRate": 0,
+                    "adslAturCurrSnrMgn": "0.0",
+                    "adslAturCurrAtn": "0.0",
+                    "adslAturCurrOutputPwr": "13.0",
+                    "adslAturCurrAttainableRate": 0,
+                    "ifIndex": 17
+                },
+                {
+                    "adslLineCoding": "",
+                    "adslLineType": "",
+                    "adslAtucInvVendorID": "",
+                    "adslAtucInvVersionNumber": "",
+                    "adslAtucCurrSnrMgn": "0.0",
+                    "adslAtucCurrAtn": "0.0",
+                    "adslAtucCurrOutputPwr": "0.0",
+                    "adslAtucCurrAttainableRate": 0,
+                    "adslAtucChanCurrTxRate": 0,
+                    "adslAturInvSerialNumber": "",
+                    "adslAturInvVendorID": "",
+                    "adslAturInvVersionNumber": "",
+                    "adslAturChanCurrTxRate": 0,
+                    "adslAturCurrSnrMgn": "0.0",
+                    "adslAturCurrAtn": "0.0",
+                    "adslAturCurrOutputPwr": "0.0",
+                    "adslAturCurrAttainableRate": 0,
+                    "ifIndex": 18
+                },
+                {
+                    "adslLineCoding": "",
+                    "adslLineType": "",
+                    "adslAtucInvVendorID": "",
+                    "adslAtucInvVersionNumber": "",
+                    "adslAtucCurrSnrMgn": "0.0",
+                    "adslAtucCurrAtn": "0.0",
+                    "adslAtucCurrOutputPwr": "0.0",
+                    "adslAtucCurrAttainableRate": 0,
+                    "adslAtucChanCurrTxRate": 0,
+                    "adslAturInvSerialNumber": "",
+                    "adslAturInvVendorID": "",
+                    "adslAturInvVersionNumber": "",
+                    "adslAturChanCurrTxRate": 0,
+                    "adslAturCurrSnrMgn": "0.0",
+                    "adslAturCurrAtn": "0.0",
+                    "adslAturCurrOutputPwr": "0.0",
+                    "adslAturCurrAttainableRate": 0,
+                    "ifIndex": 19
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

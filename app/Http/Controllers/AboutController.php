@@ -68,13 +68,13 @@ class AboutController extends Controller
 
             'db_schema' => vsprintf('%s (%s)', $version->database()),
             'git_log' => $version->gitChangelog(),
-            'git_date' => $version->gitDate(),
+            'git_date' => $version->localDate(),
             'project_name' => Config::get('project_name'),
 
             'version_local' => $version->local(),
             'version_database' => $version->databaseServer(),
             'version_php' => phpversion(),
-            'version_laravel' => App::VERSION(),
+            'version_laravel' => App::version(),
             'version_python' => $version->python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool' => Rrd::version(),

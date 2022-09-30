@@ -498,8 +498,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
@@ -586,9 +586,6 @@ return [
             'stp' => [
                 'description' => 'STP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -603,6 +600,12 @@ return [
             ],
             'wireless' => [
                 'description' => 'Wireless',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'distributed_poller' => [
@@ -624,6 +627,10 @@ return [
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
+        ],
+        'email_attach_graphs' => [
+            'description' => 'Attach graph images',
+            'help' => 'This will generate a graph when the alert is raised and attach it and embed it in the email.',
         ],
         'email_backend' => [
             'description' => 'How to deliver mail',
@@ -1091,9 +1098,6 @@ return [
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
             ],
-            'toner' => [
-                'description' => 'Toner',
-            ],
             'ucd-diskio' => [
                 'description' => 'UCD DiskIO',
             ],
@@ -1118,8 +1122,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
@@ -1186,6 +1190,12 @@ return [
             ],
             'mpls' => [
                 'description' => 'MPLS',
+            ],
+            'xdsl' => [
+                'description' => 'xDSL',
+            ],
+            'printer-supplies' => [
+                'description' => 'Printer Supplies',
             ],
         ],
         'ports_fdb_purge' => [

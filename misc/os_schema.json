@@ -212,6 +212,9 @@
                 },
                 "netscaler-vsvr": {
                     "type": "boolean"
+                },
+                "xdsl": {
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false
@@ -352,6 +355,9 @@
                     "type": "boolean"
                 },
                 "ip6-addresses": {
+                    "type": "boolean"
+                },
+                "xdsl": {
                     "type": "boolean"
                 }
             },

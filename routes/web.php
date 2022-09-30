@@ -23,6 +23,10 @@ Route::prefix('auth')->name('socialite.')->group(function () {
     Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
 });
 
+Route::get('graph/{path?}', 'GraphController')
+    ->where('path', '.*')
+    ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 

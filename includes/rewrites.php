@@ -264,20 +264,6 @@ function apc_relay_state($state)
     }
 }
 
-/**
- * @param $value
- * @return mixed
- */
-function return_number($value)
-{
-    preg_match('/[\d\.\-]+/', $value, $temp_response);
-    if (! empty($temp_response[0])) {
-        $value = $temp_response[0];
-    }
-
-    return $value;
-}
-
 function parse_entity_state($state, $value)
 {
     $data = [
