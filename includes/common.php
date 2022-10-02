@@ -541,12 +541,12 @@ function parse_location($location)
 function version_info($remote = false)
 {
     $version = \LibreNMS\Util\Version::get();
-
-    return [
+    $local = $version->localCommit();
+    $output = [
         'local_ver' => $version->local(),
-        'local_sha' => $version->localCommitSha(),
-        'local_date' => $version->localDate(),
-        'local_branch' => $version->localBranch(),
+        'local_sha' => $local['sha'],
+        'local_date' => $local['date'],
+        'local_branch' => $local['branch'],
         'github' => $remote ? $version->remoteCommit() : null,
         'db_schema' => vsprintf('%s (%s)', $version->database()),
         'php_ver' => phpversion(),
@@ -555,6 +555,8 @@ function version_info($remote = false)
         'rrdtool_ver' => $version->rrdtool(),
         'netsnmp_ver' => $version->netSnmp(),
     ];
+
+    return $output;
 }//end version_info()
 
 /**
