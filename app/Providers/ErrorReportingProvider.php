@@ -25,6 +25,7 @@
 
 namespace App\Providers;
 
+use App\Logging\Reporting\Middleware\AddGitInformation;
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
 use ErrorException;
@@ -68,6 +69,9 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
         });
+
+        // add git information, but cache it unlike the upstream provider
+        Flare::registerMiddleware(AddGitInformation::class);
 
         // Filter some extra fields for privacy
         // Move to header middleware when switching to spatie/laravel-ignition
@@ -114,20 +118,21 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         // Check git
-        if (Git::repoPresent()) {
-            if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
+        $git = Git::make(180);
+        if ($git->isAvailable()) {
+            if (! Str::contains($git->remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
-            if (! Git::unchanged()) {
+            if ($git->hasChanges()) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
-            if (! Git::officalCommit()) {
+            if (! $git->isOfficialCommit()) {
                 \Log::debug('Reporting disabled due to local modifications');
 
                 return false;

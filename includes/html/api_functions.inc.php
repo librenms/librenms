@@ -2931,7 +2931,20 @@ function edit_service_for_host(Illuminate\Http\Request $request)
  */
 function server_info()
 {
-    $versions = version_info();
+    $version = \LibreNMS\Util\Version::get();
+
+    $versions = [
+        'local_ver' => $version->name(),
+        'local_sha' => $version->git->commitHash(),
+        'local_date' => $version->date(),
+        'local_branch' => $version->git->branch(),
+        'db_schema' => $version->database(),
+        'php_ver' => phpversion(),
+        'python_ver' => $version->python(),
+        'database_ver' => $version->databaseServer(),
+        'rrdtool_ver' => $version->rrdtool(),
+        'netsnmp_ver' => $version->netSnmp(),
+    ];
 
     return api_success([
         $versions,

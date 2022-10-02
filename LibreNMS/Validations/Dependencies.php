@@ -47,7 +47,7 @@ class Dependencies extends BaseValidation
         }
 
         // if git is not installed, do not assume composer is either
-        if (! Git::repoPresent()) {
+        if (! Git::make()->repoPresent()) {
             $validator->ok('Installed from package; no Composer required');
 
             return;

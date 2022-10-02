@@ -1,8 +1,8 @@
 <?php
 /**
- * SetGroups.php
+ * AddGitInformation.php
  *
- * -Description-
+ * Add git information to Flare report, but use a cache so we don't destroy servers
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,36 +26,25 @@
 namespace App\Logging\Reporting\Middleware;
 
 use Facade\FlareClient\Report;
-use LibreNMS\Util\Version;
+use LibreNMS\Util\Git;
 
-class SetGroups
+class AddGitInformation
 {
     /**
-     * Middleware to set LibreNMS and Tools grouping data
-     *
      * @param  \Facade\FlareClient\Report  $report
-     * @param  callable  $next
+     * @param  callable  $next  next in the pipeline
      * @return mixed
      */
     public function handle(Report $report, $next)
     {
-        try {
-            $version = Version::get();
+        $git = Git::make(180);
 
-            $report->group('LibreNMS', [
-                'Git version' => $version->name(),
-                'App version' => Version::VERSION,
-            ]);
-
-            $report->group('Tools', [
-                'Database' => $version->databaseServer(),
-                'Net-SNMP' => $version->netSnmp(),
-                'Python' => $version->python(),
-                'RRDtool' => $version->rrdtool(),
-
-            ]);
-        } catch (\Exception $e) {
-        }
+        $report->group('git', [
+            'hash' => $git->commitHash(),
+            'message' => $git->message(),
+            'tag' => $git->shortTag(),
+            'remote' => $git->remoteUrl(),
+        ]);
 
         return $next($report);
     }
