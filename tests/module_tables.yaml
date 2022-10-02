@@ -36,7 +36,7 @@ ports:
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
 cipsec-tunnels:
     ipsec_tunnels:
-        excluded_fields: [tunnel_id, device_id]
+        excluded_fields: [local_addr, tunnel_id, device_id]
         order_by: peer_addr
 cisco-pw:
     pseudowires:
