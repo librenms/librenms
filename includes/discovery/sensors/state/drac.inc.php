@@ -82,24 +82,26 @@ foreach ($tables as $tablevalue) {
             }
 
             //Discover Sensors
-            discover_sensor(
-                $valid['sensor'],
-                'state',
-                $device,
-                $num_oid . $index,
-                $index,
-                $value_oid,
-                $descr,
-                1,
-                1,
-                null,
-                null,
-                null,
-                null,
-                $entry[$value_oid],
-                'snmp',
-                $index
-            );
+            if (isset($entry[$descr_oid])) {
+                discover_sensor(
+                    $valid['sensor'],
+                    'state',
+                    $device,
+                    $num_oid . $index,
+                    $index,
+                    $value_oid,
+                    $descr,
+                    1,
+                    1,
+                    null,
+                    null,
+                    null,
+                    null,
+                    $entry[$value_oid],
+                    'snmp',
+                    $index
+                );
+            }
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $value_oid, $index);

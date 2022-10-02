@@ -167,7 +167,7 @@ class Schema
         $update_cache = true;
         $cache = [];
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
-        $db_version = Version::get()->database();
+        $db_version = Version::get()->databaseMigrationCount();
 
         if (is_file($cache_file)) {
             $cache = unserialize(file_get_contents($cache_file));
