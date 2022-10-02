@@ -26,17 +26,13 @@
 namespace LibreNMS\Util;
 
 use DB;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Traits\RuntimeClassCache;
 use Symfony\Component\Process\Process;
 
 class Version
 {
-    use RuntimeClassCache;
-
     /** @var string Update this on release */
     public const VERSION = '22.9.0';
 
@@ -50,11 +46,7 @@ class Version
 
     public static function get(): Version
     {
-        try {
-            return app()->make('version');
-        } catch (BindingResolutionException $e) {
-            return new static; // no container, just return a fresh instance
-        }
+        return new static;
     }
 
     public function release(): string
@@ -131,39 +123,33 @@ class Version
 
     public function python(): string
     {
-        return $this->cacheGet('python', function () {
-            $proc = new Process(['python3', '--version']);
-            $proc->run();
+        $proc = new Process(['python3', '--version']);
+        $proc->run();
 
-            if ($proc->getExitCode() !== 0) {
-                return '';
-            }
+        if ($proc->getExitCode() !== 0) {
+            return '';
+        }
 
-            return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? '';
-        });
+        return explode(' ', rtrim($proc->getOutput()), 2)[1] ?? '';
     }
 
     public function rrdtool(): string
     {
-        return $this->cacheGet('rrdtool', function () {
-            $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
-            $process->run();
-            preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $process->run();
+        preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
-            return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
-        });
+        return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
     }
 
     public function netSnmp(): string
     {
-        return $this->cacheGet('net-snmp', function () {
-            $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
 
-            $process->run();
-            preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
+        $process->run();
+        preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
 
-            return $matches[0] ?? '';
-        });
+        return $matches[0] ?? '';
     }
 
     /**
@@ -171,33 +157,31 @@ class Version
      */
     public function os(): string
     {
-        return $this->cacheGet('os', function () {
-            $info = [];
+        $info = [];
 
-            // find release file
-            if (file_exists('/etc/os-release')) {
-                $info = @parse_ini_file('/etc/os-release');
-            } else {
-                foreach (glob('/etc/*-release') as $file) {
-                    $content = file_get_contents($file);
-                    // normal os release style
-                    $info = @parse_ini_string($content);
-                    if (! empty($info)) {
-                        break;
-                    }
+        // find release file
+        if (file_exists('/etc/os-release')) {
+            $info = @parse_ini_file('/etc/os-release');
+        } else {
+            foreach (glob('/etc/*-release') as $file) {
+                $content = file_get_contents($file);
+                // normal os release style
+                $info = @parse_ini_string($content);
+                if (! empty($info)) {
+                    break;
+                }
 
-                    // just a string of text
-                    if (substr_count($content, PHP_EOL) <= 1) {
-                        $info = ['NAME' => trim(str_replace('release ', '', $content))];
-                        break;
-                    }
+                // just a string of text
+                if (substr_count($content, PHP_EOL) <= 1) {
+                    $info = ['NAME' => trim(str_replace('release ', '', $content))];
+                    break;
                 }
             }
+        }
 
-            $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
+        $only = array_intersect_key($info, ['NAME' => true, 'VERSION_ID' => true]);
 
-            return implode(' ', $only);
-        });
+        return implode(' ', $only);
     }
 
     /**

@@ -1,8 +1,9 @@
 <?php
 /**
- * UsesRuntimeCache.php
+ * RuntimeClassCache.php
  *
- * -Description-
+ * Adds the ability to cache the output of functions either on the instance
+ * or in the global cache.  Set $runtimeCacheExternalTTL to enable global cache.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
