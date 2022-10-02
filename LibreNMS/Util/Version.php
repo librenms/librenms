@@ -91,26 +91,42 @@ class Version
     }
 
     /**
-     * Get the db schema information
-     *
-     * @return array ['last' => the name of the last migration applied, 'total' => number of migrations applied]
+     * Get the database last migration and count as a string
      */
-    public function database(): array
+    public function database(): string
     {
-        if (Eloquent::isConnected()) {
-            try {
-                $query = Eloquent::DB()->table('migrations');
+        return sprintf('%s (%s)', $this->lastDatabaseMigration(), $this->databaseMigrationCount());
+    }
 
-                return [
-                    'last' => $query->orderBy('id', 'desc')->value('migration'),
-                    'total' => $query->count(),
-                ];
-            } catch (\Exception $e) {
-                return ['last' => 'No Schema', 'total' => 0];
+    /**
+     * Get the total number of migrations applied to the database
+     */
+    public function databaseMigrationCount(): int
+    {
+        try {
+            if (Eloquent::isConnected()) {
+                return Eloquent::DB()->table('migrations')->count();
             }
+        } catch (\Exception $e) {
         }
 
-        return ['last' => 'Not Connected', 'total' => 0];
+        return 0;
+    }
+
+    /**
+     * Get the name of the last migration that was applied to the database
+     */
+    public function lastDatabaseMigration(): string
+    {
+        if (! Eloquent::isConnected()) {
+            return 'Not Connected';
+        }
+
+        try {
+            return Eloquent::DB()->table('migrations')->orderBy('id', 'desc')->value('migration');
+        } catch (\Exception $e) {
+            return 'No Schema';
+        }
     }
 
     public function python(): string
@@ -194,7 +210,7 @@ class Version
 Component | Version
 --------- | -------
 LibreNMS  | %s (%s)
-DB Schema | %s
+DB Schema | %s (%s)
 PHP       | %s
 Python    | %s
 Database  | %s
@@ -205,7 +221,8 @@ SNMP      | %s
 EOH,
             $this->name(),
             $this->date(),
-            vsprintf('%s (%s)', $this->database()),
+            $this->lastDatabaseMigration(),
+            $this->databaseMigrationCount(),
             phpversion(),
             $this->python(),
             $this->databaseServer(),

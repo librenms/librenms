@@ -2938,7 +2938,7 @@ function server_info()
         'local_sha' => $version->git->commitHash(),
         'local_date' => $version->date(),
         'local_branch' => $version->git->branch(),
-        'db_schema' => vsprintf('%s (%s)', $version->database()),
+        'db_schema' => $version->database(),
         'php_ver' => phpversion(),
         'python_ver' => $version->python(),
         'database_ver' => $version->databaseServer(),

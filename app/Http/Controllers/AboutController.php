@@ -66,7 +66,7 @@ class AboutController extends Controller
             'callback_status' => $callback_status,
             'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
 
-            'db_schema' => vsprintf('%s (%s)', $version->database()),
+            'db_schema' => $version->database(),
             'git_log' => $version->git->log(),
             'git_date' => $version->date(),
             'project_name' => Config::get('project_name'),

@@ -784,7 +784,7 @@ class IRCBot
     {
         $version = Version::get();
 
-        $msg = $this->config['project_name'] . ', Version: ' . $version->name() . ', DB schema: ' . $version->database()['total'] . ', PHP: ' . PHP_VERSION;
+        $msg = $this->config['project_name'] . ', Version: ' . $version->name() . ', DB schema: ' . $version->databaseMigrationCount() . ', PHP: ' . PHP_VERSION;
 
         return $this->respond($msg);
     }
