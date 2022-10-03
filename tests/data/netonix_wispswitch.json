@@ -600,11 +600,11 @@
                     "version": "1.3.9",
                     "hardware": "WS-12-250-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "netonix",
                     "type": "network",
                     "serial": null,
-                    "icon": "netonix.svg",
-                    "location": "<private>"
+                    "icon": "netonix.svg"
                 }
             ]
         },

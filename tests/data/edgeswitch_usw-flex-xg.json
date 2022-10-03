@@ -10,11 +10,11 @@
                     "version": "6.2.14.13855",
                     "hardware": "USW-Flex-XG",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

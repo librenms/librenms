@@ -10,11 +10,11 @@
                     "version": "V3.1.0",
                     "hardware": "GW-6420-WDM",
                     "features": null,
+                    "location": "<private>",
                     "os": "gw-eydfa",
                     "type": "network",
                     "serial": "180619085787",
-                    "icon": "glassway.svg",
-                    "location": "<private>"
+                    "icon": "glassway.svg"
                 }
             ]
         },

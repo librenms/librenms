@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.10002.1",
                     "sysDescr": "NFT 2N",
                     "sysContact": null,
                     "version": null,
                     "hardware": "NFT 2N",
                     "features": null,
+                    "location": null,
                     "os": "infinity",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ligowave.png",
-                    "location": null
+                    "icon": "ligowave.png"
                 }
             ]
         },

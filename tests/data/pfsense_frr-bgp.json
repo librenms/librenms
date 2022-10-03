@@ -10,11 +10,11 @@
                     "version": "2.4.5-RELEASE-p1",
                     "hardware": "amd64",
                     "features": null,
+                    "location": null,
                     "os": "pfsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "pfsense.svg",
-                    "location": null
+                    "icon": "pfsense.svg"
                 }
             ]
         },

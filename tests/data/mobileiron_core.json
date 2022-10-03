@@ -10,11 +10,11 @@
                     "version": "2.6.32-754.24.3.el6.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "mobileiron",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "mobileiron.png",
-                    "location": "<private>"
+                    "icon": "mobileiron.png"
                 }
             ]
         },

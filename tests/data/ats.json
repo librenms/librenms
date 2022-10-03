@@ -10,11 +10,11 @@
                     "version": "1.05",
                     "hardware": "ATS11747",
                     "features": null,
+                    "location": "<private>",
                     "os": "ats",
                     "type": "power",
                     "serial": "11230031806015",
-                    "icon": "ats.png",
-                    "location": "<private>"
+                    "icon": "ats.png"
                 }
             ]
         },

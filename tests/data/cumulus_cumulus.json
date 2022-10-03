@@ -10,11 +10,11 @@
                     "version": "Cumulus-Linux 4.4.2 (Linux Kernel 4.19.206-1+cl4.4.2u1)",
                     "hardware": "Cumulus Networks  VX Chassis",
                     "features": null,
+                    "location": "<private>",
                     "os": "cumulus",
                     "type": "network",
                     "serial": "0c:04:1f:86:00:00",
-                    "icon": "cumulus.png",
-                    "location": "<private>"
+                    "icon": "cumulus.png"
                 }
             ]
         },

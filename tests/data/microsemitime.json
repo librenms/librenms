@@ -10,32 +10,15 @@
                     "version": "2.83.2",
                     "hardware": "Symmetricom SyncServer S350",
                     "features": null,
+                    "location": "<private>",
                     "os": "microsemitime",
                     "type": "timing",
                     "serial": "1126A67238",
-                    "icon": "microsemi.png",
-                    "location": "<private>"
+                    "icon": "microsemi.png"
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.39165.1.6",
-                    "sysDescr": "Linux SyncServer 2.6.10_mvl401-pc_target.Gryphon.2.10.2009.1201126 #18 Thu Mar 10 10:31:17 PST 2016 i686",
-                    "sysContact": "<private>",
-                    "version": "2.83.2",
-                    "hardware": "Symmetricom SyncServer S350",
-                    "features": null,
-                    "os": "microsemitime",
-                    "type": "timing",
-                    "serial": "1126A67238",
-                    "icon": "microsemi.png",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {

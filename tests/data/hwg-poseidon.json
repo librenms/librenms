@@ -10,11 +10,11 @@
                     "version": "2.0.15",
                     "hardware": "Poseidon 4002",
                     "features": null,
+                    "location": "<private>",
                     "os": "hwg-poseidon",
                     "type": "environment",
                     "serial": null,
-                    "icon": "hwg-poseidon.png",
-                    "location": "<private>"
+                    "icon": "hwg-poseidon.png"
                 }
             ]
         },

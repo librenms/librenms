@@ -10,11 +10,11 @@
                     "version": "9.13.3.0 build 145 (US)",
                     "hardware": "ZD1200",
                     "features": "Licenses: 8/10",
+                    "location": "<private>",
                     "os": "ruckuswireless",
                     "type": "wireless",
                     "serial": "051608001610",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "icon": "ruckus.svg"
                 }
             ]
         },

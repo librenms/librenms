@@ -10,11 +10,11 @@
                     "version": "R80.10",
                     "hardware": "Check Point 3200",
                     "features": null,
+                    "location": "<private>",
                     "os": "gaia",
                     "type": "firewall",
                     "serial": "2000AB4000",
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },

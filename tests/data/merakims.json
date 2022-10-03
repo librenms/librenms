@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "Meraki MS",
                     "sysContact": null,
                     "version": null,
                     "hardware": "Meraki MS",
                     "features": null,
+                    "location": null,
                     "os": "merakims",
                     "type": "network",
                     "serial": "9999999999",
-                    "icon": "meraki.png",
-                    "location": null
+                    "icon": "meraki.png"
                 }
             ]
         },

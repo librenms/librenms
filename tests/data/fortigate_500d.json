@@ -10,11 +10,11 @@
                     "version": "v5.6.6,build1630,180913 (GA)",
                     "hardware": "FGT_500D",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FGT5HD3916803570",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

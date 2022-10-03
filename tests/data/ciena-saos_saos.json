@@ -10,11 +10,11 @@
                     "version": "1280",
                     "hardware": "6500 7-SLOT OPTICAL ",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciena-saos",
                     "type": "network",
                     "serial": null,
-                    "icon": "ciena.svg",
-                    "location": "<private>"
+                    "icon": "ciena.svg"
                 }
             ]
         },

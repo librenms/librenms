@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "e3meter",
                     "type": "power",
                     "serial": null,
-                    "icon": "riedo.png",
-                    "location": "<private>"
+                    "icon": "riedo.png"
                 }
             ]
         },

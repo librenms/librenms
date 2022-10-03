@@ -10,11 +10,11 @@
                     "version": "v5.6.5,build1600,180620 (GA)",
                     "hardware": "FWF_60D",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "<private>",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

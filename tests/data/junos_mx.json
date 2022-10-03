@@ -594,11 +594,11 @@
                     "version": "16.2R2.8",
                     "hardware": "Juniper MX80",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "G0290",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

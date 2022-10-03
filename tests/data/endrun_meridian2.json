@@ -10,11 +10,11 @@
                     "version": "3.04",
                     "hardware": "MeridianII GPS 6010-0067-000",
                     "features": null,
+                    "location": "<private>",
                     "os": "endrun",
                     "type": "appliance",
                     "serial": "2125389041",
-                    "icon": "endrun.png",
-                    "location": "<private>"
+                    "icon": "endrun.png"
                 }
             ]
         },

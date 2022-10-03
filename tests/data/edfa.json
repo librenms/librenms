@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "HA5837A-1x016",
                     "features": null,
+                    "location": "<private>",
                     "os": "edfa",
                     "type": "network",
                     "serial": "S26-PYA346",
-                    "icon": "generic.svg",
-                    "location": "<private>"
+                    "icon": "generic.svg"
                 }
             ]
         },

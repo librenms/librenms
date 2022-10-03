@@ -10,11 +10,11 @@
                     "version": "8.0.0s010 build 4198",
                     "hardware": "Pepwave MAX HD4",
                     "features": null,
+                    "location": "<private>",
                     "os": "pepwave",
                     "type": "network",
                     "serial": "2935-3BAB-7549",
-                    "icon": "peplink.svg",
-                    "location": "<private>"
+                    "icon": "peplink.svg"
                 }
             ]
         },

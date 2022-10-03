@@ -10,11 +10,11 @@
                     "version": "6.2.0eT183",
                     "hardware": "NetIron CER 2024F4X",
                     "features": null,
+                    "location": "<private>",
                     "os": "ironware",
                     "type": "network",
                     "serial": "CKM1234L567",
-                    "icon": "brocade.svg",
-                    "location": "<private>"
+                    "icon": "brocade.svg"
                 }
             ]
         },

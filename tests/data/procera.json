@@ -10,11 +10,11 @@
                     "version": "18.1.8.2",
                     "hardware": "PL7810-INT-FWA3210",
                     "features": null,
+                    "location": "<private>",
                     "os": "procera",
                     "type": "network",
                     "serial": "000ABCD0123",
-                    "icon": "procera.png",
-                    "location": "<private>"
+                    "icon": "procera.png"
                 }
             ]
         },

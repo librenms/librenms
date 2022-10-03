@@ -10,11 +10,11 @@
                     "version": "6.20.200.201810113973",
                     "hardware": "PowerEdge M1000e",
                     "features": null,
+                    "location": "<private>",
                     "os": "drac",
                     "type": "appliance",
                     "serial": "1234ABC",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

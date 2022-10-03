@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "ZXDSL 9806V",
                     "features": null,
+                    "location": "<private>",
                     "os": "zxdsl",
                     "type": "network",
                     "serial": null,
-                    "icon": "zte.svg",
-                    "location": "<private>"
+                    "icon": "zte.svg"
                 }
             ]
         },

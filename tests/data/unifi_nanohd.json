@@ -10,11 +10,11 @@
                     "version": "5.43.36.12724",
                     "hardware": "UAP-nanoHD",
                     "features": null,
+                    "location": "<private>",
                     "os": "unifi",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

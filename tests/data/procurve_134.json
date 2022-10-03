@@ -10,11 +10,11 @@
                     "version": "PK.1.38",
                     "hardware": "V1810-48G",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

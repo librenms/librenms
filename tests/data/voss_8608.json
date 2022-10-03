@@ -10,11 +10,11 @@
                     "version": "6.2.0.2",
                     "hardware": "VSP-8608",
                     "features": null,
+                    "location": "<private>",
                     "os": "voss",
                     "type": "network",
                     "serial": "18ND1240D10P",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

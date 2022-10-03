@@ -10,11 +10,11 @@
                     "version": "Version 8.0n",
                     "hardware": "C2S42CE-YCMFAM00",
                     "features": null,
+                    "location": "<private>",
                     "os": "sentry4",
                     "type": "power",
                     "serial": "<private>",
-                    "icon": "servertech.png",
-                    "location": "<private>"
+                    "icon": "servertech.png"
                 }
             ]
         },

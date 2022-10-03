@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "voss",
                     "type": "network",
                     "serial": null,
-                    "icon": "extremevoss.svg",
-                    "location": null
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

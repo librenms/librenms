@@ -10,11 +10,11 @@
                     "version": "5.4.8-2.1",
                     "hardware": "AT-x930-28GSTX",
                     "features": null,
+                    "location": "<private>",
                     "os": "awplus",
                     "type": "network",
                     "serial": "A04881A151300018",
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

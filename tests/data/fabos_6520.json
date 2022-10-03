@@ -10,11 +10,11 @@
                     "version": "v8.2.1c",
                     "hardware": "Brocade 6520 Switch",
                     "features": null,
+                    "location": "<private>",
                     "os": "fabos",
                     "type": "network",
                     "serial": null,
-                    "icon": "brocade.svg",
-                    "location": "<private>"
+                    "icon": "brocade.svg"
                 }
             ]
         },

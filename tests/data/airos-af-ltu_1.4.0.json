@@ -10,11 +10,11 @@
                     "version": "v1.4.0",
                     "hardware": "airFiber 5XHD",
                     "features": null,
+                    "location": "<private>",
                     "os": "airos-af-ltu",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

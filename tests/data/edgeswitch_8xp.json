@@ -10,11 +10,11 @@
                     "version": "2.1.0",
                     "hardware": "EdgeSwitch 8XP",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "50724909",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "uhp",
                     "type": "wireless",
                     "serial": "1074225446",
-                    "icon": "uhp.png",
-                    "location": "<private>"
+                    "icon": "uhp.png"
                 }
             ]
         },

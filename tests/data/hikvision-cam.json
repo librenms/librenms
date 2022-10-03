@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "V5.5.3 build 171025",
                     "hardware": "DS-2CD2185FWD-I",
                     "features": "H.264-MJPEG",
+                    "location": null,
                     "os": "hikvision-cam",
                     "type": "network",
                     "serial": null,
-                    "icon": "hikvision.png",
-                    "location": null
+                    "icon": "hikvision.png"
                 }
             ]
         },

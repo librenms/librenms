@@ -28573,11 +28573,11 @@
                     "version": "5.3.4",
                     "hardware": "ASR9K Series",
                     "features": "Default",
+                    "location": "<private>",
                     "os": "iosxr",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

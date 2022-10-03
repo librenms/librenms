@@ -10,11 +10,11 @@
                     "version": "V04.02.00",
                     "hardware": "XC206-2SFP",
                     "features": "6GK5 206-2BS00-2AC2",
+                    "location": "<private>",
                     "os": "scalance",
                     "type": "network",
                     "serial": "VPM8190273",
-                    "icon": "siemens.svg",
-                    "location": "<private>"
+                    "icon": "siemens.svg"
                 }
             ]
         },

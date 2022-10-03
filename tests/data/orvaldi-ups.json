@@ -10,11 +10,11 @@
                     "version": "VERFW:01428.1400",
                     "hardware": "G2-6KL",
                     "features": null,
+                    "location": "<private>",
                     "os": "orvaldi-ups",
                     "type": "power",
                     "serial": "11112222333344",
-                    "icon": "orvaldi.png",
-                    "location": "<private>"
+                    "icon": "orvaldi.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.6.33-A2-A001",
                     "hardware": "PL-1000IL rev 02-07",
                     "features": null,
+                    "location": "<private>",
                     "os": "packetlight",
                     "type": "network",
                     "serial": "171002782",
-                    "icon": "packetlight.png",
-                    "location": "<private>"
+                    "icon": "packetlight.png"
                 }
             ]
         },

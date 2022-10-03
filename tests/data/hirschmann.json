@@ -28,11 +28,11 @@
                     "version": "07.1.05",
                     "hardware": "RS30-1602OOZZSDHPHH",
                     "features": null,
+                    "location": "<private>",
                     "os": "hirschmann",
                     "type": "network",
                     "serial": "9999999999999F9999",
-                    "icon": "hirschmann.svg",
-                    "location": "<private>"
+                    "icon": "hirschmann.svg"
                 }
             ]
         },

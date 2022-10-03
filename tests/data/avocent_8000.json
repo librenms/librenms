@@ -10,11 +10,11 @@
                     "version": "2.0.3.3542+685+35+11",
                     "hardware": "ACS8048",
                     "features": null,
+                    "location": "snmp-location-blanked-out",
                     "os": "avocent",
                     "type": "network",
                     "serial": "0530050907",
-                    "icon": "avocent.svg",
-                    "location": "snmp-location-blanked-out"
+                    "icon": "avocent.svg"
                 }
             ]
         },

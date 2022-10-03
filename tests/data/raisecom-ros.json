@@ -10,11 +10,11 @@
                     "version": "ROS_6.2.0_20200614",
                     "hardware": "RAX711-C-R P100R001C00",
                     "features": null,
+                    "location": "<private>",
                     "os": "raisecom-ros",
                     "type": "network",
                     "serial": "103002031910S20907S0003G",
-                    "icon": "raisecom.png",
-                    "location": "<private>"
+                    "icon": "raisecom.png"
                 }
             ]
         },

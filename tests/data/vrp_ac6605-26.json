@@ -10,11 +10,11 @@
                     "version": "5.170 (V200R010C00SPC500) [4]",
                     "hardware": "AC6605-26-PWR",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": "21023579169WJ6000038",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

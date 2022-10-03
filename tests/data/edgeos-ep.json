@@ -10,11 +10,11 @@
                     "version": "EP.v1.6.0",
                     "hardware": "EP-54V-150W",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeos-ep",
                     "type": "power",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

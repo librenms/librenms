@@ -10,11 +10,11 @@
                     "version": "5.70",
                     "hardware": "Tempus LX CDMA 6010-0042-000",
                     "features": "F/W 5.11 FPGA 0416",
+                    "location": "<private>",
                     "os": "endrun",
                     "type": "appliance",
                     "serial": "1882136009",
-                    "icon": "endrun.png",
-                    "location": "<private>"
+                    "icon": "endrun.png"
                 }
             ]
         },

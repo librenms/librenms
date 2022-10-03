@@ -10,11 +10,11 @@
                     "version": "V5.13(ABMT.0)C0",
                     "hardware": "XMG3927-B50A",
                     "features": "G.fastAnnexA",
+                    "location": "<private>",
                     "os": "zyxelac",
                     "type": "network",
                     "serial": "S204135008819",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

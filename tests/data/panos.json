@@ -10,11 +10,11 @@
                     "version": "9.0.7",
                     "hardware": "PA-VM",
                     "features": null,
+                    "location": "<private>",
                     "os": "panos",
                     "type": "firewall",
                     "serial": "015351000009999",
-                    "icon": "panos.svg",
-                    "location": "<private>"
+                    "icon": "panos.svg"
                 }
             ]
         },

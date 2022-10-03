@@ -10,11 +10,11 @@
                     "version": "18.2R1.9",
                     "hardware": "Juniper VMX Internet Backbone Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "VM600B272BD3",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

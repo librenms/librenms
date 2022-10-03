@@ -10,11 +10,11 @@
                     "version": "8.1.9.8_77260",
                     "hardware": "ECS",
                     "features": null,
+                    "location": "<private>",
                     "os": "vxoa",
                     "type": "network",
                     "serial": "00-1B-BC-AA-AA-AA",
-                    "icon": "silverpeak.png",
-                    "location": "<private>"
+                    "icon": "silverpeak.png"
                 }
             ]
         },

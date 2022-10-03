@@ -10,11 +10,11 @@
                     "version": "4.08",
                     "hardware": "RIGRunner 4005i",
                     "features": null,
+                    "location": "<private>",
                     "os": "westmountainradio",
                     "type": "power",
                     "serial": null,
-                    "icon": "westmountainradio.svg",
-                    "location": "<private>"
+                    "icon": "westmountainradio.svg"
                 }
             ]
         },

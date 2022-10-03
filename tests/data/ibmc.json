@@ -10,11 +10,11 @@
                     "version": "2.55",
                     "hardware": "RH2288H V3",
                     "features": "BIOS 1.08",
+                    "location": "<private>",
                     "os": "ibmc",
                     "type": "appliance",
                     "serial": "SerialNumber",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

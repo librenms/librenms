@@ -10,11 +10,11 @@
                     "version": "PL.1.9",
                     "hardware": "1810-24G",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

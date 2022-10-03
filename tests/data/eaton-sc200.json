@@ -10,11 +10,11 @@
                     "version": "HW:022 SW:4.04",
                     "hardware": "SY106769",
                     "features": null,
+                    "location": "<private>",
                     "os": "eaton-sc200",
                     "type": "power",
                     "serial": "System:315646 Product:246152313",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

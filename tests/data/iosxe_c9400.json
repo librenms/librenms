@@ -10,11 +10,11 @@
                     "version": "15.5(3)S1a",
                     "hardware": "C9404R",
                     "features": "ADVENTERPRISEK9",
+                    "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
                     "serial": "FXS1111A11A",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

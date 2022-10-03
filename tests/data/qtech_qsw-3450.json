@@ -10,11 +10,11 @@
                     "version": "7.0.3.5(R0237.0034)",
                     "hardware": "QSW-3450-28T-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "qtech",
                     "type": "network",
                     "serial": "00030661509010026177",
-                    "icon": "qtech.svg",
-                    "location": "<private>"
+                    "icon": "qtech.svg"
                 }
             ]
         },

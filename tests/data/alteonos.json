@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.1872.1.13.3.5.1",
                     "sysDescr": "Alteon Application Switch 5224XL",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "alteonos",
                     "type": "network",
                     "serial": null,
-                    "icon": "radware.svg",
-                    "location": null
+                    "icon": "radware.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "3.4.20-A5-A016-2409",
                     "hardware": "PL-1000E rev 02-02",
                     "features": null,
+                    "location": "<private>",
                     "os": "packetlight",
                     "type": "network",
                     "serial": "100800446",
-                    "icon": "packetlight.png",
-                    "location": "<private>"
+                    "icon": "packetlight.png"
                 }
             ]
         },

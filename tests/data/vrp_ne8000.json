@@ -10,11 +10,11 @@
                     "version": "8.200 (V800R012C10SPC300)",
                     "hardware": "NetEngine 8000",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

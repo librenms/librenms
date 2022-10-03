@@ -10,11 +10,11 @@
                     "version": "3.10",
                     "hardware": "ICT200DB-12IRC",
                     "features": null,
+                    "location": null,
                     "os": "ict-pdu",
                     "type": "power",
                     "serial": null,
-                    "icon": "ict.png",
-                    "location": null
+                    "icon": "ict.png"
                 }
             ]
         },

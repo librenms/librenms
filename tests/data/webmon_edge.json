@@ -10,11 +10,11 @@
                     "version": "1.19.0",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "webmon",
                     "type": "environment",
                     "serial": null,
-                    "icon": "dantel.png",
-                    "location": "<private>"
+                    "icon": "dantel.png"
                 }
             ]
         },

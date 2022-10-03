@@ -10,11 +10,11 @@
                     "version": "9.0.5",
                     "hardware": "PA-3020",
                     "features": null,
+                    "location": "<private>",
                     "os": "panos",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "panos.svg",
-                    "location": "<private>"
+                    "icon": "panos.svg"
                 }
             ]
         },
