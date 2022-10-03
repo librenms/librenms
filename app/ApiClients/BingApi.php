@@ -34,6 +34,7 @@ class BingApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
+    /** @var ?string */
     protected ?string $base_uri = 'http://dev.virtualearth.net';
     protected $geocoding_uri = '/REST/v1/Locations';
 
