@@ -158,14 +158,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 if ($oid[2] > 4) { //ipv6 so we have to translate
                                     $address = IP::fromSnmpString($oid[3])->compressed();
                                 }
-                                $bgpPeers[$address][$vrfInstance] = array_merge($bgpPeers[$address][$vrfInstance], $value);
-                                //d_echo("$vrfInstance -- $address \t-- $value");
-                                //d_echo($value);
+                                if (is_array($bgpPeers[$address]) && is_array($bgpPeers[$address][$vrfInstance])) {
+                                    $bgpPeers[$address][$vrfInstance] = array_merge($bgpPeers[$address][$vrfInstance], $value);
+                                }
                             }
-                            //d_echo($bgpPeersCache);
-                            //d_echo($bgpPeersStats);
                         }
-                        //d_echo($bgpPeers);
                         $address = (string) $peer_ip;
                         $bgpPeer = $bgpPeers[$address];
                         $peer_data = [];
