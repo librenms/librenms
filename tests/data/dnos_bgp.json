@@ -10,11 +10,11 @@
                     "version": "9.14(1.7)",
                     "hardware": "S4048T-ON",
                     "features": null,
+                    "location": null,
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
+                    "icon": "dell.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "50670-02-00",
                     "hardware": "PTP 670 master (B0P01.01-C-FPS)",
                     "features": null,
+                    "location": "<private>",
                     "os": "ptp670",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": "<private>"
+                    "icon": "cambium.svg"
                 }
             ]
         },

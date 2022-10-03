@@ -10,11 +10,11 @@
                     "version": "7.0.0",
                     "hardware": "HP ProLiant DL380p Gen8",
                     "features": "build 15843807",
+                    "location": "<private>",
                     "os": "vmware-esxi",
                     "type": "server",
                     "serial": "CZ162913BZ",
-                    "icon": "vmware.svg",
-                    "location": "<private>"
+                    "icon": "vmware.svg"
                 }
             ]
         },

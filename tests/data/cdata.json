@@ -10,11 +10,11 @@
                     "version": "4.2.7.58",
                     "hardware": "V4.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "cdata",
                     "type": "network",
                     "serial": "AF2101-1901000029",
-                    "icon": "cdata.png",
-                    "location": "<private>"
+                    "icon": "cdata.png"
                 }
             ]
         },

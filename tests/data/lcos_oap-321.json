@@ -10,11 +10,11 @@
                     "version": "10.12.0147SU3 / 15.11.2017",
                     "hardware": "LANCOM OAP-321",
                     "features": null,
+                    "location": "<private>",
                     "os": "lcos",
                     "type": "wireless",
                     "serial": "4002024918100043",
-                    "icon": "lancom.png",
-                    "location": "<private>"
+                    "icon": "lancom.png"
                 }
             ]
         },

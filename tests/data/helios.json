@@ -10,11 +10,11 @@
                     "version": "1.1.9-9791-1b3b6d8c",
                     "hardware": "ML-60-30-18",
                     "features": null,
+                    "location": "<private>",
                     "os": "helios",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ignitenet.png",
-                    "location": "<private>"
+                    "icon": "ignitenet.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "2020.6",
                     "hardware": "Asus RT-N66U",
                     "features": null,
+                    "location": "<private>",
                     "os": "freshtomato",
                     "type": "network",
                     "serial": null,
-                    "icon": "tomato.png",
-                    "location": "<private>"
+                    "icon": "tomato.png"
                 }
             ]
         },

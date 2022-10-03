@@ -10,11 +10,11 @@
                     "version": "19.4R3.11",
                     "hardware": "Juniper MX5-T Internet Backbone Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "F8223",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "AOS v6.8.8 / App v6.6.9.b",
                     "hardware": "InRow DX 300mm",
                     "features": null,
+                    "location": null,
                     "os": "apc",
                     "type": "power",
                     "serial": null,
-                    "icon": "apc.svg",
-                    "location": null
+                    "icon": "apc.svg"
                 }
             ]
         },

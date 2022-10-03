@@ -10,11 +10,11 @@
                     "version": "5.2.14",
                     "hardware": "GM4-HPOE 8991T11D",
                     "features": null,
+                    "location": "<private>",
                     "os": "omnitron-iconverter",
                     "type": "management",
                     "serial": "00000000",
-                    "icon": "omnitron.png",
-                    "location": "<private>"
+                    "icon": "omnitron.png"
                 }
             ]
         },

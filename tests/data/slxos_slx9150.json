@@ -10,11 +10,11 @@
                     "version": "20.1.2e",
                     "hardware": "SLX9150-48Y",
                     "features": null,
+                    "location": "<private>",
                     "os": "slxos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "extreme.svg",
-                    "location": "<private>"
+                    "icon": "extreme.svg"
                 }
             ]
         },

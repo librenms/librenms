@@ -10,11 +10,11 @@
                     "version": "2.28f130731",
                     "hardware": "IGS-10020MT",
                     "features": null,
+                    "location": "<private>",
                     "os": "planetos",
                     "type": "network",
                     "serial": null,
-                    "icon": "planet.png",
-                    "location": "<private>"
+                    "icon": "planet.png"
                 }
             ]
         },

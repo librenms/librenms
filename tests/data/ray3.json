@@ -10,11 +10,11 @@
                     "version": "1.1.1.0",
                     "hardware": "RAy3-24",
                     "features": "U",
+                    "location": "<private>",
                     "os": "ray3",
                     "type": "wireless",
                     "serial": "1801456327",
-                    "icon": "ray.png",
-                    "location": "<private>"
+                    "icon": "ray.png"
                 }
             ]
         },

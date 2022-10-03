@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.5624.2.1.124",
                     "sysDescr": "Enterasys Networks, Inc. G3G124-24P Rev 06.03.08.0012",
                     "sysContact": null,
                     "version": "06.03.08.0012",
                     "hardware": "G3G124-24P",
                     "features": null,
+                    "location": null,
                     "os": "enterasys",
                     "type": "network",
                     "serial": null,
-                    "icon": "enterasys.svg",
-                    "location": null
+                    "icon": "enterasys.svg"
                 }
             ]
         },

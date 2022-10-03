@@ -10,11 +10,11 @@
                     "version": "5.7.2.006+1483656",
                     "hardware": "HP Gen8 ServBP 25+2",
                     "features": null,
+                    "location": "<private>",
                     "os": "quantastor",
                     "type": "storage",
                     "serial": "1b2cc97f",
-                    "icon": "quantastor.svg",
-                    "location": "<private>"
+                    "icon": "quantastor.svg"
                 }
             ]
         },

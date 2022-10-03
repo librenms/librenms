@@ -10,11 +10,11 @@
                     "version": "[TDCM V1.1.1 - EDFA V1.1.0]",
                     "hardware": "TDCM V1.0 - EDFA V1.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "alpineoe-tdcmedfa",
                     "type": "appliance",
                     "serial": "TDCM : 44 32 32 30 32 4C 32 30 30 38 00 00 00 00 00 00 - EDFA : 45 32 32 30 32 4C 32 31 30 30 38 00 00 00 00 00",
-                    "icon": "alpineoe.png",
-                    "location": "<private>"
+                    "icon": "alpineoe.png"
                 }
             ]
         },

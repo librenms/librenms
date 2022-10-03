@@ -10,11 +10,11 @@
                     "version": "2.0.0.J",
                     "hardware": "P9S18A",
                     "features": null,
+                    "location": "<private>",
                     "os": "hpe-mapdu",
                     "type": "power",
                     "serial": "<private>",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

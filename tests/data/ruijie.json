@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ruijie",
                     "type": "network",
                     "serial": null,
-                    "icon": "ruijie.png",
-                    "location": "<private>"
+                    "icon": "ruijie.png"
                 }
             ]
         },

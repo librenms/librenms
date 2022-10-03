@@ -10,11 +10,11 @@
                     "version": "1.02.02",
                     "hardware": "60-000367-02",
                     "features": null,
+                    "location": "<private>",
                     "os": "horizon-duo",
                     "type": "wireless",
                     "serial": "DW0123456789",
-                    "icon": "dragonwave.png",
-                    "location": "<private>"
+                    "icon": "dragonwave.png"
                 }
             ]
         },

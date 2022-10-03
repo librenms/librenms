@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ericsson-ml",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ericsson.svg",
-                    "location": "<private>"
+                    "icon": "ericsson.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "icotera",
                     "type": "network",
                     "serial": null,
-                    "icon": "icotera.png",
-                    "location": "<private>"
+                    "icon": "icotera.png"
                 }
             ]
         },

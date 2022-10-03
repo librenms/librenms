@@ -10,11 +10,11 @@
                     "version": "8.5.255.R02",
                     "hardware": "OS6860E-U28",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos7",
                     "type": "network",
                     "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },

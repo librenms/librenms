@@ -10,11 +10,11 @@
                     "version": "2767,10,2738,11",
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "powerwalker-vfi",
                     "type": "power",
                     "serial": null,
-                    "icon": "powerwalker.png",
-                    "location": null
+                    "icon": "powerwalker.png"
                 }
             ]
         },

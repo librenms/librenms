@@ -10,11 +10,11 @@
                     "version": "Software 3.1.1.7, Bootldr 3.0.0.40, Firmware 3.0.0.40",
                     "hardware": "CBS250-24P-4X V02",
                     "features": "CBS250-24P-4X",
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "FOC2503LKRC",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.04",
                     "hardware": "2",
                     "features": null,
+                    "location": "my_ict_ups",
                     "os": "ict-mps",
                     "type": "power",
                     "serial": null,
-                    "icon": "ict.png",
-                    "location": "my_ict_ups"
+                    "icon": "ict.png"
                 }
             ]
         },

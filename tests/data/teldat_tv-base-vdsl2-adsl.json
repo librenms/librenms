@@ -3642,11 +3642,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "teldat",
                     "type": "network",
                     "serial": "792/09606",
-                    "icon": "teldat.png",
-                    "location": null
+                    "icon": "teldat.png"
                 }
             ]
         },

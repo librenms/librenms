@@ -10,11 +10,11 @@
                     "version": "2.11.280 STD",
                     "hardware": "SiteBoss 550",
                     "features": null,
+                    "location": "<private>",
                     "os": "siteboss550",
                     "type": "server",
                     "serial": null,
-                    "icon": "siteboss.png",
-                    "location": "<private>"
+                    "icon": "siteboss.png"
                 }
             ]
         },

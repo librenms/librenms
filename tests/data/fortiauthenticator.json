@@ -10,11 +10,11 @@
                     "version": "v6.0.3-build0058",
                     "hardware": "FACVM",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortiauthenticator",
                     "type": "firewall",
                     "serial": "FAC-VM0A12345678",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

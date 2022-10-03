@@ -10,11 +10,11 @@
                     "version": "8.0.5.0",
                     "hardware": "VSP-7432CQ",
                     "features": null,
+                    "location": "<private>",
                     "os": "voss",
                     "type": "network",
                     "serial": "1914Q-20413",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

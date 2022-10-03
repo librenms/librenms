@@ -10,11 +10,11 @@
                     "version": "A03",
                     "hardware": "s4128Fon",
                     "features": "CWTQXC2/281 062 707 86",
+                    "location": "<private>",
                     "os": "dell-os10",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

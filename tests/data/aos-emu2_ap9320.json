@@ -10,11 +10,11 @@
                     "version": "v2.6.7",
                     "hardware": "AP9320 4",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos-emu2",
                     "type": "environment",
                     "serial": "ZA0604022112",
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

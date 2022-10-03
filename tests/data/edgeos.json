@@ -10,11 +10,11 @@
                     "version": "1.8.0",
                     "hardware": "EdgeRouter Pro 8-Port",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeos",
                     "type": "network",
                     "serial": null,
-                    "icon": "edgeos.svg",
-                    "location": "<private>"
+                    "icon": "edgeos.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "4.15.3F",
                     "hardware": "DCS-7050TX-128",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista_eos",
                     "type": "network",
                     "serial": "JPE00000000",
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },

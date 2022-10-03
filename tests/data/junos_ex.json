@@ -10,11 +10,11 @@
                     "version": "15.1X53-D59.4",
                     "hardware": "Juniper EX3400-48T",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

@@ -400,11 +400,11 @@
                     "version": "15.5(3)S1a",
                     "hardware": "ciscoASR1002F",
                     "features": "ADVENTERPRISEK9",
+                    "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

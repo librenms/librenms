@@ -10,11 +10,11 @@
                     "version": "0.16.5",
                     "hardware": "MetaMux 48 with C-Series",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista-mos",
                     "type": "network",
                     "serial": null,
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },

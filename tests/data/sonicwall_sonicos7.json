@@ -10,11 +10,11 @@
                     "version": "(Firmware SonicOS 7.0.1-R1456 / ROM 7.0.0.9)",
                     "hardware": "TZ 570",
                     "features": null,
+                    "location": null,
                     "os": "sonicwall",
                     "type": "firewall",
                     "serial": "2CB8ED6DFE5C",
-                    "icon": "sonicwall.svg",
-                    "location": null
+                    "icon": "sonicwall.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "V4.62(AALB.0)",
                     "hardware": "USG40W",
                     "features": null,
+                    "location": "<private>",
                     "os": "zywall",
                     "type": "firewall",
                     "serial": "S152L18350215",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "6.44",
                     "hardware": "RBLHGG-60ad",
                     "features": "Level 3",
+                    "location": "<private>",
                     "os": "routeros",
                     "type": "network",
                     "serial": "90C709063CC4",
-                    "icon": "mikrotik.svg",
-                    "location": "<private>"
+                    "icon": "mikrotik.svg"
                 }
             ]
         },

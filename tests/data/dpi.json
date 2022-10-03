@@ -10,11 +10,11 @@
                     "version": "V01.08.0003",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "dpi",
                     "type": "power",
                     "serial": null,
-                    "icon": "ibmos.svg",
-                    "location": "<private>"
+                    "icon": "ibmos.svg"
                 }
             ]
         },

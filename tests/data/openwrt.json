@@ -10,11 +10,11 @@
                     "version": "snapshot",
                     "hardware": "Marvell Kirkwood (Flattened Device Tree)",
                     "features": null,
+                    "location": "<private>",
                     "os": "openwrt",
                     "type": "network",
                     "serial": null,
-                    "icon": "openwrt.svg",
-                    "location": "<private>"
+                    "icon": "openwrt.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "2.72",
                     "hardware": "ProLiant DL380 Gen9",
                     "features": null,
+                    "location": null,
                     "os": "hpe-ilo",
                     "type": "appliance",
                     "serial": "CZXXXXXXXX",
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

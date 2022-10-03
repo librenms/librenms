@@ -10,11 +10,11 @@
                     "version": "9.2-RELEASE",
                     "hardware": "Red Hat KVM",
                     "features": "FreeBSD 12.1-RELEASE-p3",
+                    "location": "<private>",
                     "os": "freebsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "freebsd.svg",
-                    "location": "<private>"
+                    "icon": "freebsd.svg"
                 }
             ]
         },

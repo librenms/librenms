@@ -10,11 +10,11 @@
                     "version": "RUT2XX_R_00.01.07.1",
                     "hardware": "RUT240",
                     "features": null,
+                    "location": "<private>",
                     "os": "rutos-2xx",
                     "type": "network",
                     "serial": "1101612740",
-                    "icon": "teltonika.png",
-                    "location": "<private>"
+                    "icon": "teltonika.png"
                 }
             ]
         },

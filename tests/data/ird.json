@@ -594,11 +594,11 @@
                     "version": "2.4.20-uc0",
                     "hardware": "Generic ARM",
                     "features": null,
+                    "location": "<private>",
                     "os": "ird",
                     "type": "network",
                     "serial": null,
-                    "icon": "pbi.png",
-                    "location": "<private>"
+                    "icon": "pbi.png"
                 }
             ]
         },

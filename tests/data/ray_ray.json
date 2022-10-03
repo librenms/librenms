@@ -10,11 +10,11 @@
                     "version": "2.2.5.0",
                     "hardware": "RAy2-17",
                     "features": "U",
+                    "location": "<private>",
                     "os": "ray",
                     "type": "wireless",
                     "serial": "9879730",
-                    "icon": "ray.png",
-                    "location": "<private>"
+                    "icon": "ray.png"
                 }
             ]
         },

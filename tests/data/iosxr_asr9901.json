@@ -10,11 +10,11 @@
                     "version": "6.6.3",
                     "hardware": "ASR-9901",
                     "features": null,
+                    "location": "<private>",
                     "os": "iosxr",
                     "type": "network",
                     "serial": "FOC2211NMLZ",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

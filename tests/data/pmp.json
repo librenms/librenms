@@ -10,11 +10,11 @@
                     "version": "16.0.0.1",
                     "hardware": "PMP 450 AP",
                     "features": "5.7GHz MIMO OFDM - Multipoint - Access Point",
+                    "location": "<private>",
                     "os": "pmp",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": "<private>"
+                    "icon": "cambium.svg"
                 }
             ]
         },

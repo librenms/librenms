@@ -10,11 +10,11 @@
                     "version": "12.1X46-D86",
                     "hardware": "Juniper SRX240H Internet Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "AG3213AK0210",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

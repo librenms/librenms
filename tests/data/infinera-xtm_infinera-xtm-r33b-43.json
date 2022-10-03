@@ -10,11 +10,11 @@
                     "version": "r33b-43",
                     "hardware": "TM-3000/II subrack",
                     "features": null,
+                    "location": "<private>",
                     "os": "infinera-xtm",
                     "type": "network",
                     "serial": null,
-                    "icon": "infinera.png",
-                    "location": "<private>"
+                    "icon": "infinera.png"
                 }
             ]
         },

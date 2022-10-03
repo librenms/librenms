@@ -10,11 +10,11 @@
                     "version": "6.4.4.4-4.2.3.1",
                     "hardware": "",
                     "features": "Local Controller for 172.31.200.100",
+                    "location": "<private>",
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },

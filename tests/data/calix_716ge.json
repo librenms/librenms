@@ -10,11 +10,11 @@
                     "version": "10.7.110.17.....\n00 00 00 00",
                     "hardware": "716GE...",
                     "features": null,
+                    "location": "<private>",
                     "os": "calix",
                     "type": "network",
                     "serial": "CXNK0006E6A1",
-                    "icon": "calix.svg",
-                    "location": "<private>"
+                    "icon": "calix.svg"
                 }
             ]
         },

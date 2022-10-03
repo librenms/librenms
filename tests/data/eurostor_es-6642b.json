@@ -10,11 +10,11 @@
                     "version": "V1.50 2012-06-13",
                     "hardware": "EUROstore [ES-6642B]",
                     "features": "Controller: Areca ARC-8066",
+                    "location": "<private>",
                     "os": "eurostor",
                     "type": "appliance",
                     "serial": "A116EHDEPR900010",
-                    "icon": "eurostor.svg",
-                    "location": "<private>"
+                    "icon": "eurostor.svg"
                 }
             ]
         },

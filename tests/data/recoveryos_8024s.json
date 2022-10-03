@@ -10,11 +10,11 @@
                     "version": "2.6.32-573.26.1.el6.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "recoveryos",
                     "type": "server",
                     "serial": null,
-                    "icon": "unitrends.png",
-                    "location": "<private>"
+                    "icon": "unitrends.png"
                 }
             ]
         },

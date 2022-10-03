@@ -48842,11 +48842,11 @@
                     "version": "7.1.045",
                     "hardware": "FF 5700-40XG-2QSFP",
                     "features": "2416",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "DM20F3000F",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

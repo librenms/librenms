@@ -10,11 +10,11 @@
                     "version": "10.0.1.003",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "barracudawafirewall",
                     "type": "firewall",
                     "serial": "888888",
-                    "icon": "barracuda.svg",
-                    "location": "<private>"
+                    "icon": "barracuda.svg"
                 }
             ]
         },
