@@ -43,7 +43,7 @@ class SetGroups
             $version = Version::get();
 
             $report->group('LibreNMS', [
-                'Git version' => $version->local(),
+                'Git version' => $version->name(),
                 'App version' => Version::VERSION,
             ]);
 

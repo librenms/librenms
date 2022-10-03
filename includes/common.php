@@ -533,31 +533,6 @@ function parse_location($location)
 }//end parse_location()
 
 /**
- * Returns version info
- *
- * @param  bool  $remote  fetch remote version info from github
- * @return array
- */
-function version_info($remote = false)
-{
-    $version = \LibreNMS\Util\Version::get();
-
-    return [
-        'local_ver' => $version->local(),
-        'local_sha' => $version->localCommitSha(),
-        'local_date' => $version->localDate(),
-        'local_branch' => $version->localBranch(),
-        'github' => $remote ? $version->remoteCommit() : null,
-        'db_schema' => vsprintf('%s (%s)', $version->database()),
-        'php_ver' => phpversion(),
-        'python_ver' => $version->python(),
-        'database_ver' => $version->databaseServer(),
-        'rrdtool_ver' => $version->rrdtool(),
-        'netsnmp_ver' => $version->netSnmp(),
-    ];
-}//end version_info()
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function

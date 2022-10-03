@@ -99,19 +99,7 @@ if (empty($where)) {
 }
 
 if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
-    $versions = version_info();
-    echo <<<EOH
-===================================
-Version info:
-Commit SHA: {$versions['local_sha']}
-Commit Date: {$versions['local_date']}
-DB Schema: {$versions['db_schema']}
-PHP: {$versions['php_ver']}
-Database: {$versions['database_ver']}
-RRDTool: {$versions['rrdtool_ver']}
-SNMP: {$versions['netsnmp_ver']}
-==================================
-EOH;
+    echo \LibreNMS\Util\Version::get()->header();
 
     echo "DEBUG!\n";
     if (isset($options['v'])) {

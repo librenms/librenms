@@ -925,7 +925,7 @@ return [
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Interfaces, entrées plus anciennes que',
+            'description' => 'Purger les ports supprimés',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'public_status' => [
