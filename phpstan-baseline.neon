@@ -11388,6 +11388,6 @@ parameters:
 			path: tests/YamlSchemaTest.php
             
 		-
-			message: "#^Call to function is_null\(\) with Illuminate\\Http\\Client\\PendingRequest will always evaluate to false\.$#"
+			message: "#^Call to function is_null() with Illuminate\\Http\\Client\\PendingRequest will always evaluate to false\.$#"
 			count: 1
 			path: app/ApiClient/BaseApi.php
