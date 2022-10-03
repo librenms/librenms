@@ -37,6 +37,11 @@ class BaseApi
     /** @var \Illuminate\Http\Client\PendingRequest */
     private \Illuminate\Http\Client\PendingRequest $client;
 
+     /**
+     * Create a new http request.
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
         if (is_null($this->client)) {
