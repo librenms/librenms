@@ -10,9 +10,7 @@ modules:
                 -
                     oid: dmmGlobalSystemStatus
                     value: dmmGlobalSystemStatus
-                    num_oid:
-#                        - '.1.3.6.1.4.1.674.10892.6.3.1.0.{{ $index }}'
-                        - '.1.3.6.1.4.1.674.10892.6.2.1.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.674.10892.6.2.1.{{ $index }}'
                     descr: 'Global System Status'
                     index: 'dmmGlobalSystemStatus.{{ $index }}'
                     states:
@@ -143,13 +141,13 @@ modules:
                     value: dmmPowerWattsPeakUsage
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.5.{{ $index }}'
                     index: 'dmmPowerWattsPeakUsage.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Max Power'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Peak Usage'
                 -
                     oid: dmmPowerTable
                     value: dmmPowerWattsMinUsage
                     num_oid: '.1.3.6.1.4.1.674.10892.6.4.1.1.7.{{ $index }}'
                     index: 'dmmPowerWattsMinUsage.{{ $index }}'
-                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Min Power'
+                    descr: 'Chassis {{ $dmmPowerChassisIndex }} Min Usage'
                 -
                     oid: dmmPowerTable
                     value: dmmPowerWattsReading
