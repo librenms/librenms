@@ -10,11 +10,11 @@
                     "version": "9.9(0.0P9)",
                     "hardware": "S4048-ON",
                     "features": null,
+                    "location": "<private>",
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

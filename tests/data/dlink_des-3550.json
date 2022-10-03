@@ -10,11 +10,11 @@
                     "version": "Build 5.01.B65",
                     "hardware": "DES-3550 Rev. A5G",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": null,
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

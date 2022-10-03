@@ -10,11 +10,11 @@
                     "version": "14313012-003-5",
                     "hardware": "Communication Module 23413012-000-0",
                     "features": "NTP ena",
+                    "location": "<private>",
                     "os": "ssu2000",
                     "type": "appliance",
                     "serial": "R04334",
-                    "icon": "microsemi.png",
-                    "location": "<private>"
+                    "icon": "microsemi.png"
                 }
             ]
         },

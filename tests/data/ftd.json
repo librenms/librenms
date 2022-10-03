@@ -10,11 +10,11 @@
                     "version": "6.2.0.4 (Build 85)",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ftd",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

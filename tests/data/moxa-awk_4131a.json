@@ -10,11 +10,11 @@
                     "version": "1.17 Build 21091612",
                     "hardware": "AWK-4131A-US",
                     "features": null,
+                    "location": "<private>",
                     "os": "moxa-awk",
                     "type": "wireless",
                     "serial": "XXXXXXXXXXXX",
-                    "icon": "moxa.svg",
-                    "location": "<private>"
+                    "icon": "moxa.svg"
                 }
             ]
         },

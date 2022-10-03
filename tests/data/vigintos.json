@@ -10,11 +10,11 @@
                     "version": "Host Controller MD2021-261/15",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "vigintos",
                     "type": "network",
                     "serial": null,
-                    "icon": "vigintos.png",
-                    "location": "<private>"
+                    "icon": "vigintos.png"
                 }
             ]
         },

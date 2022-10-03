@@ -10,11 +10,11 @@
                     "version": "5.5",
                     "hardware": "SG-6000-E3965",
                     "features": null,
+                    "location": "<private>",
                     "os": "stoneos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "hillstone.svg",
-                    "location": "<private>"
+                    "icon": "hillstone.svg"
                 }
             ]
         },

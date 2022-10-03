@@ -10,11 +10,11 @@
                     "version": "RP0700",
                     "hardware": "AN5516-01",
                     "features": "WKE2.115.331R1A",
+                    "location": "<private>",
                     "os": "fiberhome",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": "<private>"
+                    "icon": "fiberhome.svg"
                 }
             ]
         },

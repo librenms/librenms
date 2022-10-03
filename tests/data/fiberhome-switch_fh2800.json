@@ -10,11 +10,11 @@
                     "version": "V210R220",
                     "hardware": "S2800 FHN USP",
                     "features": "1.0",
+                    "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": "<private>"
+                    "icon": "fiberhome.svg"
                 }
             ]
         },

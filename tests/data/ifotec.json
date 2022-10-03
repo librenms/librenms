@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "CPEFibre-G4G-PVN-001",
                     "features": null,
+                    "location": "N/A",
                     "os": "ifotec",
                     "type": "network",
                     "serial": null,
-                    "icon": "ifotec.png",
-                    "location": "N/A"
+                    "icon": "ifotec.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "8.3.5.4",
                     "hardware": "Allworx Connect 731",
                     "features": null,
+                    "location": "<private>",
                     "os": "allworx_voip",
                     "type": "appliance",
                     "serial": "<private>",
-                    "icon": "allworx.svg",
-                    "location": "<private>"
+                    "icon": "allworx.svg"
                 }
             ]
         },

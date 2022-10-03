@@ -10,11 +10,11 @@
                     "version": "Ver00700128",
                     "hardware": "KX-NS1000",
                     "features": null,
+                    "location": "<private>",
                     "os": "panasonic-ns",
                     "type": "server",
                     "serial": null,
-                    "icon": "panasonic.png",
-                    "location": "<private>"
+                    "icon": "panasonic.png"
                 }
             ]
         },

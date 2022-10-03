@@ -10,11 +10,11 @@
                     "version": "Q",
                     "hardware": "MFC-L2710DW",
                     "features": null,
+                    "location": "<private>",
                     "os": "brother",
                     "type": "printer",
                     "serial": "000A5J431816",
-                    "icon": "brother.svg",
-                    "location": "<private>"
+                    "icon": "brother.svg"
                 }
             ]
         },

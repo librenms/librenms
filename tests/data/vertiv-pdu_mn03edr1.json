@@ -10,11 +10,11 @@
                     "version": "5.6.1",
                     "hardware": "MN03EDR1-15P3B8-6PS15D0H10-S",
                     "features": null,
+                    "location": "<private>",
                     "os": "vertiv-pdu",
                     "type": "power",
                     "serial": "<private>",
-                    "icon": "vertiv.png",
-                    "location": "<private>"
+                    "icon": "vertiv.png"
                 }
             ]
         },

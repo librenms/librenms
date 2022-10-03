@@ -1192,11 +1192,11 @@
                     "version": "1.0.2.3",
                     "hardware": "FNS-SFP-24",
                     "features": null,
+                    "location": "<private>",
                     "os": "fusion",
                     "type": "network",
                     "serial": "XX00000001",
-                    "icon": "ignitenet.png",
-                    "location": "<private>"
+                    "icon": "ignitenet.png"
                 }
             ]
         },

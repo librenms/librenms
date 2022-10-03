@@ -10,11 +10,11 @@
                     "version": "1.0.4",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "harmony-enhanced",
                     "type": "wireless",
                     "serial": "<private>",
-                    "icon": "dragonwave.png",
-                    "location": "<private>"
+                    "icon": "dragonwave.png"
                 }
             ]
         },

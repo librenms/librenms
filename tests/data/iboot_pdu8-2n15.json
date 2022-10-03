@@ -10,11 +10,11 @@
                     "version": "1.03.12212017",
                     "hardware": "iBoot-PDU8-2N15",
                     "features": null,
+                    "location": "<private>",
                     "os": "iboot",
                     "type": "power",
                     "serial": null,
-                    "icon": "generic.svg",
-                    "location": "<private>"
+                    "icon": "generic.svg"
                 }
             ]
         },

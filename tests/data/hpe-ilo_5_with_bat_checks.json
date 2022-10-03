@@ -10,11 +10,11 @@
                     "version": "2.71",
                     "hardware": "ProLiant DL360 Gen10",
                     "features": null,
+                    "location": null,
                     "os": "hpe-ilo",
                     "type": "appliance",
                     "serial": "CZXXXXXXXX",
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

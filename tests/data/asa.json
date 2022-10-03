@@ -10,11 +10,11 @@
                     "version": "9.12(3)",
                     "hardware": "ASA5555",
                     "features": null,
+                    "location": "<private>",
                     "os": "asa",
                     "type": "firewall",
                     "serial": "FGL1641413L",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -28,11 +28,11 @@
                     "version": "",
                     "hardware": "GS1900-8",
                     "features": null,
+                    "location": "<private>",
                     "os": "zynos",
                     "type": "network",
                     "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

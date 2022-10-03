@@ -10,11 +10,11 @@
                     "version": "PA.03.10",
                     "hardware": "J9029A",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

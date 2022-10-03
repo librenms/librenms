@@ -10,11 +10,11 @@
                     "version": "250 (180821PL1736)",
                     "hardware": "SSDCHIN1307-002",
                     "features": null,
+                    "location": "<private>",
                     "os": "schleifenbauer",
                     "type": "power",
                     "serial": "SVNL00056319",
-                    "icon": "schleifenbauer.svg",
-                    "location": "<private>"
+                    "icon": "schleifenbauer.svg"
                 }
             ]
         },

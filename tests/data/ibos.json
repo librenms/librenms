@@ -10,11 +10,11 @@
                     "version": "7.1.2-ED-R ",
                     "hardware": "MS4026-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "ibos",
                     "type": "network",
                     "serial": null,
-                    "icon": "waystream.svg",
-                    "location": "<private>"
+                    "icon": "waystream.svg"
                 }
             ]
         },

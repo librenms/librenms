@@ -10,11 +10,11 @@
                     "version": "6.1.1 (2019-04-18)",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "e3meterdc",
                     "type": "power",
                     "serial": null,
-                    "icon": "riedo.png",
-                    "location": "<private>"
+                    "icon": "riedo.png"
                 }
             ]
         },

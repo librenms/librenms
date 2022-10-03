@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "C9500",
                     "features": null,
+                    "location": "<private>",
                     "os": "ubiquoss-pon",
                     "type": "network",
                     "serial": "U34M16450002",
-                    "icon": "generic.svg",
-                    "location": "<private>"
+                    "icon": "generic.svg"
                 }
             ]
         },

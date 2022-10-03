@@ -10,11 +10,11 @@
                     "version": "V2.40(AAHN.0)",
                     "hardware": "GS1900-48",
                     "features": null,
+                    "location": "<private>",
                     "os": "zynos",
                     "type": "network",
                     "serial": "S192L02000374",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

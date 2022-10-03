@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "Cisco PIX",
                     "sysContact": null,
                     "version": null,
                     "hardware": "",
                     "features": null,
+                    "location": null,
                     "os": "pixos",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

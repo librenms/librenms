@@ -10,11 +10,11 @@
                     "version": "3.4.11-rt19",
                     "hardware": "LBB_154",
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "S2116008555223620",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },

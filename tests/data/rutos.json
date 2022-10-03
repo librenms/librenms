@@ -10,11 +10,11 @@
                     "version": "3.18.44",
                     "hardware": "Generic MIPS",
                     "features": null,
+                    "location": "<private>",
                     "os": "rutos",
                     "type": "network",
                     "serial": null,
-                    "icon": "teltonika.png",
-                    "location": "<private>"
+                    "icon": "teltonika.png"
                 }
             ]
         },

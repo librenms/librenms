@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ucopia",
                     "type": "network",
                     "serial": null,
-                    "icon": "ucopia.png",
-                    "location": "<private>"
+                    "icon": "ucopia.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "OAW-AP1321",
                     "features": null,
+                    "location": "<private>",
                     "os": "stellar",
                     "type": "network",
                     "serial": "SSZ999999999",
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },

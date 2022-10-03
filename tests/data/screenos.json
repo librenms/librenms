@@ -10,11 +10,11 @@
                     "version": "6.3.0r24.0",
                     "hardware": "SSG5-Serial",
                     "features": "Firewall+VPN",
+                    "location": "<private>",
                     "os": "screenos",
                     "type": "firewall",
                     "serial": "0000000000000000",
-                    "icon": "screenos.png",
-                    "location": "<private>"
+                    "icon": "screenos.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "7.1",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "openbsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "openbsd.svg",
-                    "location": "<private>"
+                    "icon": "openbsd.svg"
                 }
             ]
         },

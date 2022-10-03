@@ -10,11 +10,11 @@
                     "version": "NS12.0",
                     "hardware": "NSMPX-8000-10G 4*CPU+6*E1K+2*IX+1*E1K+4*CVM 1620",
                     "features": "Build 57.19.nc",
+                    "location": "<private>",
                     "os": "netscaler",
                     "type": "loadbalancer",
                     "serial": "7FK7FCV4FH",
-                    "icon": "citrix.svg",
-                    "location": "<private>"
+                    "icon": "citrix.svg"
                 }
             ]
         },

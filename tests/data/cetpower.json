@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "Local",
                     "os": "cetpower",
                     "type": "power",
                     "serial": null,
-                    "icon": "cet.png",
-                    "location": "Local"
+                    "icon": "cet.png"
                 }
             ]
         },

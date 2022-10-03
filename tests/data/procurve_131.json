@@ -10,11 +10,11 @@
                     "version": "RA.16.02.0012",
                     "hardware": "J9625A 2620-24-PoEP",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

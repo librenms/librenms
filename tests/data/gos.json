@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "gos",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "gos.svg",
-                    "location": "<private>"
+                    "icon": "gos.svg"
                 }
             ]
         },

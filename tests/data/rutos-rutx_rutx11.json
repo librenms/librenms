@@ -10,11 +10,11 @@
                     "version": "RUTX_R_00.07.00",
                     "hardware": "Systemname",
                     "features": null,
+                    "location": "<private>",
                     "os": "rutos-rutx",
                     "type": "network",
                     "serial": "1112364866",
-                    "icon": "teltonika.png",
-                    "location": "<private>"
+                    "icon": "teltonika.png"
                 }
             ]
         },

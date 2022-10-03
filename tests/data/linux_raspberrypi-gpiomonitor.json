@@ -10,11 +10,11 @@
                     "version": "5.4.51-v7+",
                     "hardware": "Generic ARMv7",
                     "features": "Raspbian 10.4",
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "raspbian.svg",
-                    "location": "<private>"
+                    "icon": "raspbian.svg"
                 }
             ]
         },

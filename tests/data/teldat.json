@@ -10,11 +10,11 @@
                     "version": "11.01.00.20.18",
                     "hardware": "312 (rev 2)",
                     "features": null,
+                    "location": "<private>",
                     "os": "teldat",
                     "type": "network",
                     "serial": "819/01144",
-                    "icon": "teldat.png",
-                    "location": "<private>"
+                    "icon": "teldat.png"
                 }
             ]
         },

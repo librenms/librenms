@@ -83,7 +83,7 @@ class Poller
         $polled = 0;
         $this->printHeader();
 
-        if (Debug::isEnabled()) {
+        if (Debug::isEnabled() && ! defined('PHPUNIT_RUNNING')) {
             \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         }
 

@@ -10,11 +10,11 @@
                     "version": "3.10.0-693.21.1.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": "CentOS 7.4.1708",
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "centos.svg",
-                    "location": "<private>"
+                    "icon": "centos.svg"
                 }
             ]
         },

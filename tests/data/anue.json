@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "anue",
                     "type": "network",
                     "serial": null,
-                    "icon": "ixia.svg",
-                    "location": "<private>"
+                    "icon": "ixia.svg"
                 }
             ]
         },

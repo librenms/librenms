@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "wut",
                     "type": "environment",
                     "serial": null,
-                    "icon": "wut.svg",
-                    "location": "<private>"
+                    "icon": "wut.svg"
                 }
             ]
         },

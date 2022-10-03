@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.24681",
                     "sysDescr": "Linux hostname 4.2.2",
                     "sysContact": null,
                     "version": "4.3.3",
                     "hardware": "TVS-871U-RP",
                     "features": null,
+                    "location": null,
                     "os": "qnap",
                     "type": "storage",
                     "serial": "Q157I12451",
-                    "icon": "qnap.svg",
-                    "location": null
+                    "icon": "qnap.svg"
                 }
             ]
         },

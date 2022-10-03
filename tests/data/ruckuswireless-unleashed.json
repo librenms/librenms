@@ -10,11 +10,11 @@
                     "version": "200.6.10.1 build 312 (US)",
                     "hardware": "T300",
                     "features": null,
+                    "location": "<private>",
                     "os": "ruckuswireless-unleashed",
                     "type": "wireless",
                     "serial": "231603507471",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "icon": "ruckus.svg"
                 }
             ]
         },

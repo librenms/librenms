@@ -10,11 +10,11 @@
                     "version": "6.1.2.1",
                     "hardware": "VSP-8404C",
                     "features": null,
+                    "location": "<private>",
                     "os": "voss",
                     "type": "network",
                     "serial": "17JP2240CR05",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
+                    "icon": "extremevoss.svg"
                 }
             ]
         },
