@@ -42,7 +42,7 @@ cisco-pw:
     pseudowires:
         excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
         joins:
-            - { left: excluded_fields.port_id, right: ports.port_id, select: [ ifIndex ] }
+            - { left: pseudowires.port_id, right: ports.port_id, select: [ ifIndex ] }
         order_by: cpwVcID, ifIndex
 route:
     route:
