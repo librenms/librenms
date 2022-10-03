@@ -5463,6 +5463,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -5474,8 +5475,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -5486,6 +5486,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -5497,8 +5498,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -5563,6 +5563,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": "Cease/administrative shutdown",
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.0.1",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "peer.example.com EBGP",
@@ -5574,8 +5575,7 @@
                     "bgpPeerInUpdateElapsedTime": 4,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -5586,6 +5586,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "2001:0550:0002:002f:0000:0000:0033:0002",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -5597,8 +5598,7 @@
                     "bgpPeerInUpdateElapsedTime": 17,
                     "context_name": "",
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [

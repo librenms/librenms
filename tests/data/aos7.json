@@ -78348,6 +78348,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -78359,8 +78360,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78371,6 +78371,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -78382,8 +78383,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78394,6 +78394,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -78405,8 +78406,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78417,6 +78417,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -78428,8 +78429,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -78542,6 +78542,7 @@
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 3,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "hle-sg066-ro-lug-1",
@@ -78553,8 +78554,7 @@
                     "bgpPeerInUpdateElapsedTime": 4020,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78565,6 +78565,7 @@
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 3,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "hle-sg066-ro-lug-2",
@@ -78576,8 +78577,7 @@
                     "bgpPeerInUpdateElapsedTime": 5671281,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78588,6 +78588,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "hle-sg068-ro-tsr-1",
@@ -78599,8 +78600,7 @@
                     "bgpPeerInUpdateElapsedTime": 6290,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -78611,6 +78611,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "hle-sg068-ro-tsr-2",
@@ -78622,8 +78623,7 @@
                     "bgpPeerInUpdateElapsedTime": 9518677,
                     "context_name": "",
                     "bgpLocalAs": 64663,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [

@@ -8973,6 +8973,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -8984,8 +8985,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 64514,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -9026,6 +9026,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": "Reset by peer",
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "169.254.247.2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "DIRECT CONNECT",
@@ -9037,8 +9038,7 @@
                     "bgpPeerInUpdateElapsedTime": 27997600,
                     "context_name": null,
                     "bgpLocalAs": 64514,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [

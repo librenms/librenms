@@ -32,6 +32,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.16.7.2",
                     "bgpPeerDescr": "",
@@ -43,8 +44,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -55,6 +55,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.1.1",
                     "bgpPeerDescr": "",
@@ -66,8 +67,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -78,6 +78,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.2.2",
                     "bgpPeerDescr": "",
@@ -89,8 +90,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -101,6 +101,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.3.2",
                     "bgpPeerDescr": "",
@@ -112,8 +113,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "REDES DEL OESTE S.A, AR",
@@ -124,6 +124,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.65.11.2",
                     "bgpPeerDescr": "",
@@ -135,8 +136,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "YOUTUBE, US",
@@ -147,6 +147,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.158",
                     "bgpPeerDescr": "",
@@ -158,8 +159,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -170,6 +170,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.166",
                     "bgpPeerDescr": "",
@@ -181,8 +182,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -193,6 +193,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.170",
                     "bgpPeerDescr": "",
@@ -204,8 +205,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "FACEBOOK-OFFNET, US",
@@ -216,6 +216,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.208",
                     "bgpPeerDescr": "",
@@ -227,8 +228,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -239,6 +239,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.252",
                     "bgpPeerDescr": "",
@@ -250,8 +251,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -262,6 +262,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.253",
                     "bgpPeerDescr": "",
@@ -273,8 +274,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -285,6 +285,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.254",
                     "bgpPeerDescr": "",
@@ -296,8 +297,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -308,6 +308,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.223.253",
                     "bgpPeerDescr": "",
@@ -319,8 +320,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -331,6 +331,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.223.254",
                     "bgpPeerDescr": "",
@@ -342,8 +343,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PowerHost Telecom SPA, CL",
@@ -354,6 +354,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "198.18.202.5",
                     "bgpPeerDescr": "",
@@ -365,8 +366,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -377,6 +377,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "200.23.206.1",
                     "bgpPeerDescr": "",
@@ -388,8 +389,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -400,6 +400,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "200.23.206.2",
                     "bgpPeerDescr": "",
@@ -411,8 +412,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "LVLT-3549, US",
@@ -423,6 +423,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "204.199.0.169",
                     "bgpPeerDescr": "",
@@ -434,8 +435,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -446,6 +446,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::252",
                     "bgpPeerDescr": "",
@@ -457,8 +458,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -469,6 +469,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::253",
                     "bgpPeerDescr": "",
@@ -480,8 +481,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -492,6 +492,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::254",
                     "bgpPeerDescr": "",
@@ -503,8 +504,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -515,6 +515,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::223:253",
                     "bgpPeerDescr": "",
@@ -526,8 +527,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -538,6 +538,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::223:254",
                     "bgpPeerDescr": "",
@@ -549,8 +550,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -1119,6 +1119,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.16.7.2",
                     "bgpPeerDescr": "",
@@ -1130,8 +1131,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1142,6 +1142,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.1.1",
                     "bgpPeerDescr": "",
@@ -1153,8 +1154,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1165,6 +1165,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.2.2",
                     "bgpPeerDescr": "",
@@ -1176,8 +1177,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "SDC-AS, US",
@@ -1188,6 +1188,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.45.3.2",
                     "bgpPeerDescr": "",
@@ -1199,8 +1200,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "REDES DEL OESTE S.A, AR",
@@ -1211,6 +1211,7 @@
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 2,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.65.11.2",
                     "bgpPeerDescr": "",
@@ -1222,8 +1223,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "YOUTUBE, US",
@@ -1234,6 +1234,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.158",
                     "bgpPeerDescr": "",
@@ -1245,8 +1246,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -1257,6 +1257,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.166",
                     "bgpPeerDescr": "",
@@ -1268,8 +1269,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "NETFLIX-ASN, US",
@@ -1280,6 +1280,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.170",
                     "bgpPeerDescr": "",
@@ -1291,8 +1292,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "FACEBOOK-OFFNET, US",
@@ -1303,6 +1303,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "45.189.216.208",
                     "bgpPeerDescr": "",
@@ -1314,8 +1315,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1326,6 +1326,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.252",
                     "bgpPeerDescr": "",
@@ -1337,8 +1338,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1349,6 +1349,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.253",
                     "bgpPeerDescr": "",
@@ -1360,8 +1361,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1372,6 +1372,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.216.254",
                     "bgpPeerDescr": "",
@@ -1383,8 +1384,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1395,6 +1395,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.223.253",
                     "bgpPeerDescr": "",
@@ -1406,8 +1407,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1418,6 +1418,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "187.16.223.254",
                     "bgpPeerDescr": "",
@@ -1429,8 +1430,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PowerHost Telecom SPA, CL",
@@ -1441,6 +1441,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "198.18.202.5",
                     "bgpPeerDescr": "",
@@ -1452,8 +1453,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -1464,6 +1464,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "200.23.206.1",
                     "bgpPeerDescr": "",
@@ -1475,8 +1476,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PIT CHILE SP, CL",
@@ -1487,6 +1487,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "200.23.206.2",
                     "bgpPeerDescr": "",
@@ -1498,8 +1499,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "LVLT-3549, US",
@@ -1510,6 +1510,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "204.199.0.169",
                     "bgpPeerDescr": "",
@@ -1521,8 +1522,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1533,6 +1533,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::252",
                     "bgpPeerDescr": "",
@@ -1544,8 +1545,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1556,6 +1556,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::253",
                     "bgpPeerDescr": "",
@@ -1567,8 +1568,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1579,6 +1579,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::254",
                     "bgpPeerDescr": "",
@@ -1590,8 +1591,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1602,6 +1602,7 @@
                     "bgpPeerLastErrorCode": 5,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::223:253",
                     "bgpPeerDescr": "",
@@ -1613,8 +1614,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "Nucleo de Inf. e Coord. do Ponto BR - NIC., BR",
@@ -1625,6 +1625,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "2001:12F8::223:254",
                     "bgpPeerDescr": "",
@@ -1636,8 +1637,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 26479,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
