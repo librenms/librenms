@@ -10,7 +10,7 @@
                     "version": "1.5",
                     "hardware": "SmartPack2 Touch",
                     "features": null,
-                    "location": "<location>",
+                    "location": "<LOCATION>",
                     "os": "enexus",
                     "type": "power",
                     "serial": "<serial>",

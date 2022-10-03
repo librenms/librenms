@@ -21209,5 +21209,33 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "cisco-pw": {
+        "discovery": {
+            "pseudowires": [
+                {
+                    "peer_ldp_id": 10246,
+                    "cpwVcID": 222222,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernet",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "l3vpn:VC222222",
+                    "ifIndex": 56
+                },
+                {
+                    "peer_ldp_id": 10246,
+                    "cpwVcID": 234567,
+                    "cpwOid": 2147483647,
+                    "pw_type": "ethernetVPLS",
+                    "pw_psntype": "mpls",
+                    "pw_local_mtu": 0,
+                    "pw_peer_mtu": 0,
+                    "pw_descr": "PBB-EDGE:BD-I-100001",
+                    "ifIndex": null
+                }
+            ]
+        }
     }
 }

@@ -12109,5 +12109,47 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "58696c06823b",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "5897263",
+                    "topChanges": 0,
+                    "designatedRoot": "000000000000",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 69,
+                    "priority": 128,
+                    "state": "blocking",
+                    "enable": "enabled",
+                    "pathCost": 1900,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 0,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 69,
+                    "forwardTransitions": 0,
+                    "ifIndex": 69
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

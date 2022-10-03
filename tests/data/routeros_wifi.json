@@ -1083,6 +1083,62 @@
             ]
         }
     },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "b869f4802fc1",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "000000000000",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 0,
+                    "helloTime": 0,
+                    "holdTime": 0,
+                    "forwardDelay": 0,
+                    "bridgeMaxAge": 0,
+                    "bridgeHelloTime": 0,
+                    "bridgeForwardDelay": 0
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 1,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10,
+                    "designatedRoot": "788a20fa53cb",
+                    "designatedCost": 0,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 10,
+                    "forwardTransitions": 0,
+                    "ifIndex": 2
+                },
+                {
+                    "vlan": null,
+                    "port_index": 3,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10,
+                    "designatedRoot": "000000000000",
+                    "designatedCost": 0,
+                    "designatedBridge": "000000000000",
+                    "designatedPort": 0,
+                    "forwardTransitions": 0,
+                    "ifIndex": 4
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "wireless": {
         "discovery": {
             "wireless_sensors": [
@@ -1302,61 +1358,5 @@
                 }
             ]
         }
-    },
-    "stp": {
-        "discovery": {
-            "stp": [
-                {
-                    "vlan": null,
-                    "rootBridge": 0,
-                    "bridgeAddress": "b869f4802fc1",
-                    "protocolSpecification": "ieee8021d",
-                    "priority": 32768,
-                    "timeSinceTopologyChange": "0",
-                    "topChanges": 0,
-                    "designatedRoot": "000000000000",
-                    "rootCost": 0,
-                    "rootPort": 0,
-                    "maxAge": 0,
-                    "helloTime": 0,
-                    "holdTime": 0,
-                    "forwardDelay": 0,
-                    "bridgeMaxAge": 0,
-                    "bridgeHelloTime": 0,
-                    "bridgeForwardDelay": 0
-                }
-            ],
-            "ports_stp": [
-                {
-                    "vlan": null,
-                    "port_index": 1,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 10,
-                    "designatedRoot": "788a20fa53cb",
-                    "designatedCost": 0,
-                    "designatedBridge": "000000000000",
-                    "designatedPort": 10,
-                    "forwardTransitions": 0,
-                    "ifIndex": 2
-                },
-                {
-                    "vlan": null,
-                    "port_index": 3,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 10,
-                    "designatedRoot": "000000000000",
-                    "designatedCost": 0,
-                    "designatedBridge": "000000000000",
-                    "designatedPort": 0,
-                    "forwardTransitions": 0,
-                    "ifIndex": 4
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }

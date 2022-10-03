@@ -21358,7 +21358,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21382,7 +21382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21406,7 +21406,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21430,7 +21430,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21454,7 +21454,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21478,7 +21478,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21502,7 +21502,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21526,7 +21526,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21550,7 +21550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "FanStatus"
+                    "state_name": "fanStatus"
                 },
                 {
                     "sensor_deleted": 0,
@@ -21651,21 +21651,21 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "FanStatus",
+                    "state_name": "fanStatus",
                     "state_descr": "Normal",
                     "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "FanStatus",
+                    "state_name": "fanStatus",
                     "state_descr": "Stop",
                     "state_draw_graph": 1,
                     "state_value": 2,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "FanStatus",
+                    "state_name": "fanStatus",
                     "state_descr": "Unused",
                     "state_draw_graph": 1,
                     "state_value": 3,

@@ -4004,5 +4004,18 @@
                 }
             ]
         }
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 4095,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 4095",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ]
+        }
     }
 }

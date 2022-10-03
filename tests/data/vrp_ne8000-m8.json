@@ -12961,5 +12961,31 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "b46e08abcdef",
+                    "protocolSpecification": "unknown",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "b46e08abcdef",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
