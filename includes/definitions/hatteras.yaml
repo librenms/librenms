@@ -1,6 +1,6 @@
-os: hatteras 
+os: hatteras
 text: 'Hatteras Overdue DSLAM'
-type: dslam
+type: network 
 icon: hatteras
 
 empty_ifdescr: true
@@ -14,7 +14,7 @@ discovery:
 bad_if:
   - notPresent
   - serConsole
-good_if: 
+good_if:
   - ras #all interfaces has 'Hatteras' in it...
 discovery_modules:
     ntp: false
@@ -39,6 +39,8 @@ discovery_modules:
     processors: false
     mempools: false
     ports-stack: false
+    mpls: false
+    route: false
     ports: true
 poller_modules:
     ntp: false
