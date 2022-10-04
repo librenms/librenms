@@ -64,7 +64,7 @@ abstract class Sensor
         'cooling' => self::COOLING,
         'count' => self::COUNT,
         'current' => self::CURRENT,
-        'dBm' => self::DBM,
+        'dbm' => self::DBM,
         'delay' => self::DELAY,
         'eer' => self::EER,
         'fanspeed' => self::FANSPEED,

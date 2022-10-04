@@ -67,10 +67,8 @@ if (DiskIo::where('device_id', $device['device_id'])->count()) {
 
 foreach (array_keys(SensorEnum::CLASSES) as $sensor_name) {
     if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
-        //strtolower because 'dBm - dbm' difference
-        $lowname = strtolower($sensor_name);
-        $datas[] = $lowname;
-        $type_text[$lowname] = trans('sensors.' . $lowname)['short'];
+        $datas[] = $sensor_name;
+        $type_text[$sensor_name] = trans('sensors.' . $sensor_name)['short'];
     }
 }
 
