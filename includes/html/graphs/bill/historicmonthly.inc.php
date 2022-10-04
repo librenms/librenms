@@ -17,9 +17,9 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
 
         if (date('m', $start) == date('m', $end) && date('d', $start == 1)) {
             // Calendar months, omit the date and the end!
-            $graph_data['ticklabels'][$i] = strftime('%b %Y', $start);
+            $graph_data['ticklabels'][$i] = date('M Y', $start);
         } else {
-            $graph_data['ticklabels'][$i] = strftime('%e %b %Y', $start) . "\n" . strftime('%e %b %Y', $end);
+            $graph_data['ticklabels'][$i] = date('j M Y', $start) . "\n" . date('j M Y', $end);
         }
     }
 }

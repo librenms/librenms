@@ -10,11 +10,11 @@
                     "version": "4.20.12.1M",
                     "hardware": "DCS-7150S-24",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista_eos",
                     "type": "network",
                     "serial": "serial",
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },

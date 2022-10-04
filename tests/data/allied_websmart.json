@@ -5060,11 +5060,11 @@
                     "version": "WebSmart 1.00.043",
                     "hardware": "AT-GS950/24",
                     "features": "",
+                    "location": "<private>",
                     "os": "allied",
                     "type": "network",
                     "serial": null,
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

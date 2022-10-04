@@ -10,11 +10,11 @@
                     "version": "2.22.0.31.8",
                     "hardware": "2N IP Force",
                     "features": null,
+                    "location": "Front Door",
                     "os": "heliosip",
                     "type": "appliance",
                     "serial": "54-2354-8708",
-                    "icon": "2n.svg",
-                    "location": "Front Door"
+                    "icon": "2n.svg"
                 }
             ]
         },

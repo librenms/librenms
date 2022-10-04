@@ -10,11 +10,11 @@
                     "version": "0.00.51",
                     "hardware": "SPA112",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscospa",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

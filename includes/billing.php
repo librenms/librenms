@@ -353,8 +353,8 @@ function getHistoricTransferGraphData($bill_id)
     $allowed_val = null;
 
     foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', [$bill_id]) as $data) {
-        $datefrom = strftime('%Y-%m-%d', strtotime($data['bill_datefrom']));
-        $dateto = strftime('%Y-%m-%d', strtotime($data['bill_dateto']));
+        $datefrom = date('Y-m-d', strtotime($data['bill_datefrom']));
+        $dateto = date('Y-m-d', strtotime($data['bill_dateto']));
         $datelabel = $datefrom . ' - ' . $dateto;
 
         array_push($ticklabels, $datelabel);
@@ -421,7 +421,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
     $average = 0;
     if ($imgtype == 'day') {
         foreach (dbFetch('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
-            array_push($ticklabels, strftime('%Y-%m-%d', $data['timestamp']));
+            array_push($ticklabels, date('Y-m-d', $data['timestamp']));
             array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
             array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
             array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
@@ -431,7 +431,7 @@ function getBillingBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgt
         $ave_count = count($tot_data);
 
         // Add empty items for the days not yet passed
-        $days = (strftime('%e', date($to - $from)) - $ave_count - 1);
+        $days = (date('j', date($to - $from)) - $ave_count - 1);
         for ($x = 0; $x < $days; $x++) {
             array_push($ticklabels, '');
             array_push($in_data, 0);

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "MES2324B",
                     "features": "4.0.16.2",
+                    "location": "<private>",
                     "os": "eltex-mes23xx",
                     "type": "network",
                     "serial": "ES32012706",
-                    "icon": "eltex.png",
-                    "location": "<private>"
+                    "icon": "eltex.png"
                 }
             ]
         },

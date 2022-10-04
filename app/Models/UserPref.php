@@ -99,9 +99,6 @@ class UserPref extends BaseModel
     {
         /** @var array */
         $keys = $this->getKeyName();
-        if (! is_array($keys)) {
-            return parent::setKeysForSaveQuery($query);
-        }
 
         foreach ($keys as $keyName) {
             $query->where($keyName, '=', $this->getKeyForSaveQuery($keyName));

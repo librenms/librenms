@@ -10,11 +10,11 @@
                     "version": "4.01.40",
                     "hardware": "BC2000",
                     "features": "vpwrDcPowerRectifier, vpwrDcPowerRectifier",
+                    "location": "<private>",
                     "os": "valere",
                     "type": "power",
                     "serial": null,
-                    "icon": "eltek.png",
-                    "location": "<private>"
+                    "icon": "eltek.png"
                 }
             ]
         },

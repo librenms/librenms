@@ -10,11 +10,11 @@
                     "version": "8.150 (V200R002C50SPC800) [CE12804,CE12804-AC,CE12804 AC Assembly Chassis(with CMUs and Fans)]",
                     "hardware": "CE12800",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

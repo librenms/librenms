@@ -10,11 +10,11 @@
                     "version": "NECE-E",
                     "hardware": "KOA32165",
                     "features": null,
+                    "location": "<private>",
                     "os": "bktel-oa",
                     "type": "network",
                     "serial": null,
-                    "icon": "bktel.png",
-                    "location": "<private>"
+                    "icon": "bktel.png"
                 }
             ]
         },

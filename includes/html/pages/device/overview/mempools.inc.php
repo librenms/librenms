@@ -48,10 +48,10 @@ if ($mempools->isNotEmpty()) {
         $percent_text = $mempool->mempool_perc;
         if ($mempool->mempool_class == 'system' && $mempools->count() > 1) {
             // calculate available RAM instead of Free
-            $buffers = $mempools->firstWhere('mempool_class', '=', 'buffers');
-            $cached = $mempools->firstWhere('mempool_class', '=', 'cached');
+            $buffers = $mempools->firstWhere('mempool_class', '=', 'buffers')->mempool_used ?? 0;
+            $cached = $mempools->firstWhere('mempool_class', '=', 'cached')->mempool_used ?? 0;
 
-            $available_used_all = $mempool->mempool_total ? round(($mempool->mempool_used + $buffers->mempool_used + $cached->mempool_used) / $mempool->mempool_total * 100) : 0;
+            $available_used_all = Number::calculatePercent($mempool->mempool_used + $buffers + $cached, $mempool->mempool_total, 0);
         }
 
         $total = Number::formatBi($mempool->mempool_total);

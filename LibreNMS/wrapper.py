@@ -52,6 +52,7 @@ from argparse import ArgumentParser
 
 import LibreNMS
 from LibreNMS.command_runner import command_runner
+from LibreNMS.config import DBConfig
 
 
 logger = logging.getLogger(__name__)
@@ -320,20 +321,6 @@ def poll_worker(
         poll_queue.task_done()
 
 
-class DBConfig:
-    """
-    Bare minimal config class for LibreNMS.service.DB class usage
-    """
-
-    def __init__(self, _config):
-        self.db_socket = _config["db_socket"]
-        self.db_host = _config["db_host"]
-        self.db_port = int(_config["db_port"])
-        self.db_user = _config["db_user"]
-        self.db_pass = _config["db_pass"]
-        self.db_name = _config["db_name"]
-
-
 def wrapper(
     wrapper_type,  # Type: str
     amount_of_workers,  # Type: int
@@ -459,7 +446,8 @@ def wrapper(
         logger.critical("Bogus wrapper type called")
         sys.exit(3)
 
-    sconfig = DBConfig(config)
+    sconfig = DBConfig()
+    sconfig.populate(config)
     db_connection = LibreNMS.DB(sconfig)
     cursor = db_connection.query(query)
     devices = cursor.fetchall()

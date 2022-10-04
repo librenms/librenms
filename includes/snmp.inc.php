@@ -49,7 +49,7 @@ function get_mib_dir($device)
 {
     $dirs = [];
 
-    if (file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
+    if (isset($device['os']) && file_exists(Config::get('mib_dir') . '/' . $device['os'])) {
         $dirs[] = Config::get('mib_dir') . '/' . $device['os'];
     }
 
@@ -67,7 +67,7 @@ function get_mib_dir($device)
         }
     }
 
-    if ($os_mibdir = Config::get("os.{$device['os']}.mib_dir")) {
+    if (isset($device['os']) && ($os_mibdir = Config::get("os.{$device['os']}.mib_dir"))) {
         $dirs[] = Config::get('mib_dir') . '/' . $os_mibdir;
     }
 

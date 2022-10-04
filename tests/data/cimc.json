@@ -353,11 +353,11 @@
                     "version": "3.0(3a)",
                     "hardware": "UCSC-C220-M4S",
                     "features": null,
+                    "location": "<private>",
                     "os": "cimc",
                     "type": "server",
                     "serial": "FCH2126720R",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "N50052  01.05.00",
                     "hardware": "(GC8503)",
                     "features": null,
+                    "location": "<private>",
                     "os": "sm-os",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "siae.png",
-                    "location": "<private>"
+                    "icon": "siae.png"
                 }
             ]
         },

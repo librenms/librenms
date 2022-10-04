@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "xirrus_aos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "xirrus.png",
-                    "location": "<private>"
+                    "icon": "xirrus.png"
                 }
             ]
         },

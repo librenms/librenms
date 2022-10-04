@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "riverbed",
                     "type": "network",
                     "serial": null,
-                    "icon": "riverbed.png",
-                    "location": "<private>"
+                    "icon": "riverbed.png"
                 }
             ]
         },

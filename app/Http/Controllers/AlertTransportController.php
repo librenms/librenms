@@ -7,6 +7,7 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class AlertTransportController extends Controller
 {
@@ -43,6 +44,11 @@ class AlertTransportController extends Controller
             if ($result === true) {
                 return response()->json(['status' => 'ok']);
             }
+        } catch (AlertTransportDeliveryException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
         } catch (\Exception $e) {
             \Log::error($e);
             $result = basename($e->getFile(), '.php') . ':' . $e->getLine() . ' ' . $e->getMessage();

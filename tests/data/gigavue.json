@@ -10,11 +10,11 @@
                     "version": "v8.6.07",
                     "hardware": "GigaVUE-2404",
                     "features": null,
+                    "location": "<private>",
                     "os": "gigavue",
                     "type": "network",
                     "serial": "21327",
-                    "icon": "gigamon.png",
-                    "location": "<private>"
+                    "icon": "gigamon.png"
                 }
             ]
         },
@@ -3502,8 +3502,8 @@
                     "ifName": "GigaVUE-2404 Port  5 (Network Port)",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -5707,8 +5707,8 @@
                     "ifName": "GigaVUE-2404 Port g2 (Network Port)",
                     "portName": null,
                     "ifIndex": 26,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",

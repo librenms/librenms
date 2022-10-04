@@ -2438,11 +2438,11 @@
                     "version": "ARMV8EL_LINUX_IOSD-UNIVERSALK9_IOT-M 17.3.1",
                     "hardware": "IR1101-K9",
                     "features": "Amsterdam",
+                    "location": null,
                     "os": "iosxe",
                     "type": "network",
                     "serial": "FCW2428P6Q9",
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

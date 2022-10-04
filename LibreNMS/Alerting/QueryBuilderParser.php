@@ -467,6 +467,7 @@ class QueryBuilderParser implements \JsonSerializable
      *
      * @since 5.4.0
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->builder;

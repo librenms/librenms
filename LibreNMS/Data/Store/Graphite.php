@@ -113,9 +113,9 @@ class Graphite extends BaseDatastore
         }
 
         foreach ($fields as $k => $v) {
-            // Send zero for fields without values
-            if (empty($v)) {
-                $v = 0;
+            // Skip fields without values
+            if (is_null($v)) {
+                continue;
             }
             $metric = implode('.', array_filter([$this->prefix, $hostname, $measurement, $ms_name, $k]));
             $this->writeData($metric, $v, $timestamp);

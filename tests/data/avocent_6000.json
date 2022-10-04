@@ -10,11 +10,11 @@
                     "version": "3.7.0.6",
                     "hardware": "ACS6048",
                     "features": null,
+                    "location": "sys-location-here-blanked-out",
                     "os": "avocent",
                     "type": "network",
                     "serial": "0530068451",
-                    "icon": "avocent.svg",
-                    "location": "sys-location-here-blanked-out"
+                    "icon": "avocent.svg"
                 }
             ]
         },

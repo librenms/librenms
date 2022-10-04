@@ -10,11 +10,11 @@
                     "version": "6.45.7",
                     "hardware": "RBLHGR",
                     "features": "Level 3",
+                    "location": "<private>",
                     "os": "routeros",
                     "type": "network",
                     "serial": "A33309596248",
-                    "icon": "mikrotik.svg",
-                    "location": "<private>"
+                    "icon": "mikrotik.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "v6.4.8,build1914,211117 (GA)",
                     "hardware": "FGT_1500D",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "redacted",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

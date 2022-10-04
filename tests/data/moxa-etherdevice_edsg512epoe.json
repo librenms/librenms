@@ -393,11 +393,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "moxa-etherdevice",
                     "type": "network",
                     "serial": null,
-                    "icon": "moxa.svg",
-                    "location": "<private>"
+                    "icon": "moxa.svg"
                 }
             ]
         },

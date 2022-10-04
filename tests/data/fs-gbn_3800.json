@@ -10,11 +10,11 @@
                     "version": "S3800-24F4S V100R001B01D001P004SP3",
                     "hardware": "S3800-24F4S Switch Product",
                     "features": null,
+                    "location": "<private>",
                     "os": "fs-gbn",
                     "type": "network",
                     "serial": "F170823DN051",
-                    "icon": "fs.svg",
-                    "location": "<private>"
+                    "icon": "fs.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "06",
                     "hardware": "Eaton 5PX 3000",
                     "features": null,
+                    "location": "<private>",
                     "os": "eaton-mgeups",
                     "type": "power",
                     "serial": "G4294C3232",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

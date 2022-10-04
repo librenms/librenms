@@ -10,11 +10,11 @@
                     "version": "2.55",
                     "hardware": "RH2288H V3",
                     "features": "BIOS 1.08",
+                    "location": "<private>",
                     "os": "ibmc",
                     "type": "appliance",
                     "serial": "SerialNumber",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },
@@ -1192,8 +1192,8 @@
                     "ifName": "veth",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",

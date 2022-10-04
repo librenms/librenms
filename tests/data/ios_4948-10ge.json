@@ -10,11 +10,11 @@
                     "version": "15.0(2)SG11",
                     "hardware": "WS-C4948-10GE",
                     "features": "IPBASEK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -71,7 +71,7 @@ trait ActiveDirectoryCommon
             $attributes
         );
         $entries = ldap_get_entries($link_identifier, $result);
-        if ($entries['count'] > 0) {
+        if ((int) $entries['count'] > 0) {
             return $entries[0]['dn'];
         } else {
             return '';
@@ -115,7 +115,7 @@ trait ActiveDirectoryCommon
             $attributes
         );
         $entries = ldap_get_entries($connection, $result);
-        if ($entries['count'] > 0) {
+        if ((int) $entries['count'] > 0) {
             $membername = $entries[0]['name'][0];
         } else {
             $membername = $username;
@@ -196,7 +196,7 @@ trait ActiveDirectoryCommon
         ];
     }
 
-    public function getUser($user_id)
+    public function getUser($user_id): array
     {
         $connection = $this->getConnection();
         $domain_sid = $this->getDomainSid();
@@ -204,16 +204,19 @@ trait ActiveDirectoryCommon
         $search_filter = "(&(objectcategory=person)(objectclass=user)(objectsid=$domain_sid-$user_id))";
         $attributes = ['samaccountname', 'displayname', 'objectsid', 'mail'];
         $search = ldap_search($connection, Config::get('auth_ad_base_dn'), $search_filter, $attributes);
-        $entry = ldap_get_entries($connection, $search);
 
-        if (isset($entry[0]['samaccountname'][0])) {
-            return $this->userFromAd($entry[0]);
+        if ($search !== false) {
+            $entry = ldap_get_entries($connection, $search);
+
+            if (isset($entry[0]['samaccountname'][0])) {
+                return $this->userFromAd($entry[0]);
+            }
         }
 
         return [];
     }
 
-    protected function getDomainSid()
+    protected function getDomainSid(): string
     {
         $connection = $this->getConnection();
 
@@ -226,6 +229,13 @@ trait ActiveDirectoryCommon
             '(objectClass=*)',
             ['objectsid']
         );
+
+        if ($search === false) {
+            \Log::debug('AD Auth: Could not determine domain SID');
+
+            return '';
+        }
+
         $entry = ldap_get_entries($connection, $search);
 
         return substr($this->sidFromLdap($entry[0]['objectsid'][0]), 0, 41);

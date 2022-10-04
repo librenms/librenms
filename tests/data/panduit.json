@@ -10,11 +10,11 @@
                     "version": "2.3.21",
                     "hardware": "P42D04M",
                     "features": "346-415V, 32A, 22.0kVA, 50/60Hz",
+                    "location": "<private>",
                     "os": "panduit",
                     "type": "power",
                     "serial": "CN187D6053",
-                    "icon": "panduit.png",
-                    "location": "<private>"
+                    "icon": "panduit.png"
                 }
             ]
         },

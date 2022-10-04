@@ -10,11 +10,11 @@
                     "version": "R80.30",
                     "hardware": "Check Point 23900",
                     "features": null,
+                    "location": "<private>",
                     "os": "gaia",
                     "type": "firewall",
                     "serial": "LR123456789",
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },

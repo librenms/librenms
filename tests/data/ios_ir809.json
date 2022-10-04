@@ -2426,11 +2426,11 @@
                     "version": "15.8(3)M4",
                     "hardware": "IR809G-LTE-GA-K9",
                     "features": "UNIVERSALK9",
+                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": "FCW224900DK",
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

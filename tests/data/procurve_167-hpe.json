@@ -10,11 +10,11 @@
                     "version": "PT.02.01",
                     "hardware": "1820 8G J9979A",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

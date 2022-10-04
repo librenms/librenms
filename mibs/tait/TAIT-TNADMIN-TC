@@ -1,0 +1,57 @@
+TAIT-TNADMIN-TC DEFINITIONS ::= BEGIN
+--
+-- Versions:
+--
+-- Release 1
+-- Preliminary support for monitoring of core network server.
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+   MODULE-IDENTITY, Integer32
+      FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+   tnAdminMibModule
+      FROM TAIT-TNADMIN-MODULE-MIB;
+
+tnAdminTC MODULE-IDENTITY
+   LAST-UPDATED "202002101200Z"
+   ORGANIZATION "www.taitradio.com"
+   CONTACT-INFO
+      "postal: Tait International Limited
+               245 Wooldridge Road
+               Harewood
+               Christchurch
+               PO Box 1645
+               Christchurch
+               New Zealand
+       phone:  +64 3358 3399
+       email:  support@taitradio.com"
+   DESCRIPTION "TaitNet Administration textual conventions."
+
+   REVISION "202002101200Z"
+   DESCRIPTION "Initial revision of this module."
+       ::= { tnAdminMibModule 1 }
+
+-- Textual Conventions
+PercentHundredths ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d-2"
+   STATUS current
+   DESCRIPTION "Type used to represent a percent value, rounded to the nearest hundredth."
+   SYNTAX Integer32 (0..10000)
+
+TaitServiceState ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION "The current state of a Tait service. State values are Running (0), Watchdog Stopped (1), Application Stopped (2), Stopped (3), and Not Installed (4)."
+   SYNTAX INTEGER {
+             running(0),
+             watchdogStopped(1),
+             applicationStopped(2),
+             stopped(3),
+             notInstalled(4)
+          }
+
+END

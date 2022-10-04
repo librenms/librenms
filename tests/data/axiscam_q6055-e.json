@@ -10,11 +10,11 @@
                     "version": "7.40.1",
                     "hardware": " AXIS Q6055-E",
                     "features": null,
+                    "location": null,
                     "os": "axiscam",
                     "type": "appliance",
                     "serial": "ac:cc:8e:ac:27:c7",
-                    "icon": "axis.svg",
-                    "location": null
+                    "icon": "axis.svg"
                 }
             ]
         },

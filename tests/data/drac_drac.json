@@ -10,11 +10,11 @@
                     "version": "2.65.65.65",
                     "hardware": "iDRAC7",
                     "features": null,
+                    "location": "<private>",
                     "os": "drac",
                     "type": "appliance",
                     "serial": "5GC8H32",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "10.0.1.003",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "barracudawafirewall",
                     "type": "firewall",
                     "serial": "888888",
-                    "icon": "barracuda.svg",
-                    "location": "<private>"
+                    "icon": "barracuda.svg"
                 }
             ]
         },
@@ -772,8 +772,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -982,8 +982,8 @@
                     "ifName": "eth3",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",

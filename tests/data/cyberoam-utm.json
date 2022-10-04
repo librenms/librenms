@@ -28,11 +28,11 @@
                     "version": "SFOS 17.5.5 MR-5",
                     "hardware": "SFVH_SO01",
                     "features": null,
+                    "location": "<private>",
                     "os": "cyberoam-utm",
                     "type": "appliance",
                     "serial": "C01001GF24TPDE1",
-                    "icon": "sophos.png",
-                    "location": "<private>"
+                    "icon": "sophos.png"
                 }
             ]
         },

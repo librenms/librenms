@@ -46,7 +46,7 @@ require 'overview/storage.inc.php';
 if (! isset($entity_state)) {
     $entity_state = get_dev_entity_state($device['device_id']);
 }
-if (is_array($entity_state['group']['c6kxbar'])) {
+if (! empty($entity_state['group']['c6kxbar'])) {
     require 'overview/c6kxbar.inc.php';
 }
 

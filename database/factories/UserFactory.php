@@ -24,9 +24,9 @@ class UserFactory extends Factory
     {
         return [
             'auth_type' => 'mysql',
-            'username' => $this->faker->unique()->userName,
-            'realname' => $this->faker->name,
-            'email' => $this->faker->safeEmail,
+            'username' => $this->faker->unique()->userName(),
+            'realname' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
             'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'level' => 1,
         ];

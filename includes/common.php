@@ -502,7 +502,7 @@ function object_add_cache($section, $obj)
 function object_is_cached($section, $obj)
 {
     global $object_cache;
-    if (array_key_exists($obj, $object_cache)) {
+    if (is_array($object_cache) && array_key_exists($obj, $object_cache)) {
         return $object_cache[$section][$obj];
     } else {
         return false;
@@ -531,33 +531,6 @@ function parse_location($location)
 
     return false;
 }//end parse_location()
-
-/**
- * Returns version info
- *
- * @param  bool  $remote  fetch remote version info from github
- * @return array
- */
-function version_info($remote = false)
-{
-    $version = \LibreNMS\Util\Version::get();
-    $local = $version->localCommit();
-    $output = [
-        'local_ver' => $version->local(),
-        'local_sha' => $local['sha'],
-        'local_date' => $local['date'],
-        'local_branch' => $local['branch'],
-        'github' => $remote ? $version->remoteCommit() : null,
-        'db_schema' => vsprintf('%s (%s)', $version->database()),
-        'php_ver' => phpversion(),
-        'python_ver' => $version->python(),
-        'database_ver' => $version->databaseServer(),
-        'rrdtool_ver' => $version->rrdtool(),
-        'netsnmp_ver' => $version->netSnmp(),
-    ];
-
-    return $output;
-}//end version_info()
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.

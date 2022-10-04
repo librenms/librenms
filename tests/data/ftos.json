@@ -28,11 +28,11 @@
                     "version": "8.4.2.5",
                     "hardware": "S25P-AC",
                     "features": null,
+                    "location": null,
                     "os": "ftos",
                     "type": "network",
                     "serial": null,
-                    "icon": "force10.svg",
-                    "location": null
+                    "icon": "force10.svg"
                 }
             ]
         },

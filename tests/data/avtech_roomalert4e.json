@@ -10,11 +10,11 @@
                     "version": "4.2.4",
                     "hardware": "Room Alert 4E",
                     "features": null,
+                    "location": "<private>",
                     "os": "avtech",
                     "type": "environment",
                     "serial": null,
-                    "icon": "avtech.svg",
-                    "location": "<private>"
+                    "icon": "avtech.svg"
                 }
             ]
         },

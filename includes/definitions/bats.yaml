@@ -1,0 +1,11 @@
+os: bats
+text: 'BATS AATS'
+type: wireless
+icon: bats
+over:
+    - { graph: device_ping_perf, text: 'Ping Times' }
+discovery:
+     -
+        sysObjectID:
+            - .1.3.6.1.4.1.37069
+mib_dir: bats

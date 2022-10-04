@@ -4,9 +4,10 @@ import sys
 import threading
 import time
 
-import pymysql
+import pymysql  # pylint: disable=import-error
 
 import LibreNMS
+from LibreNMS.config import DBConfig
 
 try:
     import psutil
@@ -37,7 +38,7 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class ServiceConfig:
+class ServiceConfig(DBConfig):
     def __init__(self):
         """
         Stores all of the configuration variables for the LibreNMS service in a common object
@@ -95,13 +96,6 @@ class ServiceConfig:
     redis_sentinel = None
     redis_sentinel_service = None
     redis_timeout = 60
-
-    db_host = "localhost"
-    db_port = 0
-    db_socket = None
-    db_user = "librenms"
-    db_pass = ""
-    db_name = "librenms"
 
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
@@ -226,6 +220,12 @@ class ServiceConfig:
         )
         self.db_user = os.getenv(
             "DB_USERNAME", config.get("db_user", ServiceConfig.db_user)
+        )
+        self.db_sslmode = os.getenv(
+            "DB_SSLMODE", config.get("db_sslmode", ServiceConfig.db_sslmode)
+        )
+        self.db_ssl_ca = os.getenv(
+            "MYSQL_ATTR_SSL_CA", config.get("db_ssl_ca", ServiceConfig.db_ssl_ca)
         )
 
         self.watchdog_enabled = config.get(

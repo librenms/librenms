@@ -782,6 +782,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
     }
 
+    public function portsAdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortAdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+    }
+
     public function portsFdb(): HasMany
     {
         return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
@@ -795,6 +800,11 @@ class Device extends BaseModel
     public function portsStp(): HasMany
     {
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
     }
 
     public function portsVlan(): HasMany

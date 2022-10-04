@@ -10,11 +10,11 @@
                     "version": "2.60",
                     "hardware": "ProLiant ML350 Gen9",
                     "features": null,
+                    "location": "<private>",
                     "os": "hpe-ilo",
                     "type": "appliance",
                     "serial": "CZ270746S1",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
@@ -4563,7 +4563,6 @@
                     "user_func": null,
                     "state_name": "cpqDaLogDrvStatus"
                 },
-
                 {
                     "sensor_deleted": 0,
                     "sensor_class": "state",

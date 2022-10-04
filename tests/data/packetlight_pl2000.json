@@ -10,11 +10,11 @@
                     "version": "2.0.12-B2A2-A01C",
                     "hardware": "PL-2000M rev 02-28",
                     "features": null,
+                    "location": "<private>",
                     "os": "packetlight",
                     "type": "network",
                     "serial": "190400431",
-                    "icon": "packetlight.png",
-                    "location": "<private>"
+                    "icon": "packetlight.png"
                 }
             ]
         },

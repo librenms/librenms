@@ -10,11 +10,11 @@
                     "version": "9.12(3)",
                     "hardware": "ASA5555",
                     "features": null,
+                    "location": "<private>",
                     "os": "asa",
                     "type": "firewall",
                     "serial": "FGL1641413L",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -3525,7 +3525,6 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "<private>",
-                    "local_addr": "<private>",
                     "local_port": 0,
                     "tunnel_name": "<private>",
                     "tunnel_status": ""
