@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $entry['priority'] = $log['priority'] ?? '0';
         $entry['level'] = $log['level'] ?? 'INFO';
         $entry['tag'] = $log['topic'] ?? 'notag';
-        $entry['timestamp'] = $log['@timestam'] ??  date("Y-m-d H:i") ;
+        $entry['timestamp'] = $log['@timestam'] ?? date('Y-m-d H:i');
         $entry['msg'] = $log['message'] ?? 'no message recieved';
         $entry['program'] = $log['type'] ?? 'noprogram';
         if ($debug > 1) {
