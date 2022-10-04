@@ -22,7 +22,7 @@ class Mni extends OS implements
         $radio_index = \SnmpQuery::get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $transmit_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.2.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseTxPower"
         $receive_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.3.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseRSL"
-        $receive_oid = $receive_oid_raw . $radio_index;        
+        $receive_oid = $receive_oid_raw . $radio_index;
         $transmit_oid = $transmit_oid_raw . $radio_index;
 
         return [
@@ -62,7 +62,7 @@ class Mni extends OS implements
         $radio_index = \SnmpQuery::get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $receive_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.17.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps";
         $receive_oid = $receive_oid_raw . $radio_index;
-        
+
         return [
             new WirelessSensor(
                 'rate',
