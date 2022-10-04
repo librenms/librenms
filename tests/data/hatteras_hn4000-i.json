@@ -11,7 +11,7 @@
                     "hardware": null,
                     "features": null,
                     "os": "hatteras",
-                    "type": "dslam",
+                    "type": "network",
                     "serial": null,
                     "icon": "hatteras.svg",
                     "location": null
