@@ -10,11 +10,11 @@
                     "version": "1.41",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "terra-sdi480",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "terra.svg",
-                    "location": "<private>"
+                    "icon": "terra.svg"
                 }
             ]
         },

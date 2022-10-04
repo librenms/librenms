@@ -10,11 +10,11 @@
                     "version": "4.1.35-rt41-39dbc2869a26",
                     "hardware": "LBB_350",
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "T2012008334003892",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },

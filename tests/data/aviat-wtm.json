@@ -10,11 +10,11 @@
                     "version": "2.7.0.11.4349-WTM4100",
                     "hardware": "W42-11H2-WPX",
                     "features": null,
+                    "location": null,
                     "os": "aviat-wtm",
                     "type": "wireless",
                     "serial": "AAA9999A999",
-                    "icon": "aviat.png",
-                    "location": null
+                    "icon": "aviat.png"
                 }
             ]
         },

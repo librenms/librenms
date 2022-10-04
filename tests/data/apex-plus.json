@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "ApexPlus-3.2.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "apex-plus",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png",
-                    "location": "<private>"
+                    "icon": "trango.png"
                 }
             ]
         },

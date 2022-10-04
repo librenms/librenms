@@ -10,11 +10,11 @@
                     "version": "1.5.0-ej76_svrbuild_wvsrvr",
                     "hardware": "Waveserver 40x10GE/10x40GE/4x100GE QSFP+/QSFP28, 2x100G/2x150G/2x200G Wavelogic 3 Extreme Coherent Optical Processors",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciena-waveserver",
                     "type": "network",
                     "serial": "AAAAAAAA",
-                    "icon": "ciena.svg",
-                    "location": "<private>"
+                    "icon": "ciena.svg"
                 }
             ]
         },

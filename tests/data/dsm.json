@@ -10,11 +10,11 @@
                     "version": "6.1-15217",
                     "hardware": "RS2212RP+",
                     "features": null,
+                    "location": "<private>",
                     "os": "dsm",
                     "type": "storage",
                     "serial": "3005AWL999111",
-                    "icon": "synology.svg",
-                    "location": "<private>"
+                    "icon": "synology.svg"
                 }
             ]
         },

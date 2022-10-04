@@ -10,11 +10,11 @@
                     "version": "21.10.R1",
                     "hardware": "7705 SAR-Hm",
                     "features": null,
+                    "location": "<private>",
                     "os": "timos",
                     "type": "network",
                     "serial": "NS173160469",
-                    "icon": "nokia.svg",
-                    "location": "<private>"
+                    "icon": "nokia.svg"
                 }
             ]
         },

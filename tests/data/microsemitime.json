@@ -10,11 +10,11 @@
                     "version": "2.83.2",
                     "hardware": "Symmetricom SyncServer S350",
                     "features": null,
+                    "location": "<private>",
                     "os": "microsemitime",
                     "type": "timing",
                     "serial": "1126A67238",
-                    "icon": "microsemi.png",
-                    "location": "<private>"
+                    "icon": "microsemi.png"
                 }
             ]
         },

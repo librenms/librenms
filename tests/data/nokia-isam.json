@@ -10,11 +10,11 @@
                     "version": "R5.7.02a",
                     "hardware": "NFXS-E",
                     "features": null,
+                    "location": "<private>",
                     "os": "nokia-isam",
                     "type": "network",
                     "serial": "FH1819A01A1",
-                    "icon": "nokia.svg",
-                    "location": "<private>"
+                    "icon": "nokia.svg"
                 }
             ]
         },

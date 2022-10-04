@@ -10,11 +10,11 @@
                     "version": "GDET: BQ-7-AR / DIGIT: EJ-7-AR",
                     "hardware": "Galaxy 7000 250000",
                     "features": null,
+                    "location": "<private>",
                     "os": "apc-mgeups",
                     "type": "power",
                     "serial": "2Q1L200001",
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

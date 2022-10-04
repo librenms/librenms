@@ -10,11 +10,11 @@
                     "version": "1.05",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ipoman",
                     "type": "power",
                     "serial": "1113016920004",
-                    "icon": "ingrasys.png",
-                    "location": "<private>"
+                    "icon": "ingrasys.png"
                 }
             ]
         },

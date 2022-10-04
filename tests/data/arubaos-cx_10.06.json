@@ -10,11 +10,11 @@
                     "version": "GL.10.06.0110",
                     "hardware": "8325",
                     "features": null,
+                    "location": "<private>",
                     "os": "arubaos-cx",
                     "type": "network",
                     "serial": "AB12CD345E",
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },

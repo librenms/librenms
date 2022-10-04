@@ -10,11 +10,11 @@
                     "version": "CRDA103_261",
                     "hardware": "CP1000PFCLCD",
                     "features": null,
+                    "location": "<private>",
                     "os": "cyberpower",
                     "type": "power",
                     "serial": null,
-                    "icon": "cyberpower.svg",
-                    "location": "<private>"
+                    "icon": "cyberpower.svg"
                 }
             ]
         },

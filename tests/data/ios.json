@@ -13240,11 +13240,11 @@
                     "version": "12.1(22)EA14",
                     "hardware": "catalyst2950t24",
                     "features": "I6K2L2Q4",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

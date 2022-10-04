@@ -10,11 +10,11 @@
                     "version": "ML.10.07.0005",
                     "hardware": "6200F 48G CL4 4SFP+370W",
                     "features": null,
+                    "location": "<private>",
                     "os": "arubaos-cx",
                     "type": "network",
                     "serial": "AB12CD3456",
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },

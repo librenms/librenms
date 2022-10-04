@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "Color LaserJet Pro M252dw",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
-                    "icon": "hp.svg",
-                    "location": "<private>"
+                    "icon": "hp.svg"
                 }
             ]
         },

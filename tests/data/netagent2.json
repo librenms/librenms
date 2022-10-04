@@ -10,11 +10,11 @@
                     "version": "2.48.DP520.WEST",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "netagent2",
                     "type": "power",
                     "serial": null,
-                    "icon": "netagent2.png",
-                    "location": "<private>"
+                    "icon": "netagent2.png"
                 }
             ]
         },

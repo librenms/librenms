@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "aprisa",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "4rf.png",
-                    "location": "<private>"
+                    "icon": "4rf.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "At 57.0268, 1.9663. Scanning Target G17DAP ENB 01 (344.4 km)",
                     "os": "bats",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "bats.png",
-                    "location": "At 57.0268, 1.9663. Scanning Target G17DAP ENB 01 (344.4 km)"
+                    "icon": "bats.png"
                 }
             ]
         },

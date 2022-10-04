@@ -10,11 +10,11 @@
                     "version": "Rev 2.44d",
                     "hardware": "TS 324 (047202CD)",
                     "features": null,
+                    "location": "<private>",
                     "os": "cxr-ts",
                     "type": "network",
                     "serial": null,
-                    "icon": "cxr-networks.png",
-                    "location": "<private>"
+                    "icon": "cxr-networks.png"
                 }
             ]
         },

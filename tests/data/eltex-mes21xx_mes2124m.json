@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "MES2124M AC",
                     "features": "1.1.48.13",
+                    "location": "<private>",
                     "os": "eltex-mes21xx",
                     "type": "network",
                     "serial": "ES1D012471",
-                    "icon": "eltex.png",
-                    "location": "<private>"
+                    "icon": "eltex.png"
                 }
             ]
         },

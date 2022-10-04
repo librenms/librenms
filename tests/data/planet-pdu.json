@@ -10,11 +10,11 @@
                     "version": "1.30.4",
                     "hardware": "IPM-8220",
                     "features": null,
+                    "location": "<private>",
                     "os": "planet-pdu",
                     "type": "power",
                     "serial": null,
-                    "icon": "planet.png",
-                    "location": "<private>"
+                    "icon": "planet.png"
                 }
             ]
         },

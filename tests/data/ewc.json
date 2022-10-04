@@ -768,11 +768,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "ewc",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "extreme.svg",
-                    "location": null
+                    "icon": "extreme.svg"
                 }
             ]
         },

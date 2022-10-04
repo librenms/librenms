@@ -10,11 +10,11 @@
                     "version": "384.17_0",
                     "hardware": "RT-AC68U",
                     "features": null,
+                    "location": "<private>",
                     "os": "asuswrt-merlin",
                     "type": "network",
                     "serial": null,
-                    "icon": "asuswrt-merlin.png",
-                    "location": "<private>"
+                    "icon": "asuswrt-merlin.png"
                 }
             ]
         },

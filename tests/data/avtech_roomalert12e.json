@@ -10,11 +10,11 @@
                     "version": "3.3.0",
                     "hardware": "Room Alert 12E",
                     "features": null,
+                    "location": "<private>",
                     "os": "avtech",
                     "type": "environment",
                     "serial": null,
-                    "icon": "avtech.svg",
-                    "location": "<private>"
+                    "icon": "avtech.svg"
                 }
             ]
         },

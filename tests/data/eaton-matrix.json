@@ -10,11 +10,11 @@
                     "version": "1.0.0.1",
                     "hardware": "Telecom Power",
                     "features": null,
+                    "location": "<private>",
                     "os": "eaton-matrix",
                     "type": "power",
                     "serial": "000000000",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

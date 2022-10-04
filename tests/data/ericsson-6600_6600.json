@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "MINI-LINK 6691",
                     "features": null,
+                    "location": "<private>",
                     "os": "ericsson-6600",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ericsson.svg",
-                    "location": "<private>"
+                    "icon": "ericsson.svg"
                 }
             ]
         },

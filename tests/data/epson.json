@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "epson",
                     "type": "printer",
                     "serial": "X3B8022793",
-                    "icon": "epson.svg",
-                    "location": "<private>"
+                    "icon": "epson.svg"
                 }
             ]
         },

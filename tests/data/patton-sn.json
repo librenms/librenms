@@ -10,11 +10,11 @@
                     "version": "R6.10 2017-09-08_RFE2645 H323 RBS SIP",
                     "hardware": "SN4971/1E15V, HwRel: 3, HwVer: 1",
                     "features": null,
+                    "location": "<private>",
                     "os": "patton-sn",
                     "type": "network",
                     "serial": "00A0BA0BD1EC",
-                    "icon": "generic.svg",
-                    "location": "<private>"
+                    "icon": "generic.svg"
                 }
             ]
         },

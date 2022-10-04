@@ -10,11 +10,11 @@
                     "version": "6.3.1.23",
                     "hardware": "OAW-6000",
                     "features": "Local Controller for ",
+                    "location": null,
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg",
-                    "location": null
+                    "icon": "aruba.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "Release 6.3.900",
                     "hardware": "C600HC",
                     "features": null,
+                    "location": "<private>",
                     "os": "ekinops",
                     "type": "network",
                     "serial": "002870",
-                    "icon": "ekinops.svg",
-                    "location": "<private>"
+                    "icon": "ekinops.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.9.0",
                     "hardware": "Simulated Nexus 3550",
                     "features": null,
+                    "location": "<private>",
                     "os": "exalink-fusion",
                     "type": "network",
                     "serial": "EBFSN-Z-123123",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

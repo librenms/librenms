@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "dsm",
                     "type": "storage",
                     "serial": null,
-                    "icon": "synology.svg",
-                    "location": "<private>"
+                    "icon": "synology.svg"
                 }
             ]
         },

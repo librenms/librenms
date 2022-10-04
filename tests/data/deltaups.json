@@ -10,11 +10,11 @@
                     "version": "03",
                     "hardware": "Minuteman E1500RTXL2U",
                     "features": null,
+                    "location": "<private>",
                     "os": "deltaups",
                     "type": "power",
                     "serial": null,
-                    "icon": "delta.svg",
-                    "location": "<private>"
+                    "icon": "delta.svg"
                 }
             ]
         },

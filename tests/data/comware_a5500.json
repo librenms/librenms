@@ -10,11 +10,11 @@
                     "version": "5.20.99",
                     "hardware": "A5500-24G EI Switch with 2 Interface Slots",
                     "features": "2222P08",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "CN50A1Z4BN",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

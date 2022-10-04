@@ -10,11 +10,11 @@
                     "version": "SMU11B_X V500R003C00SPC036",
                     "hardware": null,
                     "features": null,
+                    "location": "Unknown",
                     "os": "huawei-smu",
                     "type": "power",
                     "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "Unknown"
+                    "icon": "huawei.svg"
                 }
             ]
         },

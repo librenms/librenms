@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "panduit-eagle",
                     "type": "power",
                     "serial": null,
-                    "icon": "panduit.png",
-                    "location": "<private>"
+                    "icon": "panduit.png"
                 }
             ]
         },

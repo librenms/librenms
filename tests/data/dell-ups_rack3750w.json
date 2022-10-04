@@ -452,11 +452,11 @@
                     "version": "01.08 0004",
                     "hardware": "Dell UPS Rack 3750W High Efficiency Online HV",
                     "features": null,
+                    "location": "<private>",
                     "os": "dell-ups",
                     "type": "power",
                     "serial": "CN-0K804N-75162-2CH-0081-A03",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

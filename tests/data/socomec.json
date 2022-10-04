@@ -10,11 +10,11 @@
                     "version": "FW 00 / SW 01.09.0f",
                     "hardware": "NRT-OP-PDU1-28",
                     "features": null,
+                    "location": "<private>",
                     "os": "socomec",
                     "type": "power",
                     "serial": "YD17190028  A",
-                    "icon": "socomecpdu.png",
-                    "location": "<private>"
+                    "icon": "socomecpdu.png"
                 }
             ]
         },

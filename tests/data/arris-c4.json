@@ -10,11 +10,11 @@
                     "version": "08.02.00.97",
                     "hardware": "C4c",
                     "features": null,
+                    "location": "<private>",
                     "os": "arris-c4",
                     "type": "network",
                     "serial": null,
-                    "icon": "arris.svg",
-                    "location": "<private>"
+                    "icon": "arris.svg"
                 }
             ]
         },

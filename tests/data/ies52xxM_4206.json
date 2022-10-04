@@ -10,11 +10,11 @@
                     "version": "V1.08(ABGX.0)",
                     "hardware": "IES5206 MSC",
                     "features": null,
+                    "location": "<private>",
                     "os": "ies52xxM",
                     "type": "network",
                     "serial": "S170Z34010399",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

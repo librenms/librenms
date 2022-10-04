@@ -10,11 +10,11 @@
                     "version": "1.04.08",
                     "hardware": "CLHP28B1CR1",
                     "features": null,
+                    "location": "<private>",
                     "os": "horizon-compact",
                     "type": "wireless",
                     "serial": "DW0123456789",
-                    "icon": "dragonwave.png",
-                    "location": "<private>"
+                    "icon": "dragonwave.png"
                 }
             ]
         },

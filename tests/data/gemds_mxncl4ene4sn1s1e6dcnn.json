@@ -10,11 +10,11 @@
                     "version": "8.3.3",
                     "hardware": "MXNCL4ENE4SN1S1E6DCNN",
                     "features": null,
+                    "location": "<private>",
                     "os": "gemds",
                     "type": "network",
                     "serial": "3525618",
-                    "icon": "ge.svg",
-                    "location": "<private>"
+                    "icon": "ge.svg"
                 }
             ]
         },

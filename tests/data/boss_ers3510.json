@@ -10,11 +10,11 @@
                     "version": "5.3.9.011",
                     "hardware": "ERS-3510GT-PWR+",
                     "features": null,
+                    "location": "<private>",
                     "os": "boss",
                     "type": "network",
                     "serial": null,
-                    "icon": "extremeboss.svg",
-                    "location": "<private>"
+                    "icon": "extremeboss.svg"
                 }
             ]
         },

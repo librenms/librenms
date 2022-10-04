@@ -10,11 +10,11 @@
                     "version": "10.3.0D Build 74104",
                     "hardware": "GP3600-16B mother card",
                     "features": null,
+                    "location": "<private>",
                     "os": "bdcom",
                     "type": "network",
                     "serial": "00321000156",
-                    "icon": "bdcom.svg",
-                    "location": "<private>"
+                    "icon": "bdcom.svg"
                 }
             ]
         },

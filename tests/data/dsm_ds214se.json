@@ -10,11 +10,11 @@
                     "version": "6.2-25426",
                     "hardware": "DS214se",
                     "features": null,
+                    "location": "<private>",
                     "os": "dsm",
                     "type": "storage",
                     "serial": "139M8N0094",
-                    "icon": "synology.svg",
-                    "location": "<private>"
+                    "icon": "synology.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "6.4.0",
                     "hardware": "MODELNUMBER",
                     "features": "Non-Expiry License",
+                    "location": "<private>",
                     "os": "dhcpatriot",
                     "type": "server",
                     "serial": "SERIALNUMBER",
-                    "icon": "dhcpatriot.png",
-                    "location": "<private>"
+                    "icon": "dhcpatriot.png"
                 }
             ]
         },

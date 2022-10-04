@@ -10,11 +10,11 @@
                     "version": "SECURE/SNMP/TELNET/WEB/V3.59",
                     "hardware": "DualSwitch 1000 BM+ I af Desk 2SFP",
                     "features": null,
+                    "location": "<private>",
                     "os": "nexans",
                     "type": "network",
                     "serial": null,
-                    "icon": "nexans.svg",
-                    "location": "<private>"
+                    "icon": "nexans.svg"
                 }
             ]
         },

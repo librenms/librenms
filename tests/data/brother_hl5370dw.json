@@ -10,11 +10,11 @@
                     "version": "1.01",
                     "hardware": "HL-5370DW [001ba90ba752]",
                     "features": null,
+                    "location": "<private>",
                     "os": "brother",
                     "type": "printer",
                     "serial": "B9J154306",
-                    "icon": "brother.svg",
-                    "location": "<private>"
+                    "icon": "brother.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "OD 5.2.1 (25684)",
                     "hardware": "OD-16-HD",
                     "features": null,
+                    "location": "<private>",
                     "os": "mrv-od",
                     "type": "network",
                     "serial": "012345EMF8K0",
-                    "icon": "mrv.png",
-                    "location": "<private>"
+                    "icon": "mrv.png"
                 }
             ]
         },

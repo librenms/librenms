@@ -10,11 +10,11 @@
                     "version": "9.2.4",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "mcafeewebgateway",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "mcafeewebgateway.svg",
-                    "location": "<private>"
+                    "icon": "mcafeewebgateway.svg"
                 }
             ]
         },

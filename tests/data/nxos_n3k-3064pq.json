@@ -10,11 +10,11 @@
                     "version": "7.0(3)I7(8)",
                     "hardware": "N3K-C3064PQ-10GX",
                     "features": null,
+                    "location": "<private>",
                     "os": "nxos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

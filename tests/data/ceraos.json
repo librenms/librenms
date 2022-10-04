@@ -10,11 +10,11 @@
                     "version": "9.0.0.0.0.295",
                     "hardware": "IP-20C",
                     "features": "2 radios in unit",
+                    "location": "<private>",
                     "os": "ceraos",
                     "type": "wireless",
                     "serial": "F217305963",
-                    "icon": "ceragon.png",
-                    "location": "<private>"
+                    "icon": "ceragon.png"
                 }
             ]
         },

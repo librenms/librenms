@@ -10,11 +10,11 @@
                     "version": "2.11",
                     "hardware": "SC-TS01",
                     "features": null,
+                    "location": "<private>",
                     "os": "serverscheck",
                     "type": "environment",
                     "serial": null,
-                    "icon": "serverscheck.svg",
-                    "location": "<private>"
+                    "icon": "serverscheck.svg"
                 }
             ]
         },

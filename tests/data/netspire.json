@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "CONAC01/4004:70FM",
                     "features": null,
+                    "location": "<private>",
                     "os": "netspire",
                     "type": "appliance",
                     "serial": "141100002",
-                    "icon": "openaccess.png",
-                    "location": "<private>"
+                    "icon": "openaccess.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "NH62.YS.N636",
                     "hardware": "Dell S5830dn",
                     "features": null,
+                    "location": "<private>",
                     "os": "dell-laser",
                     "type": "printer",
                     "serial": "7XQ1R92-132-13",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

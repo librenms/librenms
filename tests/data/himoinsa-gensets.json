@@ -10,11 +10,11 @@
                     "version": "210",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "himoinsa-gensets",
                     "type": "power",
                     "serial": null,
-                    "icon": "himoinsa.svg",
-                    "location": "<private>"
+                    "icon": "himoinsa.svg"
                 }
             ]
         },

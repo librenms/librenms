@@ -10,11 +10,11 @@
                     "version": "6.4.4.8",
                     "hardware": "Dell PowerConnect W-7210 Controller",
                     "features": "Local Controller for ",
+                    "location": null,
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg",
-                    "location": null
+                    "icon": "aruba.svg"
                 }
             ]
         },

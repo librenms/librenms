@@ -10,11 +10,11 @@
                     "version": "",
                     "hardware": "",
                     "features": null,
+                    "location": null,
                     "os": "ciscosb",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

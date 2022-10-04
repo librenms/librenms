@@ -14,7 +14,11 @@
                     "os": "axiscam",
                     "type": "appliance",
                     "serial": null,
+<<<<<<< HEAD
                     "icon": "generic.svg"
+=======
+                    "icon": "axis.svg"
+>>>>>>> e4fdbbd82d652cfb197fafb3552de7f59afde9d7
                 }
             ]
         },

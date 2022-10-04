@@ -10,11 +10,11 @@
                     "version": "6.3.1.11",
                     "hardware": "GS724Tv4",
                     "features": null,
+                    "location": null,
                     "os": "netgear",
                     "type": "network",
                     "serial": null,
-                    "icon": "netgear.svg",
-                    "location": null
+                    "icon": "netgear.svg"
                 }
             ]
         },

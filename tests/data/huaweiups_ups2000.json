@@ -10,11 +10,11 @@
                     "version": "V100R001C00SPC602",
                     "hardware": "UPS2000 6kVA",
                     "features": null,
+                    "location": "<private>",
                     "os": "huaweiups",
                     "type": "power",
                     "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

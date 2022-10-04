@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "XG116Pro",
                     "features": null,
+                    "location": "<private>",
                     "os": "adva_fsp150",
                     "type": "network",
                     "serial": null,
-                    "icon": "adva.svg",
-                    "location": "<private>"
+                    "icon": "adva.svg"
                 }
             ]
         },

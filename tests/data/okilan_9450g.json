@@ -10,11 +10,11 @@
                     "version": "07.87",
                     "hardware": "MC873",
                     "features": "9450g Rev.00.69",
+                    "location": "<private>",
                     "os": "okilan",
                     "type": "printer",
                     "serial": null,
-                    "icon": "oki.svg",
-                    "location": "<private>"
+                    "icon": "oki.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "8.4.0.0-8.4.0.0",
                     "hardware": "225",
                     "features": null,
+                    "location": "<private>",
                     "os": "aruba-instant",
                     "type": "wireless",
                     "serial": "CNBJHMV0WN",
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },

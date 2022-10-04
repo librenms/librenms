@@ -10,11 +10,11 @@
                     "version": "6.7.1.108.R04",
                     "hardware": "OS6350-P24",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos6",
                     "type": "network",
                     "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "8.7.4.45112.210415.1103",
                     "hardware": "LiteBeam 5AC Gen2",
                     "features": null,
+                    "location": "<private>",
                     "os": "airos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

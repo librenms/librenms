@@ -10,11 +10,11 @@
                     "version": "18.0.1 MR-1-Build396",
                     "hardware": "SFVH_SO01_SFOS",
                     "features": null,
+                    "location": "<private>",
                     "os": "sophos-xg",
                     "type": "appliance",
                     "serial": "C01001GF24TPDE1",
-                    "icon": "sophos-xg.png",
-                    "location": "<private>"
+                    "icon": "sophos-xg.png"
                 }
             ]
         },

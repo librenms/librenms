@@ -10,11 +10,11 @@
                     "version": "1.4.1",
                     "hardware": "PLHP11B1SXR2",
                     "features": null,
+                    "location": "<private>",
                     "os": "horizon-compactplus",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "dragonwave.png",
-                    "location": "<private>"
+                    "icon": "dragonwave.png"
                 }
             ]
         },

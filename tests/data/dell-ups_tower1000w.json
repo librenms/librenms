@@ -10,11 +10,11 @@
                     "version": "01.14 0003",
                     "hardware": "Dell UPS Tower 1000W HV",
                     "features": null,
+                    "location": "<private>",
                     "os": "dell-ups",
                     "type": "power",
                     "serial": "CN-0H914N-75162-15K-0050-A04",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

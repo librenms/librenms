@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": "sti440",
                     "features": null,
+                    "location": null,
                     "os": "terra",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "terra.svg",
-                    "location": null
+                    "icon": "terra.svg"
                 }
             ]
         },

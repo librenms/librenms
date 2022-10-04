@@ -10,11 +10,11 @@
                     "version": "S1A17",
                     "hardware": "OL2200RTXL2U",
                     "features": null,
+                    "location": "<private>",
                     "os": "cyberpower",
                     "type": "power",
                     "serial": "ABCFT1000001",
-                    "icon": "cyberpower.svg",
-                    "location": "<private>"
+                    "icon": "cyberpower.svg"
                 }
             ]
         },

@@ -28,11 +28,11 @@
                     "version": "v5.6.4,build1575,180425 (GA)",
                     "hardware": "FGT_501E",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FG5H1E5810000000",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

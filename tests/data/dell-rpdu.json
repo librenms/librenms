@@ -10,11 +10,11 @@
                     "version": "v5.1.2",
                     "hardware": "DELL6606 HW01",
                     "features": null,
+                    "location": "<private>",
                     "os": "dell-rpdu",
                     "type": "power",
                     "serial": "IN1A234B5678912CD345E67",
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

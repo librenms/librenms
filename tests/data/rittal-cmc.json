@@ -10,11 +10,11 @@
                     "version": "6.50.00",
                     "hardware": "3.20",
                     "features": null,
+                    "location": "<private>",
                     "os": "rittal-cmc",
                     "type": "environment",
                     "serial": "07627",
-                    "icon": "rittal.svg",
-                    "location": "<private>"
+                    "icon": "rittal.svg"
                 }
             ]
         },

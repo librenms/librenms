@@ -10,11 +10,11 @@
                     "version": "dmr-3.05.00.0007",
                     "hardware": "TB9300/TB7300",
                     "features": null,
+                    "location": "<private>",
                     "os": "tait-infra93",
                     "type": "network",
                     "serial": "18271180",
-                    "icon": "tait.png",
-                    "location": "<private>"
+                    "icon": "tait.png"
                 }
             ]
         },

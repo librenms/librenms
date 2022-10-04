@@ -10,11 +10,11 @@
                     "version": "B8.35Build03",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "deltaorion",
                     "type": "environment",
                     "serial": null,
-                    "icon": "delta.svg",
-                    "location": "<private>"
+                    "icon": "delta.svg"
                 }
             ]
         },

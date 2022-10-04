@@ -10,11 +10,11 @@
                     "version": "10.0.R4",
                     "hardware": "7210 SAS-R6",
                     "features": null,
+                    "location": "<private>",
                     "os": "timos",
                     "type": "network",
                     "serial": "NS1806C3752",
-                    "icon": "nokia.svg",
-                    "location": "<private>"
+                    "icon": "nokia.svg"
                 }
             ]
         },

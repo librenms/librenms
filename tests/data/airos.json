@@ -10,11 +10,11 @@
                     "version": "8.5.1.37185.180307.0931",
                     "hardware": "Rocket Prism 5AC Gen2",
                     "features": null,
+                    "location": "<private>",
                     "os": "airos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

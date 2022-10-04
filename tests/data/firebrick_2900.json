@@ -10,11 +10,11 @@
                     "version": "V1.55.126",
                     "hardware": "FB2901",
                     "features": null,
+                    "location": "<private>",
                     "os": "firebrick",
                     "type": "network",
                     "serial": null,
-                    "icon": "firebrick.svg",
-                    "location": "<private>"
+                    "icon": "firebrick.svg"
                 }
             ]
         },

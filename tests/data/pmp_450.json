@@ -10,11 +10,11 @@
                     "version": "15.0.0.1",
                     "hardware": "PMP 450 AP",
                     "features": "5.4GHzMIMO OFDM - Multipoint - Access Point",
+                    "location": "<private>",
                     "os": "pmp",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": "<private>"
+                    "icon": "cambium.svg"
                 }
             ]
         },
@@ -247,8 +247,8 @@
                     "ifName": "et1",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -352,8 +352,8 @@
                     "ifName": "rf1",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",

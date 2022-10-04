@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "liebert",
                     "type": "power",
                     "serial": null,
-                    "icon": "vertiv.png",
-                    "location": "<private>"
+                    "icon": "vertiv.png"
                 }
             ]
         },

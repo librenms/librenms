@@ -10,11 +10,11 @@
                     "version": "v6.4.8,build1914,211117 (GA)",
                     "hardware": "FGR_60F_3G4G",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FR60Fxxxxxxxxxxx",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

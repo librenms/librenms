@@ -10,11 +10,11 @@
                     "version": "15.0(2a)EX5",
                     "hardware": "WS-C2960X-48FPS-L",
                     "features": "UNIVERSALK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": "FCW1929B68S",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.46.2",
                     "hardware": "Sx800 OSEDelta 4.6",
                     "features": null,
+                    "location": null,
                     "os": "rs",
                     "type": "network",
                     "serial": "000000",
-                    "icon": "rs.svg",
-                    "location": null
+                    "icon": "rs.svg"
                 }
             ]
         },

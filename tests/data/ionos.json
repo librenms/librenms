@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ionos",
                     "type": "network",
                     "serial": null,
-                    "icon": "sagemcom.svg",
-                    "location": "<private>"
+                    "icon": "sagemcom.svg"
                 }
             ]
         },

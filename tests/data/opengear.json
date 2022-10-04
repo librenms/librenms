@@ -10,11 +10,11 @@
                     "version": "4.3.0",
                     "hardware": "ACM550x",
                     "features": null,
+                    "location": "<private>",
                     "os": "opengear",
                     "type": "OOB Management",
                     "serial": "70081804019547",
-                    "icon": "opengear.svg",
-                    "location": "<private>"
+                    "icon": "opengear.svg"
                 }
             ]
         },

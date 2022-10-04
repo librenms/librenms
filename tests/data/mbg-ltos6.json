@@ -10,11 +10,11 @@
                     "version": "7.00.014",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "mbg-ltos6",
                     "type": "timing",
                     "serial": "<private>",
-                    "icon": "meinberg.svg",
-                    "location": "<private>"
+                    "icon": "meinberg.svg"
                 }
             ]
         },

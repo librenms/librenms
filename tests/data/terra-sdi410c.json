@@ -10,11 +10,11 @@
                     "version": "1.45",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "terra-sdi410c",
                     "type": "appliance",
                     "serial": "sdi410C020340429",
-                    "icon": "terra.svg",
-                    "location": "<private>"
+                    "icon": "terra.svg"
                 }
             ]
         },

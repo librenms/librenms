@@ -10,11 +10,11 @@
                     "version": "9.0.R11",
                     "hardware": "7705 SAR-8 v2",
                     "features": null,
+                    "location": "<private>",
                     "os": "timos",
                     "type": "network",
                     "serial": "LL122819029",
-                    "icon": "nokia.svg",
-                    "location": "<private>"
+                    "icon": "nokia.svg"
                 }
             ]
         },

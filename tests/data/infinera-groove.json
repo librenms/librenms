@@ -10,11 +10,11 @@
                     "version": "FP3.0.3",
                     "hardware": "GROOVE_G30",
                     "features": null,
+                    "location": "<private>",
                     "os": "infinera-groove",
                     "type": "network",
                     "serial": "magicserialnumber",
-                    "icon": "infinera.png",
-                    "location": "<private>"
+                    "icon": "infinera.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "Torrevieja",
                     "os": "fibernet-xmux4-plus",
                     "type": "network",
                     "serial": null,
-                    "icon": "fibernet.svg",
-                    "location": "Torrevieja"
+                    "icon": "fibernet.svg"
                 }
             ]
         },

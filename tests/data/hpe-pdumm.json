@@ -10,11 +10,11 @@
                     "version": "1.00.16",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "hpe-pdumm",
                     "type": "power",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

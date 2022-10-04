@@ -39,11 +39,11 @@
                     "version": "6.3.2.011",
                     "hardware": "ERS-5530-24TFD",
                     "features": null,
+                    "location": null,
                     "os": "boss",
                     "type": "network",
                     "serial": null,
-                    "icon": "extremeboss.svg",
-                    "location": null
+                    "icon": "extremeboss.svg"
                 }
             ]
         },

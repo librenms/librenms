@@ -10,11 +10,11 @@
                     "version": "8.2.0.2",
                     "hardware": "Aruba7210",
                     "features": "Local Controller for 10.235.132.234",
+                    "location": "<private>",
                     "os": "arubaos",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },

@@ -28,11 +28,11 @@
                     "version": "15.0(2)SE7",
                     "hardware": "cat3560x24",
                     "features": "UNIVERSALK9",
+                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

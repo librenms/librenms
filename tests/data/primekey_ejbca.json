@@ -10,11 +10,11 @@
                     "version": "PrimeKeyAppliance.3.4.3",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "primekey",
                     "type": "appliance",
                     "serial": "CS700886",
-                    "icon": "primekey.svg",
-                    "location": "<private>"
+                    "icon": "primekey.svg"
                 }
             ]
         },

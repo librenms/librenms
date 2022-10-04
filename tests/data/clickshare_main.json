@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": "R9861520EU.",
+                    "location": "Zentraler Semina72 72 61 75 6D 00",
                     "os": "clickshare",
                     "type": "collaboration",
                     "serial": "1874830543.",
-                    "icon": "barco.svg",
-                    "location": "Zentraler Semina72 72 61 75 6D 00"
+                    "icon": "barco.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "01.21",
                     "hardware": "TM-5300",
                     "features": null,
+                    "location": "<private>",
                     "os": "canonprinter",
                     "type": "printer",
                     "serial": null,
-                    "icon": "canon.svg",
-                    "location": "<private>"
+                    "icon": "canon.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "iStars_SWV4.25 R1.1.1",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "istars",
                     "type": "power",
                     "serial": null,
-                    "icon": "istars.png",
-                    "location": "<private>"
+                    "icon": "istars.png"
                 }
             ]
         },

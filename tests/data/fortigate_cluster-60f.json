@@ -10,11 +10,11 @@
                     "version": "v6.4.9,build1966,220421 (GA)",
                     "hardware": "FGT_60F",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FGT60FTK20056924",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

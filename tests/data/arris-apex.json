@@ -10,11 +10,11 @@
                     "version": "2.9.4",
                     "hardware": "APEX1000",
                     "features": null,
+                    "location": "<private>",
                     "os": "arris-apex",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "arris.svg",
-                    "location": "<private>"
+                    "icon": "arris.svg"
                 }
             ]
         },

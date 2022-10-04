@@ -28,11 +28,11 @@
                     "version": "7.1.045",
                     "hardware": "5900AF-48G-4XG-2QSFP+ Switch",
                     "features": "2422P01",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "20.8.23",
                     "hardware": "LMC-A B13",
                     "features": null,
+                    "location": "<private>",
                     "os": "luminato",
                     "type": "network",
                     "serial": "HK01672034",
-                    "icon": "teleste.png",
-                    "location": "<private>"
+                    "icon": "teleste.png"
                 }
             ]
         },

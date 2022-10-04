@@ -10,11 +10,11 @@
                     "version": "rel_saos8700_8.7.0_ga195",
                     "hardware": "154-8700-930",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciena-sds",
                     "type": "network",
                     "serial": "M9123456",
-                    "icon": "ciena.svg",
-                    "location": "<private>"
+                    "icon": "ciena.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "5.0.168",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "sixnet",
                     "type": "network",
                     "serial": null,
-                    "icon": "sixnet.png",
-                    "location": "<private>"
+                    "icon": "sixnet.png"
                 }
             ]
         },

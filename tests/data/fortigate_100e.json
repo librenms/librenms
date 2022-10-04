@@ -10,11 +10,11 @@
                     "version": "v5.4.4,build7650,170529 (GA)",
                     "hardware": "FGT_100E",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FG100E4Q17011652",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

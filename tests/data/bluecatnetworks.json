@@ -10,11 +10,11 @@
                     "version": "8.3.2-091.GA.bcn",
                     "hardware": "VMware",
                     "features": null,
+                    "location": "<private>",
                     "os": "bluecatnetworks",
                     "type": "appliance",
                     "serial": "Unknown",
-                    "icon": "bcn.png",
-                    "location": "<private>"
+                    "icon": "bcn.png"
                 }
             ]
         },

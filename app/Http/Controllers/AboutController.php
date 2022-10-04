@@ -66,12 +66,12 @@ class AboutController extends Controller
             'callback_status' => $callback_status,
             'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
 
-            'db_schema' => vsprintf('%s (%s)', $version->database()),
-            'git_log' => $version->gitChangelog(),
-            'git_date' => $version->localDate(),
+            'db_schema' => $version->database(),
+            'git_log' => $version->git->log(),
+            'git_date' => $version->date(),
             'project_name' => Config::get('project_name'),
 
-            'version_local' => $version->local(),
+            'version_local' => $version->name(),
             'version_database' => $version->databaseServer(),
             'version_php' => phpversion(),
             'version_laravel' => App::version(),

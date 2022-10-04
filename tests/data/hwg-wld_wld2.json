@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "hwg-wld",
                     "type": "environment",
                     "serial": "27F5010000000008",
-                    "icon": "hwg.svg",
-                    "location": "<private>"
+                    "icon": "hwg.svg"
                 }
             ]
         },

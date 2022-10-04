@@ -10,11 +10,11 @@
                     "version": "1.80",
                     "hardware": "Develop ineo+ 280",
                     "features": null,
+                    "location": "<private>",
                     "os": "konica",
                     "type": "printer",
                     "serial": null,
-                    "icon": "konica.svg",
-                    "location": "<private>"
+                    "icon": "konica.svg"
                 }
             ]
         },

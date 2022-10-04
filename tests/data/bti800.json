@@ -10,11 +10,11 @@
                     "version": "2.2.2Build2",
                     "hardware": "BTI-SA-805 1.0",
                     "features": null,
+                    "location": null,
                     "os": "bti800",
                     "type": "network",
                     "serial": "HF17240001",
-                    "icon": "bti.png",
-                    "location": null
+                    "icon": "bti.png"
                 }
             ]
         },

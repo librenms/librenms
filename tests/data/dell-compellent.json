@@ -10,11 +10,11 @@
                     "version": "10.0-RELEASE-p11",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "dell-compellent",
                     "type": "storage",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },
