@@ -40,7 +40,6 @@ discovery_modules:
     mempools: false
     ports-stack: false
     mpls: false
-    route: false
     ports: true
 poller_modules:
     ntp: false
