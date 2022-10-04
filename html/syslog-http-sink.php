@@ -15,37 +15,37 @@ $debug = 0; // up to 3
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  $json = json_decode(file_get_contents('php://input'), true);
+    $json = json_decode(file_get_contents('php://input'), true);
 
-  if ($debug) {
-    logfile(date('Y-m-d H:i') . ' Syslog HTTP POST from ' . $_SERVER['REMOTE_ADDR'] . ' with ' . count($json) . ' messages');
-  }
-
-  foreach ($json as $log){
-    $entry['host'] = $log['host'] ?? 'localhost';
-    $entry['facility'] = $log['facility']  ?? '0';
-    $entry['priority'] = $log['priority'] ?? '0';
-    $entry['level'] = $log['level'] ?? 'INFO';;
-    $entry['tag'] = $log['topic'] ?? 'notag';;
-    $entry['timestamp'] = $log['@timestam'] ??  date("Y-m-d H:i") ;;
-    $entry['msg'] = $log['message'] ?? 'no message recieved';
-    $entry['program'] = $log['type'] ?? 'noprogram';
-    if ($debug>1) {
-      logfile(' - for host ' . $log['host'] . ': ' . substr($log['message'], 10));
+    if ($debug) {
+      logfile(date('Y-m-d H:i') . ' Syslog HTTP POST from ' . $_SERVER['REMOTE_ADDR'] . ' with ' . count($json) . ' messages');
     }
-    process_syslog($entry, 1);
-  }
- 
-  if ($debug>2) {
-    logfile(serialize($json));
-  }
-  unset($entry,$json);
-}
+
+    foreach ($json as $log){
+      $entry['host'] = $log['host'] ?? 'localhost';
+      $entry['facility'] = $log['facility']  ?? '0';
+      $entry['priority'] = $log['priority'] ?? '0';
+      $entry['level'] = $log['level'] ?? 'INFO';;
+      $entry['tag'] = $log['topic'] ?? 'notag';;
+      $entry['timestamp'] = $log['@timestam'] ??  date("Y-m-d H:i") ;;
+      $entry['msg'] = $log['message'] ?? 'no message recieved';
+      $entry['program'] = $log['type'] ?? 'noprogram';
+      if ($debug>1) {
+        logfile(' - for host ' . $log['host'] . ': ' . substr($log['message'], 10));
+      }
+      process_syslog($entry, 1);
+    }
+
+    if ($debug>2) {
+      logfile(serialize($json));
+    }
+    unset($entry,$json);
+    }
 
 
 //last resort method GET etc is not supported, help (temporary Help) page will be visible
 else {
-  ?>
+    ?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
