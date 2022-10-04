@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\Sensor;
 use LibreNMS\OS;
 
 $valid['sensor'] = [];
@@ -45,38 +46,7 @@ if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
 
-$run_sensors = [
-    'airflow',
-    'current',
-    'charge',
-    'dbm',
-    'fanspeed',
-    'frequency',
-    'humidity',
-    'load',
-    'loss',
-    'power',
-    'power_consumed',
-    'power_factor',
-    'runtime',
-    'signal',
-    'state',
-    'count',
-    'temperature',
-    'tv_signal',
-    'bitrate',
-    'voltage',
-    'snr',
-    'pressure',
-    'cooling',
-    'delay',
-    'quality_factor',
-    'chromatic_dispersion',
-    'ber',
-    'eer',
-    'waterflow',
-    'percent',
-];
+$run_sensors = array_keys(Sensor::CLASSES);
 
 // filter submodules
 $run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));

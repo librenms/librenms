@@ -4,6 +4,7 @@ use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
+use LibreNMS\Enum\Sensor;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
@@ -138,29 +139,9 @@ function poll_sensor($device, $class)
  */
 function record_sensor_data($device, $all_sensors)
 {
-    $supported_sensors = [
-        'current'     => 'A',
-        'frequency'   => 'Hz',
-        'runtime'     => 'Min',
-        'humidity'    => '%',
-        'fanspeed'    => 'rpm',
-        'power'       => 'W',
-        'voltage'     => 'V',
-        'temperature' => 'C',
-        'dbm'         => 'dBm',
-        'charge'      => '%',
-        'load'        => '%',
-        'state'       => '#',
-        'signal'      => 'dBm',
-        'airflow'     => 'cfm',
-        'snr'         => 'SNR',
-        'pressure'    => 'kPa',
-        'cooling'     => 'W',
-    ];
-
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
-        $unit = $supported_sensors[$sensor['sensor_class']];
+        $unit = Sensor::fromName($sensor['sensor_class']);
         $sensor_value = cast_number($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
