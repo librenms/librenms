@@ -10,11 +10,11 @@
                     "version": "7.5.3.2(R0010.0044)",
                     "hardware": "1.0.1",
                     "features": null,
+                    "location": "<private>",
                     "os": "snr",
                     "type": "network",
                     "serial": null,
-                    "icon": "snr.png",
-                    "location": "<private>"
+                    "icon": "snr.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "",
                     "hardware": "SG350X-48",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

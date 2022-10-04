@@ -10,11 +10,11 @@
                     "version": "SWPTTDVBTT2_P3_1_02_157 build 1441109757",
                     "hardware": "PT3080",
                     "features": null,
+                    "location": "<private>",
                     "os": "protelevision-t1",
                     "type": "network",
                     "serial": "3303302",
-                    "icon": "protelevision.png",
-                    "location": "<private>"
+                    "icon": "protelevision.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "SM8TAT2SA",
                     "features": null,
+                    "location": "<private>",
                     "os": "transition",
                     "type": "network",
                     "serial": null,
-                    "icon": "transition.png",
-                    "location": "<private>"
+                    "icon": "transition.png"
                 }
             ]
         },

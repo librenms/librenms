@@ -10,11 +10,11 @@
                     "version": "MT-32803-1.2.3-R8-GP",
                     "hardware": "OT-350 V1.0",
                     "features": "eNodeB: 1403 Physical Cell: 36 DL Modulation: 28 UL Modulation: 22 bootROM: 10.5-16886P LTE Band: 42_43",
+                    "location": "<private>",
                     "os": "zmtel",
                     "type": "network",
                     "serial": "OTIZT173501415",
-                    "icon": "greenpacket.png",
-                    "location": "<private>"
+                    "icon": "greenpacket.png"
                 }
             ]
         },

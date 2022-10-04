@@ -10,11 +10,11 @@
                     "version": "3.10.0-362035",
                     "hardware": "StudioX50",
                     "features": null,
+                    "location": "<private>",
                     "os": "polycomLens",
                     "type": "collaboration",
                     "serial": "12345678",
-                    "icon": "polycom.png",
-                    "location": "<private>"
+                    "icon": "polycom.png"
                 }
             ]
         },

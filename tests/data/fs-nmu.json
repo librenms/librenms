@@ -10,11 +10,11 @@
                     "version": "SV3.01.18",
                     "hardware": "OEO",
                     "features": null,
+                    "location": "<private>",
                     "os": "fs-nmu",
                     "type": "network",
                     "serial": "1119120009301117",
-                    "icon": "fs.svg",
-                    "location": "<private>"
+                    "icon": "fs.svg"
                 }
             ]
         },

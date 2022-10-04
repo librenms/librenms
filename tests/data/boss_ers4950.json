@@ -10,11 +10,11 @@
                     "version": "7.6.1.033",
                     "hardware": "ERS-4950GTS-PWR+",
                     "features": null,
+                    "location": "<private>",
                     "os": "boss",
                     "type": "network",
                     "serial": null,
-                    "icon": "extremeboss.svg",
-                    "location": "<private>"
+                    "icon": "extremeboss.svg"
                 }
             ]
         },

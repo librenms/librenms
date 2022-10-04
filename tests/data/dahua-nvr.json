@@ -10,11 +10,11 @@
                     "version": "3.212.0000.1",
                     "hardware": "DH-NVR4108HS-8P-4KS2",
                     "features": null,
+                    "location": "<private>",
                     "os": "dahua-nvr",
                     "type": "appliance",
                     "serial": "2M00D2APAZTL62J",
-                    "icon": "dahua.png",
-                    "location": "<private>"
+                    "icon": "dahua.png"
                 }
             ]
         },

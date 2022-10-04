@@ -10,11 +10,11 @@
                     "version": "8.2-7MR-1",
                     "hardware": "MC1550",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortiwlc",
                     "type": "network",
                     "serial": null,
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

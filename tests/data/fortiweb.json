@@ -10,11 +10,11 @@
                     "version": "5.91",
                     "hardware": "FortiWeb-Azure",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortiweb",
                     "type": "firewall",
                     "serial": "FVVM123456789012",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

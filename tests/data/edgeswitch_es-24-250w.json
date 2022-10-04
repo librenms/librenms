@@ -10,11 +10,11 @@
                     "version": "1.8.0.5106045",
                     "hardware": "EdgeSwitch 24-Port 250W",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeswitch",
                     "type": "network",
                     "serial": "F03E34F342C3",
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

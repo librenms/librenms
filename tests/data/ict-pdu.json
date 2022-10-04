@@ -10,11 +10,11 @@
                     "version": "2.08",
                     "hardware": "ICT180S-12BRCP",
                     "features": null,
+                    "location": "<private>",
                     "os": "ict-pdu",
                     "type": "power",
                     "serial": null,
-                    "icon": "ict.png",
-                    "location": "<private>"
+                    "icon": "ict.png"
                 }
             ]
         },

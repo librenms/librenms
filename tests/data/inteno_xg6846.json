@@ -10,11 +10,11 @@
                     "version": "4.12ITT01.99",
                     "hardware": "XG6846",
                     "features": null,
+                    "location": "<private>",
                     "os": "inteno",
                     "type": "network",
                     "serial": "684624H197019306",
-                    "icon": "inteno.svg",
-                    "location": "<private>"
+                    "icon": "inteno.svg"
                 }
             ]
         },

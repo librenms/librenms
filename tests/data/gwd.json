@@ -10,11 +10,11 @@
                     "version": "V1R12B192sp18",
                     "hardware": "V2.3B1",
                     "features": null,
+                    "location": "<private>",
                     "os": "gwd",
                     "type": "network",
                     "serial": "4PA0S16091000090",
-                    "icon": "gwd.png",
-                    "location": "<private>"
+                    "icon": "gwd.png"
                 }
             ]
         },

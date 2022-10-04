@@ -10,11 +10,11 @@
                     "version": "7.1.1",
                     "hardware": "RB760iGS",
                     "features": "Level 4",
+                    "location": null,
                     "os": "routeros",
                     "type": "network",
                     "serial": "E1F10E90A6E9",
-                    "icon": "mikrotik.svg",
-                    "location": null
+                    "icon": "mikrotik.svg"
                 }
             ]
         },

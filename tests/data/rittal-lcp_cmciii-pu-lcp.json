@@ -10,11 +10,11 @@
                     "version": "V3.17.10",
                     "hardware": "CMCIII-PU LCP",
                     "features": null,
+                    "location": "<private>",
                     "os": "rittal-lcp",
                     "type": "environment",
                     "serial": "41326588",
-                    "icon": "rittal.svg",
-                    "location": "<private>"
+                    "icon": "rittal.svg"
                 }
             ]
         },

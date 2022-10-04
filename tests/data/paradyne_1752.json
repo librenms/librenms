@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "paradyne",
                     "type": "network",
                     "serial": null,
-                    "icon": "paradyne.svg",
-                    "location": null
+                    "icon": "paradyne.svg"
                 }
             ]
         },

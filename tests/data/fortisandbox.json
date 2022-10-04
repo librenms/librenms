@@ -10,11 +10,11 @@
                     "version": "v3.12-build0124 (GA)",
                     "hardware": "FSA VM",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortisandbox",
                     "type": "firewall",
                     "serial": "FSAVM00000000000",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

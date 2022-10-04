@@ -10,11 +10,11 @@
                     "version": "1.01.01",
                     "hardware": "EKI-7708G-4FP",
                     "features": null,
+                    "location": "<private>",
                     "os": "advantech",
                     "type": "network",
                     "serial": null,
-                    "icon": "advantech.svg",
-                    "location": "<private>"
+                    "icon": "advantech.svg"
                 }
             ]
         },

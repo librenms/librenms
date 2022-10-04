@@ -10,11 +10,11 @@
                     "version": "15.1X49-D120.3",
                     "hardware": "Juniper SRX340",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "FP: 0.13  INV: 1.29",
                     "hardware": "PW9130 1000VA-R",
                     "features": null,
+                    "location": "<private>",
                     "os": "eatonups",
                     "type": "power",
                     "serial": "GG435A0270",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

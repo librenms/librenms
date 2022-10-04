@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "EDGE610",
                     "features": null,
+                    "location": "<private>",
                     "os": "velocloud",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "velocloud.png",
-                    "location": "<private>"
+                    "icon": "velocloud.png"
                 }
             ]
         },

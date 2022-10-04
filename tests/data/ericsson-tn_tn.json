@@ -10,11 +10,11 @@
                     "version": "MINI-LINK_TN_5.4FP_LH_1.6FP_R32B126",
                     "hardware": "AMM 2p B",
                     "features": null,
+                    "location": "<private>",
                     "os": "ericsson-tn",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ericsson.svg",
-                    "location": "<private>"
+                    "icon": "ericsson.svg"
                 }
             ]
         },

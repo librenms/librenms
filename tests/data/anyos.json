@@ -10,11 +10,11 @@
                     "version": "1.00(AAJZ.16)C0",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "anyos",
                     "type": "network",
                     "serial": "E4186BAB9C4F",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "6.1",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "aix",
                     "type": "server",
                     "serial": "00FB98004C00",
-                    "icon": "aix.svg",
-                    "location": "<private>"
+                    "icon": "aix.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "4.0.0.1",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "netsure",
                     "type": "power",
                     "serial": null,
-                    "icon": "emerson.svg",
-                    "location": "<private>"
+                    "icon": "emerson.svg"
                 }
             ]
         },

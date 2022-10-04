@@ -10,11 +10,11 @@
                     "version": "8.2.6",
                     "hardware": "LCH-D C12",
                     "features": null,
+                    "location": "<private>",
                     "os": "luminato",
                     "type": "network",
                     "serial": "HK01421528",
-                    "icon": "teleste.png",
-                    "location": "<private>"
+                    "icon": "teleste.png"
                 }
             ]
         },

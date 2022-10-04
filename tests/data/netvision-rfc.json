@@ -10,11 +10,11 @@
                     "version": "7.20",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "netvision-rfc",
                     "type": "power",
                     "serial": null,
-                    "icon": "netvision.png",
-                    "location": "<private>"
+                    "icon": "netvision.png"
                 }
             ]
         },

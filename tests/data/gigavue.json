@@ -10,11 +10,11 @@
                     "version": "v8.6.07",
                     "hardware": "GigaVUE-2404",
                     "features": null,
+                    "location": "<private>",
                     "os": "gigavue",
                     "type": "network",
                     "serial": "21327",
-                    "icon": "gigamon.png",
-                    "location": "<private>"
+                    "icon": "gigamon.png"
                 }
             ]
         },

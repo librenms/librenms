@@ -10,11 +10,11 @@
                     "version": "iRMC S4",
                     "hardware": "PRIMERGY RX300 S8",
                     "features": null,
+                    "location": "<private>",
                     "os": "fujitsuiRMC",
                     "type": "appliance",
                     "serial": "YLNT001234",
-                    "icon": "fujitsu.svg",
-                    "location": "<private>"
+                    "icon": "fujitsu.svg"
                 }
             ]
         },

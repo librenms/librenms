@@ -10,11 +10,11 @@
                     "version": "6.5r9a build-194750",
                     "hardware": "HiveAP320_n",
                     "features": null,
+                    "location": "<private>",
                     "os": "hiveos-wireless",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "aerohive.svg",
-                    "location": "<private>"
+                    "icon": "aerohive.svg"
                 }
             ]
         },

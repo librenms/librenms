@@ -10,11 +10,11 @@
                     "version": "R01 1.1.2.0",
                     "hardware": "ECS4110-28T",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgecos",
                     "type": "network",
                     "serial": "EC1549000075",
-                    "icon": "edge-core.png",
-                    "location": "<private>"
+                    "icon": "edge-core.png"
                 }
             ]
         },

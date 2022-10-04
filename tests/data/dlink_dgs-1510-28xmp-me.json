@@ -10,11 +10,11 @@
                     "version": "Build 1.10.010",
                     "hardware": "DGS-1510-28XMP/ME Rev. A1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "RZQW1I6000009",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

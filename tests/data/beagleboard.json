@@ -10,11 +10,11 @@
                     "version": "Debian Buster IoT TIDL Image 2020-04-06",
                     "hardware": "BeagleBone AI",
                     "features": null,
+                    "location": "<private>",
                     "os": "beagleboard",
                     "type": "server",
                     "serial": null,
-                    "icon": "beagleboard.png",
-                    "location": "<private>"
+                    "icon": "beagleboard.png"
                 }
             ]
         },

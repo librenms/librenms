@@ -10,11 +10,11 @@
                     "version": "7.1a",
                     "hardware": "CW-24V2C458C1",
                     "features": null,
+                    "location": null,
                     "os": "sentry3",
                     "type": "power",
                     "serial": "ADLH0001862",
-                    "icon": "servertech.png",
-                    "location": null
+                    "icon": "servertech.png"
                 }
             ]
         },

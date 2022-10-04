@@ -10,11 +10,11 @@
                     "version": "3.2.8",
                     "hardware": "GT01W",
                     "features": null,
+                    "location": "<private>",
                     "os": "wisi-tangram",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "wisi.png",
-                    "location": "<private>"
+                    "icon": "wisi.png"
                 }
             ]
         },

@@ -676,11 +676,11 @@
                     "version": "4.19.97+",
                     "hardware": "Generic ARMv6",
                     "features": null,
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
+                    "icon": "linux.svg"
                 }
             ]
         },

@@ -478,11 +478,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "rutos-rutx",
                     "type": "network",
                     "serial": null,
-                    "icon": "teltonika.png",
-                    "location": null
+                    "icon": "teltonika.png"
                 }
             ]
         },

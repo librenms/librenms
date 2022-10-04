@@ -10,11 +10,11 @@
                     "version": "9.0.4",
                     "hardware": "ALB5100",
                     "features": null,
+                    "location": "<private>",
                     "os": "aloha",
                     "type": "loadbalancer",
                     "serial": "0010F33B9A2B",
-                    "icon": "haproxy.svg",
-                    "location": "<private>"
+                    "icon": "haproxy.svg"
                 }
             ]
         },

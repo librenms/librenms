@@ -28,11 +28,11 @@
                     "version": "15.2(2a)E1",
                     "hardware": "cat29xxStack",
                     "features": "UNIVERSALK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

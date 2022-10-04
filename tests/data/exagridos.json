@@ -10,11 +10,11 @@
                     "version": "4.8.1.1209.P60",
                     "hardware": "EX40000E-SEC",
                     "features": null,
+                    "location": "<private>",
                     "os": "exagridos",
                     "type": "storage",
                     "serial": null,
-                    "icon": "exagrid.png",
-                    "location": "<private>"
+                    "icon": "exagrid.png"
                 }
             ]
         },

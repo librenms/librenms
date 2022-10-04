@@ -10,11 +10,11 @@
                     "version": "2p6r22b0D031716",
                     "hardware": "Apex Lynx-2.0.2",
                     "features": null,
+                    "location": "<private>",
                     "os": "apex-lynx",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "trango.png",
-                    "location": "<private>"
+                    "icon": "trango.png"
                 }
             ]
         },

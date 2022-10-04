@@ -5406,11 +5406,11 @@
                     "version": "CAT9K_LITE_IOSXE 16.12.4",
                     "hardware": "c92xxL Stack",
                     "features": "Gibraltar",
+                    "location": null,
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

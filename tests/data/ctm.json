@@ -10,11 +10,11 @@
                     "version": "245.00",
                     "hardware": "Last Mile Gear CTM",
                     "features": null,
+                    "location": "<private>",
                     "os": "ctm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ctm.png",
-                    "location": "<private>"
+                    "icon": "ctm.png"
                 }
             ]
         },

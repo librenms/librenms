@@ -10,11 +10,11 @@
                     "version": "0.32.0",
                     "hardware": "MetaMux 48 with L-Series",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista-mos",
                     "type": "network",
                     "serial": "891829852",
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },

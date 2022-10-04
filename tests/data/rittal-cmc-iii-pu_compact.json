@@ -10,11 +10,11 @@
                     "version": "V3.15.70_4",
                     "hardware": "CMCIII-PU Compact",
                     "features": null,
+                    "location": "<private>",
                     "os": "rittal-cmc-iii-pu",
                     "type": "environment",
                     "serial": "<private>",
-                    "icon": "rittal.svg",
-                    "location": "<private>"
+                    "icon": "rittal.svg"
                 }
             ]
         },
