@@ -3,7 +3,7 @@ modules:
     os:
         hardware:
                - ENTITY-MIB::entPhysicalDescr.2
-        version: 
+        version:
                - ENTITY-MIB::entPhysicalSoftwareRev.2
     mempools:
         data:
