@@ -15,7 +15,7 @@ modules:
                 class: system
     mempools:
         data:
-            -   
+            -
                 oid: DMOS-SYSMON-MIB::memory
                 total: DMOS-SYSMON-MIB::memoryOneMinuteTotal
                 free: DMOS-SYSMON-MIB::memoryOneMinuteFree
