@@ -11412,7 +11412,8 @@
                     "mempool_perc_warn": 90
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -15033,9 +15034,9 @@
                     "bridgeAddress": "f872eae009bc",
                     "protocolSpecification": "unknown",
                     "priority": 32769,
-                    "timeSinceTopologyChange": "0",
-                    "topChanges": 0,
-                    "designatedRoot": "000000000000",
+                    "timeSinceTopologyChange": "2620382",
+                    "topChanges": 1,
+                    "designatedRoot": "18e728922881",
                     "rootCost": 1,
                     "rootPort": 4105,
                     "maxAge": 20,
@@ -15063,6 +15064,7 @@
                     "ifIndex": 369098761
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

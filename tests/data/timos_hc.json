@@ -8327,8 +8327,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8349,8 +8348,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8371,8 +8369,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8393,8 +8390,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8415,8 +8411,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8437,8 +8432,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8459,8 +8453,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8481,8 +8474,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8503,8 +8495,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8525,8 +8516,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]"
                 }
             ]
         },
@@ -8551,8 +8541,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8573,8 +8562,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8595,8 +8583,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8617,8 +8604,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8639,8 +8625,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8661,8 +8646,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8683,8 +8667,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8705,8 +8688,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8727,8 +8709,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8749,8 +8730,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]"
                 }
             ]
         }

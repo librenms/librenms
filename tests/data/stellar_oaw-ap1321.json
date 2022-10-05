@@ -14086,8 +14086,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".\"]"
                 }
             ]
         },
@@ -14112,8 +14111,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".\"]"
                 }
             ]
         }
