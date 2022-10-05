@@ -1,8 +1,8 @@
 mib: FASTPATH-SWITCHING-MIB
 modules:
     os:
-        hardware: 
-                - ENTITY-MIB::entPhysicalDescr.2
+        hardware:
+               - ENTITY-MIB::entPhysicalDescr.2
         version: 
                - ENTITY-MIB::entPhysicalSoftwareRev.2
     mempools:
