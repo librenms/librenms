@@ -32,8 +32,8 @@ FASTPATH-INVENTORY-MIB DEFINITIONS ::= BEGIN
                                    Durham, NC 27703
             Tel:                   +1 919 865 2700"
         DESCRIPTION
-            "This MIB defines the objects used for FastPath to 
-            configure and report information and status of units, 
+            "This MIB defines the objects used for FastPath to
+            configure and report information and status of units,
             slots and supported cards."
         
         -- Revision history.	  
