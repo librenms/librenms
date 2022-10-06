@@ -74,7 +74,8 @@ if ($device['os_group'] == 'cisco') {
 
                 // Bit dirty also, clean later
                 $descr = str_replace('Temp: ', '', $descr);
-                $descr = str_ireplace('temperature ', '', $descr);
+                $descr = str_ireplace(' temperature', '', $descr);
+                $descr = trim($descr);
 
                 $oid = '.1.3.6.1.4.1.9.9.91.1.1.1.1.4.' . $index;
                 $current = $entry['entSensorValue'];
