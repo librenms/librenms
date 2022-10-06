@@ -2,6 +2,7 @@ os: vutlan
 text: 'Vutlan'
 type: environment
 icon: vutlan
+mib_dir: vutlan
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
