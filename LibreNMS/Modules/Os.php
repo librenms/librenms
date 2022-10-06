@@ -129,6 +129,7 @@ class Os implements Module
 
         echo trans('device.attributes.location') . ': ' . optional($device->location)->display() . PHP_EOL;
         foreach (['hardware', 'version', 'features', 'serial'] as $attribute) {
+            $device->$attribute = trim($device->$attribute);
             echo \App\Observers\DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)) . PHP_EOL;
         }
 
