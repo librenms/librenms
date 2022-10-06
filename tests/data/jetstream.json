@@ -6136,7 +6136,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/1 ",
+                    "port_descr_type": "gigabitethernet 1/0/1",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6241,7 +6241,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/2 ",
+                    "port_descr_type": "gigabitethernet 1/0/2",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6346,7 +6346,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/3 ",
+                    "port_descr_type": "gigabitethernet 1/0/3",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6451,7 +6451,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/4 ",
+                    "port_descr_type": "gigabitethernet 1/0/4",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6556,7 +6556,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/5 ",
+                    "port_descr_type": "gigabitethernet 1/0/5",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6661,7 +6661,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/6 ",
+                    "port_descr_type": "gigabitethernet 1/0/6",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6766,7 +6766,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/7 ",
+                    "port_descr_type": "gigabitethernet 1/0/7",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6871,7 +6871,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/8 ",
+                    "port_descr_type": "gigabitethernet 1/0/8",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6976,7 +6976,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/9 ",
+                    "port_descr_type": "gigabitethernet 1/0/9",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7081,7 +7081,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/10 ",
+                    "port_descr_type": "gigabitethernet 1/0/10",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7186,7 +7186,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/11 ",
+                    "port_descr_type": "gigabitethernet 1/0/11",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7291,7 +7291,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/12 ",
+                    "port_descr_type": "gigabitethernet 1/0/12",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7396,7 +7396,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/13 ",
+                    "port_descr_type": "gigabitethernet 1/0/13",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7501,7 +7501,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/14 ",
+                    "port_descr_type": "gigabitethernet 1/0/14",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7606,7 +7606,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/15 ",
+                    "port_descr_type": "gigabitethernet 1/0/15",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7711,7 +7711,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/16 ",
+                    "port_descr_type": "gigabitethernet 1/0/16",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7816,7 +7816,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/17 ",
+                    "port_descr_type": "gigabitethernet 1/0/17",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -7921,7 +7921,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/18 ",
+                    "port_descr_type": "gigabitethernet 1/0/18",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8026,7 +8026,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/19 ",
+                    "port_descr_type": "gigabitethernet 1/0/19",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8131,7 +8131,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/20 ",
+                    "port_descr_type": "gigabitethernet 1/0/20",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8236,7 +8236,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/21 ",
+                    "port_descr_type": "gigabitethernet 1/0/21",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8341,7 +8341,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/22 ",
+                    "port_descr_type": "gigabitethernet 1/0/22",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8446,7 +8446,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/23 ",
+                    "port_descr_type": "gigabitethernet 1/0/23",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8551,7 +8551,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/24 ",
+                    "port_descr_type": "gigabitethernet 1/0/24",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8656,7 +8656,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/25 ",
+                    "port_descr_type": "gigabitethernet 1/0/25",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8761,7 +8761,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/26 ",
+                    "port_descr_type": "gigabitethernet 1/0/26",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8866,7 +8866,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/27 ",
+                    "port_descr_type": "gigabitethernet 1/0/27",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8971,7 +8971,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/28 ",
+                    "port_descr_type": "gigabitethernet 1/0/28",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9076,7 +9076,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/29 ",
+                    "port_descr_type": "gigabitethernet 1/0/29",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9181,7 +9181,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/30 ",
+                    "port_descr_type": "gigabitethernet 1/0/30",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9286,7 +9286,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/31 ",
+                    "port_descr_type": "gigabitethernet 1/0/31",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9391,7 +9391,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/32 ",
+                    "port_descr_type": "gigabitethernet 1/0/32",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9496,7 +9496,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/33 ",
+                    "port_descr_type": "gigabitethernet 1/0/33",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9601,7 +9601,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/34 ",
+                    "port_descr_type": "gigabitethernet 1/0/34",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9706,7 +9706,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/35 ",
+                    "port_descr_type": "gigabitethernet 1/0/35",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9811,7 +9811,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/36 ",
+                    "port_descr_type": "gigabitethernet 1/0/36",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9916,7 +9916,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/37 ",
+                    "port_descr_type": "gigabitethernet 1/0/37",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10021,7 +10021,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/38 ",
+                    "port_descr_type": "gigabitethernet 1/0/38",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10126,7 +10126,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/39 ",
+                    "port_descr_type": "gigabitethernet 1/0/39",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10231,7 +10231,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/40 ",
+                    "port_descr_type": "gigabitethernet 1/0/40",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10336,7 +10336,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/41 ",
+                    "port_descr_type": "gigabitethernet 1/0/41",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10441,7 +10441,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/42 ",
+                    "port_descr_type": "gigabitethernet 1/0/42",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10546,7 +10546,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/43 ",
+                    "port_descr_type": "gigabitethernet 1/0/43",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10651,7 +10651,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/44 ",
+                    "port_descr_type": "gigabitethernet 1/0/44",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10756,7 +10756,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/45 ",
+                    "port_descr_type": "gigabitethernet 1/0/45",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10861,7 +10861,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/46 ",
+                    "port_descr_type": "gigabitethernet 1/0/46",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -10966,7 +10966,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/47 ",
+                    "port_descr_type": "gigabitethernet 1/0/47",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -11071,7 +11071,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/48 ",
+                    "port_descr_type": "gigabitethernet 1/0/48",
                     "port_descr_descr": "copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -11176,7 +11176,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/49 ",
+                    "port_descr_type": "gigabitethernet 1/0/49",
                     "port_descr_descr": "fiber",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -11281,7 +11281,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/50 ",
+                    "port_descr_type": "gigabitethernet 1/0/50",
                     "port_descr_descr": "fiber",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -11386,7 +11386,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/51 ",
+                    "port_descr_type": "gigabitethernet 1/0/51",
                     "port_descr_descr": "fiber",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -11491,7 +11491,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigabitethernet 1/0/52 ",
+                    "port_descr_type": "gigabitethernet 1/0/52",
                     "port_descr_descr": "fiber",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

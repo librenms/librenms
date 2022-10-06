@@ -428,7 +428,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.40418.2.6.2.2.1.3.1.1",
                     "sensor_index": "doState.1.1",
                     "sensor_type": "doTable",
-                    "sensor_descr": "Relay ",
+                    "sensor_descr": "Relay",
                     "group": "Ports DO",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,

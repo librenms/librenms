@@ -6550,7 +6550,7 @@
                     "processor_index": "0.1.1",
                     "processor_type": "ies5000",
                     "processor_usage": 25,
-                    "processor_descr": "0.1.1 ",
+                    "processor_descr": "0.1.1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -6561,7 +6561,7 @@
                     "processor_index": "0.2.1",
                     "processor_type": "ies5000",
                     "processor_usage": 21,
-                    "processor_descr": "0.2.1 ",
+                    "processor_descr": "0.2.1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

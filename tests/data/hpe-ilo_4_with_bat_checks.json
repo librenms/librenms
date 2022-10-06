@@ -3808,7 +3808,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "L2TP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3913,7 +3913,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "SSTP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4018,7 +4018,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "IKEv2",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4123,7 +4123,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "PPTP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4228,7 +4228,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "PPPOE",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4333,7 +4333,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "IP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4438,7 +4438,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "IPv6",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4543,7 +4543,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "Network Monitor",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5488,7 +5488,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "IP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5593,7 +5593,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "IPv6",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6328,7 +6328,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan miniport ",
+                    "port_descr_type": "wan miniport",
                     "port_descr_descr": "Network Monitor",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
