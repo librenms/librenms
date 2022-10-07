@@ -30,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Database\Events\StatementPrepared::class => [
             \App\Listeners\LegacyQueryListener::class,
         ],
+        \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+            \App\Listeners\SocialiteWasCalledListener::class,
+        ],
     ];
 
     /**
