@@ -267,9 +267,18 @@ setsebool -P httpd_can_connect_ldap 1
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
-successfully. User level 1 is assigned to those accounts so you will
-then need to assign the relevant permissions unless you set
-`$config['radius']['userlevel']` to be something other than 1.
+successfully. User level 1 is assigned by default to those accounts 
+unless radius sends a reply attribute with the correct userlevel. 
+
+You can change the default userlevel by setting
+`$config['radius']['userlevel']` to something other than 1.
+
+The attribute `Filter-ID` is a standard Radius-Reply-Attribute that
+can be assigned a value corresponding to the desired userlevel for 
+the user and/or group (profile) in your radius server. 
+
+Userlevels and corresponding values are described in the third paragraph in this document.
+
 
 ```php
 $config['radius']['hostname']      = 'localhost';

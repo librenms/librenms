@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5f22d1ad8c4de6777b2690d0115f7afe",
+    "content-hash": "807216c31606cc7c4fbc5f0a3d05bc94",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -12446,6 +12446,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-session": "*",
+        "ext-simplexml": "*",
         "ext-xml": "*",
         "ext-zlib": "*"
     },
