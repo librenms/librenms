@@ -378,7 +378,7 @@ class Routeros extends OS implements
                 '60G: Sta > ' . $entry['mtxrWl60GStaRemote'],
                 $entry['mtxrWl60GStaDistance'],
                 1,
-                1000
+                100000
             );
         }
 
