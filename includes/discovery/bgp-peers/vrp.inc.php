@@ -24,7 +24,6 @@
  * @author     PipoCanaja
  */
 
-use App\Models\BgpPeer;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
