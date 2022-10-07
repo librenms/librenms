@@ -69,10 +69,11 @@ if (Config::get('enable_bgp')) {
             }
 
             $bgpPeers[$vrfInstance][$address] = $value;
-            $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'];
+            $bgpPeers[$vrfInstance][$address]['vrf_id'] = ! empty($map_vrf['byName'][$vrfInstance]['vrf_id']) ? $map_vrf['byName'][$vrfInstance]['vrf_id'] : null;
             $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
             $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
             $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
+            $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = '';
             if (array_key_exists('0.' . $oid[3] . '.' . $oid_address, $bgpPeersDesc)) {
                 // We may have a description
                 $bgpPeers[$vrfInstance][$address]['bgpPeerDescr'] = $bgpPeersDesc['0.' . $oid[3] . '.' . $oid_address]['hwBgpPeerSessionExtDescription'];
@@ -80,10 +81,7 @@ if (Config::get('enable_bgp')) {
         }
 
         foreach ($bgpPeers as $vrfName => $vrf) {
-            $vrfId = null;
-            if (! empty($map_vrf['byName'][$vrfName]['vrf_id'])) {
-                $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
-            }
+            $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
 
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['hwBgpPeerRemoteAs']);
@@ -103,7 +101,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerOutTotalMessages' => 0,
                         'bgpPeerFsmEstablishedTime' => $value['hwBgpPeerFsmEstablishedTime'],
                         'bgpPeerInUpdateElapsedTime' => 0,
-                        'bgpPeerDescr' => $value['bgpPeerDescr'],
+                        'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
                         'astext' => $astext,
                     ];
                     if (empty($vrfId)) {
@@ -121,13 +119,13 @@ if (Config::get('enable_bgp')) {
                     $peers = [
                         'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'],
                         'astext' => $astext,
-                        'bgpPeerDescr' => $value['bgpPeerDescr'],
+                        'bgpPeerDescr' => $value['bgpPeerDescr'] ?? '',
                     ];
                     $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
                     $seenPeerID[] = (DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->select('bgpPeer_id')->orderBy('bgpPeer_id', 'ASC')->first()->bgpPeer_id);
 
                     echo str_repeat('.', $affected);
-                    $vrp_bgp_peer_count++;
+                    $vrp_bgp_peer_count += $affected;
                 }
                 if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
                     if ($vrfName != '') {
