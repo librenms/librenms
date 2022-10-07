@@ -9,6 +9,7 @@ modules:
                     oid: VUTLAN-SYSTEM-MIB::ctlUnitElementsTable
                     value: VUTLAN-SYSTEM-MIB::ctlUnitElementValue
                     descr: '{{ VUTLAN-SYSTEM-MIB::ctlUnitElementName }}'
+                    num_oid: '.1.3.6.1.4.1.39052.1.3.1.9.{{ $index }}'
                     skip_values:
                       -
                           oid: VUTLAN-SYSTEM-MIB::ctlUnitElementType
@@ -20,6 +21,7 @@ modules:
                     oid: VUTLAN-SYSTEM-MIB::ctlUnitElementsTable
                     value: VUTLAN-SYSTEM-MIB::ctlUnitElementValue
                     descr: '{{ VUTLAN-SYSTEM-MIB::ctlUnitElementName }}'
+                    num_oid: '.1.3.6.1.4.1.39052.1.3.1.9.{{ $index }}'
                     skip_values:
                       -
                           oid: VUTLAN-SYSTEM-MIB::ctlUnitElementType
@@ -32,6 +34,7 @@ modules:
                     oid: VUTLAN-SYSTEM-MIB::ctlUnitElementsTable
                     value: VUTLAN-SYSTEM-MIB::ctlUnitElementValue
                     descr: 'Door state'
+                    num_oid: '.1.3.6.1.4.1.39052.1.3.1.9.{{ $index }}'
                     skip_values:
                       -
                           oid: VUTLAN-SYSTEM-MIB::ctlUnitElementType
