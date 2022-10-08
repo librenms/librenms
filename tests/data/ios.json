@@ -13280,7 +13280,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 100,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 },
                 {
@@ -13310,7 +13310,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 1,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 }
             ],
@@ -13331,7 +13331,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "true",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -13346,7 +13346,7 @@
                     "ospfAreaLsaCksumSum": 23464326,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -13364,7 +13364,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

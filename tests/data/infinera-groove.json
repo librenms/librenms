@@ -21,6 +21,7 @@
         "poller": "matches discovery"
     },
     "ports": {
+        "discovery": [],
         "poller": {
             "ports": [
                 {

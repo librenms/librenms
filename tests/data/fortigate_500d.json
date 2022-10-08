@@ -6843,7 +6843,7 @@
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "notInService",
                     "context_name": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 }
             ],
             "ospf_instances": [
