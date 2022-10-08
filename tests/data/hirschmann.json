@@ -4090,6 +4090,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSFault"
                 },
                 {
@@ -4114,6 +4115,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSPowerSupply"
                 },
                 {
@@ -4138,6 +4140,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSRedundancyManager"
                 },
                 {
@@ -4162,6 +4165,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRStandby"
                 },
                 {
@@ -4175,7 +4179,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -4186,6 +4190,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4199,7 +4204,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -4210,6 +4215,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4234,6 +4240,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -4404,6 +4411,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSFault"
                 },
                 {
@@ -4428,6 +4436,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSPowerSupply"
                 },
                 {
@@ -4452,6 +4461,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSRedundancyManager"
                 },
                 {
@@ -4476,6 +4486,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRStandby"
                 },
                 {
@@ -4498,8 +4509,9 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "hmPowerSupplySta",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4522,8 +4534,9 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "hmPowerSupplySta",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4548,6 +4561,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

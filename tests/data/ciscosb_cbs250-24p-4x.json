@@ -9103,6 +9103,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonSupplyState"
                 }
             ],

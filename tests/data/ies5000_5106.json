@@ -11634,6 +11634,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11658,6 +11659,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11682,6 +11684,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11706,6 +11709,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11730,6 +11734,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmLedStatus"
                 },
                 {
@@ -11754,6 +11759,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chassisStatus"
                 },
                 {
@@ -11778,6 +11784,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "slotModuleStatus"
                 },
                 {
@@ -11802,6 +11809,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "slotModuleStatus"
                 },
                 {
@@ -11826,6 +11834,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemStatus"
                 },
                 {
@@ -11850,6 +11859,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11874,6 +11884,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11898,6 +11909,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11922,6 +11934,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11946,6 +11959,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11970,6 +11984,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11994,6 +12009,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12018,6 +12034,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12042,6 +12059,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12066,6 +12084,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12090,6 +12109,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12114,6 +12134,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12138,6 +12159,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12162,6 +12184,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12186,6 +12209,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12210,6 +12234,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -12293,10 +12318,115 @@
                 },
                 {
                     "state_name": "systemStatus",
-                    "state_descr": null,
-                    "state_draw_graph": null,
-                    "state_value": null,
-                    "state_generic_value": null
+                    "state_descr": "moduleNoDefect",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "moduleOverHeat",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "moduleFanRpmLow",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "moduleVoltageLow",
+                    "state_draw_graph": 0,
+                    "state_value": 8,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "moduleThermalSensorFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 16,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "modulePullOut",
+                    "state_draw_graph": 0,
+                    "state_value": 32,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "powerDC48VAFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 64,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "powerDC48VBFailure",
+                    "state_draw_graph": 0,
+                    "state_value": 128,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "extAlarmInputTrigger",
+                    "state_draw_graph": 0,
+                    "state_value": 256,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "moduleDown",
+                    "state_draw_graph": 0,
+                    "state_value": 512,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "mscSwitchOverOK",
+                    "state_draw_graph": 0,
+                    "state_value": 1024,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "networkTopologyChange",
+                    "state_draw_graph": 0,
+                    "state_value": 2048,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "macSpoof",
+                    "state_draw_graph": 0,
+                    "state_value": 4096,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "cpuHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 8192,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "memoryUsageHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 16384,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "systemStatus",
+                    "state_descr": "packetBufferUsageHigh",
+                    "state_draw_graph": 0,
+                    "state_value": 32767,
+                    "state_generic_value": 2
                 }
             ]
         },
