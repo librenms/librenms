@@ -1735,7 +1735,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1760,7 +1759,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1785,7 +1783,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1810,7 +1807,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1835,7 +1831,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellBandwidth"
                 },
                 {
@@ -1860,7 +1855,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellModemState"
                 },
                 {
@@ -1885,7 +1879,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellModemType"
                 },
                 {
@@ -1910,7 +1903,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellRoamingState"
                 },
                 {
@@ -1935,7 +1927,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellServiceState"
                 },
                 {
@@ -1960,7 +1951,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "mIfCellSimState"
                 },
                 {
@@ -1985,7 +1975,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2010,7 +1999,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

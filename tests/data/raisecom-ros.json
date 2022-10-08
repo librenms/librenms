@@ -3684,7 +3684,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3709,7 +3708,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3719,7 +3717,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637955.1",
                     "sensor_index": "tx-272637955",
                     "sensor_type": "rosMgmtOpticalTransceiverTemperature",
-                    "sensor_descr": " Transceiver Temperature",
+                    "sensor_descr": "tengigabitethernet1/1/1 Transceiver Temperature",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -3734,7 +3732,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3744,7 +3741,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637959.1",
                     "sensor_index": "tx-272637959",
                     "sensor_type": "rosMgmtOpticalTransceiverTemperature",
-                    "sensor_descr": " Transceiver Temperature",
+                    "sensor_descr": "tengigabitethernet1/1/2 Transceiver Temperature",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -3759,7 +3756,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -3860,7 +3856,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3885,7 +3880,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 3,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3895,7 +3889,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637955.1",
                     "sensor_index": "tx-272637955",
                     "sensor_type": "rosMgmtOpticalTransceiverTemperature",
-                    "sensor_descr": " Transceiver Temperature",
+                    "sensor_descr": "tengigabitethernet1/1/1 Transceiver Temperature",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -3910,7 +3904,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3920,7 +3913,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.8886.60.18.1.2.2.1.1.2.272637959.1",
                     "sensor_index": "tx-272637959",
                     "sensor_type": "rosMgmtOpticalTransceiverTemperature",
-                    "sensor_descr": " Transceiver Temperature",
+                    "sensor_descr": "tengigabitethernet1/1/2 Transceiver Temperature",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -3935,7 +3928,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

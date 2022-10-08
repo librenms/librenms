@@ -10810,7 +10810,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10835,7 +10834,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10860,7 +10858,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10885,7 +10882,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10910,7 +10906,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10935,7 +10930,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10960,7 +10954,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10985,7 +10978,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11010,7 +11002,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11035,7 +11026,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11060,7 +11050,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11085,7 +11074,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11110,7 +11098,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11135,7 +11122,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11160,7 +11146,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11185,7 +11170,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11210,7 +11194,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11235,7 +11218,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11260,7 +11242,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11285,7 +11266,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11310,7 +11290,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11335,7 +11314,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11360,7 +11338,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11385,7 +11362,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11410,7 +11386,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11435,7 +11410,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11460,7 +11434,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11485,7 +11458,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11510,7 +11482,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11535,7 +11506,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11560,7 +11530,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11585,7 +11554,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11610,7 +11578,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "hwEntityFanState"
                 },
                 {
@@ -11635,7 +11602,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11660,7 +11626,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11685,7 +11650,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11710,7 +11674,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11735,7 +11698,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11760,7 +11722,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11785,7 +11746,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11810,7 +11770,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11835,7 +11794,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11860,7 +11818,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11885,7 +11842,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11910,7 +11866,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11935,7 +11890,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11960,7 +11914,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11985,7 +11938,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12010,7 +11962,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12035,7 +11986,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12060,7 +12010,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12085,7 +12034,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12110,7 +12058,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12135,7 +12082,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -12180,7 +12126,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12205,7 +12150,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12230,7 +12174,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12255,7 +12198,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12280,7 +12222,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12305,7 +12246,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12330,7 +12270,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12355,7 +12294,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12380,7 +12318,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12405,7 +12342,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12430,7 +12366,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -11.079053973095,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12455,7 +12390,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -8.7942606879415,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12480,7 +12414,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -18.239087409443,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12505,7 +12438,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -19.208187539524,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12530,7 +12462,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12555,7 +12486,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -7.6955107862173,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12580,7 +12510,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -9.9139982823808,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12605,7 +12534,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -12.006594505464,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12630,7 +12558,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.9464863055338,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12655,7 +12582,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.4008379993015,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12680,7 +12606,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -5.9859945921846,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12705,7 +12630,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.0730304674033,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12730,7 +12654,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.1439372640169,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12755,7 +12678,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.1261017366127,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12780,7 +12702,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -5.9006687666871,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12805,7 +12726,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.2342304294349,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12830,7 +12750,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -7.0553377383841,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12855,7 +12774,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.2708799702989,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12880,7 +12798,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -6.3827216398241,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12905,7 +12822,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.4977164694491,
                     "user_func": "uw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12930,7 +12846,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12955,7 +12870,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12980,7 +12894,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "hwEntityFanState"
                 },
                 {
@@ -13005,7 +12918,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13030,7 +12942,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13055,7 +12966,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13080,7 +12990,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13105,7 +13014,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13130,7 +13038,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13155,7 +13062,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13180,7 +13086,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13205,7 +13110,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13230,7 +13134,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13255,7 +13158,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13280,7 +13182,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13305,7 +13206,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13330,7 +13230,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13355,7 +13254,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13380,7 +13278,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13405,7 +13302,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13430,7 +13326,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13455,7 +13350,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13480,7 +13374,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13505,7 +13398,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

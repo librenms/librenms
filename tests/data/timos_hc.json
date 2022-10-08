@@ -869,7 +869,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/2/1, 10/100 Ethernet TX, \\LAB_SARH_01",
+                    "ifDescr": "1/2/1, 10/100 Ethernet TX, \\\\LAB_SARH_01",
                     "ifName": "1/2/1",
                     "portName": null,
                     "ifIndex": 37781504,
@@ -1709,7 +1709,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/1, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/1, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/1",
                     "portName": null,
                     "ifIndex": 41975808,
@@ -1814,7 +1814,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/2, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/2, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/2",
                     "portName": null,
                     "ifIndex": 42008576,
@@ -1919,7 +1919,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/3, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/3, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/3",
                     "portName": null,
                     "ifIndex": 42041344,
@@ -2024,7 +2024,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/4, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/4, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/4",
                     "portName": null,
                     "ifIndex": 42074112,
@@ -2129,7 +2129,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/5/1, IP interface, \\IPsec",
+                    "ifDescr": "1/5/1, IP interface, \\\\IPsec",
                     "ifName": "1/5/1",
                     "portName": null,
                     "ifIndex": 44072960,
@@ -2234,7 +2234,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/5/2, IP interface, \\IPsec",
+                    "ifDescr": "1/5/2, IP interface, \\\\IPsec",
                     "ifName": "1/5/2",
                     "portName": null,
                     "ifIndex": 44105728,
@@ -2339,7 +2339,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-ip, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-ip, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-ip",
                     "portName": null,
                     "ifIndex": 46170112,
@@ -2444,7 +2444,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-out-ip, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-out-ip, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-out-ip",
                     "portName": null,
                     "ifIndex": 46202880,
@@ -2549,7 +2549,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-l2, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-l2, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-l2",
                     "portName": null,
                     "ifIndex": 46235648,
@@ -2654,7 +2654,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lns-net, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lns-net, IP interface, \\\\Broadband",
                     "ifName": "1/6/lns-net",
                     "portName": null,
                     "ifIndex": 46268416,
@@ -2759,7 +2759,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lns-esm, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lns-esm, IP interface, \\\\Broadband",
                     "ifName": "1/6/lns-esm",
                     "portName": null,
                     "ifIndex": 46301184,
@@ -2864,7 +2864,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-ds, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-ds, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-ds",
                     "portName": null,
                     "ifIndex": 46333952,
@@ -2969,7 +2969,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lo-gre, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lo-gre, IP interface, \\\\Broadband",
                     "ifName": "1/6/lo-gre",
                     "portName": null,
                     "ifIndex": 46366720,
@@ -3179,7 +3179,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-out-ip, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-out-ip, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-out-ip",
                     "portName": null,
                     "ifIndex": 1493172258,
@@ -3284,7 +3284,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-in-ip, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-in-ip, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-in-ip",
                     "portName": null,
                     "ifIndex": 1509949473,
@@ -3389,7 +3389,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-in-ds, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-in-ds, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-in-ds",
                     "portName": null,
                     "ifIndex": 1509949478,
@@ -4548,7 +4548,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/2/1, 10/100 Ethernet TX, \\LAB_SARH_01",
+                    "ifDescr": "1/2/1, 10/100 Ethernet TX, \\\\LAB_SARH_01",
                     "ifName": "1/2/1",
                     "portName": null,
                     "ifIndex": 37781504,
@@ -5388,7 +5388,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/1, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/1, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/1",
                     "portName": null,
                     "ifIndex": 41975808,
@@ -5493,7 +5493,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/2, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/2, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/2",
                     "portName": null,
                     "ifIndex": 42008576,
@@ -5598,7 +5598,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/3, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/3, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/3",
                     "portName": null,
                     "ifIndex": 42041344,
@@ -5703,7 +5703,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/4/4, IP interface, \\Wireless LAN",
+                    "ifDescr": "1/4/4, IP interface, \\\\Wireless LAN",
                     "ifName": "1/4/4",
                     "portName": null,
                     "ifIndex": 42074112,
@@ -5808,7 +5808,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/5/1, IP interface, \\IPsec",
+                    "ifDescr": "1/5/1, IP interface, \\\\IPsec",
                     "ifName": "1/5/1",
                     "portName": null,
                     "ifIndex": 44072960,
@@ -5913,7 +5913,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/5/2, IP interface, \\IPsec",
+                    "ifDescr": "1/5/2, IP interface, \\\\IPsec",
                     "ifName": "1/5/2",
                     "portName": null,
                     "ifIndex": 44105728,
@@ -6018,7 +6018,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-ip, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-ip, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-ip",
                     "portName": null,
                     "ifIndex": 46170112,
@@ -6123,7 +6123,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-out-ip, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-out-ip, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-out-ip",
                     "portName": null,
                     "ifIndex": 46202880,
@@ -6228,7 +6228,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-l2, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-l2, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-l2",
                     "portName": null,
                     "ifIndex": 46235648,
@@ -6333,7 +6333,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lns-net, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lns-net, IP interface, \\\\Broadband",
                     "ifName": "1/6/lns-net",
                     "portName": null,
                     "ifIndex": 46268416,
@@ -6438,7 +6438,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lns-esm, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lns-esm, IP interface, \\\\Broadband",
                     "ifName": "1/6/lns-esm",
                     "portName": null,
                     "ifIndex": 46301184,
@@ -6543,7 +6543,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/nat-in-ds, IP interface, \\Broadband",
+                    "ifDescr": "1/6/nat-in-ds, IP interface, \\\\Broadband",
                     "ifName": "1/6/nat-in-ds",
                     "portName": null,
                     "ifIndex": 46333952,
@@ -6648,7 +6648,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/6/lo-gre, IP interface, \\Broadband",
+                    "ifDescr": "1/6/lo-gre, IP interface, \\\\Broadband",
                     "ifName": "1/6/lo-gre",
                     "portName": null,
                     "ifIndex": 46366720,
@@ -6858,7 +6858,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-out-ip, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-out-ip, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-out-ip",
                     "portName": null,
                     "ifIndex": 1493172258,
@@ -6963,7 +6963,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-in-ip, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-in-ip, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-in-ip",
                     "portName": null,
                     "ifIndex": 1509949473,
@@ -7068,7 +7068,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "bbg-1.nat-in-ds, IP interface, \\Broadband",
+                    "ifDescr": "bbg-1.nat-in-ds, IP interface, \\\\Broadband",
                     "ifName": "bbg-1.nat-in-ds",
                     "portName": null,
                     "ifIndex": 1509949478,
@@ -7278,7 +7278,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7303,7 +7302,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7328,7 +7326,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7353,7 +7350,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7378,7 +7374,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7403,7 +7398,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7428,7 +7422,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7453,7 +7446,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPdnConnectionState"
                 },
                 {
@@ -7478,7 +7470,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPdnConnectionState"
                 },
                 {
@@ -7503,7 +7494,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPortRegistrationStatus"
                 },
                 {
@@ -7528,7 +7518,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPortRegistrationStatus"
                 },
                 {
@@ -7553,7 +7542,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPortWirelessTechnology"
                 },
                 {
@@ -7578,7 +7566,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellPortWirelessTechnology"
                 },
                 {
@@ -7603,7 +7590,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellSimCardEquipped"
                 },
                 {
@@ -7628,7 +7614,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxCellSimCardEquipped"
                 },
                 {
@@ -7653,7 +7638,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisOverTempState"
                 },
                 {
@@ -7678,7 +7662,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7703,7 +7686,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7728,7 +7710,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7753,7 +7734,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7778,7 +7758,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7803,7 +7782,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7828,7 +7806,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7853,7 +7830,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7878,7 +7854,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7903,7 +7878,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7928,7 +7902,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7953,7 +7926,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7978,7 +7950,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8003,7 +7974,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8028,7 +7998,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8053,7 +8022,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8078,7 +8046,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8103,7 +8070,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8128,7 +8094,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -8327,8 +8292,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8349,8 +8313,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8371,8 +8334,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8393,8 +8355,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8415,8 +8376,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8437,8 +8397,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8459,8 +8418,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8481,8 +8439,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8503,8 +8460,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8525,8 +8481,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]"
                 }
             ]
         },
@@ -8551,8 +8506,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8573,8 +8527,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8595,8 +8548,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8617,8 +8569,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8639,8 +8590,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8661,8 +8611,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8683,8 +8632,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8705,8 +8653,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.35717120\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8727,8 +8674,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35684352\"]"
                 },
                 {
                     "sensor_deleted": 0,
@@ -8749,8 +8695,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]",
-                    "rrd_type": "GAUGE"
+                    "sensor_oids": "[\".1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.35717120\"]"
                 }
             ]
         }

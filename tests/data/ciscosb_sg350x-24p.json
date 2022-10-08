@@ -9313,7 +9313,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9338,7 +9337,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9363,7 +9361,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanState"
                 },
                 {
@@ -9388,7 +9385,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanState"
                 },
                 {
@@ -9413,7 +9409,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonSupplyState"
                 },
                 {
@@ -9438,7 +9433,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9463,7 +9457,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9488,7 +9481,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9513,7 +9505,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9538,7 +9529,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9563,7 +9553,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9588,7 +9577,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9613,7 +9601,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9638,7 +9625,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9663,7 +9649,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9688,7 +9673,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9713,7 +9697,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9738,7 +9721,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9763,7 +9745,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9788,7 +9769,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9813,7 +9793,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9838,7 +9817,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9863,7 +9841,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9888,7 +9865,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9913,7 +9889,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9938,7 +9913,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9963,7 +9937,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -9988,7 +9961,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10013,7 +9985,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10038,7 +10009,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10063,7 +10033,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10088,7 +10057,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10113,7 +10081,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10138,7 +10105,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": "fahrenheit_to_celsius",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -10267,7 +10233,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10292,7 +10257,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10317,7 +10281,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanState"
                 },
                 {
@@ -10342,7 +10305,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanState"
                 },
                 {
@@ -10367,7 +10329,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonSupplyState"
                 },
                 {
@@ -10392,7 +10353,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10417,7 +10377,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10442,7 +10401,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10467,7 +10425,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10492,7 +10449,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10517,7 +10473,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10542,7 +10497,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10567,7 +10521,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10592,7 +10545,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10617,7 +10569,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10642,7 +10593,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10667,7 +10617,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10692,7 +10641,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10717,7 +10665,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10742,7 +10689,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10767,7 +10713,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10792,7 +10737,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10817,7 +10761,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10842,7 +10785,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10867,7 +10809,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10892,7 +10833,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10917,7 +10857,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10942,7 +10881,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10967,7 +10905,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -10992,7 +10929,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -11017,7 +10953,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -11042,7 +10977,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -11067,7 +11001,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "swIfOperSuspendedStatus"
                 },
                 {
@@ -11092,7 +11025,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": "fahrenheit_to_celsius",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

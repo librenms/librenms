@@ -134,7 +134,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\IP interface",
+                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\\\IP interface",
                     "ifName": "PtP-OC-Loopback",
                     "portName": null,
                     "ifIndex": 2,
@@ -449,7 +449,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
+                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
                     "ifName": "1/3/2",
                     "portName": null,
                     "ifIndex": 39911424,
@@ -659,7 +659,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\Temoprary-to-SITEB-7750 1/1/12",
+                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\\\Temoprary-to-SITEB-7750 1/1/12",
                     "ifName": "1/3/4",
                     "portName": null,
                     "ifIndex": 39976960,
@@ -764,7 +764,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
+                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",
                     "portName": null,
                     "ifIndex": 40009728,
@@ -869,7 +869,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
+                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
                     "ifName": "1/3/6",
                     "portName": null,
                     "ifIndex": 40042496,
@@ -974,7 +974,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\to-TEST-CISCO-2911",
+                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\\\to-TEST-CISCO-2911",
                     "ifName": "1/3/7",
                     "portName": null,
                     "ifIndex": 40075264,
@@ -1079,7 +1079,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
+                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\\\SAR: to-SITEA-7750 1/1/8",
                     "ifName": "1/3/8",
                     "portName": null,
                     "ifIndex": 40108032,
@@ -2238,7 +2238,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\IP interface",
+                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\\\IP interface",
                     "ifName": "PtP-OC-Loopback",
                     "portName": null,
                     "ifIndex": 2,
@@ -3393,7 +3393,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "Tam-Noc-GLTAM010-LTE-66010",
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
+                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
                     "ifName": "1/3/2",
                     "portName": null,
                     "ifIndex": 39911424,
@@ -3603,7 +3603,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\Temoprary-to-SITEB-7750 1/1/12",
+                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\\\Temoprary-to-SITEB-7750 1/1/12",
                     "ifName": "1/3/4",
                     "portName": null,
                     "ifIndex": 39976960,
@@ -3708,7 +3708,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-668",
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
+                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",
                     "portName": null,
                     "ifIndex": 40009728,
@@ -3813,7 +3813,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "PakiPlaza-GLAPAKIPLZA-MRBTS-6123",
                     "port_descr_notes": "TEST",
-                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
+                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
                     "ifName": "1/3/6",
                     "portName": null,
                     "ifIndex": 40042496,
@@ -3918,7 +3918,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\to-TEST-CISCO-2911",
+                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\\\to-TEST-CISCO-2911",
                     "ifName": "1/3/7",
                     "portName": null,
                     "ifIndex": 40075264,
@@ -4023,7 +4023,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
+                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\\\SAR: to-SITEA-7750 1/1/8",
                     "ifName": "1/3/8",
                     "portName": null,
                     "ifIndex": 40108032,
@@ -5194,7 +5194,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5219,7 +5218,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5244,7 +5242,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5269,7 +5266,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5294,7 +5290,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5319,7 +5314,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5344,7 +5338,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
@@ -5369,7 +5362,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
@@ -5394,7 +5386,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
@@ -5419,7 +5410,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisOverTempState"
                 },
                 {
@@ -5444,7 +5434,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5469,7 +5458,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5494,7 +5482,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5519,7 +5506,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5544,7 +5530,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5569,7 +5554,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5594,7 +5578,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5619,7 +5602,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5644,7 +5626,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5669,7 +5650,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5694,7 +5674,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5719,7 +5698,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5744,7 +5722,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5769,7 +5746,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5794,7 +5770,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5819,7 +5794,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5844,7 +5818,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5869,7 +5842,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5894,7 +5866,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5919,7 +5890,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5944,7 +5914,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5969,7 +5938,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -5994,7 +5962,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6019,7 +5986,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6044,7 +6010,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6069,7 +6034,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -6345,7 +6309,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6370,7 +6333,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -33.01,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6395,7 +6357,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -8.54,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6420,7 +6381,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.47,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6445,7 +6405,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -30.97,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6470,7 +6429,6 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -7.19,
                     "user_func": "mw_to_dbm",
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6495,7 +6453,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisCriticalLEDState"
                 },
                 {
@@ -6520,7 +6477,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMajorLEDState"
                 },
                 {
@@ -6545,7 +6501,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisMinorLEDState"
                 },
                 {
@@ -6570,7 +6525,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxChassisOverTempState"
                 },
                 {
@@ -6595,7 +6549,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6620,7 +6573,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6645,7 +6597,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6670,7 +6621,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6695,7 +6645,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6720,7 +6669,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6745,7 +6693,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6770,7 +6717,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6795,7 +6741,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6820,7 +6765,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6845,7 +6789,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6870,7 +6813,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6895,7 +6837,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6920,7 +6861,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6945,7 +6885,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6970,7 +6909,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -6995,7 +6933,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7020,7 +6957,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7045,7 +6981,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7070,7 +7005,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7095,7 +7029,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7120,7 +7053,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7145,7 +7077,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": "tmnxHwAlarmState"
                 },
                 {
@@ -7170,7 +7101,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7195,7 +7125,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7220,7 +7149,6 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
