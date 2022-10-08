@@ -9925,6 +9925,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9949,6 +9950,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9973,6 +9975,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9997,6 +10000,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10021,6 +10025,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10045,6 +10050,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10069,6 +10075,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10093,6 +10100,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10117,6 +10125,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10141,6 +10150,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10165,6 +10175,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10189,6 +10200,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10213,6 +10225,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10237,6 +10250,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10261,6 +10275,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10285,6 +10300,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10309,6 +10325,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10333,6 +10350,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10357,6 +10375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
@@ -10385,6 +10404,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.7992342723186,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10409,6 +10429,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.3784680769641,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10433,6 +10454,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.2029961912804,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10457,6 +10479,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.1515463835559,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10481,6 +10504,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.938798902973,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10505,6 +10529,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.8667749501297,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10529,6 +10554,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 3.0243916406986,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10553,6 +10579,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.2192113806255,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10577,6 +10604,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 2.9541314551966,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10601,6 +10629,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.0604970473601,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10625,6 +10654,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 2.9373811778352,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10649,6 +10679,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.0771218404787,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10673,6 +10704,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10697,6 +10729,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10721,6 +10754,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10745,6 +10779,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10769,6 +10804,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10793,6 +10829,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10817,6 +10854,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

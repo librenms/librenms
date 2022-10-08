@@ -3684,6 +3684,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3708,6 +3709,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3732,6 +3734,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3756,6 +3759,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -3856,6 +3860,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3880,6 +3885,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 3,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3904,6 +3910,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3928,6 +3935,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
