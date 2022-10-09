@@ -121,6 +121,10 @@ class OSModulesTest extends DBTestCase
                 . print_r(array_diff($expected, $actual), true)
                 . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
+                . "expected:"
+                . print_r($expected, true)
+                . "actual:"
+                . print_r($actual, true)
             );
 
             if ($module === 'route') {
@@ -141,6 +145,10 @@ class OSModulesTest extends DBTestCase
                 . print_r(array_diff($expected, $actual), true)
                 . $helper->getPollerOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
+                . "expected:"
+                . print_r($expected, true)
+                . "actual:"
+                . print_r($actual, true)
             );
         }
 
