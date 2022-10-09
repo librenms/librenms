@@ -8,6 +8,10 @@ if (! empty($oids)) {
 }
 
 foreach ($oids as $index => $data) {
+    if (! isset($data["LM-SENSORS-MIB::lmFanSensorsValue"]) || ! isset($data["LM-SENSORS-MIB::lmFanSensorsDevice"])) {
+        continue;
+    }
+
     $oid = '.1.3.6.1.4.1.2021.13.16.3.1.3.' . $index;
     $current = $data["LM-SENSORS-MIB::lmFanSensorsValue"];
     $descr = trim(str_ireplace('fan-', '', $data["LM-SENSORS-MIB::lmFanSensorsDevice"]));
