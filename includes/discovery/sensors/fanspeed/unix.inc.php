@@ -1,6 +1,7 @@
 <?php
 
 $oids = snmp_walk($device, 'lmFanSensorsDevice', '-OsqnU', 'LM-SENSORS-MIB');
+dump("fanspeed", $oids);
 d_echo($oids . "\n");
 
 $oids = trim($oids);
