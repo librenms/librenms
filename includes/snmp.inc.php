@@ -413,6 +413,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
+    dump("snmpwalk",$cmd,$data);
 
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
