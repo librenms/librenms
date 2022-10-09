@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "---",
-                    "sysObjectID": ".1.3.6.1.4.1.34652",
-                    "sysDescr": "VS5793 CATV Optical Receiver",
-                    "sysContact": "---",
-                    "version": "3176",
-                    "hardware": "VS5793",
-                    "features": null,
-                    "location": "---",
-                    "os": "volius",
-                    "type": "network",
-                    "serial": "257900320931910",
-                    "icon": "generic.svg"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
