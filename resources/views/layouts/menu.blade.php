@@ -335,16 +335,16 @@
 
                             <li role="presentation" class="divider"></li>
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
-							@if($port_groups->isNotEmpty())
+                            @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
                                 <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
-								<ul class="dropdown-menu scrollable-menu">
-								@foreach($port_groups as $group)
-									<li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                <ul class="dropdown-menu scrollable-menu">
+                                @foreach($port_groups as $group)
+                                    <li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
                                 @endforeach
                                 </ul>
                                 </li>
-							@endif
+                            @endif
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])

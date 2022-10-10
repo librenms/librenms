@@ -2377,7 +2377,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_prev": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
