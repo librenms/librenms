@@ -30179,7 +30179,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ieee8023adLag",
-                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\\\\\Canteen",
+                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\Canteen",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -62523,7 +62523,7 @@
                     "ifDuplex": null,
                     "ifMtu": 0,
                     "ifType": "ieee8023adLag",
-                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\\\\\Canteen",
+                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\Canteen",
                     "ifPhysAddress": "e8e73242e6e1",
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -70856,70 +70856,70 @@
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
-                    "vlan_name": "BB\\\\\\\\D&D + PROD\\\\\\\\rox-lugoj-11",
+                    "vlan_name": "BB\\\\D&D + PROD\\\\rox-lugoj-11",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
-                    "vlan_name": "WB & NB\\\\\\\\PROD\\\\\\\\rox-lugoj-12 & 20",
+                    "vlan_name": "WB & NB\\\\PROD\\\\rox-lugoj-12 & 20",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
-                    "vlan_name": "WB\\\\\\\\ADMIN + PROD\\\\\\\\rox-lugoj-13",
+                    "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-13",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 8,
                     "vlan_domain": 1,
-                    "vlan_name": "WB\\\\\\\\ADMIN + PROD\\\\\\\\rox-lugoj-14",
+                    "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-14",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
-                    "vlan_name": "BB\\\\\\\\PROD + AP\\\\\\\\rox-lugoj-15",
+                    "vlan_name": "BB\\\\PROD + AP\\\\rox-lugoj-15",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
-                    "vlan_name": "BB\\\\\\\\LOGISTICS + PROD\\\\\\\\rox-lugoj-16",
+                    "vlan_name": "BB\\\\LOGISTICS + PROD\\\\rox-lugoj-16",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
-                    "vlan_name": "BB\\\\\\\\SMT\\\\\\\\rox-lugoj-17",
+                    "vlan_name": "BB\\\\SMT\\\\rox-lugoj-17",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
-                    "vlan_name": "BB\\\\\\\\AOI\\\\\\\\rox-lugoj-18",
+                    "vlan_name": "BB\\\\AOI\\\\rox-lugoj-18",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 14,
                     "vlan_domain": 1,
-                    "vlan_name": "NB\\\\\\\\PROD\\\\\\\\rox-lugoj-21",
+                    "vlan_name": "NB\\\\PROD\\\\rox-lugoj-21",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 15,
                     "vlan_domain": 1,
-                    "vlan_name": "NB\\\\\\\\PROD\\\\\\\\rox-lugoj-22",
+                    "vlan_name": "NB\\\\PROD\\\\rox-lugoj-22",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
@@ -70975,49 +70975,49 @@
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-10",
+                    "vlan_name": "VOICE\\\\rox-lugoj-10",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 104,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-11 & 23",
+                    "vlan_name": "VOICE\\\\rox-lugoj-11 & 23",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 106,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-12 & 19",
+                    "vlan_name": "VOICE\\\\rox-lugoj-12 & 19",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 107,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-13",
+                    "vlan_name": "VOICE\\\\rox-lugoj-13",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 108,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-14",
+                    "vlan_name": "VOICE\\\\rox-lugoj-14",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 109,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-15",
+                    "vlan_name": "VOICE\\\\rox-lugoj-15",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 110,
                     "vlan_domain": 1,
-                    "vlan_name": "VOICE\\\\\\\\rox-lugoj-16",
+                    "vlan_name": "VOICE\\\\rox-lugoj-16",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
