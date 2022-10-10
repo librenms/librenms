@@ -22837,33 +22837,5 @@
                 }
             ]
         }
-    },
-    "cisco-pw": {
-        "discovery": {
-            "pseudowires": [
-                {
-                    "peer_ldp_id": 10246,
-                    "cpwVcID": 111111,
-                    "cpwOid": 2147483647,
-                    "pw_type": "ethernet",
-                    "pw_psntype": "mpls",
-                    "pw_local_mtu": 0,
-                    "pw_peer_mtu": 0,
-                    "pw_descr": "l3vpn:VC111111",
-                    "ifIndex": 74
-                },
-                {
-                    "peer_ldp_id": 10246,
-                    "cpwVcID": 123456,
-                    "cpwOid": 2147483647,
-                    "pw_type": "ethernetVPLS",
-                    "pw_psntype": "mpls",
-                    "pw_local_mtu": 0,
-                    "pw_peer_mtu": 0,
-                    "pw_descr": "PBB-EDGE:BD-I-100001",
-                    "ifIndex": null
-                }
-            ]
-        }
     }
 }
