@@ -1905,6 +1905,12 @@ function update_device(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    // Check that the device exists before updating fields
+    if (Device::where('device_id', $device_id)->doesntExist()) {
+        return api_error(404, 'Device does not exist');
+    }
+
     $data = json_decode($request->getContent(), true);
     $bad_fields = ['device_id', 'hostname'];
     if (empty($data['field'])) {
