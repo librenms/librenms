@@ -120,7 +120,7 @@ if ($components[$vars['poolid']]['type'] == 'f5-ltm-pool') {
     $graph_array['id'] = $vars['poolid'];
     require 'includes/html/print-graphrow.inc.php'; ?>
                         </div>
-		    </div>
+            </div>
 
                     <div class="panel panel-default" id="connections">
                         <div class="panel-heading">
