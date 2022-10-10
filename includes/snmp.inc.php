@@ -593,7 +593,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
     if (! (is_array($cache['snmp'][$device['device_id']] ?? null) && array_key_exists($oid, $cache['snmp'][$device['device_id']]))) {
         $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
-        if ($data) {
+        if (! empty($data)) {
             foreach (explode("\n", $data) as $entry) {
                 if (! Str::contains($entry, ' =')) {
                     if (! empty($entry) && isset($index, $r_oid)) {
