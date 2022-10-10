@@ -439,7 +439,7 @@ function snmpwalk_cache_cip($device, $oid, $array = [], $mib = 0)
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OsnQ', $mib);
     $data = trim(external_exec($cmd));
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -497,7 +497,7 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -526,7 +526,7 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -547,7 +547,7 @@ function snmpwalk_cache_long_oid($device, $oid, $noid, $array = [], $mib = null,
 {
     $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -629,7 +629,7 @@ function snmpwalk_cache_double_oid($device, $oid, $array = [], $mib = null, $mib
 {
     $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -651,7 +651,7 @@ function snmpwalk_cache_index($device, $oid, $array = [], $mib = null, $mibdir =
 {
     $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -672,7 +672,7 @@ function snmpwalk_cache_triple_oid($device, $oid, $array = [], $mib = null, $mib
 {
     $data = snmp_walk($device, $oid, '-OQUs', $mib, $mibdir);
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -716,7 +716,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpFlags, $mib, $mibdir);
     $data = rtrim(external_exec($cmd));
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -756,7 +756,7 @@ function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdi
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
     $data = trim(external_exec($cmd));
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
@@ -788,7 +788,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array = [], $mib = 0)
     $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUs', $mib);
     $data = trim(external_exec($cmd));
 
-    if ($data === false) {
+    if (empty($data)) {
         return $array;
     }
 
