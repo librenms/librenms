@@ -19,5 +19,4 @@ class Fortiadc extends Fortinet implements OSPolling
     {
         //
     }
-
 }
