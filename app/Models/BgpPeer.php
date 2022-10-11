@@ -49,6 +49,7 @@ class BgpPeer extends DeviceRelatedModel
         'bgpPeerOutTotalMessages',
         'bgpPeerFsmEstablishedTime',
         'bgpPeerInUpdateElapsedTime',
+        'bgpPeerDescr',
         'astext',
     ];
     // ---- Query scopes ----
