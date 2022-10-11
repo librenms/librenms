@@ -232,7 +232,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
 
     var ver_date = $('#version_date');
     if (ver_date.text()) {
-        ver_date.text(' - '.concat(moment.unix(ver_date.text()))).show();
+        ver_date.text(' - '.concat(moment(ver_date.text()))).show();
     }
 </script>
 @endsection
