@@ -46,7 +46,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     private $laravelErrorHandler;
     /** @var bool */
     private $reportingEnabled;
-    /** @var string */
+    /** @var string|null */
     private static $instanceId;
 
     public function boot(): void
