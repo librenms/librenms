@@ -69,7 +69,7 @@ if (Config::get('enable_bgp')) {
             }
 
             $bgpPeers[$vrfInstance][$address] = $value;
-            $bgpPeers[$vrfInstance][$address]['vrf_id'] = ! empty($map_vrf['byName'][$vrfInstance]['vrf_id']) ? $map_vrf['byName'][$vrfInstance]['vrf_id'] : null;
+            $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'] ?? null;
             $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
             $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
             $bgpPeers[$vrfInstance][$address]['typePeer'] = $oid[3];
