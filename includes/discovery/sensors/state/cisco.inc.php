@@ -215,7 +215,7 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'];
                     $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
                 }
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);

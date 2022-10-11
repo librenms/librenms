@@ -2863,7 +2863,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 0 on slx-8ms-1 ",
+                    "port_descr_type": "port 0 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2968,7 +2968,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 1 on slx-8ms-1 ",
+                    "port_descr_type": "port 1 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3073,7 +3073,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 2 on slx-8ms-1 ",
+                    "port_descr_type": "port 2 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3178,7 +3178,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 3 on slx-8ms-1 ",
+                    "port_descr_type": "port 3 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3283,7 +3283,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 4 on slx-8ms-1 ",
+                    "port_descr_type": "port 4 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3388,7 +3388,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 5 on slx-8ms-1 ",
+                    "port_descr_type": "port 5 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3493,7 +3493,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 6 on slx-8ms-1 ",
+                    "port_descr_type": "port 6 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3598,7 +3598,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 7 on slx-8ms-1 ",
+                    "port_descr_type": "port 7 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3703,7 +3703,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "port 8 on slx-8ms-1 ",
+                    "port_descr_type": "port 8 on slx-8ms-1",
                     "port_descr_descr": "VLAN 99",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
