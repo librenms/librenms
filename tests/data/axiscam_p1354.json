@@ -8,7 +8,7 @@
                     "sysDescr": "; AXIS P1354; Network Camera; 5.90.1.2; Jun 20 2016 13:04; 1BB.2; 1;",
                     "sysContact": null,
                     "version": "5.90.1.2",
-                    "hardware": " AXIS P1354",
+                    "hardware": "AXIS P1354",
                     "features": null,
                     "location": null,
                     "os": "axiscam",

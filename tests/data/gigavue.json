@@ -3493,7 +3493,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port  5 ",
+                    "port_descr_type": "gigavue-2404 port  5",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -3808,7 +3808,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port  8 ",
+                    "port_descr_type": "gigavue-2404 port  8",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4333,7 +4333,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 13 ",
+                    "port_descr_type": "gigavue-2404 port 13",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4438,7 +4438,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 14 ",
+                    "port_descr_type": "gigavue-2404 port 14",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -4963,7 +4963,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 19 ",
+                    "port_descr_type": "gigavue-2404 port 19",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5068,7 +5068,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 20 ",
+                    "port_descr_type": "gigavue-2404 port 20",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5173,7 +5173,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 21 ",
+                    "port_descr_type": "gigavue-2404 port 21",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5278,7 +5278,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 22 ",
+                    "port_descr_type": "gigavue-2404 port 22",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5383,7 +5383,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 23 ",
+                    "port_descr_type": "gigavue-2404 port 23",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5488,7 +5488,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port 24 ",
+                    "port_descr_type": "gigavue-2404 port 24",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5593,7 +5593,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port g1 ",
+                    "port_descr_type": "gigavue-2404 port g1",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -5698,7 +5698,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "gigavue-2404 port g2 ",
+                    "port_descr_type": "gigavue-2404 port g2",
                     "port_descr_descr": "Network Port",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

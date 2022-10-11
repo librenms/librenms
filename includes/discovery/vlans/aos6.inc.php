@@ -34,7 +34,7 @@ foreach ($vlans as $vlan_id => $vlan) {
 
 $vlanstype = snmpwalk_group($device, 'vpaType', 'ALCATEL-IND1-VLAN-MGR-MIB', 0, [], 'nokia');
 
-foreach ($vlanstype['vpaType'] as $vlan_id => $data) {
+foreach ($vlanstype['vpaType'] ?? [] as $vlan_id => $data) {
     foreach ($data as $portidx => $porttype) {
         $per_vlan_data[$vlan_id][$portidx]['untagged'] = ($porttype == 1 ? 1 : 0);
     }

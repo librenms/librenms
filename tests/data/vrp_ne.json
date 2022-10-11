@@ -6433,7 +6433,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "brat-pe1-six ",
+                    "port_descr_type": "brat-pe1-six",
                     "port_descr_descr": "80G",
                     "port_descr_circuit": null,
                     "port_descr_speed": "80G",
@@ -6538,7 +6538,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "brat-pe1-six ",
+                    "port_descr_type": "brat-pe1-six",
                     "port_descr_descr": "IPv4_VRF",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -6643,7 +6643,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "brat-pe1-six ",
+                    "port_descr_type": "brat-pe1-six",
                     "port_descr_descr": "20G",
                     "port_descr_circuit": null,
                     "port_descr_speed": "20G",

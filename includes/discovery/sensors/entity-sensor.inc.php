@@ -216,6 +216,7 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
+                $descr = trim($descr);
                 discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
             }
         }//end if

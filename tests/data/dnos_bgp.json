@@ -22603,7 +22603,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff18 eth4 ",
+                    "port_descr_type": "xyzserverff18 eth4",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -22708,7 +22708,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff19 eth4 ",
+                    "port_descr_type": "xyzserverff19 eth4",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23128,7 +23128,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff22 eth2 ",
+                    "port_descr_type": "xyzserverff22 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23233,7 +23233,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff23 eth2 ",
+                    "port_descr_type": "xyzserverff23 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23548,7 +23548,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff20 eth2 ",
+                    "port_descr_type": "xyzserverff20 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23653,7 +23653,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff21 eth2 ",
+                    "port_descr_type": "xyzserverff21 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23863,7 +23863,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 idrac ",
+                    "port_descr_type": "xyzserverff24 idrac",
                     "port_descr_descr": "actually eth0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23968,7 +23968,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 eth2 ",
+                    "port_descr_type": "xyzserverff24 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -24388,7 +24388,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vodafone ",
+                    "port_descr_type": "vodafone",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,
@@ -28063,7 +28063,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff18 eth5 ",
+                    "port_descr_type": "xyzserverff18 eth5",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28168,7 +28168,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff19 eth5 ",
+                    "port_descr_type": "xyzserverff19 eth5",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28588,7 +28588,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff22 eth3 ",
+                    "port_descr_type": "xyzserverff22 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28693,7 +28693,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff23 eth3 ",
+                    "port_descr_type": "xyzserverff23 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29008,7 +29008,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff20 eth3 ",
+                    "port_descr_type": "xyzserverff20 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29113,7 +29113,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff21 eth3 ",
+                    "port_descr_type": "xyzserverff21 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29323,7 +29323,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 idrac standby ",
+                    "port_descr_type": "xyzserverff24 idrac standby",
                     "port_descr_descr": "actually eth0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29428,7 +29428,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 eth3 ",
+                    "port_descr_type": "xyzserverff24 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29638,7 +29638,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vocus ",
+                    "port_descr_type": "vocus",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,
@@ -29848,7 +29848,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vodafone ",
+                    "port_descr_type": "vodafone",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,

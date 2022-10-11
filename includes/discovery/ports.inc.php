@@ -92,7 +92,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
 
     if (is_port_valid($snmp_data, $device)) {
-        port_fill_missing($snmp_data, $device);
+        port_fill_missing_and_trim($snmp_data, $device);
 
         // Port newly discovered?
         if (! is_array($ports_db[$port_id])) {

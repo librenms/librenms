@@ -183,7 +183,7 @@ class Arubaos extends OS implements
                 $oid,
                 'arubaos-iap',
                 $oid,
-                sprintf($desc, $index),
+                trim(sprintf($desc, $index)),
                 $value
             );
         }
