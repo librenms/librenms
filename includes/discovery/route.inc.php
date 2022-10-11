@@ -39,6 +39,8 @@ $create_row = [];
 $update_row = [];
 $delete_row = [];
 
+$mixed = [];
+
 //store timestamp so all update / creation will be synced on same timestamp
 $update_timestamp = dbFetchRows('select now() as now')[0]['now'];
 
@@ -189,8 +191,7 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     unset($entryClean);
                     $entryClean['inetCidrRouteDestType'] = 'ipv4';
                     $entryClean['inetCidrRouteDest'] = $inetCidrRouteDest;
-                    $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['IP-FORWARD-MIB::ipCidrRouteMask']); //CONVERT
-                    $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
+                    $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['IP-FORWARD-MIB::ipCidrRouteMask']); //CONVERT
                     $entryClean['inetCidrRoutePolicy'] = $entry['IP-FORWARD-MIB::ipCidrRouteInfo'];
                     $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
                     $entryClean['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
@@ -225,15 +226,17 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
 $mib = 'MPLS-L3VPN-STD-MIB';
 $oid = 'mplsL3VpnVrfPerfCurrNumRoutes';
 $mpls_vpn_route_nb = snmpwalk_group($device, $oid, $mib, 6, []);
+$mpls_skip = false;
 
 foreach ($mpls_vpn_route_nb as $vpnId => $route_nb) {
     if ($route_nb['mplsL3VpnVrfPerfCurrNumRoutes'] > $max_routes) {
         echo "Skipping all MPLS routes because vpn instance $vpnId has more than $max_routes routes.";
-        $mpls_skip = 1;
+        $mpls_skip = true;
+        break;
     }
 }
 
-if ($mpls_skip != 1) {
+if ($mpls_skip == false) {
     echo 'mplsL3VpnVrfRteTable ';
     // We can discover the routes;
     $oid = 'mplsL3VpnVrfRteTable';
