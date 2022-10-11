@@ -48,36 +48,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "temperature",
-                    "poller_type": "snmp",
-                    "sensor_oid": "",
-                    "sensor_index": "01",
-                    "sensor_type": "avaya-ers",
-                    "sensor_descr": "Unit 1 temperature",
-                    "group": null,
-                    "sensor_divisor": 2,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 20,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": -10,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": null
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
