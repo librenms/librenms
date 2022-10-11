@@ -916,11 +916,6 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFilter.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderParser.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alerting\\\\QueryBuilderParser\\:\\:\\$builder has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php

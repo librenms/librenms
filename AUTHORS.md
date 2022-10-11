@@ -146,7 +146,7 @@ LibreNMS contributors:
 - Joseph Eames <j.eames@outlook.com> (j-ems)
 - Eric Conroy <eric@conroy.co> (NetworkNub)
 - Timothy Willey <developer@timothywilley.net> (twilley)
-- Jon Ward	<librenms@yonzb.net> (yon2004)
+- Jon Ward  <librenms@yonzb.net> (yon2004)
 - Ian Viemeister <github@ian.viemeister.com> (iviemeister)
 - Thane Gill <me@thanegill.com> (thanegill)
 - Christoffer Stokbæk <christoffers@easyspeedy.com> (stokbaek)
