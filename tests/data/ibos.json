@@ -7,7 +7,7 @@
                     "sysObjectID": ".1.3.6.1.4.1.9303.1.5.64",
                     "sysDescr": "MS4026-AC, iBOS Version ibos-ms4k-7.1.2-ED-R  Copyright (c) 2001-2018 by Waystream AB Compiled Thu Aug 30 22:12:28 CST 2018 by builder",
                     "sysContact": "<private>",
-                    "version": "7.1.2-ED-R ",
+                    "version": "7.1.2-ED-R",
                     "hardware": "MS4026-AC",
                     "features": null,
                     "location": "<private>",
@@ -14815,5 +14815,31 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "0008ae936d40",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "688",
+                    "topChanges": 3743,
+                    "designatedRoot": "641225ea92c0",
+                    "rootCost": 8000,
+                    "rootPort": 25,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 2,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

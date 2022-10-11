@@ -14,7 +14,7 @@ modules:
                     oid: whL1
                     num_oid: .1.3.6.1.4.1.34278.4.1.{{ $index }}
                     index: whL1.{{ $index }}
-                    descr: 'L1'	    
+                    descr: 'L1'
                 -
                     oid: whL2
                     num_oid: .1.3.6.1.4.1.34278.4.2.{{ $index }}
@@ -35,7 +35,7 @@ modules:
                     num_oid: .1.3.6.1.4.1.34278.5.1.{{ $index }}
                     index: wh3.{{ $index }}
                     group: 'Sum'
-                    descr: 'L1-L3'		    
+                    descr: 'L1-L3'
                 -
                     oid: qh3
                     num_oid: .1.3.6.1.4.1.34278.5.2.{{ $index }}

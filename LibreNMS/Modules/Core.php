@@ -198,19 +198,19 @@ class Core implements Module
             }
 
             if ($key == 'sysObjectID') {
-                if (Str::startsWith($device['sysObjectID'], $value) == $check) {
+                if (Str::startsWith($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr') {
-                if (Str::contains($device['sysDescr'], $value) == $check) {
+                if (Str::contains($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr_regex') {
-                if (preg_match_any($device['sysDescr'], $value) == $check) {
+                if (preg_match_any($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysObjectID_regex') {
-                if (preg_match_any($device['sysObjectID'], $value) == $check) {
+                if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpget') {

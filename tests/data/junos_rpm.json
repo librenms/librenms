@@ -8848,7 +8848,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #2 ",
+                    "port_descr_type": "vlan #2",
                     "port_descr_descr": "Servers",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8953,7 +8953,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #5 ",
+                    "port_descr_type": "vlan #5",
                     "port_descr_descr": "VoIP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9058,7 +9058,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #10 ",
+                    "port_descr_type": "vlan #10",
                     "port_descr_descr": "LAN",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9163,7 +9163,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #112 ",
+                    "port_descr_type": "vlan #112",
                     "port_descr_descr": "PELNET Co-Lo",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

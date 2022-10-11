@@ -663,7 +663,7 @@ foreach ($ports as $port) {
         echo 'VLAN = ' . ($this_port['ifVlan'] ?? '?') . ' ';
 
         // attempt to fill missing fields
-        port_fill_missing($this_port, $device);
+        port_fill_missing_and_trim($this_port, $device);
 
         // Update IF-MIB data
         $tune_port = false;

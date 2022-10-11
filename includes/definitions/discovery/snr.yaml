@@ -43,7 +43,7 @@ modules:
                 -
                     oid: sysFanSpeed
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.4.{{ $index }}'
-                    descr: 'Fan {{ $index }} speed '
+                    descr: 'Fan {{ $index }} speed'
                     states:
                         - { value: 0, generic: 3, graph: 0, descr: none }
                         - { value: 1, generic: 0, graph: 0, descr: low }

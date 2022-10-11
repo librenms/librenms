@@ -8953,7 +8953,7 @@
         "poller": {
             "ports": [
                 {
-                    "port_descr_type": "ieee 802.11abgn wireless lan ",
+                    "port_descr_type": "ieee 802.11abgn wireless lan",
                     "port_descr_descr": "Atheros AR9160/AR9106",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

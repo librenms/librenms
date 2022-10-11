@@ -553,7 +553,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "main ",
+                    "port_descr_type": "main",
                     "port_descr_descr": "psu",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

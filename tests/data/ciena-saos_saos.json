@@ -8,7 +8,7 @@
                     "sysDescr": "6500 7-SLOT OPTICAL SW:1280 BN:BP (c) Ciena (R) Corporation",
                     "sysContact": "<private>",
                     "version": "1280",
-                    "hardware": "6500 7-SLOT OPTICAL ",
+                    "hardware": "6500 7-SLOT OPTICAL",
                     "features": null,
                     "location": "<private>",
                     "os": "ciena-saos",

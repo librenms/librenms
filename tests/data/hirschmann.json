@@ -4867,5 +4867,131 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "ece5554071d6",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "6313403",
+                    "topChanges": 1,
+                    "designatedRoot": "ece5554071d6",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 10,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 10,
+                    "forwardTransitions": 0,
+                    "ifIndex": 10
+                },
+                {
+                    "vlan": null,
+                    "port_index": 13,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 13,
+                    "forwardTransitions": 0,
+                    "ifIndex": 13
+                },
+                {
+                    "vlan": null,
+                    "port_index": 14,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 14,
+                    "forwardTransitions": 0,
+                    "ifIndex": 14
+                },
+                {
+                    "vlan": null,
+                    "port_index": 15,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 15,
+                    "forwardTransitions": 0,
+                    "ifIndex": 15
+                },
+                {
+                    "vlan": null,
+                    "port_index": 16,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 16,
+                    "forwardTransitions": 0,
+                    "ifIndex": 16
+                },
+                {
+                    "vlan": null,
+                    "port_index": 17,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 17,
+                    "forwardTransitions": 0,
+                    "ifIndex": 17
+                },
+                {
+                    "vlan": null,
+                    "port_index": 18,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 18,
+                    "forwardTransitions": 0,
+                    "ifIndex": 18
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

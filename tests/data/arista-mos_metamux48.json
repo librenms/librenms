@@ -13048,7 +13048,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "mellanox technologies mt27520 family ",
+                    "port_descr_type": "mellanox technologies mt27520 family",
                     "port_descr_descr": "ConnectX-3 Pro",
                     "port_descr_circuit": null,
                     "port_descr_speed": "ConnectX-3 Pro",
@@ -13153,7 +13153,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "mellanox technologies mt27520 family ",
+                    "port_descr_type": "mellanox technologies mt27520 family",
                     "port_descr_descr": "ConnectX-3 Pro",
                     "port_descr_circuit": null,
                     "port_descr_speed": "ConnectX-3 Pro",
@@ -15883,7 +15883,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "cme glk-2036 ",
+                    "port_descr_type": "cme glk-2036",
                     "port_descr_descr": "A-Feed",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

@@ -1813,7 +1813,7 @@
         "poller": {
             "ports": [
                 {
-                    "port_descr_type": "x0 ",
+                    "port_descr_type": "x0",
                     "port_descr_descr": "LAN",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -1918,7 +1918,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x1 ",
+                    "port_descr_type": "x1",
                     "port_descr_descr": "WAN",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2023,7 +2023,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x2 ",
+                    "port_descr_type": "x2",
                     "port_descr_descr": "DMZ",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2128,7 +2128,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x3 ",
+                    "port_descr_type": "x3",
                     "port_descr_descr": "M365DMZ",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2233,7 +2233,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x4 ",
+                    "port_descr_type": "x4",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2338,7 +2338,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x5 ",
+                    "port_descr_type": "x5",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2443,7 +2443,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x6 ",
+                    "port_descr_type": "x6",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2548,7 +2548,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x7 ",
+                    "port_descr_type": "x7",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2653,7 +2653,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x8 ",
+                    "port_descr_type": "x8",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2758,7 +2758,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "x9 ",
+                    "port_descr_type": "x9",
                     "port_descr_descr": "Unassigned",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -2863,7 +2863,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "u0 ",
+                    "port_descr_type": "u0",
                     "port_descr_descr": "WAN",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

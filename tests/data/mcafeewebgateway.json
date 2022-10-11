@@ -1183,7 +1183,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "intel corporation 82545em gigabit ethernet controller ",
+                    "port_descr_type": "intel corporation 82545em gigabit ethernet controller",
                     "port_descr_descr": "Copper",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
