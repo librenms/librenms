@@ -405,8 +405,8 @@ class Cisco extends OS implements
                     'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
                     'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
                     'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'],
-                    'authc_status' => $session_info['authc_status'],
-                    'method' => $session_info['method'],
+                    'authc_status' => $session_info['authc_status'] ?? '',
+                    'method' => $session_info['method'] ?? '',
                 ]));
             }
         }
