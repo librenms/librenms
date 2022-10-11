@@ -98,7 +98,7 @@
         ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` where (`sensors`.`sensor_current` > sensors.sensor_limit)", []]
     ],
     [
-        "%devices.hostname ~ \"@ocal@\"",
+        "%devices.hostname ~ \"@ocal@\" ",
         {"condition":"AND","rules":[{"id":"devices.hostname","field":"devices.hostname","type":"string","input":"text","operator":"regex","value":".*ocal.*"}],"valid":true},
         "devices.hostname REGEXP \".*ocal.*\"",
         "SELECT * FROM devices WHERE (devices.device_id = ?) AND devices.hostname REGEXP \".*ocal.*\"",
