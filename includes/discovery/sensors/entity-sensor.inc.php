@@ -148,7 +148,7 @@ if (! empty($entity_oids)) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if ($entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
                 $valid_sensor = false;
             }
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
