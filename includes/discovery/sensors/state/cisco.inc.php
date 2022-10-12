@@ -42,8 +42,8 @@ foreach ($tables as $tablevalue) {
     $temp = snmpwalk_cache_multi_oid($device, $tablevalue['oid'], [], $tablevalue['mib']);
     $cur_oid = $tablevalue['num_oid'];
 
-    if (is_array($temp) && isset($temp[0])) {
-        if ($temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+    if (is_array($temp)) {
+        if (isset($temp[0]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
             break;
         }
 
