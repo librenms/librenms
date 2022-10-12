@@ -1907,7 +1907,7 @@ function update_device(Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     // Check that the device exists before updating fields
-    if (Device::where('device_id', $device_id)->doesntExist()) {
+    if (! DeviceCache::get($device_id)->exists) {
         return api_error(404, 'Device does not exist');
     }
 
