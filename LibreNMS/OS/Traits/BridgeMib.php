@@ -66,7 +66,7 @@ trait BridgeMib
         if (empty($stp)) {
             return new Collection;
         }
-        
+
         $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
         $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$bridge} DR: {$drBridge}");
