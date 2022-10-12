@@ -237,7 +237,11 @@ class Cisco extends OS implements
             }
 
             if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? "Processor $index";
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
+            }
+
+            if (empty($descr)) {
+                $descr = "Processor $index";
             }
 
             if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
