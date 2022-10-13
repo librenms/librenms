@@ -506,7 +506,7 @@ foreach ($port_stats as $ifIndex => $port) {
             dbUpdate(['deleted' => '0'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '0';
         }
-        if ($ports[$port_id]['ports_statistics_port_id'] === null) {
+        if (! isset($ports[$port_id]['ports_statistics_port_id'])) {
             // in case the port was created before we created the table
             dbInsert(['port_id' => $port_id], 'ports_statistics');
         }
@@ -591,8 +591,8 @@ foreach ($ports as $port) {
 
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            [$a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($a_a) . zeropad($a_b) . zeropad($a_c) . zeropad($a_d) . zeropad($a_e) . zeropad($a_f);
+            $mac_split = explode(':', $this_port['ifPhysAddress']);
+            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4]) . zeropad($mac_split[5] ?? '');
         }
 
         // use HC values if they are available
@@ -779,7 +779,7 @@ foreach ($ports as $port) {
                 }
 
                 $port[$port_update][$oid] = set_numeric($this_port[$oid] ?? 0);
-                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
+                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid] ?? null);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
