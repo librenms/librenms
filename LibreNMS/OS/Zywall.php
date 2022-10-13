@@ -39,8 +39,7 @@ class Zywall extends Zyxel implements OSDiscovery, OSPolling
 
         $device->hardware = $device->hardware ?: $device->sysDescr;
         // ZYXEL-ES-COMMON::sysSwVersionString.0
-        $pos = strpos($device->version, 'ITS');
-        if ($pos) {
+        if ($device->version && ($pos = strpos($device->version, 'ITS'))) {
             $device->version = substr($device->version, 0, $pos);
         }
     }
