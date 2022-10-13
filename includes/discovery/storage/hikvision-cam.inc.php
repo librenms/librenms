@@ -24,8 +24,13 @@
 if ($device['os'] === 'hikvision-cam') {
     echo 'hikvision-cam:';
 
-    $size = snmp_get($device, 'diskSize.0', '-Ovq', 'HIK-DEVICE-MIB');
-    $used = snmp_get($device, 'diskPercent.0', '-Ovq', 'HIK-DEVICE-MIB');
+    $size = (float) snmp_get($device, 'diskSize.0', '-Ovq', 'HIK-DEVICE-MIB');
+    $used = (float) snmp_get($device, 'diskPercent.0', '-Ovq', 'HIK-DEVICE-MIB');
+
+    if (empty($size) && empty($used)) {
+        return;
+    }
+
     $index = 0;
     $fstype = 'hikvision-cam';
     $mib = 'HIK-DEVICE-MIB';
