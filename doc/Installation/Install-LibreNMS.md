@@ -261,7 +261,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
           try_files $uri $uri/ /index.php?$query_string;
          }
          location ~ [^/]\.php(/|$) {
-          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_pass unix:/run/php/php-fpm-librenms.sock;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
           include fastcgi.conf;
          }
