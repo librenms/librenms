@@ -909,10 +909,10 @@ pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
 ### SNMP Extend
 
 1. Copy the [memcached
-   script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached)
+   script](https://github.com/librenms/librenms-agent/blob/master/snmp/memcached)
    to `/etc/snmp/` on your remote server.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/memcached -O /etc/snmp/memcached
 ```
 
 2. Make the script executable:
