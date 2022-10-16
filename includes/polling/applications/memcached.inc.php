@@ -1,20 +1,25 @@
 <?php
 
+use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'memcached';
 
 if (! empty($agent_data['app']['memcached'])) {
-    $data = $agent_data['app']['memcached'][$app['app_instance']];
+    $data = $agent_data['app']['memcached'];
 } else {
-    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.109.101.109.99.97.99.104.101.100';
-    $result = snmp_get($device, $oid, '-Oqv');
-    $data = trim($result, '"');
-    $data = unserialize(stripslashes(str_replace("<<<app-memcached>>>\n", '', $data)));
-    $data = reset($data);
-}
+    try {
+        $data = json_app_get($device, $name, '1.1')['data'];
+        $data = $data['data'][$app->app_instance] ?? reset($data['data']);
+    } catch (JsonAppException $e) {
+        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+        update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
-echo ' memcached(' . $app['app_instance'] . ')';
+        return;
+    }
+}
+echo ' memcached(' . $app->app_instance . ')';
+$data = $data[$app->app_instance] ?? reset($data);  // specified instance or just the first one
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
