@@ -88,5 +88,10 @@
     <description>Adsl statistics are now discovered and polled in a new module. Vdsl stats were also added. `lnms config:set enable_ports_adsl true`is not supported anymore. See https://github.com/librenms/librenms/pull/14207 for more information.</description>
     <pubDate>Wed, 7 Sept 2022 18:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Memcached application compatibility break</title>
+    <description>Due to a security vulnerability, you must upgrade your memcached application scripts to the latest version. (1.1)</description>
+    <pubDate>Fri, 10 Oct 2022 18:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>
