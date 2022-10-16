@@ -259,8 +259,7 @@ if (! Auth::user()->hasGlobalRead()) {
         } catch (InvalidIpException $e) {
             $local_addr = $peer['bgpLocalAddr'];
         }
-
-
+        
         try {
             $peer_addr = new IPv6($peer['bgpPeerRemoteAddr'] != '0.0.0.0' ? $peer['bgpPeerRemoteAddr'] : $peer['bgpPeerIdentifier']);
         } catch (InvalidIpException $e) {
