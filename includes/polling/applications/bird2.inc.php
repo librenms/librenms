@@ -190,9 +190,3 @@ echo PHP_EOL;
 
 // Clean up any bgpPeers that arent on the list for this device
 BgpPeer::where('device_id', $device['device_id'])->whereNotIn('bgpPeer_id', $bgpPeerIds)->delete();
-
-
-
-
-
-
