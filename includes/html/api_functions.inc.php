@@ -1165,7 +1165,16 @@ function list_alert_rules(Illuminate\Http\Request $request)
         $param = [$id];
     }
 
-    $rules = dbFetchRows("SELECT `a`.*, GROUP_CONCAT(DISTINCT `d`.`device_id`) AS `devices`, GROUP_CONCAT(DISTINCT `g`.`group_id`) AS `groups`, GROUP_CONCAT(DISTINCT `l`.`location_id`) AS `locations` FROM `alert_rules` AS `a` LEFT JOIN `alert_device_map` AS `d` ON `a`.`id`=`d`.`rule_id` LEFT JOIN `alert_group_map` AS `g` ON `a`.`id`=`g`.`rule_id` LEFT JOIN `alert_location_map` AS `l` ON `a`.`id`=`l`.`rule_id` $sql GROUP BY `a`.`id`", $param);
+    $rules = dbFetchRows("SELECT `a`.*, 
+        GROUP_CONCAT(DISTINCT `d`.`device_id`) AS `devices`,
+        GROUP_CONCAT(DISTINCT `g`.`group_id`) AS `groups`,
+        GROUP_CONCAT(DISTINCT `l`.`location_id`) AS `locations`
+        FROM `alert_rules`
+        AS `a` LEFT JOIN `alert_device_map`
+        AS `d` ON `a`.`id`=`d`.`rule_id` LEFT JOIN `alert_group_map`
+        AS `g` ON `a`.`id`=`g`.`rule_id` LEFT JOIN `alert_location_map`
+        AS `l` ON `a`.`id`=`l`.`rule_id` $sql
+        GROUP BY `a`.`id`", $param);
 
     $i = 0;
     foreach ($rules as $rule) {
