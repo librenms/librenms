@@ -343,7 +343,7 @@
         "poller": {
             "ports": [
                 {
-                    "port_descr_type": "lan port ",
+                    "port_descr_type": "lan port",
                     "port_descr_descr": "eth0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -448,7 +448,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "wan port ",
+                    "port_descr_type": "wan port",
                     "port_descr_descr": "eth1",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

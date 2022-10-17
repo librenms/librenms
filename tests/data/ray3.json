@@ -343,7 +343,7 @@
         "poller": {
             "ports": [
                 {
-                    "port_descr_type": "eth1 ",
+                    "port_descr_type": "eth1",
                     "port_descr_descr": "p1",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -448,7 +448,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "eth2 ",
+                    "port_descr_type": "eth2",
                     "port_descr_descr": "p10",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -553,7 +553,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "air ",
+                    "port_descr_type": "air",
                     "port_descr_descr": "p9",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

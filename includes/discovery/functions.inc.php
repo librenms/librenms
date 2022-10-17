@@ -920,10 +920,10 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode('.', unpack('c*', $index)), $oid);
 
                     // process the description
-                    $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
+                    $descr = trim(YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));
 
                     // process the group
-                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
+                    $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
                     $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
                     $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);

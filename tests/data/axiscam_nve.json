@@ -8,7 +8,7 @@
                     "sysDescr": "; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;",
                     "sysContact": null,
                     "version": "5.75.1",
-                    "hardware": " AXIS M7011",
+                    "hardware": "AXIS M7011",
                     "features": null,
                     "location": null,
                     "os": "axiscam",

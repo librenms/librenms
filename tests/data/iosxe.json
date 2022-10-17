@@ -6856,7 +6856,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 5,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 },
                 {
@@ -6886,7 +6886,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 1,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 }
             ],
@@ -6907,7 +6907,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "true",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -6922,7 +6922,7 @@
                     "ospfAreaLsaCksumSum": 23452697,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -6940,7 +6940,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "port_id": null,
@@ -6956,7 +6956,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }
