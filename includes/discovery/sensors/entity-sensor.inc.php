@@ -53,7 +53,7 @@ if (! empty($entity_oids)) {
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
-        if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
+        if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
             $current = $entry['entPhySensorValue'];
@@ -144,11 +144,11 @@ if (! empty($entity_oids)) {
                     $valid_sensor = false;
                 }
             }
-            if ($current == '-127' || ($device['os'] == 'asa' && Str::endsWith($device['hardware'], 'sc'))) {
+            if ($current == '-127' || ($device['os'] == 'asa' && is_string($device['hardware']) && Str::endsWith($device['hardware'], 'sc'))) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if ($entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
                 $valid_sensor = false;
             }
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {

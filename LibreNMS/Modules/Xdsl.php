@@ -136,7 +136,7 @@ class Xdsl implements Module
 
             // trim SnmpAdminStrings
             foreach ($this->trimAdminString as $oid) {
-                $portAdsl->$oid = rtrim($portAdsl->$oid, '.');
+                $portAdsl->$oid = rtrim($portAdsl->$oid ?? '', '.');
             }
 
             $portAdsl->port_id = $os->ifIndexToId($ifIndex);

@@ -237,14 +237,14 @@ class Cisco extends OS implements
             }
 
             if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']];
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
                 $descr = "Processor $index";
             }
 
-            if (is_array($entry['cpmCore5min'])) {
+            if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
                 // This CPU has data per individual core
                 foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
                     $processors[] = Processor::discover(

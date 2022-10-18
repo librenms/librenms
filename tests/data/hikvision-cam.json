@@ -64,25 +64,5 @@
             ]
         },
         "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": [
-                {
-                    "storage_mib": "HIK-DEVICE-MIB",
-                    "storage_index": "0",
-                    "storage_type": "hikvision-cam",
-                    "storage_descr": "Storage",
-                    "storage_size": 0,
-                    "storage_units": 0,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
