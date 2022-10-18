@@ -30,18 +30,10 @@ use LibreNMS\Util\Proxy;
 
 class BaseApi
 {
-    /** @var ?string */
     protected ?string $base_uri;
-    /** @var int */
     protected int $timeout = 3;
-    /** @var ?\Illuminate\Http\Client\PendingRequest */
     private ?\Illuminate\Http\Client\PendingRequest $client;
 
-    /**
-     * Create a new http request.
-     *
-     * @return \Illuminate\Http\Client\PendingRequest
-     */
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
         if (is_null($this->client)) {
