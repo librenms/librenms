@@ -158,7 +158,9 @@ class IRCBot
     private function init()
     {
         if ($this->config['irc_alert']) {
-            $this->connectAlert();
+            if (!$this->connectAlert()) {
+                sleep(5);
+                return false;
         }
 
         $this->last_activity = time();
@@ -205,7 +207,7 @@ class IRCBot
 
             usleep($this->tick);
         }
-
+        sleep(10);
         return $this->init();
     }
 
