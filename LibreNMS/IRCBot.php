@@ -161,6 +161,7 @@ class IRCBot
             if (!$this->connectAlert()) {
                 sleep(5);
                 return false;
+            }
         }
 
         $this->last_activity = time();
