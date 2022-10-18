@@ -37,7 +37,7 @@ class BaseApi
     /** @var \Illuminate\Http\Client\PendingRequest */
     private \Illuminate\Http\Client\PendingRequest $client;
 
-     /**
+    /**
      * Create a new http request.
      *
      * @return \Illuminate\Http\Client\PendingRequest
