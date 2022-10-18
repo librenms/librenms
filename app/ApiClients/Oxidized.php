@@ -29,10 +29,7 @@ use LibreNMS\Config;
 
 class Oxidized extends BaseApi
 {
-    /**
-     * @var bool if Oxidized is enabled
-     */
-    private $enabled;
+    private bool $enabled;
 
     public function __construct()
     {
