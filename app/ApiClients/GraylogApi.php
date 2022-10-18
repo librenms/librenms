@@ -31,7 +31,7 @@ use LibreNMS\Config;
 
 class GraylogApi
 {
-    private ?\Illuminate\Http\Client\PendingRequest $client;
+    private Client $client;
     private string $api_prefix = '';
 
     public function __construct(array $config = [])
@@ -146,7 +146,7 @@ class GraylogApi
         return $addresses->filter()->unique();
     }
 
-    public function isConfigured(): string
+    public function isConfigured(): bool
     {
         return isset($this->client->getConfig()['base_uri']);
     }
