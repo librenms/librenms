@@ -883,7 +883,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }

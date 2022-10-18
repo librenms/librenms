@@ -21,7 +21,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (! is_array($storage_cache['vrp'])) {
+if (! isset($storage_cache['vrp'])) {
     $storage_cache['vrp'] = snmpwalk_cache_oid($device, 'hwStorageEntry', null, 'HUAWEI-FLASH-MAN-MIB');
     d_echo($storage_cache);
 }

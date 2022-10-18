@@ -85,7 +85,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery
                 zeropad($count),
                 "Unit $count processor",
                 1,
-                $entry['sgProxyCpuCoreBusyPerCent']
+                $entry['sgProxyCpuCoreBusyPerCent'] ?? null
             );
 
             $count++;

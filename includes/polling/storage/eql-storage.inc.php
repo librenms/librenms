@@ -12,12 +12,12 @@
  * the source code distribution for details.
  */
 
-if (! is_array($storage_cache1['eql-storage'])) {
+if (! isset($storage_cache1['eql-storage'])) {
     $storage_cache1['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
     d_echo($storage_cache1);
 }
 
-if (! is_array($storage_cache2['eql-storage'])) {
+if (! isset($storage_cache2['eql-storage'])) {
     $storage_cache2['eql-storage'] = snmpwalk_cache_oid($device, 'EqliscsiVolumeStatusEntry', null, 'EQLVOLUME-MIB', 'equallogic');
     d_echo($storage_cache2);
 }
@@ -25,8 +25,6 @@ if (! is_array($storage_cache2['eql-storage'])) {
 $iind = 0;
 $storage_cache10 = [];
 $storage_cache20 = [];
-
-d_echo($storage);
 
 foreach ($storage_cache1['eql-storage'] as $index => $ventry) {
     if (! array_key_exists('eqliscsiVolumeName', $ventry)) {
