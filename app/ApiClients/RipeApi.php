@@ -54,7 +54,7 @@ class RipeApi extends BaseApi
      *
      * @throws ApiException
      */
-    public function getAbuseContact(string $resource): array|mixed
+    public function getAbuseContact(string $resource): mixed
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
@@ -66,7 +66,7 @@ class RipeApi extends BaseApi
     /**
      * @throws ApiException
      */
-    private function makeApiCall(string $uri, array $options): array|mixed
+    private function makeApiCall(string $uri, array $options): mixed
     {
         try {
             $response_data = $this->getClient()->get($uri, $options)->json();
