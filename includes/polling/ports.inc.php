@@ -506,7 +506,7 @@ foreach ($port_stats as $ifIndex => $port) {
             dbUpdate(['deleted' => '0'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '0';
         }
-        if ($ports[$port_id]['ports_statistics_port_id'] === null) {
+        if (! isset($ports[$port_id]['ports_statistics_port_id'])) {
             // in case the port was created before we created the table
             dbInsert(['port_id' => $port_id], 'ports_statistics');
         }
@@ -779,7 +779,7 @@ foreach ($ports as $port) {
                 }
 
                 $port[$port_update][$oid] = set_numeric($this_port[$oid] ?? 0);
-                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid]);
+                $port[$port_update][$oid . '_prev'] = set_numeric($port[$oid] ?? null);
 
                 $oid_prev = $oid . '_prev';
                 if (isset($port[$oid])) {
