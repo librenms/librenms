@@ -591,8 +591,8 @@ foreach ($ports as $port) {
 
         // rewrite the ifPhysAddress
         if (strpos($this_port['ifPhysAddress'] ?? '', ':')) {
-            [$a_a, $a_b, $a_c, $a_d, $a_e, $a_f] = explode(':', $this_port['ifPhysAddress']);
-            $this_port['ifPhysAddress'] = zeropad($a_a) . zeropad($a_b) . zeropad($a_c) . zeropad($a_d) . zeropad($a_e) . zeropad($a_f);
+            $mac_split = explode(':', $this_port['ifPhysAddress']);
+            $this_port['ifPhysAddress'] = zeropad($mac_split[0]) . zeropad($mac_split[1]) . zeropad($mac_split[2]) . zeropad($mac_split[3]) . zeropad($mac_split[4] ?? '') . zeropad($mac_split[5] ?? '');
         }
 
         // use HC values if they are available
