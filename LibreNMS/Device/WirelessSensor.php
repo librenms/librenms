@@ -253,7 +253,7 @@ class WirelessSensor extends Sensor
      * @param  int  $channel
      * @return int
      */
-    public static function channelToFrequency($channel)
+    public static function channelToFrequency($channel): int
     {
         $channels = [
             1 => 2412,
@@ -300,6 +300,6 @@ class WirelessSensor extends Sensor
             165 => 5825,
         ];
 
-        return $channels[$channel];
+        return $channels[$channel] ?? 0;
     }
 }

@@ -90,14 +90,14 @@ class Number
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
-     * @param  string  $number
+     * @param  mixed  $number
      * @return float|int
      */
     public static function cast($number)
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
-            if (! preg_match('/^-?\d+(\.\d+)?/', $number, $matches)) {
+            if (! preg_match('/^-?\d+(\.\d+)?/', $number ?? '', $matches)) {
                 return 0;
             }
             $number = $matches[0];
