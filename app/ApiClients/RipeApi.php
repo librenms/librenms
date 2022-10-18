@@ -30,7 +30,6 @@ use LibreNMS\Exceptions\ApiException;
 
 class RipeApi extends BaseApi
 {
-    /** @var ?string */
     protected ?string $base_uri = 'https://stat.ripe.net';
 
     protected $whois_uri = '/data/whois/data.json';
