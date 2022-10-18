@@ -10,22 +10,22 @@
         </x-slot>
 
         <div class="table-responsive">
-            <table id="users" class="table table-bordered table-condensed" style="display: none;">
+            <table id="users" class="table table-bordered table-condensed">
                 <thead>
                 <tr>
                     <th data-column-id="user_id" data-visible="false" data-identifier="true" data-type="numeric">{{ __('ID') }}</th>
-                    <th data-column-id="username">{{ __('Username') }}</th>
-                    <th data-column-id="realname">{{ __('Real Name') }}</th>
+                    <th data-column-id="username" data-formatter="text">{{ __('Username') }}</th>
+                    <th data-column-id="realname" data-formatter="text">{{ __('Real Name') }}</th>
                     <th data-column-id="level" data-formatter="level" data-type="numeric">{{ __('Access') }}</th>
                     <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">{{ __('auth.title') }}</th>
-                    <th data-column-id="email">{{ __('Email') }}</th>
+                    <th data-column-id="email" data-formatter="text">{{ __('Email') }}</th>
                     @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                     <th data-column-id="enabled" data-formatter="enabled">{{ __('Enabled') }}</th>
                     @endif
                     @config('twofactor')
                     <th data-column-id="twofactor" data-formatter="twofactor">{{ __('2FA') }}</th>
                     @endconfig
-                    <th data-column-id="descr">{{ __('Description') }}</th>
+                    <th data-column-id="descr" data-formatter="text">{{ __('Description') }}</th>
                     <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">{{ __('Actions') }}</th>
                 </tr>
                 </thead>
@@ -69,6 +69,11 @@
                         } else {
                             return '<span class="fa fa-fw fa-close text-danger"></span>';
                         }
+                    },
+                    text: function (column, row) {
+                        let div = document.createElement('div');
+                        div.innerText = row[column.id];
+                        return div.innerHTML;
                     },
                     twofactor: function (column, row) {
                         if(row['twofactor'] == 1) {

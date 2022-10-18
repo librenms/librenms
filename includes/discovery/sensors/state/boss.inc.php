@@ -35,6 +35,7 @@ if ($device['os'] === 'boss') {
         }
 
         $ps_num = 0;
+        $temp_unit = null;
         foreach ($ers_sensors as $index => $entry) {
             //Get unit number
             $unit_array = explode('.', $index);

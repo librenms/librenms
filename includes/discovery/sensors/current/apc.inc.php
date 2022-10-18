@@ -2,7 +2,7 @@
 
 // PDU - Phase
 $oids = snmp_walk($device, 'rPDUStatusPhaseIndex', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {
@@ -45,7 +45,7 @@ if ($oids) {
 }
 unset($oids);
 $oids = snmp_walk($device, 'rPDULoadStatusPhaseNumber', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     d_echo($oids . "\n");
     $oids = trim($oids);
     if ($oids) {
@@ -97,7 +97,7 @@ if ($bank_count > 0) {
     $oids = snmp_walk($device, 'rPDULoadStatusBankNumber', '-OsqnU', 'PowerNet-MIB');
 }
 // should work with firmware v2 and v3
-if ($oids) {
+if (isset($oids) && $oids) {
     echo 'APC PowerNet-MIB Banks ';
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -139,7 +139,7 @@ if ($oids) {
 unset($oids);
 // Per Outlet Power Bar
 $oids = snmp_walk($device, '.1.3.6.1.4.1.318.1.1.26.9.4.3.1.1', '-t 30 -OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     echo 'APC PowerNet-MIB Outlets ';
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -176,7 +176,7 @@ if ($oids) {
 unset($oids);
 // ATS
 $oids = snmp_walk($device, 'atsConfigPhaseTableIndex', '-OsqnU', 'PowerNet-MIB');
-if ($oids) {
+if (isset($oids) && $oids) {
     $type = 'apc';
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -206,12 +206,12 @@ unset($oids);
 
 // UPS
 
-    $phasecount = $phasecount = $pre_cache['apcups_phase_count'];
+$phasecount = $pre_cache['apcups_phase_count'];
 if ($phasecount > 1) {
-    $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', $oids, 'PowerNet-MIB');
+    $oids = snmpwalk_cache_oid($device, 'upsPhaseOutputCurrent', [], 'PowerNet-MIB');
     $in_oids = snmpwalk_cache_oid($device, 'upsPhaseInputCurrent', $in_oids, 'PowerNet-MIB');
 } else {
-    $oids = snmpwalk_cache_oid($device, 'upsHighPrecOutputCurrent', $oids, 'PowerNet-MIB');
+    $oids = snmpwalk_cache_oid($device, 'upsHighPrecOutputCurrent', [], 'PowerNet-MIB');
 }
 if (isset($in_oids)) {
     foreach ($in_oids as $index => $data) {

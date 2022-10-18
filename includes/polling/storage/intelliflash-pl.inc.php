@@ -21,7 +21,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (! is_array($storage_cache['intelliflash-pl'])) {
+if (! isset($storage_cache['intelliflash-pl'])) {
     $storage_cache['intelliflash-pl'] = snmpwalk_cache_oid($device, 'poolEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }
