@@ -34,8 +34,8 @@ class BaseApi
     protected ?string $base_uri;
     /** @var int */
     protected int $timeout = 3;
-    /** @var \Illuminate\Http\Client\PendingRequest */
-    private \Illuminate\Http\Client\PendingRequest $client;
+    /** @var ?\Illuminate\Http\Client\PendingRequest */
+    private ?\Illuminate\Http\Client\PendingRequest $client;
 
     /**
      * Create a new http request.
