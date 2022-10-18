@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "TEG-S80ES",
                     "features": null,
+                    "location": "<private>",
                     "os": "trendnet",
                     "type": "network",
                     "serial": null,
-                    "icon": "trendnet.png",
-                    "location": "<private>"
+                    "icon": "trendnet.png"
                 }
             ]
         },

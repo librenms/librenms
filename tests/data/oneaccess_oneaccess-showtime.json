@@ -10,11 +10,11 @@
                     "version": "2.0/0",
                     "hardware": "LBB_240",
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "S1730007920093079",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },

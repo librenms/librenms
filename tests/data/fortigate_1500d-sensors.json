@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "fortinet.svg",
-                    "location": null
+                    "icon": "fortinet.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "Cisco ADE-OS 3.0",
                     "hardware": "ISE-VM-K9 rev V01",
                     "features": null,
+                    "location": "<private>",
                     "os": "ise",
                     "type": "server",
                     "serial": "Fxxxx8MB3DB",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

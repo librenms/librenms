@@ -43,7 +43,9 @@ class Graphite extends BaseDatastore
         $host = Config::get('graphite.host');
         $port = Config::get('graphite.port', 2003);
         try {
-            $this->connection = $socketFactory->createClient("$host:$port");
+            if (self::isEnabled() && $host && $port) {
+                $this->connection = $socketFactory->createClient("$host:$port");
+            }
         } catch (\Exception $e) {
             d_echo($e->getMessage());
         }

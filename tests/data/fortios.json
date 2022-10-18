@@ -10,11 +10,11 @@
                     "version": "v5.6.0-build1557 170727 (GA)",
                     "hardware": null,
                     "features": "with Analyzer features",
+                    "location": "<private>",
                     "os": "fortios",
                     "type": "appliance",
                     "serial": "FMG-VM0000000000",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },

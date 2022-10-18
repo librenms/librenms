@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "phybridge-flex",
                     "type": "network",
                     "serial": null,
-                    "icon": "phybridge.svg",
-                    "location": "<private>"
+                    "icon": "phybridge.svg"
                 }
             ]
         },

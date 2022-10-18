@@ -10,11 +10,11 @@
                     "version": "02.00.0044",
                     "hardware": "Assy 3.6kVA 100-240V 16A WW maPDU",
                     "features": null,
+                    "location": "<private>",
                     "os": "hpe-mapdu",
                     "type": "power",
                     "serial": "3C87241397",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },

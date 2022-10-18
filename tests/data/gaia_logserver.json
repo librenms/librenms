@@ -10,11 +10,11 @@
                     "version": "R80.30",
                     "hardware": "ProLiant DL380 Gen9",
                     "features": null,
+                    "location": "<private>",
                     "os": "gaia",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "checkpoint.png",
-                    "location": "<private>"
+                    "icon": "checkpoint.png"
                 }
             ]
         },

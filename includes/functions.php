@@ -670,12 +670,22 @@ function is_port_valid($port, $device)
 /**
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
+ * Also trims the data
  *
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device)
 {
+    if (isset($port['ifDescr'])) {
+        $port['ifDescr'] = trim($port['ifDescr']);
+    }
+    if (isset($port['ifAlias'])) {
+        $port['ifAlias'] = trim($port['ifAlias']);
+    }
+    if (isset($port['ifName'])) {
+        $port['ifName'] = trim($port['ifName']);
+    }
     // When devices do not provide data, populate with other data if available
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];

@@ -10,11 +10,11 @@
                     "version": "v2.11",
                     "hardware": "CSS106-1G-4P-1S",
                     "features": null,
+                    "location": "<private>",
                     "os": "swos",
                     "type": "network",
                     "serial": null,
-                    "icon": "mikrotik.svg",
-                    "location": "<private>"
+                    "icon": "mikrotik.svg"
                 }
             ]
         },

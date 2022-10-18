@@ -101,9 +101,9 @@ class Allied extends OS implements OSDiscovery
             $hardware = $e;
         }
 
-        $device->version = str_replace(['"', ','], '', $version ?? null);
-        $device->features = str_replace('"', '', $features ?? null);
-        $device->hardware = str_replace('"', '', $hardware ?? null);
+        $device->version = isset($version) ? str_replace(['"', ','], '', $version) : null;
+        $device->features = isset($features) ? str_replace('"', '', $features) : null;
+        $device->hardware = isset($hardware) ? str_replace('"', '', $hardware) : null;
         $device->serial = $serial ?? null;
     }
 }

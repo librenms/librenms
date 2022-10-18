@@ -909,10 +909,10 @@ pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
 ### SNMP Extend
 
 1. Copy the [memcached
-   script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached)
+   script](https://github.com/librenms/librenms-agent/blob/master/snmp/memcached)
    to `/etc/snmp/` on your remote server.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/memcached -O /etc/snmp/memcached
 ```
 
 2. Make the script executable:
@@ -1776,6 +1776,38 @@ systemctl reload snmpd
 ```
 
 7. You're now ready to enable the application in LibreNMS.
+
+
+## Pwrstatd
+
+Pwrstatd (commonly known as powerpanel) is an application/service available from CyberPower to monitor their PSUs over USB.  It is currently capable of reading the status of only one PSU connected via USB at a time.  The powerpanel software is available here:
+https://www.cyberpowersystems.com/products/software/power-panel-personal/
+
+### SNMP Extend
+
+1. Copy the python script, pwrstatd.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/pwrstatd.py -O /etc/snmp/pwrstatd.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/pwrstatd.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend pwrstatd /etc/snmp/pwrstatd.py
+```
+
+4. (Optional) Create a /etc/snmp/pwrstatd.json file and specify the path to the pwrstat executable [the default path is /sbin/pwrstat]:
+```
+{
+    "pwrstat_cmd": "/sbin/pwrstat"
+}
+```
+
+5. Restart snmpd.
 
 
 ## Proxmox

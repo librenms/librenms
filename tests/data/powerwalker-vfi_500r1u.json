@@ -10,11 +10,11 @@
                     "version": "1.0.6",
                     "hardware": "500R",
                     "features": null,
+                    "location": "<private>",
                     "os": "powerwalker-vfi",
                     "type": "power",
                     "serial": null,
-                    "icon": "powerwalker.png",
-                    "location": "<private>"
+                    "icon": "powerwalker.png"
                 }
             ]
         },

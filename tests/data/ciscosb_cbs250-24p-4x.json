@@ -10,11 +10,11 @@
                     "version": "Software 3.1.1.7, Bootldr 3.0.0.40, Firmware 3.0.0.40",
                     "hardware": "CBS250-24P-4X V02",
                     "features": "CBS250-24P-4X",
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "FOC2503LKRC",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -569,7 +569,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "Drucker Schulb..\n72 6F ",
+                    "ifAlias": "Drucker Schulbü\n72 6F",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -5088,7 +5088,7 @@
                     "ifDuplex": "fullDuplex",
                     "ifMtu": 1500,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "Drucker Schulb..\n72 6F ",
+                    "ifAlias": "Drucker Schulbü\n72 6F",
                     "ifPhysAddress": "b0c53cf2ad19",
                     "ifHardType": null,
                     "ifLastChange": 135047751,

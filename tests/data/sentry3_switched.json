@@ -10,11 +10,11 @@
                     "version": "7.1f",
                     "hardware": "CWG-30VDE455/CB",
                     "features": null,
+                    "location": "<private>",
                     "os": "sentry3",
                     "type": "power",
                     "serial": "ADFC0001714",
-                    "icon": "servertech.png",
-                    "location": "<private>"
+                    "icon": "servertech.png"
                 }
             ]
         },

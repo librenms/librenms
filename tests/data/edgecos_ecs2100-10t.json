@@ -10,11 +10,11 @@
                     "version": "R01 1.2.2.24",
                     "hardware": "ECS2100-10T",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgecos",
                     "type": "network",
                     "serial": "EC1813001458",
-                    "icon": "edge-core.png",
-                    "location": "<private>"
+                    "icon": "edge-core.png"
                 }
             ]
         },

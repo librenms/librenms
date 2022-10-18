@@ -10,11 +10,11 @@
                     "version": "8.0.0 build 1595",
                     "hardware": "Peplink FusionHub",
                     "features": null,
+                    "location": "<private>",
                     "os": "fusionhub",
                     "type": "appliance",
                     "serial": "1113-8637-D091",
-                    "icon": "peplink.svg",
-                    "location": "<private>"
+                    "icon": "peplink.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "sonus-sbc",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "ribbon.svg",
-                    "location": "<private>"
+                    "icon": "ribbon.svg"
                 }
             ]
         },

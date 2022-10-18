@@ -10,11 +10,11 @@
                     "version": "3.0.3 Build 20181101 Rel.42543(s)",
                     "hardware": "T2600G-28TS 3.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetstream",
                     "type": "network",
                     "serial": "217B851000014",
-                    "icon": "tplink.svg",
-                    "location": "<private>"
+                    "icon": "tplink.svg"
                 }
             ]
         },

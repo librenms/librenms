@@ -10,11 +10,11 @@
                     "version": "8.2.0.0_B020",
                     "hardware": "XA1440",
                     "features": null,
+                    "location": "<private>",
                     "os": "voss",
                     "type": "network",
                     "serial": "1931C-W0153",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

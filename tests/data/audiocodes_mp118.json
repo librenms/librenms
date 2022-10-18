@@ -10,11 +10,11 @@
                     "version": "6.60A.309.001",
                     "hardware": "MP-118 FXS",
                     "features": null,
+                    "location": "<private>",
                     "os": "audiocodes",
                     "type": "network",
                     "serial": "10512508",
-                    "icon": "audiocodes.png",
-                    "location": "<private>"
+                    "icon": "audiocodes.png"
                 }
             ]
         },

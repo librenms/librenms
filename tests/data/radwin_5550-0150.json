@@ -188,11 +188,11 @@
                     "version": "4.9.00_b0016_Jan  8 2017",
                     "hardware": "RW5000/HSU/5550/F58/FCC/INT - RW-5550-0150",
                     "features": "Ver. 9",
+                    "location": "<private>",
                     "os": "radwin",
                     "type": "wireless",
                     "serial": "P07100I500A00824",
-                    "icon": "radwin.svg",
-                    "location": "<private>"
+                    "icon": "radwin.svg"
                 }
             ]
         },

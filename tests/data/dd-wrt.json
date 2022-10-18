@@ -10,11 +10,11 @@
                     "version": "3.10.108-d8",
                     "hardware": "Netgear WNDR4500",
                     "features": null,
+                    "location": "<private>",
                     "os": "dd-wrt",
                     "type": "network",
                     "serial": null,
-                    "icon": "dd-wrt.png",
-                    "location": "<private>"
+                    "icon": "dd-wrt.png"
                 }
             ]
         },

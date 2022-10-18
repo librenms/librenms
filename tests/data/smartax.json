@@ -10,11 +10,11 @@
                     "version": "MA5603V800R018C10B085",
                     "hardware": "MA5603T",
                     "features": null,
+                    "location": "<private>",
                     "os": "smartax",
                     "type": "network",
                     "serial": "020LGJT0G4020681",
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },

@@ -8,7 +8,7 @@
  * the source code distribution for details.
  */
 
-if (! is_array($aix_cache['aixFileSystem'])) {
+if (! isset($aix_cache) || ! is_array($aix_cache['aixFileSystem'])) {
     $aix_cache['aixFileSystem'] = snmpwalk_cache_oid($device, 'aixFsTableEntry', [], 'IBM-AIX-MIB');
     d_echo($aix_cache);
 }

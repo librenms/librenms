@@ -10,11 +10,11 @@
                     "version": "1.7.0.13",
                     "hardware": "OmniStack LS 6224P",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos",
                     "type": "network",
                     "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },

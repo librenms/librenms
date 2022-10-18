@@ -10,11 +10,11 @@
                     "version": "4.1.4.1",
                     "hardware": "VSP-9012",
                     "features": null,
+                    "location": "<private>",
                     "os": "voss",
                     "type": "network",
                     "serial": "LBNNTMRJ0003NP",
-                    "icon": "extremevoss.svg",
-                    "location": "<private>"
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

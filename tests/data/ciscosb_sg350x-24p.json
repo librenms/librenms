@@ -10,11 +10,11 @@
                     "version": "Software 2.5.9.13, Bootldr 3.5.7.13, Firmware 3.5.7.13",
                     "hardware": "SG350X-24P V04",
                     "features": "SG350X-24P-K9",
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "DNI232304PG",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

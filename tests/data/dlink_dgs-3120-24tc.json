@@ -10,11 +10,11 @@
                     "version": "Build 2.00.010",
                     "hardware": "DGS-3120-24TC Rev. A1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "R34O1B9000496",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "sensatronics-em1",
                     "type": "sensor",
                     "serial": null,
-                    "icon": "sensatronics.png",
-                    "location": "<private>"
+                    "icon": "sensatronics.png"
                 }
             ]
         },

@@ -2960,11 +2960,11 @@
                     "version": "Software 1.0.0, Firmware 1.0.0",
                     "hardware": "SG350-10",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

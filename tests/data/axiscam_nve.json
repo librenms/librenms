@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.368.1.1",
                     "sysDescr": "; AXIS M7011; Network Video Encoder; 5.75.1; Mar 04 2015 10:10; 1FC; 1;",
                     "sysContact": null,
                     "version": "5.75.1",
-                    "hardware": " AXIS M7011",
+                    "hardware": "AXIS M7011",
                     "features": null,
+                    "location": null,
                     "os": "axiscam",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "axis.svg",
-                    "location": null
+                    "icon": "axis.svg"
                 }
             ]
         },

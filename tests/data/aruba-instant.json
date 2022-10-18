@@ -10,11 +10,11 @@
                     "version": "8.4.0.0-8.4.0.0",
                     "hardware": "225",
                     "features": null,
+                    "location": "<private>",
                     "os": "aruba-instant",
                     "type": "wireless",
                     "serial": "CNBJHMV0WN",
-                    "icon": "aruba.svg",
-                    "location": "<private>"
+                    "icon": "aruba.svg"
                 }
             ]
         },
@@ -2377,7 +2377,7 @@
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_aggregator": "sum",
-                    "sensor_current": 0,
+                    "sensor_current": null,
                     "sensor_prev": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,

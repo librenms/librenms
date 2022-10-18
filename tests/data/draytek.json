@@ -10,11 +10,11 @@
                     "version": "3.8.8.2",
                     "hardware": "Vigor2920 Series",
                     "features": null,
+                    "location": "<private>",
                     "os": "draytek",
                     "type": "network",
                     "serial": null,
-                    "icon": "draytek.svg",
-                    "location": "<private>"
+                    "icon": "draytek.svg"
                 }
             ]
         },

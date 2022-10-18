@@ -10,11 +10,11 @@
                     "version": "3.19.6",
                     "hardware": "Integra-X",
                     "features": null,
+                    "location": "<private>",
                     "os": "saf-integra-x",
                     "type": "wireless",
                     "serial": "0123456789",
-                    "icon": "saf.png",
-                    "location": "<private>"
+                    "icon": "saf.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "6.6.4.1.3",
                     "hardware": "S3220",
                     "features": null,
+                    "location": "<private>",
                     "os": "mypoweros",
                     "type": "network",
                     "serial": null,
-                    "icon": "maipu.png",
-                    "location": "<private>"
+                    "icon": "maipu.png"
                 }
             ]
         },

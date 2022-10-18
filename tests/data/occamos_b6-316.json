@@ -10,11 +10,11 @@
                     "version": "8.0",
                     "hardware": "B6-316",
                     "features": null,
+                    "location": "<private>",
                     "os": "occamos",
                     "type": "network",
                     "serial": "68021242",
-                    "icon": "calix.svg",
-                    "location": "<private>"
+                    "icon": "calix.svg"
                 }
             ]
         },

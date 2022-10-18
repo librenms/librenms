@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ts-bspdu",
                     "type": "power",
                     "serial": null,
-                    "icon": "bladeshelterpdu.svg",
-                    "location": "<private>"
+                    "icon": "bladeshelterpdu.svg"
                 }
             ]
         },

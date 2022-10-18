@@ -10,11 +10,11 @@
                     "version": "PD.01.05",
                     "hardware": "1920S 24G 2SFP JL381A",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

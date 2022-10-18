@@ -10,11 +10,11 @@
                     "version": "0.32.0",
                     "hardware": "MetaMux 48 with L-Series",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista-mos",
                     "type": "network",
                     "serial": "891829852",
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },
@@ -13048,7 +13048,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "mellanox technologies mt27520 family ",
+                    "port_descr_type": "mellanox technologies mt27520 family",
                     "port_descr_descr": "ConnectX-3 Pro",
                     "port_descr_circuit": null,
                     "port_descr_speed": "ConnectX-3 Pro",
@@ -13153,7 +13153,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "mellanox technologies mt27520 family ",
+                    "port_descr_type": "mellanox technologies mt27520 family",
                     "port_descr_descr": "ConnectX-3 Pro",
                     "port_descr_circuit": null,
                     "port_descr_speed": "ConnectX-3 Pro",
@@ -15883,7 +15883,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "cme glk-2036 ",
+                    "port_descr_type": "cme glk-2036",
                     "port_descr_descr": "A-Feed",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

@@ -10,11 +10,11 @@
                     "version": "3176",
                     "hardware": "VS5793",
                     "features": null,
+                    "location": "---",
                     "os": "volius",
                     "type": "network",
                     "serial": "257900320931910",
-                    "icon": "volius.png",
-                    "location": "---"
+                    "icon": "volius.png"
                 }
             ]
         },
