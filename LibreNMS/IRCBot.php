@@ -158,7 +158,7 @@ class IRCBot
     private function init()
     {
         if ($this->config['irc_alert']) {
-            if ( !$this->connectAlert()) {
+            if (! $this->connectAlert()) {
                 sleep(5);
 
                 return false;
