@@ -6381,29 +6381,14 @@ parameters:
 			path: app/Actions/Device/ValidateDeviceAndCreate.php
 
 		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
+			message: "#^Call to function is_null\\(\\) with Illuminate\\\\Http\\\\Client\\\\PendingRequest will always evaluate to false\\.$#"
 			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$client has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BingApi.php
+			path: app/ApiClient/BaseApi.php
 
 		-
 			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BingApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GoogleMapsApi.php
 
 		-
 			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
@@ -6436,19 +6421,9 @@ parameters:
 			path: app/ApiClients/GraylogApi.php
 
 		-
-			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/MapquestApi.php
-
-		-
 			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/MapquestApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/NominatimApi.php
 
 		-
 			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
@@ -6457,11 +6432,6 @@ parameters:
 
 		-
 			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$abuse_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$base_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/RipeApi.php
 
@@ -11414,4 +11384,5 @@ parameters:
 			message: "#^Property LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:\\$excluded has no type specified\\.$#"
 			count: 1
 			path: tests/YamlSchemaTest.php
+
 
