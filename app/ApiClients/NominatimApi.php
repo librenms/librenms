@@ -31,7 +31,6 @@ class NominatimApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    /** @var ?sting */
     protected ?string $base_uri = 'https://nominatim.openstreetmap.org';
     protected $geocoding_uri = '/search';
 
