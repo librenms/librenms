@@ -6381,11 +6381,6 @@ parameters:
 			path: app/Actions/Device/ValidateDeviceAndCreate.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with Illuminate\\\\Http\\\\Client\\\\PendingRequest will always evaluate to false\\.$#"
-			count: 1
-			path: app/ApiClient/BaseApi.php
-
-		-
 			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BingApi.php
