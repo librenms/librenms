@@ -182,7 +182,7 @@ class DeviceGroupController extends Controller
         }
         $deviceGroup->delete();
 
-        $msg = __('Device Group :name deleted', ['name' => $deviceGroup->name]);
+        $msg = __('Device Group :name deleted', ['name' => htmlentities($deviceGroup->name)]);
 
         return response($msg, 200);
     }
