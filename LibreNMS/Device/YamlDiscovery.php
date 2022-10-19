@@ -309,7 +309,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'];
+                                $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);

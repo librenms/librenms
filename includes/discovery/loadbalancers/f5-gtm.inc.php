@@ -28,7 +28,7 @@ $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id']);
 
 // We only care about our device id.
-$components = $components[$device['device_id']];
+$components = $components[$device['device_id']] ?? [];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];

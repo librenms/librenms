@@ -12,7 +12,7 @@
 foreach ($port_stats as $index => $port) {
     //Logically convert swp ports to human readable
     //only convert swp ports
-    if (substr($port['ifName'], 0, 3) === 'swp') {
+    if (isset($port['ifName']) && substr($port['ifName'], 0, 3) === 'swp') {
         $portNum = preg_replace('/[a-z]+/', '', $port['ifName']);
         if ($portNum < 50) {
             $portNum++;
@@ -36,7 +36,7 @@ foreach ($port_stats as $index => $port) {
         }
     } else {
         //Set port number to match current
-        $ifName = $port['ifName'];
+        $ifName = $port['ifName'] ?? null;
     }
     //set the libre ifName value to new port name
     $port_stats[$index]['ifName'] = $ifName;
