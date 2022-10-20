@@ -5,7 +5,7 @@ on [DockerHub](https://hub.docker.com/r/librenms/librenms/).
 
 # Documentation
 
-Documentation can be found on the [GitHub repository](https://github.com/librenms/docker).
+Full install and configuration documentation can be found on the [GitHub repository](https://github.com/librenms/docker).
 
 # Quick install
 1. Install docker: https://docs.docker.com/engine/install/
