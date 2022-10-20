@@ -44,6 +44,8 @@
                             @config('twofactor')
                                 @if(\App\Models\UserPref::getPref($user, 'twofactor'))
                                 <td>1</td>
+                                @else
+                                <td></td>
                                 @endif
                             @endconfig
                             <td>{{ $user->descr }}</td>
