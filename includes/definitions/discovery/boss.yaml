@@ -1,6 +1,18 @@
+mib: RAPID-CITY:S5-CHASSIS-MIB
 modules:
+    os:
+        hardware: RAPID-CITY::rcChasType.0
+        serial: RAPID-CITY::rcChasSerialNumber.0
+        version: RAPID-CITY::rcSysVersion.0
     mempools:
         data:
+            -
+                total: RAPID-CITY::rcSysDramSize
+                free: RAPID-CITY::rcSysDramFree
+                used: RAPID-CITY::rcSysDramUsed
+                precision: 512
+                type: 'ers8600-mem'
+                descr: 'Dynamic Memory'
             -
                 total: S5-CHASSIS-MIB::s5ChasUtilMemoryTotalMB
                 free: S5-CHASSIS-MIB::s5ChasUtilMemoryAvailableMB
@@ -8,3 +20,45 @@ modules:
                 precision: 1048576
                 index: '.{{ $index }}'
                 type: avaya-ers
+
+    processors:
+        data:
+            -
+                oid: RAPID-CITY::rcSysCpuUtil
+                descr: 'ers8600-cpu'
+
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: RAPID-CITY::rcChasFanTable
+                    value: RAPID-CITY::rcChasFanAmbientTemperature
+                    num_oid: '.1.3.6.1.4.1.2272.1.4.7.1.1.3.{{ $index }}'
+                    descr: 'Fan  {{ $index }}'
+                    group: Fans
+
+        state:
+            data:
+                -
+                    oid: RAPID-CITY::rcChasFanTable
+                    value:  RAPID-CITY::rcChasFanOperStatus
+                    num_oid: '.1.3.6.1.4.1.2272.1.4.7.1.1.2.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    group: Fans
+                    state_name: RAPID-CITY::rcChasFanOperStatus
+                    states:
+                        - { value: 1, descr: unknown, graph: 0, generic: 3 }
+                        - { value: 2, descr: normal, graph: 0, generic: 0 }
+                        - { value: 3, descr: down, graph: 0, generic: 1 }
+                -
+                    oid: RAPID-CITY::rcChasPowerSupplyTable
+                    value: RAPID-CITY::rcChasPowerSupplyOperStatus
+                    num_oid: '.1.3.6.1.4.1.2272.1.4.8.1.1.2.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+                    group: PSUs
+                    state_name: RAPID-CITY::rcChasPowerSupplyOperStatus
+                    states:
+                        - { value: 1, descr: unknown, graph: 0, generic: 3 }
+                        - { value: 2, descr: empty, graph: 0, generic: 3 }
+                        - { value: 3, descr: OK, graph: 0, generic: 0 }
+                        - { value: 4, descr: down, graph: 0, generic: 1 }
