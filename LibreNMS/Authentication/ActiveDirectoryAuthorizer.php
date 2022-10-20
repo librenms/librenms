@@ -78,11 +78,10 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         if ($result == false || $result['count'] !== 1) {
             if (Config::get('auth_ad_debug', false)) {
                 if ($result == false) {
-                    // FIXME: what went wrong?
-                    throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter'");
-                } elseif ($result['count'] == 0) {
+                    throw new AuthenticationException("LDAP query failed for group '$groupname' using filter '$search_filter', last LDAP error: " . ldap_error($connection));
+                } elseif ((int) $result['count'] == 0) {
                     throw new AuthenticationException("Failed to find group matching '$groupname' using filter '$search_filter'");
-                } elseif ($result['count'] > 1) {
+                } elseif ((int) $result['count'] > 1) {
                     throw new AuthenticationException("Multiple groups returned for '$groupname' using filter '$search_filter'");
                 }
             }
@@ -103,7 +102,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         );
         $entries = ldap_get_entries($connection, $search);
 
-        return $entries['count'] > 0;
+        return (int) $entries['count'] > 0;
     }
 
     public function userExists($username, $throw_exception = false)
@@ -158,10 +157,13 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $this->userFilter($username),
             $attributes
         );
-        $entries = ldap_get_entries($connection, $search);
 
-        if ($entries['count']) {
-            return $this->getUseridFromSid($this->sidFromLdap($entries[0]['objectsid'][0]));
+        if ($search !== false) {
+            $entries = ldap_get_entries($connection, $search);
+
+            if ($entries !== false && $entries['count']) {
+                return $this->getUseridFromSid($this->sidFromLdap($entries[0]['objectsid'][0]));
+            }
         }
 
         return -1;
@@ -205,6 +207,14 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+
+        $starttls = Config::get('auth_ad_starttls');
+        if ($starttls == 'optional' || $starttls == 'required') {
+            $tls = ldap_start_tls($this->ldap_connection);
+            if ($starttls == 'required' && $tls === false) {
+                throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
+            }
+        }
     }
 
     public function bind($credentials = [])

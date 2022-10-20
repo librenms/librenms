@@ -11,7 +11,6 @@
  */
 
 use LibreNMS\Config;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -81,19 +80,6 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-/**
- * Find all links in some text and turn them into html links.
- *
- * @param  string  $text
- * @return string
- */
-function linkify($text)
-{
-    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
-
-    return preg_replace($regex, '<a href="$0">$0</a>', $text);
-}
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
@@ -144,19 +130,6 @@ function port_permitted($port_id, $device_id = null)
     }
 
     return \Permissions::canAccessPort($port_id, Auth::id());
-}
-
-function application_permitted($app_id, $device_id = null)
-{
-    if (! is_numeric($app_id)) {
-        return false;
-    }
-
-    if (! $device_id) {
-        $device_id = get_device_id_by_app_id($app_id);
-    }
-
-    return device_permitted($device_id);
 }
 
 function device_permitted($device_id)
@@ -259,7 +232,7 @@ function generate_graph_js_state($args)
     $to = (is_numeric($args['to']) ? $args['to'] : 0);
     $width = (is_numeric($args['width']) ? $args['width'] : 0);
     $height = (is_numeric($args['height']) ? $args['height'] : 0);
-    $legend = str_replace("'", '', $args['legend']);
+    $legend = str_replace("'", '', $args['legend'] ?? '');
 
     $state = <<<STATE
 <script type="text/javascript" language="JavaScript">
@@ -347,6 +320,10 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
     if (! isset($port['hostname'])) {
         $port = array_merge($port, device_by_id_cache($port['device_id']));
+    }
+
+    if (! isset($port['label'])) {
+        $port = cleanPort($port);
     }
 
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
@@ -461,44 +438,7 @@ function generate_port_image($args)
  */
 function graph_error($text, $color = [128, 0, 0])
 {
-    global $vars;
-
-    $type = Config::get('webui.graph_type');
-    if (! Debug::isEnabled()) {
-        header('Content-type: ' . get_image_type($type));
-    }
-
-    $width = (int) ($vars['width'] ?? 150);
-    $height = (int) ($vars['height'] ?? 60);
-
-    if ($type === 'svg') {
-        $rgb = implode(', ', $color);
-        echo <<<SVG
-<svg xmlns="http://www.w3.org/2000/svg"
-xmlns:xhtml="http://www.w3.org/1999/xhtml"
-viewBox="0 0 $width $height"
-preserveAspectRatio="xMinYMin">
-<foreignObject x="0" y="0" width="$width" height="$height" transform="translate(0,0)">
-      <xhtml:div style="display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
-         <xhtml:div style="display:table-cell; vertical-align:middle;">
-            <xhtml:div style="color:rgb($rgb); text-align:center; font-family:sans-serif; font-size:0.6em;">$text</xhtml:div>
-         </xhtml:div>
-      </xhtml:div>
-   </foreignObject>
-</svg>
-SVG;
-    } else {
-        $img = imagecreate($width, $height);
-        imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
-
-        $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
-        $font = $width < 200 ? 3 : 5;
-        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
-
-        // Output the image
-        imagepng($img);
-        imagedestroy($img);
-    }
+    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
 }
 
 /**
@@ -750,33 +690,41 @@ function get_url()
 
 function alert_details($details)
 {
-    if (! is_array($details)) {
+    if (is_string($details)) {
         $details = json_decode(gzuncompress($details), true);
+    } elseif (! is_array($details)) {
+        $details = [];
     }
 
     $max_row_length = 0;
     $all_fault_detail = '';
-    foreach ($details['rule'] as $o => $tmp_alerts) {
+    foreach ($details['rule'] ?? [] as $o => $tmp_alerts) {
         $fault_detail = '';
         $fallback = true;
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
-        if ($tmp_alerts['bill_id']) {
+        if (isset($tmp_alerts['bill_id'])) {
             $fault_detail .= '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $tmp_alerts['bill_id']], []) . '">' . $tmp_alerts['bill_name'] . '</a>;&nbsp;';
             $fallback = false;
         }
 
-        if ($tmp_alerts['port_id']) {
-            $tmp_alerts = cleanPort($tmp_alerts);
-            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+        if (isset($tmp_alerts['port_id'])) {
+            if ($tmp_alerts['isisISAdjState']) {
+                $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
+                $port = \App\Models\Port::find($tmp_alerts['port_id']);
+                $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
+            } else {
+                $tmp_alerts = cleanPort($tmp_alerts);
+                $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            }
             $fallback = false;
         }
 
-        if ($tmp_alerts['accesspoint_id']) {
+        if (isset($tmp_alerts['accesspoint_id'])) {
             $fault_detail .= generate_ap_link($tmp_alerts, $tmp_alerts['name']) . ';&nbsp;';
             $fallback = false;
         }
 
-        if ($tmp_alerts['sensor_id']) {
+        if (isset($tmp_alerts['sensor_id'])) {
             if ($tmp_alerts['sensor_class'] == 'state') {
                 // Give more details for a state (textual form)
                 $details = 'State: ' . $tmp_alerts['state_descr'] . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
@@ -804,7 +752,7 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['bgpPeer_id']) {
+        if (isset($tmp_alerts['bgpPeer_id'])) {
             // If we have a bgpPeer_id, we format the data accordingly
             $fault_detail .= "BGP peer <a href='" .
                 \LibreNMS\Util\Url::generate([
@@ -819,7 +767,7 @@ function alert_details($details)
             $fallback = false;
         }
 
-        if ($tmp_alerts['type'] && $tmp_alerts['label']) {
+        if ($tmp_alerts['type'] && isset($tmp_alerts['label'])) {
             if ($tmp_alerts['error'] == '') {
                 $fault_detail .= ' ' . $tmp_alerts['type'] . ' - ' . $tmp_alerts['label'] . ';&nbsp;';
             } else {
@@ -1049,7 +997,7 @@ function eventlog_severity($eventlog_severity)
  */
 function get_image_type(string $type)
 {
-    return $type === 'svg' ? 'image/svg+xml' : 'image/png';
+    return \LibreNMS\Util\Graph::imageType($type);
 }
 
 function get_oxidized_nodes_list()
@@ -1080,60 +1028,6 @@ function get_oxidized_nodes_list()
         <td></td>
         </tr>';
     }
-}
-
-/**
- * Get the fail2ban jails for a device... just requires the device ID
- * an empty return means either no jails or fail2ban is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_fail2ban_jails($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'fail2ban'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $f2bc = $component->getComponents($device_id, $options);
-
-    if (isset($f2bc[$device_id])) {
-        $id = $component->getFirstComponentID($f2bc, $device_id);
-
-        return json_decode($f2bc[$device_id][$id]['jails']);
-    }
-
-    return [];
-}
-
-/**
- * Get the Postgres databases for a device... just requires the device ID
- * an empty return means Postres is not in use
- *
- * @param $device_id
- * @return array
- */
-function get_postgres_databases($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'postgres'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $pgc = $component->getComponents($device_id, $options);
-
-    if (isset($pgc[$device_id])) {
-        $id = $component->getFirstComponentID($pgc, $device_id);
-
-        return json_decode($pgc[$device_id][$id]['databases']);
-    }
-
-    return [];
 }
 
 /**
@@ -1179,60 +1073,6 @@ function parse_at_time($time)
     }
 
     return (int) strtotime($time);
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_zfs_pools($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'zfs'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $zfsc = $component->getComponents($device_id, $options);
-
-    if (isset($zfsc[$device_id])) {
-        $id = $component->getFirstComponentID($zfsc, $device_id);
-
-        return json_decode($zfsc[$device_id][$id]['pools']);
-    }
-
-    return [];
-}
-
-/**
- * Get the ports for a device... just requires the device ID
- * an empty return means portsactivity is not in use or there are currently no ports
- *
- * @param $device_id
- * @return array
- */
-function get_portactivity_ports($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'portsactivity'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $portsc = $component->getComponents($device_id, $options);
-
-    if (isset($portsc[$device_id])) {
-        $id = $component->getFirstComponentID($portsc, $device_id);
-
-        return json_decode($portsc[$device_id][$id]['ports']);
-    }
-
-    return [];
 }
 
 /**
@@ -1436,31 +1276,4 @@ function nfsen_live_dir($hostname)
             return $base_dir . '/profiles-data/live/' . $hostname;
         }
     }
-}
-
-/**
- * Get the ZFS pools for a device... just requires the device ID
- * an empty return means ZFS is not in use or there are currently no pools
- *
- * @param $device_id
- * @return array
- */
-function get_chrony_sources($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'chronyd'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $chronyd_cpnt = $component->getComponents($device_id, $options);
-
-    if (isset($chronyd_cpnt[$device_id])) {
-        $id = $component->getFirstComponentID($chronyd_cpnt, $device_id);
-
-        return json_decode($chronyd_cpnt[$device_id][$id]['sources']);
-    }
-
-    return [];
 }

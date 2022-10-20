@@ -10,11 +10,11 @@
                     "version": "11.10",
                     "hardware": "EPDU1116S",
                     "features": null,
+                    "location": "<private>",
                     "os": "apc-epdu",
                     "type": "power",
                     "serial": "506255602541",
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

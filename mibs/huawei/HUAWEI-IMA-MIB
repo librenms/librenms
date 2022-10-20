@@ -1,8 +1,8 @@
 -- =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private IMA Interface MIB
--- Version: V2.11
+-- Version: V1.0
 -- History:
 --      V1.0 
 -- ==================================================================
@@ -32,7 +32,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
 --  February 10,2009 at 14:00 GMT
 -- February 10,2009 at 14:00 GMT
     hwImaMIB MODULE-IDENTITY
-        LAST-UPDATED "201702170000Z" -- February 10,2009 at 14:00 GMT
+        LAST-UPDATED "200902101400Z" -- February 10,2009 at 14:00 GMT
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO
@@ -46,10 +46,6 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The MIB is mainly used to configure Inverse Multiplexing
             for ATM (IMA) interfaces."  
-
-        REVISION     "201702170000Z"       
-        DESCRIPTION       
-            "V2.11, modify the description of hwImaNotifications." 
         ::= { hwDatacomm 176 }
         
         
@@ -206,7 +202,6 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         STATUS current
         DESCRIPTION
             "Symmetry of the IMA group."
-        DEFVAL { symmetricOperation }
         ::= { hwImaGroupEntry 4 }
         
     hwImaGroupMinNumTxLinks OBJECT-TYPE
@@ -303,7 +298,6 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
             "This indicates the 'alpha' value used to specify the number
             of consecutive invalid ICP cells to be detected before moving
             to the IMA Hunt state from the IMA Sync state."
-        DEFVAL { 2 }
         ::= { hwImaGroupEntry 14 }
         
     hwImaGroupBetaValue OBJECT-TYPE
@@ -314,7 +308,6 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
             "This indicates the 'beta' value used to specify the number
             of consecutive errored ICP cells to be detected before moving
             to the IMA Hunt state from the IMA Sync state."
-        DEFVAL { 2 }
         ::= { hwImaGroupEntry 15 }  
         
     hwImaGroupGammaValue OBJECT-TYPE
@@ -325,7 +318,6 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
             "This indicates the 'gamma' value used to specify the number
             of consecutive valid ICP cells to be detected before moving
             to the IMA Sync state from the IMA PreSync state."
-        DEFVAL { 1 }
         ::= { hwImaGroupEntry 16 }
         
 -- hwImaGroupNumTxActLinks is used by a network operator to tell how many
@@ -812,7 +804,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the local IMA group is generated."
+            "Description."
         ::= { hwImaNotifications 1 }
 
     
@@ -821,7 +813,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the local IMA group is cleared."
+            "Description."
         ::= { hwImaNotifications 2 }
 
     
@@ -830,7 +822,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the remote IMA group is generated."
+            "Description."
         ::= { hwImaNotifications 3 }
 
     
@@ -839,7 +831,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the remote IMA group is cleared."
+            "Description."
         ::= { hwImaNotifications 4 }
 
     
@@ -848,7 +840,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the clock mode sent by the local IMA group does not match that sent by the remote IMA group is generated."
+            "Description."
         ::= { hwImaNotifications 5 }
 
     
@@ -857,7 +849,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaGroupName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the clock mode sent by the local IMA group does not match that sent by the remote IMA group is cleared."
+            "Description."
         ::= { hwImaNotifications 6 }
 
     
@@ -866,7 +858,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the IMA link is out of frame is generated."
+            "Description."
         ::= { hwImaNotifications 7 }
 
     
@@ -875,7 +867,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the IMA link is out of frame is cleared."
+            "Description."
         ::= { hwImaNotifications 8 }
 
     
@@ -884,7 +876,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the IMA link differential delay exceeds the threshold is generated."
+            "Description."
         ::= { hwImaNotifications 9 }
 
     
@@ -893,7 +885,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the IMA link differential delay exceeds the threshold is cleared."
+            "Description."
         ::= { hwImaNotifications 10 }
 
     
@@ -902,7 +894,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the remote IMA link is generated."
+            "Description."
         ::= { hwImaNotifications 11 }
 
     
@@ -911,7 +903,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating the failure in the remote IMA link is cleared."
+            "Description."
         ::= { hwImaNotifications 12 }
 
     
@@ -920,7 +912,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the remote IMA link cannot be used to send packets is generated."
+            "Description."
         ::= { hwImaNotifications 13 }
 
     
@@ -929,7 +921,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the remote IMA link cannot be used to send packets is cleared."
+            "Description."
         ::= { hwImaNotifications 14 }
 
     
@@ -938,7 +930,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the remote IMA link cannot be used to receive packets is generated."
+            "Description."
         ::= { hwImaNotifications 15 }
 
     
@@ -947,7 +939,7 @@ HUAWEI-IMA-MIB DEFINITIONS ::= BEGIN
         OBJECTS { hwImaLinkName }
         STATUS current
         DESCRIPTION 
-            "The alarm indicating that the remote IMA link cannot be used to receive packets is cleared."
+            "Description."
         ::= { hwImaNotifications 16 }
 
     

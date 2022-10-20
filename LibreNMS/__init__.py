@@ -26,7 +26,7 @@ from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
-MAX_LOGFILE_SIZE = (1024 ** 2) * 10  # 10 Megabytes max log files
+MAX_LOGFILE_SIZE = (1024**2) * 10  # 10 Megabytes max log files
 
 logger = logging.getLogger(__name__)
 
@@ -248,6 +248,24 @@ class DB:
             if self.config.db_socket:
                 args["unix_socket"] = self.config.db_socket
 
+            sslmode = self.config.db_sslmode.lower()
+            if sslmode == "disabled":
+                logger.debug("Using cleartext MySQL connection")
+            elif sslmode == "verify_ca":
+                logger.info(
+                    "Using TLS MySQL connection without CN/SAN check (CA validation only)"
+                )
+                args["ssl"] = {"ca": self.config.db_ssl_ca, "check_hostname": False}
+            elif sslmode == "verify_identity":
+                logger.info("Using TLS MySQL connection with full validation")
+                args["ssl"] = {"ca": self.config.db_ssl_ca}
+            else:
+                logger.critical(
+                    "Unsupported MySQL sslmode %s, dispatcher supports DISABLED, VERIFY_CA, and VERIFY_IDENTITY only",
+                    self.config.db_sslmode,
+                )
+                raise SystemExit(2)
+
             conn = MySQLdb.connect(**args)
             conn.autocommit(True)
             conn.ping(True)
@@ -403,8 +421,8 @@ class ThreadingLock(Lock):
 
 class RedisLock(Lock):
     def __init__(self, namespace="lock", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):
@@ -440,7 +458,7 @@ class RedisLock(Lock):
         :param owner: str a unique name for the locking node
         :param expiration: int in seconds, 0 expiration means forever
         """
-        import redis
+        import redis  # pylint: disable=import-error
 
         try:
             if int(expiration) < 1:
@@ -485,8 +503,8 @@ class RedisLock(Lock):
 
 class RedisUniqueQueue(object):
     def __init__(self, name, namespace="queue", **redis_kwargs):
-        import redis
-        from redis.sentinel import Sentinel
+        import redis  # pylint: disable=import-error
+        from redis.sentinel import Sentinel  # pylint: disable=import-error
 
         redis_kwargs["decode_responses"] = True
         if redis_kwargs.get("sentinel") and redis_kwargs.get("sentinel_service"):

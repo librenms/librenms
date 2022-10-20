@@ -29,7 +29,7 @@ $dostack = 0;
 $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'ups-apcups', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ups-apcups', $app->app_id]);
 $array = [
     'battery_nominal' => ['descr' => 'Nominal', 'colour' => '630606'],
     'battery_voltage' => ['descr' => 'Current', 'colour' => '50C150'],

@@ -10,11 +10,11 @@
                     "version": "4.17.05.07",
                     "hardware": "Midspan",
                     "features": null,
+                    "location": "<private>",
                     "os": "microsemipdsine",
                     "type": "network",
                     "serial": "000076",
-                    "icon": "microsemi.png",
-                    "location": "<private>"
+                    "icon": "microsemi.png"
                 }
             ]
         },

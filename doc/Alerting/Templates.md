@@ -25,8 +25,7 @@ Controls:
 
 - if-else (Else can be omitted): `@if ($alert->placeholder  ==
   'value') Some Text @else Other Text @endif`
-- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key
-  </br> alue: $value @endforeach`
+- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key Value: $value @endforeach`
 
 Placeholders:
 
@@ -141,7 +140,7 @@ More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.c
 
 ## Examples
 
-#### Default Template
+### Default Template
 
 ```text
 {{ $alert->title }}
@@ -285,17 +284,77 @@ Note: To use HTML emails you must set HTML email to Yes in the WebUI
 under Global Settings > Alerting Settings > Email transport > Use HTML
 emails
 
-Note: To include Graphs you must enable unauthorized graphs in
-config.php. Allow_unauth_graphs_cidr is optional, but more secure.
+## Graphs
+
+There are two helpers for graphs that will use a signed url to allow secure external
+access.  Anyone using the signed url will be able to view the graph.
+
+ - Your LibreNMS web must be accessible from the location where the graph is viewed.
+   Some alert transports require publicly accessible urls.
+ - APP_URL must be set in .env to use signed graphs.
+ - Changing APP_KEY will invalidate all previously issued singed urls.
+
+You may specify the graph one of two ways, a php array of parameters, or
+a direct url to a graph.
+
+Note that to and from can be specified either as timestamps with `time()`
+or as relative time `-3d` or `-36h`.  When using relative time, the graph
+will show based on when the user views the graph, not when the event happened.
+Sharing a graph image with a relative time will always give the recipient access
+to current data, where a specific timestamp will only allow access to that timeframe.
+
+### @signedGraphTag
+
+This will insert a specially formatted html img tag linking to the graph.
+Some transports may search the template for this tag to attach images properly
+for that transport.
 
 ```
-$config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
-$config['allow_unauth_graphs'] = true;
+@signedGraphTag([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+    'width' => 700, 
+    'height' => 250
+])
+```
+
+Output:
+```html
+<img class="librenms-graph" src="https://librenms.org/graph?from=1662176216&amp;height=250&amp;id=20425&amp;to=1662219416&amp;type=port_bits&amp;width=700&amp;signature=f6e516e8fd893c772eeaba165d027cb400e15a515254de561a05b63bc6f360a4">
+```
+
+Specific graph using url input:
+
+```
+@signedGraphTag('https://librenms.org/graph.php?type=device_processor&from=-2d&device=2&legend=no&height=400&width=1200')
+```
+
+### @signedGraphUrl
+
+This is used when you need the url directly. One example is using the
+API Transport, you may want to include the url only instead of a html tag.
+
+```
+@signedGraphUrl([
+    'id' => $value['port_id'],
+    'type' => 'port_bits',
+    'from' => time() - 43200,
+    'to' => time(),
+])
 ```
 
 ## Using models for optional data
 
-If some value does not exist withing the `$faults[]`-array, you may query fields from the database using Laravel models. You may use models to query additional values and use them on the template by placing the model and the value to search for within the braces. For example, ISIS-alerts do have a `port_id` value associated with the alert but `ifName` is not directly accessible from the `$faults[]`-array. If the name of the port was needed, it's value could be queried using a template such as:
+If some value does not exist within the `$faults[]`-array, you may
+query fields from the database using Laravel models. You may use
+models to query additional values and use them on the template by
+placing the model and the value to search for within the braces. For
+example, ISIS-alerts do have a `port_id` value associated with the
+alert but `ifName` is not directly accessible from the
+`$faults[]`-array. If the name of the port was needed, it's value
+could be queried using a template such as:
 
 ```
 {{ $alert->title }}
@@ -313,7 +372,7 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 @endif
 ```
 
-#### Service Alert
+### Service Alert
 
 ```
 <div style="font-family:Helvetica;">
@@ -349,7 +408,8 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif <br>
 {{ $key }}: {{ $value['string'] }}<br>
 @endforeach
 @if ($alert->faults) <b>Faults:</b><br>
-@foreach ($alert->faults as $key => $value)<img src="https://server/graph.php?device={{ $value['device_id'] }}&type=device_processor&width=459&height=213&lazy_w=552&from=end-72h"><br>
+@foreach ($alert->faults as $key => $value)
+@signedGraphTag(['device_id' => $value['device_id'], 'type' => 'device_processor', 'width' => 459, 'height' => 213, 'from' => time() - 259200])<br>
 https://server/graphs/id={{ $value['device_id'] }}/type=device_processor/<br>
 @endforeach
 Template: CPU alert <br>
@@ -372,29 +432,29 @@ The included templates apart from the default template are:
 
 ## Other Examples
 
-#### Microsoft Teams - Markdown
+### Microsoft Teams - Markdown
 
 ```
-[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-**Device name:** {{ $alert->sysName }}  
-**Severity:** {{ $alert->severity }}  
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)
+**Device name:** {{ $alert->sysName }}
+**Severity:** {{ $alert->severity }}
 @if ($alert->state == 0)
-**Time elapsed:** {{ $alert->elapsed }}  
+**Time elapsed:** {{ $alert->elapsed }}
 @endif
-**Timestamp:** {{ $alert->timestamp }}  
-**Unique-ID:** {{ $alert->uid }}  
+**Timestamp:** {{ $alert->timestamp }}
+**Unique-ID:** {{ $alert->uid }}
 @if ($alert->name)
-**Rule:** {{ $alert->name }}  
+**Rule:** {{ $alert->name }}
 @else
-**Rule:** {{ $alert->rule }}  
+**Rule:** {{ $alert->rule }}
 @endif
 @if ($alert->faults)
-**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}
 @endforeach
 @endif
 ```
 
-#### Microsoft Teams - JSON
+### Microsoft Teams - JSON
 
 ```
 {

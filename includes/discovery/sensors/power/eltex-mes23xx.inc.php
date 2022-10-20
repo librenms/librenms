@@ -29,8 +29,8 @@ if ($pre_cache['eltex-mes23xx-poe']) {
         if (isset($data['rlPethPsePortOutputPower'])) {
             $value = $data['rlPethPsePortOutputPower'] / $divisor;
             if ($value) {
-                $high_limit = $data['rlPethPsePortPowerLimit'] / $divisor;
-                $high_warn_limit = ($data['rlPethPsePortPowerLimit'] / $divisor) * 0.8;
+                $high_limit = isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) : null;
+                $high_warn_limit = isset($data['rlPethPsePortPowerLimit']) ? ($data['rlPethPsePortPowerLimit'] / $divisor) * 0.8 : null;
                 $low_warn_limit = 0;
                 $low_limit = 0;
                 [$unit, $ifIndex] = explode('.', $index);

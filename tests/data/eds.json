@@ -10,11 +10,11 @@
                     "version": "2.10",
                     "hardware": "Ethernet to 1-wire Interface",
                     "features": null,
+                    "location": null,
                     "os": "eds",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "eds.png",
-                    "location": null
+                    "icon": "eds.png"
                 }
             ]
         },

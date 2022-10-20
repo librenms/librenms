@@ -18,38 +18,31 @@ on:
       - 'doc/**'
       - 'mkdocs.yml'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   test:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     strategy:
       fail-fast: false
       matrix:
         include:
           -
-            php-version: 8.0
+            php-version: 8.1
             name: Unit
             skip-web-check: 1
             database: mariadb:10.5
           -
-            php-version: 8.0
-            name: Web
-            skip-unit-check: 1
-            database: mysql:5.7
-          -
-            php-version: 7.4
-            name: Unit
-            skip-web-check: 1
-            database: mysql:5.7
-          -
-            php-version: 7.3
+            php-version: 8.1
             name: Unit
             skip-web-check: 1
             database: mysql:8.0
           -
-            php-version: 7.3
+            php-version: 8.1
             name: Web
             skip-unit-check: 1
-            database: mysql:8.0
+            database: mariadb:10.9
     services:
       database:
         image: ${{ matrix.database }}
@@ -63,7 +56,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       -
@@ -85,6 +78,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
           tools: composer,php-cs-fixer
+          coverage: none
       -
         name: Get composer cache directory
         id: composer-cache
@@ -92,7 +86,7 @@ jobs:
           echo "::set-output name=dir::$(composer config cache-files-dir)"
       -
         name: Cache composer
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
@@ -100,7 +94,7 @@ jobs:
             ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
       -
         name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}

@@ -59,7 +59,7 @@ class Trap
         $this->hostname = array_shift($lines);
 
         $line = array_shift($lines);
-        if (preg_match('/\[([0-9.:a-fA-F]+)\]/', $line, $matches)) {
+        if ($line && preg_match('/\[([0-9.:a-fA-F]+)\]/', $line, $matches)) {
             $this->ip = $matches[1];
         }
 

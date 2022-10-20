@@ -10,11 +10,11 @@
                     "version": "01.01.01",
                     "hardware": "DBQ145412",
                     "features": null,
+                    "location": "<private>",
                     "os": "eatonpdu",
                     "type": "power",
                     "serial": "ADO3051266",
-                    "icon": "eaton.svg",
-                    "location": "<private>"
+                    "icon": "eaton.svg"
                 }
             ]
         },

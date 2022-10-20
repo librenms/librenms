@@ -47,8 +47,8 @@
                     <td>{{ $version_python }}</td>
                 </tr>
                 <tr>
-                    <td><b>{{ __('MySQL') }}</b></td>
-                    <td>{{ $version_mysql }}</td>
+                    <td><b>{{ __('Database') }}</b></td>
+                    <td>{{ $version_database }}</td>
                 </tr>
                 <tr>
                     <td><a href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>
@@ -232,7 +232,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
 
     var ver_date = $('#version_date');
     if (ver_date.text()) {
-        ver_date.text(' - '.concat(moment.unix(ver_date.text()))).show();
+        ver_date.text(' - '.concat(moment(ver_date.text()))).show();
     }
 </script>
 @endsection

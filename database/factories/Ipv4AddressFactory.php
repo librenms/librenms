@@ -26,7 +26,7 @@ class Ipv4AddressFactory extends Factory
     public function definition()
     {
         $prefix = $this->faker->numberBetween(0, 32);
-        $ip = new IPv4($this->faker->ipv4 . '/' . $prefix);
+        $ip = new IPv4($this->faker->ipv4() . '/' . $prefix);
 
         return [
             'ipv4_address' => $ip->uncompressed(),

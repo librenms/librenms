@@ -10,11 +10,11 @@
                     "version": "V2.8.23.A.19.P02",
                     "hardware": "5928",
                     "features": null,
+                    "location": "<private>",
                     "os": "zxr10",
                     "type": "network",
                     "serial": null,
-                    "icon": "zte.svg",
-                    "location": "<private>"
+                    "icon": "zte.svg"
                 }
             ]
         },

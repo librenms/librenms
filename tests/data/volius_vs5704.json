@@ -10,11 +10,11 @@
                     "version": "2950",
                     "hardware": "VS5704-1x32-Telnevia",
                     "features": null,
+                    "location": "---",
                     "os": "volius",
                     "type": "network",
                     "serial": "257000316601711117",
-                    "icon": "volius.png",
-                    "location": "---"
+                    "icon": "volius.png"
                 }
             ]
         },

@@ -50,10 +50,10 @@ In the table below you can find the values needed for devices which are already 
 LibreNMS is ready for the devices listed in this table. You only need
 to configure your pCOweb card with the accorded System OID and Enterprise OID:
 
-| Manufacturer 	| Description 	| System OID                 	| Enterprise OID 	|
-|--------------	|-------------	|----------------------------	|----------------	|
-| Rittal       	| IT Chiller  	| 1.3.6.1.4.1.9839.2606.1    	| 9839           	|
-| Rittal       	| LCP DX 3311 	| 1.3.6.1.4.1.9839.2606.3311 	| 9839.2606      	|
+| Manufacturer  | Description   | System OID                    | Enterprise OID    |
+|-------------- |-------------  |----------------------------   |----------------   |
+| Rittal        | IT Chiller    | 1.3.6.1.4.1.9839.2606.1       | 9839              |
+| Rittal        | LCP DX 3311   | 1.3.6.1.4.1.9839.2606.3311    | 9839.2606         |
 
 ## Unsupported devices
 After constructing the correct System OID for your SNMP card, you can

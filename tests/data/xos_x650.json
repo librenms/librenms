@@ -10,11 +10,11 @@
                     "version": "15.3.5.2",
                     "hardware": "Summit X650-24x(SSns)",
                     "features": "v1535b2-patch1-14",
+                    "location": "<private>",
                     "os": "xos",
                     "type": "network",
                     "serial": null,
-                    "icon": "extreme.svg",
-                    "location": "<private>"
+                    "icon": "extreme.svg"
                 }
             ]
         },

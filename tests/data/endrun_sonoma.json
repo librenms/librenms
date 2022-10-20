@@ -10,11 +10,11 @@
                     "version": "3.04",
                     "hardware": "Sonoma_D12 GPS 6010-0065-000",
                     "features": null,
+                    "location": "<private>",
                     "os": "endrun",
                     "type": "appliance",
                     "serial": "426724685",
-                    "icon": "endrun.png",
-                    "location": "<private>"
+                    "icon": "endrun.png"
                 }
             ]
         },

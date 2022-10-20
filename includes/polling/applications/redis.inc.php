@@ -5,18 +5,26 @@ use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'redis';
-$app_id = $app['app_id'];
 $output = 'OK';
+if (! empty($agent_data['app'][$name])) {
+    $parsed_json = json_decode(stripslashes($agent_data['app'][$name]), true);
+    if (json_last_error() !== JSON_ERROR_NONE || empty($parsed_json) || ! isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version']) || $parsed_json['version'] < 1 || $parsed_json['error'] != 0) {
+        update_application($app, '-10:No correct data retrieved', []);
 
-try {
-    $redis_data = json_app_get($device, $name, 1)['data'];
-} catch (JsonAppMissingKeysException $e) {
-    $redis_data = $e->getParsedJson();
-} catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+        return;
+    }
+    $redis_data = $parsed_json['data'];
+} else {
+    try {
+        $redis_data = json_app_get($device, $name, 1)['data'];
+    } catch (JsonAppMissingKeysException $e) {
+        $redis_data = $e->getParsedJson();
+    } catch (JsonAppException $e) {
+        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+        update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
-    return;
+        return;
+    }
 }
 
 $client_data = $redis_data['Clients'];
@@ -33,10 +41,10 @@ $fields = [
 $rrd_def = RrdDefinition::make()
     ->addDataset('connected', 'GAUGE', 0)
     ->addDataset('blocked', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'memory';
@@ -53,10 +61,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('resident', 'GAUGE', 0)
     ->addDataset('frag_bytes', 'GAUGE', 0)
     ->addDataset('rss_bytes', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'objects';
@@ -65,10 +73,10 @@ $fields = [
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('pending', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'fragmentation';
@@ -77,10 +85,10 @@ $fields = [
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('bytes', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'usage';
@@ -103,10 +111,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('rss', 'GAUGE', 0)
     ->addDataset('scripts', 'GAUGE', 0)
     ->addDataset('startup', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'defrag';
@@ -121,10 +129,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('misses', 'GAUGE', 0)
     ->addDataset('key_hits', 'GAUGE', 0)
     ->addDataset('key_misses', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'keyspace';
@@ -135,10 +143,10 @@ $fields = [
 $rrd_def = RrdDefinition::make()
     ->addDataset('hits', 'COUNTER', 0)
     ->addDataset('misses', 'COUNTER', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'sync';
@@ -151,10 +159,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('full', 'GAUGE', 0)
     ->addDataset('ok', 'GAUGE', 0)
     ->addDataset('err', 'GAUGE', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'commands';
@@ -163,10 +171,10 @@ $fields = [
 ];
 $rrd_def = RrdDefinition::make()
     ->addDataset('processed', 'COUNTER', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'connections';
@@ -177,10 +185,10 @@ $fields = [
 $rrd_def = RrdDefinition::make()
     ->addDataset('received', 'COUNTER', 0)
     ->addDataset('rejected', 'COUNTER', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $category = 'net';
@@ -191,10 +199,10 @@ $fields = [
 $rrd_def = RrdDefinition::make()
     ->addDataset('input_bytes', 'COUNTER', 0)
     ->addDataset('output_bytes', 'COUNTER', 0);
-$rrd_name = ['app', $name, $app_id, $category];
+$rrd_name = ['app', $name, $app->app_id, $category];
 
 $metrics[$category] = $fields;
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $output, $metrics);

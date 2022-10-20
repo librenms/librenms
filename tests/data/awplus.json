@@ -10,11 +10,11 @@
                     "version": "5.4.7-2.1",
                     "hardware": "AT-SBx8106",
                     "features": "AT-SBx81CFC960",
+                    "location": "<private>",
                     "os": "awplus",
                     "type": "network",
                     "serial": "A04699H130900048",
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

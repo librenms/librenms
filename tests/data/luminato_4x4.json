@@ -10,11 +10,11 @@
                     "version": "20.8.23",
                     "hardware": "LMC-A B13",
                     "features": null,
+                    "location": "<private>",
                     "os": "luminato",
                     "type": "network",
                     "serial": "HK01672034",
-                    "icon": "teleste.png",
-                    "location": "<private>"
+                    "icon": "teleste.png"
                 }
             ]
         },
@@ -3312,7 +3312,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.3715.99.2.2.1.1.3.1",
                     "sensor_index": "1",
                     "sensor_type": "luminato",
-                    "sensor_descr": "Slot1 (LDM-C) ",
+                    "sensor_descr": "Slot1 (LDM-C)",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -3336,7 +3336,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.3715.99.2.2.1.1.3.2",
                     "sensor_index": "2",
                     "sensor_type": "luminato",
-                    "sensor_descr": "Slot2 (LDM-C) ",
+                    "sensor_descr": "Slot2 (LDM-C)",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -3360,7 +3360,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.3715.99.2.2.1.1.3.3",
                     "sensor_index": "3",
                     "sensor_type": "luminato",
-                    "sensor_descr": "Slot3 (LDM-C) ",
+                    "sensor_descr": "Slot3 (LDM-C)",
                     "group": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,

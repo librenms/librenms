@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.1718.4",
                     "sysDescr": "Sentry Smart PDU",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "sentry4",
                     "type": "power",
                     "serial": null,
-                    "icon": "servertech.png",
-                    "location": null
+                    "icon": "servertech.png"
                 }
             ]
         },

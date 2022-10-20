@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "000292",
                     "hardware": "DSR-4410MD",
                     "features": null,
+                    "location": null,
                     "os": "arris-dsr4410md",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "arris.svg",
-                    "location": null
+                    "icon": "arris.svg"
                 }
             ]
         },

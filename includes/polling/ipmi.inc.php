@@ -13,13 +13,18 @@ if (is_array($ipmi_rows)) {
         $ipmi['port'] = filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623';
         $ipmi['user'] = $device['attribs']['ipmi_username'];
         $ipmi['password'] = $device['attribs']['ipmi_password'];
+        $ipmi['kg_key'] = $device['attribs']['ipmi_kg_key'];
         $ipmi['type'] = $device['attribs']['ipmi_type'];
 
         echo 'Fetching IPMI sensor data...';
 
         $cmd = [Config::get('ipmitool', 'ipmitool')];
         if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
-            array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port']);
+            if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
+                array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port']);
+            } else {
+                array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER', '-p', $ipmi['port'], '-y', $ipmi['kg_key']);
+            }
         }
 
         // Check to see if we know which IPMI interface to use

@@ -98,6 +98,6 @@ class ChecksController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-list-ul fa-flip-horizontal';
+        return 'fa-solid fa-list-ul fa-flip-horizontal';
     }
 }

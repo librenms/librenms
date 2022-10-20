@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1069",
                     "sysDescr": "Cisco Controller",
                     "sysContact": null,
                     "version": null,
                     "hardware": "cisco5500Wlc",
                     "features": null,
+                    "location": null,
                     "os": "ciscowlc",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

@@ -14,7 +14,7 @@ $array = [
     'upload'   => 'Upload',
 ];
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'pureftpd', $app['app_id'], 'bitrate']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'pureftpd', $app->app_id, 'bitrate']);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {

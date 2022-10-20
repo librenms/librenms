@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "NetVanta",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "adtran-aos",
                     "type": "network",
                     "serial": null,
-                    "icon": "adtran.png",
-                    "location": null
+                    "icon": "adtran.png"
                 }
             ]
         },

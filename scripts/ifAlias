@@ -1,5 +1,5 @@
-#!/bin/sh
-# (c) 2013-2017, f0o@devilcode.org, olb@nebkha.net
+#!/bin/bash
+# (c) 2013-2022, f0o@devilcode.org, olb@nebkha.net, tim@tim427.net
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -41,7 +41,7 @@ interface_id()
 {
     local N=
     local L=
-    local ID="${GET_OID#${BASE}.}"
+    local ID="${GET_OID#"${BASE}".}"
 
     case "$GET_TYPE" in
         -g)
@@ -58,7 +58,7 @@ interface_id()
                 # find the next iface_id
                 for N in $(echo "$IP_LINK" | grep -oE "^[0-9]+:" | cut -d':' -f 1)
                 do
-                    if [ "$L" = "$ID" -o ! "$ID" ]
+                    if [ "$L" = "$ID" ] || [ ! "$ID" ]
                     then
                         echo -n "$N"
                         return 0
@@ -85,23 +85,23 @@ alias_from_interfaces_config_file()
     if [ -x "$DISTRO_BIN" ]
     then
         case "$("$DISTRO_BIN" | cut -d " " -f 1)" in
-            Debian)
-                CONFIG_FILE="/etc/network/interfaces"
+            Debian|Ubuntu|Raspbian)
+                CONFIG_FILE=("/etc/network/interfaces" "/etc/network/interfaces.d/"*)
             ;;
             Gentoo)
-                CONFIG_FILE="/etc/conf.d/net"
+                CONFIG_FILE=("/etc/conf.d/net")
             ;;
             CentOS|RedHat|SuSE|Mandriva|Mandrake)
-                CONFIG_FILE="/etc/sysconfig/network-scripts/ifcfg-$IFACE"
+                CONFIG_FILE=("/etc/sysconfig/network-scripts/ifcfg-$IFACE")
             ;;
             Archlinux)
-                CONFIG_FILE="/etc/conf.d/net-conf-$IFACE"
+                CONFIG_FILE=("/etc/conf.d/net-conf-$IFACE")
             ;;
         esac
     fi
-    if [ "$CONFIG_FILE" ]
+    if ((${#CONFIG_FILE[@]}))
     then
-         echo "$(grep -i "^# $IFACE:" $CONFIG_FILE | sed "s/^# $IFACE: //i")"
+         grep -hsi "^# $IFACE:" "${CONFIG_FILE[@]}" | sed "s/^# $IFACE: //i"
     fi
 }
 

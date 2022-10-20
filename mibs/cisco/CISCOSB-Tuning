@@ -13,7 +13,7 @@ IMPORTS
     VlanList1, VlanList2, VlanList3, VlanList4              FROM CISCOSB-BRIDGEMIBOBJECTS-MIB;
 
 rsTunning  MODULE-IDENTITY
-           LAST-UPDATED "200602120000Z"
+           LAST-UPDATED "202105170000Z"
            ORGANIZATION "Cisco Systems, Inc."
 
            CONTACT-INFO

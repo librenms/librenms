@@ -14,7 +14,7 @@ IMPORTS
 
 
 rlRmonControl  MODULE-IDENTITY
-                 LAST-UPDATED "200406010000Z"
+                 LAST-UPDATED "200406010001Z"
                  ORGANIZATION "Cisco Systems, Inc."
 
                  CONTACT-INFO

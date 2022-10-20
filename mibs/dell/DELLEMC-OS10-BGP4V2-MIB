@@ -36,19 +36,23 @@
             FROM SNMP-FRAMEWORK-MIB;
 
         os10Bgp4V2Mib MODULE-IDENTITY
-            LAST-UPDATED "201807041200Z"
+            LAST-UPDATED "202002251200Z"
             ORGANIZATION "Dell EMC"
             CONTACT-INFO "http://www.dell.com/support"
             DESCRIPTION
                     "The MIB module for the BGP-4 protocol."
 					
+            REVISION     "202002251200Z"
+            DESCRIPTION
+                    "Changed the MAX-ACCESS of bgp4V2AdjRibsOutIndex to not-accessible."
+
             REVISION     "201807041200Z"
             DESCRIPTION
-            "Dell EMC Networking OS10 Experiment object IDs added."
+                    "Dell EMC Networking OS10 Experiment object IDs added."
 
             REVISION "201401240000Z"
             DESCRIPTION
-                   "This MIB updates and replaces the BGP MIB defined in
+                    "This MIB updates and replaces the BGP MIB defined in
                     RFC 4273."
             ::= { os10Experiment 1 }
 
@@ -1586,7 +1590,7 @@
 
     os10bgp4V2AdjRibsOutIndex OBJECT-TYPE
         SYNTAX     Unsigned32 (1..4294967295)
-        MAX-ACCESS read-only
+        MAX-ACCESS not-accessible
         STATUS     current
         DESCRIPTION
             "Certain extensions to BGP permit multiple instance of

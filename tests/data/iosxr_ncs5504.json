@@ -10,11 +10,11 @@
                     "version": "6.6.3",
                     "hardware": "NCS-5504",
                     "features": null,
+                    "location": "<private>",
                     "os": "iosxr",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

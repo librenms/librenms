@@ -12,7 +12,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id'], $vars['jail']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id, $vars['jail']]);
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [

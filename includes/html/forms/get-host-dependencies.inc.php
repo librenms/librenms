@@ -31,6 +31,9 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 $order_by = '';
                 if (isset($_POST['sort']) && is_array($_REQUEST['sort'])) {
                     foreach ($_REQUEST['sort'] as $key => $value) {
+                        $key = preg_replace('/[^A-Za-z0-9_]/', '', $key); // only allow plain columns
+                        $value = strtolower($value) == 'desc' ? 'DESC' : 'ASC';
+
                         $order_by .= " $key $value";
                     }
                 } else {

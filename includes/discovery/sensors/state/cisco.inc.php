@@ -43,7 +43,7 @@ foreach ($tables as $tablevalue) {
     $cur_oid = $tablevalue['num_oid'];
 
     if (is_array($temp)) {
-        if ($temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+        if (isset($temp[0]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
             break;
         }
 
@@ -215,7 +215,7 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'];
                     $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
                 }
-                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
+                discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 
                 //Create Sensor To State Index
                 create_sensor_to_state_index($device, $state_name, $index);

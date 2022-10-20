@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\IP;
 
@@ -76,8 +77,8 @@ if (! empty($_POST['hostname'])) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
 
-        $poller_group = strip_tags($_POST['poller_group']);
-        $force_add = ($_POST['force_add'] == 'on');
+        $poller_group = strip_tags($_POST['poller_group'] ?? '');
+        $force_add = (isset($_POST['force_add']) && $_POST['force_add'] == 'on');
 
         $port_assoc_mode = strip_tags($_POST['port_assoc_mode']);
         try {
@@ -164,12 +165,7 @@ $pagetitle[] = 'Add host';
             <select name="transport" id="transport" class="form-control input-sm">
 <?php
 foreach (Config::get('snmp.transports') as $transport) {
-    echo "<option value='" . $transport . "'";
-    if ($transport == $device['transport']) {
-        echo " selected='selected'";
-    }
-
-    echo '>' . $transport . '</option>';
+    echo "<option value='" . $transport . "'>" . $transport . '</option>';
 }
 ?>
             </select>
@@ -181,7 +177,7 @@ foreach (Config::get('snmp.transports') as $transport) {
             <select name="port_assoc_mode" id="port_assoc_mode" class="form-control input-sm">
 <?php
 
-foreach (get_port_assoc_modes() as $mode) {
+foreach (PortAssociationMode::getModes() as $mode) {
     $selected = '';
     if ($mode == Config::get('default_port_association_mode')) {
         $selected = 'selected';

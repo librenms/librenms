@@ -1,9 +1,9 @@
 mib: RS-COMMON-MIB:RS-XX8000-COMMON-MIB:RS-XX8000-DVB-TX-MIB:IRT-DVBT-SINGLETRANSMITTER-MIB
 modules:
     os:
-        hardware: SNMPv2-MIB::sysDescr.0
         serial: RS-XX8000-COMMON-MIB::serialNumber.0
         version: RS-XX8000-COMMON-MIB::versionNumberSW.0
+        sysDescr_regex: "/(?<hardware>.*)/"
     sensors:
         power:
             data:

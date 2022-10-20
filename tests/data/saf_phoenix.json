@@ -314,11 +314,11 @@
                     "version": "1.63.46",
                     "hardware": "CFIP PhoeniX IDU",
                     "features": null,
+                    "location": "<private>",
                     "os": "saf",
                     "type": "wireless",
                     "serial": "000000000000",
-                    "icon": "saf.png",
-                    "location": "<private>"
+                    "icon": "saf.png"
                 }
             ]
         },

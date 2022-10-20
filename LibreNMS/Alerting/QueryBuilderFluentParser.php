@@ -140,7 +140,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
         $op = $rule['operator'];
 
         $value = $rule['value'];
-        if (! is_array($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
+        if (! is_array($value) && is_string($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             $value = DB::raw($this->expandMacro(trim($value, '`')));
         }
 

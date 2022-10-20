@@ -22,7 +22,7 @@ function bulk_sensor_snmpget($device, $sensors)
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
-        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQnte');
+        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);
     }
 
@@ -76,16 +76,18 @@ function poll_sensor($device, $class)
 
             if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if ($class == 'temperature') {
-                preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
+            if (! is_numeric($sensor_value)) {
+                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
                 if (! empty($temp_response[0])) {
                     $sensor_value = $temp_response[0];
                 }
-            } elseif ($class == 'state') {
+            }
+
+            if ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
                         'SELECT `state_value`
@@ -313,12 +315,18 @@ function poll_device($device, $force_module = false)
         $measurements->checkpoint(); // don't count previous stats
 
         foreach (Config::get('poller_modules') as $module => $module_status) {
+            if (! is_file("includes/polling/$module.inc.php")) {
+                echo "Module $module does not exist, please remove it from your configuration";
+
+                continue;
+            }
+
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
             d_echo('Device' . (isset($device['attribs']['poll_' . $module]) ? ($device['attribs']['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
-                $device['attribs']['poll_' . $module] ||
+                ! empty($device['attribs']['poll_' . $module]) ||
                 ($os_module_status && ! isset($device['attribs']['poll_' . $module])) ||
                 ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
@@ -329,8 +337,9 @@ function poll_device($device, $force_module = false)
                     include "includes/polling/$module.inc.php";
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    Log::error("%rError polling $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
                     Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    report($e);
                 }
 
                 $module_time = microtime(true) - $module_start;
@@ -439,46 +448,43 @@ function poll_device($device, $force_module = false)
  * The group name (key) will be prepended to each metric in that group, separated by an underscore
  * The special group "none" will not be prefixed.
  *
- * @param  array  $app  app from the db, including app_id
+ * @param  \App\Models\Application  $app  app from the db, including app_id
  * @param  string  $response  This should be the return state of Application polling
  * @param  array  $metrics  an array of additional metrics to store in the database for alerting
  * @param  string  $status  This is the current value for alerting
  */
 function update_application($app, $response, $metrics = [], $status = '')
 {
-    if (! is_numeric($app['app_id'])) {
-        d_echo('$app does not contain app_id, could not update');
+    if (! $app) {
+        d_echo('$app does not exist, could not update');
 
         return;
     }
 
-    $data = [
-        'app_state'  => 'UNKNOWN',
-        'app_status' => $status,
-        'timestamp'  => ['NOW()'],
-    ];
+    $app->app_state = 'UNKNOWN';
+    $app->app_status = $status;
+    $app->timestamp = DB::raw('NOW()');
 
     if ($response != '' && $response !== false) {
+        // if the response indicates an error, set it and set app_status to the raw response
         if (Str::contains($response, [
             'Traceback (most recent call last):',
         ])) {
-            $data['app_state'] = 'ERROR';
-        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
-            $data['app_state'] = $response;
+            $app->app_state = 'ERROR';
+            $app->app_status = $response;
+        } elseif (preg_match('/^(ERROR|LEGACY|UNSUPPORTED)/', $response, $matches)) {
+            $app->app_state = $matches[1];
+            $app->app_status = $response;
         } else {
             // should maybe be 'unknown' as state
-            $data['app_state'] = 'OK';
+            $app->app_state = 'OK';
         }
     }
 
-    if ($data['app_state'] != $app['app_state']) {
-        $data['app_state_prev'] = $app['app_state'];
+    if ($app->isDirty('app_state')) {
+        $app->app_state_prev = $app->getOriginal('app_state');
 
-        $device = dbFetchRow('SELECT * FROM devices LEFT JOIN applications ON devices.device_id=applications.device_id WHERE applications.app_id=?', [$app['app_id']]);
-
-        $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
-
-        switch ($data['app_state']) {
+        switch ($app->app_state) {
             case 'OK':
                 $severity = Alert::OK;
                 $event_msg = 'changed to OK';
@@ -500,9 +506,10 @@ function update_application($app, $response, $metrics = [], $status = '')
                 $event_msg = 'has UNKNOWN state';
                 break;
         }
-        log_event('Application ' . $app_name . ' ' . $event_msg, $device, 'application', $severity);
+        Log::event('Application ' . $app->displayName() . ' ' . $event_msg, DeviceCache::getPrimary(), 'application', $severity);
     }
-    dbUpdate($data, 'applications', '`app_id` = ?', [$app['app_id']]);
+
+    $app->save();
 
     // update metrics
     if (! empty($metrics)) {

@@ -7,7 +7,7 @@ modules:
                 free: EdgeSwitch-SWITCHING-MIB::agentSwitchCpuProcessMemFree
                 precision: 1024
     os:
-        sysDescr_regex: '/^(?<hardware>EdgeSwitch .*|EdgePoint Switch .*|USW-.*|US-.*), (?<version>.*), Linux .*$/'
+        sysDescr_regex: '/^(?<hardware>EdgeSwitch[ \d\w\-]*|EdgePoint Switch[ \d\w\-]*|US[ \d\w\-]*)(,)* (firmware )*(?<version>\S*)(, Linux .*)*$/'
         serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
         state:

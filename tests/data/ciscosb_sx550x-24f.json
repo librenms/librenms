@@ -10,11 +10,11 @@
                     "version": "Software 2.5.0.90, Firmware 2.5.18",
                     "hardware": "SX550X-24F V02",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosb",
                     "type": "network",
                     "serial": "DNI22500E57",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

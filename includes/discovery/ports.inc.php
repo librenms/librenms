@@ -3,6 +3,7 @@
 // Build SNMP Cache Array
 use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 
 $descrSnmpFlags = '-OQUs';
@@ -20,6 +21,16 @@ $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
+
+//Get UFiber OLT ports
+if ($device['os'] == 'edgeosolt') {
+    require base_path('includes/discovery/ports/edgeosolt.inc.php');
+}
+
+//Change Zynos ports from swp to 1/1
+if ($device['os'] == 'zynos') {
+    require base_path('includes/discovery/ports/zynos.inc.php');
+}
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
@@ -42,7 +53,7 @@ d_echo($port_stats);
 // compatibility reasons.
 $port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
-    $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
+    $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
@@ -81,7 +92,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
 
     if (is_port_valid($snmp_data, $device)) {
-        port_fill_missing($snmp_data, $device);
+        port_fill_missing_and_trim($snmp_data, $device);
 
         // Port newly discovered?
         if (! is_array($ports_db[$port_id])) {

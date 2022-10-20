@@ -22,6 +22,11 @@ $base_to_index = [];
 $tmp_base_indexes = snmpwalk_cache_oid($device, 'dot1dBasePortIfIndex', [], 'BRIDGE-MIB');
 // flatten the array
 foreach ($tmp_base_indexes as $index => $array) {
+    // Broken SNMP servers can return the wrong data when OID doesn't exist
+    // So lets sanity check
+    if (! array_key_exists('dot1dBasePortIfIndex', $array)) {
+        continue;
+    }
     $base_to_index[$index] = $array['dot1dBasePortIfIndex'];
 }
 $index_to_base = array_flip($base_to_index);
@@ -49,7 +54,6 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
 
         foreach ((array) $vlan_data as $ifIndex => $vlan_port) {
             $port = get_port_by_index_cache($device['device_id'], $ifIndex);
-            echo str_pad($vlan_port_id, 10) . str_pad($ifIndex, 10) . str_pad($port['ifDescr'], 25) . str_pad($vlan_port['dot1dStpPortPriority'], 10) . str_pad($vlan_port['dot1dStpPortState'], 15) . str_pad($vlan_port['dot1dStpPortPathCost'], 10);
 
             $db_w = [
                 'device_id' => $device['device_id'],
@@ -62,6 +66,8 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
             $db_a['state'] = isset($vlan_port['dot1dStpPortState']) ? $vlan_port['dot1dStpPortState'] : 'unknown';
             $db_a['cost'] = isset($vlan_port['dot1dStpPortPathCost']) ? $vlan_port['dot1dStpPortPathCost'] : 0;
             $db_a['untagged'] = isset($vlan_port['untagged']) ? $vlan_port['untagged'] : 0;
+
+            echo str_pad($db_a['baseport'], 10) . str_pad($ifIndex, 10) . str_pad($port['ifName'] ?: $port['ifDescr'], 25) . str_pad($db_a['priority'], 10) . str_pad($db_a['state'], 15) . str_pad($db_a['cost'], 10);
 
             $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port['port_id'], $vlan_id]);
 

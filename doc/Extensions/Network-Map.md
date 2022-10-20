@@ -47,7 +47,7 @@ be done by clicking on the Settings Icon then Refresh Pause.
 
 Once you've achieved your desired map appearance, click the generate
 options button at the bottom to be given the necessary parameters to
-add to your config.php file. You will need to paste the genrated
+add to your config.php file. You will need to paste the generated
 config into config.php the format will need to look something like
 this. Note that the configurator will output the config with `var options`
 you will need to strip them out and at the end of the config you need to

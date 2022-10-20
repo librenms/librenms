@@ -1,11 +1,20 @@
 -- =================================================================
--- Copyright (C) 2008 by HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2016 by HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description:HUAWEI MAC AUTHEN MIB
 -- Reference:
--- Version: V1.00
+-- Version: V1.05
 -- History:
---    V1.0 2008-07-02, publish
+--    v1.01
+--    modified by z00196108  2013-8-7
+--    v1.02
+--    modified by z00196108  2013-10-23
+--    v1.03
+--    modified by q00228201  2014-1-13
+--    v1.04
+--    modified by h00280725  2015-6-22
+--    v1.05
+--    modified by c00350813  2016-3-18
 -- =================================================================
     
     HUAWEI-MAC-AUTHEN-MIB DEFINITIONS ::= BEGIN
@@ -13,11 +22,14 @@
         IMPORTS
             hwDatacomm            
                 FROM HUAWEI-MIB
-            MODULE-IDENTITY, IpAddress, OBJECT-TYPE        
-                FROM SNMPv2-SMI    
+            MODULE-IDENTITY, IpAddress, OBJECT-TYPE,
+            NOTIFICATION-TYPE,Integer32 
+                FROM SNMPv2-SMI 
+                 MODULE-COMPLIANCE,OBJECT-GROUP,NOTIFICATION-GROUP
+		 FROM SNMPv2-CONF   
             InterfaceIndexOrZero, ifDescr
                 FROM IF-MIB
-                        VlanIdOrNone     
+            VlanIdOrNone     
                 FROM Q-BRIDGE-MIB
             EnabledStatus
                 FROM P-BRIDGE-MIB                                             
@@ -29,22 +41,38 @@
 -- Module Identifier                
 --
     hwMacAuthenMIB MODULE-IDENTITY 
-        LAST-UPDATED "200807021800Z"            -- June 02th, 2008 at 14:00 GMT
+        LAST-UPDATED "201603181536Z"           
         ORGANIZATION 
-            "Huawei Technologies co., Ltd."
+            "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-            " R&D NanJing, Huawei Technologies co.,Ltd.
-            Huihong Bld.,NO.91 Baixia Rd., 
-            Bai-Xia District NanJing P.R. China
-            Zip:210001 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+            "Huawei Industrial Base
+			Bantian, Longgang
+			Shenzhen 518129
+			People's Republic of China
+			Website: http://www.huawei.com
+			Email: support@huawei.com
+			"
         DESCRIPTION 
             "This MIB describes objects used for mac-authentication,including
             configuring mac-authentication."
-        REVISION "200807021800Z"            -- July 02th, 2008 at 14:00 GMT
+         REVISION    "201603181536Z"         
+         DESCRIPTION
+            "Modify hwMacAuthenModeUsername"
+        REVISION    "201506221604Z"           
+        DESCRIPTION 
+            "Modify range of hwMacAuthenMaxUserNum"
+        REVISION "200912151800Z"               -- December 15th, 2009 at 14:00 GMT
         DESCRIPTION
             "The initial revision of this MIB module."
+        REVISION    "201308071111Z"            -- August 7th, 2013 at 14:00 GMT
+        DESCRIPTION 
+             "Modify quiet-period."
+        REVISION    "201310231221Z"            -- October 23th, 2013 at 14:00 GMT
+       DESCRIPTION
+            "Modify hwMacAuthenTimerOfflineDetect"
+        REVISION    "201401131221Z"           
+        DESCRIPTION 
+            "Modify quiet-period."
         ::= { hwDatacomm 171 }
     
 --
@@ -69,12 +97,17 @@
     
             
     hwMacAuthenModeUsername OBJECT-TYPE
-            SYNTAX     INTEGER
-            {
-             macAddressWithoutHyphen(1),
-             macAddressWithHyphen(2),
-             fixed(3)
-            }
+        SYNTAX     INTEGER
+        {
+         macAddressWithoutHyphen(1),
+         macAddressWithHyphen(2),
+         fixed(3),
+         option82(4),
+         macAddressWithHyphenNormal(5),
+         macAddressWithoutHyphenUpper(6),
+         macAddressWithHyphenUpper(7),
+         macAddressWithHyphenNormalUpper(8)
+        }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -84,7 +117,7 @@
     
             
     hwMacAuthenPassword OBJECT-TYPE
-                SYNTAX     DisplayString
+        SYNTAX     DisplayString
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -93,7 +126,7 @@
     
     
     hwMacAuthenUsername OBJECT-TYPE
-                SYNTAX     DisplayString
+        SYNTAX     DisplayString
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -102,8 +135,8 @@
     
     
     hwMacAuthenDomain OBJECT-TYPE
-                SYNTAX     DisplayString
-                MAX-ACCESS read-write
+        SYNTAX     DisplayString
+        MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "Specify domain server configuration. "
@@ -111,7 +144,7 @@
     
     
     hwMacAuthenTimerOfflineDetect OBJECT-TYPE
-        SYNTAX     Integer32(30..7200)
+        SYNTAX     Integer32(0..7200)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -121,7 +154,7 @@
     
             
     hwMacAuthenTimerQuiet OBJECT-TYPE
-        SYNTAX     Integer32(10..3600)
+        SYNTAX     Integer32(0..3600)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -141,85 +174,161 @@
     
     
     hwMacAuthenReauthInterval OBJECT-TYPE
-        SYNTAX     Integer32(1..3600)
+        SYNTAX     Integer32(1..7200)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "Specify timer configuration of guest vlan reauthentication. "
         DEFVAL { 30 }
-        ::= { hwMacAuthenObjects 9 }
-        
+        ::= { hwMacAuthenObjects 9 }  
+   
             
     hwMacAuthenCfgTable  OBJECT-TYPE
-            SYNTAX SEQUENCE OF HwMacAuthenCfgEntry
-            MAX-ACCESS not-accessible
-            STATUS current
-            DESCRIPTION
-                "The MAC authentication configuration table."
-            ::= { hwMacAuthenObjects 10 }
+        SYNTAX SEQUENCE OF HwMacAuthenCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The MAC authentication configuration table."
+        ::= { hwMacAuthenObjects 10 }
     
            
     hwMacAuthenCfgEntry OBJECT-TYPE
-            SYNTAX HwMacAuthenCfgEntry
-            MAX-ACCESS not-accessible
-            STATUS current
-            DESCRIPTION
-                "An entry in the MAC authentication configuration table."
-            INDEX { hwMacAuthenPortIndex }
-            ::= { hwMacAuthenCfgTable 1 }
+        SYNTAX HwMacAuthenCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the MAC authentication configuration table."
+        INDEX { hwMacAuthenPortIndex }
+        ::= { hwMacAuthenCfgTable 1 }
             
     HwMacAuthenCfgEntry ::=
-            SEQUENCE {
-                hwMacAuthenPortIndex         Integer32,
-                hwMacAuthenPortEnable         EnabledStatus,
-                hwMacAuthenGuestVlan                VlanIdOrNone,
-                hwMacAuthenMaxUserNum             Integer32                
-                }
+        SEQUENCE {
+            hwMacAuthenPortIndex          Integer32,
+            hwMacAuthenPortEnable         EnabledStatus,
+            hwMacAuthenGuestVlan          VlanIdOrNone,
+            hwMacAuthenMaxUserNum         Integer32,
+            hwMacAuthenPortDomain         DisplayString,       
+            hwMacAuthenPortModeUserName   INTEGER,
+            hwMacAuthenPortUserName       DisplayString,
+            hwMacAuthenPortPassWord       DisplayString, 
+            hwMacAuthenPortPwdType        INTEGER            
+            }
     
     hwMacAuthenPortIndex OBJECT-TYPE
-            SYNTAX  Integer32 (1..512)
-            MAX-ACCESS not-accessible
-            STATUS current
-            DESCRIPTION "The Index of L2-Switch Interface."
-            ::= { hwMacAuthenCfgEntry 1 }
+        SYNTAX  Integer32 (0..1280)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The Index of L2-Switch Interface."
+        ::= { hwMacAuthenCfgEntry 1 }
            
     hwMacAuthenPortEnable OBJECT-TYPE
-            SYNTAX  EnabledStatus
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION " Whether to enable MAC authentication on this interface."
-            DEFVAL { disable }            
-            ::= { hwMacAuthenCfgEntry 2 } 
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION 
+            " Whether to enable MAC authentication on this interface."
+        DEFVAL { disable }            
+        ::= { hwMacAuthenCfgEntry 2 } 
     
     hwMacAuthenGuestVlan OBJECT-TYPE
         SYNTAX VlanIdOrNone
-               MAX-ACCESS read-create
-               STATUS current
-               DESCRIPTION 
-                   " Specify guest vlan configuration information for ports."
-               ::= { hwMacAuthenCfgEntry 3 }         
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION 
+            " Specify guest vlan configuration information for ports."
+        ::= { hwMacAuthenCfgEntry 3 }         
             
     hwMacAuthenMaxUserNum OBJECT-TYPE
-            SYNTAX  Integer32(1..256)
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION 
-                "The max number of users. "
-            DEFVAL { 256 }    
-            ::= { hwMacAuthenCfgEntry 4 }
+        SYNTAX  Integer32(1..16384)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION 
+            "The max number of users. "
+        DEFVAL { 256 }    
+        ::= { hwMacAuthenCfgEntry 4 }
+            
+    hwMacAuthenPortDomain  OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Specify domain server configuration for ports."
+       ::= { hwMacAuthenCfgEntry 5 }
+            
+            
+    hwMacAuthenPortModeUserName OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+         obeyGlobalConfiguration(1),
+         macAddressWithoutHyphen(2),
+         macAddressWithHyphen(3),
+         fixed(4),
+         option82(5),
+         macAddressWithHyphenNormal(6),
+         macAddressWithoutHyphenUpper(7),
+         macAddressWithHyphenUpper(8),
+         macAddressWithHyphenNormalUpper(9)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+           "Specify MAC authentication mode config for ports."
+        DEFVAL { obeyGlobalConfiguration }
+        ::= { hwMacAuthenCfgEntry 6 }
     
+     hwMacAuthenPortUserName OBJECT-TYPE
+         SYNTAX     DisplayString
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+             "Special the fixed username for ports."
+         ::= { hwMacAuthenCfgEntry 7 }
+            
+    hwMacAuthenPortPassWord OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Special the fixed password for ports."
+        ::= { hwMacAuthenCfgEntry 8 } 
+        
+    hwMacAuthenPortPwdType  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+         simple(1),
+         cipher(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The type of port password. "
+        DEFVAL { simple }
+        ::= { hwMacAuthenCfgEntry 9 }  
+                   
+    hwMacAuthenPwdType  OBJECT-TYPE
+        SYNTAX     INTEGER
+        {
+         simple(1),
+         cipher(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The type of global password. "
+        DEFVAL { simple }
+        ::= { hwMacAuthenObjects 11 }  
     
 --
 -- Traps Identifier
 --
-        hwMacAuthenMibTraps OBJECT IDENTIFIER ::= { hwMacAuthenMIB 2 }
+     hwMacAuthenMibTraps OBJECT IDENTIFIER ::= { hwMacAuthenMIB 2 }
         
-            hwMacAuthenMaxUserAlarm NOTIFICATION-TYPE
-                   OBJECTS { ifDescr } 
-                   STATUS current     
-                   DESCRIPTION 
-                           "The number of ahthenticate users is reached the max number. "
-                   ::= { hwMacAuthenMibTraps 1 }
+     hwMacAuthenMaxUserAlarm NOTIFICATION-TYPE
+           OBJECTS { ifDescr } 
+           STATUS current     
+           DESCRIPTION 
+                   "The number of ahthenticate users is reached the max number. "
+           ::= { hwMacAuthenMibTraps 1 }
         
             
      --  ============== conformance information ==============
@@ -256,9 +365,15 @@
                       hwMacAuthenReauthInterval, 
                       hwMacAuthenPortEnable, 
                       hwMacAuthenGuestVlan, 
-                      hwMacAuthenMaxUserNum
+                      hwMacAuthenMaxUserNum,
+                      hwMacAuthenPortDomain,
+                      hwMacAuthenPortModeUserName,
+                      hwMacAuthenPortUserName,
+                      hwMacAuthenPortPassWord,
+                      hwMacAuthenPortPwdType,
+                      hwMacAuthenPwdType
                     }
-             STATUS current
+            STATUS current
             DESCRIPTION 
                 "The mac-authen's Configuration group."
             ::= { hwMacAuthenCfgGroups 1 }    

@@ -26,20 +26,16 @@
 namespace LibreNMS\Util;
 
 use App;
-use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\DB\Eloquent;
 use Log;
 
 class Debug
 {
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private static $debug = false;
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private static $verbose = false;
+    /** @var bool */
+    private static $sql_debug_enabled = false;
 
     /**
      * Enable/disable debug output
@@ -51,8 +47,6 @@ class Debug
     public static function set($debug = true, bool $silence = false): bool
     {
         self::$debug = (bool) $debug;
-
-        restore_error_handler(); // disable Laravel error handler
 
         if (self::$debug) {
             self::enableErrorReporting();
@@ -92,18 +86,15 @@ class Debug
 
     public static function disableQueryDebug(): void
     {
-        $db = Eloquent::DB();
-
-        if ($db) {
-            // remove all query executed event handlers
-            $db->getEventDispatcher()->flush('Illuminate\Database\Events\QueryExecuted');
-        }
+        self::$sql_debug_enabled = false;
     }
 
     public static function enableCliDebugOutput(): void
     {
         if (Laravel::isBooted() && App::runningInConsole()) {
             Log::setDefaultDriver('console_debug');
+        } else {
+            putenv('LOG_CHANNEL=console_debug');
         }
     }
 
@@ -116,28 +107,12 @@ class Debug
 
     public static function enableQueryDebug(): void
     {
-        static $sql_debug_enabled;
-        $db = Eloquent::DB();
+        self::$sql_debug_enabled = true;
+    }
 
-        if ($db && ! $sql_debug_enabled) {
-            $db->listen(function (QueryExecuted $query) {
-                // collect bindings and make them a little more readable
-                $bindings = collect($query->bindings)->map(function ($item) {
-                    if ($item instanceof \Carbon\Carbon) {
-                        return $item->toDateTimeString();
-                    }
-
-                    return $item;
-                })->toJson();
-
-                if (Laravel::isBooted()) {
-                    Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-                } else {
-                    c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-                }
-            });
-            $sql_debug_enabled = true;
-        }
+    public static function queryDebugIsEnabled(): bool
+    {
+        return self::$sql_debug_enabled;
     }
 
     /**

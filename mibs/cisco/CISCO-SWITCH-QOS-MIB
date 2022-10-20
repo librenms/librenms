@@ -3,7 +3,7 @@
 --   
 -- September 2006, Edward Pham
 --   
--- Copyright (c) 2006, 2009-2011, 2013, 2014 by cisco Systems Inc.
+-- Copyright (c) 2006, 2009-2011, 2013-2016 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -49,7 +49,7 @@ IMPORTS
 
 
 ciscoSwitchQosMIB MODULE-IDENTITY
-    LAST-UPDATED    "201409190000Z"
+    LAST-UPDATED    "201606300000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -141,6 +141,12 @@ ciscoSwitchQosMIB MODULE-IDENTITY
         MPLS-EXP:  MPLS experimental field in MPLS label.
 
         MTU: Maximum Transmission Unit."
+    REVISION        "201606300000Z"
+    DESCRIPTION
+        "Updated QosStatsType to add new value
+        ucastWatchdogDroppedPkts(20).
+        Added ciscoSwitchQosHwServicePoolUsageGroup
+        and ciscoSwitchQosServicePoolUsageTxGroup."
     REVISION        "201409190000Z"
     DESCRIPTION
         "Updated csqIfQosGroupInfoScheduling to add new
@@ -254,7 +260,9 @@ QosStatsType ::= TEXTUAL-CONVENTION
         ucastSentOobfcPkts(16): Unicast packets sent on OOBFC
         ucastSentOobfcBytes(17): Unicast bytes sent on OOBFC
         ucastDroppedOobfcPkts(18): Unicast packets dropped on OOBFC
-        ucastDroppedOobfcBytes(19): Unicast bytes dropped on OOBFC"
+        ucastDroppedOobfcBytes(19): Unicast bytes dropped on OOBFC
+        ucastWatchdogDroppedPkts(20): Unicast packets dropped after watchdog
+                                      triggered"
     SYNTAX          INTEGER  {
                         ucastSentPkts(1),
                         ucastSentBytes(2),
@@ -274,7 +282,8 @@ QosStatsType ::= TEXTUAL-CONVENTION
                         ucastSentOobfcPkts(16),
                         ucastSentOobfcBytes(17),
                         ucastDroppedOobfcPkts(18),
-                        ucastDroppedOobfcBytes(19)
+                        ucastDroppedOobfcBytes(19),
+                        ucastWatchdogDroppedPkts(20)
                     }
 
 -- Global group
@@ -2854,7 +2863,12 @@ CsqSharedPoolUsageEntry ::= SEQUENCE {
         csqSharedPoolUsageUsed   Unsigned32,
         csqSharedPoolUsageRemain Unsigned32,
         csqSharedPoolUsagePeak   Unsigned32,
-        csqSharedPoolUsageTotal  Unsigned32
+        csqSharedPoolUsageTotal  Unsigned32,
+        csqSharedPoolUsageUsedTx   Unsigned32,
+        csqSharedPoolUsageRemainTx Unsigned32,
+        csqSharedPoolUsagePeakTx   Unsigned32,
+        csqSharedPoolUsageTotalTx  Unsigned32,
+        csqSharedPoolUsageNameTx   SnmpAdminString
 }
 
 csqSharedPoolUsageInstNo OBJECT-TYPE
@@ -2907,6 +2921,185 @@ csqSharedPoolUsageTotal OBJECT-TYPE
         "This object indicates the total cells in a shared pool." 
     ::= { csqSharedPoolUsageEntry 6 }
  
+csqSharedPoolUsageUsedTx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of used cells in a output shared
+        pool."
+    ::= { csqSharedPoolUsageEntry 7 }
+
+csqSharedPoolUsageRemainTx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the remaining cells in a output shared pool."
+    ::= { csqSharedPoolUsageEntry 8 }
+
+csqSharedPoolUsagePeakTx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the peak used cells in a output shared pool."
+    ::= { csqSharedPoolUsageEntry 9 }
+
+csqSharedPoolUsageTotalTx OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total cells in a output shared pool."
+    ::= { csqSharedPoolUsageEntry 10 }
+
+csqSharedPoolUsageNameTx OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the name of output shared pool."
+    ::= { csqSharedPoolUsageEntry 11 }
+
+
+-- - Hardware Shared Service Pool Usage table
+
+csqHwSharedPoolUsageTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CsqHwSharedPoolUsageEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table contains the utilization of the shared service pool 
+        for internal devices of a specific physical entity that is 
+        capable of providing this information."
+    ::= { csqStatistics 8 }
+
+csqHwSharedPoolUsageEntry OBJECT-TYPE
+    SYNTAX          CsqHwSharedPoolUsageEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry indicates the utilization of an shared service pool
+        for an internal device on a particular physical device, which is 
+        identified by a specific module(indicated by entPhysicalIndex in 
+        ENTITY-MIB), device ID (indicated by csqHwSharedPoolDeviceId), traffic
+        direction (indicated by csqHwSharedPoolStatsDirection), instance 
+        (indicated by csqHwSharedPoolUsageInstNo) and statistic type 
+        (indicated by csqHwSharedPoolStatsType). 
+        The unit of the value of the objects is cell. A cell represents the 
+        number of bytes, which is indicated by scalar object 
+        csqServicePoolCellSize."
+    INDEX           {
+                        entPhysicalIndex,
+                        csqHwSharedPoolDeviceId,
+                        csqHwSharedPoolUsageInstNo,
+                        csqHwSharedPoolStatsDirection,
+                        csqHwSharedPoolStatsType
+                    } 
+    ::= { csqHwSharedPoolUsageTable 1 }
+
+CsqHwSharedPoolUsageEntry ::= SEQUENCE {
+        csqHwSharedPoolDeviceId           INTEGER,
+        csqHwSharedPoolUsageInstNo        Unsigned32,
+        csqHwSharedPoolStatsDirection     INTEGER,
+        csqHwSharedPoolStatsType          INTEGER,
+        csqHwSharedPoolUsageUsed          Unsigned32,
+        csqHwSharedPoolUsageRemain        Unsigned32,
+        csqHwSharedPoolUsageShared        Unsigned32,
+        csqHwSharedPoolUsageTotal         Unsigned32 
+}
+
+csqHwSharedPoolDeviceId OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        northStar(1)
+                    } 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates an arbitrary number which uniquely
+        identifies a specific internal device."
+    ::= { csqHwSharedPoolUsageEntry 1 }
+
+csqHwSharedPoolUsageInstNo OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates an arbitrary number which uniquely
+        identifies the instance number of a specific internal device." 
+    ::= { csqHwSharedPoolUsageEntry 2 }
+
+csqHwSharedPoolStatsDirection OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        inputStats-ingressStraight(1),
+                        inputStats-ingressHairpin(2),
+                        inputStats-egress(3),
+                        outputStats-ingressStraight(4),
+                        outputStats-ingressHairpin(5),
+                        outputStats-egress(6)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the flow direction of a specific
+        traffic statistics."
+    ::= { csqHwSharedPoolUsageEntry 3 }
+
+csqHwSharedPoolStatsType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        drop(1),
+                        nodrop(2),
+                        span(3),
+                        sup(4)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the specific traffic classification type for 
+         hardware shared pool.
+
+         drop -  droppable traffic class
+         nodrop - no drop traffic class
+         span -  span traffic class
+         sup -  sup traffic class."
+    ::= { csqHwSharedPoolUsageEntry 4 }
+
+csqHwSharedPoolUsageUsed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of used cells in a hardware
+        shared pool." 
+    ::= { csqHwSharedPoolUsageEntry 5 }
+
+csqHwSharedPoolUsageRemain OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the remaining cells in a hardware
+         shared pool." 
+    ::= { csqHwSharedPoolUsageEntry 6 }
+
+csqHwSharedPoolUsageShared OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the shared used cells in a hardware
+        shared pool." 
+    ::= { csqHwSharedPoolUsageEntry 7 }
+
+csqHwSharedPoolUsageTotal OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total cells in a hardware shared pool." 
+    ::= { csqHwSharedPoolUsageEntry 8 }
+
 
 -- csqPolicerUsage group
 --   
@@ -6164,6 +6357,32 @@ ciscoSwitchQosIfQosGroupInfoShapeGroup OBJECT-GROUP
         each QoS group on an interface."
     ::= { ciscoSwitchQosMIBGroups 32 }
 
+ciscoSwitchQosHwServicePoolUsageGroup OBJECT-GROUP
+    OBJECTS         {
+                        csqHwSharedPoolUsageUsed,
+                        csqHwSharedPoolUsageRemain,
+                        csqHwSharedPoolUsageShared,
+                        csqHwSharedPoolUsageTotal
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object which provides the statistics
+        of each hardware service pool."
+    ::= { ciscoSwitchQosMIBGroups 33 }
+
+ciscoSwitchQosServicePoolUsageTxGroup OBJECT-GROUP
+    OBJECTS         {
+                        csqSharedPoolUsageUsedTx,
+                        csqSharedPoolUsageRemainTx,
+                        csqSharedPoolUsagePeakTx,
+                        csqSharedPoolUsageTotalTx,
+                        csqSharedPoolUsageNameTx
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of object which provides the statistics
+        of each output service pool."
+    ::= { ciscoSwitchQosMIBGroups 34 }
 END
 
 

@@ -30,7 +30,7 @@ IMPORTS
     DisplayString                                           FROM SNMPv2-TC;
 
 swInterfaces MODULE-IDENTITY
-      	LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      	LAST-UPDATED "202105190000Z"  -- April 1, 2013
 		ORGANIZATION "Cisco Systems, Inc."
 
 		CONTACT-INFO
@@ -43,7 +43,7 @@ swInterfaces MODULE-IDENTITY
 
         DESCRIPTION
              "The private MIB module definition for Switch Interfaces."
-      	REVISION     "201304010000Z"  -- April 1, 2013
+      	REVISION     "202105190000Z"  -- April 1, 2013
       	DESCRIPTION
               "Added MODULE-IDENTITY"
         ::= { switch001 43 }

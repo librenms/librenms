@@ -10,11 +10,11 @@
                     "version": "50670-02-00",
                     "hardware": "PTP 670 master (B0P01.01-C-FPS)",
                     "features": null,
+                    "location": "<private>",
                     "os": "ptp670",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": "<private>"
+                    "icon": "cambium.svg"
                 }
             ]
         },
@@ -553,7 +553,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "main ",
+                    "port_descr_type": "main",
                     "port_descr_descr": "psu",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -667,8 +667,8 @@
                     "ifName": "aux ethernet interface",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -772,8 +772,8 @@
                     "ifName": "nidu lan ethernet interface",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",

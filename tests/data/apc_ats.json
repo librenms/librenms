@@ -10,11 +10,11 @@
                     "version": "AOS v2.6.4 / App v1.0.6",
                     "hardware": "AP4423 R01",
                     "features": null,
+                    "location": "<private>",
                     "os": "apc",
                     "type": "power",
                     "serial": "<private>",
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

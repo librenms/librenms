@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use LibreNMS\Util\Compare;
 use Log;
 
 class YamlDiscovery
@@ -237,6 +238,17 @@ class YamlDiscovery
             return $pre_cache[$index][$name];
         }
 
+        //create the sub-index values in order to try to match them with precache
+        $sub_indexes = explode('.', $index);
+        // parse sub_index options name with trailing colon and index
+        $sub_index = 0;
+        $sub_index_end = null;
+        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
+            $name = $matches[1] ?? null;
+            $sub_index = $matches[2] ?? null;
+            $sub_index_end = $matches[3] ?? null;
+        }
+
         // search possible tables pre-cached based on various table schema
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
@@ -313,14 +325,14 @@ class YamlDiscovery
                     $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
-                        foreach ((array) $data['oid'] as $oid) {
+                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUS'];
+                                    $snmp_flag = ['-OteQUSa'];
                                 } else {
-                                    $snmp_flag = ['-OteQUs'];
+                                    $snmp_flag = ['-OteQUsa'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
@@ -329,7 +341,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'];
+                                $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
@@ -375,7 +387,7 @@ class YamlDiscovery
                     }
                 }
 
-                if (compare_var($tmp_value, $skip_value['value'], $op)) {
+                if (Compare::values($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
             }

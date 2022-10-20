@@ -10,11 +10,11 @@
                     "version": "20_2_1 (17875)",
                     "hardware": "FSP150-XG304 OptiSwitch V8-F",
                     "features": null,
+                    "location": null,
                     "os": "adva_xg300",
                     "type": "network",
                     "serial": "9520351101",
-                    "icon": "adva.svg",
-                    "location": null
+                    "icon": "adva.svg"
                 }
             ]
         },

@@ -3,7 +3,7 @@
 --   
 -- April 1995, Ashwin Baindur
 --   
--- Copyright (c) 1995-2009, 2011 by cisco Systems Inc.
+-- Copyright (c) 1995-2009, 2011, 2013, 2018 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -39,12 +39,14 @@ IMPORTS
         FROM INET-ADDRESS-MIB
     CounterBasedGauge64
         FROM HCNUM-TC
+    Percent
+        FROM CISCO-QOS-PIB-MIB
     ciscoMgmt
         FROM CISCO-SMI;
 
 
 ciscoFlashMIB MODULE-IDENTITY
-    LAST-UPDATED    "201103160000Z"
+    LAST-UPDATED    "201308060000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -58,8 +60,24 @@ ciscoFlashMIB MODULE-IDENTITY
 
             E-mail: cs-snmp@cisco.com"
     DESCRIPTION
+        "Added new object ciscoFlashDeviceChangeExtTrap
+        Added new object ciscoFlashDeviceInsertedExtNotif
+        Added new object ciscoFlashDeviceRemovedExtNotif
+        to support flash devices of sizes greater than 4 GB"
+    REVISION        "201808140000Z"
+    DESCRIPTION
         "This MIB provides for the management of Cisco
         Flash Devices."
+    REVISION        "201308060000Z"
+    DESCRIPTION
+        "Added new notification ciscoFlashPartitionLowSpaceNotif.
+        Added new notification ciscoFlashPartitionLowSpaceRecoveryNotif.
+        Added new object ciscoFlashPartitionLowSpaceNotifEnable.
+        Added new object ciscoFlashPartitionLowSpaceNotifThreshold.
+        Added new object group ciscoFlashPartitionInfoGroupRev1.
+        Added new notification group ciscoFlashNotifGroupRev3.
+        Added new compliance group ciscoFlashMIBComplianceRev11 which
+        deprecates ciscoFlashMIBComplianceRev10."
     REVISION        "201103160000Z"
     DESCRIPTION
         "Added ciscoFlashDeviceMinPartitionSizeExtended to support flash
@@ -904,20 +922,21 @@ ciscoFlashPartitionEntry OBJECT-TYPE
     ::= { ciscoFlashPartitionTable 1 }
 
 CiscoFlashPartitionEntry ::= SEQUENCE {
-        ciscoFlashPartitionIndex             Unsigned32,
-        ciscoFlashPartitionStartChip         Integer32,
-        ciscoFlashPartitionEndChip           Integer32,
-        ciscoFlashPartitionSize              Unsigned32,
-        ciscoFlashPartitionFreeSpace         Gauge32,
-        ciscoFlashPartitionFileCount         Gauge32,
-        ciscoFlashPartitionChecksumAlgorithm INTEGER,
-        ciscoFlashPartitionStatus            INTEGER,
-        ciscoFlashPartitionUpgradeMethod     INTEGER,
-        ciscoFlashPartitionName              DisplayString,
-        ciscoFlashPartitionNeedErasure       TruthValue,
-        ciscoFlashPartitionFileNameLength    Integer32,
-        ciscoFlashPartitionSizeExtended      CounterBasedGauge64,
-        ciscoFlashPartitionFreeSpaceExtended CounterBasedGauge64
+        ciscoFlashPartitionIndex                  Unsigned32,
+        ciscoFlashPartitionStartChip              Integer32,
+        ciscoFlashPartitionEndChip                Integer32,
+        ciscoFlashPartitionSize                   Unsigned32,
+        ciscoFlashPartitionFreeSpace              Gauge32,
+        ciscoFlashPartitionFileCount              Gauge32,
+        ciscoFlashPartitionChecksumAlgorithm      INTEGER,
+        ciscoFlashPartitionStatus                 INTEGER,
+        ciscoFlashPartitionUpgradeMethod          INTEGER,
+        ciscoFlashPartitionName                   DisplayString,
+        ciscoFlashPartitionNeedErasure            TruthValue,
+        ciscoFlashPartitionFileNameLength         Integer32,
+        ciscoFlashPartitionSizeExtended           CounterBasedGauge64,
+        ciscoFlashPartitionFreeSpaceExtended      CounterBasedGauge64,
+        ciscoFlashPartitionLowSpaceNotifThreshold Percent
 }
 
 ciscoFlashPartitionIndex OBJECT-TYPE
@@ -1208,6 +1227,20 @@ ciscoFlashPartitionFreeSpaceExtended OBJECT-TYPE
 
         This object is a 64-bit version of ciscoFlashPartitionFreeSpace" 
     ::= { ciscoFlashPartitionEntry 14 }
+
+ciscoFlashPartitionLowSpaceNotifThreshold OBJECT-TYPE
+    SYNTAX          Percent
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the minimum threshold value in percentage
+        of free space for each partition. If the free space available
+        goes below this threshold value and if
+        ciscoFlashPartionLowSpaceNotifEnable is set to true,
+        ciscoFlashPartitionLowSpaceNotif will be generated. When the
+        available free space comes back to the threshold value
+        ciscoFlashPartionLowSpaceRecoveryNotif will be generated." 
+    ::= { ciscoFlashPartitionEntry 15 }
  
 
 -- Flash partition sub group : File level information
@@ -2475,6 +2508,31 @@ ciscoFlashCfgDevRemNotifEnable OBJECT-TYPE
         notification to be delivered."
     DEFVAL          { false } 
     ::= { ciscoFlashCfg 2 }
+
+ciscoFlashPartitionLowSpaceNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether or not a notification should be
+        generated when the free space falls below the threshold value on
+        a flash partition and on recovery from low space.
+
+        If the value of this object is 'true' then
+        ciscoFlashPartitionLowSpaceNotif and
+        ciscoFlashPartitionLowSpaceRecoveryNotif notifications will be
+        generated.
+
+        If the value of this object is 'false' then the
+        ciscoFlashPartitionLowSpaceNotif  and
+        ciscoFlashPartitionLowSpaceRecoveryNotif notifications
+        will not be generated.
+
+        It is the responsibility of the management entity to
+        ensure that the SNMP administrative model is
+        configured in such a way as to allow the
+        notifications to be delivered." 
+    ::= { ciscoFlashCfg 3 }
 -- Traps (or notifications ??)
 
 ciscoFlashMIBTraps  OBJECT IDENTIFIER
@@ -2567,8 +2625,93 @@ ciscoFlashDeviceRemovedNotifRev1 NOTIFICATION-TYPE
         ciscoFlashDeviceName as a varbind which is
         deprecated"
    ::= { ciscoFlashMIBTraps 8 }
+
+ciscoFlashPartitionLowSpaceNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoFlashPartitionName,
+                        ciscoFlashPartitionFreeSpaceExtended,
+                        ciscoFlashPartitionLowSpaceNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoFlashPartitionLowSpaceNotif notification is sent
+        when the percentage of free space in a flash partition falls
+        below ciscoFlashPartitionLowSpaceNotifThreshold.This
+        notification will be generated when the value of
+        ciscoFlashPartitionLowSpaceNotifEnable is
+        true.
+
+        ciscoFlashPartitionName indicates the name of the flash
+        partition for which this notification has been sent.
+
+        ciscoFlashPartitionFreeSpaceExtended indicates the free space
+        available with in the flash partition.
+
+        ciscoFlashPartitionLowSpaceNotifThreshold indicates the minimum
+        threshold value in percentage of free space for each partition."
+   ::= { ciscoFlashMIBTraps 9 }
+
+ciscoFlashPartitionLowSpaceRecoveryNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoFlashPartitionName,
+                        ciscoFlashPartitionFreeSpaceExtended,
+                        ciscoFlashPartitionLowSpaceNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoFlashPartitionLowSpaceRecoveryNotif notification is sent
+        whenever the free space in a flash partition becomes
+        normal once it has gone low. This notification will be
+        generated
+        when the value of ciscoFlashPartitionLowSpaceNotifEnable is
+        true. This trap is generated as a recovery notification for
+        ciscoFlashPartitionLowSpaceNotif.
+
+        ciscoFlashPartitionName indicates the name of the flash
+        partition for which this notification has been sent.
+
+        ciscoFlashPartitionFreeSpaceExtended indicates the free space
+        available with in the flash partition.
+
+        ciscoFlashPartitionLowSpaceNotifThreshold indicates the minimum
+        threshold value in percentage of free space for each partition."
+   ::= { ciscoFlashMIBTraps 10 }
+
 -- Conformance information
 
+ciscoFlashDeviceChangeExtTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoFlashDeviceMinPartitionSizeExtended,
+                        ciscoFlashDeviceNameExtended
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoFlashDeviceChangeExtTrap is sent whenever a
+        removable Flash device is inserted or removed."
+   ::= { ciscoFlashMIBTraps 11 }
+
+ciscoFlashDeviceInsertedExtNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoFlashDeviceMinPartitionSizeExtended,
+                        ciscoFlashDeviceNameExtended
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoFlashDeviceInsertedExtNotif notification is sent
+        whenever a removable Flash device is inserted."
+   ::= { ciscoFlashMIBTraps 12 }
+
+ciscoFlashDeviceRemovedExtNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        ciscoFlashDeviceMinPartitionSizeExtended,
+                        ciscoFlashDeviceNameExtended
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ciscoFlashDeviceRemovedExtNotif notification is sent
+        whenever a removable Flash device removed."
+   ::= { ciscoFlashMIBTraps 13 }
+   
 ciscoFlashMIBConformance  OBJECT IDENTIFIER
     ::= { ciscoFlashMIB 2 }
 
@@ -3032,10 +3175,13 @@ ciscoFlashMIBComplianceRev9 MODULE-COMPLIANCE
     ::= { ciscoFlashMIBCompliances 10 }
 
 ciscoFlashMIBComplianceRev10 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for entities that supports
-        the Cisco Flash MIB."
+        the Cisco Flash MIB.
+
+        This compliance is deprecated by
+        ciscoFlashMIBComplianceRev11."
     MODULE          -- this module
     MANDATORY-GROUPS {
                         ciscoFlashPartitionInfoGroup,
@@ -3094,6 +3240,70 @@ ciscoFlashMIBComplianceRev10 MODULE-COMPLIANCE
         flash devices of sizes greater than 4 GB and also
         supports ciscoFlashDeviceInfoGroupRev2."
     ::= { ciscoFlashMIBCompliances 11 }
+
+ciscoFlashMIBComplianceRev11 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities that supports
+        the Cisco Flash MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoFlashPartitionInfoGroupRev1,
+                        ciscoFlashFileInfoGroupRev1,
+                        ciscoFlashFileInfoGroupSupp1,
+                        ciscoFlashChipInfoGroup,
+                        ciscoFlashCopyOpGroupRev2,
+                        ciscoFlashCopyOpGroupRev3
+                    }
+
+    GROUP           ciscoFlashDeviceOptionalInfoGroupRev1
+    DESCRIPTION
+        "The Flash device optional group contains objects for features
+        that may be optional or not available across all systems.       
+        An example is the partitioning feature"
+
+    GROUP           ciscoFlashPartitioningOpGroup
+    DESCRIPTION
+        "The Flash partitioning operations group is optional. It is
+        intended whenever partitioning is supported."
+
+    GROUP           ciscoFlashMiscOpGroup
+    DESCRIPTION
+        "The Flash miscellaneous operations group is optional. It
+        contains operations that are not essential or not universally
+        supported across all platforms"
+
+    GROUP           ciscoFlashNotifGroupRev3
+    DESCRIPTION
+        "This group contains Notifications representing flash operations"
+
+    GROUP           ciscoFlashFileTypeInfoGroup
+    DESCRIPTION
+        "This group contain objects for the device to represent Flash
+        Files sorted by FlashFileType"
+
+    GROUP           ciscoFlashDeviceInfoGroupRev2
+    DESCRIPTION
+        "This group contain objects for the device to represent Flash
+        Files sorted by FlashFileType"
+
+    GROUP           ciscoFlashDeviceInfoExtGroup
+    DESCRIPTION
+        "This group is mandatory for device which suppoorts
+        flash devices of sizes greater than 4 GB and also
+        supports ciscoFlashDeviceInfoGroupRev2."
+
+    GROUP           ciscoFlashPartitionInfoExtGroup
+    DESCRIPTION
+        "This group is mandatory for device which suppoorts
+        flash devices of sizes greater than 4 GB"
+
+    GROUP           ciscoFlashDeviceInfoExtGroupSupRev1
+    DESCRIPTION
+        "This group is mandatory for device which suppoorts
+        flash devices of sizes greater than 4 GB and also
+        supports ciscoFlashDeviceInfoGroupRev2."
+    ::= { ciscoFlashMIBCompliances 12 }
 
 -- Units of conformance
 
@@ -3157,7 +3367,7 @@ ciscoFlashPartitionInfoGroup OBJECT-GROUP
                         ciscoFlashPartitionNeedErasure,
                         ciscoFlashPartitionFileNameLength
                     }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing Flash
         partition level information. Where a Flash
@@ -3377,9 +3587,10 @@ ciscoFlashNotifGroupRev2 NOTIFICATION-GROUP
                         ciscoFlashDeviceInsertedNotifRev1,
                         ciscoFlashDeviceRemovedNotifRev1
                     }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
-        "The set of notification defined by this MIB."
+        "The set of notification defined by this MIB.
+        ciscoFlashNotifGroupRev2 object is superseded by ciscoFlashNotifGroupRev3."
     ::= { ciscoFlashMIBGroups 17 }
 
 ciscoFlashCopyOpGroupRev3 OBJECT-GROUP
@@ -3444,26 +3655,48 @@ ciscoFlashDeviceInfoExtGroupSupRev1 OBJECT-GROUP
         This Group is supplement to ciscoFlashDeviceInfoExtGroup."
     ::= { ciscoFlashMIBGroups 23 }
 
+ciscoFlashPartitionInfoGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        ciscoFlashPartitionStartChip,
+                        ciscoFlashPartitionEndChip,
+                        ciscoFlashPartitionSize,
+                        ciscoFlashPartitionFreeSpace,
+                        ciscoFlashPartitionFileCount,
+                        ciscoFlashPartitionChecksumAlgorithm,
+                        ciscoFlashPartitionStatus,
+                        ciscoFlashPartitionUpgradeMethod,
+                        ciscoFlashPartitionName,
+                        ciscoFlashPartitionNeedErasure,
+                        ciscoFlashPartitionFileNameLength,
+                        ciscoFlashPartitionLowSpaceNotifThreshold,
+                        ciscoFlashPartitionLowSpaceNotifEnable
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing Flash
+        partition level information. Where a Flash
+        device has not been partitioned or does
+        not support partitioning, a partition is
+        synonymous with the entire device."
+    ::= { ciscoFlashMIBGroups 24 }
+
+ciscoFlashNotifGroupRev3 NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoFlashCopyCompletionTrap,
+                        ciscoFlashPartitioningCompletionTrap,
+                        ciscoFlashMiscOpCompletionTrap,
+                        ciscoFlashDeviceInsertedNotifRev1,
+                        ciscoFlashDeviceRemovedNotifRev1,
+                        ciscoFlashPartitionLowSpaceNotif,
+                        ciscoFlashPartitionLowSpaceRecoveryNotif,
+                        ciscoFlashDeviceChangeExtTrap,
+                        ciscoFlashDeviceInsertedExtNotif,
+                        ciscoFlashDeviceRemovedExtNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The set of notification defined by this MIB."
+    ::= { ciscoFlashMIBGroups 25 }
+
 END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

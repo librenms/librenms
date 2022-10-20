@@ -10,11 +10,11 @@
                     "version": "250 (180914PL1760)",
                     "hardware": "",
                     "features": null,
+                    "location": "<private>",
                     "os": "schleifenbauer",
                     "type": "power",
                     "serial": "SVNL00655429",
-                    "icon": "schleifenbauer.svg",
-                    "location": "<private>"
+                    "icon": "schleifenbauer.svg"
                 }
             ]
         },

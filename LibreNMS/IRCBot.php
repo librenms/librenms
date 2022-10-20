@@ -25,6 +25,7 @@ use LibreNMS\DB\Eloquent;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Version;
 use Permissions;
 
 class IRCBot
@@ -602,7 +603,7 @@ class IRCBot
     {
         if (! Eloquent::isConnected()) {
             try {
-                Eloquent::boot();
+                Eloquent::DB()->statement('SELECT VERSION()');
             } catch (\PDOException $e) {
                 $this->log('Cannot connect to MySQL: ' . $e->getMessage());
 
@@ -781,11 +782,9 @@ class IRCBot
 
     private function _version($params)
     {
-        $versions = version_info();
-        $schema_version = $versions['db_schema'];
-        $version = $versions['local_ver'];
+        $version = Version::get();
 
-        $msg = $this->config['project_name'] . ', Version: ' . $version . ', DB schema: ' . $schema_version . ', PHP: ' . PHP_VERSION;
+        $msg = $this->config['project_name'] . ', Version: ' . $version->name() . ', DB schema: ' . $version->databaseMigrationCount() . ', PHP: ' . PHP_VERSION;
 
         return $this->respond($msg);
     }

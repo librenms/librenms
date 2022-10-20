@@ -59,7 +59,7 @@ on what you want the users access to change.
 Step 2: Then go to Settings -> WebUI settings -> Dashboard Settings
 and set the global default dashboard.
 
-## Setting embeded webpage
+## Setting embedded webpage
 
 Using the Notes Widget.
 
