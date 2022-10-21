@@ -148,13 +148,13 @@ class Mail
                 $image = Graph::getImage($url);
 
                 // attach image
-                $fileName = substr(Clean::fileName($image->title() ?: $cid), 0, 250);
+                $fileName = substr(Clean::fileName($image->title ?: $cid), 0, 250);
                 $mail->addStringEmbeddedImage(
-                    $image->data(),
+                    $image->data,
                     $cid,
                     $fileName . '.' . $image->fileExtension(),
                     PHPMailer::ENCODING_BASE64,
-                    $image->imageType()
+                    $image->format->contentType()
                 );
 
                 // update image tag to link to attached image, or just the image name

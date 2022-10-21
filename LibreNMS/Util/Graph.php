@@ -30,6 +30,8 @@ use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphImage;
+use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
 use Rrd;
 
@@ -65,7 +67,7 @@ class Graph
             return self::getImage($vars)->base64();
         }
 
-        return self::getImage($vars)->data();
+        return self::getImage($vars)->data;
     }
 
     /**
@@ -84,7 +86,7 @@ class Graph
                 throw $e;
             }
 
-            return new GraphImage(self::imageType(), 'Error', $e->generateErrorImage());
+            return new GraphImage(ImageFormat::forGraph(), 'Error', $e->generateErrorImage());
         }
     }
 
@@ -111,28 +113,15 @@ class Graph
             $vars = Url::parseLegacyPathVars($vars);
         }
 
-        [$type, $subtype] = extract_graph_type($vars['type']);
-
-        $graph_title = '';
         if (isset($vars['device'])) {
             $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : getidbyname($vars['device']));
             DeviceCache::setPrimary($device['device_id']);
-
-            //set default graph title
-            $graph_title = DeviceCache::getPrimary()->displayName();
         }
 
         // variables for included graphs
-        $width = $vars['width'] ?? 400;
-        $height = $vars['height'] ?? $width / 3;
-        $title = $vars['title'] ?? '';
-        $vertical = $vars['vertical'] ?? '';
-        $legend = $vars['legend'] ?? false;
-        $from = parse_at_time($vars['from'] ?? '-1d');
-        $to = empty($vars['to']) ? time() : parse_at_time($vars['to']);
-        $period = ($to - $from);
-        $prev_from = ($from - $period);
-        $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+        $graph_params = new GraphParameters($vars);
+        extract($graph_params->all()); // set php variables for legacy graphs
+
         $rrd_options = '';
         $rrd_filename = null;
 
@@ -152,22 +141,17 @@ class Graph
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
 
-        if ($graph_image_type === 'svg') {
-            $rrd_options .= ' --imgformat=SVG';
-            if ($width < 350) {
-                $rrd_options .= ' -m 0.75 -R light';
-            }
-        }
-
         if (empty($rrd_options)) {
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
+
+        $rrd_options = $graph_params . ' ' . $rrd_options;
 
         // Generating the graph!
         try {
             $image_data = Rrd::graph($rrd_options);
 
-            return new GraphImage(self::imageType($graph_image_type), $title ?? $graph_title, $image_data);
+            return new GraphImage($graph_params->imageFormat, $graph_params->title, $image_data);
         } catch (RrdGraphException $e) {
             // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (Debug::isEnabled()) {
@@ -249,21 +233,6 @@ class Graph
         $os_group = Config::getOsSetting($device->os, 'group');
 
         return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
-    }
-
-    /**
-     * Get the http content type of the image
-     *
-     * @param  string|null  $type  svg or png
-     * @return string
-     */
-    public static function imageType(?string $type = null): string
-    {
-        if ($type === null) {
-            $type = Config::get('webui.graph_type');
-        }
-
-        return $type === 'svg' ? 'image/svg+xml' : 'image/png';
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Enum\ImageFormat;
 
 global $debug;
 
@@ -10,27 +12,15 @@ if (isset($vars['device'])) {
     $device = is_numeric($vars['device'])
         ? device_by_id_cache($vars['device'])
         : device_by_name($vars['device']);
+    DeviceCache::setPrimary($device['device_id']);
 }
 
-// FIXME -- remove these
-$width = $vars['width'] ?? 400;
-$height = $vars['height'] ?? round($width / 3);
-$title = $vars['title'] ?? '';
-$vertical = $vars['vertical'] ?? '';
-$legend = $vars['legend'] ?? false;
-$output = (! empty($vars['output']) ? $vars['output'] : 'default');
-$from = empty($vars['from']) ? Config::get('time.day') : parse_at_time($vars['from']);
-$to = empty($vars['to']) ? Config::get('time.now') : parse_at_time($vars['to']);
-$period = ($to - $from);
-$prev_from = ($from - $period);
-
-$graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+// variables for included graphs
+$graph_params = new GraphParameters($vars);
+extract($graph_params->all()); // set php variables for legacy graphs
 $rrd_options = '';
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
-
-//set default graph title
-$graph_title = format_hostname($device);
 
 if ($auth && is_customoid_graph($type, $subtype)) {
     $unit = $vars['unit'];
@@ -49,12 +39,7 @@ if ($auth === null) {
     return;
 }
 
-if ($graph_image_type === 'svg') {
-    $rrd_options .= ' --imgformat=SVG';
-    if ($width < 350) {
-        $rrd_options .= ' -m 0.75 -R light';
-    }
-}
+$rrd_options = $graph_params . ' ' . $rrd_options;
 
 // command output requested
 if (! empty($command_only)) {
@@ -88,9 +73,9 @@ try {
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
-        echo '<img src="data:' . get_image_type($graph_image_type) . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
+        echo '<img src="data:' . ImageFormat::forGraph()->contentType() . ';base64,' . base64_encode($image_data) . '" alt="graph" />';
     } else {
-        header('Content-type: ' . get_image_type(Config::get('webui.graph_type')));
+        header('Content-type: ' . ImageFormat::forGraph()->contentType());
         echo $output === 'base64' ? base64_encode($image_data) : $image_data;
     }
 } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
