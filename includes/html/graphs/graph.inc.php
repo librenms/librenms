@@ -6,8 +6,6 @@ use LibreNMS\Enum\ImageFormat;
 
 global $debug;
 
-[$type, $subtype] = extract_graph_type($vars['type']);
-
 if (isset($vars['device'])) {
     $device = is_numeric($vars['device'])
         ? device_by_id_cache($vars['device'])

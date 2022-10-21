@@ -188,6 +188,7 @@ if (! $auth) {
     }
 
     if (! empty($vars['showcommand'])) {
+        $vars = $graph_array;
         $_GET = $graph_array;
         $command_only = 1;
 

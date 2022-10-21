@@ -62,7 +62,7 @@ class GraphParameters
     public ?int $scale_max = null;
     public ?int $scale_min = null;
     public ?bool $scale_rigid = null;
-    public bool $sloped = false;
+    public bool $sloped = true;
 
     public int $float_precision = 2;
 
@@ -73,7 +73,7 @@ class GraphParameters
 
     public function __construct(array $vars)
     {
-        $this->imageFormat = ImageFormat::tryFrom($vars['graph_type'] ?? Config::get('webui.graph_type')) ?? ImageFormat::png;
+        $this->imageFormat = ImageFormat::forGraph($vars['graph_type'] ?? null);
         [$this->type, $this->subtype] = $this->extractType($vars['type'] ?? '');
 
         $this->width = (int) ($vars['width'] ?? 400);
@@ -94,7 +94,7 @@ class GraphParameters
             'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
-            'aggregate' => ! ($vars['noagg'] ?? $this->is_small),
+            'aggregate' => ! empty($vars['noagg']),
         ];
 
         $this->from = $this->parseAtTime($vars['from'] ?? '-1d');
@@ -127,7 +127,7 @@ class GraphParameters
 
     public function toRrdOptions(): array
     {
-        $options = ['-E', '--start', $this->from, '--end', $this->to, '--width', $this->width, '--height', $this->height];
+        $options = ['--start', $this->from, '--end', $this->to, '--width', $this->width, '--height', $this->height];
 
         // image must fit final dimensions
         if ($this->full_size) {
