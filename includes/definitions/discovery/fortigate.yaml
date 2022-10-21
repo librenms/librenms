@@ -31,7 +31,6 @@ modules:
                         - fgVpnTunEntPhase1Name
                         - fgVpnTunEntPhase2Name
                         - fgVpnTunEntRemGwyIp
-                        - fgVWLHealthCheckLinkName
         state:
             data:
                 -
@@ -111,14 +110,14 @@ modules:
                     value: fgVWLHealthCheckLinkLatency
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.5.{{ $index }}'
                     descr: 'Link Latency {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
-                    group: SD-Wan
+                    group: SD-WAN
                     index: 'fgVWLHealthCheckLinkLatency.{{ $index }}'
                 -
                     oid: fgVWLHealthCheckLinkTable
                     value: fgVWLHealthCheckLinkJitter
                     num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.6.{{ $index }}'
                     descr: 'Link Jitter {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
-                    group: SD-Wan
+                    group: SD-WAN
                     index: 'fgVWLHealthCheckLinkJitter.{{ $index }}'
 
         signal:
