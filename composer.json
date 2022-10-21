@@ -14,7 +14,7 @@
     "homepage": "https://www.librenms.org/",
     "license": "GPL-3.0-or-later",
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-gd": "*",
         "ext-json": "*",
