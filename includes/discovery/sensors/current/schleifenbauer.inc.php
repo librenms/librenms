@@ -3,7 +3,7 @@
 echo 'Schleifenbauer ';
 $divisor = 100;
 
-foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
+foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] ?? [] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
     foreach ($pre_cache['sdbDevInActualCurrent'][$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInActualCurrent) {
         $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $current_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.5.$sdbDevIdIndex.$sdbDevInIndex";
@@ -21,7 +21,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 }
 
 $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
-foreach ($pre_cache['sdbDevOutMtActualCurrent'] as $sdbDevOutMtIndex => $sdbDevOutMtActualCurrent) {
+foreach ($pre_cache['sdbDevOutMtActualCurrent'] ?? [] as $sdbDevOutMtIndex => $sdbDevOutMtActualCurrent) {
     $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
     $current_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.5.$unit.$sdbDevOutMtIndex";
     $current = $sdbDevOutMtActualCurrent / $divisor;

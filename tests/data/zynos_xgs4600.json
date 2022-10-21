@@ -55,11 +55,11 @@
                     "version": "V4.70(ABBI.2)",
                     "hardware": "XGS4600-32F",
                     "features": null,
+                    "location": "<private>",
                     "os": "zynos",
                     "type": "network",
                     "serial": "S182L35001343",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

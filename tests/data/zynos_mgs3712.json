@@ -10,11 +10,11 @@
                     "version": "",
                     "hardware": "MGS-3712",
                     "features": null,
+                    "location": "<private>",
                     "os": "zynos",
                     "type": "network",
                     "serial": "S100Z16017355",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },

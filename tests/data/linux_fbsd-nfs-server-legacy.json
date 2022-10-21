@@ -9,7 +9,6 @@
                     "app_state_prev": null,
                     "app_status": "",
                     "app_instance": "",
-
                     "data": null
                 }
             ]
@@ -221,11 +220,11 @@
                     "version": "3.10.0-693.5.2.el7.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
+                    "icon": "linux.svg"
                 }
             ]
         },

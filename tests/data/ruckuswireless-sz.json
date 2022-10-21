@@ -10,11 +10,11 @@
                     "version": "3.6.2.0.78 (US)",
                     "hardware": "SZ104",
                     "features": "Licenses: 40/76",
+                    "location": "<private>",
                     "os": "ruckuswireless-sz",
                     "type": "wireless",
                     "serial": "211838000212",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "icon": "ruckus.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "6.4.0",
                     "hardware": "MODELNUMBER",
                     "features": "Non-Expiry License",
+                    "location": "<private>",
                     "os": "dhcpatriot",
                     "type": "server",
                     "serial": "SERIALNUMBER",
-                    "icon": "dhcpatriot.png",
-                    "location": "<private>"
+                    "icon": "dhcpatriot.png"
                 }
             ]
         },
@@ -562,8 +562,8 @@
                     "ifName": "sit0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",

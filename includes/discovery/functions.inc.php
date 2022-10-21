@@ -155,6 +155,7 @@ function discover_device(&$device, $force_module = false)
                 // isolate module exceptions so they don't disrupt the polling process
                 Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 Log::event("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
+                report($e);
             }
 
             $module_time = microtime(true) - $module_start;
@@ -860,6 +861,11 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 
         foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
+
+            if (! isset($pre_cache[$tmp_name])) {
+                continue;
+            }
+
             $raw_data = (array) $pre_cache[$tmp_name];
 
             d_echo("Data $tmp_name: ");
@@ -877,7 +883,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
@@ -919,10 +925,10 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode('.', unpack('c*', $index)), $oid);
 
                     // process the description
-                    $descr = YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache);
+                    $descr = trim(YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));
 
                     // process the group
-                    $group = YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache) ?: null;
+                    $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
                     $divisor = $data['divisor'] ?? ($sensor_options['divisor'] ?? 1);
                     $multiplier = $data['multiplier'] ?? ($sensor_options['multiplier'] ?? 1);
@@ -945,7 +951,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $sensor_name = $device['os'];
 
                     if ($sensor_class === 'state') {
-                        $sensor_name = $data['state_name'] ?: $data['oid'];
+                        $sensor_name = $data['state_name'] ?? $data['oid'];
                         create_state_index($sensor_name, $data['states']);
                     } else {
                         // We default to 1 for both divisors / multipliers so it should be safe to do the calculation using both.
@@ -1018,7 +1024,7 @@ function build_bgp_peers($device, $data, $peer2)
 
     $peerlist = [];
     $ver = '';
-    foreach (explode("\n", $peers) as $peer) {
+    foreach ($peers ? explode("\n", $peers) : [] as $peer) {
         $local_ip = null;
         if ($peer2 === true) {
             [$ver, $peer] = explode('.', $peer, 2);

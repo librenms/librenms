@@ -23,19 +23,19 @@ class BgpPeerFactory extends Factory
     public function definition()
     {
         return [
-            'bgpPeerIdentifier' => $this->faker->ipv4,
-            'bgpLocalAddr' => $this->faker->ipv4,
-            'bgpPeerRemoteAddr' => $this->faker->ipv4,
+            'bgpPeerIdentifier' => $this->faker->ipv4(),
+            'bgpLocalAddr' => $this->faker->ipv4(),
+            'bgpPeerRemoteAddr' => $this->faker->ipv4(),
             'bgpPeerRemoteAs' => $this->faker->numberBetween(1, 65535),
             'bgpPeerState' => $this->faker->randomElement(['established', 'idle']),
-            'astext' => $this->faker->sentence,
+            'astext' => $this->faker->sentence(),
             'bgpPeerAdminStatus' => $this->faker->randomElement(['start', 'stop']),
             'bgpPeerInUpdates' => $this->faker->randomDigit(),
             'bgpPeerOutUpdates' => $this->faker->randomDigit(),
             'bgpPeerInTotalMessages' => $this->faker->randomDigit(),
             'bgpPeerOutTotalMessages' => $this->faker->randomDigit(),
-            'bgpPeerFsmEstablishedTime' => $this->faker->unixTime,
-            'bgpPeerInUpdateElapsedTime' => $this->faker->unixTime,
+            'bgpPeerFsmEstablishedTime' => $this->faker->unixTime(),
+            'bgpPeerInUpdateElapsedTime' => $this->faker->unixTime(),
         ];
     }
 }

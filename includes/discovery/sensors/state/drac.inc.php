@@ -72,34 +72,35 @@ foreach ($tables as $tablevalue) {
         }
 
         // Create State Index
-        create_state_index($value_oid, $states);
+        create_state_index($value_oid, $states ?? []);
 
         foreach ($temp as $index => $entry) {
-            if ($value_oid == 'memoryDeviceStatus') {
-                $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize'] / 1024 . ' MB';
-            } else {
-                $descr = $entry[$descr_oid];
-            }
-
             //Discover Sensors
-            discover_sensor(
-                $valid['sensor'],
-                'state',
-                $device,
-                $num_oid . $index,
-                $index,
-                $value_oid,
-                $descr,
-                1,
-                1,
-                null,
-                null,
-                null,
-                null,
-                $entry[$value_oid],
-                'snmp',
-                $index
-            );
+            if (isset($entry[$descr_oid])) {
+                if ($value_oid == 'memoryDeviceStatus') {
+                    $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize'] / 1024 . ' MB';
+                } else {
+                    $descr = $entry[$descr_oid];
+                }
+                discover_sensor(
+                    $valid['sensor'],
+                    'state',
+                    $device,
+                    $num_oid . $index,
+                    $index,
+                    $value_oid,
+                    $descr,
+                    1,
+                    1,
+                    null,
+                    null,
+                    null,
+                    null,
+                    $entry[$value_oid],
+                    'snmp',
+                    $index
+                );
+            }
 
             //Create Sensor To State Index
             create_sensor_to_state_index($device, $value_oid, $index);

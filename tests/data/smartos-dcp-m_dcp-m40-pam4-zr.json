@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "DCP-M40-PAM4-ZR",
                     "features": null,
+                    "location": "<private>",
                     "os": "smartos-dcp-m",
                     "type": "network",
                     "serial": null,
-                    "icon": "smartoptics.png",
-                    "location": "<private>"
+                    "icon": "smartoptics.png"
                 }
             ]
         },

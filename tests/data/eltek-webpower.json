@@ -10,11 +10,11 @@
                     "version": "4.11",
                     "hardware": "smartpack",
                     "features": "Rectifier type: FLATPACK2 48/2000 HE, Battery name: PowerSafe 12V170FS",
+                    "location": "sysLocation",
                     "os": "eltek-webpower",
                     "type": "power",
                     "serial": "142308329523",
-                    "icon": "eltek.png",
-                    "location": "sysLocation"
+                    "icon": "eltek.png"
                 }
             ]
         },

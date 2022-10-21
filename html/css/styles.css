@@ -2060,7 +2060,8 @@ label {
   margin:2px;
 }
 
-.widget-availability-fixed {
+.widget-availability:empty {
+  display: inline;
   min-width: 2.4em;
   min-height: 1.3em;
   max-height: 1.6em;

@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "f5",
                     "type": "loadbalancer",
                     "serial": null,
-                    "icon": "f5.svg",
-                    "location": null
+                    "icon": "f5.svg"
                 }
             ]
         },

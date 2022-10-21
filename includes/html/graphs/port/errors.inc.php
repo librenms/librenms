@@ -1,7 +1,7 @@
 <?php
 
 $rrd_list[1]['filename'] = $rrd_filename;
-$rrd_list[1]['descr'] = $int['ifDescr'];
+$rrd_list[1]['descr'] = $port['ifDescr'];
 $rrd_list[1]['ds_in'] = 'INERRORS';
 $rrd_list[1]['ds_out'] = 'OUTERRORS';
 $rrd_list[1]['descr'] = 'Errors';
@@ -9,7 +9,7 @@ $rrd_list[1]['colour_area_in'] = 'FF3300';
 $rrd_list[1]['colour_area_out'] = 'FF6633';
 
 $rrd_list[4]['filename'] = $rrd_filename;
-$rrd_list[4]['descr'] = $int['ifDescr'];
+$rrd_list[4]['descr'] = $port['ifDescr'];
 $rrd_list[4]['ds_in'] = 'INDISCARDS';
 $rrd_list[4]['ds_out'] = 'OUTDISCARDS';
 $rrd_list[4]['descr'] = 'Discards';

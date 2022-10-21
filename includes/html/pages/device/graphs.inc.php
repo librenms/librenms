@@ -15,6 +15,7 @@ print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Graphs</span> &#187; ";
 
+$graph_enable = [];
 foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY graph', [$device['device_id']]) as $graph) {
     $section = \LibreNMS\Config::get("graph_types.device.{$graph['graph']}.section");
     if ($section != '') {
@@ -26,7 +27,7 @@ $sep = '';
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
         $type = strtolower($section);
-        if (! $vars['group']) {
+        if (empty($vars['group'])) {
             $vars['group'] = $type;
         }
 
@@ -52,10 +53,9 @@ unset($sep);
 
 print_optionbar_end();
 
-$group = $vars['group'];
-$graph_enable = $graph_enable[$group];
+$group = $vars['group'] ?? array_key_first($graph_enable);
+$graph_enable = $graph_enable[$group] ?? [];
 
-$metric = basename($vars['metric']);
 if (($group != 'customoid') && (is_file("includes/html/pages/device/graphs/$group.inc.php"))) {
     include "includes/html/pages/device/graphs/$group.inc.php";
 } else {

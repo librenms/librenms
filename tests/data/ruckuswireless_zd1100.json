@@ -10,11 +10,11 @@
                     "version": "9.7.2.0 build 20 (US)",
                     "hardware": "ZD1106",
                     "features": "Licenses: 13/12",
+                    "location": "<private>",
                     "os": "ruckuswireless",
                     "type": "wireless",
                     "serial": "431323000588",
-                    "icon": "ruckus.svg",
-                    "location": "<private>"
+                    "icon": "ruckus.svg"
                 }
             ]
         },

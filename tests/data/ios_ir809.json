@@ -631,7 +631,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.13",
                     "sensor_index": "13",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": " 1",
+                    "sensor_descr": "1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1707,7 +1707,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.13",
                     "sensor_index": "13",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": " 1",
+                    "sensor_descr": "1",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2426,11 +2426,11 @@
                     "version": "15.8(3)M4",
                     "hardware": "IR809G-LTE-GA-K9",
                     "features": "UNIVERSALK9",
+                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": "FCW224900DK",
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

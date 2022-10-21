@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\IP;
 
 if ($device['os_group'] == 'cisco') {
     // FIXME - seems to be broken. IPs appear with leading zeroes.
@@ -21,13 +22,25 @@ if ($device['os_group'] == 'cisco') {
     $valid_tunnels = [];
 
     foreach ($ipsec_array as $index => $tunnel) {
-        $tunnel = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
+        if (isset($tunnel['cipSecTunIkeTunnelIndex']) && isset($ike_array[$tunnel['cipSecTunIkeTunnelIndex']]) && is_array($ike_array[$tunnel['cipSecTunIkeTunnelIndex']])) {
+            $tunnel_full = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
+        } else {
+            $tunnel_full = $tunnel;
+            $tunnel_full['cikeTunLocalValue'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr']);
+            $tunnel_full['cikeTunLocalName'] = (string) IP::fromHexString($tunnel_full['cipSecTunLocalAddr']);
+        }
 
-        echo "Tunnel $index (" . $tunnel['cipSecTunIkeTunnelIndex'] . ")\n";
+        d_echo($tunnel_full);
 
-        echo 'Address ' . $tunnel['cikeTunRemoteValue'] . "\n";
+        echo "Tunnel $index (" . $tunnel_full['cipSecTunIkeTunnelIndex'] . ")\n";
 
-        $address = $tunnel['cikeTunRemoteValue'];
+        $address = isset($tunnel_full['cikeTunRemoteValue']) ? $tunnel_full['cikeTunRemoteValue'] : (string) IP::fromHexString($tunnel_full['cipSecTunRemoteAddr']);
+
+        echo 'Address ' . $address . "\n";
+
+        if ($tunnel_full['cipSecTunIkeTunnelAlive'] == 'false') {
+            echo "IKE is not valid anymore, and was replaced on the router by a newer one.\n";
+        }
 
         $oids = [
             'cipSecTunInOctets',
@@ -55,41 +68,41 @@ if ($device['os_group'] == 'cisco') {
             'cikeTunLocalValue' => 'local_addr',
         ];
 
-        if (! is_array($tunnels[$tunnel['cikeTunRemoteValue']]) && ! empty($tunnel['cikeTunRemoteValue'])) {
+        if (! isset($tunnels[$address]) && ! empty($address)) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
-                'peer_addr' => $tunnel['cikeTunRemoteValue'],
-                'local_addr' => $tunnel['cikeTunLocalValue'],
-                'tunnel_name' => $tunnel['cikeTunLocalName'],
+                'peer_addr' => $address,
+                'local_addr' => $tunnel_full['cikeTunLocalValue'],
+                'tunnel_name' => $tunnel_full['cikeTunLocalName'],
             ], 'ipsec_tunnels');
             $valid_tunnels[] = $tunnel_id;
         } else {
             foreach ($db_oids as $db_oid => $db_value) {
-                $db_update[$db_value] = $tunnel[$db_oid];
+                $db_update[$db_value] = isset($tunnel_full[$db_oid]) ? $tunnel_full[$db_oid] : '';
             }
 
-            if (! empty($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])) {
+            if (! empty($tunnels[$address]['tunnel_id'])) {
                 $updated = dbUpdate(
                     $db_update,
                     'ipsec_tunnels',
                     '`tunnel_id` = ?',
-                    [$tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id']]
+                    [$tunnels[$address]['tunnel_id']]
                 );
-                $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+                $valid_tunnels[] = $tunnels[$address]['tunnel_id'];
             }
         }
 
-        if (is_numeric($tunnel['cipSecTunHcInOctets']) &&
-            is_numeric($tunnel['cipSecTunHcInDecompOctets']) &&
-            is_numeric($tunnel['cipSecTunHcOutOctets']) &&
-            is_numeric($tunnel['cipSecTunHcOutUncompOctets'])
+        if (is_numeric($tunnel_full['cipSecTunHcInOctets']) &&
+            is_numeric($tunnel_full['cipSecTunHcInDecompOctets']) &&
+            is_numeric($tunnel_full['cipSecTunHcOutOctets']) &&
+            is_numeric($tunnel_full['cipSecTunHcOutUncompOctets'])
         ) {
             echo 'HC ';
 
-            $tunnel['cipSecTunInOctets'] = $tunnel['cipSecTunHcInOctets'];
-            $tunnel['cipSecTunInDecompOctets'] = $tunnel['cipSecTunHcInDecompOctets'];
-            $tunnel['cipSecTunOutOctets'] = $tunnel['cipSecTunHcOutOctets'];
-            $tunnel['cipSecTunOutUncompOctets'] = $tunnel['cipSecTunHcOutUncompOctets'];
+            $tunnel_full['cipSecTunInOctets'] = $tunnel_full['cipSecTunHcInOctets'];
+            $tunnel_full['cipSecTunInDecompOctets'] = $tunnel_full['cipSecTunHcInDecompOctets'];
+            $tunnel_full['cipSecTunOutOctets'] = $tunnel_full['cipSecTunHcOutOctets'];
+            $tunnel_full['cipSecTunOutUncompOctets'] = $tunnel_full['cipSecTunHcOutUncompOctets'];
         }
 
         $rrd_name = ['ipsectunnel', $address];
@@ -103,15 +116,15 @@ if ($device['os_group'] == 'cisco') {
         $fields = [];
 
         foreach ($oids as $oid) {
-            if (is_numeric($tunnel[$oid])) {
-                $value = $tunnel[$oid];
+            if (is_numeric($tunnel_full[$oid])) {
+                $value = $tunnel_full[$oid];
             } else {
                 $value = '0';
             }
             $fields[$oid] = $value;
         }
 
-        if (isset($tunnel['cikeTunRemoteValue'])) {
+        if (isset($address)) {
             $tags = compact('address', 'rrd_name', 'rrd_def');
             data_update($device, 'ipsectunnel', $tags, $fields);
 
@@ -124,7 +137,7 @@ if ($device['os_group'] == 'cisco') {
         dbDelete(
             'ipsec_tunnels',
             '`tunnel_id` NOT IN ' . dbGenPlaceholders(count($valid_tunnels)) . ' AND `device_id`=?',
-            array_merge([$device['device_id']], $valid_tunnels)
+            array_merge($valid_tunnels, [$device['device_id']])
         );
     }
 
@@ -167,7 +180,10 @@ if ($device['os_group'] == 'firebrick') {
     ];
 
     foreach ($ipsec_array as $index => $tunnel) {
-        if (! is_array($tunnels[$tunnel['fbIPsecConnectionName']]) && ! empty($tunnel['fbIPsecConnectionName'])) {
+        if (
+            (! isset($tunnels[$tunnel['fbIPsecConnectionName']]) || ! is_array($tunnels[$tunnel['fbIPsecConnectionName']]))
+            && ! empty($tunnel['fbIPsecConnectionName'])
+        ) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
                 'peer_addr' => $tunnel['fbIPsecConnectionPeerAddress'],

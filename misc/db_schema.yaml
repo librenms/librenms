@@ -1505,23 +1505,23 @@ ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_adsl_updated, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: adslLineCoding, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslLineType, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: adslAtucInvVendorID, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAtucInvVersionNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAtucCurrAttainableRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAtucChanCurrTxRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAturInvSerialNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturInvVendorID, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturInvVersionNumber, Type: varchar(8), 'Null': false, Extra: '' }
-    - { Field: adslAturChanCurrTxRate, Type: int, 'Null': false, Extra: '' }
-    - { Field: adslAturCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '' }
-    - { Field: adslAturCurrAttainableRate, Type: int, 'Null': false, Extra: '' }
+    - { Field: adslLineCoding, Type: varchar(8), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslLineType, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucInvVendorID, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucInvVersionNumber, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAtucCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAtucCurrAttainableRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAtucChanCurrTxRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAturInvSerialNumber, Type: varchar(32), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturInvVendorID, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturInvVersionNumber, Type: varchar(16), 'Null': false, Extra: '', Default: '' }
+    - { Field: adslAturChanCurrTxRate, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: adslAturCurrSnrMgn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrAtn, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrOutputPwr, Type: 'decimal(5,1)', 'Null': false, Extra: '', Default: '0.0' }
+    - { Field: adslAturCurrAttainableRate, Type: int, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     ports_adsl_port_id_unique: { Name: ports_adsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_fdb:
@@ -1637,6 +1637,18 @@ ports_stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
     ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
+ports_vdsl:
+  Columns:
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_vdsl_updated, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: xdsl2LineStatusAttainableRateDs, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2LineStatusAttainableRateUs, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2ChStatusActDataRateXtur, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2ChStatusActDataRateXtuc, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: xdsl2LineStatusActAtpDs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
+    - { Field: xdsl2LineStatusActAtpUs, Type: 'decimal(8,2)', 'Null': false, Extra: '', Default: '0.00' }
+  Indexes:
+    ports_vdsl_port_id_unique: { Name: ports_vdsl_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

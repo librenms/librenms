@@ -10,11 +10,11 @@
                     "version": "18.2R1.9",
                     "hardware": "Juniper VMX Internet Backbone Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "VM600B272BD3",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },
@@ -4559,7 +4559,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34 ",
+                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -10653,7 +10653,7 @@
                     "ifDuplex": "fullDuplex",
                     "ifMtu": 1514,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34 ",
+                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34",
                     "ifPhysAddress": "0c2016e8b706",
                     "ifHardType": null,
                     "ifLastChange": 3220,
@@ -13313,6 +13313,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13324,8 +13325,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PROTON, CH",
@@ -13336,6 +13336,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13347,8 +13348,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -13413,6 +13413,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.1.1.2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13424,8 +13425,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "PROTON, CH",
@@ -13436,6 +13436,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.1.1.6",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13447,8 +13448,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64999,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [

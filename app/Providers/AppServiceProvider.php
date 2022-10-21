@@ -31,6 +31,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
         });
+        $this->app->singleton('git', function ($app) {
+            return new \LibreNMS\Util\Git();
+        });
 
         $this->app->bind(\App\Models\Device::class, function () {
             /** @var \LibreNMS\Cache\Device $cache */
@@ -70,6 +73,19 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
         });
+
+        // Graphing
+        Blade::directive('signedGraphUrl', function ($vars) {
+            return "<?php echo \LibreNMS\Util\Url::forExternalGraph($vars); ?>";
+        });
+
+        Blade::directive('signedGraphTag', function ($vars) {
+            return "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>";
+        });
+
+        Blade::directive('graphImage', function ($vars, $flags = 0) {
+            return "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>";
+        });
     }
 
     private function configureMorphAliases()
@@ -90,7 +106,7 @@ class AppServiceProvider extends ServiceProvider
     private function registerFacades()
     {
         // replace log manager so we can add the event function
-        $this->app->bind('log', function ($app) {
+        $this->app->singleton('log', function ($app) {
             return new \App\Facades\LogManager($app);
         });
     }

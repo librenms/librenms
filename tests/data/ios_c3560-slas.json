@@ -10,11 +10,11 @@
                     "version": "15.0(2)SE11",
                     "hardware": "catalyst3560G24TS",
                     "features": "IPSERVICESK9",
+                    "location": null,
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

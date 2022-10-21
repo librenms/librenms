@@ -10,11 +10,11 @@
                     "version": "GP.ipq806x.v2.6.0-RC.46590.211230.1238",
                     "hardware": "AF60-LR",
                     "features": null,
+                    "location": "<private>",
                     "os": "airos-af60",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

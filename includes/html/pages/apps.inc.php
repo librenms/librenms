@@ -430,6 +430,12 @@ $graphs['hv-monitor'] = [
     'snaps',
     'snaps_size',
 ];
+$graphs['pwrstatd'] = [
+    'wattage',
+    'voltage',
+    'percentage',
+    'minutes',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

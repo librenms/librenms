@@ -10,11 +10,11 @@
                     "version": "6.3.0r24.0",
                     "hardware": "SSG5-Serial",
                     "features": "Firewall+VPN",
+                    "location": "<private>",
                     "os": "screenos",
                     "type": "firewall",
                     "serial": "0000000000000000",
-                    "icon": "screenos.png",
-                    "location": "<private>"
+                    "icon": "screenos.png"
                 }
             ]
         },
@@ -2032,8 +2032,8 @@
                     "ifName": "serial0/0",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",

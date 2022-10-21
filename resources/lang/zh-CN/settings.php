@@ -602,7 +602,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '连接埠大于',
+            'description' => '清除端口已删除',
             'help' => 'Cleanup done by daily.sh',
         ],
         'public_status' => [

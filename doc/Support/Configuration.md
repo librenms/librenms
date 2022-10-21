@@ -639,7 +639,6 @@ Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Pa
 ```bash
 lnms config:set enable_ports_etherlike false
 lnms config:set enable_ports_junoseatmvp false
-lnms config:set enable_ports_adsl true
 lnms config:set enable_ports_poe false
 ```
 

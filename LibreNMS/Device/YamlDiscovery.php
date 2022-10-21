@@ -226,7 +226,9 @@ class YamlDiscovery
         $sub_index = 0;
         $sub_index_end = null;
         if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            [,$name, $sub_index, $sub_index_end] = $matches;
+            $name = $matches[1] ?? null;
+            $sub_index = $matches[2] ?? null;
+            $sub_index_end = $matches[3] ?? null;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -291,7 +293,7 @@ class YamlDiscovery
                     $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
-                        foreach ((array) $data['oid'] as $oid) {
+                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
@@ -307,7 +309,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'];
+                                $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);

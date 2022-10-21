@@ -7,7 +7,7 @@ if (is_numeric($vars['id'])) {
         $device = device_by_id_cache($data['device_id']);
 
         $title = generate_device_link($device);
-        $title .= ' :: BGP :: ' . htmlentities($data['bgp_peerid']);
+        $title .= ' :: BGP :: ' . htmlentities($data['bgpPeerIdentifier']);
         $auth = true;
     }
 }

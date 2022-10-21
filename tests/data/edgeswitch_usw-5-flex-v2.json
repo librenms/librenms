@@ -10,11 +10,11 @@
                     "version": "5.76.7.13442",
                     "hardware": "USW-Flex",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },

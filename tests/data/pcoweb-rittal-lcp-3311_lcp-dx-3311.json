@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "pcoweb-rittal-lcp-3311",
                     "type": "environment",
                     "serial": null,
-                    "icon": "rittal.svg",
-                    "location": null
+                    "icon": "rittal.svg"
                 }
             ]
         },

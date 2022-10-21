@@ -23,7 +23,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.36.{{ $index }}'
                     index: 'slot.{{ $index }}'
                     group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
-                    descr:  '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }}'
+                    descr: '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }}'
         count:
             data:
                 -

@@ -40,19 +40,19 @@ if (isset($options['snmpsim'])) {
 
 if (isset($options['h'])
     || isset($options['help'])
-    || (isset($options['o']) || isset($options['os'])) && ! (isset($options['v']) || isset($options['variant']))
     || ! (isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
 ) {
     echo "Script to update test data. Database data is saved in tests/data.
 
 Usage:
-  You must specify a valid OS (and variant) and/or module(s).
+  - This script can process new test data (by specifying both OS and VARIANT).
+  - This script can refresh test data.
+    -> if an OS is specified, only this OS will be refreshed.
+    -> if MODULES are specified, only these modules will be refreshed.
 
-Required:
-  -o, --os           Name of the OS to save test data for
-  -v, --variant      The variant of the OS to use, usually the device model
-
-Optional:
+Parameters:
+  -o, --os           Name of the OS to save test data for.
+  -v, --variant      The variant of the OS to use, usually the device model.
   -m, --modules      The discovery/poller module(s) to collect data for, comma delimited.
                      Use -m 'all' for all modules.
   -n, --no-save      Don't save database entries, print them out instead
@@ -89,7 +89,8 @@ if ((isset($options['m']) && $options['m'] == 'all') || (isset($options['modules
 }
 
 $full_os_name = $os_name;
-$variant = '';
+$variant = null;
+
 if (isset($options['v'])) {
     $variant = $options['v'];
     $full_os_name = $os_name . '_' . $variant;
@@ -100,8 +101,10 @@ if (isset($options['v'])) {
 
 $os_list = [];
 
-if ($os_name) {
+if (isset($os_name) && isset($variant)) {
     $os_list = [$full_os_name => [$os_name, $variant]];
+} elseif (isset($os_name)) {
+    $os_list = ModuleTestHelper::findOsWithData($modules, $os_name);
 } else {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }

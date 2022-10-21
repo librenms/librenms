@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "Netman 204",
                     "features": null,
+                    "location": "<private>",
                     "os": "netmanplus",
                     "type": "power",
                     "serial": null,
-                    "icon": "riello.png",
-                    "location": "<private>"
+                    "icon": "riello.png"
                 }
             ]
         },

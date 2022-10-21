@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.12356.106.1.2482",
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "3.3.3",
                     "hardware": "FortiSwitch-248D-FPOE",
                     "features": null,
+                    "location": null,
                     "os": "fortiswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fortinet.svg",
-                    "location": null
+                    "icon": "fortinet.svg"
                 }
             ]
         },

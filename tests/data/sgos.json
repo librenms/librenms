@@ -39,11 +39,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "sgos",
                     "type": "network",
                     "serial": null,
-                    "icon": "bluecoat.png",
-                    "location": null
+                    "icon": "bluecoat.png"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "1.50(1.11)",
                     "hardware": "D9859",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosat",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

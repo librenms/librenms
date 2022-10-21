@@ -8,13 +8,13 @@
                     "sysDescr": "FreeBSD some.example.org 9.2-RELEASE FreeBSD 9.2-RELEASE #0 r255898: Thu Sep 26 22:50:31 UTC 2013     root@bake.isc.freebsd.org:/usr/obj/usr/src/sys/GENERIC amd64",
                     "sysContact": "<private>",
                     "version": "9.2-RELEASE",
-                    "hardware": "Red Hat [KVM]",
+                    "hardware": "Red Hat KVM",
                     "features": "FreeBSD 12.1-RELEASE-p3",
+                    "location": "<private>",
                     "os": "freebsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "freebsd.svg",
-                    "location": "<private>"
+                    "icon": "freebsd.svg"
                 }
             ]
         },

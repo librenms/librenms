@@ -314,11 +314,11 @@
                     "version": "2.64.33",
                     "hardware": "CFIP Lumina FODU",
                     "features": null,
+                    "location": "<private>",
                     "os": "saf",
                     "type": "wireless",
                     "serial": "000000000000",
-                    "icon": "saf.png",
-                    "location": "<private>"
+                    "icon": "saf.png"
                 }
             ]
         },

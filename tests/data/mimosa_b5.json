@@ -10,11 +10,11 @@
                     "version": "2.3.3",
                     "hardware": "mimosaB5",
                     "features": null,
+                    "location": "<private>",
                     "os": "mimosa",
                     "type": "wireless",
                     "serial": "0000000000",
-                    "icon": "mimosa.svg",
-                    "location": "<private>"
+                    "icon": "mimosa.svg"
                 }
             ]
         },

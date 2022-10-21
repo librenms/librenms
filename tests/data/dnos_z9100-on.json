@@ -10,11 +10,11 @@
                     "version": "9.14(1.5)",
                     "hardware": "Z9100-ON",
                     "features": null,
+                    "location": "<private>",
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

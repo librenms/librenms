@@ -595,7 +595,7 @@ return [
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports älter als',
+            'description' => 'Purge Ports gelöscht',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'public_status' => [

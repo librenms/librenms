@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "AKCP sensorProbe8 v2.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "akcp",
                     "type": "environment",
                     "serial": null,
-                    "icon": "akcp.png",
-                    "location": "<private>"
+                    "icon": "akcp.png"
                 }
             ]
         },

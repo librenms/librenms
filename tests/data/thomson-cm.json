@@ -10,11 +10,11 @@
                     "version": "ST52.04.05",
                     "hardware": "TCM420",
                     "features": null,
+                    "location": "<private>",
                     "os": "thomson-cm",
                     "type": "network",
                     "serial": null,
-                    "icon": "thomson-cm.png",
-                    "location": "<private>"
+                    "icon": "thomson-cm.png"
                 }
             ]
         },

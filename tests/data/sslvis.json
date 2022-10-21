@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "sslvis",
                     "type": "network",
                     "serial": null,
-                    "icon": "bluecoat.png",
-                    "location": "<private>"
+                    "icon": "bluecoat.png"
                 }
             ]
         },

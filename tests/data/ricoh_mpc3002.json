@@ -10,11 +10,11 @@
                     "version": "2.20",
                     "hardware": "Aficio MP C3002",
                     "features": null,
+                    "location": "<private>",
                     "os": "ricoh",
                     "type": "printer",
                     "serial": "W492KB03439",
-                    "icon": "ricoh.svg",
-                    "location": "<private>"
+                    "icon": "ricoh.svg"
                 }
             ]
         },

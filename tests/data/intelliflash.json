@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "intelliflash",
                     "type": "storage",
                     "serial": null,
-                    "icon": "tegile.svg",
-                    "location": null
+                    "icon": "tegile.svg"
                 }
             ]
         },
@@ -67,7 +67,7 @@
                     "storage_index": "3.1",
                     "storage_type": "1",
                     "storage_descr": "fileserver",
-                    "storage_size": 6352124462592,
+                    "storage_size": 21878431237632,
                     "storage_units": 1,
                     "storage_used": 6347866291712,
                     "storage_free": 0,
@@ -80,7 +80,7 @@
                     "storage_index": "3.2",
                     "storage_type": "1",
                     "storage_descr": "servers",
-                    "storage_size": 2940800152064,
+                    "storage_size": 18467106927104,
                     "storage_units": 1,
                     "storage_used": 2936541981184,
                     "storage_free": 0,
@@ -93,7 +93,7 @@
                     "storage_index": "3.3",
                     "storage_type": "1",
                     "storage_descr": "Backups",
-                    "storage_size": 4258197504,
+                    "storage_size": 15530564972544,
                     "storage_units": 1,
                     "storage_used": 26624,
                     "storage_free": 0,

@@ -28,6 +28,24 @@ class Notification extends Model
      * @var string
      */
     protected $primaryKey = 'notifications_id';
+    protected $fillable = [
+        'title',
+        'body',
+        'severity',
+        'source',
+        'checksum',
+        'datetime',
+    ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        // delete attribs for this notification
+        static::deleting(function (Notification $notification) {
+            $notification->attribs()->delete();
+        });
+    }
 
     // ---- Helper Functions ----
 

@@ -47,7 +47,7 @@ class Config
     public static function load()
     {
         // don't reload the config if it is already loaded, reload() should be used for that
-        if (! is_null(self::$config)) {
+        if (self::isLoaded()) {
             return self::$config;
         }
 
@@ -114,7 +114,9 @@ class Config
     private static function loadUserConfigFile(&$config)
     {
         // Load user config file
-        @include base_path('config.php');
+        if (is_file(base_path('config.php'))) {
+            @include base_path('config.php');
+        }
     }
 
     /**
@@ -412,10 +414,10 @@ class Config
             isset($_SERVER['HTTPS']) ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
         ) {
-            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url', '')));
         }
 
-        self::set('base_url', Str::finish(self::get('base_url'), '/'));
+        self::set('base_url', Str::finish(self::get('base_url', ''), '/'));
 
         if (! self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
@@ -565,5 +567,15 @@ class Config
         self::set('db_pass', config("database.connections.$db.password"));
         self::set('db_port', config("database.connections.$db.port", 3306));
         self::set('db_socket', config("database.connections.$db.unix_socket"));
+    }
+
+    /**
+     * Check if the config has been loaded yet
+     *
+     * @return bool
+     */
+    public static function isLoaded(): bool
+    {
+        return ! is_null(self::$config);
     }
 }

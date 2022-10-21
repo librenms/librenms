@@ -10,11 +10,11 @@
                     "version": "(Firmware 8.6.0.3-11sv / ROM 5.0.0.5)",
                     "hardware": "SMA 400",
                     "features": null,
+                    "location": "<private>",
                     "os": "sonicwall",
                     "type": "firewall",
                     "serial": "18B1697FEE2C",
-                    "icon": "sonicwall.svg",
-                    "location": "<private>"
+                    "icon": "sonicwall.svg"
                 }
             ]
         },

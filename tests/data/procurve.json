@@ -551,11 +551,11 @@
                     "version": "KA.15.03.3004",
                     "hardware": "Stack",
                     "features": null,
+                    "location": "<private>",
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
