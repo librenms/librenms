@@ -1953,7 +1953,7 @@ function update_device(Illuminate\Http\Request $request)
 
                 $update[$field] = $field_data;
             }
-            if (dbUpdate($update, 'devices', '`device_id`=?', [$device->device_id]) >= 0) {
+            if ($device->fill($update)->save()) {
                 return api_success_noresult(200, 'Device fields have been updated');
             } else {
                 return api_error(500, 'Device fields failed to be updated');
@@ -1961,7 +1961,7 @@ function update_device(Illuminate\Http\Request $request)
         } else {
             return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
         }
-    } elseif (dbUpdate([$data['field'] => $data['data']], 'devices', '`device_id`=?', [$device->device_id]) >= 0) {
+    } elseif ($device->fill([$data['field'] => $data['data']])->save()) {
         return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
     } else {
         return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
