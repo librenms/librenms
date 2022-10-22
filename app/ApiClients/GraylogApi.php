@@ -148,6 +148,6 @@ class GraylogApi
 
     public function isConfigured(): bool
     {
-        return isset($this->client->getConfig()['base_uri']);
+        return (bool) Config::get('graylog.server');
     }
 }
