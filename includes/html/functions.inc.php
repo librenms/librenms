@@ -1035,17 +1035,6 @@ function generate_stacked_graphs($transparency = '88')
 }
 
 /**
- * Parse AT time spec, does not handle the entire spec.
- *
- * @param  string|int  $time
- * @return int
- */
-function parse_at_time($time)
-{
-    return (new \LibreNMS\Data\Graphing\GraphParameters([]))->parseAtTime($time); // TODO fix test
-}
-
-/**
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string

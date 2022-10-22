@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
+use LibreNMS\Util\Time;
 
 class GraphParameters
 {
@@ -97,8 +98,8 @@ class GraphParameters
             'aggregate' => ! empty($vars['noagg']),
         ];
 
-        $this->from = $this->parseAtTime($vars['from'] ?? '-1d');
-        $this->to = empty($vars['to']) ? time() : $this->parseAtTime($vars['to']);
+        $this->from = Time::parseAt($vars['from'] ?? '-1d');
+        $this->to = empty($vars['to']) ? time() : Time::parseAt($vars['to']);
         $this->period = $this->to - $this->from;
         $this->prev_from = $this->from - $this->period;
 
@@ -191,30 +192,6 @@ class GraphParameters
     public function __toString(): string
     {
         return implode(' ', $this->toRrdOptions());
-    }
-
-    public function parseAtTime(string|int $time): int
-    {
-        if (is_numeric($time)) {
-            return $time < 0 ? time() + $time : intval($time);
-        }
-
-        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
-            $units = [
-                'm' => 60,
-                'h' => 3600,
-                'd' => 86400,
-                'y' => 31557600,
-            ];
-            $value = substr($time, 1, -1);
-            $unit = substr($time, -1);
-
-            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
-
-            return time() + $offset;
-        }
-
-        return (int) strtotime($time);
     }
 
     private function graphColors(): array
