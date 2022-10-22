@@ -1,5 +1,7 @@
 mib: RNX-UPDU-MIB
 modules:
+  os:
+    sysDescr_regex: '/RNX UPDU (?<hardware>\S+) \(\S+\), S\/N: (?<serial>[^,]+), Version (?<version>\S+)/'
   sensors:
     temperature:
       data:
