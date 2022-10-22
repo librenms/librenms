@@ -91,7 +91,7 @@ class GraphParameters
 
         $this->title = $vars['graph_title'] ?? $this->defaultTitle();
         $this->visibleElements = [
-            'title' => empty($vars['title'])  || $vars['title'] !== 'no',
+            'title' => empty($vars['title']) || $vars['title'] !== 'no',
             'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
