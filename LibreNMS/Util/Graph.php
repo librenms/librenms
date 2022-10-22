@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphImage;
@@ -120,7 +121,23 @@ class Graph
 
         // variables for included graphs
         $graph_params = new GraphParameters($vars);
-        extract($graph_params->all()); // set php variables for legacy graphs
+        // set php variables for legacy graphs
+        $type = $graph_params->type;
+        $subtype = $graph_params->subtype;
+        $height = $graph_params->height;
+        $width = $graph_params->width;
+        $from = $graph_params->from;
+        $to = $graph_params->to;
+        $period = $graph_params->period;
+        $prev_from = $graph_params->prev_from;
+        $inverse = $graph_params->inverse;
+        $in = $graph_params->in;
+        $out = $graph_params->out;
+        $float_precision = $graph_params->float_precision;
+        $title = $graph_params->visible('title');
+        $nototal = ! $graph_params->visible('total');
+        $nodetails = ! $graph_params->visible('details');
+        $noagg = ! $graph_params->visible('aggregate');
 
         $rrd_options = '';
         $rrd_filename = null;
@@ -220,19 +237,19 @@ class Graph
         return Config::get("graph_types.$type.$subtype.section") == 'mib';
     }
 
-    public static function getOverviewGraphsForDevice($device)
+    public static function getOverviewGraphsForDevice(Device $device): array
     {
         if ($device->snmp_disable) {
-            return Config::getOsSetting('ping', 'over');
+            return Arr::wrap(Config::getOsSetting('ping', 'over'));
         }
 
         if ($graphs = Config::getOsSetting($device->os, 'over')) {
-            return $graphs;
+            return Arr::wrap($graphs);
         }
 
         $os_group = Config::getOsSetting($device->os, 'group');
 
-        return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
+        return Arr::wrap(Config::get("os_group.$os_group.over", Config::get('os.default.over')));
     }
 
     /**

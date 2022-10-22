@@ -153,7 +153,7 @@ class Time
                 'd' => 86400,
                 'y' => 31557600,
             ];
-            $value = substr($time, 1, -1);
+            $value = Number::cast(substr($time, 1, -1));
             $unit = substr($time, -1);
 
             $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;

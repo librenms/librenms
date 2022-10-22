@@ -15,7 +15,23 @@ if (isset($vars['device'])) {
 
 // variables for included graphs
 $graph_params = new GraphParameters($vars);
-extract($graph_params->all()); // set php variables for legacy graphs
+// set php variables for legacy graphs
+$type = $graph_params->type;
+$subtype = $graph_params->subtype;
+$height = $graph_params->height;
+$width = $graph_params->width;
+$from = $graph_params->from;
+$to = $graph_params->to;
+$period = $graph_params->period;
+$prev_from = $graph_params->prev_from;
+$inverse = $graph_params->inverse;
+$in = $graph_params->in;
+$out = $graph_params->out;
+$float_precision = $graph_params->float_precision;
+$title = $graph_params->visible('title');
+$nototal = ! $graph_params->visible('total');
+$nodetails = ! $graph_params->visible('details');
+$noagg = ! $graph_params->visible('aggregate');
 $rrd_options = '';
 
 require Config::get('install_dir') . "/includes/html/graphs/$type/auth.inc.php";
