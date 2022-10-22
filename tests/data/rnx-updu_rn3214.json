@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.55108.1.0",
+                    "sysDescr": "RNX UPDU RN3214 (UPDU-Right), S/N: 100124, Version 2.7.0-5741e7a3",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "rnx-updu",
+                    "type": "power",
+                    "serial": null,
+                    "icon": "riedo.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
