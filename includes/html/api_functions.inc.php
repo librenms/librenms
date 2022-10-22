@@ -33,8 +33,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
-use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Number;
@@ -87,29 +87,17 @@ function api_not_found()
 
 function api_get_graph(array $vars)
 {
-    global $dur;        // Needed for callback within graph code
+    try {
+        $graph = Graph::get($vars);
 
-    $auth = true;
+        if ($vars['output'] === 'base64') {
+            return api_success(['image' => $graph->base64(), 'content-type' => $graph->imageType()], 'image');
+        }
 
-    // prevent ugly error for undefined graphs from being passed to the user
-    [$type, $subtype] = extract_graph_type($vars['type']);
-    if (! is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
-        return api_error(400, 'Invalid graph type');
+        return response($graph->data(), 200, ['Content-Type' => $graph->imageType()]);
+    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+        return api_error(500, $e->getMessage());
     }
-
-    ob_start();
-
-    include 'includes/html/graphs/graph.inc.php';
-    Datastore::terminate();
-
-    $image = ob_get_contents();
-    ob_end_clean();
-
-    if ($vars['output'] === 'base64') {
-        return api_success(['image' => $image, 'content-type' => get_image_type(Config::get('webui.graph_type'))], 'image');
-    }
-
-    return response($image, 200, ['Content-Type' => get_image_type(Config::get('webui.graph_type'))]);
 }
 
 function check_bill_permission($bill_id, $callback)
