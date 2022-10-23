@@ -1,7 +1,7 @@
 %
 <?php
 
-if (! is_array($storage_cache['hpe-ilo'])) {
+if (! isset($storage_cache['hpe-ilo'])) {
     $storage_cache['hpe-ilo'] = snmpwalk_group($device, 'cpqHoFileSysEntry', 'CPQHOST-MIB');
     echo 'HPE ILO4 ';
 }

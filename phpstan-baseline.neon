@@ -3641,11 +3641,6 @@ parameters:
 			path: LibreNMS/OS/ArrisDsr4410md.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/ArubaInstant.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/ArubaInstant.php

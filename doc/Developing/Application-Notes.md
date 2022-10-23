@@ -56,6 +56,15 @@ try {
 }
 ```
 
+### Compression
+
+Also worth noting that `json_app_get` supports compressed data via
+base64 encoded gzip. If base64 encoding is detected on the the SNMP
+return, it will be gunzipped and then parsed.
+
+`https://github.com/librenms/librenms-agent/blob/master/utils/librenms_return_optimizer`
+may be used to optimize JSON returns.
+
 ## Application Data Storage
 
 The `$app` model is supplied for each application poller and graph.

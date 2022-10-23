@@ -6,7 +6,7 @@ $battery_current = snmp_get($device, 'upsBatteryCurrent.0', '-OqvU', 'UPS-MIB');
 
 if (is_numeric($battery_current)) {
     $oid = '.1.3.6.1.2.1.33.1.2.6.0';
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
 
     discover_sensor(
         $valid['sensor'],
@@ -29,7 +29,7 @@ if (is_numeric($battery_current)) {
 $output_current = snmpwalk_group($device, 'upsOutputCurrent', 'UPS-MIB');
 foreach ($output_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.4.4.1.3.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
     $descr = 'Output';
     if (count($output_current) > 1) {
         $descr .= " Phase $index";
@@ -60,7 +60,7 @@ foreach ($output_current as $index => $data) {
 $input_current = snmpwalk_group($device, 'upsInputCurrent', 'UPS-MIB');
 foreach ($input_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.3.3.1.4.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
     $descr = 'Input';
     if (count($input_current) > 1) {
         $descr .= " Phase $index";
@@ -91,7 +91,7 @@ foreach ($input_current as $index => $data) {
 $bypass_current = snmpwalk_group($device, 'upsBypassCurrent', 'UPS-MIB');
 foreach ($bypass_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.5.3.1.3.$index";
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'], 'current', $oid);
+    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
     $descr = 'Bypass';
     if (count($bypass_current) > 1) {
         $descr .= " Phase $index";

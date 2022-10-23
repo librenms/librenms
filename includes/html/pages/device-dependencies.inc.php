@@ -29,7 +29,7 @@ require_once 'includes/html/modal/manage_host_dependencies.inc.php';
     <table id="hostdeps" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="id" data-type="int" data-sortable="true" data-visible="true">Id</th>
+                <th data-column-id="id" data-type="int" data-formatter="id" data-sortable="true" data-visible="true">Id</th>
                 <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
                 <th data-column-id="sysname" data-type="string" data-visible="false">Sysname</th>
                 <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Device(s)</th>
@@ -77,6 +77,9 @@ var grid = $("#hostdeps").bootgrid({
             }
             response += "<button type='button' class='command-delete btn btn-danger btn-sm"+buttonDisabled+"' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-device_id='"+row.deviceid+"' data-device_parent ='"+row.parentid+"' data-host_name='"+row.hostname+"' name='delete-host-dependency'"+buttonDisabled+"><i class='fa fa-trash' aria-hidden='true'></i></button>";
             return response;
+        },
+        "id": function(column, row) {
+            return row.deviceid;
         },
         "hostname": function(column, row) {
             return '<a href="device/device='+row.deviceid+'/" class="list-device">'+row.hostname+'</a><br />'+row.sysname;

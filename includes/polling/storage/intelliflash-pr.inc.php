@@ -21,7 +21,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (! is_array($storage_cache['intelliflash-pr'])) {
+if (! isset($storage_cache['intelliflash-pr'])) {
     $storage_cache['intelliflash-pr'] = snmpwalk_cache_oid($device, 'projectEntry', null, 'TEGILE-MIB');
     d_echo($storage_cache);
 }

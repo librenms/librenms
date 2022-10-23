@@ -50,7 +50,7 @@ if ($device['os'] == 'intelliflash') {
             $pdsh = ($storage['projectDataSizeHigh'] << 32);
             $pdsl = ($storage['projectDataSizeLow']);
             $pdst = (($pdsh + $pdsl) * $units);
-            $pfsh = ($storae['projectFreeSizeHigh'] << 32);
+            $pfsh = ($storage['projectFreeSizeHigh'] << 32);
             $pfsl = ($storage['projectFreeSizeLow']);
             $pfst = (($pfsh + $pfsl) * $units);
             //Tegile uses a high 32bit counter and a low 32bit counter to make a 64bit counter. Storage units are in bytes.

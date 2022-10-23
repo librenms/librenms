@@ -43,7 +43,7 @@ foreach ($tables as $tablevalue) {
     $cur_oid = $tablevalue['num_oid'];
 
     if (is_array($temp)) {
-        if ($temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+        if (isset($temp[0]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
             break;
         }
 

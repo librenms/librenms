@@ -29,7 +29,7 @@ $options['filter']['ignore'] = ['=', 0];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
-$components = $components[$device['device_id']];
+$components = $components[$device['device_id']] ?? [];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];
@@ -68,9 +68,8 @@ if (! empty($components)) {
         if ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('currconns', 'GAUGE', 0);
-
             $fields = [
-                'currconns' => $f5_stats['ltmVirtualServStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.12.' . $UID],
+                'currconns' => $f5_stats['ltmVirtualServStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.12.' . $UID] ?? null,
             ];
 
             // Let's print some debugging info.
@@ -97,7 +96,7 @@ if (! empty($components)) {
             $array['available'] = $f5_stats['ltmPoolMbrStatusEntryAvail']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $UID];
 
             $fields = [
-                'currconns' => $f5_stats['ltmPoolMemberStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.11.' . $UID],
+                'currconns' => $f5_stats['ltmPoolMemberStatEntryCurrconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.11.' . $UID] ?? null,
             ];
 
             // Let's print some debugging info.

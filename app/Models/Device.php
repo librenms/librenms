@@ -51,6 +51,7 @@ class Device extends BaseModel
         'display',
         'icon',
         'ip',
+        'notes',
         'os',
         'overwrite_ip',
         'poller_group',
