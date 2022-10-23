@@ -7,6 +7,7 @@ modules:
         data:
             -
                 oid: fadcSysCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.112.1.4.{{ $index }}'
                 descr: System CPU Usage
                 type: fortigate-fixed
     mempools:
