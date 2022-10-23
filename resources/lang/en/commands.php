@@ -50,6 +50,15 @@ return [
             'snmpsim' => 'Use snmpsim for unit tests',
         ],
     ],
+    'dev:service' => [
+        'description' => 'Tool to help debug service help parsing',
+        'arguments' => [
+            'check' => 'Check name to work with, must exist in the checks directory. Example: check_icmp',
+        ],
+        'options' => [
+            'test-lines' => 'Print out lines to add to ServiceHelpParserTest for this check',
+        ],
+    ],
     'dev:simulate' => [
         'description' => 'Simulate devices using test data',
         'arguments' => [
@@ -174,6 +183,18 @@ return [
         'already_enabled' => 'Plugin already enabled',
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
+    ],
+    'services:poll' => [
+        'description' => 'Poll services',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname or wildcard',
+        ],
+        'options' => [
+            'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
+        ],
+        'starting' => 'Starting service polling run:',
+        'polled' => 'services:poll :timestamp - :count services polled in :duration secs',
+        'module_enabled' => 'Refusing to run to prevent double polling, poller module is enabled. Use lnms device:poll -m services instead.',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

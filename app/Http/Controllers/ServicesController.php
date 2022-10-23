@@ -1,0 +1,254 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Device;
+use App\Models\Service;
+use Closure;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use LibreNMS\Enum\CheckStatus;
+use LibreNMS\Services;
+
+class ServicesController extends Controller
+{
+    public function __construct()
+    {
+        $this->authorizeResource(Service::class, 'service');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function index(Request $request)
+    {
+        $state = $request->input('state', 'all');
+        $disabled = $request->input('disabled', false);
+        $ignored = $request->input('ignored', false);
+
+        $devices = Device::with(['services' => $this->filterServices($state, $disabled, $ignored)])
+            ->whereHas('services', $this->filterServices($state, $disabled, $ignored))
+            ->get();
+
+        $view_menu = [
+            'view' => [
+                ['key' => 'basic', 'name' => trans('service.view_basic')],
+                ['key' => 'detailed', 'name' => trans('service.view_detailed'), 'default' => true],
+                ['key' => 'graphs', 'name' => trans('service.view_graphs')],
+            ],
+        ];
+
+        $state_menu = [
+            'state' => [
+                ['key' => 'all', 'name' => trans('service.state_all'), 'default' => true],
+                ['key' => 'ok', 'name' => trans('service.state_ok')],
+                ['key' => 'warning', 'name' => trans('service.state_warning')],
+                ['key' => 'critical', 'name' => trans('service.state_critical')],
+            ],
+        ];
+
+        return view('service.index', [
+            'devices' => $devices,
+            'view_menu' => $view_menu,
+            'state_menu' => $state_menu,
+            'view' => $request->input('view'),
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function create()
+    {
+        return view('service.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $service = $this->validateNewService($request);
+        $service->save();
+
+        return response()->json($service);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Service  $service
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function show(Service $service): JsonResponse
+    {
+        // legacy service_param, try to convert
+        if (is_string($service->service_param)) {
+            $modern = [];
+            foreach (Services::parseLegacyParams($service->service_param) as $group) {
+                [$key, $value] = array_pad(preg_split('/[= ]/', $group, 2), 2, null);
+                $modern[$key] = $value;
+            }
+            $service->service_param = $modern;
+        }
+
+        return response()->json($service);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Service  $service
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function update(Request $request, Service $service): JsonResponse
+    {
+        $service->fill($this->validateServiceData($request, false));
+        $service->save();
+
+        return response()->json($service);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Service  $service
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Service $service): JsonResponse
+    {
+        if ($service->delete()) {
+            return response()->json([
+                'status' => 1,
+                'service_id' => $service->service_id,
+                'message' => __('service.deleted', ['service' => $service->service_name . " ($service->service_id)"]),
+            ]);
+        }
+
+        return response()->json([
+            'status' => 0,
+            'service_id' => $service->service_id,
+            'message' => __('service.not_deleted', ['service' => $service->service_name . " ($service->service_id)"]),
+        ]);
+    }
+
+    /**
+     * @param  string  $type
+     * @param  string[]  $services
+     * @return array
+     */
+    private function buildParamRules(string $type, array $services): array
+    {
+        // don't try to load a check that isn't valid
+        if (! in_array($type, $services)) {
+            return [];
+        }
+
+        return Services::makeCheck(new Service(['service_type' => $type]))
+            ->getParameterValidationRules();
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function test(Request $request): JsonResponse
+    {
+        $service = $this->validateNewService($request);
+        $response = (new \LibreNMS\Modules\Services)->checkService($service);
+
+        $message = $response->message;
+
+        // prepend the CLI for troubleshooting if the check fails
+        if ($response->result == 2 || $response->result == 3) {
+            $message = $response->commandLine . PHP_EOL . PHP_EOL . $message;
+        }
+
+        return response()->json([
+            'message' => $message,
+            'result' => $response->result,
+        ]);
+    }
+
+    /**
+     * @param  string  $state
+     * @param  bool  $disabled
+     * @param  bool  $ignored
+     * @return \Closure
+     */
+    private function filterServices($state, $disabled, $ignored): Closure
+    {
+        return function ($query) use ($state, $disabled, $ignored) {
+            if ($state !== 'all') {
+                $query->where('service_status', CheckStatus::toState($state));
+            }
+
+            if ($disabled) {
+                $query->where('service_disabled', 1);
+            }
+
+            if ($ignored) {
+                $query->where('service_ignore', 1);
+            }
+        };
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \App\Models\Service
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    private function validateNewService(Request $request): Service
+    {
+        return new Service($this->validateServiceData($request));
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $new
+     * @return array
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    private function validateServiceData(Request $request, bool $new = true): array
+    {
+        $services = Services::list();
+        // create rules for parameters from actual check.  Adds service_ip if one of them uses it.
+        $param_rules = $this->buildParamRules($request->get('service_type'), $services);
+
+        $validated = $this->validate($request, [
+                'device_id' => 'int|exists:App\Models\Device,device_id',
+                'service_type' => [
+                    $new ? 'required' : 'nullable',
+                    Rule::in($services),
+                ],
+                'service_desc' => 'nullable|string',
+                'service_param' => 'nullable|array',
+                'service_param.*' => 'string',
+                'service_ignore' => 'boolean',
+                'service_disabled' => 'boolean',
+                'service_name' => 'nullable|string',
+                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+            ] + $param_rules);
+
+        // set service IP if the check uses it, otherwise set to null to indicate it is unused
+        $validated['service_ip'] = isset($param_rules['service_ip']) ? $validated['service_ip'] ?? '' : null;
+
+        return $validated;
+    }
+}

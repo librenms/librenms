@@ -27,8 +27,22 @@ namespace LibreNMS\Enum;
 
 class CheckStatus
 {
-    const OK = 0;
-    const WARNING = 1;
-    const ERROR = 2;
-    const UNKNOWN = 3;
+    public const OK = 0;
+    public const WARNING = 1;
+    public const CRITICAL = 2;
+    public const UNKNOWN = 3;
+
+    public static function toState(string $name): int
+    {
+        switch ($name) {
+            case 'ok':
+                return self::OK;
+            case 'warning':
+                return self::WARNING;
+            case 'critical':
+                return self::CRITICAL;
+            default:
+                return self::UNKNOWN;
+        }
+    }
 }

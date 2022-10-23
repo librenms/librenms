@@ -4516,6 +4516,11 @@ parameters:
 			path: LibreNMS/RRD/RrdDefinition.php
 
 		-
+			message: "#^Parameter \\#1 \\$str of function trim expects string, array\\|null given\\.$#"
+			count: 1
+			path: LibreNMS/Services/DefaultServiceCheck.php
+
+		-
 			message: "#^Method LibreNMS\\\\Snmptrap\\\\Dispatcher\\:\\:handle\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Snmptrap/Dispatcher.php
@@ -7408,16 +7413,6 @@ parameters:
 		-
 			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
 			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Cannot call method only\\(\\) on array\\<string, string\\>\\.$#"
-			count: 1
-			path: app/Http/Controllers/ServiceController.php
-
-		-
-			message: "#^Called 'Model\\:\\:make\\(\\)' which performs unnecessary work, use 'new Model\\(\\)'\\.$#"
-			count: 1
 			path: app/Http/Controllers/ServiceTemplateController.php
 
 		-
@@ -9141,39 +9136,9 @@ parameters:
 			path: app/View/Components/Panel.php
 
 		-
-			message: "#^Method App\\\\View\\\\Components\\\\Panel\\:\\:__construct\\(\\) has parameter \\$footerClass with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Panel.php
-
-		-
 			message: "#^Method App\\\\View\\\\Components\\\\Panel\\:\\:__construct\\(\\) has parameter \\$title with no type specified\\.$#"
 			count: 1
 			path: app/View/Components/Panel.php
-
-		-
-			message: "#^Method App\\\\View\\\\Components\\\\Submenu\\:\\:__construct\\(\\) has parameter \\$currentTab with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Submenu.php
-
-		-
-			message: "#^Method App\\\\View\\\\Components\\\\Submenu\\:\\:__construct\\(\\) has parameter \\$deviceId with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Submenu.php
-
-		-
-			message: "#^Method App\\\\View\\\\Components\\\\Submenu\\:\\:__construct\\(\\) has parameter \\$menu with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Submenu.php
-
-		-
-			message: "#^Method App\\\\View\\\\Components\\\\Submenu\\:\\:__construct\\(\\) has parameter \\$selected with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Submenu.php
-
-		-
-			message: "#^Method App\\\\View\\\\Components\\\\Submenu\\:\\:__construct\\(\\) has parameter \\$title with no type specified\\.$#"
-			count: 1
-			path: app/View/Components/Submenu.php
 
 		-
 			message: "#^Property App\\\\View\\\\SimpleTemplate\\:\\:\\$callback \\(callable\\) on left side of \\?\\? is not nullable\\.$#"

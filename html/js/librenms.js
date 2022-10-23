@@ -439,6 +439,8 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         var newOption = new Option(selected.text, selected.id, true, true);
         $select.append(newOption).trigger('change');
     }
+
+    return $select;
 }
 
 function humanize_duration(seconds) {

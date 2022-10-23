@@ -1,21 +1,24 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
-        @foreach ($menu as $header => $m)
-            @if($loop->first)
-                <b>{{ $title }}</b>
-                »
-            @else
-                | {{ $header }}:
+@props(['menu' => [], 'title' => '', 'base' => url()->current(), 'current' => null])
+
+<span>
+    @foreach ($menu as $header => $m)
+        @php($current_value = $current ?: request()->input($header))
+        @if($loop->first)
+            <b>{{ $title }}</b>
+            »
+        @else
+            | {{ $header }}:
+        @endif
+
+        @foreach($m as $sm)
+            <span @if($current_value ? $current_value == $sm['key'] : isset($sm['default'])) class="pagemenu-selected" @endif><a
+                        href="{{ $base . '?' . Arr::query([$header => $sm['key']] + request()->all()) }}"
+                >{{ $sm['name'] }}</a></span>
+
+            @if(!$loop->last)
+                |
             @endif
-
-            @foreach($m as $sm)
-                @if($isSelected($sm['url']))<span class="pagemenu-selected">@endif
-                <a href="{{ route('device', ['device' => $device_id, 'tab' => $current_tab, 'vars' => $sm['url']]) }}">{{ $sm['name'] }}</a>@if($isSelected($sm['url']))</span>@endif
-
-                @if(!$loop->last)
-                    |
-                @endif
-            @endforeach
         @endforeach
-    </div>
-</div>
+    @endforeach
+    {{ $slot }}
+</span>

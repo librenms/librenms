@@ -24,6 +24,7 @@ use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
+use App\Models\Service;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
@@ -2708,24 +2709,29 @@ function get_service_templates(Illuminate\Http\Request $request)
 function add_service_for_host(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $data = json_decode($request->getContent(), true);
+    $data = $request->json()->all();
     if (missing_fields(['type'], $data)) {
         return api_error(400, 'Required fields missing (hostname and type needed)');
     }
-    if (! in_array($data['type'], list_available_services())) {
-        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', list_available_services()));
+    $service_list = \LibreNMS\Services::list();
+    if (! in_array($data['type'], $service_list)) {
+        return api_error(400, 'The service ' . $data['type'] . " does not exist.\n Available service types: " . implode(', ', $service_list));
     }
-    $service_type = $data['type'];
-    $service_ip = $data['ip'];
-    $service_desc = $data['desc'] ? $data['desc'] : '';
-    $service_param = $data['param'] ? $data['param'] : '';
-    $service_ignore = $data['ignore'] ? true : false; // Default false
-    $service_disable = $data['disable'] ? true : false; // Default false
-    $service_name = $data['name'];
-    $service_id = add_service($device_id, $service_type, $service_desc, $service_ip, $service_param, (int) $service_ignore, (int) $service_disable, 0, $service_name);
-    if ($service_id != false) {
-        return api_success_noresult(201, "Service $service_type has been added to device $hostname (#$service_id)");
+
+    $service = Service::create([
+        'device_id' => ctype_digit($hostname) ? $hostname : getidbyname($hostname),
+        'service_type' => $data['type'],
+        'service_desc' => $data['desc'] ?: '',
+        'service_ip' => $data['ip'],
+        'service_param' => $data['param'] ?: '', // FIXME convert string to array
+        'service_ignore' => $data['ignore'] ? 1 : 0,
+        'service_disable' => $data['disable'] ? 1 : 0,
+        'service_template_id' => 0,
+        'service_name' => $data['name'],
+    ]);
+
+    if ($service->exists) {
+        return api_success_noresult(201, 'Service ' . ($data['type']) . " has been added to device $hostname (#$service_id)");
     }
 
     return api_error(500, 'Failed to add the service');
@@ -2870,8 +2876,8 @@ function del_service_from_host(Illuminate\Http\Request $request)
     if (empty($service_id)) {
         return api_error(400, 'No service_id has been provided to delete');
     }
-    $result = delete_service($service_id);
-    if ($result == 1) {
+
+    if (Service::where('service_id', $service_id)->delete()) {
         return api_success_noresult(201, 'Service has been deleted successfully');
     }
 
@@ -2911,9 +2917,13 @@ function search_by_mac(Illuminate\Http\Request $request)
 function edit_service_for_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');
-    $data = json_decode($request->getContent(), true);
-    if (edit_service($data, $service_id) == 1) {
-        return api_success_noresult(201, 'Service updated successfully');
+    $service = Service::find($service_id);
+
+    if ($service) {
+        $service->fill($request->json()->all());
+        if ($service->save()) {
+            return api_success_noresult(201, 'Service updated successfully');
+        }
     }
 
     return api_error(500, "Failed to update the service with id $service_id");

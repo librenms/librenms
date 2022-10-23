@@ -25,6 +25,11 @@
 
 namespace LibreNMS;
 
+use App\Facades\DeviceCache;
+use App\Models\Service;
+use LibreNMS\Interfaces\ServiceCheck;
+use LibreNMS\Services\DefaultServiceCheck;
+
 class Services
 {
     /**
@@ -32,17 +37,67 @@ class Services
      *
      * @return array
      */
-    public static function list()
+    public static function list(): array
     {
-        $services = [];
-        if (is_dir(Config::get('nagios_plugins'))) {
-            foreach (scandir(Config::get('nagios_plugins')) as $file) {
-                if (substr($file, 0, 6) === 'check_') {
-                    $services[] = substr($file, 6);
+        return \Cache::remember('services.list', 30, function () {
+            $services = [];
+            if (is_dir(Config::get('nagios_plugins'))) {
+                foreach (scandir(Config::get('nagios_plugins')) as $file) {
+                    if (substr($file, 0, 6) === 'check_') {
+                        $services[] = substr($file, 6);
+                    }
                 }
             }
+
+            return $services;
+        });
+    }
+
+    /**
+     * Makes an instance of the ServiceCheck for the given service
+     */
+    public static function makeCheck(Service $service): ServiceCheck
+    {
+        if (DeviceCache::hasPrimary()) {
+            $service->setRelation('device', DeviceCache::getPrimary());
         }
 
-        return $services;
+        $class = self::getCheck($service->service_type);
+
+        return new $class($service);
+    }
+
+    /**
+     * Get the ServiceCheck class for the given check. May be a custom one or the default instance.
+     */
+    public static function getCheck(string $check): string
+    {
+        $check_class = self::checkToClass($check);
+        if (class_exists($check_class) && in_array(ServiceCheck::class, class_implements($check_class))) {
+            return $check_class;
+        }
+
+        return DefaultServiceCheck::class;
+    }
+
+    /**
+     * Parse legacy options into escapable arguments
+     */
+    public static function parseLegacyParams(string $params): array
+    {
+        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($params));
+
+        return array_map(function ($part) {
+            return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
+        }, $parts);
+    }
+
+
+    private static function checkToClass(string $check): string
+    {
+        $name = ucwords(str_replace('_', ' ', strtolower($check)));
+        $class = str_replace(' ', '', $name);
+
+        return '\LibreNMS\Services\Checks\\' . $class;
     }
 }

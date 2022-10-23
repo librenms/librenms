@@ -175,8 +175,23 @@ class Rrd extends BaseDatastore
             }, ARRAY_FILTER_USE_KEY);
 
             if (! $this->checkRrdExists($rrd)) {
-                $newdef = "--step $step $rrd_def $this->rra";
-                $this->command('create', $rrd, $newdef);
+                $sources = '';
+                $source_index = 1;
+                $new_def = (string) $rrd_def;
+
+                foreach ($rrd_def->getSources() as $key => $source) {
+                    $filename = is_array($source) ? $this->name($device['hostname'], $source) : $source;
+                    $replacement = '';
+                    if ($this->checkRrdExists($filename)) {
+                        $sources .= ' --source ' . $filename;
+                        $replacement = '=$1[' . $source_index++ . ']';
+                    }
+
+                    // if rrd exists, set the correct source index, otherwise remove all fills referencing it
+                    $new_def = preg_replace('/=(\w+)\[' . $key . ']/', $replacement, $new_def);
+                }
+
+                $this->command('create', $rrd, "$sources --step $step $new_def $this->rra");
             }
         }
 

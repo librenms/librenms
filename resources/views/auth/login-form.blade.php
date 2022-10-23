@@ -1,10 +1,10 @@
-<x-panel footer-class="text-center">
+<x-panel>
     <x-slot name="title">
         <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
     </x-slot>
 
     @config('login_message')
-    <x-slot name="footer">
+    <x-slot name="footer" class="text-center">
         <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div>
     </x-slot>
     @endconfig

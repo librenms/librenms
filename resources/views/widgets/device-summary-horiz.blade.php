@@ -34,7 +34,7 @@
                 <td><a href="{{ url('ports/format=list_detail/state=up') }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
                 <td><a href="{{ url('ports/format=list_detail/state=down') }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 <td><a href="{{ url('ports/format=list_detail/ignore=1') }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
-                 <td><span class="grey"> NA</span></a></td>
+                 <td><span class="grey"> NA</span></td>
                 <td><a href="{{ url('ports/format=list_detail/state=admindown') }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($summary_errors)
                     <td><a href="{{ url('ports/format=list_detail/errors=1') }}"><span class="black"> {{ $ports['errored'] }}</span></a></td>
@@ -42,13 +42,13 @@
             </tr>
             @if($show_services)
                 <tr>
-                    <td><a href="{{ url('services') }}">{{ __('Services') }}</a></td>
-                    <td><a href="{{ url('services') }}"><span>{{ $services['total'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=ok/view=details') }}"><span class="green">{{ $services['ok'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=critical/view=details') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
-                    <td><a href="{{ url('services/ignore=1/view=details') }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
-                    <td><span class="grey"> NA</span></a></td>
-                    <td><a href="{{ url('services/disabled=1/view=details') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
+                    <td><a href="{{ route('services.index') }}">{{ __('Services') }}</a></td>
+                    <td><a href="{{ route('services.index') }}"><span>{{ $services['total'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'ok']) }}"><span class="green">{{ $services['ok'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'critical']) }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['ignore' => '1']) }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
+                    <td><span class="grey"> NA</span></td>
+                    <td><a href="{{ route('services.index', ['disabled' => '1']) }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
                     @if($summary_errors)
                         <td>-</td>
                     @endif

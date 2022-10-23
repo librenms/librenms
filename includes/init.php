@@ -63,7 +63,6 @@ require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
-require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
 

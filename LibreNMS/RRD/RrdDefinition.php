@@ -32,6 +32,7 @@ class RrdDefinition
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
+    private $sources = [];
     private $skipNameCheck = false;
 
     /**
@@ -51,17 +52,22 @@ class RrdDefinition
      * @param  int  $min  Minimum allowed value.  null means undefined.
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string|array  $source_rrd
+     * @param  string  $source_ds
      * @return RrdDefinition
      */
-    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
+    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $source_rrd = null, $source_ds = null)
     {
         if (empty($name)) {
             d_echo('DS must be set to a non-empty string.');
         }
 
+        $source_rrd_key = is_array($source_rrd) ? implode(',', $source_rrd) : $source_rrd;
+        $this->sources[$source_rrd_key] = $source_rrd;
         $name = $this->escapeName($name);
+
         $this->dataSets[$name] = [
-            $name,
+            is_null($source_rrd) ? $name : "$name={$source_ds}[$source_rrd_key]",
             $this->checkType($type),
             is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
             is_null($min) ? 'U' : $min,
@@ -105,6 +111,14 @@ class RrdDefinition
         $this->skipNameCheck = true;
 
         return $this;
+    }
+
+    /**
+     * returns sources to be added with --source for data filling
+     */
+    public function getSources(): array
+    {
+        return $this->sources;
     }
 
     /**

@@ -3841,15 +3841,6 @@ parameters:
 					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 				"""
 			count: 1
-			path: includes/html/pages/addsrv.inc.php
-
-		-
-			message:
-				"""
-					#^Call to deprecated function dbFetchRows\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 1
 			path: includes/html/pages/apps/proxmox.inc.php
 
 		-
