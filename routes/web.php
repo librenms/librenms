@@ -28,13 +28,13 @@ Route::get('graph/{path?}', 'GraphController')
     ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
 
 // WebUI
-Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
+Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
 
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::resource('port', 'PortController', ['only' => 'update']);
-    Route::group(['prefix' => 'poller'], function () {
+    Route::resource('port', 'PortController')->only('update');
+    Route::prefix('poller')->group(function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
         Route::get('log', 'PollerController@logTab')->name('poller.log');
         Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
@@ -49,7 +49,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::post('templates/remove/{template}', 'ServiceTemplateController@remove')->name('templates.remove');
     });
     Route::get('locations', 'LocationController@index');
-    Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
+    Route::resource('preferences', 'UserPreferencesController')->only('index', 'store');
     Route::resource('users', 'UserController');
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
@@ -58,7 +58,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::view('vminfo', 'vminfo');
 
     // Device Tabs
-    Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
+    Route::prefix('device/{device}')->namespace('Device\Tabs')->name('device.')->group(function () {
         Route::put('notes', 'NotesController@update')->name('notes.update');
     });
 
@@ -66,7 +66,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         ->name('device')->where(['vars' => '.*']);
 
     // Maps
-    Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
+    Route::prefix('maps')->namespace('Maps')->group(function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
@@ -80,7 +80,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::put('dashboard/widgets/{widget}', 'WidgetSettingsController@update')->name('dashboard.widget.settings');
 
     // Push notifications
-    Route::group(['prefix' => 'push'], function () {
+    Route::prefix('push')->group(function () {
         Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
         Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key'])->name('push.key');
         Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register'])->name('push.register');
@@ -88,7 +88,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
 
     // admin pages
-    Route::group(['middleware' => ['can:admin']], function () {
+    Route::middleware('can:admin')->group(function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
@@ -115,7 +115,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::permanentRedirect('poll-log', 'poller/log');
 
     // Two Factor Auth
-    Route::group(['prefix' => '2fa', 'namespace' => 'Auth'], function () {
+    Route::prefix('2fa')->namespace('Auth')->group(function () {
         Route::get('', 'TwoFactorController@showTwoFactorForm')->name('2fa.form');
         Route::post('', 'TwoFactorController@verifyTwoFactor')->name('2fa.verify');
         Route::post('add', 'TwoFactorController@create')->name('2fa.add');
@@ -127,12 +127,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
 
     // Ajax routes
-    Route::group(['prefix' => 'ajax'], function () {
+    Route::prefix('ajax')->group(function () {
         // page ajax controllers
-        Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
-        Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
+        Route::resource('location', 'LocationController')->only('update', 'destroy');
+        Route::resource('pollergroup', 'PollerGroupController')->only('destroy');
         // misc ajax controllers
-        Route::group(['namespace' => 'Ajax'], function () {
+        Route::namespace('Ajax')->group(function () {
             Route::get('search/bgp', 'BgpSearchController');
             Route::get('search/device', 'DeviceSearchController');
             Route::get('search/port', 'PortSearchController');
@@ -147,7 +147,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
 
         // js select2 data controllers
-        Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
+        Route::prefix('select')->namespace('Select')->group(function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
             Route::get('bill', 'BillController')->name('ajax.select.bill');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
@@ -170,7 +170,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         });
 
         // jquery bootgrid data controllers
-        Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+        Route::prefix('table')->namespace('Table')->group(function () {
             Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
@@ -190,7 +190,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         });
 
         // dashboard widgets
-        Route::group(['prefix' => 'dash', 'namespace' => 'Widgets'], function () {
+        Route::prefix('dash')->namespace('Widgets')->group(function () {
             Route::post('alerts', 'AlertsController');
             Route::post('alertlog', 'AlertlogController');
             Route::post('availability-map', 'AvailabilityMapController');
@@ -220,7 +220,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 });
 
 // installation routes
-Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
+Route::prefix('install')->namespace('Install')->group(function () {
     Route::get('/', 'InstallationController@redirectToFirst')->name('install');
     Route::get('/checks', 'ChecksController@index')->name('install.checks');
     Route::get('/database', 'DatabaseController@index')->name('install.database');
