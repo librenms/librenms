@@ -11,13 +11,6 @@ use LibreNMS\Enum\SyslogSeverity;
 class SyslogFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Syslog::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
