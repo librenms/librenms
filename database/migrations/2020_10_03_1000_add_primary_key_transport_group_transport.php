@@ -10,7 +10,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddPrimaryKeyTransportGroupTransport extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -34,4 +34,4 @@ class AddPrimaryKeyTransportGroupTransport extends Migration
     public function down()
     {
     }
-}
+};
