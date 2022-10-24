@@ -33,7 +33,6 @@
         "ezyang/htmlpurifier": "^4.8",
         "facade/ignition": "^2.17.6",
         "fico7489/laravel-pivot": "^3.0",
-        "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "influxdb/influxdb-php": "^1.14",
         "justinrainbow/json-schema": "^5.2",
