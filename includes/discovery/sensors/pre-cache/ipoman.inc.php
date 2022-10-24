@@ -1,5 +1,7 @@
 <?php
 
+$pre_cache['ipoman']['out'] = $pre_cache['ipoman']['out'] ?? [];
+$pre_cache['ipoman']['in'] = $pre_cache['ipoman']['in'] ?? [];
 echo 'outletConfigDesc ';
 $pre_cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', [], 'IPOMANII-MIB');
 

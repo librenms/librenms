@@ -54,10 +54,10 @@ class AutonomousSystem
             }
 
             try {
-                $result = @dns_get_record("AS$this->asn.asn.cymru.com", DNS_TXT);
+                $result = (new Dns())->getRecord("AS$this->asn.asn.cymru.com", 'TXT');
 
-                if (! empty($result[0]['txt'])) {
-                    $txt = explode('|', $result[0]['txt']);
+                if (! empty($result[0]->text[0])) {
+                    $txt = explode('|', $result[0]->text[0]);
 
                     return trim($txt[4], ' "');
                 }

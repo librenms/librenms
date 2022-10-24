@@ -37,33 +37,40 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
             $vlan_index = array_search($key, $temp_vlan);
             $port_on_vlan = explode(',', $taganduntag['dot1qVlanStaticEgressPorts']);
             foreach ($port_on_vlan as $port) {
-                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 0;
+                $index = $base_to_index[$port] ?? null;
+                $tagness_by_vlan_index[$vlan_index][$index]['tag'] = 0;
                 unset($tagness_by_vlan_index[$vlan_index]['']);
             }
         }
         // correct all untagged ports to be untagged
         foreach ($untag as $key => $untag) {
             $vlan_index = array_search($key, $temp_vlan);
+
+            // $port_on_vlan = [];
+            //    if (strpos(",", $untag['dot1qVlanStaticUntaggedPorts'])) {
             $port_on_vlan = explode(',', $untag['dot1qVlanStaticUntaggedPorts']);
+            //   }
             foreach ($port_on_vlan as $port) {
-                $tagness_by_vlan_index[$vlan_index][$base_to_index[$port]]['tag'] = 1;
+                $index = $base_to_index[$port] ?? null;
+                $tagness_by_vlan_index[$vlan_index][$index]['tag'] = 1;
                 unset($tagness_by_vlan_index[$vlan_index]['']);
             }
         }
     } else {
         foreach ($untag as $key => $tagness) {
             $key = explode('.', $key);
+            $index = $base_to_index[$key[1]] ?? null;
             if ($tagness['jnxExVlanPortTagness'] == 2) {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 1;
+                $tagness_by_vlan_index[$key[0]][$index]['tag'] = 1;
             } else {
-                $tagness_by_vlan_index[$key[0]][$base_to_index[$key[1]]]['tag'] = 0;
+                $tagness_by_vlan_index[$key[0]][$index]['tag'] = 0;
             }
         }
     }
     foreach ($vlans as $vlan_index => $vlan) {
         $vlan_id = $vlan_tag[$vlan_index][$tmp_tag];
         d_echo("VLAN --> $vlan_id");
-        if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
+        if (isset(($vlans_db[$vtpdomain_id][$vlan_id])) && is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
             $vlan_data = $vlans_db[$vtpdomain_id][$vlan_id];
             if ($vlan_data['vlan_name'] != $vlan[$tmp_name]) {
                 $vlan_upd['vlan_name'] = $vlan[$tmp_name];

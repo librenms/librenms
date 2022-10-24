@@ -42,8 +42,12 @@ foreach ($tables as $tablevalue) {
     $temp = snmpwalk_cache_multi_oid($device, $tablevalue['oid'], [], $tablevalue['mib']);
     $cur_oid = $tablevalue['num_oid'];
 
-    if (is_array($temp)) {
-        if (isset($temp[0]) && $temp[0][$tablevalue['state_name']] == 'nonRedundant' || $temp[0]['cswMaxSwitchNum'] == '1') {
+    if (! empty($temp) && is_array($temp)) {
+        if (
+            isset($temp[0])
+            &&
+            ($temp[0][$tablevalue['state_name']] == 'nonRedundant' || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1'))
+        ) {
             break;
         }
 
@@ -190,14 +194,14 @@ foreach ($tables as $tablevalue) {
             ];
         }
         create_state_index($state_name, $states);
-
+        $swrolenumber = 0;
+        $swstatenumber = 0;
         foreach ($temp as $index => $entry) {
             $state_group = null;
             if ($tablevalue['state_name'] == 'ciscoEnvMonTemperatureState' && (empty($temp[$index][$tablevalue['descr']]))) {
                 d_echo('Invalid sensor, skipping..');
             } else {
                 //Discover Sensors
-                $descr = ucwords($temp[$index][$tablevalue['descr']]);
                 if ($state_name == 'cRFStatusUnitState' || $state_name == 'cRFStatusPeerUnitState' || $state_name == 'cRFCfgRedundancyOperMode' || $state_name == 'cswRingRedundant') {
                     $descr = $tablevalue['descr'];
                 } elseif ($state_name == 'cswSwitchRole') {
@@ -208,12 +212,14 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
                     $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
-                    $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
+                    $descr = $tablevalue['descr'] . ($stack_port_descr['ifDescr'] ?? null);
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
                     $descr = $tablevalue['descr'];
                     $state_group = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB');
+                } else {
+                    $descr = ucwords($temp[$index][$tablevalue['descr']]);
                 }
                 discover_sensor($valid['sensor'], 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index, null, null, $state_group);
 
@@ -224,4 +230,4 @@ foreach ($tables as $tablevalue) {
     }
 }
 
-unset($role_data, $redundant_data);
+unset($role_data, $redundant_data, $swrolenumber, $swstatenumber);

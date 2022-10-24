@@ -199,6 +199,8 @@ trait BridgeMib
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
 
-        return (int) hexdec($dp);
+        // TODO: Some ports have; "BRIDGE-MIB::dot1dStpPortDesignatedPort" => "Bq" (aos7), which is not valid hex
+        // support or not?
+        return ctype_xdigit($dp) ? hexdec($dp) : 0;
     }
 }

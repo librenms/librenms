@@ -413,20 +413,21 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $measure = Measurement::start('snmpwalk');
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = external_exec($cmd);
 
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
+    $data = trim($data);
 
     if (is_string($data) && preg_match('/No Such (Object|Instance)/i', $data)) {
         d_echo('Invalid snmp_walk() data = ' . print_r($data, true));
         $data = false;
     } elseif (preg_match('/Wrong Type(.*)should be/', $data)) {
-        $data = preg_replace('/Wrong Type \(should be .*\): /', '', $data);
+        $data = trim(preg_replace('/Wrong Type \(should be .*\): /', '', $data));
     } else {
         if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
             $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';
-            $data = preg_replace($no_more_pattern, '', $data);
+            $data = trim(preg_replace($no_more_pattern, '', $data));
         }
     }
 
@@ -514,7 +515,12 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \\\n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+
+        $split = explode('.', $oid, 2);
+        $oid = $split[0];
+        // Some broken devices (aix.snmprec) doesn't gave a index for ifName
+        $index = $split[1] ?? null;
+
         if (! strstr($value, 'at this OID') && ! empty($oid)) {
             $array[$index][$oid] = $value;
         }
@@ -532,11 +538,11 @@ function snmpwalk_cache_numerical_oid($device, $oid, $array = [], $mib = null, $
     }
 
     foreach (explode("\n", $data) as $entry) {
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
+        $split = explode('=', $entry, 2);
+        $oid = trim($split[0]);
+        $value = isset($split[1]) ? trim($split[1]) : null;
         [$index,] = explode('.', strrev($oid), 2);
-        if (! strstr($value, 'at this OID') && isset($oid) && isset($index)) {
+        if (! strstr($value ?? '', 'at this OID') && isset($oid) && isset($index)) {
             $array[$index][$oid] = $value;
         }
     }

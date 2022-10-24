@@ -55,7 +55,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDeviceArray();
 
-        if (! Str::startsWith($device['hardware'], 'AIR-') && ! Str::contains($device['hardware'], 'ciscoAIR')) {
+        if (is_string($device['hardware']) && (! Str::startsWith($device['hardware'], 'AIR-') && ! Str::contains($device['hardware'], 'ciscoAIR'))) {
             // unsupported IOS hardware
             return [];
         }

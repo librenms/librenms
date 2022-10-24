@@ -287,9 +287,10 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         }
     } else {
         echo 'Full ports polling ';
+
         // For devices that are on the bad_ifXentry list, try fetching ifAlias to have nice interface descriptions.
 
-        if (! in_array(strtolower($device['hardware']), array_map('strtolower', (array) Config::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
+        if (! in_array(strtolower($device['hardware'] ?? ''), array_map('strtolower', (array) Config::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         } else {
             $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB', null, '-OQUst');
@@ -461,7 +462,7 @@ $ports_found = [];
 foreach ($port_stats as $ifIndex => $port) {
     // Store ifIndex in port entry and prefetch ifName as we'll need it multiple times
     $port['ifIndex'] = $ifIndex;
-    $ifName = $port['ifName'];
+    $ifName = $port['ifName'] ?? null;
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $port, $port_association_mode);
@@ -524,7 +525,7 @@ foreach ($port_stats as $ifIndex => $port) {
         $ports_found[] = $port_id;
     } elseif (empty($ports[$port_id]['skipped'])) {
         // Port vanished (mark as deleted) (except when skipped by selective port polling)
-        if ($ports[$port_id]['deleted'] != '1') {
+        if (! isset($ports[$port_id]['deleted']) || $ports[$port_id]['deleted'] != '1') {
             dbUpdate(['deleted' => '1'], 'ports', '`port_id` = ?', [$port_id]);
             $ports[$port_id]['deleted'] = '1';
         }
@@ -546,6 +547,13 @@ $globally_updated_port_ids = [];
 
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
+
+    // Sometimes we end up with a "port" only containing deleted = 1
+    // This is probably to a bug somewhere else, but lets just ignore it here.
+    if (isset($port['deleted']) && $port['deleted'] == '1' && count($port) == 1) {
+        continue;
+    }
+
     $port_id = $port['port_id'];
     $ifIndex = $port['ifIndex'];
 
@@ -680,7 +688,7 @@ foreach ($ports as $port) {
                 }
             }
 
-            if ($port[$oid] != $this_port[$oid] && ! isset($this_port[$oid])) {
+            if ($port[$oid] != null && ! isset($this_port[$oid])) {
                 $port['update'][$oid] = ['NULL'];
                 log_event($oid . ': ' . $port[$oid] . ' -> NULL', $device, 'interface', 4, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
@@ -688,8 +696,8 @@ foreach ($ports as $port) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']];
-                $device_tune = $device['attribs']['override_rrdtool_tune'];
+                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']] ?? null;
+                $device_tune = $device['attribs']['override_rrdtool_tune'] ?? null;
                 if ($port_tune == 'true' ||
                     ($device_tune == 'true' && $port_tune != 'false') ||
                     (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
@@ -723,7 +731,7 @@ foreach ($ports as $port) {
             } else {
                 if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed'])) {
                     if ($port[$oid . '_prev'] == null) {
-                        $port['update'][$oid . '_prev'] = $this_port[$oid];
+                        $port['update'][$oid . '_prev'] = $this_port[$oid] ?? null;
                     }
                 }
             }
@@ -806,18 +814,20 @@ foreach ($ports as $port) {
                 echo 'Wrote port debugging data';
             }
 
-            $port['stats']['ifInBits_rate'] = round(($port['stats']['ifInOctets_rate'] * 8));
-            $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
+            if (isset($port['stats']) && is_array($port['stats'])) {
+                $port['stats']['ifInBits_rate'] = round(($port['stats']['ifInOctets_rate'] * 8));
+                $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
 
-            // If we have a valid ifSpeed we should populate the stats for checking
-            if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
-                $port['stats']['ifInBits_perc'] = Number::calculatePercent($port['stats']['ifInBits_rate'], $this_port['ifSpeed'], 0);
-                $port['stats']['ifOutBits_perc'] = Number::calculatePercent($port['stats']['ifOutBits_rate'], $this_port['ifSpeed'], 0);
+                // If we have a valid ifSpeed we should populate the stats for checking
+                if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
+                    $port['stats']['ifInBits_perc'] = Number::calculatePercent($port['stats']['ifInBits_rate'], $this_port['ifSpeed'], 0);
+                    $port['stats']['ifOutBits_perc'] = Number::calculatePercent($port['stats']['ifOutBits_rate'], $this_port['ifSpeed'], 0);
+                }
+
+                echo 'bps(' . Number::formatSi($port['stats']['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($port['stats']['ifOutBits_rate'], 2, 3, 'bps') . ')';
+                echo 'bytes(' . Number::formatBi($port['stats']['ifInOctets_diff']) . '/' . Number::formatBi($port['stats']['ifOutOctets_diff']) . ')';
+                echo 'pkts(' . (isset($port['stats']['ifInUcastPkts_rate']) ? Number::formatSi($port['stats']['ifInUcastPkts_rate'], 2, 3, 'pps') : '?') . '/' . (isset($port['stats']['ifOutUcastPkts_rate']) ? Number::formatSi($port['stats']['ifOutUcastPkts_rate'], 2, 3, 'pps') : '?') . ')';
             }
-
-            echo 'bps(' . Number::formatSi($port['stats']['ifInBits_rate'], 2, 3, 'bps') . '/' . Number::formatSi($port['stats']['ifOutBits_rate'], 2, 3, 'bps') . ')';
-            echo 'bytes(' . Number::formatBi($port['stats']['ifInOctets_diff']) . '/' . Number::formatBi($port['stats']['ifOutOctets_diff']) . ')';
-            echo 'pkts(' . Number::formatSi($port['stats']['ifInUcastPkts_rate'], 2, 3, 'pps') . '/' . Number::formatSi($port['stats']['ifOutUcastPkts_rate'], 2, 3, 'pps') . ')';
 
             // Update data stores
             $rrd_name = Rrd::portName($port_id, '');
@@ -866,8 +876,9 @@ foreach ($ports as $port) {
             $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
 
             // Add delta rate between current poll and last poll.
-            $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'];
-            $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'];
+            // TODO: This is not mentioned anywhere else in the code?
+            $fields['ifInBits_rate'] = $port['stats']['ifInBits_rate'] ?? null;
+            $fields['ifOutBits_rate'] = $port['stats']['ifOutBits_rate'] ?? null;
 
             if ($tune_port === true) {
                 Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);

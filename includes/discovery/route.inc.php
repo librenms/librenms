@@ -99,7 +99,7 @@ if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'route
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;
         $entryClean['updated_at'] = $update_timestamp;
-        $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
+        $current = $mixed['']['ipv4'][$entryClean['inetCidrRouteDest']][$entryClean['inetCidrRoutePfxLen']][$entryClean['inetCidrRoutePolicy']]['ipv4'][$entryClean['inetCidrRouteNextHop']] ?? null;
         if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
             //we already have a row in DB
             $entryClean['route_id'] = $current['db']['route_id'];

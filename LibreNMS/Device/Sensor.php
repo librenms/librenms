@@ -195,12 +195,13 @@ class Sensor implements DiscoveryModule, PollerModule
             );
         }
 
-        $sensor = dbFetchRow(
+        if ($sensor = dbFetchRow(
             "SELECT * FROM `$table` " .
             'WHERE `device_id`=? AND `sensor_class`=? AND `sensor_type`=? AND `sensor_index`=?',
             [$this->device_id, $this->type, $this->subtype, $this->index]
-        );
-        $this->sensor_id = $sensor['sensor_id'];
+        )) {
+            $this->sensor_id = $sensor['sensor_id'];
+        }
 
         return $sensor;
     }
@@ -394,6 +395,12 @@ class Sensor implements DiscoveryModule, PollerModule
     {
         $sensor_data = [];
         foreach ($sensors as $sensor) {
+            // TODO: Why is sensor_id missing for some sensors only?
+            // And what happens if its missing for multiple here?
+            if (! isset($sensor['sensor_id'])) {
+                $sensor['sensor_id'] = null;
+            }
+
             // pull out the data for this sensor
             $requested_oids = array_flip($sensor['sensor_oids']);
             $data = array_intersect_key($prefetch, $requested_oids);

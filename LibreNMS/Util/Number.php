@@ -90,7 +90,7 @@ class Number
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
-     * @param  mixed  $number
+     * @param  string  $number
      * @return float|int
      */
     public static function cast($number)

@@ -141,24 +141,38 @@ function poll_sensor($device, $class)
  */
 function record_sensor_data($device, $all_sensors)
 {
+    // TODO: Replace with enum
     $supported_sensors = [
-        'current'     => 'A',
-        'frequency'   => 'Hz',
-        'runtime'     => 'Min',
-        'humidity'    => '%',
-        'fanspeed'    => 'rpm',
-        'power'       => 'W',
-        'voltage'     => 'V',
+        'airflow' => 'cfm',
+        'ber' => 'ratio',
+        'bitrate' => 'bps',
+        'charge' => '%',
+        'chromatic_dispersion' => 'ps/nm',
+        'cooling' => 'W',
+        'count' => '#',
+        'current' => 'A',
+        'dbm' => 'dBm',
+        'delay' => 's',
+        'eer' => 'eer',
+        'fanspeed' => 'rpm',
+        'frequency' => 'Hz',
+        'humidity' => '%',
+        'load' => '%',
+        'loss' => '%',
+        'percent' => '%',
+        'power' => 'W',
+        'power_consumed' => 'kWh',
+        'power_factor' => 'ratio',
+        'pressure' => 'kPa',
+        'quality_factor' => 'dB',
+        'runtime' => 'Min',
+        'signal' => 'dBm',
+        'snr' => 'SNR',
+        'state' => '#',
         'temperature' => 'C',
-        'dbm'         => 'dBm',
-        'charge'      => '%',
-        'load'        => '%',
-        'state'       => '#',
-        'signal'      => 'dBm',
-        'airflow'     => 'cfm',
-        'snr'         => 'SNR',
-        'pressure'    => 'kPa',
-        'cooling'     => 'W',
+        'tv_signal' => 'dBmV',
+        'voltage' => 'V',
+        'waterflow' => 'l/m',
     ];
 
     foreach ($all_sensors as $sensor) {
@@ -221,8 +235,9 @@ function record_sensor_data($device, $all_sensors)
                 'state_descr',
                 'state_value'
             );
-
-            log_event("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
+            $prev_sensor_value_translation = $trans[$prev_sensor_value] ?? null;
+            $sensor_value_translation = $trans[$sensor_value] ?? null;
+            log_event("$class sensor {$sensor['sensor_descr']} has changed from {$prev_sensor_value_translation} ($prev_sensor_value) to {$sensor_value_translation} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
             dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);
@@ -529,7 +544,7 @@ function update_application($app, $response, $metrics = [], $status = '')
                     } else {
                         $prefix = $metric_group . '_';
                     }
-
+                    dump($metrics, $metric_group);
                     foreach ($metrics[$metric_group] as $metric_name => $value) {
                         $carry[$prefix . $metric_name] = $value;
                     }

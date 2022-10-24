@@ -539,7 +539,9 @@ function hex2str($hex)
     $string = '';
 
     for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr($hex, $i, 2)));
+        if (ctype_xdigit($input = substr($hex, $i, 2))) {
+            $string .= chr(hexdec($input));
+        }
     }
 
     return $string;
@@ -607,9 +609,9 @@ function is_port_valid($port, $device)
     }
 
     $ifDescr = $port['ifDescr'];
-    $ifName = $port['ifName'];
+    $ifName = $port['ifName'] ?? '';
     $ifAlias = $port['ifAlias'] ?? '';
-    $ifType = $port['ifType'];
+    $ifType = $port['ifType'] ?? '';
     $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
@@ -687,10 +689,16 @@ function port_fill_missing_and_trim(&$port, $device)
         $port['ifName'] = trim($port['ifName']);
     }
     // When devices do not provide data, populate with other data if available
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
+        $port['ifName'] = $port['ifDescr'] ?? null;
+        d_echo(' Using ifDescr as ifName');
+    }
+
     if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
+
     if (! empty($device['attribs']['ifName:' . $port['ifName']])) {
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
@@ -698,11 +706,6 @@ function port_fill_missing_and_trim(&$port, $device)
     } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
-    }
-
-    if (! isset($port['ifName']) || $port['ifName'] == '') {
-        $port['ifName'] = $port['ifDescr'];
-        d_echo(' Using ifDescr as ifName');
     }
 }
 
@@ -1152,6 +1155,11 @@ function q_bridge_bits2indices($hex_data)
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
     */
     $hex_data = str_replace([' ', "\n"], '', $hex_data);
+
+    // Return early if input is not hex
+    if (! ctype_xdigit($hex_data)) {
+        return [];
+    }
 
     // we need an even number of digits for hex2bin
     if (strlen($hex_data) % 2 === 1) {

@@ -163,6 +163,11 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
+        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING === true) {
+            debug_print_backtrace();
+            dd('----------------------handleError--------------------', $message, $file, $line, '!---------------------handleError-------------------!');
+        }
+
         // report errors if they are allowed
         if ($this->errorReportingLevel & $level) {
             Flare::report(new ErrorException($message, 0, $level, $file, $line));

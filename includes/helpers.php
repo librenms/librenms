@@ -104,7 +104,7 @@ if (! function_exists('preg_match_any')) {
      * @param  array|string  $regexes  an array of regexes or single regex to check
      * @return bool if any of the regexes matched, return true
      */
-    function preg_match_any($subject, $regexes)
+    function preg_match_any(string $subject, $regexes)
     {
         foreach ((array) $regexes as $regex) {
             if (preg_match($regex, $subject)) {

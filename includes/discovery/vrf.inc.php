@@ -49,14 +49,15 @@ if (Config::get('enable_vrfs')) {
         d_echo("\n[DEBUG OIDS]\n$rds\n[/DEBUG]\n");
 
         $rds = trim($rds);
-
+        $descr_table = [];
         if ($descr_oid) {
             $descrs = snmp_walk($device, $descr_oid, '-Osqn', $vpnmib, null);
             $descrs = trim(str_replace("$descr_oid.", '', $descrs));
-            $descr_table = [];
             foreach (explode("\n", $descrs) as $descr) {
-                $t = explode(' ', $descr, 2);
-                $descr_table[$t[0]] = $t[1];
+                if (strpos($descr, ' ') !== false) {
+                    $t = explode(' ', $descr, 2);
+                    $descr_table[$t[0]] = $t[1];
+                }
             }
         }
 
@@ -85,11 +86,20 @@ if (Config::get('enable_vrfs')) {
             if ($oid) {
                 // 8.49.53.48.56.58.49.48.48 "1508:100"
                 // First digit gives number of chars in VRF Name, then it's ASCII
-                [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                $vrf_oid = $oid;
+                $vrf_rd = null;
+
+                if (strpos($oid, ' ') !== false) {
+                    [$vrf_oid, $vrf_rd] = explode(' ', $oid);
+                }
                 $oid_values = explode('.', $vrf_oid);
+
                 $vrf_name = '';
-                for ($i = 1; $i <= $oid_values[0]; $i++) {
-                    $vrf_name .= chr($oid_values[$i]);
+
+                if (count($oid_values) > 1) {
+                    for ($i = 1; $i <= $oid_values[0]; $i++) {
+                        $vrf_name .= chr($oid_values[$i]);
+                    }
                 }
 
                 // Some VRP versions output VRF RD values as Null terminated Hex-STRING rather than string.
@@ -114,9 +124,9 @@ if (Config::get('enable_vrfs')) {
                 } elseif (empty($descr_oid)) {
                     // Move rd to vrf_name and remove rd (no way to grab these values with CISCO-VRF-MIB)
                     $vrf_name = $vrf_rd;
-                    unset($vrf_rd);
+                    $vrf_rd = null;
                 }
-
+                $descr_table[$vrf_oid] = $descr_table[$vrf_oid] ?? null;
                 echo "\n  [VRF $vrf_name] OID   - $vrf_oid";
                 echo "\n  [VRF $vrf_name] RD    - $vrf_rd";
                 echo "\n  [VRF $vrf_name] DESC  - " . $descr_table[$vrf_oid];

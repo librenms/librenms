@@ -92,7 +92,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
 
                         if (! isset($peer_data_tmp)) {
-                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerState', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.2', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerStatus', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.3', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerOutUpdates', '.1.3.6.1.4.1.2636.5.1.1.2.6.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
@@ -116,11 +116,13 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerInTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerInTotalMessages'];
                         $peer_data['bgpPeerOutTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerOutTotalMessages'];
                         $peer_data['bgpPeerFsmEstablishedTime'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerFsmEstablishedTime'];
-                        $peer_data['bgpPeerLastErrorText'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceivedText'];
+                        $peer_data['bgpPeerLastErrorText'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceivedText'] ?? null;
 
-                        $error_data = explode(' ', $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceived']);
-                        $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
-                        $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
+                        if (isset($peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceived'])) {
+                            $error_data = explode(' ', $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceived']);
+                            $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
+                            $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
+                        }
 
                         try {
                             $peer_data['bgpLocalAddr'] = IP::fromHexString($peer_data_tmp[$peer_hash]['jnxBgpM2PeerLocalAddr'])->uncompressed();
@@ -333,7 +335,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         } elseif ($device['os'] == 'aos7') {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
                             $peer_data = [];
-                            $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', $al_descr, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                            $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', [], 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
                             $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [], 'BGP4-MIB', 'aos7', '-OQUs');
                             $peer_data['bgpPeerDescr'] = $al_descr[$peer_identifier]['alaBgpPeerName'];
                             $peer_data['bgpPeerState'] = $al_peer[$peer_identifier]['bgpPeerState'];
@@ -561,13 +563,13 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $key = key($cbgp_data_tmp); // get key of item
                             $cbgp_data = [
                                 'cbgpPeerAcceptedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AcceptedPrefixes'],
-                                'cbgpPeerDeniedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2DeniedPrefixes'],
-                                'cbgpPeerPrefixAdminLimit' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixAdminLimit'],
-                                'cbgpPeerPrefixThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixThreshold'],
-                                'cbgpPeerPrefixClearThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixClearThreshold'],
-                                'cbgpPeerAdvertisedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AdvertisedPrefixes'],
-                                'cbgpPeerSuppressedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2SuppressedPrefixes'],
-                                'cbgpPeerWithdrawnPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2WithdrawnPrefixes'],
+                                'cbgpPeerDeniedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2DeniedPrefixes'] ?? null,
+                                'cbgpPeerPrefixAdminLimit' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixAdminLimit'] ?? null,
+                                'cbgpPeerPrefixThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixThreshold'] ?? null,
+                                'cbgpPeerPrefixClearThreshold' => $cbgp_data_tmp[$key]['cbgpPeer2PrefixClearThreshold'] ?? null,
+                                'cbgpPeerAdvertisedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2AdvertisedPrefixes'] ?? null,
+                                'cbgpPeerSuppressedPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2SuppressedPrefixes'] ?? null,
+                                'cbgpPeerWithdrawnPrefixes' => $cbgp_data_tmp[$key]['cbgpPeer2WithdrawnPrefixes'] ?? null,
                             ];
                         } else {
                             $cbgp_oids = [
@@ -588,9 +590,9 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                         $cbgpPeerAcceptedPrefixes = $cbgp_data['cbgpPeerAcceptedPrefixes'];
                         $cbgpPeerDeniedPrefixes = $cbgp_data['cbgpPeerDeniedPrefixes'];
-                        $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'];
-                        $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'];
-                        $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'];
+                        $cbgpPeerPrefixAdminLimit = $cbgp_data['cbgpPeerPrefixAdminLimit'] ?? null;
+                        $cbgpPeerPrefixThreshold = $cbgp_data['cbgpPeerPrefixThreshold'] ?? null;
+                        $cbgpPeerPrefixClearThreshold = $cbgp_data['cbgpPeerPrefixClearThreshold'] ?? null;
                         $cbgpPeerAdvertisedPrefixes = $cbgp_data['cbgpPeerAdvertisedPrefixes'];
                         $cbgpPeerSuppressedPrefixes = $cbgp_data['cbgpPeerSuppressedPrefixes'];
                         $cbgpPeerWithdrawnPrefixes = $cbgp_data['cbgpPeerWithdrawnPrefixes'];
@@ -619,10 +621,12 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             ])->table(3);
                         }
 
-                        $current_peer_data = $j_prefixes[$junos[(string) $peer_ip]['index']][$afi][$safis[$safi]];
-                        $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'];
-                        $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'];
-                        $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'];
+                        if (isset($j_prefixes[$junos[(string) $peer_ip]['index']][$afi])) {
+                            $current_peer_data = $j_prefixes[$junos[(string) $peer_ip]['index']][$afi][$safis[$safi]];
+                            $cbgpPeerAcceptedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesAccepted'];
+                            $cbgpPeerDeniedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixInPrefixesRejected'];
+                            $cbgpPeerAdvertisedPrefixes = $current_peer_data['BGP4-V2-MIB-JUNIPER::jnxBgpM2PrefixOutPrefixes'];
+                        }
                     }//end if
 
                     if ($device['os_group'] === 'arista') {
@@ -637,11 +641,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         } else {
                             $tmp_peer = $peer['bgpPeerIdentifier'];
                         }
-                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
-                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', $out_prefixes, 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixInPrefixesAccepted', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
+                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'aristaBgp4V2PrefixOutPrefixes', [], 'ARISTA-BGP4V2-MIB', null, '-OQUs');
 
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixInPrefixesAccepted'];
-                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'];
+                        $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['aristaBgp4V2PrefixOutPrefixes'] ?? null;
                     }
 
                     if ($device['os'] == 'dell-os10') {
@@ -656,8 +660,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         } else {
                             $tmp_peer = $peer['bgpPeerIdentifier'];
                         }
-                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixInPrefixesAccepted', $a_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
-                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixOutPrefixes', $out_prefixes, 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+                        $a_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixInPrefixesAccepted', [], 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
+                        $out_prefixes = snmpwalk_cache_multi_oid($device, 'os10bgp4V2PrefixOutPrefixes', [], 'DELLEMC-OS10-BGP4V2-MIB', null, '-OQUs');
 
                         $cbgpPeerAcceptedPrefixes = $a_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixInPrefixesAccepted'];
                         $cbgpPeerAdvertisedPrefixes = $out_prefixes["1.$afi.$tmp_peer.$afi.$safi"]['os10bgp4V2PrefixOutPrefixes'];
@@ -665,12 +669,12 @@ if (\LibreNMS\Config::get('enable_bgp')) {
 
                     if ($device['os'] === 'aos7') {
                         $tmp_peer = $peer['bgpPeerIdentifier'];
-                        $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', $al_prefixes, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                        $al_prefixes = snmpwalk_cache_multi_oid($device, 'alaBgpPeerRcvdPrefixes', [], 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
                         $cbgpPeerAcceptedPrefixes = $al_prefixes[$tmp_peer]['alaBgpPeerRcvdPrefixes'];
                     }
 
                     if ($device['os_group'] === 'vrp') {
-                        $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
+                        $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixRcvCounter', [], 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
                         $vrpPrefixes = snmpwalk_cache_multi_oid($device, 'hwBgpPeerPrefixAdvCounter', $vrpPrefixes, 'HUAWEI-BGP-VPN-MIB', null, '-OQUs');
 
                         // only works in global routing table, as the vpnInstanceId is not available
@@ -705,14 +709,14 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     }
 
                     // Validate data
-                    $cbgpPeerAcceptedPrefixes = set_numeric($cbgpPeerAcceptedPrefixes);
-                    $cbgpPeerDeniedPrefixes = set_numeric($cbgpPeerDeniedPrefixes);
-                    $cbgpPeerPrefixAdminLimit = set_numeric($cbgpPeerPrefixAdminLimit);
-                    $cbgpPeerPrefixThreshold = set_numeric($cbgpPeerPrefixThreshold);
-                    $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold);
-                    $cbgpPeerAdvertisedPrefixes = set_numeric($cbgpPeerAdvertisedPrefixes);
-                    $cbgpPeerSuppressedPrefixes = set_numeric($cbgpPeerSuppressedPrefixes);
-                    $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes);
+                    $cbgpPeerAcceptedPrefixes = set_numeric($cbgpPeerAcceptedPrefixes ?? null);
+                    $cbgpPeerDeniedPrefixes = set_numeric($cbgpPeerDeniedPrefixes ?? null);
+                    $cbgpPeerPrefixAdminLimit = set_numeric($cbgpPeerPrefixAdminLimit ?? null);
+                    $cbgpPeerPrefixThreshold = set_numeric($cbgpPeerPrefixThreshold ?? null);
+                    $cbgpPeerPrefixClearThreshold = set_numeric($cbgpPeerPrefixClearThreshold ?? null);
+                    $cbgpPeerAdvertisedPrefixes = set_numeric($cbgpPeerAdvertisedPrefixes ?? null);
+                    $cbgpPeerSuppressedPrefixes = set_numeric($cbgpPeerSuppressedPrefixes ?? null);
+                    $cbgpPeerWithdrawnPrefixes = set_numeric($cbgpPeerWithdrawnPrefixes ?? null);
 
                     $cbgpPeers_cbgp_fields = [
                         'AcceptedPrefixes'     => $cbgpPeerAcceptedPrefixes,
@@ -750,7 +754,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         }
                     }
 
-                    if ($peer['c_update']) {
+                    if (isset($peer['c_update'])) {
                         dbUpdate(
                             $peer['c_update'],
                             'bgpPeers_cbgp',
