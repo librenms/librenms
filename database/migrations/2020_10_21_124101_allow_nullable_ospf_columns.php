@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AllowNullableOspfColumns extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class AllowNullableOspfColumns extends Migration
             $table->string('ospfAuthType', 64)->nullable(false)->change();
         });
     }
-}
+};
