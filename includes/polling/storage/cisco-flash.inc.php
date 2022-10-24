@@ -26,7 +26,8 @@
 use LibreNMS\Util\Number;
 
 $oids = array('ciscoFlashPartitionSize.' . $storage['storage_index'], 'ciscoFlashPartitionFreeSpace.' . $storage['storage_index'], 'ciscoFlashPartitionSizeExtended.' . $storage['storage_index'], 'ciscoFlashPartitionFreeSpaceExtended.' . $storage['storage_index']);
-$entry = array_shift(snmp_get_multi($device, $oids, '-OQUs', 'CISCO-FLASH-MIB'));
+$entry = snmp_get_multi($device, $oids, '-OQUs', 'CISCO-FLASH-MIB');
+$entry = array_shift($entry);
 $storage['size'] = (Number::cast($entry['ciscoFlashPartitionSize']) === 4294967295 ? $entry['ciscoFlashPartitionSizeExtended'] : $entry['ciscoFlashPartitionSize']);
 $storage['free'] = (Number::cast($entry['ciscoFlashPartitionFreeSpace']) === 4294967295 ? $entry['ciscoFlashPartitionFreeSpaceExtended'] : $entry['ciscoFlashPartitionFreeSpace']);
 $storage['used'] = $storage['size'] - $storage['free'];

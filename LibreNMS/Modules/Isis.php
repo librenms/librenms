@@ -180,7 +180,7 @@ class Isis implements Module
 
     protected function parseAdjacencyTime($data): int
     {
-        return (int) max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100;
+        return (int) (max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100);
     }
 
     /**
