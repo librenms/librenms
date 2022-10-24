@@ -8,8 +8,6 @@ use LibreNMS\Alert\Transport;
 
 class AlertTransportFactory extends Factory
 {
-    protected $model = AlertTransport::class;
-
     public function definition(): array
     {
         return [
