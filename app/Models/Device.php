@@ -410,7 +410,7 @@ class Device extends BaseModel
                 return;
             }
 
-            if (! $this->relationLoaded('location') || optional($this->location)->location !== $new_location->location) {
+            if (! $this->relationLoaded('location') || $this->location?->location !== $new_location->location) {
                 if (! $new_location->exists) { // don't fetch if new location persisted to the DB, just use it
                     $new_location = Location::firstOrCreate(['location' => $new_location->location], $coord);
                 }
