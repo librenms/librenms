@@ -11595,7 +11595,7 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "0",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "C:\\\\ [OS:NTFS] Volume{xxxxxxxxx-317b-43a9-8555-066d7xxxxx}",
                     "storage_size": 100117,
                     "storage_units": 1048576,
@@ -11608,10 +11608,10 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "1",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "E:\\\\ [SWAP:NTFS] Volume{xxxxxxx-7d96-4d08-b920-daac0ab8xxxx}",
                     "storage_size": 39280,
-                    "storage_units": 0,
+                    "storage_units": 1048576,
                     "storage_used": 32856,
                     "storage_free": 0,
                     "storage_perc": 0,
@@ -11621,10 +11621,10 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "2",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "F:\\\\ [DB:NTFS] Volume{xxxxxxxxx-39f3-4256-b8e0-cdd56332xxxx}",
                     "storage_size": 285940,
-                    "storage_units": 0,
+                    "storage_units": 1048576,
                     "storage_used": 10776,
                     "storage_free": 0,
                     "storage_perc": 0,
@@ -11634,10 +11634,10 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "3",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "G:\\\\ [DATA:NTFS] Volume{xxxxxxxx-d910-481f-92f9-41e970axxxx}",
                     "storage_size": 76308170,
-                    "storage_units": 0,
+                    "storage_units": 1048576,
                     "storage_used": 15287960,
                     "storage_free": 0,
                     "storage_perc": 0,
@@ -11651,7 +11651,7 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "0",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "C:\\\\ [OS:NTFS] Volume{xxxxxxxxx-317b-43a9-8555-066d7xxxxx}",
                     "storage_size": 104980283392,
                     "storage_units": 1048576,
@@ -11664,7 +11664,7 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "1",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "E:\\\\ [SWAP:NTFS] Volume{xxxxxxx-7d96-4d08-b920-daac0ab8xxxx}",
                     "storage_size": 41188065280,
                     "storage_units": 1048576,
@@ -11677,7 +11677,7 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "2",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "F:\\\\ [DB:NTFS] Volume{xxxxxxxxx-39f3-4256-b8e0-cdd56332xxxx}",
                     "storage_size": 299829821440,
                     "storage_units": 1048576,
@@ -11690,7 +11690,7 @@
                 {
                     "storage_mib": "hpe-ilo",
                     "storage_index": "3",
-                    "storage_type": null,
+                    "storage_type": "NTFS",
                     "storage_descr": "G:\\\\ [DATA:NTFS] Volume{xxxxxxxx-d910-481f-92f9-41e970axxxx}",
                     "storage_size": 80014915665920,
                     "storage_units": 1048576,
