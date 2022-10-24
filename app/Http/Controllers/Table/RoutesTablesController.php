@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Table;
 
+use Illuminate\Support\Facades\Route;
 use App\Models\Device;
 use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
