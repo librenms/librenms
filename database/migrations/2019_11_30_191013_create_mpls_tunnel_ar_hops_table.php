@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateMplsTunnelArHopsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -41,4 +41,4 @@ class CreateMplsTunnelArHopsTable extends Migration
     {
         Schema::dropIfExists('mpls_tunnel_ar_hops');
     }
-}
+};

@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class UpdatePortsAdslTableWithDefaults extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -60,4 +60,4 @@ class UpdatePortsAdslTableWithDefaults extends Migration
             $table->integer('adslAturCurrAttainableRate')->change();
         });
     }
-}
+};

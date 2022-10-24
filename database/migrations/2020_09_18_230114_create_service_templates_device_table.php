@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateServiceTemplatesDeviceTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -29,4 +29,4 @@ class CreateServiceTemplatesDeviceTable extends Migration
     {
         Schema::drop('service_templates_device');
     }
-}
+};
