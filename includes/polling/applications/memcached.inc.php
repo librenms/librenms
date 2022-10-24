@@ -9,8 +9,8 @@ if (! empty($agent_data['app']['memcached'])) {
     $data = $agent_data['app']['memcached'];
 } else {
     try {
-        $data = json_app_get($device, $name, '1.1')['data'];
-        $data = $data['data'][$app->app_instance] ?? reset($data['data']);
+        $data = json_app_get($device, $name, '1.1')['data'] ?? [];
+        $data = $data[$app->app_instance] ?? reset($data);
     } catch (JsonAppException $e) {
         echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
         update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
