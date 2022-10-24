@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateHrSystemTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -30,4 +30,4 @@ class CreateHrSystemTable extends Migration
     {
         Schema::drop('hrSystem');
     }
-}
+};

@@ -4,7 +4,7 @@ use App\Models\PortsFdb;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class AddDatesToFdb extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -33,4 +33,4 @@ class AddDatesToFdb extends Migration
             $table->dropColumn(['created_at', 'updated_at']);
         });
     }
-}
+};
