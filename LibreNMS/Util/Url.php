@@ -141,7 +141,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities(optional($port->device)->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($port->device?->displayName() . ' - ' . $label)) . '</div>';
         if ($description = $port->getDescription()) {
             $content .= addslashes(htmlentities($description)) . '<br />';
         }
