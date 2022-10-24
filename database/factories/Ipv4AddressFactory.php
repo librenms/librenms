@@ -12,13 +12,6 @@ use LibreNMS\Util\IPv4;
 class Ipv4AddressFactory extends Factory
 {
     /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = Ipv4Address::class;
-
-    /**
      * Define the model's default state.
      *
      * @return array
