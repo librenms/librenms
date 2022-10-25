@@ -31,12 +31,12 @@ use App\Logging\Reporting\Middleware\SetGroups;
 use App\Logging\Reporting\Middleware\SetInstanceId;
 use App\Models\Callback;
 use ErrorException;
-use Spatie\FlareClient\Report;
-use Spatie\LaravelIgnition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Git;
+use Spatie\FlareClient\Report;
+use Spatie\LaravelIgnition\Facades\Flare;
 
 class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProvider
 {
