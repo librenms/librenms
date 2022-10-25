@@ -44,6 +44,10 @@ if (empty($device['vlans']) === true) {
 foreach ($device['vlans'] as $domain_id => $vlans) {
     foreach ($vlans as $vlan_id => $vlan) {
         // grab the populated data for this vlan
+        if (! isset($per_vlan_data[$vlan_id])) {
+            continue;
+        }
+
         $vlan_data = $per_vlan_data[$vlan_id];
 
         echo "VLAN $vlan_id \n";
@@ -57,21 +61,26 @@ foreach ($device['vlans'] as $domain_id => $vlans) {
 
             $db_w = [
                 'device_id' => $device['device_id'],
-                'port_id'   => $port['port_id'],
+                'port_id'   => $port['port_id'] ?? null,
                 'vlan'      => $vlan_id,
             ];
 
-            $db_a['baseport'] = $index_to_base[$ifIndex];
+            $db_a['baseport'] = $index_to_base[$ifIndex] ?? '';
             $db_a['priority'] = isset($vlan_port['dot1dStpPortPriority']) ? $vlan_port['dot1dStpPortPriority'] : 0;
             $db_a['state'] = isset($vlan_port['dot1dStpPortState']) ? $vlan_port['dot1dStpPortState'] : 'unknown';
             $db_a['cost'] = isset($vlan_port['dot1dStpPortPathCost']) ? $vlan_port['dot1dStpPortPathCost'] : 0;
             $db_a['untagged'] = isset($vlan_port['untagged']) ? $vlan_port['untagged'] : 0;
 
-            echo str_pad($db_a['baseport'], 10) . str_pad($ifIndex, 10) . str_pad($port['ifName'] ?: $port['ifDescr'], 25) . str_pad($db_a['priority'], 10) . str_pad($db_a['state'], 15) . str_pad($db_a['cost'], 10);
+            echo str_pad($db_a['baseport'], 10);
+            echo str_pad($ifIndex, 10);
+            echo str_pad($port['ifName'] ?? $port['ifDescr'] ?? '', 25);
+            echo str_pad($db_a['priority'], 10);
+            echo str_pad($db_a['state'], 15);
+            echo str_pad($db_a['cost'], 10);
 
-            $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port['port_id'], $vlan_id]);
+            $from_db = dbFetchRow('SELECT * FROM `ports_vlans` WHERE device_id = ? AND port_id = ? AND `vlan` = ?', [$device['device_id'], $port['port_id'] ?? null, $vlan_id]);
 
-            if ($from_db['port_vlan_id']) {
+            if ($from_db && $from_db['port_vlan_id']) {
                 $db_id = $from_db['port_vlan_id'];
                 dbUpdate($db_a, 'ports_vlans', '`port_vlan_id` = ?', [$db_id]);
                 echo 'Updated';
