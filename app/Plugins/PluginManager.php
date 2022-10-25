@@ -122,7 +122,7 @@ class PluginManager
                     return 'HOOK FAILED';
                 }
             })->filter(function ($hook) {
-                return $hook === 'HOOK FAILED';
+                return $hook !== 'HOOK FAILED';
             });
     }
 
