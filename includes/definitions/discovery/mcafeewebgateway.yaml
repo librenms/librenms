@@ -15,6 +15,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.2.{{ $index }}'
                     descr: 'Infections detected by Antimalware'
                     index: 'stMalwareDetected.{{ $index }}'
+                    rrd_type: COUNTER
                 -
                     oid: stConnectionsLegitimate
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.3.{{ $index }}'
@@ -49,9 +50,10 @@ modules:
                 -
                     oid: stCategoryCount
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.10.1.2.{{ $index }}'
-                    index: 'stCategoryCount.{{ $index }}'
+                    index: stCategoryName
                     descr: 'Blocked "{{ $stCategoryName }}"'
                     group: 'Categories Blocked'
+                    rrd_type: COUNTER
                 -
                     oid: stHttpRequests
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.2.1.{{ $index }}'
