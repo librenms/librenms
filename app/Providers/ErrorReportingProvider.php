@@ -31,14 +31,14 @@ use App\Logging\Reporting\Middleware\SetGroups;
 use App\Logging\Reporting\Middleware\SetInstanceId;
 use App\Models\Callback;
 use ErrorException;
-use Facade\FlareClient\Report;
-use Facade\Ignition\Facades\Flare;
+use Spatie\FlareClient\Report;
+use Spatie\LaravelIgnition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Git;
 
-class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
+class ErrorReportingProvider extends \Spatie\LaravelIgnition\IgnitionServiceProvider
 {
     /** @var int */
     protected $errorReportingLevel = E_ALL & ~E_NOTICE;
@@ -52,7 +52,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     public function boot(): void
     {
         /* @phpstan-ignore-next-line */
-        if (! method_exists(\Facade\FlareClient\Flare::class, 'filterReportsUsing')) {
+        if (! method_exists(\Spatie\FlareClient\Flare::class, 'filterReportsUsing')) {
             Log::debug("Flare client too old, disabling Ignition to avoid bug.\n");
 
             return;
