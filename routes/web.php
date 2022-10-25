@@ -1,5 +1,6 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,20 +19,18 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // Socialite
 Route::prefix('auth')->name('socialite.')->group(function () {
-    Route::post('{provider}/redirect', [\App\Http\Controllers\Auth\SocialiteController::class, 'redirect'])->name('redirect');
-    Route::match(['get', 'post'], '{provider}/callback', [\App\Http\Controllers\Auth\SocialiteController::class, 'callback'])->name('callback');
-    Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
+    Route::post('{provider}/redirect', [Auth\SocialiteController::class, 'redirect'])->name('redirect');
+    Route::match(['get', 'post'], '{provider}/callback', [Auth\SocialiteController::class, 'callback'])->name('callback');
+    Route::get('{provider}/metadata', [Auth\SocialiteController::class, 'metadata'])->name('metadata');
 });
 
-Route::get('graph/{path?}', 'GraphController')
-    ->where('path', '.*')
-    ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
+Route::get('graph/{path?}', GraphController::class);
 
 // WebUI
-Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
+Route::middleware(['auth'])->group(function () {
 
     // pages
-    Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
+    Route::post('alert/{alert}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port', 'PortController')->only('update');
     Route::prefix('poller')->group(function () {
@@ -63,7 +62,7 @@ Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
     });
 
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
-        ->name('device')->where(['vars' => '.*']);
+        ->name('device')->where('vars', '.*');
 
     // Maps
     Route::prefix('maps')->namespace('Maps')->group(function () {
@@ -81,10 +80,10 @@ Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
 
     // Push notifications
     Route::prefix('push')->group(function () {
-        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
-        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key'])->name('push.key');
-        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register'])->name('push.register');
-        Route::post('unregister', [\App\Http\Controllers\PushNotificationController::class, 'unregister'])->name('push.unregister');
+        Route::get('token', [PushNotificationController::class, 'token'])->name('push.token');
+        Route::get('key', [PushNotificationController::class, 'key'])->name('push.key');
+        Route::post('register', [PushNotificationController::class, 'register'])->name('push.register');
+        Route::post('unregister', [PushNotificationController::class, 'unregister'])->name('push.unregister');
     });
 
     // admin pages
@@ -93,23 +92,23 @@ Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
 
-        Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
+        Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
 
-        Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
-        Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
+        Route::get('plugin/settings', PluginAdminController::class)->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
         Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
 
         Route::resource('port-groups', 'PortGroupController');
-        Route::get('validate', [\App\Http\Controllers\ValidateController::class, 'index'])->name('validate');
-        Route::get('validate/results', [\App\Http\Controllers\ValidateController::class, 'runValidation'])->name('validate.results');
-        Route::post('validate/fix', [\App\Http\Controllers\ValidateController::class, 'runFixer'])->name('validate.fix');
+        Route::get('validate', [ValidateController::class, 'index'])->name('validate');
+        Route::get('validate/results', [ValidateController::class, 'runValidation'])->name('validate.results');
+        Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
     });
 
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
-    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', 'PluginLegacyController')->where('other', '(.*)')->name('plugin.legacy');
-    Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
+    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
+    Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
@@ -133,9 +132,9 @@ Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
         Route::resource('pollergroup', 'PollerGroupController')->only('destroy');
         // misc ajax controllers
         Route::namespace('Ajax')->group(function () {
-            Route::get('search/bgp', 'BgpSearchController');
-            Route::get('search/device', 'DeviceSearchController');
-            Route::get('search/port', 'PortSearchController');
+            Route::get('search/bgp', BgpSearchController::class);
+            Route::get('search/device', DeviceSearchController::class);
+            Route::get('search/port', PortSearchController::class);
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');
