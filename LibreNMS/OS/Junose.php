@@ -31,7 +31,7 @@ class Junose extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
-        if (strpos($device->sysDescr, 'olive')) {
+        if (is_string($device->sysDescr) && strpos($device->sysDescr, 'olive')) {
             $device->hardware = 'Olive';
 
             return;

@@ -9,7 +9,7 @@ if (! isset($storage_cache['hrstorage'])) {
 $entry = $storage_cache['hrstorage'][$storage['storage_index']];
 
 $storage['units'] = $entry['hrStorageAllocationUnits'];
-$entry['hrStorageUsed'] = fix_integer_value($entry['hrStorageUsed']);
+$entry['hrStorageUsed'] = fix_integer_value($entry['hrStorageUsed'] ?? 0);
 $entry['hrStorageSize'] = fix_integer_value($entry['hrStorageSize']);
 $storage['used'] = ($entry['hrStorageUsed'] * $storage['units']);
 $storage['size'] = ($entry['hrStorageSize'] * $storage['units']);

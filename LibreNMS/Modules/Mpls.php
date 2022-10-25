@@ -57,35 +57,35 @@ class Mpls implements Module
     {
         if ($os instanceof MplsDiscovery) {
             echo "\nMPLS LSPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsLsp');
+            ModuleModelObserver::observe(\App\Models\MplsLsp::class);
             $lsps = $this->syncModels($os->getDevice(), 'mplsLsps', $os->discoverMplsLsps());
 
             echo "\nMPLS LSP Paths: ";
-            ModuleModelObserver::observe('\App\Models\MplsLspPath');
+            ModuleModelObserver::observe(\App\Models\MplsLspPath::class);
             $paths = $this->syncModels($os->getDevice(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
 
             echo "\nMPLS SDPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsSdp');
+            ModuleModelObserver::observe(\App\Models\MplsSdp::class);
             $sdps = $this->syncModels($os->getDevice(), 'mplsSdps', $os->discoverMplsSdps());
 
             echo "\nMPLS Services: ";
-            ModuleModelObserver::observe('\App\Models\MplsService');
+            ModuleModelObserver::observe(\App\Models\MplsService::class);
             $svcs = $this->syncModels($os->getDevice(), 'mplsServices', $os->discoverMplsServices());
 
             echo "\nMPLS SAPs: ";
-            ModuleModelObserver::observe('\App\Models\MplsSap');
+            ModuleModelObserver::observe(\App\Models\MplsSap::class);
             $this->syncModels($os->getDevice(), 'mplsSaps', $os->discoverMplsSaps($svcs));
 
             echo "\nMPLS SDP Bindings: ";
-            ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+            ModuleModelObserver::observe(\App\Models\MplsSdpBind::class);
             $this->syncModels($os->getDevice(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
 
             echo "\nMPLS Tunnel Active Routing Hops: ";
-            ModuleModelObserver::observe('\App\Models\MplsTunnelArHop');
+            ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class);
             $this->syncModels($os->getDevice(), 'mplsTunnelArHops', $os->discoverMplsTunnelArHops($paths));
 
             echo "\nMPLS Tunnel Constrained Shortest Path First Hops: ";
-            ModuleModelObserver::observe('\App\Models\MplsTunnelCHop');
+            ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class);
             $this->syncModels($os->getDevice(), 'mplsTunnelCHops', $os->discoverMplsTunnelCHops($paths));
 
             echo PHP_EOL;
@@ -106,49 +106,49 @@ class Mpls implements Module
 
             if ($device->mplsLsps()->exists()) {
                 echo "\nMPLS LSPs: ";
-                ModuleModelObserver::observe('\App\Models\MplsLsp');
+                ModuleModelObserver::observe(\App\Models\MplsLsp::class);
                 $lsps = $this->syncModels($device, 'mplsLsps', $os->pollMplsLsps());
             }
 
             if ($device->mplsLspPaths()->exists()) {
                 echo "\nMPLS LSP Paths: ";
-                ModuleModelObserver::observe('\App\Models\MplsLspPath');
+                ModuleModelObserver::observe(\App\Models\MplsLspPath::class);
                 $paths = $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
             }
 
             if ($device->mplsSdps()->exists()) {
                 echo "\nMPLS SDPs: ";
-                ModuleModelObserver::observe('\App\Models\MplsSdp');
+                ModuleModelObserver::observe(\App\Models\MplsSdp::class);
                 $sdps = $this->syncModels($device, 'mplsSdps', $os->pollMplsSdps());
             }
 
             if ($device->mplsServices()->exists()) {
                 echo "\nMPLS Services: ";
-                ModuleModelObserver::observe('\App\Models\MplsService');
+                ModuleModelObserver::observe(\App\Models\MplsService::class);
                 $svcs = $this->syncModels($device, 'mplsServices', $os->pollMplsServices());
             }
 
             if ($device->mplsSaps()->exists()) {
                 echo "\nMPLS SAPs: ";
-                ModuleModelObserver::observe('\App\Models\MplsSap');
+                ModuleModelObserver::observe(\App\Models\MplsSap::class);
                 $this->syncModels($device, 'mplsSaps', $os->pollMplsSaps($svcs));
             }
 
             if ($device->mplsSdpBinds()->exists()) {
                 echo "\nMPLS SDP Bindings: ";
-                ModuleModelObserver::observe('\App\Models\MplsSdpBind');
+                ModuleModelObserver::observe(\App\Models\MplsSdpBind::class);
                 $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
             }
 
             if ($device->mplsTunnelArHops()->exists()) {
                 echo "\nMPLS Tunnel Active Routing Hops: ";
-                ModuleModelObserver::observe('\App\Models\MplsTunnelArHop');
+                ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class);
                 $this->syncModels($device, 'mplsTunnelArHops', $os->pollMplsTunnelArHops($paths));
             }
 
             if ($device->mplsTunnelCHops()->exists()) {
                 echo "\nMPLS Tunnel Constrained Shortest Path First Hops: ";
-                ModuleModelObserver::observe('\App\Models\MplsTunnelCHop');
+                ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class);
                 $this->syncModels($device, 'mplsTunnelCHops', $os->pollMplsTunnelCHops($paths));
             }
 

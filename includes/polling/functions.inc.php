@@ -75,7 +75,7 @@ function poll_sensor($device, $class)
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
 
-            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
+            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
 
             if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
@@ -186,7 +186,7 @@ function record_sensor_data($device, $all_sensors)
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
 
-        $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
+        $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
         echo "$sensor_value $unit\n";
 

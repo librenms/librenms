@@ -61,7 +61,7 @@ class Mempools implements Module
         });
         $this->calculateAvailable($mempools);
 
-        MempoolObserver::observe('\App\Models\Mempool');
+        MempoolObserver::observe(\App\Models\Mempool::class);
         $this->syncModels($os->getDevice(), 'mempools', $mempools);
 
         echo PHP_EOL;

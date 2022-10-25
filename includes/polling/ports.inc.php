@@ -842,19 +842,19 @@ foreach ($ports as $port) {
             $fields = [
                 'INOCTETS' => $this_port['ifInOctets'] ?? null,
                 'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
-                'INERRORS' => $this_port['ifInErrors'],
-                'OUTERRORS' => $this_port['ifOutErrors'],
+                'INERRORS' => $this_port['ifInErrors'] ?? null,
+                'OUTERRORS' => $this_port['ifOutErrors'] ?? null,
                 'INUCASTPKTS' => $this_port['ifInUcastPkts'] ?? null,
                 'OUTUCASTPKTS' => $this_port['ifOutUcastPkts'] ?? null,
                 'INNUCASTPKTS' => $this_port['ifInNUcastPkts'] ?? null,
                 'OUTNUCASTPKTS' => $this_port['ifOutNUcastPkts'] ?? null,
-                'INDISCARDS' => $this_port['ifInDiscards'],
-                'OUTDISCARDS' => $this_port['ifOutDiscards'],
+                'INDISCARDS' => $this_port['ifInDiscards'] ?? null,
+                'OUTDISCARDS' => $this_port['ifOutDiscards'] ?? null,
                 'INUNKNOWNPROTOS' => $this_port['ifInUnknownProtos'] ?? null,
-                'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'],
-                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'],
-                'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'],
-                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'],
+                'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'] ?? null,
+                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'] ?? null,
+                'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'] ?? null,
+                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
 
             // non rrd stats (will be filtered)
