@@ -68,7 +68,7 @@ class Isis implements Module
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        ModuleModelObserver::observe('\App\Models\IsisAdjacency');
+        ModuleModelObserver::observe(\App\Models\IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
