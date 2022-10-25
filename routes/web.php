@@ -28,7 +28,7 @@ Route::get('graph/{path?}', 'GraphController')
     ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
 
 // WebUI
-Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
+Route::middleware('auth')->group(['guard' => 'auth'], function () {
 
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
