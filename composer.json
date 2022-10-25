@@ -35,7 +35,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "influxdb/influxdb-php": "^1.15",
         "justinrainbow/json-schema": "^5.2",
-        "laravel-notification-channels/webpush": "^6.0",
+        "laravel-notification-channels/webpush": "^7.0",
         "laravel/framework": "^9.36",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^3.3",
@@ -53,7 +53,6 @@
         "symfony/yaml": "^6.0",
         "tecnickcom/tcpdf": "^6.4",
         "tightenco/ziggy": "^0.9",
-        "league/flysystem-aws-s3-v3": "^3.0",
         "spatie/laravel-ignition": "^1.4"
     },
     "require-dev": {
