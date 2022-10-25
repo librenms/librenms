@@ -224,7 +224,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
-        'Flare' => Facade\Ignition\Facades\Flare::class,
+        'Flare' => Spatie\LaravelIgnition\Facades\Flare::class,
         'Redis' => Illuminate\Support\Facades\Redis::class,
 
         // LibreNMS

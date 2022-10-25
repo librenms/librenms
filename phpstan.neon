@@ -33,6 +33,8 @@ parameters:
     checkAlwaysTrueInstanceof: true
     checkAlwaysTrueStrictComparison: true
 
+    checkGenericClassInNonGenericObjectType: false
+
     ignoreErrors:
         - '#Unsafe usage of new static#'
 
