@@ -390,7 +390,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.6302.2.1.2.13.4.0",
                     "sensor_index": "psConverterVoltage.0",
                     "sensor_type": "ees",
-                    "sensor_descr": "Convertor Voltage",
+                    "sensor_descr": "Converter Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
