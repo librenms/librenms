@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b52f0b9419bd66dd03d7e8fab9360415",
+    "content-hash": "4bbcde4b19dc7e846c05e40270206160",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -205,23 +205,23 @@
         },
         {
             "name": "dapphp/radius",
-            "version": "2.5.8",
+            "version": "v3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dapphp/radius.git",
-                "reference": "7b2533f9b89b134cb92b6a260cc2e54b347390f9"
+                "reference": "023f538e46d20fa285f55dd65d7054fb9b370a82"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dapphp/radius/zipball/7b2533f9b89b134cb92b6a260cc2e54b347390f9",
-                "reference": "7b2533f9b89b134cb92b6a260cc2e54b347390f9",
+                "url": "https://api.github.com/repos/dapphp/radius/zipball/023f538e46d20fa285f55dd65d7054fb9b370a82",
+                "reference": "023f538e46d20fa285f55dd65d7054fb9b370a82",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3 || <= 7.4"
+                "php": "^7.3 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8"
+                "phpunit/phpunit": "^9.5.13"
             },
             "suggest": {
                 "ext-openssl": "To support hashing required by Pear_CHAP"
@@ -268,9 +268,9 @@
             ],
             "support": {
                 "issues": "https://github.com/dapphp/radius/issues",
-                "source": "https://github.com/dapphp/radius/tree/2.5.8"
+                "source": "https://github.com/dapphp/radius/tree/v3.0.0"
             },
-            "time": "2022-01-26T03:55:41+00:00"
+            "time": "2022-01-26T04:33:16+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -2255,32 +2255,32 @@
         },
         {
             "name": "laravel/ui",
-            "version": "v3.4.6",
+            "version": "v4.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/ui.git",
-                "reference": "65ec5c03f7fee2c8ecae785795b829a15be48c2c"
+                "reference": "9aa6930c8ae98b2465594d7f14f4ac131bfd6a99"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/ui/zipball/65ec5c03f7fee2c8ecae785795b829a15be48c2c",
-                "reference": "65ec5c03f7fee2c8ecae785795b829a15be48c2c",
+                "url": "https://api.github.com/repos/laravel/ui/zipball/9aa6930c8ae98b2465594d7f14f4ac131bfd6a99",
+                "reference": "9aa6930c8ae98b2465594d7f14f4ac131bfd6a99",
                 "shasum": ""
             },
             "require": {
-                "illuminate/console": "^8.42|^9.0",
-                "illuminate/filesystem": "^8.42|^9.0",
-                "illuminate/support": "^8.82|^9.0",
-                "illuminate/validation": "^8.42|^9.0",
-                "php": "^7.3|^8.0"
+                "illuminate/console": "^9.21",
+                "illuminate/filesystem": "^9.21",
+                "illuminate/support": "^9.21",
+                "illuminate/validation": "^9.21",
+                "php": "^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^6.23|^7.0"
+                "orchestra/testbench": "^7.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.x-dev"
+                    "dev-master": "4.x-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -2310,9 +2310,9 @@
                 "ui"
             ],
             "support": {
-                "source": "https://github.com/laravel/ui/tree/v3.4.6"
+                "source": "https://github.com/laravel/ui/tree/v4.0.2"
             },
-            "time": "2022-05-20T13:38:08+00:00"
+            "time": "2022-09-09T18:20:35+00:00"
         },
         {
             "name": "league/commonmark",
@@ -4284,29 +4284,34 @@
         },
         {
             "name": "predis/predis",
-            "version": "v1.1.10",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/predis/predis.git",
-                "reference": "a2fb02d738bedadcffdbb07efa3a5e7bd57f8d6e"
+                "reference": "ff59f745815150c65ed388f7d64e7660fe961771"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/predis/predis/zipball/a2fb02d738bedadcffdbb07efa3a5e7bd57f8d6e",
-                "reference": "a2fb02d738bedadcffdbb07efa3a5e7bd57f8d6e",
+                "url": "https://api.github.com/repos/predis/predis/zipball/ff59f745815150c65ed388f7d64e7660fe961771",
+                "reference": "ff59f745815150c65ed388f7d64e7660fe961771",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.9"
+                "php": "^7.2 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "^8.0 || ~9.4.4"
             },
             "suggest": {
                 "ext-curl": "Allows access to Webdis when paired with phpiredis",
                 "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol"
             },
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "2.0-dev"
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "Predis\\": "src/"
@@ -4329,7 +4334,7 @@
                     "role": "Maintainer"
                 }
             ],
-            "description": "Flexible and feature-complete Redis client for PHP and HHVM",
+            "description": "A flexible and feature-complete Redis client for PHP.",
             "homepage": "http://github.com/predis/predis",
             "keywords": [
                 "nosql",
@@ -4338,7 +4343,7 @@
             ],
             "support": {
                 "issues": "https://github.com/predis/predis/issues",
-                "source": "https://github.com/predis/predis/tree/v1.1.10"
+                "source": "https://github.com/predis/predis/tree/v2.0.3"
             },
             "funding": [
                 {
@@ -4346,7 +4351,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-01-05T17:46:08+00:00"
+            "time": "2022-10-11T16:52:29+00:00"
         },
         {
             "name": "psr/container",
@@ -9424,35 +9429,35 @@
         },
         {
             "name": "laravel/dusk",
-            "version": "v6.25.2",
+            "version": "v7.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/dusk.git",
-                "reference": "25a595ac3dc82089a91af10dd23b0d58fd3f6d0b"
+                "reference": "c7aacfabdf0883ba9a76c23a0d08b63dea2d0de8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/dusk/zipball/25a595ac3dc82089a91af10dd23b0d58fd3f6d0b",
-                "reference": "25a595ac3dc82089a91af10dd23b0d58fd3f6d0b",
+                "url": "https://api.github.com/repos/laravel/dusk/zipball/c7aacfabdf0883ba9a76c23a0d08b63dea2d0de8",
+                "reference": "c7aacfabdf0883ba9a76c23a0d08b63dea2d0de8",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-zip": "*",
-                "illuminate/console": "^6.0|^7.0|^8.0|^9.0",
-                "illuminate/support": "^6.0|^7.0|^8.0|^9.0",
+                "illuminate/console": "^9.0",
+                "illuminate/support": "^9.0",
                 "nesbot/carbon": "^2.0",
-                "php": "^7.2|^8.0",
+                "php": "^8.0",
                 "php-webdriver/webdriver": "^1.9.0",
-                "symfony/console": "^4.3|^5.0|^6.0",
-                "symfony/finder": "^4.3|^5.0|^6.0",
-                "symfony/process": "^4.3|^5.0|^6.0",
-                "vlucas/phpdotenv": "^3.0|^4.0|^5.2"
+                "symfony/console": "^6.0",
+                "symfony/finder": "^6.0",
+                "symfony/process": "^6.0",
+                "vlucas/phpdotenv": "^5.2"
             },
             "require-dev": {
-                "mockery/mockery": "^1.0",
-                "orchestra/testbench": "^4.16|^5.17.1|^6.12.1|^7.0",
-                "phpunit/phpunit": "^7.5.15|^8.4|^9.0"
+                "mockery/mockery": "^1.4.2",
+                "orchestra/testbench": "^7.0",
+                "phpunit/phpunit": "^9.0"
             },
             "suggest": {
                 "ext-pcntl": "Used to gracefully terminate Dusk when tests are running."
@@ -9460,7 +9465,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "6.x-dev"
+                    "dev-master": "7.x-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -9491,9 +9496,9 @@
             ],
             "support": {
                 "issues": "https://github.com/laravel/dusk/issues",
-                "source": "https://github.com/laravel/dusk/tree/v6.25.2"
+                "source": "https://github.com/laravel/dusk/tree/v7.1.1"
             },
-            "time": "2022-09-29T09:37:07+00:00"
+            "time": "2022-09-29T09:38:10+00:00"
         },
         {
             "name": "maximebf/debugbar",
