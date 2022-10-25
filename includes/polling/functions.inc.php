@@ -186,7 +186,7 @@ function record_sensor_data($device, $all_sensors)
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
 
-        $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
+        $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
         echo "$sensor_value $unit\n";
 
