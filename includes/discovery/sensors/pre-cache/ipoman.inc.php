@@ -3,7 +3,7 @@
 $pre_cache['ipoman']['out'] = $pre_cache['ipoman']['out'] ?? [];
 $pre_cache['ipoman']['in'] = $pre_cache['ipoman']['in'] ?? [];
 echo 'outletConfigDesc ';
-$pre_cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', $pre_cache['ipoman']['out'], 'IPOMANII-MIB');
+$pre_cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigDesc', [], 'IPOMANII-MIB');
 
 echo 'outletConfigLocation ';
 $pre_cache['ipoman']['out'] = snmpwalk_cache_multi_oid($device, 'outletConfigLocation', $pre_cache['ipoman']['out'], 'IPOMANII-MIB');
