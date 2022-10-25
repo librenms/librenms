@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\AlertTransport;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Alert\Transport;
 
