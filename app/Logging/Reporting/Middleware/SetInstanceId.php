@@ -23,7 +23,7 @@
 namespace App\Logging\Reporting\Middleware;
 
 use App\Providers\ErrorReportingProvider;
-use Facade\FlareClient\Report;
+use Spatie\FlareClient\Report;
 
 class SetInstanceId
 {
