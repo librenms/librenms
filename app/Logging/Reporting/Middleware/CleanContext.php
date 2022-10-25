@@ -25,7 +25,7 @@
 
 namespace App\Logging\Reporting\Middleware;
 
-use Facade\FlareClient\Report;
+use Spatie\FlareClient\Report;
 
 class CleanContext
 {
