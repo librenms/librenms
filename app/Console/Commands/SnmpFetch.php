@@ -27,7 +27,7 @@ class SnmpFetch extends LnmsCommand
         $this->addArgument('oid', InputArgument::REQUIRED);
         $this->addOption('type', 't', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.type', ['types' => '[get, walk, next, translate]']), 'get');
         $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table]']));
-        $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED, null, 1);
+        $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED, '', 1);
         $this->addOption('numeric', 'i', InputOption::VALUE_NONE);
     }
 
