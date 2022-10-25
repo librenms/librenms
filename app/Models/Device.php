@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\Route;
 use App\View\SimpleTemplate;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;

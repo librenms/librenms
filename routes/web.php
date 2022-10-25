@@ -1,17 +1,5 @@
 <?php
 
-use App\Http\Controllers\DeviceGroupController;
-use App\Http\Controllers\GraphController;
-use App\Http\Controllers\PluginAdminController;
-use App\Http\Controllers\PluginPageController;
-use App\Http\Controllers\PollerGroupController;
-use App\Http\Controllers\PollerSettingsController;
-use App\Http\Controllers\PortController;
-use App\Http\Controllers\PortGroupController;
-use App\Http\Controllers\Select;
-use App\Http\Controllers\Table;
-use App\Http\Controllers\UserPreferencesController;
-use App\Http\Controllers\Widgets;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\Auth;
@@ -19,17 +7,29 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DashboardWidgetController;
 use App\Http\Controllers\Device;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceGroupController;
+use App\Http\Controllers\GraphController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\Maps;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\PluginAdminController;
 use App\Http\Controllers\PluginLegacyController;
+use App\Http\Controllers\PluginPageController;
 use App\Http\Controllers\PluginSettingsController;
 use App\Http\Controllers\PollerController;
+use App\Http\Controllers\PollerGroupController;
+use App\Http\Controllers\PollerSettingsController;
+use App\Http\Controllers\PortController;
+use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\Select;
 use App\Http\Controllers\ServiceTemplateController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\Table;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserPreferencesController;
+use App\Http\Controllers\Widgets;
 use App\Http\Controllers\WidgetSettingsController;
 use Illuminate\Support\Facades\Route;
 
@@ -59,7 +59,7 @@ Route::get('graph/{path?}', GraphController::class)
     ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
 
 // WebUI
-Route::middleware('auth')->group([ 'guard' => 'auth'], function () {
+Route::middleware('auth')->group(['guard' => 'auth'], function () {
 
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');

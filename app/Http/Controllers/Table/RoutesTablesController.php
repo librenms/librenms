@@ -25,11 +25,11 @@
 
 namespace App\Http\Controllers\Table;
 
-use Illuminate\Support\Facades\Route;
 use App\Models\Device;
 use App\Models\Route;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
