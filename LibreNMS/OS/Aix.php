@@ -36,9 +36,11 @@ class Aix extends OS implements OSDiscovery
         $aix_descr = explode("\n", $device->sysDescr);
         // AIX standard snmp deamon
         if (! empty($aix_descr[1])) {
-            $device->serial = explode('Processor id: ', $aix_descr[1])[1];
+            $device->serial = snmp_get($this->getDeviceArray(), 'aixSeSerialNumber.0', '-Oqv', 'IBM-AIX-MIB');
+            $device->hardware = snmp_get($this->getDeviceArray(), 'aixSeMachineType.0', '-Oqv', 'IBM-AIX-MIB');
             $aix_long_version = explode(' version: ', $aix_descr[2])[1];
-            [$device->version, $aix_version_min] = array_map('intval', explode('.', $aix_long_version));
+            [$device->version, $aix_version_min, $aix_tl] = array_map('intval', explode('.', $aix_long_version));
+            $aix_version_min = $aix_version_min . ' TL ' . $aix_tl;
         // AIX net-snmp
         } else {
             [, , $aix_version_min, $device->version, $device->serial] = explode(' ', $aix_descr[0]);
