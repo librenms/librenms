@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -69,7 +70,7 @@ class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $memory = snmp_get($this->getDeviceArray(), $oid, '-OQv');
 
         if ($memory === false) {
-            return collect();
+            return new Collection();
         }
 
         return collect()->push((new Mempool([

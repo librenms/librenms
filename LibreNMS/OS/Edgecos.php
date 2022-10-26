@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\YamlDiscovery;
@@ -42,7 +43,7 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $data = snmp_get_multi_oid($this->getDeviceArray(), ['memoryTotal.0', 'memoryFreed.0', 'memoryAllocated.0'], '-OUQs', $mib);
 
         if (empty($data)) {
-            return collect();
+            return new Collection();
         }
 
         $mempool = new Mempool([
