@@ -20,6 +20,8 @@ parameters:
         - includes
 
     level: 5
+    # TODO: REMOVE ME!
+    reportUnmatchedIgnoredErrors: false
 
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
