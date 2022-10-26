@@ -31,7 +31,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 <?php
 
 // Iterate through each alert transport
-foreach (\App\Models\AlertTransport::all() as $transport) {
+foreach (\App\Models\AlertTransport::orderBy('transport_name', 'asc')->get() as $transport) {
     $instance = $transport->instance();
     echo "<tr id=\"alert-transport-{$transport->transport_id}\">";
     echo '<td>' . $transport->transport_name . '</td>';

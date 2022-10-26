@@ -10135,6 +10135,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10159,6 +10160,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10183,6 +10185,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10207,6 +10210,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10231,6 +10235,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10255,6 +10260,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10279,6 +10285,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 },
                 {
@@ -10303,6 +10310,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Mgnt2SlotStatus"
                 }
             ],

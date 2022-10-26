@@ -1824,6 +1824,7 @@ sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_prev, Type: double, 'Null': true, Extra: '' }
     - { Field: user_func, Type: varchar(100), 'Null': true, Extra: '' }
+    - { Field: rrd_type, Type: 'enum(''GAUGE'',''COUNTER'',''DERIVE'',''DCOUNTER'',''DDERIVE'',''ABSOLUTE'')', 'Null': false, Extra: '', Default: GAUGE }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     sensors_device_id_index: { Name: sensors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -2170,6 +2171,7 @@ wireless_sensors:
     - { Field: lastupdate, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: sensor_oids, Type: text, 'Null': false, Extra: '' }
     - { Field: access_point_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: rrd_type, Type: 'enum(''GAUGE'',''COUNTER'',''DERIVE'',''DCOUNTER'',''DDERIVE'',''ABSOLUTE'')', 'Null': false, Extra: '', Default: GAUGE }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [sensor_id], Unique: true, Type: BTREE }
     wireless_sensors_device_id_index: { Name: wireless_sensors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

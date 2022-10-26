@@ -8,9 +8,10 @@ echo $this_port['ifAlias'];
 $split = preg_split('/[:\[\]{}()]/', $this_port['ifAlias']);
 $type = isset($split[0]) ? trim($split[0]) : null;
 $descr = isset($split[1]) ? trim($split[1]) : null;
-$circuit = trim(preg_split('/[{}]/', $this_port['ifAlias'])[1]) ?? null;
-$notes = trim(preg_split('/[()]/', $this_port['ifAlias'])[1]) ?? null;
-$speed = preg_split('/[\[\]]/', $this_port['ifAlias'])[1] ?? null;
+
+$circuit = trim(preg_split('/[{}]/', $this_port['ifAlias'])[1] ?? '');
+$notes = trim(preg_split('/[()]/', $this_port['ifAlias'])[1] ?? '');
+$speed = trim(preg_split('/[\[\]]/', $this_port['ifAlias'])[1] ?? '');
 
 if ($type && $descr) {
     $type = strtolower($type);
