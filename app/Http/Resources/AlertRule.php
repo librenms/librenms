@@ -5,9 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
- * @property string $devices
- * @property string $groups
- * @property string $locations
+ * @property \App\Models\Device $devices
+ * @property \App\Models\DeviceGroup $groups
+ * @property \App\Models\Location $locations
  */
 class AlertRule extends JsonResource
 {
