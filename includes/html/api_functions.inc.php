@@ -1158,45 +1158,13 @@ function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate
 function list_alert_rules(Illuminate\Http\Request $request)
 {
     $id = $request->route('id');
-    $sql = '';
-    $param = [];
-    if ($id > 0) {
-        $sql = 'WHERE `a`.`id`=?';
-        $param = [$id];
-    }
 
-    $rules = dbFetchRows("SELECT `a`.*,
-        GROUP_CONCAT(DISTINCT `d`.`device_id`) AS `devices`,
-        GROUP_CONCAT(DISTINCT `g`.`group_id`) AS `groups`,
-        GROUP_CONCAT(DISTINCT `l`.`location_id`) AS `locations`
-        FROM `alert_rules`
-        AS `a` LEFT JOIN `alert_device_map`
-        AS `d` ON `a`.`id`=`d`.`rule_id` LEFT JOIN `alert_group_map`
-        AS `g` ON `a`.`id`=`g`.`rule_id` LEFT JOIN `alert_location_map`
-        AS `l` ON `a`.`id`=`l`.`rule_id` $sql
-        GROUP BY `a`.`id`", $param);
+    $rules = \App\Http\Resources\AlertRule::collection(
+        \App\Models\AlertRule::when($id, fn($query) => $query->where('id', $id))
+        ->with(['devices:device_id', 'groups:id', 'locations:id'])->get()
+    );
 
-    $i = 0;
-    foreach ($rules as $rule) {
-        if ($rule['devices'] == null) {
-            unset($rules[$i]['devices']);
-        } else {
-            $rules[$i]['devices'] = array_map('intval', explode(',', $rules[$i]['devices']));
-        }
-        if ($rule['groups'] == null) {
-            unset($rules[$i]['groups']);
-        } else {
-            $rules[$i]['groups'] = array_map('intval', explode(',', $rules[$i]['groups']));
-        }
-        if ($rule['locations'] == null) {
-            unset($rules[$i]['locations']);
-        } else {
-            $rules[$i]['locations'] = array_map('intval', explode(',', $rules[$i]['locations']));
-        }
-        $i++;
-    }
-
-    return api_success($rules, 'rules');
+    return api_success($rules->toArray($request), 'rules');
 }
 
 function list_alerts(Illuminate\Http\Request $request)
