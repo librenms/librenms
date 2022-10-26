@@ -1160,7 +1160,7 @@ function list_alert_rules(Illuminate\Http\Request $request)
     $id = $request->route('id');
 
     $rules = \App\Http\Resources\AlertRule::collection(
-        \App\Models\AlertRule::when($id, fn($query) => $query->where('id', $id))
+        \App\Models\AlertRule::when($id, fn ($query) => $query->where('id', $id))
         ->with(['devices:device_id', 'groups:id', 'locations:id'])->get()
     );
 
