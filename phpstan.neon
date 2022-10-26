@@ -19,7 +19,7 @@ parameters:
     scanDirectories:
         - includes
 
-    level: 6
+    level: 5
 
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false
