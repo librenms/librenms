@@ -267,7 +267,7 @@ setsebool -P httpd_can_connect_ldap 1
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
-uccessfully. User level 1 is assigned by default to those accounts 
+successfully. User level 1 is assigned by default to those accounts 
 unless radius sends a reply attribute with the correct userlevel. 
 
 You can change the default userlevel by setting
