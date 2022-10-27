@@ -43,7 +43,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 //If user exists - update, not add.
                 //If new user - add user with attribute value if present, or use default from config.
                 if ($this->radius->getAttribute(11)) {
-                    switch($this->radius->getAttribute(11)){
+                    switch($this->radius->getAttribute(11)) {
                         case 'lnms_admin':
                             $attribute = 10;
                             break;
