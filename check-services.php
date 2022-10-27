@@ -33,7 +33,7 @@ $polled_services = 0;
 
 $where = '';
 $params = [];
-if ($options['h']) {
+if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $where = 'AND `S`.`device_id` = ?';
         $params[] = (int) $options['h'];
