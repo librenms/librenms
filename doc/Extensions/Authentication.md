@@ -278,10 +278,10 @@ can be assigned a value which translates into a userlevel in LibreNMS.
 
 The strings to send in `Filter-ID` reply attribute is *one* of the following:
 
-`lnms_normal` - Sets the value `1`, which is the normal user level.
-`lnms_admin` - Sets the value `5`, which is the administrator level.
-`lnms_globalRead` - Sets the value `10`, which is the global read level.
-`lnms_admin` - Sets the value `11`, which is the demo level.
+- `lnms_normal` - Sets the value `1`, which is the normal user level.
+- `lnms_admin` - Sets the value `5`, which is the administrator level.
+- `lnms_globalRead` - Sets the value `10`, which is the global read level.
+- `lnms_demo` - Sets the value `11`, which is the demo level.
 
 LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default userlevel that is set in `config.php`.
 
