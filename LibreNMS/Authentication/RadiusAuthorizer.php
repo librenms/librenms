@@ -33,16 +33,16 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
-            
+
                 //attribute 11 is "Filter-Id"
-                //Always set password change to 0 - password resides in AAA, not LibreNMS
-                //If attribute 11 is sent in reply after accept - update user
-                //If user exists - update, not add.
-                //If new user - add user with attribute value if present, or use default from config.
+            //Always set password change to 0 - password resides in AAA, not LibreNMS
+            //If attribute 11 is sent in reply after accept - update user
+            //If user exists - update, not add.
+            //If new user - add user with attribute value if present, or use default from config.
 
             $attribute = '';
-                if ($this->radius->getAttribute(11)) {
-                    switch ($this->radius->getAttribute(11)) {
+            if ($this->radius->getAttribute(11)) {
+                switch ($this->radius->getAttribute(11)) {
                         case 'lnms_admin':
                             $attribute = 10;
                             break;
@@ -55,11 +55,10 @@ class RadiusAuthorizer extends MysqlAuthorizer
                         case 'lnms_demo':
                             $attribute = 11;
                             break;
-                        
 
                     }
-                }
-            
+            }
+
             if ($this->userExists($credentials['username'])) {
                 if ($attribute) {
                     $this->updateUser($this->getUserid($credentials['username']), $credentials['username'], $attribute, 0, '');
