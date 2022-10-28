@@ -34,7 +34,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
             
-            //attribute 11 is "Filter-Id"
+                //attribute 11 is "Filter-Id"
                 //Always set password change to 0 - password resides in AAA, not LibreNMS
                 //If attribute 11 is sent in reply after accept - update user
                 //If user exists - update, not add.
