@@ -27,9 +27,12 @@ namespace LibreNMS\Util;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphImage;
+use LibreNMS\Data\Graphing\GraphParameters;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Exceptions\RrdGraphException;
 use Rrd;
 
@@ -65,7 +68,7 @@ class Graph
             return self::getImage($vars)->base64();
         }
 
-        return self::getImage($vars)->data();
+        return self::getImage($vars)->data;
     }
 
     /**
@@ -84,7 +87,7 @@ class Graph
                 throw $e;
             }
 
-            return new GraphImage(self::imageType(), 'Error', $e->generateErrorImage());
+            return new GraphImage(ImageFormat::forGraph(), 'Error', $e->generateErrorImage());
         }
     }
 
@@ -111,28 +114,31 @@ class Graph
             $vars = Url::parseLegacyPathVars($vars);
         }
 
-        [$type, $subtype] = extract_graph_type($vars['type']);
-
-        $graph_title = '';
         if (isset($vars['device'])) {
             $device = device_by_id_cache(is_numeric($vars['device']) ? $vars['device'] : getidbyname($vars['device']));
             DeviceCache::setPrimary($device['device_id']);
-
-            //set default graph title
-            $graph_title = DeviceCache::getPrimary()->displayName();
         }
 
         // variables for included graphs
-        $width = $vars['width'] ?? 400;
-        $height = $vars['height'] ?? $width / 3;
-        $title = $vars['title'] ?? '';
-        $vertical = $vars['vertical'] ?? '';
-        $legend = $vars['legend'] ?? false;
-        $from = parse_at_time($vars['from'] ?? '-1d');
-        $to = empty($vars['to']) ? time() : parse_at_time($vars['to']);
-        $period = ($to - $from);
-        $prev_from = ($from - $period);
-        $graph_image_type = $vars['graph_type'] ?? Config::get('webui.graph_type');
+        $graph_params = new GraphParameters($vars);
+        // set php variables for legacy graphs
+        $type = $graph_params->type;
+        $subtype = $graph_params->subtype;
+        $height = $graph_params->height;
+        $width = $graph_params->width;
+        $from = $graph_params->from;
+        $to = $graph_params->to;
+        $period = $graph_params->period;
+        $prev_from = $graph_params->prev_from;
+        $inverse = $graph_params->inverse;
+        $in = $graph_params->in;
+        $out = $graph_params->out;
+        $float_precision = $graph_params->float_precision;
+        $title = $graph_params->visible('title');
+        $nototal = ! $graph_params->visible('total');
+        $nodetails = ! $graph_params->visible('details');
+        $noagg = ! $graph_params->visible('aggregate');
+
         $rrd_options = '';
         $rrd_filename = null;
 
@@ -152,22 +158,17 @@ class Graph
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
 
-        if ($graph_image_type === 'svg') {
-            $rrd_options .= ' --imgformat=SVG';
-            if ($width < 350) {
-                $rrd_options .= ' -m 0.75 -R light';
-            }
-        }
-
         if (empty($rrd_options)) {
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
+
+        $rrd_options = $graph_params . ' ' . $rrd_options;
 
         // Generating the graph!
         try {
             $image_data = Rrd::graph($rrd_options);
 
-            return new GraphImage(self::imageType($graph_image_type), $title ?? $graph_title, $image_data);
+            return new GraphImage($graph_params->imageFormat, $graph_params->title, $image_data);
         } catch (RrdGraphException $e) {
             // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (Debug::isEnabled()) {
@@ -236,34 +237,19 @@ class Graph
         return Config::get("graph_types.$type.$subtype.section") == 'mib';
     }
 
-    public static function getOverviewGraphsForDevice($device)
+    public static function getOverviewGraphsForDevice(Device $device): array
     {
         if ($device->snmp_disable) {
-            return Config::getOsSetting('ping', 'over');
+            return Arr::wrap(Config::getOsSetting('ping', 'over'));
         }
 
         if ($graphs = Config::getOsSetting($device->os, 'over')) {
-            return $graphs;
+            return Arr::wrap($graphs);
         }
 
         $os_group = Config::getOsSetting($device->os, 'group');
 
-        return Config::get("os_group.$os_group.over", Config::get('os.default.over'));
-    }
-
-    /**
-     * Get the http content type of the image
-     *
-     * @param  string|null  $type  svg or png
-     * @return string
-     */
-    public static function imageType(?string $type = null): string
-    {
-        if ($type === null) {
-            $type = Config::get('webui.graph_type');
-        }
-
-        return $type === 'svg' ? 'image/svg+xml' : 'image/png';
+        return Arr::wrap(Config::get("os_group.$os_group.over", Config::get('os.default.over')));
     }
 
     /**

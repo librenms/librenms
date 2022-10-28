@@ -91,10 +91,10 @@ function api_get_graph(array $vars)
         $graph = Graph::get($vars);
 
         if ($vars['output'] === 'base64') {
-            return api_success(['image' => $graph->base64(), 'content-type' => $graph->imageType()], 'image');
+            return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
         }
 
-        return response($graph->data(), 200, ['Content-Type' => $graph->imageType()]);
+        return response($graph->data, 200, ['Content-Type' => $graph->contentType()]);
     } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
         return api_error(500, $e->getMessage());
     }

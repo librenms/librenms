@@ -1,8 +1,8 @@
 <?php
 /**
- * GraphImage.php
+ * GraphType.php
  *
- * Wrapper around a graph image to include metadata and control output format
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,38 +23,22 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Graphing;
+namespace LibreNMS\Enum;
 
-use LibreNMS\Enum\ImageFormat;
+use LibreNMS\Config;
 
-class GraphImage
+enum ImageFormat : string
 {
-    public function __construct(public readonly ImageFormat $format, public readonly string $title, public readonly string $data)
-    {
-    }
+    case png = 'png';
+    case svg = 'svg';
 
-    public function base64(): string
+    public static function forGraph(?string $type = null): ImageFormat
     {
-        return base64_encode($this->data);
-    }
-
-    public function inline(): string
-    {
-        return 'data:' . $this->contentType() . ';base64,' . $this->base64();
-    }
-
-    public function fileExtension(): string
-    {
-        return $this->format->name;
+        return ImageFormat::tryFrom($type ?? Config::get('webui.graph_type')) ?? ImageFormat::png;
     }
 
     public function contentType(): string
     {
-        return $this->format->contentType();
-    }
-
-    public function __toString()
-    {
-        return $this->data;
+        return $this->value == 'svg' ? 'image/svg+xml' : 'image/png';
     }
 }
