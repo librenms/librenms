@@ -120,7 +120,7 @@ class GraylogApi
         return implode(' && ', $query);
     }
 
-    public function getAddresses(Device $device): Illuminate\Support\Collection
+    public function getAddresses(Device $device): App\ApiClients\Illuminate\Support\Collection
     {
         $addresses = collect([
             gethostbyname($device->hostname),
