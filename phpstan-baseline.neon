@@ -5411,22 +5411,12 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has no return type specified\\.$#"
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
+			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
