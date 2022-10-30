@@ -55,14 +55,6 @@ class Clean
     }
 
     /**
-     * Sanitize string for shell usage.  The string must also be enclosed in quotes.
-     */
-    public static function shell(string $string): string
-    {
-        return preg_replace('#[^a-zA-Z0-9,._+:@%/-]#', '', $string) ?? '';
-    }
-
-    /**
      * Clean a string for display in an html page.
      * For use in non-blade pages
      *

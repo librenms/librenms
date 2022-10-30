@@ -183,7 +183,7 @@ class GraphParameters
         }
 
         if ($this->visible('title')) {
-            $options[] = "--title='" . Clean::shell($this->defaultTitle()) . "'";
+            $options[] = '--title=' . escapeshellarg($this->title ?: $this->defaultTitle());
         }
 
         return $options;
