@@ -36,7 +36,7 @@ class GraphParameters
 {
     public readonly array $visibleElements;
 
-    public ?string $title = null;
+    public string $title = '';
     public readonly ?string $user_title;
     public readonly string $type;
     public readonly string $subtype;
@@ -185,8 +185,7 @@ class GraphParameters
 
         if ($this->visible('title')) {
             // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
-            $title = str_replace("'", '', $this->user_title ?? $this->title ?: $this->defaultTitle());
-            $options[] = '--title=' . escapeshellarg($title);
+            $options[] = '--title=' . escapeshellarg(str_replace("'", '', $this->getTitle()));
         }
 
         return $options;
@@ -195,6 +194,17 @@ class GraphParameters
     public function __toString(): string
     {
         return implode(' ', $this->toRrdOptions());
+    }
+
+    /**
+     * Get the graph title. In order:
+     * - User set title
+     * - Graph set title
+     * - Fallback default title
+     */
+    public function getTitle(): string
+    {
+        return $this->user_title ?? $this->title ?: $this->defaultTitle();
     }
 
     private function graphColors(): array
