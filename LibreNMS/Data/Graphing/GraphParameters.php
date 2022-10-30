@@ -36,7 +36,7 @@ class GraphParameters
 {
     public readonly array $visibleElements;
 
-    public string $title;
+    public ?string $title;
     public readonly string $type;
     public readonly string $subtype;
     public readonly ImageFormat $imageFormat;
@@ -89,9 +89,9 @@ class GraphParameters
         $this->canvas = Clean::alphaDash($vars['bg'] ?? '');
         $this->background = Clean::alphaDash($vars['bbg'] ?? '');
 
-        $this->title = $vars['graph_title'] ?? $this->defaultTitle();
+        $this->title = $vars['graph_title'] ?? null;
         $this->visibleElements = [
-            'title' => empty($vars['title']) || $vars['title'] !== 'no',
+            'title' => isset($vars['title']) && $vars['title'] !== 'no',
             'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
@@ -182,8 +182,8 @@ class GraphParameters
             $options[] = '-g';
         }
 
-        if ($this->visible('title') && $this->title) {
-            $options[] = "--title='" . Clean::alphaDashSpace($this->title) . "'";
+        if ($this->visible('title') || $this->title) {
+            $options[] = "--title='" . Clean::alphaDashSpace($this->title ?? $this->defaultTitle()) . "'";
         }
 
         return $options;
