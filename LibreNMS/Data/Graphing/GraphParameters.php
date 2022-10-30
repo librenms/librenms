@@ -182,7 +182,7 @@ class GraphParameters
             $options[] = '-g';
         }
 
-        if ($this->visible('title') || $this->title) {
+        if ($this->visible('title')) {
             $options[] = "--title='" . Clean::shell($this->title ?: $this->defaultTitle()) . "'";
         }
 
