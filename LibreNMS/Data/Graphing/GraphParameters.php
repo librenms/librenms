@@ -183,7 +183,7 @@ class GraphParameters
         }
 
         if ($this->visible('title')) {
-            $options[] = "--title='" . Clean::shell($this->title ?: $this->defaultTitle()) . "'";
+            $options[] = "--title='" . Clean::shell($this->defaultTitle()) . "'";
         }
 
         return $options;
@@ -234,8 +234,8 @@ class GraphParameters
     private function defaultTitle(): string
     {
         $title = DeviceCache::getPrimary()->displayName() ?: ucfirst($this->type);
-        $title .= ' - ';
-        $title .= Str::title(str_replace('_', ' ', $this->subtype));
+        $title .= '::';
+        $title .= Str::title(Str::snake($this->subtype));
 
         return $title;
     }
