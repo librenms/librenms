@@ -36,7 +36,7 @@ class GraphParameters
 {
     public readonly array $visibleElements;
 
-    public ?string $title;
+    public ?string $title = null;
     public readonly ?string $user_title;
     public readonly string $type;
     public readonly string $subtype;
