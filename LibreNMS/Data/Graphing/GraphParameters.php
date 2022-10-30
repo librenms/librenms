@@ -92,7 +92,7 @@ class GraphParameters
 
         $this->user_title = $vars['graph_title'] ?? null; // if the user sets a title, show it
         $this->visibleElements = [
-            'title' => isset($this->user_title)  || (isset($vars['title']) && $vars['title'] !== 'no'),
+            'title' => isset($this->user_title) || (isset($vars['title']) && $vars['title'] !== 'no'),
             'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
