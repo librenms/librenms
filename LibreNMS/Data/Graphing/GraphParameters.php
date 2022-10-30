@@ -183,7 +183,7 @@ class GraphParameters
         }
 
         if ($this->visible('title') || $this->title) {
-            $options[] = "--title='" . Clean::alphaDashSpace($this->title ?? $this->defaultTitle()) . "'";
+            $options[] = "--title='" . Clean::alphaDashSpace($this->title ?: $this->defaultTitle()) . "'";
         }
 
         return $options;
