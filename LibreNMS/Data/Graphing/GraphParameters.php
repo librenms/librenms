@@ -248,7 +248,7 @@ class GraphParameters
     {
         $title = DeviceCache::getPrimary()->displayName() ?: ucfirst($this->type);
         $title .= '::';
-        $title .= Str::title(Str::snake($this->subtype));
+        $title .= Str::title(str_replace('_', ' ', $this->subtype));
 
         return $title;
     }
