@@ -29,7 +29,7 @@ class AdvaAttributeChangeTest extends SnmpTrapTestCase
 {
     public function testSyslogIPVersionModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -46,7 +46,7 @@ TRAP,
 
     public function testSyslogIP6AddrModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -63,7 +63,7 @@ TRAP,
 
     public function testSyslogIPAddrModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -80,7 +80,7 @@ TRAP,
 
     public function testSyslogPortModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -97,7 +97,7 @@ TRAP,
 
     public function testAclModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -114,7 +114,7 @@ TRAP,
 
     public function testBannerModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -131,7 +131,7 @@ TRAP,
 
     public function testTimeSourceModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -146,7 +146,7 @@ TRAP,
             'Could not handle cmAttributeValueChangeTrap time source modified'
         );
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -164,7 +164,7 @@ TRAP,
 
     public function testTimeZoneModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -178,7 +178,7 @@ TRAP,
             'Could not handle cmAttributeValueChangeTrap DST enabled'
         );
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -192,7 +192,7 @@ TRAP,
             'Could not handle cmAttributeValueChangeTrap DST disabled'
         );
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -209,7 +209,7 @@ TRAP,
 
     public function testNtpModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -224,7 +224,7 @@ TRAP,
             'Could not handle cmAttributeValueChangeTrap NTP primary server modified'
         );
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -242,7 +242,7 @@ TRAP,
 
     public function testAuthServerModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -264,7 +264,7 @@ TRAP,
             'Could not handle cmAttributeValueChangeTrap authentication server modified'
         );
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -280,7 +280,7 @@ TRAP,
 
     public function testNeModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -301,7 +301,7 @@ TRAP,
 
     public function testSnmpDyingGaspStateModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -314,7 +314,7 @@ TRAP,
             'SNMP Dying Gasp is enabled',
             'Could not handle cmAttributeValueChangeTrap SNMP dying gasp enabled');
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -330,7 +330,7 @@ TRAP,
 
     public function testNetPortModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -356,7 +356,7 @@ TRAP,
             ],
             'Could not handle cmAttributeValueChangeTrap network port modified specific messages');
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -372,7 +372,7 @@ TRAP,
 
     public function testAccPortModied(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -398,7 +398,7 @@ TRAP,
             ],
             'Could not handle cmAttributeValueChangeTrap access port modified specific messages');
 
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -415,7 +415,7 @@ TRAP,
 
     public function testAccFlowModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -434,7 +434,7 @@ TRAP,
 
     public function testLagModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -450,7 +450,7 @@ TRAP,
 
     public function testQosFlowPolicerModfied(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -469,7 +469,7 @@ TRAP,
 
     public function testQosShaperModified(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -486,7 +486,7 @@ TRAP,
 
     public function testAccShaper(): void
     {
-        $this->assertTrapLogsMessage(<<<TRAP
+        $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
