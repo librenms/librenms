@@ -12,8 +12,9 @@ if (! empty($agent_data['app']['memcached'])) {
         $data = json_app_get($device, $name, '1.1')['data'] ?? [];
         $data = $data[$app->app_instance] ?? reset($data);
     } catch (JsonAppException $e) {
-        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-        update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+        $error_string = 'ERROR: ' . $e->getCode() . ':' . $e->getMessage();
+        echo PHP_EOL . $name . ':' . $error_string . PHP_EOL;
+        update_application($app, $error_string); // Set empty metrics and error message
 
         return;
     }
@@ -66,4 +67,4 @@ $fields = [
 $app_id = $app->app_id;
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
-update_application($app, $result, $fields);
+update_application($app, empty($data) ? 'ERROR: No Data' : 'OK', $fields);

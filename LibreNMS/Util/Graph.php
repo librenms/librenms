@@ -168,7 +168,7 @@ class Graph
         try {
             $image_data = Rrd::graph($rrd_options);
 
-            return new GraphImage($graph_params->imageFormat, $graph_params->title, $image_data);
+            return new GraphImage($graph_params->imageFormat, $graph_params->getTitle(), $image_data);
         } catch (RrdGraphException $e) {
             // preserve original error if debug is enabled, otherwise make it a little more user friendly
             if (Debug::isEnabled()) {
