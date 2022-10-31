@@ -36,7 +36,8 @@ class GraphParameters
 {
     public readonly array $visibleElements;
 
-    public string $title;
+    public string $title = '';
+    public readonly ?string $user_title;
     public readonly string $type;
     public readonly string $subtype;
     public readonly ImageFormat $imageFormat;
@@ -89,9 +90,9 @@ class GraphParameters
         $this->canvas = Clean::alphaDash($vars['bg'] ?? '');
         $this->background = Clean::alphaDash($vars['bbg'] ?? '');
 
-        $this->title = $vars['graph_title'] ?? $this->defaultTitle();
+        $this->user_title = $vars['graph_title'] ?? null; // if the user sets a title, show it
         $this->visibleElements = [
-            'title' => empty($vars['title']) || $vars['title'] !== 'no',
+            'title' => isset($this->user_title) || (isset($vars['title']) && $vars['title'] !== 'no'),
             'legend' => empty($vars['legend']) || $vars['legend'] !== 'no',
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
@@ -182,8 +183,9 @@ class GraphParameters
             $options[] = '-g';
         }
 
-        if ($this->visible('title') && $this->title) {
-            $options[] = "--title='" . Clean::alphaDashSpace($this->title) . "'";
+        if ($this->visible('title')) {
+            // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
+            $options[] = '--title=' . escapeshellarg(str_replace("'", '', $this->getTitle()));
         }
 
         return $options;
@@ -192,6 +194,17 @@ class GraphParameters
     public function __toString(): string
     {
         return implode(' ', $this->toRrdOptions());
+    }
+
+    /**
+     * Get the graph title. In order:
+     * - User set title
+     * - Graph set title
+     * - Fallback default title
+     */
+    public function getTitle(): string
+    {
+        return $this->user_title ?? $this->title ?: $this->defaultTitle();
     }
 
     private function graphColors(): array
@@ -234,7 +247,7 @@ class GraphParameters
     private function defaultTitle(): string
     {
         $title = DeviceCache::getPrimary()->displayName() ?: ucfirst($this->type);
-        $title .= ' - ';
+        $title .= '::';
         $title .= Str::title(str_replace('_', ' ', $this->subtype));
 
         return $title;
