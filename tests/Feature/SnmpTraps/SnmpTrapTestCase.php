@@ -25,10 +25,31 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
+use App\Models\Device;
+use App\View\SimpleTemplate;
+use Illuminate\Support\Arr;
+use LibreNMS\Snmptrap\Dispatcher;
+use LibreNMS\Tests\TestCase;
+use Mockery;
 
-class SnmpTrapTestCase extends DBTestCase
+class SnmpTrapTestCase extends TestCase
 {
-    use DatabaseTransactions; // people skip this a lot so extract it to here
+    protected function assertTrapLogsMessage(string $rawTrap, string|array $log, string $failureMessage = ''): void
+    {
+        /** @var Device $device */
+        $device = Device::factory()->make();
+
+        $rawTrap = SimpleTemplate::parse($rawTrap, [
+            'hostname' => $device->hostname,
+            'ip' => $device->ip,
+        ]);
+        $trap = Mockery::mock('LibreNMS\Snmptrap\Trap[log,getDevice]', [$rawTrap]);
+        $trap->shouldReceive('getDevice')->andReturn($device); // mock getDevice to avoid saving to database
+        foreach (Arr::wrap($log) as $message) {
+            $trap->shouldReceive('log')->once()->with($message);
+        }
+
+        /** @var \LibreNMS\Snmptrap\Trap $trap */
+        $this->assertTrue(Dispatcher::handle($trap), $failureMessage);
+    }
 }
