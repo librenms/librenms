@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.7571.100.1.1.7.1",
                     "sysDescr": "Prod: Integra;Vers: 3.6.18;Timestamp: 2017-06-12 16:26:01;kernel: 3.15.0;rootfs: 0.0.5;fpga: 0.0.5;devicetree: 0.0.5;P/C: D18BSR03H;S/N: 382920100006",
                     "sysContact": null,
                     "version": "3.6.18",
                     "hardware": "Integra",
                     "features": null,
+                    "location": null,
                     "os": "saf-integra-b",
                     "type": "wireless",
                     "serial": "382920100006",
-                    "icon": "saf.png",
-                    "location": null
+                    "icon": "saf.png"
                 }
             ]
         },

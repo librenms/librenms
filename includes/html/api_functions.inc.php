@@ -33,8 +33,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
-use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Number;
@@ -87,29 +87,17 @@ function api_not_found()
 
 function api_get_graph(array $vars)
 {
-    global $dur;        // Needed for callback within graph code
+    try {
+        $graph = Graph::get($vars);
 
-    $auth = true;
+        if ($vars['output'] === 'base64') {
+            return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
+        }
 
-    // prevent ugly error for undefined graphs from being passed to the user
-    [$type, $subtype] = extract_graph_type($vars['type']);
-    if (! is_file(base_path("includes/html/graphs/$type/auth.inc.php"))) {
-        return api_error(400, 'Invalid graph type');
+        return response($graph->data, 200, ['Content-Type' => $graph->contentType()]);
+    } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
+        return api_error(500, $e->getMessage());
     }
-
-    ob_start();
-
-    include 'includes/html/graphs/graph.inc.php';
-    Datastore::terminate();
-
-    $image = ob_get_contents();
-    ob_end_clean();
-
-    if ($vars['output'] === 'base64') {
-        return api_success(['image' => $image, 'content-type' => get_image_type(Config::get('webui.graph_type'))], 'image');
-    }
-
-    return response($image, 200, ['Content-Type' => get_image_type(Config::get('webui.graph_type'))]);
 }
 
 function check_bill_permission($bill_id, $callback)
@@ -273,7 +261,7 @@ function get_device(Illuminate\Http\Request $request)
 
     // find device matching the id
     $device = device_by_id_cache($device_id);
-    if (! $device || ! $device['device_id']) {
+    if (! $device || ! isset($device['device_id'])) {
         return api_error(404, "Device $hostname does not exist");
     }
 
@@ -1924,7 +1912,12 @@ function update_device(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = ctype_digit($hostname) ? Device::find($hostname) : Device::findByHostname($hostname);
+
+    if (is_null($device)) {
+        return api_error(404, "Device $hostname not found");
+    }
+
     $data = json_decode($request->getContent(), true);
     $bad_fields = ['device_id', 'hostname'];
     if (empty($data['field'])) {
@@ -1952,7 +1945,7 @@ function update_device(Illuminate\Http\Request $request)
 
                 $update[$field] = $field_data;
             }
-            if (dbUpdate($update, 'devices', '`device_id`=?', [$device_id]) >= 0) {
+            if ($device->fill($update)->save()) {
                 return api_success_noresult(200, 'Device fields have been updated');
             } else {
                 return api_error(500, 'Device fields failed to be updated');
@@ -1960,7 +1953,7 @@ function update_device(Illuminate\Http\Request $request)
         } else {
             return api_error(500, 'Device fields failed to be updated as the number of fields (' . count($data['field']) . ') does not match the supplied data (' . count($data['data']) . ')');
         }
-    } elseif (dbUpdate([$data['field'] => $data['data']], 'devices', '`device_id`=?', [$device_id]) >= 0) {
+    } elseif ($device->fill([$data['field'] => $data['data']])->save()) {
         return api_success_noresult(200, 'Device ' . $data['field'] . ' field has been updated');
     } else {
         return api_error(500, 'Device ' . $data['field'] . ' field failed to be updated');
@@ -2935,7 +2928,20 @@ function edit_service_for_host(Illuminate\Http\Request $request)
  */
 function server_info()
 {
-    $versions = version_info();
+    $version = \LibreNMS\Util\Version::get();
+
+    $versions = [
+        'local_ver' => $version->name(),
+        'local_sha' => $version->git->commitHash(),
+        'local_date' => $version->date(),
+        'local_branch' => $version->git->branch(),
+        'db_schema' => $version->database(),
+        'php_ver' => phpversion(),
+        'python_ver' => $version->python(),
+        'database_ver' => $version->databaseServer(),
+        'rrdtool_ver' => $version->rrdtool(),
+        'netsnmp_ver' => $version->netSnmp(),
+    ];
 
     return api_success([
         $versions,

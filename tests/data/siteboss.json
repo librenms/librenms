@@ -10,11 +10,11 @@
                     "version": "2.10.540 STD",
                     "hardware": "SiteBoss 530",
                     "features": null,
+                    "location": "<private>",
                     "os": "siteboss",
                     "type": "server",
                     "serial": null,
-                    "icon": "siteboss.png",
-                    "location": "<private>"
+                    "icon": "siteboss.png"
                 }
             ]
         },

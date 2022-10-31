@@ -916,11 +916,6 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFilter.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderParser.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alerting\\\\QueryBuilderParser\\:\\:\\$builder has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
@@ -3646,11 +3641,6 @@ parameters:
 			path: LibreNMS/OS/ArrisDsr4410md.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/ArubaInstant.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/ArubaInstant.php
@@ -5421,22 +5411,12 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has no return type specified\\.$#"
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
+			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 

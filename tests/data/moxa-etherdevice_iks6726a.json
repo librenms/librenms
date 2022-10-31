@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.8691.7.116",
                     "sysDescr": "IKS-6726A-2GTXSFP-T",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "moxa-etherdevice",
                     "type": "network",
                     "serial": null,
-                    "icon": "moxa.svg",
-                    "location": null
+                    "icon": "moxa.svg"
                 }
             ]
         },

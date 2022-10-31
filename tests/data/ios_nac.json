@@ -2631,11 +2631,11 @@
                     "version": "15.0(2)SE8",
                     "hardware": "catalyst29608TCS",
                     "features": "LANLITEK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

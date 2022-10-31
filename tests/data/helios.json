@@ -10,11 +10,11 @@
                     "version": "1.1.9-9791-1b3b6d8c",
                     "hardware": "ML-60-30-18",
                     "features": null,
+                    "location": "<private>",
                     "os": "helios",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ignitenet.png",
-                    "location": "<private>"
+                    "icon": "ignitenet.png"
                 }
             ]
         },
@@ -667,8 +667,8 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -772,8 +772,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -877,8 +877,8 @@
                     "ifName": "wlan0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -982,8 +982,8 @@
                     "ifName": "wlan1",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -1102,7 +1102,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1123,7 +1124,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1144,7 +1146,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1165,7 +1168,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1186,7 +1190,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1207,7 +1212,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.2\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -1232,7 +1238,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1253,7 +1260,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.10.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1274,7 +1282,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1295,7 +1304,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1316,7 +1326,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -1337,7 +1348,138 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.47307.1.4.2.1.4.2\"]",
+                    "rrd_type": "GAUGE"
+                }
+            ]
+        }
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 21,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 53719040,
+                    "mempool_used_oid": null,
+                    "mempool_free": 207958016,
+                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 98,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 257048576,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
+                    "mempool_free": 4628480,
+                    "mempool_free_oid": null,
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 95,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 248324096,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
+                    "mempool_free": 13352960,
+                    "mempool_free_oid": null,
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                }
+            ]
+        },
+        "poller": {
+            "mempools": [
+                {
+                    "mempool_index": "1",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "system",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Physical memory",
+                    "mempool_perc": 21,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 53719040,
+                    "mempool_used_oid": null,
+                    "mempool_free": 207958016,
+                    "mempool_free_oid": ".1.3.6.1.4.1.2021.4.6.0",
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "3",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "buffers",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Memory buffers",
+                    "mempool_perc": 2,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 4628480,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.14.0",
+                    "mempool_free": 257048576,
+                    "mempool_free_oid": null,
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
+                },
+                {
+                    "mempool_index": "4",
+                    "entPhysicalIndex": null,
+                    "mempool_type": "ucd",
+                    "mempool_class": "cached",
+                    "mempool_precision": 1024,
+                    "mempool_descr": "Cached memory",
+                    "mempool_perc": 5,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 13352960,
+                    "mempool_used_oid": ".1.3.6.1.4.1.2021.4.15.0",
+                    "mempool_free": 248324096,
+                    "mempool_free_oid": null,
+                    "mempool_total": 261677056,
+                    "mempool_total_oid": null,
+                    "mempool_largestfree": null,
+                    "mempool_lowestfree": null,
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": null
                 }
             ]
         }

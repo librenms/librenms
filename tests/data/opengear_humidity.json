@@ -10,11 +10,11 @@
                     "version": "1.2.3u1",
                     "hardware": "IM72xx",
                     "features": null,
+                    "location": "<private>",
                     "os": "opengear",
                     "type": "OOB Management",
                     "serial": "12345678954321",
-                    "icon": "opengear.svg",
-                    "location": "<private>"
+                    "icon": "opengear.svg"
                 }
             ]
         },
@@ -2093,6 +2093,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2117,6 +2118,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2141,6 +2143,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ogCellModemConnected"
                 },
                 {
@@ -2165,6 +2168,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ogCellModemRadioTechnology"
                 },
                 {
@@ -2189,6 +2193,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

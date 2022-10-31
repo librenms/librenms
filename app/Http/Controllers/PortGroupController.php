@@ -110,7 +110,7 @@ class PortGroupController extends Controller
     {
         $portGroup->delete();
 
-        $msg = __('Port Group :name deleted', ['name' => $portGroup->name]);
+        $msg = __('Port Group :name deleted', ['name' => htmlentities($portGroup->name)]);
 
         return response($msg, 200);
     }

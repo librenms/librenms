@@ -10,11 +10,11 @@
                     "version": "RP0700",
                     "hardware": "AN5516-01",
                     "features": "WKE2.115.331R1A",
+                    "location": "<private>",
                     "os": "fiberhome",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg",
-                    "location": "<private>"
+                    "icon": "fiberhome.svg"
                 }
             ]
         },
@@ -121,6 +121,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fanState"
                 },
                 {
@@ -145,6 +146,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fanState"
                 },
                 {
@@ -169,6 +171,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fanState"
                 },
                 {
@@ -193,6 +196,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "powerState"
                 },
                 {
@@ -217,6 +221,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "powerState"
                 },
                 {
@@ -241,6 +246,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

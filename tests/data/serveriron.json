@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "ServerIron",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "serveriron",
                     "type": "loadbalancer",
                     "serial": null,
-                    "icon": "brocade.svg",
-                    "location": null
+                    "icon": "brocade.svg"
                 }
             ]
         },

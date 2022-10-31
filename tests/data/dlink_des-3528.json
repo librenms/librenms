@@ -10,11 +10,11 @@
                     "version": "3.00.012",
                     "hardware": "DES-3528 Rev. A2",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "P1UM298000677",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },
@@ -6400,6 +6400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

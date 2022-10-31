@@ -262,8 +262,11 @@ class ArubaInstant extends OS implements
         return $sensors;
     }
 
-    protected function decodeChannel($channel)
+    protected function decodeChannel($channel): int
     {
+        // Trim off everything not a digit, like channel "116e"
+        $channel = preg_replace("/\D/", '', $channel);
+
         return $channel & 255; // mask off the channel width information
     }
 
@@ -303,7 +306,7 @@ class ArubaInstant extends OS implements
                 $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
                 foreach ($oids as $id => $oid) {
-                    $data[$id] = $snmp_data[$oid];
+                    $data[$id] = $snmp_data[$oid] ?? null;
                 }
             } else {
                 // version is lower than 8.4.0.0

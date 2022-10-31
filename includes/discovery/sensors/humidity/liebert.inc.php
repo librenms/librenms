@@ -25,14 +25,14 @@
 $lib_data = snmpwalk_cache_oid($device, 'lgpEnvHumidityEntryRel', [], 'LIEBERT-GP-ENVIRONMENTAL-MIB');
 
 foreach ($lib_data as $index => $data) {
-    if (is_numeric($data['lgpEnvHumidityMeasurementRelTenths'])) {
+    if (isset($data['lgpEnvHumidityMeasurementRelTenths']) && is_numeric($data['lgpEnvHumidityMeasurementRelTenths'])) {
         $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.50.' . $index;
         $low_limit = $data['lgpEnvHumidityLowThresholdRelTenths'];
         $high_limit = $data['lgpEnvHumidityHighThresholdRelTenths'];
         $current = $data['lgpEnvHumidityMeasurementRelTenths'];
         $divisor = 10;
         $new_index = 'lgpEnvHumidityMeasurementRelTenths.' . $index;
-    } elseif (is_numeric($data['lgpEnvHumidityMeasurementRel'])) {
+    } elseif (isset($data['lgpEnvHumidityMeasurementRel']) && is_numeric($data['lgpEnvHumidityMeasurementRel'])) {
         $oid = '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.3.' . $index;
         $low_limit = $data['lgpEnvHumidityLowThresholdRel'];
         $high_limit = $data['lgpEnvHumidityHighThresholdRel'];

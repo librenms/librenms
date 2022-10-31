@@ -362,18 +362,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.22610.1.3.28",
                     "sysDescr": "Thunder Series Unified Application Service Gateway TH5630, ACOS 4.1.0-P5,",
                     "sysContact": null,
                     "version": "4.1.0-P5",
                     "hardware": "TH5630",
                     "features": null,
+                    "location": null,
                     "os": "acos",
                     "type": "network",
                     "serial": null,
-                    "icon": "a10.png",
-                    "location": null
+                    "icon": "a10.png"
                 }
             ]
         },

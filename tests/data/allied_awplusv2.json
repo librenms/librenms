@@ -5279,11 +5279,11 @@
                     "version": "",
                     "hardware": "",
                     "features": "",
+                    "location": null,
                     "os": "allied",
                     "type": "network",
                     "serial": null,
-                    "icon": "alliedtelesis.svg",
-                    "location": null
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

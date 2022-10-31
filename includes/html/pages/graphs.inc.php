@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Time;
 
 unset($vars['page']);
 
@@ -14,8 +15,8 @@ if (session('widescreen')) {
     $thumb_width = 113;
 }
 
-$vars['from'] = parse_at_time($vars['from'] ?? '') ?: Config::get('time.day');
-$vars['to'] = parse_at_time($vars['to'] ?? '') ?: Config::get('time.now');
+$vars['from'] = Time::parseAt($vars['from'] ?? '') ?: Config::get('time.day');
+$vars['to'] = Time::parseAt($vars['to'] ?? '') ?: Config::get('time.now');
 
 preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
 
@@ -188,6 +189,7 @@ if (! $auth) {
     }
 
     if (! empty($vars['showcommand'])) {
+        $vars = $graph_array;
         $_GET = $graph_array;
         $command_only = 1;
 

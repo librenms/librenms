@@ -22,7 +22,7 @@
  * @copyright  2019 Nick Hilliard
  * @author     Nick Hilliard <nick@foobar.org>
  */
-if (! is_array($pre_cache['infineragroove_portTable'])) {
+if (! isset($pre_cache['infineragroove_portTable']) || ! is_array($pre_cache['infineragroove_portTable'])) {
     echo 'Caching OIDs:';
     $pre_cache['infineragroove_portTable'] = [];
     echo ' portTable';
@@ -44,7 +44,7 @@ foreach (array_keys($pre_cache['infineragroove_portTable']) as $index) {
     unset($indexids);
 }
 
-if (! is_array($pre_cache['infineragroove_slotTable'])) {
+if (! isset($pre_cache['infineragroove_slotTable']) || ! is_array($pre_cache['infineragroove_slotTable'])) {
     $pre_cache['infineragroove_slotTable'] = [];
     echo ' slotTable';
     $pre_cache['infineragroove_slotTable'] = snmpwalk_cache_multi_oid($device, 'slotTable', $pre_cache['infineragroove_slotTable'], 'CORIANT-GROOVE-MIB');
