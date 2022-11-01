@@ -63,8 +63,7 @@ class CommonTrapTest extends SnmpTrapTestCase
 UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
-        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
-        Log::makePartial();
+        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
@@ -88,8 +87,7 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
-        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
-        Log::makePartial();
+        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap));

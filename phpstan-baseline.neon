@@ -9346,11 +9346,6 @@ parameters:
 			path: tests/DocsTest.php
 
 		-
-			message: "#^Call to an undefined static method Illuminate\\\\Support\\\\Facades\\\\Log\\:\\:makePartial\\(\\)\\.$#"
-			count: 2
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
 			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\TestScheduledMaintenance\\:\\:assertScheduleActive\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/Feature/TestScheduledMaintenance.php
