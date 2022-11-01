@@ -85,7 +85,7 @@ class GraphParameters
 
         $this->font = Config::get('mono_font');
         $this->font_color = Clean::alphaDash($vars['font']);
-        $this->font_size = $this->width <= self::MEDIUM_SMALL ? 8 : 7;
+        $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;
 
         $this->canvas = Clean::alphaDash($vars['bg'] ?? '');
         $this->background = Clean::alphaDash($vars['bbg'] ?? '');
