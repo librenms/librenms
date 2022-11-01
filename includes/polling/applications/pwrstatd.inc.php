@@ -39,14 +39,14 @@ foreach ($pwrstatd_data as $data) {
         continue;
     }
 
-    $mruntime = is_int($data['mruntime']) ? $data['mruntime'] : null;
-    $pcapacity = is_int($data['pcapacity']) ? $data['pcapacity'] : null;
-    $pload = is_int($data['pload']) ? $data['pload'] : null;
-    $voutput = is_int($data['voutput']) ? $data['voutput'] : null;
-    $vrating = is_int($data['vrating']) ? $data['vrating'] : null;
-    $vutility = is_int($data['vutility']) ? $data['vutility'] : null;
-    $wload = is_int($data['wload']) ? $data['wload'] : null;
-    $wrating = is_int($data['wrating']) ? $data['wrating'] : null;
+    $mruntime = $data['mruntime'];
+    $pcapacity = $data['pcapacity'];
+    $pload = $data['pload'];
+    $voutput = $data['voutput'];
+    $vrating = $data['vrating'];
+    $vutility = $data['vutility'];
+    $wload = $data['wload'];
+    $wrating = $data['wrating'];
 
     $rrd_name = ['app', $name, $app->app_id, $sn];
 
