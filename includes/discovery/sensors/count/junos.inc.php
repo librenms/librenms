@@ -62,8 +62,6 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         null,
         'COUNTER'
-
-
     );
 
     discover_sensor(
