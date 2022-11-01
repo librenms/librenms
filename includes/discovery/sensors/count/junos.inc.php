@@ -55,7 +55,15 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         null,
         null,
-        $firewall_entry['jnxFWCounterPacketCount']
+        $firewall_entry['jnxFWCounterPacketCount'],
+        $poller_type = 'snmp',
+        $entPhysicalIndex = null,
+        $entPhysicalIndex_measured = null,
+        $user_func = null,
+        $group = null,
+        $rrd_type = 'COUNTER'
+
+
     );
 
     discover_sensor(
@@ -72,6 +80,12 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         null,
         null,
-        $firewall_entry['jnxFWCounterByteCount']
+        $firewall_entry['jnxFWCounterByteCount'],
+        $poller_type = 'snmp',
+        $entPhysicalIndex = null,
+        $entPhysicalIndex_measured = null,
+        $user_func = null,
+        $group = null,
+        $rrd_type = 'COUNTER'
     );
 }
