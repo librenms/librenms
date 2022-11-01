@@ -46,11 +46,11 @@ class VmwVmPoweredOff implements SnmptrapHandler
     {
         $vmGuestName = VmwTrapUtil::getGuestName($trap);
 
+        /** @var \App\Models\Vminfo $vminfo */
         $vminfo = $device->vminfo()->where('vmwVmDisplayName', $vmGuestName)->first();
         $vminfo->vmwVmState = PowerState::OFF;
+        $vminfo->save();
 
         $trap->log("Guest $vmGuestName was powered off");
-
-        $vminfo->save();
     }
 }

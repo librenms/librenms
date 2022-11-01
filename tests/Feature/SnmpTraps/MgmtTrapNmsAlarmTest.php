@@ -30,22 +30,17 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
-
 class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
     public function testAlarmClear()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $specific = $alarm['specific'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[192.168.1.100]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[192.168.1.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 168:19:32:11.62
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNotificationId 566098
@@ -61,29 +56,24 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAlarmType synthesisAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogTime 2020-8-19,14:21:2.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Alarm on slot $slotNum, $srcPm Issue: $specific Possible Cause: Unknown";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 1);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSAlarm trap CLEARED');
+EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
+            "Alarm on slot $slotNum, $srcPm Issue: $specific Possible Cause: Unknown",
+            'Could not handle mgnt2TrapNMSAlarm trap CLEARED',
+            [1],
+    );
     }
 
     //Test alarm with addtional text supplied.
     public function testAlarmAddText()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $specific = $alarm['specific'];
         $add = $alarm['addText'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[192.168.1.100]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[192.168.1.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 168:19:32:11.62
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNotificationId 566098
@@ -99,21 +89,16 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText $add
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAlarmType synthesisAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogTime 2020-8-19,14:21:2.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Alarm on slot $slotNum, $srcPm Issue: $specific Additional info: $add Possible Cause: Unknown";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 1);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSAlarm trap with additional text');
+EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
+            "Alarm on slot $slotNum, $srcPm Issue: $specific Additional info: $add Possible Cause: Unknown",
+            'Could not handle mgnt2TrapNMSAlarm trap with additional text',
+            [1],
+        );
     }
 
     //Alarm is on a specific port
     public function testAlarmPort()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiAlarm();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -123,8 +108,8 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
         $portNum = $alarm['portNum'];
         $add = $alarm['addText'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[192.168.1.100]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[192.168.1.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 168:19:32:03.51
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSAlarm
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNotificationId 566097
@@ -140,15 +125,11 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAdditionalText
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogAlarmType integrityViolation
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogTime 2020-8-19,14:20:54.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Alarm on slot $slotNum, $srcPm Port: $portType $portNum Issue: $specific Possible Cause: $probCause";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 5);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSAlarm trap with additional text');
+EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
+            "Alarm on slot $slotNum, $srcPm Port: $portType $portNum Issue: $specific Possible Cause: $probCause",
+            'Could not handle mgnt2TrapNMSAlarm trap with additional text',
+            [5],
+        );
     }
 
     public static function genEkiAlarm()

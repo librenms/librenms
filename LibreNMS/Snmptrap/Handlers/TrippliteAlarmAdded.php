@@ -33,6 +33,6 @@ class TrippliteAlarmAdded extends Tripplite implements SnmptrapHandler
 {
     public function handle(Device $device, Trap $trap)
     {
-        \$trap->log($this->describe($trap), $this->getSeverity($trap));
+        $trap->log($this->describe($trap), $this->getSeverity($trap));
     }
 }

@@ -54,6 +54,6 @@ class OspfTxRetransmit implements SnmptrapHandler
             return;
         }
 
-        $trap->log('SNMP Trap: OSPFTxRetransmit trap recieved from ' . $device->displayName() . "(Router ID: $ospfRouterId). A $ospfPacketType packet was sent to $ospfNbrRtrId. LSType: $ospfLsdbType, route ID: $ospfLsdbLsid, originating from $ospfLsdbRouterId.", 2);
+        $trap->log('SNMP Trap: OSPFTxRetransmit trap received from ' . $device->displayName() . "(Router ID: $ospfRouterId). A $ospfPacketType packet was sent to $ospfNbrRtrId. LSType: $ospfLsdbType, route ID: $ospfLsdbLsid, originating from $ospfLsdbRouterId.");
     }
 }

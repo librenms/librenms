@@ -1,6 +1,6 @@
 <?php
-/*
- * TrippliteAlarmRemoved.php
+/**
+ * RequiresDatabase.php
  *
  * -Description-
  *
@@ -15,24 +15,24 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handlers;
+namespace LibreNMS\Tests\Traits;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
-
-class TrippliteAlarmRemoved extends Tripplite implements SnmptrapHandler
+trait RequiresDatabase
 {
-    public function handle(Device $device, Trap $trap)
+    public static function setUpBeforeClass(): void
     {
-        $trap->log($this->describe($trap), $this->getSeverity($trap));
+        if (! getenv('DBTEST')) {
+            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        parent::setUpBeforeClass();
     }
 }

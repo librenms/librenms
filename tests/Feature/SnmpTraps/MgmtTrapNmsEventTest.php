@@ -31,21 +31,19 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use LibreNMS\Snmptrap\Dispatcher;
-use LibreNMS\Snmptrap\Trap;
 
 class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
     public function testEvent()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
+        /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $reason = $alarm['reason'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[10.0.0.1]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 159:19:33:14.42
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSEvent
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNotificationId 132
@@ -60,29 +58,23 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Event on slot $slotNum, $srcPm Reason: $reason";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSEvent trap');
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId {{ ip }}",
+            "Event on slot $slotNum, $srcPm Reason: $reason",
+            'Could not handle mgnt2TrapNMSEvent trap'
+        );
     }
 
     //Test alarm with addtional text supplied.
     public function testEventAddText()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
         $reason = $alarm['reason'];
         $add = $alarm['addText'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[10.0.0.1]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 159:19:33:14.42
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSEvent
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNotificationId 132
@@ -97,21 +89,15 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText $add
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Event on slot $slotNum, $srcPm Reason: $reason Additional info: $add";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSEvent trap with additional text');
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId {{ ip }}",
+            "Event on slot $slotNum, $srcPm Reason: $reason Additional info: $add",
+            'Could not handle mgnt2TrapNMSEvent trap with additional text'
+        );
     }
 
     //Event trap on a specific port
     public function testEventPort()
     {
-        $device = Device::factory()->create(); /** @var Device $device */
         $alarm = self::genEkiEvent();
         $slotNum = $alarm['slotNum'];
         $srcPm = $alarm['srcPm'];
@@ -120,8 +106,8 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
         $portType = $alarm['portType'];
         $portNum = $alarm['portNum'];
 
-        $trapText = "$device->hostname
-UDP: [$device->ip]:60057->[10.0.0.1]:162
+        $this->assertTrapLogsMessage("{{ hostname }}
+UDP: [{{ ip }}]:60057->[10.0.0.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 159:19:33:14.42
 SNMPv2-MIB::snmpTrapOID.0 EKINOPS-MGNT2-NMS-MIB::mgnt2TrapNMSEvent
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNotificationId 132
@@ -136,15 +122,10 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogReason $reason
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogAdditionalText 
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogTime 2020-8-10,14:22:5
 EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogNodeControllerIpAddress 0.0.0.0
-EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId $device->ip";
-
-        $trap = new Trap($trapText);
-
-        $msg = "Event on slot $slotNum, $srcPm Port: $portType $portNum. Reason: $reason";
-
-        \Log::shouldReceive('event')->once()->with($msg, $device->device_id, 'trap', 2);
-
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle mgnt2TrapNMSEvent trap with a specficied port');
+EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId {{ ip }}",
+            "Event on slot $slotNum, $srcPm Port: $portType $portNum. Reason: $reason",
+            'Could not handle mgnt2TrapNMSEvent trap with a specified port',
+        );
     }
 
     public static function genEkiEvent()
