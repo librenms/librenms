@@ -164,7 +164,7 @@ function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'p
     $vars['id'] = Port::where([
         'device_id' => $device_id,
         'deleted' => 0,
-        $port_field => $vars['port']
+        $port_field => $vars['port'],
     ])->value('port_id');
 
     return check_port_permission($vars['id'], $device_id, function () use ($request, $vars) {
