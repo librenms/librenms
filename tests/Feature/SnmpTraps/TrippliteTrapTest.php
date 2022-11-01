@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class TrippliteTrapTest extends SnmpTrapTestCase
 {
-    public function testTlpNotificationsAlarmEntryAdded()
+    public function testTlpNotificationsAlarmEntryAdded(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -53,7 +53,7 @@ TRAP,
         );
     }
 
-    public function testTlpNotificationsAlarmEntryRemoved()
+    public function testTlpNotificationsAlarmEntryRemoved(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

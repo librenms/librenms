@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class CyberPowerTrapsTest extends SnmpTrapTestCase
 {
-    public function testCpUpsOverload()
+    public function testCpUpsOverload(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -45,7 +45,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsDiagFailed()
+    public function testCpUpsDiagFailed(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -63,7 +63,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsDischarged()
+    public function testCpUpsDischarged(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -80,7 +80,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsOnBattery()
+    public function testCpUpsOnBattery(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -98,7 +98,7 @@ TRAP,
         );
     }
 
-    public function testCpLowBattery()
+    public function testCpLowBattery(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -116,7 +116,7 @@ TRAP,
         );
     }
 
-    public function testCpPowerRestored()
+    public function testCpPowerRestored(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -134,7 +134,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsDiagPassed()
+    public function testCpUpsDiagPassed(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -151,7 +151,7 @@ TRAP,
         );
     }
 
-    public function testCpRtnLowBattery()
+    public function testCpRtnLowBattery(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -169,7 +169,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsTurnedOff()
+    public function testCpUpsTurnedOff(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -187,7 +187,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsSleeping()
+    public function testCpUpsSleeping(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -205,7 +205,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsWokeUp()
+    public function testCpUpsWokeUp(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -223,7 +223,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsRebootStarted()
+    public function testCpUpsRebootStarted(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -241,7 +241,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsOverTemp()
+    public function testCpUpsOverTemp(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -259,7 +259,7 @@ TRAP,
         );
     }
 
-    public function testCpRtnOverTemp()
+    public function testCpRtnOverTemp(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -277,7 +277,7 @@ TRAP,
         );
     }
 
-    public function testCpRtOverLoad()
+    public function testCpRtOverLoad(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -295,7 +295,7 @@ TRAP,
         );
     }
 
-    public function testCpRtnDischarged()
+    public function testCpRtnDischarged(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -313,7 +313,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsChargerFailure()
+    public function testCpUpsChargerFailure(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -331,7 +331,7 @@ TRAP,
         );
     }
 
-    public function testCpRtnChargerFailure()
+    public function testCpRtnChargerFailure(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -349,7 +349,7 @@ TRAP,
         );
     }
 
-    public function testCpUpsBatteryNotPresent()
+    public function testCpUpsBatteryNotPresent(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

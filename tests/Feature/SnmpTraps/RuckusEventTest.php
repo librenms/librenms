@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class RuckusEventTest extends SnmpTrapTestCase
 {
-    public function testRuckusAssocTrap()
+    public function testRuckusAssocTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -43,7 +43,7 @@ TRAP,
         );
     }
 
-    public function testRuckusDiassocTrap()
+    public function testRuckusDiassocTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -57,7 +57,7 @@ TRAP,
         );
     }
 
-    public function testRuckusSetErrorTrap()
+    public function testRuckusSetErrorTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

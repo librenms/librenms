@@ -31,7 +31,7 @@ class ApcPowerRestoredTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testApcPowerRestored()
+    public function testApcPowerRestored(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

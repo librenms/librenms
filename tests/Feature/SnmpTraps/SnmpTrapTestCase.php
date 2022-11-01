@@ -62,8 +62,8 @@ abstract class SnmpTrapTestCase extends TestCase
         /** @var \LibreNMS\Snmptrap\Trap $trap */
         $this->assertTrue(Dispatcher::handle($trap), $failureMessage);
 
-        // if test set any log expectations, log_spy will be null
-        if ($log_spy !== null) {
+        // if the test set any log expectations, log_spy will be null
+        if ($log_spy != null) {
             $log_spy->shouldNotHaveReceived('error');
             $log_spy->shouldNotHaveReceived('warning');
         }

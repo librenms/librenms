@@ -38,7 +38,7 @@ class JnxVpnPwTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testVpnPwDown()
+    public function testVpnPwDown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
@@ -59,7 +59,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
         );
     }
 
-    public function testVpnPwUp()
+    public function testVpnPwUp(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */

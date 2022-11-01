@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class AdvaObjectCreationTest extends SnmpTrapTestCase
 {
-    public function testUserCreation()
+    public function testUserCreation(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -47,7 +47,7 @@ TRAP,
         );
     }
 
-    public function testLagCreation()
+    public function testLagCreation(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

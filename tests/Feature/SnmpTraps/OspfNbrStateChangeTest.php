@@ -40,7 +40,7 @@ class OspfNbrStateChangeTest extends SnmpTrapTestCase
     use DatabaseTransactions;
 
     //Test OSPF neighbor state down trap
-    public function testOspfNbrDown()
+    public function testOspfNbrDown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */
@@ -68,7 +68,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     }
 
     //Test OSPF neighbor state full trap
-    public function testOspfNbrFull()
+    public function testOspfNbrFull(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'down']); /** @var OspfNbr $ospfNbr */
@@ -96,7 +96,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
     }
 
     //Test OSPF neighbor state trap any other state
-    public function testOspfNbrOther()
+    public function testOspfNbrOther(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ospfNbr = OspfNbr::factory()->make(['ospfNbrState' => 'full']); /** @var OspfNbr $ospfNbr */

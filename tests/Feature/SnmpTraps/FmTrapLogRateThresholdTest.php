@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
 {
-    public function testAvOversize()
+    public function testAvOversize(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

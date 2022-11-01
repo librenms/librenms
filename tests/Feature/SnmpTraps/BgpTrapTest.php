@@ -36,7 +36,7 @@ class BgpTrapTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testBgpUp()
+    public function testBgpUp(): void
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');
@@ -62,7 +62,7 @@ BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n",
         $this->assertEquals($bgppeer->bgpPeerState, 'established');
     }
 
-    public function testBgpDown()
+    public function testBgpDown(): void
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');

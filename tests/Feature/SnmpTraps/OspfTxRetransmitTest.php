@@ -32,7 +32,7 @@ class OspfTxRetransmitTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testLsUpdatePacket()
+    public function testLsUpdatePacket(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -58,7 +58,7 @@ TRAP,
      *
      * @return void
      */
-    public function testNotLsUpdatePacket()
+    public function testNotLsUpdatePacket(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

@@ -37,11 +37,10 @@ class JnxLdpLspTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testLdpLspDownTrap()
+    public function testLdpLspDownTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -59,11 +58,10 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
         );
     }
 
-    public function testLdpLspUpTrap()
+    public function testLdpLspUpTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91

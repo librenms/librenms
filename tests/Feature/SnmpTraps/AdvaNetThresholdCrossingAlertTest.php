@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class AdvaNetThresholdCrossingAlertTest extends SnmpTrapTestCase
 {
-    public function testNetThresholdTrap()
+    public function testNetThresholdTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

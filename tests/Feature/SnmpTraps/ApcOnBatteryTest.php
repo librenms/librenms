@@ -31,7 +31,7 @@ class ApcOnBatteryTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testApcOnBattery()
+    public function testApcOnBattery(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

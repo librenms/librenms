@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
 {
-    public function testDyingGasp()
+    public function testDyingGasp(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

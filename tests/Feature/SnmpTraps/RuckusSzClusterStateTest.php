@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class RuckusSzClusterStateTest extends SnmpTrapTestCase
 {
-    public function testClusterInMaintenance()
+    public function testClusterInMaintenance(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -41,13 +41,13 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "807"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "clusterInMaintenanceState"
 RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName.0 "{{ hostname }}"
 TRAP,
-            "Smartzone cluster {{ hostname }} state changed to maintenance",
+            'Smartzone cluster {{ hostname }} state changed to maintenance',
             'Could not handle ruckusSZClusterInMaintenanceStateTrap',
             [3],
         );
     }
 
-    public function testClusterInService()
+    public function testClusterInService(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -59,7 +59,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventCode.0 "808"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventType.0 "clusterBackToInService"
 RUCKUS-SZ-EVENT-MIB::ruckusSZClusterName.0 "{{ hostname }}"
 TRAP,
-            "Smartzone cluster {{ hostname }} is now in service",
+            'Smartzone cluster {{ hostname }} is now in service',
             'Could not handle ruckusSZClusterBackToInServiceTrap',
         );
     }

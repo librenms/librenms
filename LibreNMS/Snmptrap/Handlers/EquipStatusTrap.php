@@ -39,7 +39,7 @@ class EquipStatusTrap implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $state = $trap->getOidData('EQUIPMENT-MIB::equipStatus.0');
 
@@ -47,21 +47,14 @@ class EquipStatusTrap implements SnmptrapHandler
         $trap->log('SNMP Trap: Equipment Status  ' . $state, $severity, 'state');
     }
 
-    private function getSeverity($state)
+    private function getSeverity(string $state): int
     {
-        $severity_map = [
-            'warning' => 4,
-            'major' => 4,
-            '5' => 4,
-            '3' => 4,
-            'critical' => 5,
-            '4' => 5,
-            'minor' => 3,
-            '2' => 3,
-            'nonAlarmed' => 1,
-            '1' => 1,
-        ];
-
-        return $severity_map[$state] ?? 0;
+        return match($state) {
+            'warning', '3', 'major', '5' => 4,
+            'critical', '4' => 5,
+            'minor', '2' => 3,
+            'nonAlarmed', '1' => 1,
+            default => 0,
+        };
     }
 }

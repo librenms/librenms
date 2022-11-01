@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class FgTrapAvOversizeTest extends SnmpTrapTestCase
 {
-    public function testAvOversize()
+    public function testAvOversize(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -37,7 +37,7 @@ SNMPv2-MIB::snmpTrapOID.0 FORTINET-FORTIGATE-MIB::fgTrapAvOversize
 FORTINET-CORE-MIB::fnSysSerial.0 $device->serial
 SNMPv2-MIB::sysName.0 $device->hostname
 TRAP,
-            "{{ hostname }} received a file that exceeds proxy buffer, skipping AV scan",
+            '{{ hostname }} received a file that exceeds proxy buffer, skipping AV scan',
             'Could not handle fgTrapIpsAvOversize',
         );
     }

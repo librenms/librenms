@@ -24,7 +24,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class ApcPduOutletTest extends SnmpTrapTestCase
 {
-    public function testOutletOff()
+    public function testOutletOff(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -41,7 +41,7 @@ TRAP,
         );
     }
 
-    public function testOutletOn()
+    public function testOutletOn(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -58,7 +58,7 @@ TRAP,
         );
     }
 
-    public function testOutletReboot()
+    public function testOutletReboot(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

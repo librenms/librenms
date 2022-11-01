@@ -40,7 +40,7 @@ class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testErrDisableInterfaceEvent()
+    public function testErrDisableInterfaceEvent(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */
@@ -65,7 +65,7 @@ CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.$port->ifIndex.0 bpduGuard",
      *
      * @return void
      */
-    public function testErrDisableBadIfIndex()
+    public function testErrDisableBadIfIndex(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */

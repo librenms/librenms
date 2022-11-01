@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
-    public function testConfigChangeTrap()
+    public function testConfigChangeTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -47,7 +47,7 @@ TRAP,
         );
     }
 
-    public function testConfigRollbackTrap()
+    public function testConfigRollbackTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

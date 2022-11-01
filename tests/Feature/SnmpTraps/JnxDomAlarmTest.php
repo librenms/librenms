@@ -36,12 +36,11 @@ class JnxDomAlarmTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;
-    
-    public function testJnxDomAlarmSetTrap()
+
+    public function testJnxDomAlarmSetTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(); /** @var Port $port */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -58,11 +57,10 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
         );
     }
 
-    public function testJnxDomAlarmClearTrap()
+    public function testJnxDomAlarmClearTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(); /** @var Port $port */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91

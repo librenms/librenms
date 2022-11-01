@@ -35,7 +35,7 @@ class PortsTrapTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testLinkDown()
+    public function testLinkDown(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */
@@ -71,7 +71,7 @@ OLD-CISCO-INTERFACES-MIB::locIfReason.$port->ifIndex \"down\"\n",
         $this->assertEquals($port->ifOperStatus, 'down');
     }
 
-    public function testLinkUp()
+    public function testLinkUp(): void
     {
         // make a device and associate a port with it
         $device = Device::factory()->create(); /** @var Device $device */

@@ -37,7 +37,7 @@ class JnxLdpSesTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testJnxLdpSesDownTrap()
+    public function testJnxLdpSesDownTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
@@ -61,7 +61,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
         );
     }
 
-    public function testJnxLdpSesUpTrap()
+    public function testJnxLdpSesUpTrap(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */

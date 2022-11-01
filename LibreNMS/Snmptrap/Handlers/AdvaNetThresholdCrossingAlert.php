@@ -42,7 +42,7 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $interval = $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdInterval'));
         $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
@@ -53,7 +53,7 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
         $trap->log("$ifName $threshMessage threshold exceeded for $interval");
     }
 
-    public function getThresholdMessage($thresholdOid)
+    public function getThresholdMessage(string $thresholdOid): string
     {
         foreach ($this->getThresholds() as $oid => $descr) {
             if (Str::contains($thresholdOid, $oid)) {
@@ -64,7 +64,7 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
         return 'unknown';
     }
 
-    public function getThresholds()
+    public function getThresholds(): array
     {
         return [
             'CM-PERFORMANCE-MIB::cmEthernetNetPortStatsUAS' => 'unavailable seconds',

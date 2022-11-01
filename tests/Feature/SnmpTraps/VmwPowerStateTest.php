@@ -38,7 +38,7 @@ class VmwPowerStateTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testVmwVmPoweredOffTrap()
+    public function testVmwVmPoweredOffTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */
@@ -62,7 +62,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX",
         $this->assertEquals(PowerState::OFF, $guest->vmwVmState);
     }
 
-    public function testVmwVmPoweredONTrap()
+    public function testVmwVmPoweredONTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */
@@ -86,7 +86,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX",
         $this->assertEquals(PowerState::ON, $guest->vmwVmState);
     }
 
-    public function testVmwVmSuspendedTrap()
+    public function testVmwVmSuspendedTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $guest = Vminfo::factory()->make(); /** @var Vminfo $guest */

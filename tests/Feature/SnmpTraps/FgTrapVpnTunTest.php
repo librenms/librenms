@@ -35,11 +35,10 @@ class FgTrapVpnTunTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testVpnTunDown()
+    public function testVpnTunDown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
@@ -56,7 +55,7 @@ FORTINET-FORTIGATE-MIB::fgVpnTrapPhase1Name.0 test_tunnel_down",
         );
     }
 
-    public function testVpnTunUp()
+    public function testVpnTunUp(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */

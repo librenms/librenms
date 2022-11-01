@@ -35,11 +35,10 @@ class FgTrapIpsTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testIpsAnomaly()
+    public function testIpsAnomaly(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
@@ -56,10 +55,9 @@ FORTINET-FORTIGATE-MIB::fgIpsTrapSigMsg.0 tcp_src_session",
         );
     }
 
-    public function testIpsPkgUdate()
+    public function testIpsPkgUdate(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $this->assertTrapLogsMessage("$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81
@@ -72,11 +70,10 @@ SNMPv2-MIB::sysName.0 $device->hostname",
         );
     }
 
-    public function testIpsSignature()
+    public function testIpsSignature(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
-
         $this->assertTrapLogsMessage("{{ hostname }}
 UDP: [{{ ip }}]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 302:12:56:24.81

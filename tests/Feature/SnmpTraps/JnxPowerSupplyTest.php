@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class JnxPowerSupplyTest extends SnmpTrapTestCase
 {
-    public function testJnxPowerSupplyFailureTrap()
+    public function testJnxPowerSupplyFailureTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -50,7 +50,7 @@ TRAP,
         );
     }
 
-    public function testJnxPowerSupplyOkTrap()
+    public function testJnxPowerSupplyOkTrap(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class AdvaSysAlmTrapTest extends SnmpTrapTestCase
 {
-    public function testCriticalAlarm()
+    public function testCriticalAlarm(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -49,7 +49,7 @@ TRAP,
         );
     }
 
-    public function testMajorAlarm()
+    public function testMajorAlarm(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -71,7 +71,7 @@ TRAP,
         );
     }
 
-    public function testMinorAlarm()
+    public function testMinorAlarm(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -93,7 +93,7 @@ TRAP,
         );
     }
 
-    public function testClearedAlarm()
+    public function testClearedAlarm(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

@@ -35,7 +35,7 @@ class SnTrapUserAuthTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testSnTrapUserLogin()
+    public function testSnTrapUserLogin(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -44,7 +44,7 @@ SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-TRAP-MIB::snTrapUserLogin
 DISMAN-EVENT-MIB::sysUpTimeInstance 172:9:43:55.64
 FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0 "Security: ssh login by rancid from src IP {{ ip }} to PRIVILEGED EXEC mode using RSA as Server Host Key. "
 TRAP,
-            "Security: ssh login by rancid from src IP {{ ip }} to PRIVILEGED EXEC mode using RSA as Server Host Key. ",
+            'Security: ssh login by rancid from src IP {{ ip }} to PRIVILEGED EXEC mode using RSA as Server Host Key. ',
             'Could not handle snTrapUserLogin',
         );
     }
@@ -55,7 +55,7 @@ TRAP,
      *
      * @return void
      */
-    public function testSnTrapUserLogout()
+    public function testSnTrapUserLogout(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -64,7 +64,7 @@ SNMPv2-MIB::snmpTrapOID.0 FOUNDRY-SN-TRAP-MIB::snTrapUserLogin
 DISMAN-EVENT-MIB::sysUpTimeInstance 172:9:43:55.64
 FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0 "Security: ssh logout by rancid from src IP {{ ip }} from USER EXEC mode using RSA as Server Host Key. "
 TRAP,
-            "Security: ssh logout by rancid from src IP {{ ip }} from USER EXEC mode using RSA as Server Host Key. ",
+            'Security: ssh logout by rancid from src IP {{ ip }} from USER EXEC mode using RSA as Server Host Key. ',
             'Could not handle snTrapUserLogout',
         );
     }

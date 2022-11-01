@@ -37,7 +37,7 @@ class JnxDomLaneAlarmTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testJnxDomLaneAlarmSetTrap()
+    public function testJnxDomLaneAlarmSetTrap(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */
@@ -65,7 +65,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX96
         );
     }
 
-    public function testJnxDomLaneAlarmClearedTrap()
+    public function testJnxDomLaneAlarmClearedTrap(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */

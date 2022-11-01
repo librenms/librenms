@@ -37,10 +37,9 @@ class JnxBgpM2Test extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testBgpPeerUnknown()
+    public function testBgpPeerUnknown(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
-
         $error = 'Unknown bgp peer handling bgpEstablished trap: 2001:d88:1::2';
         \Log::shouldReceive('error')->once()->with($error);
 
@@ -63,7 +62,7 @@ TRAP,
         );
     }
 
-    public function testBgpBackwardTransition()
+    public function testBgpBackwardTransition(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */
@@ -94,7 +93,7 @@ TRAP,
         );
     }
 
-    public function testBgpEstablished()
+    public function testBgpEstablished(): void
     {
         $device = Device::factory()->create();
         /** @var Device $device */
@@ -105,17 +104,17 @@ TRAP,
         $error = 'Unknown bgp peer handling bgpEstablished trap: 2001:d88:1::2';
         \Log::shouldReceive('error')->never()->with($error);
 
-        $this->assertTrapLogsMessage("{{ hostname }}
+        $this->assertTrapLogsMessage('{{ hostname }}
 UDP: [{{ ip }}]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 BGP4-V2-MIB-JUNIPER::jnxBgpM2Established
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddrType.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 ipv6
-BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 01 \"
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 "20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 01 "
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddrType.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 ipv6
-BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 02 \"
-BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 \"00 00 \"
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerRemoteAddr.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 "20 01 0D 88 00 01 00 00 00 00 00 00 00 00 00 02 "
+BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLastErrorReceived.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 "00 00 "
 BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerState.0.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.1.2.32.1.13.136.0.1.0.0.0.0.0.0.0.0.0.2 established
-SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240",
+SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX240',
             'BGP Peer 2001:d88:1::2 is now in the established state',
             'Could not handle JnxBgpM2Established trap',
             [1],

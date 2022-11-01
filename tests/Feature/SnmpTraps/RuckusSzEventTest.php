@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class RuckusSzEventTest extends SnmpTrapTestCase
 {
-    public function testSzApConf()
+    public function testSzApConf(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -46,13 +46,13 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZAPConfigID.0 "2f860f70-6b88-11e9-a3c5-000000937916"
 TRAP,
-            "AP at location {{ location }} configuration updated with config-id 2f860f70-6b88-11e9-a3c5-000000937916",
+            'AP at location {{ location }} configuration updated with config-id 2f860f70-6b88-11e9-a3c5-000000937916',
             'Could not handle ruckusSZAPConfUpdatedTrap',
             [2],
         );
     }
 
-    public function testSzApConnect()
+    public function testSzApConnect(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -69,13 +69,13 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP connected after rebooting"
 TRAP,
-            "AP at location {{ location }} has connected to the SmartZone with reason AP connected after rebooting",
+            'AP at location {{ location }} has connected to the SmartZone with reason AP connected after rebooting',
             'Could not handle ruckusSZAPConnectedTrap',
             [2],
         );
     }
 
-    public function testSzApMiscEvent()
+    public function testSzApMiscEvent(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -98,7 +98,7 @@ TRAP,
         );
     }
 
-    public function testSzApRebooted()
+    public function testSzApRebooted(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -115,7 +115,7 @@ RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPLocation.0 "{{ location }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventAPDescription.0 "{{ sysDescr }}"
 RUCKUS-SZ-EVENT-MIB::ruckusSZEventReason.0 "AP rebooted by controller user"
 TRAP,
-            "AP at site {{ location }} rebooted with reason AP rebooted by controller user",
+            'AP at site {{ location }} rebooted with reason AP rebooted by controller user',
             'Could not handle ruckusSZAPRebootTrap',
             [5],
         );

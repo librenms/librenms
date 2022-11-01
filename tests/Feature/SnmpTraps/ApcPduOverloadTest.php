@@ -29,7 +29,7 @@ class ApcPduOverloadTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testNearOverload()
+    public function testNearOverload(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -53,7 +53,7 @@ TRAP,
      *
      * @return void
      */
-    public function testNearOverloadClear()
+    public function testNearOverloadClear(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -77,7 +77,7 @@ TRAP,
      *
      * @return void
      */
-    public function testOverload()
+    public function testOverload(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -101,7 +101,7 @@ TRAP,
      *
      * @return void
      */
-    public function testOverloadClear()
+    public function testOverloadClear(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

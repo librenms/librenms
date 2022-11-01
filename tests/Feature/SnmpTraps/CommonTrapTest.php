@@ -41,7 +41,7 @@ class CommonTrapTest extends SnmpTrapTestCase
     use RequiresDatabase;
     use DatabaseTransactions;
 
-    public function testGarbage()
+    public function testGarbage(): void
     {
         $trapText = "Garbage\n";
 
@@ -49,7 +49,7 @@ class CommonTrapTest extends SnmpTrapTestCase
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
     }
 
-    public function testFindByIp()
+    public function testFindByIp(): void
     {
         Config::set('snmptraps.eventlog', 'unhandled');
         $device = Device::factory()->create(); /** @var Device $device */
@@ -80,7 +80,7 @@ DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
         $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testGenericTrap()
+    public function testGenericTrap(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -102,7 +102,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
         $this->assertEquals(2, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testAuthorization()
+    public function testAuthorization(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -124,7 +124,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
         $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testBridgeNewRoot()
+    public function testBridgeNewRoot(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -146,7 +146,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
         $this->assertEquals(3, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
 
-    public function testBridgeTopologyChanged()
+    public function testBridgeTopologyChanged(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -160,7 +160,7 @@ TRAP,
         );
     }
 
-    public function testColdStart()
+    public function testColdStart(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -174,7 +174,7 @@ TRAP,
         );
     }
 
-    public function testWarmStart()
+    public function testWarmStart(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -188,7 +188,7 @@ TRAP,
         );
     }
 
-    public function testEntityDatabaseChanged()
+    public function testEntityDatabaseChanged(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

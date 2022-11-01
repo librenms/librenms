@@ -31,7 +31,7 @@ class ApcSmartAvrReducingOffTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testApcSmartAvrReducingOff()
+    public function testApcSmartAvrReducingOff(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

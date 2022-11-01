@@ -29,7 +29,7 @@ class CiscoMacViolationTest extends SnmpTrapTestCase
      *
      * @return void
      */
-    public function testMacViolation()
+    public function testMacViolation(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}

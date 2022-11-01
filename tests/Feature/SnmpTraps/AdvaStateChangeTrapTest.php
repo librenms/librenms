@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 class AdvaStateChangeTrapTest extends SnmpTrapTestCase
 {
-    public function testAccessPortChg()
+    public function testAccessPortChg(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -47,7 +47,7 @@ TRAP,
         );
     }
 
-    public function testNetworkPortChg()
+    public function testNetworkPortChg(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
@@ -67,7 +67,7 @@ TRAP,
         );
     }
 
-    public function testFlowStateChg()
+    public function testFlowStateChg(): void
     {
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
