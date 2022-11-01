@@ -56,12 +56,12 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         null,
         $firewall_entry['jnxFWCounterPacketCount'],
-        $poller_type = 'snmp',
-        $entPhysicalIndex = null,
-        $entPhysicalIndex_measured = null,
-        $user_func = null,
-        $group = null,
-        $rrd_type = 'COUNTER'
+        'snmp',
+        null,
+        null,
+        null,
+        null,
+        'COUNTER'
 
 
     );
@@ -81,11 +81,11 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         null,
         $firewall_entry['jnxFWCounterByteCount'],
-        $poller_type = 'snmp',
-        $entPhysicalIndex = null,
-        $entPhysicalIndex_measured = null,
-        $user_func = null,
-        $group = null,
-        $rrd_type = 'COUNTER'
+        'snmp',
+        null,
+        null,
+        null,
+        null,
+        'COUNTER'
     );
 }
