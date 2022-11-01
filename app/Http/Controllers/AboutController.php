@@ -53,7 +53,6 @@ use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
@@ -67,15 +66,15 @@ class AboutController extends Controller
             'callback_status' => $callback_status,
             'callback_uuid'   => $callback_status ? Callback::get('uuid') : null,
 
-            'db_schema' => vsprintf('%s (%s)', $version->database()),
-            'git_log' => $version->gitChangelog(),
-            'git_date' => $version->gitDate(),
+            'db_schema' => $version->database(),
+            'git_log' => $version->git->log(),
+            'git_date' => $version->date(),
             'project_name' => Config::get('project_name'),
 
-            'version_local' => $version->local(),
-            'version_mysql' => Eloquent::version(),
+            'version_local' => $version->name(),
+            'version_database' => $version->databaseServer(),
             'version_php' => phpversion(),
-            'version_laravel' => App::VERSION(),
+            'version_laravel' => App::version(),
             'version_python' => $version->python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool' => Rrd::version(),

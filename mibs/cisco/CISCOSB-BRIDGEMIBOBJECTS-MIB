@@ -56,7 +56,7 @@ VlanList4 ::= TEXTUAL-CONVENTION
 
 
 rlpBridgeMIBObjects MODULE-IDENTITY
-                LAST-UPDATED "200701020000Z"
+                LAST-UPDATED "200701020001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 				CONTACT-INFO
 				"Postal: 170 West Tasman Drive

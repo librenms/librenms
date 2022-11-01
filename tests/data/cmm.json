@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "cmm",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg",
-                    "location": "<private>"
+                    "icon": "cambium.svg"
                 }
             ]
         },
@@ -352,8 +352,8 @@
                     "ifName": "CMM Port 2",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -457,8 +457,8 @@
                     "ifName": "CMM Port 3",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
                     "ifOperStatus": "up",
@@ -1210,6 +1210,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1234,6 +1235,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1258,6 +1260,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1282,6 +1285,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1306,6 +1310,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1330,6 +1335,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1354,6 +1360,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 },
                 {
@@ -1378,6 +1385,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "CMM3-MIB::powerStatus"
                 }
             ],

@@ -76,7 +76,7 @@ $config['discovery_modules']['cisco-mac-accounting'] = false;
 $config['discovery_modules']['cisco-pw']             = false;
 $config['discovery_modules']['vrf']                  = false;
 $config['discovery_modules']['cisco-cef']            = false;
-$config['discovery_modules']['cisco-sla']            = false;
+$config['discovery_modules']['slas']                 = false;
 $config['discovery_modules']['cisco-cbqos']          = false;
 $config['discovery_modules']['cisco-otv']            = false;
 $config['discovery_modules']['ipv4-addresses']       = true;
@@ -93,7 +93,7 @@ $config['discovery_modules']['bgp-peers']            = true;
 $config['discovery_modules']['vlans']                = true;
 $config['discovery_modules']['vmware-vminfo']        = false;
 $config['discovery_modules']['libvirt-vminfo']       = false;
-$config['discovery_modules']['toner']                = false;
+$config['discovery_modules']['printer-supplies']     = false;
 $config['discovery_modules']['ucd-diskio']           = true;
 $config['discovery_modules']['applications']         = false;
 $config['discovery_modules']['services']             = true;
@@ -103,6 +103,7 @@ $config['discovery_modules']['loadbalancers']        = false;
 $config['discovery_modules']['mef']                  = false;
 $config['discovery_modules']['wireless']             = true;
 $config['discovery_modules']['fdb-table']            = true;
+$config['discovery_modules']['xdsl']                 = false;
 ```
 
 ## OS based Discovery config
@@ -129,6 +130,8 @@ $config['os']['linux']['discovery_modules']['discovery-arp'] = true;
 configured to be ignored by config options.
 
 `ports-stack`: Same as ports except for stacks.
+
+`xdsl`: Module to collect more metrics for xDSL interfaces.
 
 `entity-physical`: Module to pick up the devices hardware support.
 
@@ -175,13 +178,13 @@ device, with history data.
 
 `cisco-cef`: CEF detection and support.
 
-`cisco-sla`: SLA detection and support.
+`slas`: SLA detection and support.
 
 `vmware-vminfo`: Detection of vmware guests on an ESXi host
 
 `libvirt-vminfo`: Detection of libvirt guests.
 
-`toner`: Toner levels support.
+`printer-supplies`: Toner levels support.
 
 `ucd-diskio`: Disk I/O support.
 

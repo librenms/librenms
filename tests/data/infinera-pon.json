@@ -10,11 +10,11 @@
                     "version": "7090 4.0 01.00.00 Build 2.9.0_p12",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "infinera-pon",
                     "type": "network",
                     "serial": null,
-                    "icon": "infinera.png",
-                    "location": "<private>"
+                    "icon": "infinera.png"
                 }
             ]
         },

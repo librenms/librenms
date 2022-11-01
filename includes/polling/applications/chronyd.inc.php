@@ -4,8 +4,6 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'chronyd';
-$app_id = $app['app_id'];
-
 try {
     $chronyd = json_app_get($device, $name, 1)['data'];
 } catch (JsonAppException $e) {
@@ -15,7 +13,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('stratum', 'GAUGE', 0, 15)
     ->addDataset('reference_time', 'DCOUNTER', 0.0, 10000000000) // good until year 2286
@@ -44,7 +42,7 @@ $fields = [
 ];
 
 // $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // process sources data
@@ -70,7 +68,7 @@ unset($metrics['sources']);
 
 foreach ($chronyd['sources'] as $source) {
     $sources[] = $source['source_name'];
-    $rrd_name = ['app', $name, $app_id, $source['source_name']];
+    $rrd_name = ['app', $name, $app->app_id, $source['source_name']];
     $fields = [
         'stratum'               => $source['stratum'],
         'polling_rate'          => $source['polling_rate'],
@@ -87,7 +85,7 @@ foreach ($chronyd['sources'] as $source) {
         'stddev'                => $source['stddev'],
     ];
 
-    $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 
     // insert flattened source metrics into the metrics array
@@ -96,42 +94,18 @@ foreach ($chronyd['sources'] as $source) {
     }
 }
 
-//
-// component processing for Chrony
-//
-$device_id = $device['device_id'];
-$options = [
-    'filter' => [
-        'device_id' => ['=', $device_id],
-        'type' => ['=', 'chronyd'],
-    ],
-];
+// check for added or removed sources
+$old_sources = $app->data['sources'] ?? [];
+$added_sources = array_diff($sources, $old_sources);
+$removed_sources = array_diff($old_sources, $sources);
 
-$component = new LibreNMS\Component();
-$components = $component->getComponents($device_id, $options);
-
-// if no sources, delete chrony components
-if (empty($sources)) {
-    if (isset($components[$device_id])) {
-        foreach ($components[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
-    }
-} else {
-    if (isset($components[$device_id])) {
-        $chrony_cpnt = $components[$device_id];
-    } else {
-        $chrony_cpnt = $component->createComponent($device_id, 'chronyd');
-    }
-
-    // Make sure we don't readd it, just in a different order.
-    sort($sources);
-
-    $id = $component->getFirstComponentID($chrony_cpnt);
-    $chrony_cpnt[$id]['label'] = 'Chrony';
-    $chrony_cpnt[$id]['sources'] = json_encode($sources);
-
-    $component->setComponentPrefs($device_id, $chrony_cpnt);
+// if we have any source changes, save and log
+if (count($added_sources) > 0 || count($removed_sources) > 0) {
+    $app->data = ['sources' => $sources]; // save sources
+    $log_message = 'Chronyd Source Change:';
+    $log_message .= count($added_sources) > 0 ? ' Added ' . implode(',', $added_sources) : '';
+    $log_message .= count($removed_sources) > 0 ? ' Removed ' . implode(',', $added_sources) : '';
+    log_event($log_message, $device, 'application');
 }
 
 update_application($app, 'OK', $metrics);

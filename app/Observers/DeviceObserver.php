@@ -190,7 +190,7 @@ class DeviceObserver
             // a parent attached to this device
 
             // update the parent's max depth incase it used to be standalone
-            Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
+            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->validateStandalone();
 
             // make sure this device's max depth is updated
             $device->updateMaxDepth();
@@ -201,7 +201,7 @@ class DeviceObserver
             $device->validateStandalone();
 
             // make sure the child's max depth is updated
-            Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
+            Device::whereIntegerInRaw('device_id', $pivotIds)->get()->each->updateMaxDepth();
         }
     }
 

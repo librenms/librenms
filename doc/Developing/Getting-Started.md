@@ -22,7 +22,7 @@ Possible options:
 
 1. Install development dependencies `./scripts/composer_wrapper.php install`
 
-1. Set variables in .env, including database settings.  Which could be
+1. Set variables in `.env`, including database settings.  Which could be
    a local or remote MySQL server including your production DB.
 
 ```dotenv

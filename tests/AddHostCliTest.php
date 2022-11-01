@@ -164,7 +164,7 @@ class AddHostCliTest extends DBTestCase
             ->assertExitCode(0)
             ->execute();
         $this->artisan('device:add', ['device spec' => 'existing'])
-            ->assertExitCode(2)
+            ->assertExitCode(3)
             ->execute();
     }
 }

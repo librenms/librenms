@@ -10,11 +10,11 @@
                     "version": "R7.21",
                     "hardware": "LBP6670",
                     "features": null,
+                    "location": "<private>",
                     "os": "canonprinter",
                     "type": "printer",
                     "serial": "MKRA012345",
-                    "icon": "canon.svg",
-                    "location": "<private>"
+                    "icon": "canon.svg"
                 }
             ]
         },
@@ -518,6 +518,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrDeviceStatus"
                 }
             ],

@@ -10,11 +10,11 @@
                     "version": "6.0.220.41",
                     "hardware": "QSW-3500-24-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "qtech",
                     "type": "network",
                     "serial": null,
-                    "icon": "qtech.svg",
-                    "location": "<private>"
+                    "icon": "qtech.svg"
                 }
             ]
         },

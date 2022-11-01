@@ -8,7 +8,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
     $oids = trim(snmp_walk($device, 'ipAdEntIfIndex', '-Osq', 'IP-MIB'));
     $oids = str_replace('ipAdEntIfIndex.', '', $oids);
-    foreach (explode("\n", $oids) as $data) {
+    foreach ($oids ? explode("\n", $oids) : [] as $data) {
         $data = trim($data);
         [$oid,$ifIndex] = explode(' ', $data);
         $mask = trim(snmp_get($device, "ipAdEntNetMask.$oid", '-Oqv', 'IP-MIB'));

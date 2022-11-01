@@ -42,7 +42,9 @@ class OpenTSDB extends BaseDatastore
         $host = Config::get('opentsdb.host');
         $port = Config::get('opentsdb.port', 2181);
         try {
-            $this->connection = $socketFactory->createClient("$host:$port");
+            if (self::isEnabled() && $host && $port) {
+                $this->connection = $socketFactory->createClient("$host:$port");
+            }
         } catch (\Socket\Raw\Exception $e) {
             Log::debug('OpenTSDB Error: ' . $e->getMessage());
         }

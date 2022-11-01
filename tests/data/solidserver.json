@@ -10,11 +10,11 @@
                     "version": "6.0.2.P0a",
                     "hardware": "SOLIDserver-260",
                     "features": null,
+                    "location": "<private>",
                     "os": "solidserver",
                     "type": "server",
                     "serial": "FXLQ3K2",
-                    "icon": "eip.png",
-                    "location": "<private>"
+                    "icon": "eip.png"
                 }
             ]
         },
@@ -982,8 +982,8 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",

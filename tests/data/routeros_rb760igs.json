@@ -10,11 +10,11 @@
                     "version": "7.1.1",
                     "hardware": "RB760iGS",
                     "features": "Level 4",
+                    "location": null,
                     "os": "routeros",
                     "type": "network",
                     "serial": "E1F10E90A6E9",
-                    "icon": "mikrotik.svg",
-                    "location": null
+                    "icon": "mikrotik.svg"
                 }
             ]
         },
@@ -2215,20 +2215,6 @@
                     "context_name": "",
                     "inetCidrRouteIfIndex": 0,
                     "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 2,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 1,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "0.0.0.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "169.254.101.1",
-                    "inetCidrRoutePolicy": "ccitt.0",
-                    "inetCidrRoutePfxLen": 0
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 0,
-                    "inetCidrRouteType": 4,
                     "inetCidrRouteProto": 3,
                     "inetCidrRouteNextHopAS": 0,
                     "inetCidrRouteMetric1": 1,
@@ -2236,7 +2222,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "169.254.101.1",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -2257,20 +2243,6 @@
                     "context_name": "",
                     "inetCidrRouteIfIndex": 10,
                     "inetCidrRouteType": 3,
-                    "inetCidrRouteProto": 1,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "169.254.101.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0",
-                    "inetCidrRoutePfxLen": 24
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 10,
-                    "inetCidrRouteType": 3,
                     "inetCidrRouteProto": 2,
                     "inetCidrRouteNextHopAS": 0,
                     "inetCidrRouteMetric1": 0,
@@ -2278,7 +2250,7 @@
                     "inetCidrRouteDest": "169.254.101.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -2365,6 +2337,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2389,6 +2362,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2413,6 +2387,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2437,6 +2412,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2461,6 +2437,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2485,6 +2462,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "mtxrOpticalRxLoss"
                 },
                 {
@@ -2509,6 +2487,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "mtxrOpticalTxFault"
                 },
                 {
@@ -2533,6 +2512,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "mtxrPOEStatus"
                 },
                 {
@@ -2557,6 +2537,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2581,6 +2562,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2605,6 +2587,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2629,6 +2612,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2653,6 +2637,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

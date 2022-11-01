@@ -10,11 +10,11 @@
                     "version": "Rev 2.44d",
                     "hardware": "TS 324 (047202CD)",
                     "features": null,
+                    "location": "<private>",
                     "os": "cxr-ts",
                     "type": "network",
                     "serial": null,
-                    "icon": "cxr-networks.png",
-                    "location": "<private>"
+                    "icon": "cxr-networks.png"
                 }
             ]
         },
@@ -790,6 +790,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "ftpdService"
                 },
                 {
@@ -814,6 +815,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "httpdService"
                 },
                 {
@@ -838,6 +840,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "telnetdService"
                 }
             ],

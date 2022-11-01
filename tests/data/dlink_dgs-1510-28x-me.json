@@ -10,11 +10,11 @@
                     "version": "Build 1.10.010",
                     "hardware": "DGS-1510-28X/ME Rev. A1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "RZQG1HB000048",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },
@@ -7030,6 +7030,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

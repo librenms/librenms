@@ -8,13 +8,27 @@ theme:
     text: 'Roboto'
     code: 'Roboto Mono'
   palette:
-    primary: black
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
 
   features:
     - navigation.instant
     - navigation.sections
     - navigation.tracking
     - navigation.top
+    - content.tabs.link
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
@@ -59,14 +73,22 @@ plugins:
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
         'Installation/Ubuntu-image.md': 'Installation/Images.md'
         'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
-
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+          remove_comments: true
+      js_files:
+          - js/docs-settings-links.js
+      css_files:
+          - librenms.css
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css
   - librenms.css
 extra_javascript:
-  - js/docs-install-tab.js
   - js/docs-settings-links.js
 extra:
   analytics:
@@ -75,7 +97,7 @@ extra:
   article_nav_top: false
   article_nav_bottom: true
   php:
-    version_min: 7.3
+    version_min: 8.1
 site_author: LibreNMS
 site_description: LibreNMS user and developer documentation
 repo_url: https://github.com/librenms/librenms/
@@ -231,6 +253,7 @@ nav:
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
       - Creating Release: Developing/Creating-Release.md
+      - Applications: Developing/Application-Notes.md
 
   - Miscellaneous:
     - Security information: General/Security.md

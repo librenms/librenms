@@ -54,7 +54,7 @@ group credentials within Oxidized. To enable this support please
 switch on 'Enable the return of groups to Oxidized':
 
 !!! setting "external/oxidized"
-   ```bash
+    ```bash
     lnms config:set oxidized.group_support true
     ```
 
@@ -135,7 +135,7 @@ check for the validity of these attributes but will deliver them to
 Oxidized as defined.
 
 Matching of hosts can be done using `hostname`, `sysname`, `os`,
-`location`, `sysDescr` or `hardware` and including either a 'match'
+`location`, `sysDescr`, `hardware`, `purpose` or `notes` and including either a 'match'
 key and value, or a 'regex' key and value. The order of matching is:
 
 - `hostname`
@@ -145,6 +145,8 @@ key and value, or a 'regex' key and value. The order of matching is:
 - `os`
 - `location`
 - `ip`
+- `purpose`
+- `notes`
 
 To match on the device hostnames or sysNames that contain 'lon-sw' or
 if the location contains 'London' then you would set the following:
@@ -165,6 +167,14 @@ To match on a device os of edgeos then please use the following:
 
 Matching on OS requires system name of the OS. For example, "match": "RouterOS"
 will not work, while "match": "routeros" will.
+
+To match on a device purpose or device notes that contains 'lon-net' then you would set the following:
+
+!!! setting "external/oxidized"
+    ```bash
+    lnms config:set oxidized.maps.group.purpose.+ '{"regex": "/^lon-sw/", "value": "london-network"}'
+    lnms config:set oxidized.maps.group.notes.+ '{"regex": "/^lon-sw/", "value": "london-network"}'
+    ```
 
 To edit an existing map, you must use the index to override it.
 

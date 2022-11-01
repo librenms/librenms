@@ -10,11 +10,11 @@
                     "version": "3.0.6 Build 20200805 Rel.55968",
                     "hardware": "T1600G-28TS 3.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetstream",
                     "type": "network",
                     "serial": "2199797000735",
-                    "icon": "tplink.svg",
-                    "location": "<private>"
+                    "icon": "tplink.svg"
                 }
             ]
         },

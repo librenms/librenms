@@ -7,5 +7,8 @@
             @include('auth.login-form')
         </div>
     </div>
+    @if($errors->any())
+        <script>toastr.error('{{ $errors->first() }}')</script>
+    @endif
 </div>
 @endsection

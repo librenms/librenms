@@ -22,72 +22,7 @@
 
 use Illuminate\Database\QueryException;
 use LibreNMS\DB\Eloquent;
-use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
-
-/**
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbIsConnected()
-{
-    return Eloquent::isConnected();
-}
-
-/**
- * Connect to the database.
- * Will use global config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
- *
- * @param  string  $db_host
- * @param  string  $db_user
- * @param  string  $db_pass
- * @param  string  $db_name
- * @param  string  $db_port
- * @param  string  $db_socket
- * @return \Illuminate\Database\Connection
- *
- * @throws DatabaseConnectException
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
- * @see https://laravel.com/docs/eloquent
- */
-function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
-{
-    if (Eloquent::isConnected()) {
-        return Eloquent::DB();
-    }
-
-    if (! extension_loaded('pdo_mysql')) {
-        throw new DatabaseConnectException('PHP pdo_mysql extension not loaded!');
-    }
-
-    try {
-        if (! is_null($db_host) || ! empty($db_name)) {
-            // legacy connection override
-            \Config::set('database.connections.setup', [
-                'driver' => 'mysql',
-                'host' => $db_host,
-                'port' => $db_port,
-                'database' => $db_name,
-                'username' => $db_user,
-                'password' => $db_pass,
-                'unix_socket' => $db_socket,
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => true,
-                'engine' => null,
-            ]);
-            \Config::set('database.default', 'setup');
-        }
-
-        Eloquent::boot();
-    } catch (PDOException $e) {
-        throw new DatabaseConnectException($e->getMessage(), $e->getCode(), $e);
-    }
-
-    return Eloquent::DB();
-}
 
 /**
  * Performs a query using the given string.

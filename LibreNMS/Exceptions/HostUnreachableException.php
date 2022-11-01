@@ -48,7 +48,7 @@ class HostUnreachableException extends \Exception
     public function addReason(string $snmpVersion, string $credentials)
     {
         $vars = [
-            'snmpver' => $snmpVersion,
+            'version' => $snmpVersion,
             'credentials' => $credentials,
         ];
 

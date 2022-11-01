@@ -37,7 +37,7 @@ class LogManager extends \Illuminate\Log\LogManager
      * @param  \App\Models\Device|int  $device  device array or device_id
      * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
      * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
-     * @param  int  $reference  the id of the referenced entity.  Supported types: interface
+     * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface, bgpPeer
      */
     public function event($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {

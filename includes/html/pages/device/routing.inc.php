@@ -31,9 +31,9 @@ $pagetitle[] = 'Routing';
 
 echo "<span style='font-weight: bold;'>Routing</span> &#187; ";
 
-unset($sep);
+$sep = '';
 foreach ($routing_tabs as $type => $type_count) {
-    if (! $vars['proto']) {
+    if (empty($vars['proto'])) {
         $vars['proto'] = $type;
     }
 

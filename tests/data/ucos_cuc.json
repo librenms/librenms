@@ -10,11 +10,11 @@
                     "version": "10.5.2.18900-15",
                     "hardware": "ciscoUCVirtualMachine",
                     "features": "CUC",
+                    "location": "<private>",
                     "os": "ucos",
                     "type": "collaboration",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

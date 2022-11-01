@@ -4,7 +4,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mysql';
-$app_id = $app['app_id'];
+
 if (! empty($agent_data['app'][$name])) {
     $mysql = $agent_data['app'][$name];
 } else {
@@ -112,7 +112,7 @@ foreach ($mapping as $k => $v) {
 }
 $metrics = $fields;
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('IDBLBSe', 'GAUGE', 0, 125000000000)
     ->addDataset('IBLFh', 'DERIVE', 0, 125000000000)
@@ -218,7 +218,7 @@ $mapping_status = [
     'State_other'                => 'dh',
 ];
 
-$rrd_name = ['app', $name, $app_id, 'status'];
+$rrd_name = ['app', $name, $app->app_id, 'status'];
 $rrd_def = new RrdDefinition();
 // because this sends different names for rrd and compared to other datastores, disable $fields name checks
 $rrd_def->disableNameChecking();

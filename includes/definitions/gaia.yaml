@@ -12,6 +12,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.2620.1.6.123.1
+            - .1.3.6.1.4.1.2620.1.1
     -
         sysObjectID: .1.3.6.1.4.1.8072.3.2.10
         snmpget:
@@ -19,3 +20,7 @@ discovery:
             mib_dir: checkpoint
             op: contains
             value: Gaia
+poller_modules:
+    xdsl: true
+discovery_modules:
+    xdsl: true

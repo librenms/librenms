@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\IsisAdjacency;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
@@ -48,18 +49,26 @@ class Isis implements Module
     ];
 
     /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return ['ports'];
+    }
+
+    /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         $adjacencies = $os instanceof IsIsDiscovery
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        ModuleModelObserver::observe('\App\Models\IsisAdjacency');
+        ModuleModelObserver::observe(\App\Models\IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
@@ -70,7 +79,7 @@ class Isis implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         $adjacencies = $os->getDevice()->isisAdjacencies;
 
@@ -88,15 +97,13 @@ class Isis implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  Os  $os
      */
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->isisAdjacencies()->delete();
+        $device->isisAdjacencies()->delete();
 
         // clean up legacy components from old code
-        $os->getDevice()->components()->where('type', 'ISIS')->delete();
+        $device->components()->where('type', 'ISIS')->delete();
     }
 
     public function discoverIsIsMib(OS $os): Collection
@@ -137,7 +144,7 @@ class Isis implements Module
                         'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
                         'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['isisISAdjAreaAddress'] ?? '')),
                         'isisISAdjIPAddrType' => $adjacency_data['isisISAdjIPAddrType'] ?? '',
-                        'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
+                        'isisISAdjIPAddrAddress' => (string) IP::fromHexString($adjacency_data['isisISAdjIPAddrAddress'] ?? null, true),
                     ]);
                 }
 
@@ -173,6 +180,17 @@ class Isis implements Module
 
     protected function parseAdjacencyTime($data): int
     {
-        return (int) max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100;
+        return (int) (max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'isis_adjacencies' => $device->isisAdjacencies()->orderBy('index')
+                ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
+        ];
     }
 }

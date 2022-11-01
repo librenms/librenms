@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use SnmpQuery;
 
 class Unix extends \LibreNMS\OS implements MempoolsDiscovery
 {
@@ -80,47 +81,47 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
     protected function discoverExtends(Device $device)
     {
         // Distro "extend" support
-        $features_extend = snmp_get_multi_oid($this->getDeviceArray(), [
-            '.1.3.6.1.4.1.8072.1.3.2.3.1.1.6.100.105.115.116.114.111', // NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"distro\"
-            '.1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111', // UCD-MIB shell
-            '.1.3.6.1.4.1.2021.7890.1.101.1', // exec
-        ], '-OUQn', 'NET-SNMP-EXTEND-MIB');
-        $features = reset($features_extend);
+        $features = SnmpQuery::get([
+            'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."distro"',
+            '.1.3.6.1.4.1.2021.7890.1.3.1.1.6.100.105.115.116.114.111', // legacy nsExtendOutput1Line UCD-SNMP-MIB prefix with extend "distro"
+            '.1.3.6.1.4.1.2021.7890.1.101.1', // legacy UCD-SNMP-MIB exec
+        ])->value();
         $device->features = $features ?: $device->features;
 
         // Try detect using the extended option (dmidecode)
-        $hardware_extend = snmp_get_multi_oid($this->getDeviceArray(), [
-            '.1.3.6.1.4.1.8072.1.3.2.3.1.1.8.104.97.114.100.119.97.114.101', // NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"hardware\"
-            '.1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1', // UCD-MIB shell
-            '.1.3.6.1.4.1.2021.7890.3.101.1', // UCD-MIB exec
-        ], '-OUQn', 'NET-SNMP-EXTEND-MIB');
-        $hardware = reset($hardware_extend);
+        $hardware = SnmpQuery::get([
+            'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."hardware"',
+            '.1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1', // legacy nsExtendOutLine.1 UCD-SNMP-MIB prefix with extend "hardware"
+            '.1.3.6.1.4.1.2021.7890.2.101.2', // legacy UCD-SNMP-MIB exec
+        ])->value();
 
         if ($hardware) {
-            //  NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"manufacturer\"
-            $manufacturer = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.8072.1.3.2.3.1.1.12.109.97.110.117.102.97.99.116.117.114.101.114', '-Oqv', 'NET-SNMP-EXTEND-MIB');
+            // Add manufacturer if we have it
+            $manufacturer = SnmpQuery::get([
+                'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."manufacturer"',
+                '.1.3.6.1.4.1.2021.7890.3.4.1.2.12.109.97.110.117.102.97.99.116.117.114.101.114.1', // legacy nsExtendOutLine.1 UCD-SNMP-MIB prefix with extend "manufacturer"
+                '.1.3.6.1.4.1.2021.7890.3.4.1.2.6.118.101.110.100.111.114.1', // legacy nsExtendOutLine.1 UCD-SNMP-MIB prefix with extend "vendor"
+                '.1.3.6.1.4.1.2021.7890.3.101.1', // legacy UCD-SNMP-MIB exec
+            ])->value();
             if ($manufacturer) {
                 $hardware = Str::start($hardware, $manufacturer . ' ');
             }
 
-            $version_extend = snmp_get_multi_oid($this->getDeviceArray(), [
-                '.1.3.6.1.4.1.8072.1.3.2.3.1.1.7.118.101.114.115.105.111.110', // NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"version\"
-                '.1.3.6.1.4.1.2021.7890.2.4.1.2.8.104.97.114.100.119.97.114.101.1', // UCD-MIB shell
-                '.1.3.6.1.4.1.2021.7890.2.101.1', // UCD-MIB exec
-            ], '-OUQn', 'NET-SNMP-EXTEND-MIB');
-            $version = reset($version_extend);
+            // add version if we have it
+            $version = SnmpQuery::get([
+                'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."version"',
+            ])->value();
             if ($version) {
                 $hardware .= " [$version]";
             }
             $device->hardware = $hardware;
         }
 
-        $serial_extend = snmp_get_multi_oid($this->getDeviceArray(), [
-            '.1.3.6.1.4.1.674.10892.1.300.10.1.11.1', // Dell
-            '.1.3.6.1.4.1.8072.1.3.2.3.1.1.6.115.101.114.105.97.108', // NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"serial\"
-            '.1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1', // UCD-MIB shell
-        ], '-OUQn', 'NET-SNMP-EXTEND-MIB:MIB-Dell-10892', 'dell');
-        $serial = reset($serial_extend);
+        $serial = SnmpQuery::get([
+            'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."serial"',
+            '.1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1', // legacy nsExtendOutLine.1 UCD-SNMP-MIB prefix with extend "serial"
+            '.1.3.6.1.4.1.2021.7890.4.101.1', // legacy UCD-SNMP-MIB exec
+        ])->value();
         $device->serial = $serial ?: $device->serial;
     }
 }

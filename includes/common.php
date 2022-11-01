@@ -20,7 +20,6 @@ use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
-use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
@@ -207,18 +206,6 @@ function get_port_by_id($port_id)
     }
 }
 
-function get_application_by_id($application_id)
-{
-    if (is_numeric($application_id)) {
-        $application = dbFetchRow('SELECT * FROM `applications` WHERE `app_id` = ?', [$application_id]);
-        if (is_array($application)) {
-            return $application;
-        } else {
-            return false;
-        }
-    }
-}
-
 function get_sensor_by_id($sensor_id)
 {
     if (is_numeric($sensor_id)) {
@@ -235,18 +222,6 @@ function get_device_id_by_port_id($port_id)
 {
     if (is_numeric($port_id)) {
         $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
-    }
-}
-
-function get_device_id_by_app_id($app_id)
-{
-    if (is_numeric($app_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `applications` WHERE `app_id` = ?', [$app_id]);
         if (is_numeric($device_id)) {
             return $device_id;
         } else {
@@ -527,7 +502,7 @@ function object_add_cache($section, $obj)
 function object_is_cached($section, $obj)
 {
     global $object_cache;
-    if (array_key_exists($obj, $object_cache)) {
+    if (is_array($object_cache) && array_key_exists($obj, $object_cache)) {
         return $object_cache[$section][$obj];
     } else {
         return false;
@@ -540,26 +515,6 @@ function search_phrase_column($c)
 
     return "$c LIKE '%$searchPhrase%'";
 } // search_phrase_column
-
-/**
- * Constructs the path to an RRD for the Ceph application
- *
- * @param  string  $gtype  The type of rrd we're looking for
- * @return string
- **/
-function ceph_rrd($gtype)
-{
-    global $device;
-    global $vars;
-
-    if ($gtype == 'osd') {
-        $var = $vars['osd'];
-    } else {
-        $var = $vars['pool'];
-    }
-
-    return Rrd::name($device['hostname'], ['app', 'ceph', $vars['id'], $gtype, $var]);
-} // ceph_rrd
 
 /**
  * Parse location field for coordinates
@@ -576,45 +531,6 @@ function parse_location($location)
 
     return false;
 }//end parse_location()
-
-/**
- * Returns version info
- *
- * @param  bool  $remote  fetch remote version info from github
- * @return array
- */
-function version_info($remote = false)
-{
-    $version = \LibreNMS\Util\Version::get();
-    $output = [
-        'local_ver' => $version->local(),
-    ];
-    if (Git::repoPresent() && Git::binaryExists()) {
-        if ($remote === true && Config::get('update_channel') == 'master') {
-            $api = curl_init();
-            set_curl_proxy($api);
-            curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
-            curl_setopt($api, CURLOPT_URL, Config::get('github_api') . 'commits/master');
-            curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($api, CURLOPT_TIMEOUT, 5);
-            curl_setopt($api, CURLOPT_TIMEOUT_MS, 5000);
-            curl_setopt($api, CURLOPT_CONNECTTIMEOUT, 5);
-            $output['github'] = json_decode(curl_exec($api), true);
-        }
-        [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
-        $output['local_sha'] = $local_sha;
-        $output['local_date'] = $local_date;
-        $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
-    }
-    $output['db_schema'] = vsprintf('%s (%s)', $version->database());
-    $output['php_ver'] = phpversion();
-    $output['python_ver'] = $version->python();
-    $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
-    $output['rrdtool_ver'] = $version->rrdtool();
-    $output['netsnmp_ver'] = $version->netSnmp();
-
-    return $output;
-}//end version_info()
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
@@ -720,7 +636,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
     $maps = $ports_mapped['maps'];
 
     if (in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
-        $port_id = $maps[$port_association_mode][$port[$port_association_mode]];
+        $port_id = $maps[$port_association_mode][$port[$port_association_mode]] ?? null;
     }
 
     return $port_id;

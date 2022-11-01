@@ -29,6 +29,7 @@ class Port extends DeviceRelatedModel
         static::deleting(function (Port $port) {
             // delete related data
             $port->adsl()->delete();
+            $port->vdsl()->delete();
             $port->fdbEntries()->delete();
             $port->ipv4()->delete();
             $port->ipv6()->delete();
@@ -61,7 +62,7 @@ class Port extends DeviceRelatedModel
      */
     public function getLabel()
     {
-        $os = $this->device->os;
+        $os = optional($this->device)->os;
 
         if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
             $label = $this->ifName;
@@ -277,6 +278,11 @@ class Port extends DeviceRelatedModel
     public function adsl(): HasMany
     {
         return $this->hasMany(PortAdsl::class, 'port_id');
+    }
+
+    public function vdsl(): HasMany
+    {
+        return $this->hasMany(PortVdsl::class, 'port_id');
     }
 
     public function events(): MorphMany

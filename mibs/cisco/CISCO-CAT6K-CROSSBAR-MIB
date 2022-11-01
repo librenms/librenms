@@ -6,8 +6,7 @@
 -- March  2003, Padma Pullela
 -- June  2004, Padma Pullela
 --   
-
--- Copyright (c) 2001-2002, 2003-2009 by cisco Systems, Inc.
+-- Copyright (c) 2001-2009, 2012-2013 by cisco Systems, Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -43,7 +42,7 @@ IMPORTS
 
 
 ciscoCat6kCrossbarMIB MODULE-IDENTITY
-    LAST-UPDATED    "200902150000Z"
+    LAST-UPDATED    "201309160000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -58,33 +57,45 @@ ciscoCat6kCrossbarMIB MODULE-IDENTITY
         "The Catalyst 6000 Crossbar MIB provides instrumentation for
         configuration and operation of the crossbar switching fabric
         module, and additional functionalities for switching bus 
-        and internal bus, etc.
-        "
+        and internal bus, etc."
+    REVISION        "201309160000Z"
+    DESCRIPTION
+        "Added two new enumerations 'pfc4xxl' and 'pfc4lite'
+        in cc6kxbarSysCapPfcOperMode."
+    REVISION        "201205310000Z"
+    DESCRIPTION
+        "Added following OBJECT-GROUP
+        - cc6kxbarStatisticsLbusDropGroup
+        Added new compliance
+        - cc6kxbarMIBComplianceVer8.
+        Updated the description for
+        - cc6kxbarStatisticsPeakTmInUtil
+        - cc6kxbarStatisticsPeakTmOutUtil."
     REVISION        "200902150000Z"
     DESCRIPTION
         "Added cc6kxbarErrRcvryPersLinkResGroup and
-         cc6kxbarErrRcvryChResyncGroup,
-         cc6kxbarTMSwBusUtilGroup, 
-         cc6kxbarTMSwBusUtilNotifControlGroup,
-         cc6kxbarTMSwBusUtilNotifObjectGroup,
-         cc6kxbarTMSwBusUtilNotifGroup,
-         cc6kxbarTMChUtilGroup,
-         cc6kxbarTMChUtilNotifControlGroup,
-         cc6kxbarTMChUtilNotifObjectGroup,
-         cc6kxbarTMChUtilNotifGroup.
+        cc6kxbarErrRcvryChResyncGroup,
+        cc6kxbarTMSwBusUtilGroup, 
+        cc6kxbarTMSwBusUtilNotifControlGroup,
+        cc6kxbarTMSwBusUtilNotifObjectGroup,
+        cc6kxbarTMSwBusUtilNotifGroup,
+        cc6kxbarTMChUtilGroup,
+        cc6kxbarTMChUtilNotifControlGroup,
+        cc6kxbarTMChUtilNotifObjectGroup,
+        cc6kxbarTMChUtilNotifGroup.
 
-         Added two new enumerations 'pfc4' and 'pfc4xl' 
-         in cc6kxbarSysCapPfcOperMode.
+        Added two new enumerations 'pfc4' and 'pfc4xl' 
+        in cc6kxbarSysCapPfcOperMode.
 
-         Added DISPLAY-HINT in TEXTUAL-CONVENTION
-         of ModuleSlotNumber and FabricChannelNumber."
+        Added DISPLAY-HINT in TEXTUAL-CONVENTION
+        of ModuleSlotNumber and FabricChannelNumber."
     REVISION        "200712180000Z"
     DESCRIPTION
         "Added cc6kxbarSysCapPfcOperModeGroup,
-         cc6kxbarSysCapSwitchResGroup, cc6kxbarChannelUtilGroup1,
-         cc6kxbarSwBusGroup1, cc6kxbarErrorGroup,
-         cc6kxbarErrRcvryThresholdGroup and 
-         cc6kxbarErrRcvrySwitchoverGroup."
+        cc6kxbarSysCapSwitchResGroup, cc6kxbarChannelUtilGroup1,
+        cc6kxbarSwBusGroup1, cc6kxbarErrorGroup,
+        cc6kxbarErrRcvryThresholdGroup and 
+        cc6kxbarErrRcvrySwitchoverGroup."
     REVISION        "200612190000Z"
     DESCRIPTION
         "Added cc6kxbarDcefOnlyModeAllowedGroup,
@@ -122,7 +133,7 @@ ciscoCat6kCrossbarMIB MODULE-IDENTITY
     REVISION        "200106250000Z"
     DESCRIPTION
         "Initial version of this MIB module."
-          ::= { ciscoMgmt 217 }
+    ::= { ciscoMgmt 217 }
 
 
 ciscoCat6kXbarMIBObjects  OBJECT IDENTIFIER
@@ -146,20 +157,20 @@ cc6kxbarIntBusObjects  OBJECT IDENTIFIER
 cc6kxbarFlowCtrlObjects  OBJECT IDENTIFIER
     ::= { ciscoCat6kXbarMIBObjects 6 }
 
-cc6kxbarSystemCapacityObjects OBJECT IDENTIFIER 
+cc6kxbarSystemCapacityObjects  OBJECT IDENTIFIER
     ::= { ciscoCat6kXbarMIBObjects 7 }
 
-cc6kxbarErrorRecoveryObjects OBJECT IDENTIFIER
+cc6kxbarErrorRecoveryObjects  OBJECT IDENTIFIER
     ::= { ciscoCat6kXbarMIBObjects 8 }
 
-cc6kxbarTrafficMonitorObjects OBJECT IDENTIFIER
+cc6kxbarTrafficMonitorObjects  OBJECT IDENTIFIER
     ::= { ciscoCat6kXbarMIBObjects 9 }
 
-cc6kxbarTrafficMonitorSwBusObjects OBJECT IDENTIFIER 
-    ::= { cc6kxbarTrafficMonitorObjects 1}
+cc6kxbarTrafficMonitorSwBusObjects  OBJECT IDENTIFIER
+    ::= { cc6kxbarTrafficMonitorObjects 1 }
 
-cc6kxbarTrafficMonitorChObjects  OBJECT IDENTIFIER 
-    ::= { cc6kxbarTrafficMonitorObjects 2}
+cc6kxbarTrafficMonitorChObjects  OBJECT IDENTIFIER
+    ::= { cc6kxbarTrafficMonitorObjects 2 }
 
 
 -- Textual Conventions
@@ -167,18 +178,21 @@ cc6kxbarTrafficMonitorChObjects  OBJECT IDENTIFIER
 ModuleSlotNumber ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "d"
     STATUS          current
-    DESCRIPTION     "Slot number of the module."
+    DESCRIPTION
+        "Slot number of the module."
     SYNTAX          Unsigned32
 
 FabricChannelNumber ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT    "d" 
+    DISPLAY-HINT    "d"
     STATUS          current
-    DESCRIPTION     "Fabric channel number."
+    DESCRIPTION
+        "Fabric channel number."
     SYNTAX          Unsigned32
 
 ChannelStatus ::= TEXTUAL-CONVENTION
     STATUS          current
-    DESCRIPTION     "Status of the Channel."
+    DESCRIPTION
+        "Status of the Channel."
     SYNTAX          INTEGER  {
                         ok(1),
                         syncError(2),
@@ -190,6 +204,7 @@ ChannelStatus ::= TEXTUAL-CONVENTION
                     }
 
 -- Configuration objects
+
 cc6kxbarFallbackMode OBJECT-TYPE
     SYNTAX          TruthValue
     MAX-ACCESS      read-write
@@ -376,6 +391,7 @@ cc6kxbarBusOnlyModeOper OBJECT-TYPE
     ::= { cc6kxbarConfiguration 9 }
 
 -- Status objects
+
 cc6kxbarFabricActiveSlot OBJECT-TYPE
     SYNTAX          ModuleSlotNumber
     MAX-ACCESS      read-only
@@ -422,14 +438,15 @@ cc6kxbarModuleModeEntry OBJECT-TYPE
 
 Cc6kxbarModuleModeEntry ::= SEQUENCE {
         cc6kxbarModuleModeModule        ModuleSlotNumber,
-        cc6kxbarModuleModeSwitchingMode INTEGER 
+        cc6kxbarModuleModeSwitchingMode INTEGER
 }
 
 cc6kxbarModuleModeModule OBJECT-TYPE
     SYNTAX          ModuleSlotNumber
     MAX-ACCESS      not-accessible
     STATUS          current
-    DESCRIPTION     "The module slot number." 
+    DESCRIPTION
+        "The module slot number." 
     ::= { cc6kxbarModuleModeEntry 1 }
 
 cc6kxbarModuleModeSwitchingMode OBJECT-TYPE
@@ -469,7 +486,8 @@ cc6kxbarModuleChannelEntry OBJECT-TYPE
     SYNTAX          Cc6kxbarModuleChannelEntry
     MAX-ACCESS      not-accessible
     STATUS          current
-    DESCRIPTION     "An entry in cc6kxbarModuleChannelTable."
+    DESCRIPTION
+        "An entry in cc6kxbarModuleChannelTable."
     INDEX           {
                         cc6kxbarModuleChannelModule,
                         cc6kxbarModuleChannelChannel
@@ -488,7 +506,8 @@ cc6kxbarModuleChannelModule OBJECT-TYPE
     SYNTAX          ModuleSlotNumber
     MAX-ACCESS      not-accessible
     STATUS          current
-    DESCRIPTION     "The module slot number." 
+    DESCRIPTION
+        "The module slot number." 
     ::= { cc6kxbarModuleChannelEntry 1 }
 
 cc6kxbarModuleChannelChannel OBJECT-TYPE
@@ -545,7 +564,8 @@ cc6kxbarStatisticsEntry OBJECT-TYPE
     SYNTAX          Cc6kxbarStatisticsEntry
     MAX-ACCESS      not-accessible
     STATUS          current
-    DESCRIPTION     "An entry in cc6kxbarStatisticsTable."
+    DESCRIPTION
+        "An entry in cc6kxbarStatisticsTable."
     INDEX           {
                         cc6kxbarStatisticsModule,
                         cc6kxbarStatisticsChannel
@@ -553,24 +573,26 @@ cc6kxbarStatisticsEntry OBJECT-TYPE
     ::= { cc6kxbarStatisticsTable 1 }
 
 Cc6kxbarStatisticsEntry ::= SEQUENCE {
-        cc6kxbarStatisticsModule         ModuleSlotNumber,
-        cc6kxbarStatisticsChannel        FabricChannelNumber,
-        cc6kxbarStatisticsInErrors       Counter32,
-        cc6kxbarStatisticsOutErrors      Counter32,
-        cc6kxbarStatisticsOutDropped     Counter32,
-        cc6kxbarStatisticsInUtil         Percent,
-        cc6kxbarStatisticsOutUtil        Percent,
-        cc6kxbarStatisticsPeakInUtil     Percent,
-        cc6kxbarStatisticsPeakTmInUtil   DateAndTime,
-        cc6kxbarStatisticsPeakOutUtil    Percent,
-        cc6kxbarStatisticsPeakTmOutUtil  DateAndTime
+        cc6kxbarStatisticsModule        ModuleSlotNumber,
+        cc6kxbarStatisticsChannel       FabricChannelNumber,
+        cc6kxbarStatisticsInErrors      Counter32,
+        cc6kxbarStatisticsOutErrors     Counter32,
+        cc6kxbarStatisticsOutDropped    Counter32,
+        cc6kxbarStatisticsInUtil        Percent,
+        cc6kxbarStatisticsOutUtil       Percent,
+        cc6kxbarStatisticsPeakInUtil    Percent,
+        cc6kxbarStatisticsPeakTmInUtil  DateAndTime,
+        cc6kxbarStatisticsPeakOutUtil   Percent,
+        cc6kxbarStatisticsPeakTmOutUtil DateAndTime,
+        cc6kxbarStatisticsLbusDrops     Counter32
 }
 
 cc6kxbarStatisticsModule OBJECT-TYPE
     SYNTAX          ModuleSlotNumber
     MAX-ACCESS      not-accessible
     STATUS          current
-    DESCRIPTION     "The module slot number." 
+    DESCRIPTION
+        "The module slot number." 
     ::= { cc6kxbarStatisticsEntry 1 }
 
 cc6kxbarStatisticsChannel OBJECT-TYPE
@@ -630,157 +652,183 @@ cc6kxbarStatisticsOutUtil OBJECT-TYPE
         "Output utilization of the cc6kxbarStatisticsChannel for
         cc6kxbarStatisticsModule." 
     ::= { cc6kxbarStatisticsEntry 7 }
- 
-cc6kxbarStatisticsPeakInUtil  OBJECT-TYPE
-    SYNTAX Percent
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Indicates the peak value of cc6kxbarStatisticsInUtil of the 
-         cc6kxbarStatisticsChannel for cc6kxbarStatisticsModule."
-    ::= {cc6kxbarStatisticsEntry 8}
 
-cc6kxbarStatisticsPeakTmInUtil   OBJECT-TYPE
-    SYNTAX DateAndTime 
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarStatisticsPeakInUtil OBJECT-TYPE
+    SYNTAX          Percent
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the time of most recent change in the corresponding 
-         instance value of cc6kxbarStatisticsPeakInUtil."
-    ::= {cc6kxbarStatisticsEntry 9}
+        "Indicates the peak value of cc6kxbarStatisticsInUtil of the
+        cc6kxbarStatisticsChannel for cc6kxbarStatisticsModule." 
+    ::= { cc6kxbarStatisticsEntry 8 }
 
-cc6kxbarStatisticsPeakOutUtil   OBJECT-TYPE
-    SYNTAX Percent
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Indicates the peak value of cc6kxbarStatisticsOutUtil of the 
-         cc6kxbarStatisticsChannel for cc6kxbarStatisticsModule."
-    ::= {cc6kxbarStatisticsEntry 10}
-
-cc6kxbarStatisticsPeakTmOutUtil   OBJECT-TYPE
-    SYNTAX DateAndTime 
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarStatisticsPeakTmInUtil OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the time of most recent change in the corresponding
-         instance value of cc6kxbarStatisticsPeakOutUtil."
-    ::= {cc6kxbarStatisticsEntry 11}
+        instance value of cc6kxbarStatisticsPeakInUtil.
+
+        This object contains value 0x0000010100000000 when the
+        corresponding instance value of cc6kxbarStatisticsPeakInUtil 
+        is '0'." 
+    ::= { cc6kxbarStatisticsEntry 9 }
+
+cc6kxbarStatisticsPeakOutUtil OBJECT-TYPE
+    SYNTAX          Percent
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the peak value of cc6kxbarStatisticsOutUtil of the
+        cc6kxbarStatisticsChannel for cc6kxbarStatisticsModule." 
+    ::= { cc6kxbarStatisticsEntry 10 }
+
+cc6kxbarStatisticsPeakTmOutUtil OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the time of most recent change in the corresponding
+        instance value of cc6kxbarStatisticsPeakOutUtil.
+
+        This object contains value 0x0000010100000000 when the
+        corresponding instance value of cc6kxbarStatisticsPeakOutUtil 
+        is '0'." 
+    ::= { cc6kxbarStatisticsEntry 11 }
+
+cc6kxbarStatisticsLbusDrops OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of packets that have been
+        deterministically dropped due to the threshold on the local
+        bus FIFO, errors and exception conditions." 
+    ::= { cc6kxbarStatisticsEntry 12 }
+ 
+
 
 cc6kxbarErrorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF Cc6kxbarErrorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
+    SYNTAX          SEQUENCE OF Cc6kxbarErrorEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "cc6kxbarErrorTable provides the fabric channel error 
-         information. This table will be instantiated only when 
-         cc6kxbarFabricActiveSlot has a valid value other than zero."
+        "cc6kxbarErrorTable provides the fabric channel error
+        information. This table will be instantiated only when 
+        cc6kxbarFabricActiveSlot has a valid value other than zero."
     ::= { cc6kxbarStatistics 2 }
 
 cc6kxbarErrorEntry OBJECT-TYPE
-    SYNTAX Cc6kxbarErrorEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          Cc6kxbarErrorEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "An entry in cc6kxbarErrorTable for a specific fabric channel
-         on a specific module."  
-    INDEX { cc6kxbarErrorModule, cc6kxbarErrorChannel }
+        on a specific module."
+    INDEX           {
+                        cc6kxbarErrorModule,
+                        cc6kxbarErrorChannel
+                    } 
     ::= { cc6kxbarErrorTable 1 }
 
 Cc6kxbarErrorEntry ::= SEQUENCE {
-    cc6kxbarErrorModule         ModuleSlotNumber,
-    cc6kxbarErrorChannel        FabricChannelNumber,
-    cc6kxbarErrorModuleCrc      Gauge32,
-    cc6kxbarErrorModuleHbeat    Gauge32,
-    cc6kxbarErrorModuleSync     Gauge32,
-    cc6kxbarErrorModuleDDRSync  Gauge32,
-    cc6kxbarErrorChannelSync    Gauge32,
-    cc6kxbarErrorChannelBuffer  Gauge32,
-    cc6kxbarErrorChannelTimeout Gauge32
-    }
+        cc6kxbarErrorModule         ModuleSlotNumber,
+        cc6kxbarErrorChannel        FabricChannelNumber,
+        cc6kxbarErrorModuleCrc      Gauge32,
+        cc6kxbarErrorModuleHbeat    Gauge32,
+        cc6kxbarErrorModuleSync     Gauge32,
+        cc6kxbarErrorModuleDDRSync  Gauge32,
+        cc6kxbarErrorChannelSync    Gauge32,
+        cc6kxbarErrorChannelBuffer  Gauge32,
+        cc6kxbarErrorChannelTimeout Gauge32
+}
 
-cc6kxbarErrorModule  OBJECT-TYPE
-    SYNTAX ModuleSlotNumber
-    MAX-ACCESS not-accessible
-    STATUS current
+cc6kxbarErrorModule OBJECT-TYPE
+    SYNTAX          ModuleSlotNumber
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "The module slot number."
+        "The module slot number." 
     ::= { cc6kxbarErrorEntry 1 }
 
 cc6kxbarErrorChannel OBJECT-TYPE
-    SYNTAX FabricChannelNumber
-    MAX-ACCESS not-accessible
-    STATUS current
+    SYNTAX          FabricChannelNumber
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "Fabric channel number associated with the  
-         cc6kxbarErrorModule."
+        "Fabric channel number associated with the
+        cc6kxbarErrorModule." 
     ::= { cc6kxbarErrorEntry 2 }
 
-cc6kxbarErrorModuleCrc  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorModuleCrc OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the total number of CRC error packets for the
-         cc6kxbarErrorChannel of the cc6kxbarErrorModule." 
+        cc6kxbarErrorChannel of the cc6kxbarErrorModule." 
     ::= { cc6kxbarErrorEntry 3 }
 
-cc6kxbarErrorModuleHbeat  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorModuleHbeat OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the total number of heartbeat misses detected 
-         for the cc6kxbarErrorChannel of the cc6kxbarErrorModule."
+        "Indicates the total number of heartbeat misses detected
+        for the cc6kxbarErrorChannel of the cc6kxbarErrorModule." 
     ::= { cc6kxbarErrorEntry 4 }
 
-cc6kxbarErrorModuleSync  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorModuleSync OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the total number of times cc6kxbarErrorModule could 
-         not sync to the active switching fabric module."
+        "Indicates the total number of times cc6kxbarErrorModule could
+        not sync to the active switching fabric module." 
     ::= { cc6kxbarErrorEntry 5 }
 
-cc6kxbarErrorModuleDDRSync  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorModuleDDRSync OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the total number of DDR(Double Data Rate) channel
-         sync errors for the cc6kxbarErrorChannel of the 
-         cc6kxbarErrorModule."
+        sync errors for the cc6kxbarErrorChannel of the 
+        cc6kxbarErrorModule." 
     ::= { cc6kxbarErrorEntry 6 }
 
-cc6kxbarErrorChannelSync  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorChannelSync OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the total number of sync errors received at
-         cc6kxbarErrorChannel." 
+        cc6kxbarErrorChannel." 
     ::= { cc6kxbarErrorEntry 7 }
 
-cc6kxbarErrorChannelBuffer  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorChannelBuffer OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the total number of times the memory buffer for
-         cc6kxbarErrorChannel of the cc6kxbarErrorModule is full." 
+        cc6kxbarErrorChannel of the cc6kxbarErrorModule is full." 
     ::= { cc6kxbarErrorEntry 8 }
 
-cc6kxbarErrorChannelTimeout  OBJECT-TYPE
-    SYNTAX Gauge32
-    MAX-ACCESS read-only
-    STATUS current
+cc6kxbarErrorChannelTimeout OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the total number of timeouts for input from
-         the cc6kxbarErrorChannel of the cc6kxbarErrorModule." 
+        the cc6kxbarErrorChannel of the cc6kxbarErrorModule." 
     ::= { cc6kxbarErrorEntry 9 }
+ 
+
 
 -- Switching Bus Objects
+
 cc6kxbarSwBusSwitchingStatus OBJECT-TYPE
     SYNTAX          INTEGER  {
                         normal(1),
@@ -844,35 +892,36 @@ cc6kxbarSwBusNotifEnable OBJECT-TYPE
     ::= { cc6kxbarSwBusObjects 3 }
 
 cc6kxbarSwBusUtilization OBJECT-TYPE
-        SYNTAX          Percent
-        MAX-ACCESS      read-only
-        STATUS          current
-        DESCRIPTION
-             "Indicates the percentage of bandwidth utilization
-              of the switching bus."
-        ::= { cc6kxbarSwBusObjects 4 }
+    SYNTAX          Percent
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the percentage of bandwidth utilization
+        of the switching bus." 
+    ::= { cc6kxbarSwBusObjects 4 }
 
 cc6kxbarSwBusPeakUtilization OBJECT-TYPE
-        SYNTAX          Percent
-        MAX-ACCESS      read-only
-        STATUS          current
-        DESCRIPTION
-             "Indicates the peak percentage value of bandwidth 
-              utilization of the switching bus since the system 
-              started."
-        ::= { cc6kxbarSwBusObjects 5 }
+    SYNTAX          Percent
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the peak percentage value of bandwidth
+        utilization of the switching bus since the system 
+        started." 
+    ::= { cc6kxbarSwBusObjects 5 }
 
 cc6kxbarSwBusPeakTimeUtil OBJECT-TYPE
-        SYNTAX          DateAndTime
-        MAX-ACCESS      read-only
-        STATUS          current
-        DESCRIPTION
-             "Indicates the time at which the peak percentage value 
-              of bandwidth utilization of the switching bus value 
-              occurred."
-        ::= { cc6kxbarSwBusObjects 6 }
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the time at which the peak percentage value
+        of bandwidth utilization of the switching bus value 
+        occurred." 
+    ::= { cc6kxbarSwBusObjects 6 }
 
 -- Internal Bus Objects
+
 cc6kxbarIntBusNotifEnable OBJECT-TYPE
     SYNTAX          BITS {
                         intBusCRCErrExcd(0),
@@ -890,8 +939,7 @@ cc6kxbarIntBusNotifEnable OBJECT-TYPE
                             notification.
 
         intBusCRCErrRcvrd -- the cc6kxbarIntBusCRCErrRcvrdNotif
-                            notification.
-        " 
+                            notification." 
     ::= { cc6kxbarIntBusObjects 1 }
 
 cc6kxbarIntBusCRCErrTable OBJECT-TYPE
@@ -941,6 +989,7 @@ cc6kxbarIntBusCRCErrExcdCount OBJECT-TYPE
 
 
 -- Flow Control Objects
+
 cc6kxbarFlowCtrlNotifEnable OBJECT-TYPE
     SYNTAX          BITS {
                         busThreshExcd(0)
@@ -954,8 +1003,7 @@ cc6kxbarFlowCtrlNotifEnable OBJECT-TYPE
         to one, then that notification can be generated.
 
         busThreshExcd -- the cc6kxbarFlowCtrlBusThrExcdNotif
-                            notification.
-        " 
+                            notification." 
     ::= { cc6kxbarFlowCtrlObjects 1 }
 
 cc6kxbarFlowCtrlBusFIFOThrMode OBJECT-TYPE
@@ -1015,65 +1063,69 @@ cc6kxbarFlowCtrlBusFIFOTransTime OBJECT-TYPE
 -- System Capacity Objects
 
 cc6kxbarSysCapPfcOperMode OBJECT-TYPE
-        SYNTAX          INTEGER {
-                                  unknown(1),
-                                  pfc3a(2),
-                                  pfc3b(3),
-                                  pfc3bxl(4),
-                                  pfc3cst1(5),
-                                  pfc3cxlst1(6),
-                                  pfc3c(7),
-                                  pfc3cxl(8),
-                                  pfc4(9),
-                                  pfc4xl(10)   
-                        }
-        MAX-ACCESS      read-only
-        STATUS          current
-        DESCRIPTION
-             "Indicates the operating mode of the policy feature
-             card (PFC).
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        pfc3a(2),
+                        pfc3b(3),
+                        pfc3bxl(4),
+                        pfc3cst1(5),
+                        pfc3cxlst1(6),
+                        pfc3c(7),
+                        pfc3cxl(8),
+                        pfc4(9),
+                        pfc4xl(10),
+                        pfc4xxl(11),
+                        pfc4lite(12)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the operating mode of the policy feature
+        card (PFC).
 
-             unknown -- unknown.
+        unknown -- unknown.
 
-             pfc3a -- Policy feature card 3A.
+        pfc3a -- Policy feature card 3A.
 
-             pfc3b -- Policy feature card 3B.
+        pfc3b -- Policy feature card 3B.
 
-             pfc3bxl -- Policy feature card 3B XL.
+        pfc3bxl -- Policy feature card 3B XL.
 
-             pfc3cst1 -- Policy feature card 3C ST1.
+        pfc3cst1 -- Policy feature card 3C ST1.
 
-             pfc3cxlst1 -- Policy feature card 3C XL ST1.
+        pfc3cxlst1 -- Policy feature card 3C XL ST1.
 
-             pfc3c -- Policy feature card 3C.
+        pfc3c -- Policy feature card 3C.
 
-             pfc3cxl -- Policy feature card 3C XL.  
+        pfc3cxl -- Policy feature card 3C XL.  
 
-             pfc4 -- Policy feature card 4.
+        pfc4 -- Policy feature card 4.
 
-             pfc4xl -- Policy feature card 4 XL.
-             "
-        ::= { cc6kxbarSystemCapacityObjects 1 }
+        pfc4xl -- Policy feature card 4 XL. 
+
+        pfc4xxl -- Policy feature card 4 XXL.  
+
+        pfc4lite -- Policy feature card 4 Lite." 
+    ::= { cc6kxbarSystemCapacityObjects 1 }
 
 cc6kxbarSysCapSwitchResTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF Cc6kxbarSysCapSwitchResEntry
-    MAX-ACCESS  not-accessible
-    STATUS  current
+    SYNTAX          SEQUENCE OF Cc6kxbarSysCapSwitchResEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "A cc6kxbarSysCapSwitchResTable entry lists 
+        "A cc6kxbarSysCapSwitchResTable entry lists
         the capacity information of the switching 
         resources for ENTITY-MIB entPhysicalTable entries 
         of manageable components with type entPhysicalClass 
-        module(9).
-        "
-    ::= { cc6kxbarSystemCapacityObjects 2 } 
+        module(9)."
+    ::= { cc6kxbarSystemCapacityObjects 2 }
 
 cc6kxbarSysCapSwitchResEntry OBJECT-TYPE
-    SYNTAX  Cc6kxbarSysCapSwitchResEntry
-    MAX-ACCESS  not-accessible
-    STATUS  current
+    SYNTAX          Cc6kxbarSysCapSwitchResEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "A cc6kxbarSysCapSwitchResEntry entry lists 
+        "A cc6kxbarSysCapSwitchResEntry entry lists
         the capacity information of the switching 
         resources for ENTITY-MIB entPhysicalTable entries
         of manageable components with type entPhysicalClass 
@@ -1081,32 +1133,31 @@ cc6kxbarSysCapSwitchResEntry OBJECT-TYPE
 
         Entries are created by the agent at the system power-up
         or module insertion.
-      
-        Entries are deleted by the agent upon module removal.
-        "
-    INDEX   { entPhysicalIndex } 
+
+        Entries are deleted by the agent upon module removal."
+    INDEX           { entPhysicalIndex } 
     ::= { cc6kxbarSysCapSwitchResTable 1 }
 
 Cc6kxbarSysCapSwitchResEntry ::= SEQUENCE {
-    cc6kxbarSysCapSwitchResSeries   INTEGER,
-    cc6kxbarSysCapSwitchResCefMode  INTEGER 
-}  
+        cc6kxbarSysCapSwitchResSeries  INTEGER,
+        cc6kxbarSysCapSwitchResCefMode INTEGER
+}
 
 cc6kxbarSysCapSwitchResSeries OBJECT-TYPE
-    SYNTAX        INTEGER {
-                            unknown(1),
-                            supervisor(2),
-                            classic(3),
-                            fabric(4),
-                            dcef720(5),
-                            cef720(6),
-                            dcef256(7),
-                            cef256(8) 
-                  }                        
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        supervisor(2),
+                        classic(3),
+                        fabric(4),
+                        dcef720(5),
+                        cef720(6),
+                        dcef256(7),
+                        cef256(8)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the module series for traffic forwarding options. 
+        "Indicates the module series for traffic forwarding options.
 
         unknown -- unknown.
 
@@ -1115,345 +1166,347 @@ cc6kxbarSysCapSwitchResSeries OBJECT-TYPE
         classic -- classic module.
 
         fabric -- fabric module.
- 
+
         dcef720 -- dCEF720 module.
 
         cef720 -- CEF720 module.
 
         dcef256 -- dCEF256 module.
 
-        cef256 -- CEF256 module. 
-        "
+        cef256 -- CEF256 module." 
     ::= { cc6kxbarSysCapSwitchResEntry 1 }
 
 cc6kxbarSysCapSwitchResCefMode OBJECT-TYPE
-    SYNTAX        INTEGER {
-                            notApplicable(1),
-                            dcef(2),
-                            cef(3)
-                  }                        
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          INTEGER  {
+                        notApplicable(1),
+                        dcef(2),
+                        cef(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the Cisco Express Forwarding (CEF) mode of 
+        "Indicates the Cisco Express Forwarding (CEF) mode of
         the module.  
 
         notApplicable -- not applicable for this module.
 
         dcef -- distributed CEF.
 
-        cef -- CEF. 
-        "
+        cef -- CEF." 
     ::= { cc6kxbarSysCapSwitchResEntry 2 }
+ 
 
--- Fabric Error Recovery Objects 
+
+-- Fabric Error Recovery Objects
 
 cc6kxbarErrRcvryThreshLink OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies the threshold on fabric link errors occurring 
+        "Specifies the threshold on fabric link errors occurring
         in a channel for the fabric error recovery feature." 
     ::= { cc6kxbarErrorRecoveryObjects 1 }
 
 cc6kxbarErrRcvryThreshPersLink OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the threshold on persistent fabric link errors
-        occurring in a channel for the fabric error recovery feature."
+        occurring in a channel for the fabric error recovery feature." 
     ::= { cc6kxbarErrorRecoveryObjects 2 }
 
 cc6kxbarErrRcvrySwitchoverEnable OBJECT-TYPE
-    SYNTAX        TruthValue 
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies whether the switchover to the standby fabric module 
+        "Specifies whether the switchover to the standby fabric module
         is enabled or not on the detection of excessive fabric link 
         errors occurring in a channel for the fabric error recovery 
-        feature."
+        feature." 
     ::= { cc6kxbarErrorRecoveryObjects 3 }
 
 cc6kxbarErrRcvryPersLinkResync OBJECT-TYPE
-    SYNTAX        TruthValue
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies whether the system will resync the channel or not
         on the detection of excessive persistent fabric link errors
         in a channel for the fabric error recovery feature." 
     ::= { cc6kxbarErrorRecoveryObjects 4 }
-    
+
 cc6kxbarErrRcvryChResyncCount OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    MAX-ACCESS    read-write 
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the consecutive number of times of
         channel resync within the time interval as specified
         by cc6kxbarErrRcvryChResyncInterval, over which  
         the channel resync is considered as failure 
-        for the fabric error recovery feature."  
+        for the fabric error recovery feature." 
     ::= { cc6kxbarErrorRecoveryObjects 5 }
 
 cc6kxbarErrRcvryChResyncInterval OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    UNITS         "milliseconds"
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the time interval for the consecutive
         counting of channel resync for the fabric error
-        recovery feature."
+        recovery feature." 
     ::= { cc6kxbarErrorRecoveryObjects 6 }
 
---Traffic Monitor Objects
+-- Traffic Monitor Objects
 
 cc6kxbarTMSwBusUtilEnable OBJECT-TYPE
     SYNTAX          TruthValue
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "Specifies whether the traffic monitor feature is 
-         enabled on the switching bus or not."
+        "Specifies whether the traffic monitor feature is
+        enabled on the switching bus or not." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 1 }
 
 cc6kxbarTMSwBusUtilInterval OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    UNITS         "seconds"
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies the interval at the end of which 
-         the switching bus traffic utilization is compared 
-         against cc6kxbarTMSwBusUtilThreshold."
+        "Specifies the interval at the end of which
+        the switching bus traffic utilization is compared 
+        against cc6kxbarTMSwBusUtilThreshold." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 2 }
 
 cc6kxbarTMSwBusUtilThreshold OBJECT-TYPE
-    SYNTAX        Percent
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Percent
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies the threshold of the switching bus 
-         traffic utilization."
+        "Specifies the threshold of the switching bus
+        traffic utilization." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 3 }
 
 cc6kxbarTMSwBusUtilLogCount OBJECT-TYPE
-    SYNTAX        Counter32
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the number of times the following
-         events are logged for the switching bus:
+        events are logged for the switching bus:
 
-         1. the switching bus traffic utilization has 
-         risen above the configured threshold (as 
-         specified by cc6kxbarTMSwBusUtilThreshold),
-         or has kept staying above the configured 
-         threshold at a logging interval (as specified
-         by cc6kxbarTMSwBusUtilLogInterval).
+        1. the switching bus traffic utilization has 
+        risen above the configured threshold (as 
+        specified by cc6kxbarTMSwBusUtilThreshold),
+        or has kept staying above the configured 
+        threshold at a logging interval (as specified
+        by cc6kxbarTMSwBusUtilLogInterval).
 
-         2. the switching bus traffic utilization
-         has fallen below the configured threshold."
+        2. the switching bus traffic utilization
+        has fallen below the configured threshold." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 4 }
 
 cc6kxbarTMSwBusUtilLastLogTime OBJECT-TYPE
-    SYNTAX        DateAndTime
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the last logging time of the 
-         events as counted in cc6kxbarTMSwBusUtilLogCount.  
+        "Indicates the last logging time of the
+        events as counted in cc6kxbarTMSwBusUtilLogCount.  
 
-         This object will contain 0-1-1,00:00:00.0 when
-         the value of cc6kxbarTMSwBusUtilLogCount is zero."
+        This object will contain 0-1-1,00:00:00.0 when
+        the value of cc6kxbarTMSwBusUtilLogCount is zero." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 5 }
 
 cc6kxbarTMSwBusUtilLogInterval OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    UNITS         "seconds"
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the logging interval if the switching
-         bus traffic utilization keeps staying above the
-         cc6kxbarTMSwBusUtilThreshold."
+        bus traffic utilization keeps staying above the
+        cc6kxbarTMSwBusUtilThreshold." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 6 }
 
 cc6kxbarTMSwBusUtilUtilization OBJECT-TYPE
-    SYNTAX        Percent
-    MAX-ACCESS    accessible-for-notify
-    STATUS        current
+    SYNTAX          Percent
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
     DESCRIPTION
-        "The switching bus traffic utilization included 
-         in the notification currently being sent."  
+        "The switching bus traffic utilization included
+        in the notification currently being sent." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 7 }
 
 cc6kxbarTMSwBusUtilNotifEnable OBJECT-TYPE
-    SYNTAX       TruthValue
-    MAX-ACCESS   read-write
-    STATUS       current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies whether the generation of 
-         c6kxbarTMSwBusUtilAboveNotif and 
-         c6kxbarTMSwBusUtilBelowNotif notifications
-         is enabled or not.
- 
-         When this object is 'true', the generation of
-         cc6kxbarTMSwBusUtilAboveNotif and 
-         c6kxbarTMSwBusUtilBelowNotif notifications is
-         enabled. When this object is 'false', the 
-         generation of cc6kxbarTMSwBusUtilAboveNotif and 
-         c6kxbarTMSwBusUtilBelowNotif notifications 
-         is disabled."
+        "Specifies whether the generation of
+        c6kxbarTMSwBusUtilAboveNotif and 
+        c6kxbarTMSwBusUtilBelowNotif notifications
+        is enabled or not.
+
+        When this object is 'true', the generation of
+        cc6kxbarTMSwBusUtilAboveNotif and 
+        c6kxbarTMSwBusUtilBelowNotif notifications is
+        enabled. When this object is 'false', the 
+        generation of cc6kxbarTMSwBusUtilAboveNotif and 
+        c6kxbarTMSwBusUtilBelowNotif notifications 
+        is disabled." 
     ::= { cc6kxbarTrafficMonitorSwBusObjects 8 }
 
 cc6kxbarTMChUtilTable OBJECT-TYPE
-    SYNTAX        SEQUENCE OF Cc6kxbarTMChUtilEntry 
-    MAX-ACCESS    not-accessible
-    STATUS        current
+    SYNTAX          SEQUENCE OF Cc6kxbarTMChUtilEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "cc6kxbarTrafficMntrChUtilTable provides the 
-         information on the traffic utilization of each 
-         fabric channel associated with each module slot
-         for a given traffic direction in the chassis."  
+        "cc6kxbarTrafficMntrChUtilTable provides the
+        information on the traffic utilization of each 
+        fabric channel associated with each module slot
+        for a given traffic direction in the chassis."
     ::= { cc6kxbarTrafficMonitorChObjects 1 }
 
 cc6kxbarTMChUtilEntry OBJECT-TYPE
-    SYNTAX        Cc6kxbarTMChUtilEntry
-    MAX-ACCESS    not-accessible
-    STATUS        current
+    SYNTAX          Cc6kxbarTMChUtilEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "An entry in cc6kxbarTMChUtilTable. Each traffic
-         direction for each fabric channel associated with
-         each module slot in the chassis will have an 
-         entry in this table." 
-    INDEX         { 
-                      cc6kxbarTMChUtilModule, 
-                      cc6kxbarTMChUtilChannel, 
-                      cc6kxbarTMChUtilDirection 
-                  } 
+        direction for each fabric channel associated with
+        each module slot in the chassis will have an 
+        entry in this table."
+    INDEX           {
+                        cc6kxbarTMChUtilModule,
+                        cc6kxbarTMChUtilChannel,
+                        cc6kxbarTMChUtilDirection
+                    } 
     ::= { cc6kxbarTMChUtilTable 1 }
 
 Cc6kxbarTMChUtilEntry ::= SEQUENCE {
-     cc6kxbarTMChUtilModule          ModuleSlotNumber,
-     cc6kxbarTMChUtilChannel         FabricChannelNumber,
-     cc6kxbarTMChUtilDirection       INTEGER,
-     cc6kxbarTMChUtilEnable          TruthValue,
-     cc6kxbarTMChUtilInterval        Unsigned32,
-     cc6kxbarTMChUtilThreshold       Percent,
-     cc6kxbarTMChUtilLogCount        Counter32,
-     cc6kxbarTMChUtilLastLogTime     DateAndTime 
+        cc6kxbarTMChUtilModule      ModuleSlotNumber,
+        cc6kxbarTMChUtilChannel     FabricChannelNumber,
+        cc6kxbarTMChUtilDirection   INTEGER,
+        cc6kxbarTMChUtilEnable      TruthValue,
+        cc6kxbarTMChUtilInterval    Unsigned32,
+        cc6kxbarTMChUtilThreshold   Percent,
+        cc6kxbarTMChUtilLogCount    Counter32,
+        cc6kxbarTMChUtilLastLogTime DateAndTime
 }
 
-cc6kxbarTMChUtilModule  OBJECT-TYPE
-    SYNTAX        ModuleSlotNumber
-    MAX-ACCESS    not-accessible
-    STATUS        current
+cc6kxbarTMChUtilModule OBJECT-TYPE
+    SYNTAX          ModuleSlotNumber
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "Indicates the module slot number in the chassis."  
+        "Indicates the module slot number in the chassis." 
     ::= { cc6kxbarTMChUtilEntry 1 }
 
 cc6kxbarTMChUtilChannel OBJECT-TYPE
-    SYNTAX        FabricChannelNumber
-    MAX-ACCESS    not-accessible
-    STATUS        current
+    SYNTAX          FabricChannelNumber
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "Indicates the fabric channel number associated with
-         the corresponding cc6kxbarTMChUtilModule." 
+        the corresponding cc6kxbarTMChUtilModule." 
     ::= { cc6kxbarTMChUtilEntry 2 }
 
 cc6kxbarTMChUtilDirection OBJECT-TYPE
-    SYNTAX        INTEGER {
-                              ingress(1),
-                              egress(2)
-                           }
-    MAX-ACCESS    not-accessible
-    STATUS        current
+    SYNTAX          INTEGER  {
+                        ingress(1),
+                        egress(2)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-         "Indicates the direction of traffic to be monitored."
+        "Indicates the direction of traffic to be monitored." 
     ::= { cc6kxbarTMChUtilEntry 3 }
 
 cc6kxbarTMChUtilEnable OBJECT-TYPE
-    SYNTAX       TruthValue
-    MAX-ACCESS   read-write
-    STATUS       current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies whether the traffic monitor feature is
-         enabled on a fabric channel for a given traffic
-         direction or not." 
+        enabled on a fabric channel for a given traffic
+        direction or not." 
     ::= { cc6kxbarTMChUtilEntry 4 }
 
 cc6kxbarTMChUtilInterval OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    UNITS         "seconds"
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the interval at the end of which the
-         traffic utilization on a fabric channel for a 
-         given traffic direction is compared against 
-         its corresponding cc6kxbarTMChUtilThreshold."
+        traffic utilization on a fabric channel for a 
+        given traffic direction is compared against 
+        its corresponding cc6kxbarTMChUtilThreshold." 
     ::= { cc6kxbarTMChUtilEntry 5 }
 
 cc6kxbarTMChUtilThreshold OBJECT-TYPE
-    SYNTAX        Percent
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Percent
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "Specifies the threshold of the traffic utilization
-         on a fabric channel for a given traffic direction."
+        on a fabric channel for a given traffic direction." 
     ::= { cc6kxbarTMChUtilEntry 6 }
 
 cc6kxbarTMChUtilLogCount OBJECT-TYPE
-    SYNTAX        Counter32
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "Indicates the number of times the following
-         events are logged on a fabric channel
-         for a given direction.
-    
-         1. the traffic utilization on a fabric channel 
-         for a given traffic direction has risen above its 
-         corresponding configured threshold (as specified 
-         by cc6kxbarTMChUtilThreshold), or has kept 
-         staying above the configured threshold at a 
-         logging interval (as specified by 
-         cc6kxbarTMChUtilLogInterval).
-    
-         2. the traffic utilization on a fabric channel
-         for a given traffic direciton has fallen below 
-         its corresponding configured threshold."
+        events are logged on a fabric channel
+        for a given direction.
+
+        1. the traffic utilization on a fabric channel 
+        for a given traffic direction has risen above its 
+        corresponding configured threshold (as specified 
+        by cc6kxbarTMChUtilThreshold), or has kept 
+        staying above the configured threshold at a 
+        logging interval (as specified by 
+        cc6kxbarTMChUtilLogInterval).
+
+        2. the traffic utilization on a fabric channel
+        for a given traffic direction has fallen below 
+        its corresponding configured threshold." 
     ::= { cc6kxbarTMChUtilEntry 7 }
 
 cc6kxbarTMChUtilLastLogTime OBJECT-TYPE
-    SYNTAX        DateAndTime
-    MAX-ACCESS    read-only
-    STATUS        current
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Indicates the last logging time of the 
-         events as counted in the corresponding
-         cc6kxbarTMChUtilLogCount on a fabric channel 
-         for a given traffic direction.
+        "Indicates the last logging time of the
+        events as counted in the corresponding
+        cc6kxbarTMChUtilLogCount on a fabric channel 
+        for a given traffic direction.
 
-         This object will contain 0-1-1,00:00:00.0 when
-         the corresponding cc6kxbarTMChUtilLogCount is zero."
-         ::= { cc6kxbarTMChUtilEntry 8 }
+        This object will contain 0-1-1,00:00:00.0 when
+        the corresponding cc6kxbarTMChUtilLogCount is zero." 
+    ::= { cc6kxbarTMChUtilEntry 8 }
+ 
+
 
 cc6kxbarTMChUtilLogInterval OBJECT-TYPE
-    SYNTAX        Unsigned32 (1..4294967295)
-    UNITS         "seconds"
-    MAX-ACCESS    read-write
-    STATUS        current
+    SYNTAX          Unsigned32 (1..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Specifies the logging interval if the traffic 
-         utilization for a fabric channel on a given
-         traffic direction keeps staying above its 
-         corresponding cc6kxbarTMChUtilThreshold." 
+        "Specifies the logging interval if the traffic
+        utilization for a fabric channel on a given
+        traffic direction keeps staying above its 
+        corresponding cc6kxbarTMChUtilThreshold." 
     ::= { cc6kxbarTrafficMonitorChObjects 2 }
 
 cc6kxbarTMChUtilUtilization OBJECT-TYPE
@@ -1461,9 +1514,9 @@ cc6kxbarTMChUtilUtilization OBJECT-TYPE
     MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
-       "The traffic utilization on a fabric channel
-        for a given traffic direciton included in the 
-        notification currently being sent."
+        "The traffic utilization on a fabric channel
+        for a given traffic direction included in the 
+        notification currently being sent." 
     ::= { cc6kxbarTrafficMonitorChObjects 3 }
 
 cc6kxbarTMChUtilNotifEnable OBJECT-TYPE
@@ -1471,7 +1524,7 @@ cc6kxbarTMChUtilNotifEnable OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-       "Specifies whether the generation of 
+        "Specifies whether the generation of
         cc6kxbarTMChUtilAboveNotif and cc6kxbarTMChUtilBelowNotif
         notifications is enabled or not.
 
@@ -1479,13 +1532,12 @@ cc6kxbarTMChUtilNotifEnable OBJECT-TYPE
         cc6kxbarTMChUtilAboveNotif and cc6kxbarTMChUtilBelowNotif
         notifications is enabled. When this object is 'false', 
         the generation of cc6kxbarTMChUtilAboveNotif and 
-        cc6kxbarTMChUtilBelowNotif notifications is disabled."
-        ::= { cc6kxbarTrafficMonitorChObjects 4 }
-
+        cc6kxbarTMChUtilBelowNotif notifications is disabled." 
+    ::= { cc6kxbarTrafficMonitorChObjects 4 }
 -- Notifications
+
 ciscoCat6kXbarMIBNotifs  OBJECT IDENTIFIER
     ::= { ciscoCat6kCrossbarMIB 0 }
-
 
 
 cc6kxbarSwBusStatusChangeNotif NOTIFICATION-TYPE
@@ -1496,11 +1548,10 @@ cc6kxbarSwBusStatusChangeNotif NOTIFICATION-TYPE
     STATUS          current
     DESCRIPTION
         "A cc6kxbarSwBusStatusChangeNotif notification
-        is sent by the the device when there is change
+        is sent by the device when there is change
         in switching status of the switching bus as 
         monitored by cc6kxbarSwBusSwitchingStatus."
    ::= { ciscoCat6kXbarMIBNotifs 1 }
-
 
 cc6kxbarIntBusCRCErrExcdNotif NOTIFICATION-TYPE
     OBJECTS         {
@@ -1516,7 +1567,6 @@ cc6kxbarIntBusCRCErrExcdNotif NOTIFICATION-TYPE
         by entPhysicalName has exceeded the fatal threshold."
    ::= { ciscoCat6kXbarMIBNotifs 2 }
 
-
 cc6kxbarIntBusCRCErrRcvrdNotif NOTIFICATION-TYPE
     OBJECTS         {
                         entPhysicalName,
@@ -1531,7 +1581,6 @@ cc6kxbarIntBusCRCErrRcvrdNotif NOTIFICATION-TYPE
         specified by entPhysicalName has fallen below
         the normal threshold."
    ::= { ciscoCat6kXbarMIBNotifs 3 }
-
 
 cc6kxbarFlowCtrlBusThrExcdNotif NOTIFICATION-TYPE
     OBJECTS         {
@@ -1558,15 +1607,15 @@ cc6kxbarTMSwBusUtilAboveNotif NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "This notification is sent when the switching bus 
-         traffic utilization has risen above the configured 
-         threshold (as specified by 
-         cc6kxbarTMSwBusUtilThreshold), or has kept staying
-         above the configured threshold at a logging interval 
-         (as specified by cc6kxbarTMSwBusUtilLogInterval).
-         The varbind entPhysicalDescr specifies the physical 
-         entity (such as chassis) for which the 
-         cc6kxbarTMSwBusUtilAboveNotif is sent."
+        "This notification is sent when the switching bus
+        traffic utilization has risen above the configured 
+        threshold (as specified by 
+        cc6kxbarTMSwBusUtilThreshold), or has kept staying
+        above the configured threshold at a logging interval 
+        (as specified by cc6kxbarTMSwBusUtilLogInterval).
+        The varbind entPhysicalDescr specifies the physical 
+        entity (such as chassis) for which the 
+        cc6kxbarTMSwBusUtilAboveNotif is sent."
    ::= { ciscoCat6kXbarMIBNotifs 5 }
 
 cc6kxbarTMSwBusUtilBelowNotif NOTIFICATION-TYPE
@@ -1578,14 +1627,14 @@ cc6kxbarTMSwBusUtilBelowNotif NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "This notification is sent when the switching bus 
-         traffic utilization has fallen below the configured 
-         threshold (as specified by 
-         cc6kxbarTMSwBusUtilThreshold). The varbind 
-         entPhysicalDescr specifies the physical entity 
-         (such as chassis) for which the 
-         cc6kxbarTMSwBusUtilBelowNotif is sent." 
-    ::= { ciscoCat6kXbarMIBNotifs 6 }
+        "This notification is sent when the switching bus
+        traffic utilization has fallen below the configured 
+        threshold (as specified by 
+        cc6kxbarTMSwBusUtilThreshold). The varbind 
+        entPhysicalDescr specifies the physical entity 
+        (such as chassis) for which the 
+        cc6kxbarTMSwBusUtilBelowNotif is sent."
+   ::= { ciscoCat6kXbarMIBNotifs 6 }
 
 cc6kxbarTMChUtilAboveNotif NOTIFICATION-TYPE
     OBJECTS         {
@@ -1596,17 +1645,17 @@ cc6kxbarTMChUtilAboveNotif NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "This notification is sent when the traffic 
-         utilization on a fabric channel for a given 
-         traffic direction has risen above its 
-         corresponding configured threshold (as 
-         specified by cc6kxbarTMChUtilThreshold), or has 
-         kept staying above the configured threshold at a 
-         logging interval (as specified by 
-         cc6kxbarTMChUtilLogInterval). The varbind 
-         entPhysicalDescr specifies the physical entity 
-         (such as chassis) for which the 
-         cc6kxbarTMChUtilAboveNotif is sent."
+        "This notification is sent when the traffic
+        utilization on a fabric channel for a given 
+        traffic direction has risen above its 
+        corresponding configured threshold (as 
+        specified by cc6kxbarTMChUtilThreshold), or has 
+        kept staying above the configured threshold at a 
+        logging interval (as specified by 
+        cc6kxbarTMChUtilLogInterval). The varbind 
+        entPhysicalDescr specifies the physical entity 
+        (such as chassis) for which the 
+        cc6kxbarTMChUtilAboveNotif is sent."
    ::= { ciscoCat6kXbarMIBNotifs 7 }
 
 cc6kxbarTMChUtilBelowNotif NOTIFICATION-TYPE
@@ -1618,17 +1667,17 @@ cc6kxbarTMChUtilBelowNotif NOTIFICATION-TYPE
                     }
     STATUS          current
     DESCRIPTION
-        "This notification is sent when the traffic 
-         utilization on a fabric channel for a given 
-         traffic direction has fallen below its 
-         corresponding configured threshold (as 
-         specified by cc6kxbarTMChUtilThreshold). The 
-         varbind entPhysicalDescr specifies the 
-         physical entity (such as chassis) for which
-         the cc6kxbarTMChUtilBelowNotif is sent."
-    ::= { ciscoCat6kXbarMIBNotifs 8 }
-
+        "This notification is sent when the traffic
+        utilization on a fabric channel for a given 
+        traffic direction has fallen below its 
+        corresponding configured threshold (as 
+        specified by cc6kxbarTMChUtilThreshold). The 
+        varbind entPhysicalDescr specifies the 
+        physical entity (such as chassis) for which
+        the cc6kxbarTMChUtilBelowNotif is sent."
+   ::= { ciscoCat6kXbarMIBNotifs 8 }
 -- Conformance and Compliance
+
 cc6kxbarMIBConformance  OBJECT IDENTIFIER
     ::= { ciscoCat6kCrossbarMIB 3 }
 
@@ -1640,6 +1689,7 @@ cc6kxbarMIBGroups  OBJECT IDENTIFIER
 
 
 -- Conformance
+
 cc6kxbarMIBCompliance MODULE-COMPLIANCE
     STATUS          deprecated
     DESCRIPTION
@@ -2108,44 +2158,240 @@ cc6kxbarMIBComplianceVer6 MODULE-COMPLIANCE
     DESCRIPTION
         "This group is mandatory only for platforms which
         support the system information of PFC operational mode."
- 
+
     GROUP           cc6kxbarSysCapSwitchResGroup
     DESCRIPTION
         "This group is mandatory only for platforms which
         support the capacity information of switching 
         resources in the system."
 
-    GROUP cc6kxbarChannelUtilGroup1
-    DESCRIPTION
-         "This group is mandatory only for those platforms which
-          support peak input and output traffic utilization on the
-          fabric channel."
-
-    GROUP cc6kxbarSwBusGroup1
-    DESCRIPTION
-        "This group is mandatory only for platforms which support
-         switching bus utilization."
-
-    GROUP cc6kxbarErrorGroup
+    GROUP           cc6kxbarChannelUtilGroup1
     DESCRIPTION
         "This group is mandatory only for those platforms which
-         support error statistics on the fabric channel."
+        support peak input and output traffic utilization on the
+        fabric channel."
 
-    GROUP cc6kxbarErrRcvryThresholdGroup
+    GROUP           cc6kxbarSwBusGroup1
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory only for platforms which support
+        switching bus utilization."
+
+    GROUP           cc6kxbarErrorGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support error statistics on the fabric channel."
+
+    GROUP           cc6kxbarErrRcvryThresholdGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
         the configuration of thresholds on fabric link errors
         for the fabric error recovery feature."
 
-    GROUP cc6kxbarErrRcvrySwitchoverGroup
+    GROUP           cc6kxbarErrRcvrySwitchoverGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the configuration of fabric switchover on excessive fabric 
         link errors for the fabric error recovery feature."
-
     ::= { cc6kxbarMIBCompliances 8 }
 
 cc6kxbarMIBComplianceVer7 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for
+        the CISCO-CAT6K-CROSSBAR-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cc6kxbarModuleStatusGroupVer1,
+                        cc6kxbarChannelStatusGroup,
+                        cc6kxbarChannelStatisticsGroupVer1
+                    }
+
+    GROUP           cc6kxbarFallbackGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support fallback mode feature."
+
+    GROUP           cc6kxbarBusOnlyAllowedGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support bus only mode feature."
+
+    GROUP           cc6kxbarLcdBannerGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support lcd banner feature."
+
+    GROUP           cc6kxbarChannelUtilGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support Input and Output traffic utilization on the 
+        fabric channel."
+
+    GROUP           cc6kxbarChannelSpeedGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support fabric channel speed feature."
+
+    GROUP           cc6kxbarSwBusGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        switching bus switching detection feature."
+
+    GROUP           cc6kxbarSwBusNotifGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        switching bus switching detection notification 
+        feature."
+
+    GROUP           cc6kxbarTruncatedOperGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        operational truncated mode."
+
+    GROUP           cc6kxbarIntBusNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        internal bus notifications."
+
+    GROUP           cc6kxbarIntBusCRCErrNotifGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        internal bus CRC error notifications."
+
+    GROUP           cc6kxbarIntBusCRCErrGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        internal bus CRC error status."
+
+    GROUP           cc6kxbarDcefOnlyModeAllowedGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        dcef only mode feature."
+
+    GROUP           cc6kxbarForceBusModeGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        force bus mode feature."
+
+    GROUP           cc6kxbarFlowCtrlNotifCtrlGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        the system flow control notification control."
+
+    GROUP           cc6kxbarFlowCtrlBusThreshGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        the system bus flow control FIFO threshold configuration."
+
+    GROUP           cc6kxbarFlowCtrlBusThrNotifGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        the system bus flow control FIFO threshold exceeding
+        notification."
+
+    GROUP           cc6kxbarBusOnlyModeOperGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        operational bus mode."
+
+    GROUP           cc6kxbarSysCapPfcOperModeGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which
+        support the system information of PFC operational mode."
+
+    GROUP           cc6kxbarSysCapSwitchResGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which
+        support the capacity information of switching 
+        resources in the system."
+
+    GROUP           cc6kxbarChannelUtilGroup1
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support peak input and output traffic utilization on the
+        fabric channel."
+
+    GROUP           cc6kxbarSwBusGroup1
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        switching bus utilization."
+
+    GROUP           cc6kxbarErrorGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support error statistics on the fabric channel."
+
+    GROUP           cc6kxbarErrRcvryThresholdGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration of thresholds on fabric link errors
+        for the fabric error recovery feature."
+
+    GROUP           cc6kxbarErrRcvrySwitchoverGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration of fabric switchover on excessive fabric 
+        link errors for the fabric error recovery feature."
+
+    GROUP           cc6kxbarErrRcvryPersLinkResGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration of channel resync on excessive 
+        persistent fabric link errors for the fabric error 
+        recovery feature."
+
+    GROUP           cc6kxbarErrRcvryChResyncGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration of channel resync threshold for the 
+        fabric error recovery feature."
+
+    GROUP           cc6kxbarTMSwBusUtilGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration for traffic monitor feature on the 
+        switching bus."
+
+    GROUP           cc6kxbarTMSwBusUtilNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the notification control for traffic monitor 
+        notifications on the switching bus."
+
+    GROUP           cc6kxbarTMSwBusUtilNotifObjectGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on the switching bus."
+
+    GROUP           cc6kxbarTMSwBusUtilNotifGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on the switching bus."
+
+    GROUP           cc6kxbarTMChUtilGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the configuration for traffic monitor feature on  
+        fabric channels."
+
+    GROUP           cc6kxbarTMChUtilNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
+        the notification control for traffic monitor 
+        notifications on fabric channels."
+
+    GROUP           cc6kxbarTMChUtilNotifObjectGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on fabric channels."
+
+    GROUP           cc6kxbarTMChUtilNotifGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on fabric channels."
+    ::= { cc6kxbarMIBCompliances 9 }
+
+cc6kxbarMIBComplianceVer8 MODULE-COMPLIANCE
     STATUS          current
     DESCRIPTION
         "The compliance statement for
@@ -2249,101 +2495,106 @@ cc6kxbarMIBComplianceVer7 MODULE-COMPLIANCE
     DESCRIPTION
         "This group is mandatory only for platforms which
         support the system information of PFC operational mode."
- 
+
     GROUP           cc6kxbarSysCapSwitchResGroup
     DESCRIPTION
         "This group is mandatory only for platforms which
         support the capacity information of switching 
         resources in the system."
 
-    GROUP cc6kxbarChannelUtilGroup1
-    DESCRIPTION
-         "This group is mandatory only for those platforms which
-          support peak input and output traffic utilization on the
-          fabric channel."
-
-    GROUP cc6kxbarSwBusGroup1
-    DESCRIPTION
-        "This group is mandatory only for platforms which support
-         switching bus utilization."
-
-    GROUP cc6kxbarErrorGroup
+    GROUP           cc6kxbarChannelUtilGroup1
     DESCRIPTION
         "This group is mandatory only for those platforms which
-         support error statistics on the fabric channel."
+        support peak input and output traffic utilization on the
+        fabric channel."
 
-    GROUP cc6kxbarErrRcvryThresholdGroup
+    GROUP           cc6kxbarSwBusGroup1
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory only for platforms which support
+        switching bus utilization."
+
+    GROUP           cc6kxbarErrorGroup
+    DESCRIPTION
+        "This group is mandatory only for those platforms which
+        support error statistics on the fabric channel."
+
+    GROUP           cc6kxbarErrRcvryThresholdGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which provide
         the configuration of thresholds on fabric link errors
         for the fabric error recovery feature."
 
-    GROUP cc6kxbarErrRcvrySwitchoverGroup
+    GROUP           cc6kxbarErrRcvrySwitchoverGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the configuration of fabric switchover on excessive fabric 
         link errors for the fabric error recovery feature."
 
-    GROUP cc6kxbarErrRcvryPersLinkResGroup
+    GROUP           cc6kxbarErrRcvryPersLinkResGroup
     DESCRIPTION
         "This group is mandatory for platforms which provide
         the configuration of channel resync on excessive 
         persistent fabric link errors for the fabric error 
         recovery feature."
 
-    GROUP cc6kxbarErrRcvryChResyncGroup
+    GROUP           cc6kxbarErrRcvryChResyncGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the configuration of channel resync threshold for the 
         fabric error recovery feature."
 
-    GROUP cc6kxbarTMSwBusUtilGroup
+    GROUP           cc6kxbarTMSwBusUtilGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide  
+        "This group is mandatory for platforms which provide
         the configuration for traffic monitor feature on the 
         switching bus."
 
-    GROUP cc6kxbarTMSwBusUtilNotifControlGroup
+    GROUP           cc6kxbarTMSwBusUtilNotifControlGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the notification control for traffic monitor 
         notifications on the switching bus."
 
-    GROUP cc6kxbarTMSwBusUtilNotifObjectGroup
+    GROUP           cc6kxbarTMSwBusUtilNotifObjectGroup
     DESCRIPTION
-       "This group is mandatory for platforms which support 
+        "This group is mandatory for platforms which support
         traffic monitor notifications on the switching bus."
 
-    GROUP cc6kxbarTMSwBusUtilNotifGroup
+    GROUP           cc6kxbarTMSwBusUtilNotifGroup
     DESCRIPTION
-         "This group is mandatory for platforms which support
-         traffic monitor notifications on the switching bus." 
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on the switching bus."
 
-    GROUP cc6kxbarTMChUtilGroup
+    GROUP           cc6kxbarTMChUtilGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the configuration for traffic monitor feature on  
         fabric channels."
 
-    GROUP cc6kxbarTMChUtilNotifControlGroup
+    GROUP           cc6kxbarTMChUtilNotifControlGroup
     DESCRIPTION
-       "This group is mandatory for platforms which provide
+        "This group is mandatory for platforms which provide
         the notification control for traffic monitor 
         notifications on fabric channels."
 
-    GROUP cc6kxbarTMChUtilNotifObjectGroup
+    GROUP           cc6kxbarTMChUtilNotifObjectGroup
     DESCRIPTION
-       "This group is mandatory for platforms which support 
+        "This group is mandatory for platforms which support
         traffic monitor notifications on fabric channels."
 
-    GROUP cc6kxbarTMChUtilNotifGroup
+    GROUP           cc6kxbarTMChUtilNotifGroup
     DESCRIPTION
-         "This group is mandatory for platforms which support
-         traffic monitor notifications on fabric channels." 
+        "This group is mandatory for platforms which support
+        traffic monitor notifications on fabric channels."
 
-    ::= { cc6kxbarMIBCompliances 9 }
+    GROUP           cc6kxbarStatisticsLbusDropGroup
+    DESCRIPTION
+        "This group is mandatory for platforms which support
+        local bus packet drop statistics on fabric channels."
+    ::= { cc6kxbarMIBCompliances 10 }
 
 -- Units of Conformance
+
 cc6kxbarModuleStatusGroup OBJECT-GROUP
     OBJECTS         {
                         cc6kxbarLcdBannerMaxSize,
@@ -2359,7 +2610,8 @@ cc6kxbarModuleStatusGroup OBJECT-GROUP
         "A collection of objects providing
         configuration and operation of the crossbar 
         switching fabric module and switching capable 
-        module."
+        module.
+        cc6kxbarModuleStatusGroup object is superseded by cc6kxbarModuleStatusGroupVer1."
     ::= { cc6kxbarMIBGroups 1 }
 
 cc6kxbarChannelStatusGroup OBJECT-GROUP
@@ -2384,7 +2636,8 @@ cc6kxbarChannelStatisticsGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "A collection of objects providing statistics for
-        the fabric channel."
+        the fabric channel.
+        cc6kxbarChannelStatisticsGroup object is superseded by cc6kxbarChannelStatisticsGroupVer1."
     ::= { cc6kxbarMIBGroups 3 }
 
 cc6kxbarFallbackGroup OBJECT-GROUP
@@ -2573,201 +2826,201 @@ cc6kxbarBusOnlyModeOperGroup OBJECT-GROUP
     ::= { cc6kxbarMIBGroups 22 }
 
 cc6kxbarSysCapPfcOperModeGroup OBJECT-GROUP
-      OBJECTS { cc6kxbarSysCapPfcOperMode }
-      STATUS  current
-      DESCRIPTION
-          "A collection of objects providing the system 
-           information of PFC operational mode."
-      ::= { cc6kxbarMIBGroups 23 }
+    OBJECTS         { cc6kxbarSysCapPfcOperMode }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing the system
+        information of PFC operational mode."
+    ::= { cc6kxbarMIBGroups 23 }
 
 cc6kxbarSysCapSwitchResGroup OBJECT-GROUP
-      OBJECTS { 
-                  cc6kxbarSysCapSwitchResSeries,
-                  cc6kxbarSysCapSwitchResCefMode 
-              }
-      STATUS  current
-      DESCRIPTION
-          "A collection of objects providing the capacity 
-           information of switching resources in the system."
-      ::= { cc6kxbarMIBGroups 24 }
+    OBJECTS         {
+                        cc6kxbarSysCapSwitchResSeries,
+                        cc6kxbarSysCapSwitchResCefMode
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing the capacity
+        information of switching resources in the system."
+    ::= { cc6kxbarMIBGroups 24 }
 
 cc6kxbarChannelUtilGroup1 OBJECT-GROUP
-    OBJECTS {
-         cc6kxbarStatisticsPeakInUtil,
-         cc6kxbarStatisticsPeakTmInUtil,
-         cc6kxbarStatisticsPeakOutUtil,
-         cc6kxbarStatisticsPeakTmOutUtil
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarStatisticsPeakInUtil,
+                        cc6kxbarStatisticsPeakTmInUtil,
+                        cc6kxbarStatisticsPeakOutUtil,
+                        cc6kxbarStatisticsPeakTmOutUtil
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the information about peak
-         input and output utilization of a specific fabric channel on 
-         a specific module."
-      ::= { cc6kxbarMIBGroups 25 }
+        input and output utilization of a specific fabric channel on 
+        a specific module."
+    ::= { cc6kxbarMIBGroups 25 }
 
 cc6kxbarSwBusGroup1 OBJECT-GROUP
-    OBJECTS {
-         cc6kxbarSwBusUtilization,
-         cc6kxbarSwBusPeakUtilization,
-         cc6kxbarSwBusPeakTimeUtil
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarSwBusUtilization,
+                        cc6kxbarSwBusPeakUtilization,
+                        cc6kxbarSwBusPeakTimeUtil
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the information about
-         switching bus utilization."
-      ::= { cc6kxbarMIBGroups 26 }
+        switching bus utilization."
+    ::= { cc6kxbarMIBGroups 26 }
 
 cc6kxbarErrorGroup OBJECT-GROUP
-    OBJECTS {
-         cc6kxbarErrorModuleCrc,
-         cc6kxbarErrorModuleHbeat,
-         cc6kxbarErrorModuleSync,
-         cc6kxbarErrorModuleDDRSync,
-         cc6kxbarErrorChannelSync,
-         cc6kxbarErrorChannelBuffer,
-         cc6kxbarErrorChannelTimeout
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarErrorModuleCrc,
+                        cc6kxbarErrorModuleHbeat,
+                        cc6kxbarErrorModuleSync,
+                        cc6kxbarErrorModuleDDRSync,
+                        cc6kxbarErrorChannelSync,
+                        cc6kxbarErrorChannelBuffer,
+                        cc6kxbarErrorChannelTimeout
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing error statistics for
-         a specific fabric channel on a specific module."
-      ::= { cc6kxbarMIBGroups 27 }
+        a specific fabric channel on a specific module."
+    ::= { cc6kxbarMIBGroups 27 }
 
 cc6kxbarErrRcvryThresholdGroup OBJECT-GROUP
-    OBJECTS {
-         cc6kxbarErrRcvryThreshLink,
-         cc6kxbarErrRcvryThreshPersLink
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarErrRcvryThreshLink,
+                        cc6kxbarErrRcvryThreshPersLink
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the configuration
-         of thresholds on fabric link errors for the fabric
-         error recovery feature." 
-      ::= { cc6kxbarMIBGroups 28 }
+        of thresholds on fabric link errors for the fabric
+        error recovery feature."
+    ::= { cc6kxbarMIBGroups 28 }
 
-cc6kxbarErrRcvrySwitchoverGroup  OBJECT-GROUP
-    OBJECTS { cc6kxbarErrRcvrySwitchoverEnable }
-    STATUS  current
-    DESCRIPTION
-        "A collection of objects providing the configuration  
-         of fabric switchover on excessive fabric link errors
-         for the fabric error recovery feature." 
-      ::= { cc6kxbarMIBGroups 29 }
-
-cc6kxbarErrRcvryPersLinkResGroup  OBJECT-GROUP
-    OBJECTS { cc6kxbarErrRcvryPersLinkResync }
-    STATUS  current
+cc6kxbarErrRcvrySwitchoverGroup OBJECT-GROUP
+    OBJECTS         { cc6kxbarErrRcvrySwitchoverEnable }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the configuration
-         of channel resync on excessive persistent fabric link
-         errors for the fabric error recovery feature."
+        of fabric switchover on excessive fabric link errors
+        for the fabric error recovery feature."
+    ::= { cc6kxbarMIBGroups 29 }
+
+cc6kxbarErrRcvryPersLinkResGroup OBJECT-GROUP
+    OBJECTS         { cc6kxbarErrRcvryPersLinkResync }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing the configuration
+        of channel resync on excessive persistent fabric link
+        errors for the fabric error recovery feature."
     ::= { cc6kxbarMIBGroups 30 }
 
 cc6kxbarErrRcvryChResyncGroup OBJECT-GROUP
-    OBJECTS {
-         cc6kxbarErrRcvryChResyncCount,
-         cc6kxbarErrRcvryChResyncInterval
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarErrRcvryChResyncCount,
+                        cc6kxbarErrRcvryChResyncInterval
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the configuration
-         for channel resync threshold for the fabric error
-         recovery feature."
+        for channel resync threshold for the fabric error
+        recovery feature."
     ::= { cc6kxbarMIBGroups 31 }
 
 cc6kxbarTMSwBusUtilGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMSwBusUtilEnable,
-        cc6kxbarTMSwBusUtilInterval,
-        cc6kxbarTMSwBusUtilThreshold,
-        cc6kxbarTMSwBusUtilLogCount,
-        cc6kxbarTMSwBusUtilLastLogTime,
-        cc6kxbarTMSwBusUtilLogInterval
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarTMSwBusUtilEnable,
+                        cc6kxbarTMSwBusUtilInterval,
+                        cc6kxbarTMSwBusUtilThreshold,
+                        cc6kxbarTMSwBusUtilLogCount,
+                        cc6kxbarTMSwBusUtilLastLogTime,
+                        cc6kxbarTMSwBusUtilLogInterval
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing configuration
-         information for traffic monitor feature on 
-         the switching bus."
+        information for traffic monitor feature on 
+        the switching bus."
     ::= { cc6kxbarMIBGroups 32 }
 
 cc6kxbarTMSwBusUtilNotifControlGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMSwBusUtilNotifEnable
-    }
-    STATUS  current
+    OBJECTS         { cc6kxbarTMSwBusUtilNotifEnable }
+    STATUS          current
     DESCRIPTION
         "A collection of objects to control the traffic monitor
-         notification generation on the switching bus."
+        notification generation on the switching bus."
     ::= { cc6kxbarMIBGroups 33 }
 
 cc6kxbarTMSwBusUtilNotifObjectGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMSwBusUtilUtilization
-    }
-    STATUS  current
+    OBJECTS         { cc6kxbarTMSwBusUtilUtilization }
+    STATUS          current
     DESCRIPTION
         "A collection of objects included in the traffic monitor
-         notifications on the switching bus."
+        notifications on the switching bus."
     ::= { cc6kxbarMIBGroups 34 }
 
 cc6kxbarTMSwBusUtilNotifGroup NOTIFICATION-GROUP
-    NOTIFICATIONS {
-         cc6kxbarTMSwBusUtilAboveNotif,
-         cc6kxbarTMSwBusUtilBelowNotif
-    }
-    STATUS  current
+   NOTIFICATIONS    {
+                        cc6kxbarTMSwBusUtilAboveNotif,
+                        cc6kxbarTMSwBusUtilBelowNotif
+                    }
+    STATUS          current
     DESCRIPTION
-         "A collection of traffic monitor notifications on the
-          switching bus."  
+        "A collection of traffic monitor notifications on the
+        switching bus."
     ::= { cc6kxbarMIBGroups 35 }
 
 cc6kxbarTMChUtilGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMChUtilEnable,         
-        cc6kxbarTMChUtilInterval,      
-        cc6kxbarTMChUtilThreshold,    
-        cc6kxbarTMChUtilLogCount,  
-        cc6kxbarTMChUtilLastLogTime,
-        cc6kxbarTMChUtilLogInterval  
-    }
-    STATUS  current
+    OBJECTS         {
+                        cc6kxbarTMChUtilEnable,
+                        cc6kxbarTMChUtilInterval,
+                        cc6kxbarTMChUtilThreshold,
+                        cc6kxbarTMChUtilLogCount,
+                        cc6kxbarTMChUtilLastLogTime,
+                        cc6kxbarTMChUtilLogInterval
+                    }
+    STATUS          current
     DESCRIPTION
         "A collection of objects providing the configuration
-         information for traffic monitor feature on fabric 
-         channels."
+        information for traffic monitor feature on fabric 
+        channels."
     ::= { cc6kxbarMIBGroups 36 }
 
 cc6kxbarTMChUtilNotifControlGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMChUtilNotifEnable
-    }
-    STATUS  current
+    OBJECTS         { cc6kxbarTMChUtilNotifEnable }
+    STATUS          current
     DESCRIPTION
-        "A collection of objects to control the traffic monitor 
-         notification generation on fabric channels. "
+        "A collection of objects to control the traffic monitor
+        notification generation on fabric channels."
     ::= { cc6kxbarMIBGroups 37 }
 
 cc6kxbarTMChUtilNotifObjectGroup OBJECT-GROUP
-    OBJECTS {
-        cc6kxbarTMChUtilUtilization
-    }
-    STATUS  current
+    OBJECTS         { cc6kxbarTMChUtilUtilization }
+    STATUS          current
     DESCRIPTION
         "A collection of objects included in the traffic monitor
-         notifications on fabric channels."
+        notifications on fabric channels."
     ::= { cc6kxbarMIBGroups 38 }
 
 cc6kxbarTMChUtilNotifGroup NOTIFICATION-GROUP
-    NOTIFICATIONS {
-        cc6kxbarTMChUtilAboveNotif,
-        cc6kxbarTMChUtilBelowNotif 
-    }
-    STATUS  current
+   NOTIFICATIONS    {
+                        cc6kxbarTMChUtilAboveNotif,
+                        cc6kxbarTMChUtilBelowNotif
+                    }
+    STATUS          current
     DESCRIPTION
-        "A collection of traffic monitor notifications on 
-         fabric channels."
+        "A collection of traffic monitor notifications on
+        fabric channels."
     ::= { cc6kxbarMIBGroups 39 }
+
+cc6kxbarStatisticsLbusDropGroup OBJECT-GROUP
+    OBJECTS         { cc6kxbarStatisticsLbusDrops }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing information for
+        local bus drop packets statistics."
+    ::= { cc6kxbarMIBGroups 40 }
 
 END
 

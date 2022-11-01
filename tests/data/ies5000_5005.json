@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ies5000",
                     "type": "network",
                     "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },
@@ -6550,7 +6550,7 @@
                     "processor_index": "0.1.1",
                     "processor_type": "ies5000",
                     "processor_usage": 25,
-                    "processor_descr": "0.1.1 ",
+                    "processor_descr": "0.1.1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 },
@@ -6561,7 +6561,7 @@
                     "processor_index": "0.2.1",
                     "processor_type": "ies5000",
                     "processor_usage": 21,
-                    "processor_descr": "0.2.1 ",
+                    "processor_descr": "0.2.1",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
@@ -6579,7 +6579,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.2.0.1",
                     "sensor_index": "0.1",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " Speed",
+                    "sensor_descr": "Speed",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -6594,6 +6594,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6603,7 +6604,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.2.0.2",
                     "sensor_index": "0.2",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " Speed",
+                    "sensor_descr": "Speed",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -6618,6 +6619,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6627,7 +6629,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.1.1.2.0.3",
                     "sensor_index": "0.3",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " Speed",
+                    "sensor_descr": "Speed",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -6642,6 +6644,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6666,6 +6669,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alarmLedStatus"
                 },
                 {
@@ -6690,6 +6694,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chassisStatus"
                 },
                 {
@@ -6714,6 +6719,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "slotModuleStatus"
                 },
                 {
@@ -6738,6 +6744,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "slotModuleStatus"
                 },
                 {
@@ -6762,6 +6769,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "systemStatus"
                 },
                 {
@@ -6786,6 +6794,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6810,6 +6819,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6834,6 +6844,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6858,6 +6869,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6882,6 +6894,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6906,6 +6919,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6915,7 +6929,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.1.1",
                     "sensor_index": "0.1.1",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -6930,6 +6944,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6939,7 +6954,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.1.2",
                     "sensor_index": "0.1.2",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -6954,6 +6969,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6963,7 +6979,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.1.3",
                     "sensor_index": "0.1.3",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -6978,6 +6994,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6987,7 +7004,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.1.4",
                     "sensor_index": "0.1.4",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7002,6 +7019,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7011,7 +7029,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.1.5",
                     "sensor_index": "0.1.5",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7026,6 +7044,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7035,7 +7054,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.2.1",
                     "sensor_index": "0.2.1",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7050,6 +7069,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7059,7 +7079,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.2.2",
                     "sensor_index": "0.2.2",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7074,6 +7094,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7083,7 +7104,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.2.3",
                     "sensor_index": "0.2.3",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7098,6 +7119,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7107,7 +7129,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.2.4",
                     "sensor_index": "0.2.4",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7122,6 +7144,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7131,7 +7154,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.5.11.3.2.1.2.0.2.5",
                     "sensor_index": "0.2.5",
                     "sensor_type": "ies5000",
-                    "sensor_descr": " mA",
+                    "sensor_descr": "mA",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -7146,6 +7169,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

@@ -25,7 +25,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 33;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-proc3', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'nfs-server-proc3', $app->app_id]);
 
 $array = [
     'proc3_setattr' => ['descr' => 'Set attributes'],

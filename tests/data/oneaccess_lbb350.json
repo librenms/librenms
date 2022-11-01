@@ -10,11 +10,11 @@
                     "version": "4.1.35-rt41-39dbc2869a26",
                     "hardware": "LBB_350",
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "T2012008334003892",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },
@@ -1402,8 +1402,8 @@
                     "ifName": "GigabitEthernet0/2",
                     "portName": null,
                     "ifIndex": 532480,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1507,8 +1507,8 @@
                     "ifName": "GigabitEthernet0/3",
                     "portName": null,
                     "ifIndex": 536576,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1822,8 +1822,8 @@
                     "ifName": "GigabitEthernet2/0",
                     "portName": null,
                     "ifIndex": 655360,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -2032,8 +2032,8 @@
                     "ifName": "Null0",
                     "portName": null,
                     "ifIndex": 1879048192,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2137,8 +2137,8 @@
                     "ifName": "Loopback1",
                     "portName": null,
                     "ifIndex": 1912602625,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2443,6 +2443,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 },
                 {
@@ -2467,6 +2468,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 },
                 {
@@ -2491,6 +2493,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 },
                 {
@@ -2515,6 +2518,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 }
             ],

@@ -37,6 +37,7 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
 
     protected $fillable = [
         'device_id',
+        'index',
         'port_id',
         'ifIndex',
         'isisCircAdminState',
@@ -59,6 +60,6 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
 
     public function getCompositeKey()
     {
-        return $this->ifIndex;
+        return $this->ifIndex . $this->index;
     }
 }

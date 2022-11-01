@@ -8,6 +8,7 @@ body {
   color: #555;
   font-size: 10pt;
   line-height: 20px;
+  overflow-y: scroll;
 }
 
 ul { margin: 0px; padding: 0px; list-style: disc outside; }
@@ -2059,7 +2060,8 @@ label {
   margin:2px;
 }
 
-.widget-availability-fixed {
+.widget-availability:empty {
+  display: inline;
   min-width: 2.4em;
   min-height: 1.3em;
   max-height: 1.6em;

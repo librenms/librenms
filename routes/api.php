@@ -13,7 +13,7 @@
 
 Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function () {
     Route::get('system', 'LegacyApiController@server_info')->name('server_info');
-    Route::get(null, 'LegacyApiController@show_endpoints');
+    Route::get('', 'LegacyApiController@show_endpoints');
 
     // global read only access required
     Route::middleware(['can:global-read'])->group(function () {
@@ -57,7 +57,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     // admin required
     Route::middleware(['can:admin'])->group(function () {
         Route::group(['prefix' => 'devices'], function () {
-            Route::post(null, 'LegacyApiController@add_device')->name('add_device');
+            Route::post('', 'LegacyApiController@add_device')->name('add_device');
             Route::delete('{hostname}', 'LegacyApiController@del_device')->name('del_device');
             Route::patch('{hostname}', 'LegacyApiController@update_device')->name('update_device_field');
             Route::patch('{hostname}/rename/{new_hostname}', 'LegacyApiController@rename_device')->name('rename_device');
@@ -65,6 +65,10 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
             Route::post('{hostname}/maintenance', 'LegacyApiController@maintenance_device')->name('maintenance_device');
+        });
+
+        Route::group(['prefix' => 'devicegroups'], function () {
+            Route::post('{name}/maintenance', 'LegacyApiController@maintenance_devicegroup')->name('maintenance_devicegroup');
         });
 
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
@@ -116,19 +120,19 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/ports/{ifname}/{type}', 'LegacyApiController@get_graph_by_port_hostname')->name('get_graph_by_port_hostname');
 
         Route::get('{hostname}/{type}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_graph_generic_by_hostname');
-        Route::get(null, 'LegacyApiController@list_devices')->name('list_devices');
+        Route::get('', 'LegacyApiController@list_devices')->name('list_devices');
     });
 
     Route::group(['prefix' => 'ports'], function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
-        Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports');
+        Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports')->where('search', '.*');
         Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
-        Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
+        Route::get('', 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 
     Route::group(['prefix' => 'bills'], function () {
-        Route::get(null, 'LegacyApiController@list_bills')->name('list_bills');
+        Route::get('', 'LegacyApiController@list_bills')->name('list_bills');
         Route::get('{bill_id}', 'LegacyApiController@list_bills')->name('get_bill');
         Route::get('{bill_id}/graphs/{graph_type}', 'LegacyApiController@get_bill_graph')->name('get_bill_graph');
         Route::get('{bill_id}/graphdata/{graph_type}', 'LegacyApiController@get_bill_graphdata')->name('get_bill_graphdata');

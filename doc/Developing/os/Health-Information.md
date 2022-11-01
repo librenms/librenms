@@ -124,6 +124,9 @@ are as follows:
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)
+- `rrd_type` (optional): You can change the type of the RRD file that will be created to
+  store the data. By default, type GAUGE is used. More details can be found here:
+  https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
 
 For `options:` you have the following available:
 
@@ -262,6 +265,9 @@ then passed to `discover_sensor()`.
   to celsius use `fahrenheit_to_celsius`)
 - $group = Defaults to null. Groups sensors together under in the
   webui, displaying this text.
+- $rrd_type = Default to 'GAUGE'. Allows to change the type of the RRD
+  file created for this sensor. More details can be found here in the
+  RRD documentation: https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
 
 For the majority of devices, this is all that's required to add
 support for a sensor. Polling is done based on the data gathered using

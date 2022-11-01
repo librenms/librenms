@@ -10,11 +10,11 @@
                     "version": "5.43.36.12724",
                     "hardware": "UAP-nanoHD",
                     "features": null,
+                    "location": "<private>",
                     "os": "unifi",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },
@@ -3187,8 +3187,8 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3292,8 +3292,8 @@
                     "ifName": "ra0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3397,8 +3397,8 @@
                     "ifName": "rai0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3502,8 +3502,8 @@
                     "ifName": "ra1",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3607,8 +3607,8 @@
                     "ifName": "ra2",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3712,8 +3712,8 @@
                     "ifName": "ra3",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3817,8 +3817,8 @@
                     "ifName": "ra4",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3922,8 +3922,8 @@
                     "ifName": "ra5",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4027,8 +4027,8 @@
                     "ifName": "ra6",
                     "portName": null,
                     "ifIndex": 10,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4132,8 +4132,8 @@
                     "ifName": "ra7",
                     "portName": null,
                     "ifIndex": 11,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4237,8 +4237,8 @@
                     "ifName": "wds0",
                     "portName": null,
                     "ifIndex": 12,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4342,8 +4342,8 @@
                     "ifName": "wds1",
                     "portName": null,
                     "ifIndex": 13,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4447,8 +4447,8 @@
                     "ifName": "wds2",
                     "portName": null,
                     "ifIndex": 14,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4552,8 +4552,8 @@
                     "ifName": "wds3",
                     "portName": null,
                     "ifIndex": 15,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4657,8 +4657,8 @@
                     "ifName": "apcli0",
                     "portName": null,
                     "ifIndex": 16,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4762,8 +4762,8 @@
                     "ifName": "rai1",
                     "portName": null,
                     "ifIndex": 17,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -4867,8 +4867,8 @@
                     "ifName": "rai2",
                     "portName": null,
                     "ifIndex": 18,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4972,8 +4972,8 @@
                     "ifName": "rai3",
                     "portName": null,
                     "ifIndex": 19,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5077,8 +5077,8 @@
                     "ifName": "rai4",
                     "portName": null,
                     "ifIndex": 20,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5182,8 +5182,8 @@
                     "ifName": "rai5",
                     "portName": null,
                     "ifIndex": 21,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5287,8 +5287,8 @@
                     "ifName": "rai6",
                     "portName": null,
                     "ifIndex": 22,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5392,8 +5392,8 @@
                     "ifName": "rai7",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5497,8 +5497,8 @@
                     "ifName": "wdsi0",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5602,8 +5602,8 @@
                     "ifName": "wdsi1",
                     "portName": null,
                     "ifIndex": 25,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5707,8 +5707,8 @@
                     "ifName": "wdsi2",
                     "portName": null,
                     "ifIndex": 26,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5812,8 +5812,8 @@
                     "ifName": "wdsi3",
                     "portName": null,
                     "ifIndex": 27,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -5917,8 +5917,8 @@
                     "ifName": "apclii0",
                     "portName": null,
                     "ifIndex": 28,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -6022,8 +6022,8 @@
                     "ifName": "br0",
                     "portName": null,
                     "ifIndex": 29,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6220,7 +6220,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6241,7 +6242,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6262,7 +6264,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6283,7 +6286,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6304,7 +6308,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6325,7 +6330,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6346,7 +6352,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6367,7 +6374,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6388,7 +6396,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6409,7 +6418,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6430,7 +6440,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6451,7 +6462,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6472,7 +6484,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6493,7 +6506,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6514,7 +6528,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6535,7 +6550,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.3\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -6560,7 +6576,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6581,7 +6598,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6602,7 +6620,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.1\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6623,7 +6642,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.8.2\",\".1.3.6.1.4.1.41112.1.6.1.2.1.8.4\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6644,7 +6664,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6665,7 +6686,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6686,7 +6708,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6707,7 +6730,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6728,7 +6752,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.6.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6749,7 +6774,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.7.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6770,7 +6796,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.8.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6791,7 +6818,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.2\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.1.1.9.2\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6812,7 +6840,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6833,7 +6862,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.21.3\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6854,7 +6884,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -6875,7 +6906,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.3\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.41112.1.6.1.2.1.4.3\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         }

@@ -10,11 +10,11 @@
                     "version": "6.2.201.11",
                     "hardware": "QSW-3400-28T-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "qtech",
                     "type": "network",
                     "serial": "00019711401010007262",
-                    "icon": "qtech.svg",
-                    "location": "<private>"
+                    "icon": "qtech.svg"
                 }
             ]
         },

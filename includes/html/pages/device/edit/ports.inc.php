@@ -228,12 +228,24 @@
         });
 
         init_select2('.port_group_select', 'port-group', {}, null, 'No Group');
+        var last_port_group_change;
         $('.port_group_select').on('change', function (e) {
-            var $target = $(e.target)
+            var $target = $(e.target);
+            var port_id = $target.data('port_id');
+            var groups = JSON.stringify({"groups": $target.val()});
+
+            console.log(last_port_group_change, (port_id + groups));
+            // don't send the same update multiple times... silly select2
+            if (last_port_group_change === (port_id + groups)) {
+                return;
+            }
+
+            last_port_group_change = port_id + groups;
+
             $.ajax({
                 type: "PUT",
-                url: "<?php echo url('port'); ?>/" + $target.data('port_id'),
-                data: {"groups": $target.val()},
+                url: "<?php echo url('port'); ?>/" + port_id,
+                data: groups,
                 success: function(data) {
                     toastr.success(data.message)
                 },

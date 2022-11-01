@@ -8,13 +8,13 @@
                     "sysDescr": "HP J9146A E2910al-24G-PoE Switch, revision W.15.08.0012, ROM W.14.06 (/ws/swbuildm/W_rel_galt_qaoff/code/build/sbm(W_rel_galt_qaoff)) (Formerly ProCurve)",
                     "sysContact": "<private>",
                     "version": "W.15.08.0012",
-                    "hardware": "E2910al-24G-PoE",
+                    "hardware": "J9146A E2910al-24G-PoE",
                     "features": null,
+                    "location": "<private>",
                     "os": "procurve",
                     "type": "network",
                     "serial": "AB123CD45E",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
@@ -8353,6 +8353,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfFanSensor"
                 },
                 {
@@ -8377,6 +8378,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8401,6 +8403,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8425,6 +8428,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8449,6 +8453,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8473,6 +8478,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8497,6 +8503,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8521,6 +8528,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfPowerSupplySensor"
                 },
                 {
@@ -8545,6 +8553,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "icfTemperatureSensor"
                 },
                 {
@@ -8569,6 +8578,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

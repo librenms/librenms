@@ -105,6 +105,29 @@ Add the following config to your snmptrapd.service after `ExecStart=/usr/sbin/sn
 
 ```
 
+On SELinux, you need to configure SELinux for SNMPd to communicate to LibreNMS:
+
+```
+cat > snmptrap.te << EOF
+module snmptrap 1.0;
+
+require {
+        type httpd_sys_rw_content_t;
+        type snmpd_t;
+        class file { append getattr open read };
+        class capability dac_override;
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t httpd_sys_rw_content_t:file { append getattr open read };
+allow snmpd_t self:capability dac_override;
+EOF
+checkmodule -M -m -o snmptrap.mod snmptrap.te
+semodule_package -o snmptrap.pp -m snmptrap.mod
+semodule -i snmptrap.pp
+```
+
 After successfully configuring the service, reload service files, enable, and start the snmptrapd service:
 
 ```
@@ -138,13 +161,13 @@ If you have configured logging of traps to ```/var/log/snmptrap/traps.log``` the
 
 ```
 2020-03-09 16:22:59 localhost [UDP: [127.0.0.1]:58942->[127.0.0.1]:162]:
-SNMPv2-MIB::sysUpTime.0 = Timeticks: (149721964) 17 days, 7:53:39.64	SNMPv2-MIB::snmpTrapOID.0 = OID: SNMPv2-SMI::enterprises.8072.2.3.0.1	SNMPv2-SMI::enterprises.8072.2.3.2.1 = INTEGER: 123456
+SNMPv2-MIB::sysUpTime.0 = Timeticks: (149721964) 17 days, 7:53:39.64    SNMPv2-MIB::snmpTrapOID.0 = OID: SNMPv2-SMI::enterprises.8072.2.3.0.1   SNMPv2-SMI::enterprises.8072.2.3.2.1 = INTEGER: 123456
 ```
 
 and in LibreNMS your localhost device eventlog like:
 
 ```
-2020-03-09 16:22:59		SNMP trap received: SNMPv2-SMI::enterprises.8072.2.3.0.1
+2020-03-09 16:22:59             SNMP trap received: SNMPv2-SMI::enterprises.8072.2.3.0.1
 ```
 
 ### Why we need Uptime

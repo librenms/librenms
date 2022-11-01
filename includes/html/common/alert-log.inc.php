@@ -54,13 +54,9 @@ $common_output[] = '<div class="panel panel-default panel-condensed">
                 </div>
             ';
 
-if (isset($_POST['device_id'])) {
-    $selected_device = '<option value="' . (int) $_POST['device_id'] . '" selected="selected">';
-    $selected_device .= htmlentities($_POST['hostname']) . '</option>';
-} else {
-    $selected_device = $device_id;
-    $_POST['device_id'] = $device_id;
-}
+$device = DeviceCache::get((int) $vars['device_id']);
+$device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
+
 if (isset($_POST['state'])) {
     $selected_state = '<option value="' . htmlspecialchars($_POST['state']) . '" selected="selected">';
     $selected_state .= array_search((int) $_POST['state'], $alert_states) . '</option>';
@@ -112,9 +108,7 @@ if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
                 <label> \
                 <strong>Device&nbsp;</strong> \
                 </label> \
-                <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"> \
-                ' . $selected_device . ' \
-               </select> \
+                <select name="device_id" id="device_id" class="form-control input-sm" style="min-width: 175px;"></select> \
                </div> \
                ';
 }
@@ -153,7 +147,7 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($_POST['device_id']) . '\',
+                device_id: \'' . htmlspecialchars($_POST['device_id'] ?? $device_id) . '\',
                 state: \'' . htmlspecialchars($_POST['state']) . '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };
@@ -204,23 +198,6 @@ $common_output[] = '<div class="form-group"> \
         });
     });
 
-    $("#device_id").select2({
-        allowClear: true,
-        placeholder: "All Devices",
-        ajax: {
-            url: \'ajax_list.php\',
-            delay: 250,
-            data: function (params) {
-                return {
-                    type: \'devices\',
-                    search: params.term,
-                    limit: 8,
-                    page: params.page || 1
-                };
-            }
-        }
-    }).on(\'select2:select\', function (e) {
-        $(\'#hostname\').val(e.params.data.text);
-    });
+    init_select2("#device_id", "device", {}, ' . $device_selected . ' , "All Devices");
 </script>
 ';

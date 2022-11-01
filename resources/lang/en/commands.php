@@ -73,7 +73,7 @@ return [
             'v1' => 'Use SNMP v1',
             'v2c' => 'Use SNMP v2c',
             'v3' => 'Use SNMP v3',
-            'display-name' => 'A string to display as the name of this device, defaults to hostname. May be a simple template using replacements: {{ $hostname }}, {{ $sysName }}, {{ $sysName_fallback }}, {{ $ip }}',
+            'display-name' => "A string to display as the name of this device, defaults to hostname.\nMay be a simple template using replacements: {{ \$hostname }}, {{ \$sysName }}, {{ \$sysName_fallback }}, {{ \$ip }}",
             'force' => 'Just add the device, do not make any safety checks',
             'group' => 'Poller group (for distributed polling)',
             'ping-fallback' => 'Add the device as ping only if it does not respond to SNMP',
@@ -110,7 +110,7 @@ return [
     'device:poll' => [
         'description' => 'Poll data from device(s) as defined by discovery',
         'arguments' => [
-            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
@@ -119,21 +119,32 @@ return [
         'errors' => [
             'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
             'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+            'no_devices' => 'No devices found matching your given device specification.',
+            'none_polled' => 'No devices were polled.',
         ],
+        'polled' => 'Polled :count devices in :time',
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
         'arguments' => [
             'old_key' => 'The old APP_KEY which is valid for encrypted data',
         ],
+        'options' => [
+            'generate-new-key' => 'If you do not have the new key set in .env, use the APP_KEY from .env to decrypt data and generate a new key and set it in .env',
+            'forgot-key' => 'If you do not have the old key, you must delete all encrypted data to be able to continue to use certain LibreNMS features',
+        ],
+        'destroy' => 'Destroy all encrypted configuration data?',
+        'destroy_confirm' => 'Only destroy all encrypted data if you cannot find the old APP_KEY!',
         'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
         'backup_keys' => 'Document BOTH keys! In case something goes wrong set the new key in .env and use the old key as an argument to this command',
+        'backup_key' => 'Document this key! This key is required to access encrypted data',
         'backups' => 'This command could cause irreversible loss of data and will invalidate all browser sessions. Make sure you have backups.',
         'confirm' => 'I have backups and want to continue',
         'decrypt-failed' => 'Failed to decrypt :item, skipping',
         'failed' => 'Failed to decrypt item(s).  Set new key as APP_KEY and run this again with the old key as an argument.',
-        'new_key' => 'New key: :key',
-        'old_key' => 'Old key: :key',
+        'current_key' => 'Current APP_KEY: :key',
+        'new_key' => 'New APP_KEY: :key',
+        'old_key' => 'Old APP_KEY: :key',
         'save_key' => 'Save new key to .env?',
         'success' => 'Successfully rotated keys!',
         'validation-errors' => [
@@ -145,6 +156,24 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
+    ],
+    'plugin:disable' => [
+        'description' => 'Disable all plugins with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to disable or "all" to disable all plugins',
+        ],
+        'already_disabled' => 'Plugin already disabled',
+        'disabled' => ':count plugin disabled|:count plugins disabled',
+        'failed' => 'Failed to disable plugin(s)',
+    ],
+    'plugin:enable' => [
+        'description' => 'Enable the newest plugin with the given name',
+        'arguments' => [
+            'plugin' => 'The name of the plugin to enable or "all" to disable all plugins',
+        ],
+        'already_enabled' => 'Plugin already enabled',
+        'enabled' => ':count plugin enabled|:count plugins enabled',
+        'failed' => 'Failed to enable plugin(s)',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

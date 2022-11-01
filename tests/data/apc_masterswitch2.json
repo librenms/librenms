@@ -24,6 +24,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -48,6 +49,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -72,6 +74,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -96,6 +99,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -120,6 +124,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -144,6 +149,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -168,6 +174,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 },
                 {
@@ -192,6 +199,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sPDUOutletCtl"
                 }
             ],
@@ -260,11 +268,11 @@
                     "version": "AOS v3.0.9.a / App v2.2.5.a",
                     "hardware": "Web/SNMP Management Card",
                     "features": null,
+                    "location": "<private>",
                     "os": "apc",
                     "type": "power",
                     "serial": null,
-                    "icon": "apc.svg",
-                    "location": "<private>"
+                    "icon": "apc.svg"
                 }
             ]
         },

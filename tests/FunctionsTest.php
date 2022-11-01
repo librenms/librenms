@@ -27,6 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Time;
 
 class FunctionsTest extends TestCase
 {
@@ -52,23 +53,6 @@ class FunctionsTest extends TestCase
         $this->assertTrue(isHexString('aF 28 02 CE'));
         $this->assertFalse(isHexString('a5 fj 53'));
         $this->assertFalse(isHexString('a5fe53'));
-    }
-
-    public function testLinkify()
-    {
-        $input = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	http://foo.co.uk/
-sdfsd ftp://192.168.1.1/help/me/now.php
-http://regexr.com/foo.html?q=bar
-https://mediatemple.net.';
-
-        $expected = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
-sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.php</a>
-<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
-<a href="https://mediatemple.net">https://mediatemple.net</a>.';
-
-        $this->assertSame($expected, linkify($input));
     }
 
     public function testDynamicDiscoveryGetValue()
@@ -119,20 +103,20 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
 
     public function testParseAtTime()
     {
-        $this->assertEquals(time(), parse_at_time('now'), 'now did not match');
-        $this->assertEquals(time() + 180, parse_at_time('+3m'), '+3m did not match');
-        $this->assertEquals(time() + 7200, parse_at_time('+2h'), '+2h did not match');
-        $this->assertEquals(time() + 172800, parse_at_time('+2d'), '+2d did not match');
-        $this->assertEquals(time() + 63115200, parse_at_time('+2y'), '+2y did not match');
-        $this->assertEquals(time() - 180, parse_at_time('-3m'), '-3m did not match');
-        $this->assertEquals(time() - 7200, parse_at_time('-2h'), '-2h did not match');
-        $this->assertEquals(time() - 172800, parse_at_time('-2d'), '-2d did not match');
-        $this->assertEquals(time() - 63115200, parse_at_time('-2y'), '-2y did not match');
-        $this->assertEquals(429929439, parse_at_time('429929439'));
-        $this->assertEquals(212334234, parse_at_time(212334234));
-        $this->assertEquals(time() - 43, parse_at_time('-43'), '-43 did not match');
-        $this->assertEquals(0, parse_at_time('invalid'));
-        $this->assertEquals(606614400, parse_at_time('March 23 1989 UTC'));
-        $this->assertEquals(time() + 86400, parse_at_time('+1 day'));
+        $this->assertEquals(time(), Time::parseAt('now'), 'now did not match');
+        $this->assertEquals(time() + 180, Time::parseAt('+3m'), '+3m did not match');
+        $this->assertEquals(time() + 7200, Time::parseAt('+2h'), '+2h did not match');
+        $this->assertEquals(time() + 172800, Time::parseAt('+2d'), '+2d did not match');
+        $this->assertEquals(time() + 63115200, Time::parseAt('+2y'), '+2y did not match');
+        $this->assertEquals(time() - 180, Time::parseAt('-3m'), '-3m did not match');
+        $this->assertEquals(time() - 7200, Time::parseAt('-2h'), '-2h did not match');
+        $this->assertEquals(time() - 172800, Time::parseAt('-2d'), '-2d did not match');
+        $this->assertEquals(time() - 63115200, Time::parseAt('-2y'), '-2y did not match');
+        $this->assertEquals(429929439, Time::parseAt('429929439'));
+        $this->assertEquals(212334234, Time::parseAt(212334234));
+        $this->assertEquals(time() - 43, Time::parseAt('-43'), '-43 did not match');
+        $this->assertEquals(0, Time::parseAt('invalid'));
+        $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
+        $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
     }
 }

@@ -25,7 +25,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-apcups"
 $name = 'ups-apcups';
-$app_id = $app['app_id'];
 
 try {
     $json_return = json_app_get($device, $name);
@@ -53,7 +52,7 @@ try {
     return;
 }
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('charge', 'GAUGE', 0, 100)
     ->addDataset('time_remaining', 'GAUGE', 0)
