@@ -127,8 +127,8 @@ class Trap
     /**
      * Log this trap in the eventlog with the given message
      */
-    public function log(string $message, int $severity = Alert::INFO): void
+    public function log(string $message, int $severity = Alert::INFO, string $type = 'trap', int|null|string $reference = null): void
     {
-        \Log::event($message, $this->getDevice(), 'trap', $severity);
+        \Log::event($message, $this->getDevice(), $type, $severity, $reference);
     }
 }

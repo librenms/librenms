@@ -25,7 +25,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class FailedUserLogin implements SnmptrapHandler
 {
@@ -39,6 +38,6 @@ class FailedUserLogin implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Failed User Login: ' . $device->displayName(), $device->device_id, 'auth', 4);
+        $trap->log('SNMP Trap: Failed User Login: ' . $device->displayName(), 4, 'auth');
     }
 }

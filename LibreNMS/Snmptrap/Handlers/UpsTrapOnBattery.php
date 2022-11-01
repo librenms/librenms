@@ -44,7 +44,7 @@ class UpsTrapOnBattery implements SnmptrapHandler
     {
         $min_remaining = (int) Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining')), ' ');
         $sec_time = (int) Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery')), ' ');
-        Log::event("UPS running on battery for $sec_time seconds. Estimated $min_remaining minutes remaining", $device->device_id, 'trap', 5);
+        $trap->log("UPS running on battery for $sec_time seconds. Estimated $min_remaining minutes remaining", 5);
         $sensor_remaining = $device->sensors()->where('sensor_index', '200')->where('sensor_type', 'rfc1628')->first();
         if (! $sensor_remaining) {
             Log::warning("Snmptrap upsTrapOnBattery: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);

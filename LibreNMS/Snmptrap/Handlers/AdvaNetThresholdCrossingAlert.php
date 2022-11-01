@@ -31,7 +31,6 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
 {
@@ -51,7 +50,7 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
             $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetNetPortThresholdVariable'))
         );
 
-        Log::event("$ifName $threshMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
+        $trap->log("$ifName $threshMessage threshold exceeded for $interval");
     }
 
     public function getThresholdMessage($thresholdOid)
