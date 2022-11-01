@@ -56,7 +56,7 @@ class LogTrap implements SnmptrapHandler
 
     private function getSeverity(string $state): int
     {
-        return match($state) {
+        return match ($state) {
             'warning', '3', 'major', '5' => 4,
             'critical', '4' => 5,
             'minor', '2' => 3,
