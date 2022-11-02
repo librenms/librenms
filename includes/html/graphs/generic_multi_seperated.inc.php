@@ -18,7 +18,7 @@ use LibreNMS\Config;
 require 'includes/html/graphs/common.inc.php';
 
 $format = $format ?? '';
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 $transparency = $transparency ?? false;
 $stack = $stack ?? '';
 

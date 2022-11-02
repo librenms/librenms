@@ -22,7 +22,7 @@ $stacked = generate_stacked_graphs();
 $inverse = $inverse ?? false;
 $multiplier = $multiplier ?? false;
 $format = $format ?? '';
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 
 if ($rrd_filename) {
     $rrd_filename_out = $rrd_filename;
