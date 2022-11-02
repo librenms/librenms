@@ -191,12 +191,12 @@ jobs:
         name: Dump serve logs
         if: always() && matrix.skip-web-check != '1'
         run: |
-          cat /tmp/artisan-serve.log
+          [ ! -f /tmp/artisan-serve.log ] || cat /tmp/artisan-serve.log
       -
         name: Dump snmp logs
         if: always() && matrix.skip-unit-check != '1'
         run: |
-          cat /tmp/snmpsimd.log
+          [ ! -f /tmp/snmpsimd.log ] || cat /tmp/snmpsimd.log
       -
         name: Dump context
         if: always()
