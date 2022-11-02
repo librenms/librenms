@@ -36,7 +36,7 @@ if (isset($components[$vars['id']])) {
         $colour_area_max = '9999cc';
 
         $graph_max = 1;
-        
+
         $unit_text = 'Requests';
         $line_text = 'Requests';
         require 'includes/html/graphs/generic_simplex.inc.php';
