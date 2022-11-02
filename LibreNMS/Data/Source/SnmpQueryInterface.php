@@ -73,7 +73,7 @@ interface SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQueryInterface;
+    public function numeric(bool $numeric = true): SnmpQueryInterface;
 
     /**
      * Hide MIB in output
