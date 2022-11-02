@@ -973,7 +973,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         if (Str::contains($data['index'], '{{')) {
                             $uindex = trim(YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache));
                         } else {
-                            $uindex = str_replace('{{ $index }}', $index, $data['index']);
+                            $uindex = $data['index'];
                         }
                     }
 
