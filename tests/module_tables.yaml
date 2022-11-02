@@ -36,13 +36,13 @@ ports:
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
 cipsec-tunnels:
     ipsec_tunnels:
-        excluded_fields: [tunnel_id, device_id]
+        excluded_fields: [local_addr, tunnel_id, device_id]
         order_by: peer_addr
 cisco-pw:
     pseudowires:
         excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
         joins:
-            - { left: excluded_fields.port_id, right: ports.port_id, select: [ ifIndex ] }
+            - { left: pseudowires.port_id, right: ports.port_id, select: [ ifIndex ] }
         order_by: cpwVcID, ifIndex
 route:
     route:

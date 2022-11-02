@@ -447,6 +447,9 @@
                             "snmp_bulk": {
                                 "type": "boolean"
                             },
+                            "rrd_type": {
+                                "type": "string"
+                            },
                             "entPhysicalIndex": {
                                 "type": ["integer", "string"]
                             },

@@ -25,36 +25,12 @@
 
 namespace LibreNMS\Data\Graphing;
 
+use LibreNMS\Enum\ImageFormat;
+
 class GraphImage
 {
-    /**
-     * @var string
-     */
-    private $type;
-    /**
-     * @var string
-     */
-    private $title;
-    /**
-     * @var string
-     */
-    private $data;
-
-    public function __construct(string $type, string $title, string $data)
+    public function __construct(public readonly ImageFormat $format, public readonly string $title, public readonly string $data)
     {
-        $this->type = $type;
-        $this->title = $title;
-        $this->data = $data;
-    }
-
-    public function title(): string
-    {
-        return $this->title;
-    }
-
-    public function data(): string
-    {
-        return $this->data;
     }
 
     public function base64(): string
@@ -64,28 +40,21 @@ class GraphImage
 
     public function inline(): string
     {
-        return 'data:' . $this->imageType() . ';base64,' . $this->base64();
+        return 'data:' . $this->contentType() . ';base64,' . $this->base64();
     }
 
     public function fileExtension(): string
     {
-        switch ($this->imageType()) {
-            case 'image/svg+xml':
-                return 'svg';
-            case 'image/png':
-                // fallthrough
-            default:
-                return 'png';
-        }
+        return $this->format->name;
     }
 
-    public function imageType(): string
+    public function contentType(): string
     {
-        return $this->type;
+        return $this->format->contentType();
     }
 
     public function __toString()
     {
-        return $this->data();
+        return $this->data;
     }
 }

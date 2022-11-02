@@ -201,24 +201,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div style='text-align:left;'>";
 
     $output .= "<input title='Port Description' type='text' name='ifAlias' id='ifAlias' class='form-control input-sm' " . $ifaliasvalue . " placeholder='Port Description'>&nbsp;";
-    $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'>&nbsp;";
-    $output .= "<option value=''>All Locations</option>";
-
-    foreach (getlocations() as $location_row) {
-        $location = $location_row['location'];
-        $location_id = $location_row['id'];
-        if ($location) {
-            if (isset($vars['location']) && $location_id == $vars['location']) {
-                $locationselected = 'selected';
-            } else {
-                $locationselected = '';
-            }
-            $ui_location = strlen($location) > 15 ? substr($location, 0, 15) . '...' : $location;
-            $output .= "<option value='$location_id' $locationselected>" . clean_bootgrid($ui_location) . '</option>';
-        }
-    }
-
-    $output .= '</select>&nbsp;';
+    $output .= "<select title='Location' name='location' id='location' class='form-control input-sm'></select>&nbsp;";
 
     $ignorecheck = isset($vars['ignore']) ? 'checked' : '';
     $disabledcheck = isset($vars['disabled']) ? 'checked' : '';

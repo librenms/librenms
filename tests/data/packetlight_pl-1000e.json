@@ -10,11 +10,11 @@
                     "version": "3.4.20-A5-A016-2409",
                     "hardware": "PL-1000E rev 02-02",
                     "features": null,
+                    "location": "<private>",
                     "os": "packetlight",
                     "type": "network",
                     "serial": "100800446",
-                    "icon": "packetlight.png",
-                    "location": "<private>"
+                    "icon": "packetlight.png"
                 }
             ]
         },
@@ -9911,7 +9911,7 @@
                     "sensor_index": "Rxin-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.7992342723186,
@@ -9925,6 +9925,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9935,7 +9936,7 @@
                     "sensor_index": "Rxin-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.3784680769641,
@@ -9949,6 +9950,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9959,7 +9961,7 @@
                     "sensor_index": "Rxin-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -3.2029961912804,
@@ -9973,6 +9975,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -9983,7 +9986,7 @@
                     "sensor_index": "Rxin-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -3.1515463835559,
@@ -9997,6 +10000,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10007,7 +10011,7 @@
                     "sensor_index": "Rxin-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.938798902973,
@@ -10021,6 +10025,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10031,7 +10036,7 @@
                     "sensor_index": "Rxin-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.8667749501297,
@@ -10045,6 +10050,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10055,7 +10061,7 @@
                     "sensor_index": "txout-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.0243916406986,
@@ -10069,6 +10075,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10079,7 +10086,7 @@
                     "sensor_index": "txout-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.2192113806255,
@@ -10093,6 +10100,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10103,7 +10111,7 @@
                     "sensor_index": "txout-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.9541314551966,
@@ -10117,6 +10125,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10127,7 +10136,7 @@
                     "sensor_index": "txout-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.0604970473601,
@@ -10141,6 +10150,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10151,7 +10161,7 @@
                     "sensor_index": "txout-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.9373811778352,
@@ -10165,6 +10175,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10175,7 +10186,7 @@
                     "sensor_index": "txout-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.0771218404787,
@@ -10189,6 +10200,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10199,7 +10211,7 @@
                     "sensor_index": "opt-temp-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 CWDM 1550 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 42.44140625,
@@ -10213,6 +10225,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10223,7 +10236,7 @@
                     "sensor_index": "opt-temp-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 to btcc Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 32.1328125,
@@ -10237,6 +10250,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10247,7 +10261,7 @@
                     "sensor_index": "opt-temp-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 CWDM 1470 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.55859375,
@@ -10261,6 +10275,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10271,7 +10286,7 @@
                     "sensor_index": "opt-temp-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10  Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 27.3359375,
@@ -10285,6 +10300,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10295,7 +10311,7 @@
                     "sensor_index": "opt-temp-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 CWDM 1530 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.25,
@@ -10309,6 +10325,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10319,7 +10336,7 @@
                     "sensor_index": "opt-temp-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12  Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 31.3359375,
@@ -10333,6 +10350,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10357,6 +10375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
@@ -10371,7 +10390,7 @@
                     "sensor_index": "Rxin-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.7992342723186,
@@ -10385,6 +10404,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.7992342723186,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10395,7 +10415,7 @@
                     "sensor_index": "Rxin-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.3784680769641,
@@ -10409,6 +10429,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.3784680769641,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10419,7 +10440,7 @@
                     "sensor_index": "Rxin-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -3.2029961912804,
@@ -10433,6 +10454,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.2029961912804,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10443,7 +10465,7 @@
                     "sensor_index": "Rxin-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -3.1515463835559,
@@ -10457,6 +10479,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -3.1515463835559,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10467,7 +10490,7 @@
                     "sensor_index": "Rxin-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.938798902973,
@@ -10481,6 +10504,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.938798902973,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10491,7 +10515,7 @@
                     "sensor_index": "Rxin-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12 Rx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.8667749501297,
@@ -10505,6 +10529,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.8667749501297,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10515,7 +10540,7 @@
                     "sensor_index": "txout-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.0243916406986,
@@ -10529,6 +10554,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 3.0243916406986,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10539,7 +10565,7 @@
                     "sensor_index": "txout-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -2.2192113806255,
@@ -10553,6 +10579,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -2.2192113806255,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10563,7 +10590,7 @@
                     "sensor_index": "txout-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.9541314551966,
@@ -10577,6 +10604,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 2.9541314551966,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10587,7 +10615,7 @@
                     "sensor_index": "txout-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.0604970473601,
@@ -10601,6 +10629,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.0604970473601,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10611,7 +10640,7 @@
                     "sensor_index": "txout-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.9373811778352,
@@ -10625,6 +10654,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": 2.9373811778352,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10635,7 +10665,7 @@
                     "sensor_index": "txout-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12 Tx",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": -4.0771218404787,
@@ -10649,6 +10679,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": -4.0771218404787,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::convertWattToDbm",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10659,7 +10690,7 @@
                     "sensor_index": "opt-temp-115712",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 1 CWDM 1550 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 42.44140625,
@@ -10673,6 +10704,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10683,7 +10715,7 @@
                     "sensor_index": "opt-temp-377856",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 5 to btcc Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 32.1328125,
@@ -10697,6 +10729,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10707,7 +10740,7 @@
                     "sensor_index": "opt-temp-640000",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 9 CWDM 1470 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.55859375,
@@ -10721,6 +10754,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10731,7 +10765,7 @@
                     "sensor_index": "opt-temp-705536",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 10  Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 27.3359375,
@@ -10745,6 +10779,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10755,7 +10790,7 @@
                     "sensor_index": "opt-temp-771072",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 11 CWDM 1530 Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 36.25,
@@ -10769,6 +10804,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10779,7 +10815,7 @@
                     "sensor_index": "opt-temp-836608",
                     "sensor_type": "packetlight",
                     "sensor_descr": "SFP Interface 12  Temperature",
-                    "group": "Optic , ",
+                    "group": "Optic ,",
                     "sensor_divisor": 256,
                     "sensor_multiplier": 1,
                     "sensor_current": 31.3359375,
@@ -10793,6 +10829,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": "\\LibreNMS\\OS\\Packetlight::offsetSfpTemperature",
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -10817,6 +10854,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

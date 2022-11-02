@@ -417,6 +417,17 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['pwrstatd'] = [
+    'wattage',
+    'voltage',
+    'percentage',
+    'minutes',
+];
+$graphs['systemd'] = [
+    'sub',
+    'active',
+    'load',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';

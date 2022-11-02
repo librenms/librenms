@@ -4,8 +4,15 @@ on:
   pull_request:
     branches: [master, main]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   super-linter:
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+      checks: write # to mark the status of each individual linter run
+
     name: Lint Code Base
     runs-on: ubuntu-latest
 
@@ -21,7 +28,7 @@ jobs:
         uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
-          VALIDATE_PHP_BUILTIN: true
+          # VALIDATE_PHP_BUILTIN: true # temp disable until it supports PHP 8.1
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
 
@@ -35,7 +42,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: [7.3, 7.4, 8.0, 8.1]
+        php: [8.1]
     steps:
       -
         name: Checkout Code

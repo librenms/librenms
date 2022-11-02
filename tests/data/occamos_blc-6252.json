@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "BLC 6252 02",
                     "features": null,
+                    "location": "<private>",
                     "os": "occamos",
                     "type": "network",
                     "serial": null,
-                    "icon": "calix.svg",
-                    "location": "<private>"
+                    "icon": "calix.svg"
                 }
             ]
         },

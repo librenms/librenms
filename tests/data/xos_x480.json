@@ -10,11 +10,11 @@
                     "version": "15.3.5.2",
                     "hardware": "Summit X480-24x(10G4X)",
                     "features": "v1535b2-patch1-13",
+                    "location": "<private>",
                     "os": "xos",
                     "type": "network",
                     "serial": null,
-                    "icon": "extreme.svg",
-                    "location": "<private>"
+                    "icon": "extreme.svg"
                 }
             ]
         },

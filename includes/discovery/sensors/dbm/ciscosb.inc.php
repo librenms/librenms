@@ -16,21 +16,21 @@ $multiplier = 1;
 $divisor = 1000;
 foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
     foreach ($ciscosb_data as $key => $value) {
-        if (is_numeric($value['rlPhyTestTableTxOutput']) && ($value['rlPhyTestTableRxOpticalPower'] != 0)) {
+        if (isset($value['rlPhyTestTableTxOutput']) && is_numeric($value['rlPhyTestTableTxOutput']) && ($value['rlPhyTestTableRxOpticalPower'] != 0)) {
             $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.8';
             $sensor_type = 'rlPhyTestTableTxOutput';
             $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-            $descr = $port_descr['ifDescr'] . ' Transmit Power';
+            $descr = trim(($port_descr['ifDescr'] ?? null) . ' Transmit Power');
             $dbm = $value['rlPhyTestTableTxOutput'] / $divisor;
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';
             discover_sensor($valid['sensor'], 'dbm', $device, $oid, 'tx-' . $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $dbm, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
         }
-        if (is_numeric($value['rlPhyTestTableRxOpticalPower']) && ($value['rlPhyTestTableTxOutput'] != 0)) {
+        if (isset($value['rlPhyTestTableRxOpticalPower']) && is_numeric($value['rlPhyTestTableRxOpticalPower']) && ($value['rlPhyTestTableTxOutput'] != 0)) {
             $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.9';
             $sensor_type = 'rlPhyTestTableRxOpticalPower';
             $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-            $descr = $port_descr['ifDescr'] . ' Receive Power';
+            $descr = trim(($port_descr['ifDescr'] ?? null) . ' Receive Power');
             $dbm = $value['rlPhyTestTableRxOpticalPower'] / $divisor;
             $entPhysicalIndex = $index;
             $entPhysicalIndex_measured = 'ports';

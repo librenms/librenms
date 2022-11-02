@@ -1203,7 +1203,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than',
+            'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1412,7 +1412,7 @@ return [
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
                 'unordered' => [
-                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'description' => 'Allow out of order snmp responses for OIDs',
                     'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
             ],

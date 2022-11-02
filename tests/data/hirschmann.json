@@ -28,11 +28,11 @@
                     "version": "07.1.05",
                     "hardware": "RS30-1602OOZZSDHPHH",
                     "features": null,
+                    "location": "<private>",
                     "os": "hirschmann",
                     "type": "network",
                     "serial": "9999999999999F9999",
-                    "icon": "hirschmann.svg",
-                    "location": "<private>"
+                    "icon": "hirschmann.svg"
                 }
             ]
         },
@@ -2077,8 +2077,8 @@
                     "ifName": "1/1/1",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2182,8 +2182,8 @@
                     "ifName": "1/1/2",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2497,8 +2497,8 @@
                     "ifName": "1/1/5",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2602,8 +2602,8 @@
                     "ifName": "1/1/6",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2707,8 +2707,8 @@
                     "ifName": "1/1/7",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2812,8 +2812,8 @@
                     "ifName": "1/1/8",
                     "portName": null,
                     "ifIndex": 8,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -2917,8 +2917,8 @@
                     "ifName": "1/1/9",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -3127,8 +3127,8 @@
                     "ifName": "1/1/11",
                     "portName": null,
                     "ifIndex": 11,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -3232,8 +3232,8 @@
                     "ifName": "1/1/12",
                     "portName": null,
                     "ifIndex": 12,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -3967,8 +3967,8 @@
                     "ifName": "CPU Interface:  1/4/1",
                     "portName": null,
                     "ifIndex": 53,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -4090,6 +4090,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSFault"
                 },
                 {
@@ -4114,6 +4115,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSPowerSupply"
                 },
                 {
@@ -4138,6 +4140,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSRedundancyManager"
                 },
                 {
@@ -4162,6 +4165,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRStandby"
                 },
                 {
@@ -4175,7 +4179,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -4186,6 +4190,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4199,7 +4204,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -4210,6 +4215,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4234,6 +4240,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -4404,6 +4411,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSFault"
                 },
                 {
@@ -4428,6 +4436,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSPowerSupply"
                 },
                 {
@@ -4452,6 +4461,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRSRedundancyManager"
                 },
                 {
@@ -4476,6 +4486,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmLEDRStandby"
                 },
                 {
@@ -4498,8 +4509,9 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "hmPowerSupplySta",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4522,8 +4534,9 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": "hmPowerSupplySta",
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hmPowerSupplyStatus"
                 },
                 {
@@ -4548,6 +4561,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -4853,5 +4867,131 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "ece5554071d6",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "6313403",
+                    "topChanges": 1,
+                    "designatedRoot": "ece5554071d6",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 10,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 10,
+                    "forwardTransitions": 0,
+                    "ifIndex": 10
+                },
+                {
+                    "vlan": null,
+                    "port_index": 13,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 13,
+                    "forwardTransitions": 0,
+                    "ifIndex": 13
+                },
+                {
+                    "vlan": null,
+                    "port_index": 14,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 14,
+                    "forwardTransitions": 0,
+                    "ifIndex": 14
+                },
+                {
+                    "vlan": null,
+                    "port_index": 15,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 15,
+                    "forwardTransitions": 0,
+                    "ifIndex": 15
+                },
+                {
+                    "vlan": null,
+                    "port_index": 16,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 16,
+                    "forwardTransitions": 0,
+                    "ifIndex": 16
+                },
+                {
+                    "vlan": null,
+                    "port_index": 17,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 17,
+                    "forwardTransitions": 0,
+                    "ifIndex": 17
+                },
+                {
+                    "vlan": null,
+                    "port_index": 18,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "ece5554071d6",
+                    "designatedCost": 0,
+                    "designatedBridge": "ece5554071d6",
+                    "designatedPort": 18,
+                    "forwardTransitions": 0,
+                    "ifIndex": 18
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

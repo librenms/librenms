@@ -10,11 +10,11 @@
                     "version": "SB5101E-2.6.2.0-SCM00-NOSH",
                     "hardware": "SB5101E",
                     "features": null,
+                    "location": "<private>",
                     "os": "motorola-cm",
                     "type": "network",
                     "serial": null,
-                    "icon": "motorola-cm.png",
-                    "location": "<private>"
+                    "icon": "motorola-cm.png"
                 }
             ]
         },
@@ -1315,6 +1315,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1339,6 +1340,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1363,6 +1365,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

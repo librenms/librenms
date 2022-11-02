@@ -61,8 +61,12 @@ class Foundry extends OS implements ProcessorDiscovery
                 continue;
             }
 
-            $module_description = $module_descriptions[$entry['snAgentCpuUtilSlotNum']];
-            [$module_description] = explode(' ', $module_description);
+            $module_description = null;
+            if (isset($module_descriptions[$entry['snAgentCpuUtilSlotNum']])) {
+                $module_description = $module_descriptions[$entry['snAgentCpuUtilSlotNum']];
+                [$module_description] = explode(' ', $module_description);
+            }
+
             $descr = "Slot {$entry['snAgentCpuUtilSlotNum']} $module_description [{$entry['snAgentCpuUtilSlotNum']}]";
 
             $processors[] = Processor::discover(

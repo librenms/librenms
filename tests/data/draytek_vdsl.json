@@ -10,11 +10,11 @@
                     "version": "r13107_788_b947ce1af_beta",
                     "hardware": "Vigor165",
                     "features": null,
+                    "location": null,
                     "os": "draytek",
                     "type": "network",
                     "serial": null,
-                    "icon": "draytek.svg",
-                    "location": null
+                    "icon": "draytek.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "V7R1M0",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "ibm-i",
                     "type": "server",
                     "serial": null,
-                    "icon": "ibmos.svg",
-                    "location": "<private>"
+                    "icon": "ibmos.svg"
                 }
             ]
         },

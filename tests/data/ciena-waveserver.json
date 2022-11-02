@@ -10,11 +10,11 @@
                     "version": "1.5.0-ej76_svrbuild_wvsrvr",
                     "hardware": "Waveserver 40x10GE/10x40GE/4x100GE QSFP+/QSFP28, 2x100G/2x150G/2x200G Wavelogic 3 Extreme Coherent Optical Processors",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciena-waveserver",
                     "type": "network",
                     "serial": "AAAAAAAA",
-                    "icon": "ciena.svg",
-                    "location": "<private>"
+                    "icon": "ciena.svg"
                 }
             ]
         },
@@ -3397,8 +3397,8 @@
                     "ifName": "Console",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -3712,8 +3712,8 @@
                     "ifName": "1.1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3922,8 +3922,8 @@
                     "ifName": "5",
                     "portName": null,
                     "ifIndex": 20,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4027,8 +4027,8 @@
                     "ifName": "12.1",
                     "portName": null,
                     "ifIndex": 48,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4132,8 +4132,8 @@
                     "ifName": "12.2",
                     "portName": null,
                     "ifIndex": 49,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -4237,8 +4237,8 @@
                     "ifName": "XCVR-1/1",
                     "portName": null,
                     "ifIndex": 16777728,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -4342,8 +4342,8 @@
                     "ifName": "PTP-1/1-WaveLogic",
                     "portName": null,
                     "ifIndex": 16777729,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -4447,8 +4447,8 @@
                     "ifName": "PTP-1/1",
                     "portName": null,
                     "ifIndex": 16777730,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -5182,8 +5182,8 @@
                     "ifName": "XCVR-1/2",
                     "portName": null,
                     "ifIndex": 16778240,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -5287,8 +5287,8 @@
                     "ifName": "PTP-1/2-WaveLogic",
                     "portName": null,
                     "ifIndex": 16778241,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -5392,8 +5392,8 @@
                     "ifName": "PTP-1/2",
                     "portName": null,
                     "ifIndex": 16778242,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6127,8 +6127,8 @@
                     "ifName": "XCVR-1/3",
                     "portName": null,
                     "ifIndex": 16778752,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6232,8 +6232,8 @@
                     "ifName": "PTP-1/3",
                     "portName": null,
                     "ifIndex": 16778754,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6442,8 +6442,8 @@
                     "ifName": "XCVR-1/7",
                     "portName": null,
                     "ifIndex": 16780800,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6547,8 +6547,8 @@
                     "ifName": "PTP-1/7",
                     "portName": null,
                     "ifIndex": 16780802,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6775,6 +6775,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6799,6 +6800,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6823,6 +6825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6847,6 +6850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6860,7 +6864,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -21.004000000000001,
+                    "sensor_current": -21.004,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -6871,6 +6875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6895,6 +6900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6908,7 +6914,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.972999999999999,
+                    "sensor_current": -20.973,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -6919,6 +6925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6932,7 +6939,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.9689999999999999,
+                    "sensor_current": 3.969,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -6943,6 +6950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6956,7 +6964,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 4.0640000000000001,
+                    "sensor_current": 4.064,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -6967,6 +6975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6991,6 +7000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7004,7 +7014,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.486999999999998,
+                    "sensor_current": -20.487,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7015,6 +7025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7028,7 +7039,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.318999999999999,
+                    "sensor_current": -20.319,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7039,6 +7050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7052,7 +7064,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.385999999999999,
+                    "sensor_current": -20.386,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7063,6 +7075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7087,6 +7100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7100,7 +7114,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -21.175000000000001,
+                    "sensor_current": -21.175,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7111,6 +7125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7124,7 +7139,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -21.216000000000001,
+                    "sensor_current": -21.216,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7135,6 +7150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7148,7 +7164,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 3.9580000000000002,
+                    "sensor_current": 3.958,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7159,6 +7175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7172,7 +7189,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 4.0339999999999998,
+                    "sensor_current": 4.034,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7183,6 +7200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7207,6 +7225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7231,6 +7250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7244,7 +7264,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.847000000000001,
+                    "sensor_current": -20.847,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7255,6 +7275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7268,7 +7289,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -20.954000000000001,
+                    "sensor_current": -20.954,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7279,6 +7300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7292,7 +7314,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.050999999999999997,
+                    "sensor_current": -0.051,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7303,6 +7325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7316,7 +7339,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.025999999999999999,
+                    "sensor_current": 0.026,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7327,6 +7350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7340,7 +7364,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.0040000000000000001,
+                    "sensor_current": -0.004,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7351,6 +7375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7364,7 +7389,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.17999999999999999,
+                    "sensor_current": 0.18,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7375,6 +7400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7388,7 +7414,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.26300000000000001,
+                    "sensor_current": 0.263,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7399,6 +7425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7423,6 +7450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7447,6 +7475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7460,7 +7489,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.025999999999999999,
+                    "sensor_current": 0.026,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7471,6 +7500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7484,7 +7514,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.021000000000000001,
+                    "sensor_current": -0.021,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7495,6 +7525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7508,7 +7539,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.26300000000000001,
+                    "sensor_current": 0.263,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7519,6 +7550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7543,6 +7575,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7556,7 +7589,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.28499999999999998,
+                    "sensor_current": 0.285,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7567,6 +7600,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7591,6 +7625,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7604,7 +7639,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.14000000000000001,
+                    "sensor_current": 0.14,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7615,6 +7650,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7628,7 +7664,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.068000000000000005,
+                    "sensor_current": 0.068,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7639,6 +7675,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7652,7 +7689,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.083000000000000004,
+                    "sensor_current": 0.083,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7663,6 +7700,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7676,7 +7714,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.16800000000000001,
+                    "sensor_current": 0.168,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7687,6 +7725,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7711,6 +7750,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7724,7 +7764,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.49099999999999999,
+                    "sensor_current": -0.491,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7735,6 +7775,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7759,6 +7800,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7772,7 +7814,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.44700000000000001,
+                    "sensor_current": -0.447,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7783,6 +7825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7796,7 +7839,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.17399999999999999,
+                    "sensor_current": 0.174,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7807,6 +7850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7820,7 +7864,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0.27500000000000002,
+                    "sensor_current": 0.275,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7831,6 +7875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7855,6 +7900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7868,7 +7914,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.10199999999999999,
+                    "sensor_current": -0.102,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7879,6 +7925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7903,6 +7950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7916,7 +7964,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.041000000000000002,
+                    "sensor_current": -0.041,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7927,6 +7975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7940,7 +7989,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.52300000000000002,
+                    "sensor_current": -0.523,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7951,6 +8000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7964,7 +8014,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.43099999999999999,
+                    "sensor_current": -0.431,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7975,6 +8025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7988,7 +8039,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.47099999999999997,
+                    "sensor_current": -0.471,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -7999,6 +8050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8012,7 +8064,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.14299999999999999,
+                    "sensor_current": -0.143,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8023,6 +8075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8036,7 +8089,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.082000000000000003,
+                    "sensor_current": -0.082,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8047,6 +8100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8071,6 +8125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8084,7 +8139,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.66100000000000003,
+                    "sensor_current": -0.661,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8095,6 +8150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8108,7 +8164,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.58699999999999997,
+                    "sensor_current": -0.587,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8119,6 +8175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8132,7 +8189,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.61399999999999999,
+                    "sensor_current": -0.614,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8143,6 +8200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8156,7 +8214,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.32000000000000001,
+                    "sensor_current": -0.32,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8167,6 +8225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8180,7 +8239,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.22600000000000001,
+                    "sensor_current": -0.226,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8191,6 +8250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8204,7 +8264,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.27600000000000002,
+                    "sensor_current": -0.276,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8215,6 +8275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8228,7 +8289,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.83699999999999997,
+                    "sensor_current": -0.837,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8239,6 +8300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8252,7 +8314,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.78100000000000003,
+                    "sensor_current": -0.781,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8263,6 +8325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8276,7 +8339,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.78600000000000003,
+                    "sensor_current": -0.786,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8287,6 +8350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8300,7 +8364,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -0.29699999999999999,
+                    "sensor_current": -0.297,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8311,6 +8375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8335,6 +8400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8359,6 +8425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8372,7 +8439,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1.5049999999999999,
+                    "sensor_current": -1.505,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8383,6 +8450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8407,6 +8475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8420,7 +8489,7 @@
                     "group": "Optical Power - Last 24 Hours",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -1.4470000000000001,
+                    "sensor_current": -1.447,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -40,
@@ -8431,6 +8500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -8455,6 +8525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8479,6 +8550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8503,6 +8575,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8527,6 +8600,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8551,6 +8625,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8575,6 +8650,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8599,6 +8675,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8623,6 +8700,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8647,6 +8725,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8671,6 +8750,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8695,6 +8775,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8719,6 +8800,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8743,6 +8825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8767,6 +8850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8791,6 +8875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8815,6 +8900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8839,6 +8925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8863,6 +8950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8887,6 +8975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8911,6 +9000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8935,6 +9025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8959,6 +9050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -8983,6 +9075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9007,6 +9100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9031,6 +9125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9055,6 +9150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9079,6 +9175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9103,6 +9200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9127,6 +9225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9151,6 +9250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9175,6 +9275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9199,6 +9300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9223,6 +9325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9247,6 +9350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9271,6 +9375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9295,6 +9400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9319,6 +9425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9343,6 +9450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9367,6 +9475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9391,6 +9500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9415,6 +9525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9439,6 +9550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9463,6 +9575,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-critical"
                 },
                 {
@@ -9487,6 +9600,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9511,6 +9625,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9535,6 +9650,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9559,6 +9675,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9583,6 +9700,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9607,6 +9725,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9631,6 +9750,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9655,6 +9775,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9679,6 +9800,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9703,6 +9825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9727,6 +9850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9751,6 +9875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9775,6 +9900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9799,6 +9925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9823,6 +9950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9847,6 +9975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9871,6 +10000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9895,6 +10025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9919,6 +10050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9943,6 +10075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9967,6 +10100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -9991,6 +10125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10015,6 +10150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10039,6 +10175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10063,6 +10200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10087,6 +10225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10111,6 +10250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10135,6 +10275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10159,6 +10300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10183,6 +10325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10207,6 +10350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10231,6 +10375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10255,6 +10400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10279,6 +10425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10303,6 +10450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10327,6 +10475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10351,6 +10500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10375,6 +10525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10399,6 +10550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10423,6 +10575,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10447,6 +10600,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10471,6 +10625,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10495,6 +10650,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10519,6 +10675,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10543,6 +10700,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10567,6 +10725,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10591,6 +10750,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10615,6 +10775,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10639,6 +10800,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10663,6 +10825,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10687,6 +10850,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10711,6 +10875,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10735,6 +10900,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10759,6 +10925,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10783,6 +10950,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-major"
                 },
                 {
@@ -10807,6 +10975,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10831,6 +11000,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10855,6 +11025,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10879,6 +11050,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10903,6 +11075,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10927,6 +11100,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10951,6 +11125,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10975,6 +11150,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -10999,6 +11175,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11023,6 +11200,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11047,6 +11225,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11071,6 +11250,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11095,6 +11275,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11119,6 +11300,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11143,6 +11325,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11167,6 +11350,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11191,6 +11375,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11215,6 +11400,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "{{ $definedAlarmActive }}-minor"
                 },
                 {
@@ -11224,7 +11410,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1271.3.4.15.13.1.2.20.0",
                     "sensor_index": "cwsXcvrTemperatureTable.20.0",
                     "sensor_type": "ciena-waveserver",
-                    "sensor_descr": "Module 20 - ",
+                    "sensor_descr": "Module 20 -",
                     "group": "Modules",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -11239,6 +11425,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11263,6 +11450,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11287,6 +11475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

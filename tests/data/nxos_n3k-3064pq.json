@@ -10,11 +10,11 @@
                     "version": "7.0(3)I7(8)",
                     "hardware": "N3K-C3064PQ-10GX",
                     "features": null,
+                    "location": "<private>",
                     "os": "nxos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -11425,7 +11425,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000004",
                     "sensor_index": "300000004",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11440,6 +11440,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11449,7 +11450,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001764",
                     "sensor_index": "300001764",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11464,6 +11465,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11473,7 +11475,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003524",
                     "sensor_index": "300003524",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11488,6 +11490,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11497,7 +11500,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005284",
                     "sensor_index": "300005284",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11512,6 +11515,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11521,7 +11525,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007044",
                     "sensor_index": "300007044",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11536,6 +11540,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11545,7 +11550,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008804",
                     "sensor_index": "300008804",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11560,6 +11565,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11569,7 +11575,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010564",
                     "sensor_index": "300010564",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11584,6 +11590,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11593,7 +11600,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012324",
                     "sensor_index": "300012324",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -11608,6 +11615,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11617,7 +11625,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000013",
                     "sensor_index": "300000013",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11632,6 +11640,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11641,7 +11650,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000014",
                     "sensor_index": "300000014",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11656,6 +11665,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11665,7 +11675,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001773",
                     "sensor_index": "300001773",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11680,6 +11690,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11689,7 +11700,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001774",
                     "sensor_index": "300001774",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11704,6 +11715,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11713,7 +11725,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003533",
                     "sensor_index": "300003533",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11728,6 +11740,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11737,7 +11750,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003534",
                     "sensor_index": "300003534",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11752,6 +11765,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11761,7 +11775,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005293",
                     "sensor_index": "300005293",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11776,6 +11790,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11785,7 +11800,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005294",
                     "sensor_index": "300005294",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11800,6 +11815,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11809,7 +11825,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007053",
                     "sensor_index": "300007053",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11824,6 +11840,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11833,7 +11850,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007054",
                     "sensor_index": "300007054",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11848,6 +11865,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11857,7 +11875,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008813",
                     "sensor_index": "300008813",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11872,6 +11890,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11881,7 +11900,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008814",
                     "sensor_index": "300008814",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11896,6 +11915,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11905,7 +11925,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010573",
                     "sensor_index": "300010573",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11920,6 +11940,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11929,7 +11950,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010574",
                     "sensor_index": "300010574",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11944,6 +11965,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11953,7 +11975,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012333",
                     "sensor_index": "300012333",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11968,6 +11990,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -11977,7 +12000,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012334",
                     "sensor_index": "300012334",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -11992,6 +12015,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12016,6 +12040,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFanTrayOperStatus"
                 },
                 {
@@ -12040,6 +12065,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFanTrayOperStatus"
                 },
                 {
@@ -12064,6 +12090,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -12088,6 +12115,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusPeerUnitState"
                 },
                 {
@@ -12112,6 +12140,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusUnitState"
                 },
                 {
@@ -12121,7 +12150,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000007",
                     "sensor_index": "300000007",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12136,6 +12165,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12145,7 +12175,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001767",
                     "sensor_index": "300001767",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12160,6 +12190,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12169,7 +12200,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003527",
                     "sensor_index": "300003527",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12184,6 +12215,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12193,7 +12225,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005287",
                     "sensor_index": "300005287",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12208,6 +12240,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12217,7 +12250,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007047",
                     "sensor_index": "300007047",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12232,6 +12265,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12241,7 +12275,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008807",
                     "sensor_index": "300008807",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12256,6 +12290,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12265,7 +12300,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010567",
                     "sensor_index": "300010567",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12280,6 +12315,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12289,7 +12325,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012327",
                     "sensor_index": "300012327",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12304,6 +12340,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12328,6 +12365,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12352,6 +12390,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12376,6 +12415,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12400,6 +12440,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12409,7 +12450,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000003",
                     "sensor_index": "300000003",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12424,6 +12465,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12433,7 +12475,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001763",
                     "sensor_index": "300001763",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12448,6 +12490,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12457,7 +12500,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003523",
                     "sensor_index": "300003523",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12472,6 +12515,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12481,7 +12525,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005283",
                     "sensor_index": "300005283",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12496,6 +12540,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12505,7 +12550,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007043",
                     "sensor_index": "300007043",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12520,6 +12565,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12529,7 +12575,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008803",
                     "sensor_index": "300008803",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12544,6 +12590,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12553,7 +12600,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010563",
                     "sensor_index": "300010563",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12568,6 +12615,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12577,7 +12625,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012323",
                     "sensor_index": "300012323",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -12592,6 +12640,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -12943,7 +12992,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000004",
                     "sensor_index": "300000004",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -12958,6 +13007,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12967,7 +13017,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001764",
                     "sensor_index": "300001764",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -12982,6 +13032,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12991,7 +13042,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003524",
                     "sensor_index": "300003524",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13006,6 +13057,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13015,7 +13067,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005284",
                     "sensor_index": "300005284",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13030,6 +13082,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13039,7 +13092,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007044",
                     "sensor_index": "300007044",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13054,6 +13107,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13063,7 +13117,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008804",
                     "sensor_index": "300008804",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13078,6 +13132,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13087,7 +13142,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010564",
                     "sensor_index": "300010564",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13102,6 +13157,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13111,7 +13167,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012324",
                     "sensor_index": "300012324",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Bias Current ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Bias Current",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
@@ -13126,6 +13182,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13135,7 +13192,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000013",
                     "sensor_index": "300000013",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13150,6 +13207,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13159,7 +13217,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000014",
                     "sensor_index": "300000014",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13174,6 +13232,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13183,7 +13242,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001773",
                     "sensor_index": "300001773",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13198,6 +13257,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13207,7 +13267,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001774",
                     "sensor_index": "300001774",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13222,6 +13282,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13231,7 +13292,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003533",
                     "sensor_index": "300003533",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13246,6 +13307,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13255,7 +13317,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003534",
                     "sensor_index": "300003534",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13270,6 +13332,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13279,7 +13342,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005293",
                     "sensor_index": "300005293",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13294,6 +13357,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13303,7 +13367,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005294",
                     "sensor_index": "300005294",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13318,6 +13382,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13327,7 +13392,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007053",
                     "sensor_index": "300007053",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13342,6 +13407,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13351,7 +13417,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007054",
                     "sensor_index": "300007054",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13366,6 +13432,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13375,7 +13442,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008813",
                     "sensor_index": "300008813",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13390,6 +13457,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13399,7 +13467,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008814",
                     "sensor_index": "300008814",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13414,6 +13482,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13423,7 +13492,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010573",
                     "sensor_index": "300010573",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13438,6 +13507,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13447,7 +13517,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010574",
                     "sensor_index": "300010574",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13462,6 +13532,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13471,7 +13542,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012333",
                     "sensor_index": "300012333",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Receive Power ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Receive Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13486,6 +13557,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13495,7 +13567,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012334",
                     "sensor_index": "300012334",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Transmit Power ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Transmit Power",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13510,6 +13582,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13534,6 +13607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFanTrayOperStatus"
                 },
                 {
@@ -13558,6 +13632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFanTrayOperStatus"
                 },
                 {
@@ -13582,6 +13657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cefcFRUPowerOperStatus"
                 },
                 {
@@ -13606,6 +13682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusPeerUnitState"
                 },
                 {
@@ -13630,6 +13707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 0,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "cRFStatusUnitState"
                 },
                 {
@@ -13639,7 +13717,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000007",
                     "sensor_index": "300000007",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13654,6 +13732,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13663,7 +13742,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001767",
                     "sensor_index": "300001767",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13678,6 +13757,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13687,7 +13767,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003527",
                     "sensor_index": "300003527",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13702,6 +13782,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13711,7 +13792,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005287",
                     "sensor_index": "300005287",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13726,6 +13807,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13735,7 +13817,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007047",
                     "sensor_index": "300007047",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13750,6 +13832,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13759,7 +13842,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008807",
                     "sensor_index": "300008807",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13774,6 +13857,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13783,7 +13867,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010567",
                     "sensor_index": "300010567",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13798,6 +13882,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13807,7 +13892,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012327",
                     "sensor_index": "300012327",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13822,6 +13907,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13846,6 +13932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13870,6 +13957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13894,6 +13982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13918,6 +14007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13927,7 +14017,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300000003",
                     "sensor_index": "300000003",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/1 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13942,6 +14032,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13951,7 +14042,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300001763",
                     "sensor_index": "300001763",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/2 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13966,6 +14057,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13975,7 +14067,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300003523",
                     "sensor_index": "300003523",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/3 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -13990,6 +14082,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -13999,7 +14092,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300005283",
                     "sensor_index": "300005283",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/4 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14014,6 +14107,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14023,7 +14117,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300007043",
                     "sensor_index": "300007043",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/5 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14038,6 +14132,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14047,7 +14142,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300008803",
                     "sensor_index": "300008803",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/6 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14062,6 +14157,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14071,7 +14167,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300010563",
                     "sensor_index": "300010563",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/7 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14086,6 +14182,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -14095,7 +14192,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9.9.91.1.1.1.1.4.300012323",
                     "sensor_index": "300012323",
                     "sensor_type": "cisco-entity-sensor",
-                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Voltage ",
+                    "sensor_descr": "Ethernet1/8 Lane 1 Transceiver Voltage",
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
@@ -14110,6 +14207,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

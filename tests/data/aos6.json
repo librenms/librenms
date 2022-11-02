@@ -10,11 +10,11 @@
                     "version": "6.7.1.108.R04",
                     "hardware": "OS6350-P24",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos6",
                     "type": "network",
                     "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },
@@ -8955,7 +8955,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Dynamic Aggregate Number 1 ref 40000001 size 2",
-                    "ifName": "Uplink rox-timi2\n2D 31 00 ",
+                    "ifName": "Uplink rox-timi2\n2D 31 00",
                     "portName": null,
                     "ifIndex": 40000001,
                     "ifSpeed": null,
@@ -9060,7 +9060,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Omnichannel Aggregate Number 2 ref 40000002 size 2",
-                    "ifName": "WLAN Controller\n72 6F 63 2D 68 72 6F 63 63 2D 67 69 61 72 6D 2D \n31 00 ",
+                    "ifName": "WLAN Controller\n72 6F 63 2D 68 72 6F 63 63 2D 67 69 61 72 6D 2D \n31 00",
                     "portName": null,
                     "ifIndex": 40000002,
                     "ifSpeed": null,
@@ -18199,7 +18199,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Dynamic Aggregate Number 1 ref 40000001 size 2",
-                    "ifName": "Uplink rox-timi2\n2D 31 00 ",
+                    "ifName": "Uplink rox-timi2\n2D 31 00",
                     "portName": null,
                     "ifIndex": 40000001,
                     "ifSpeed": 0,
@@ -18304,7 +18304,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Omnichannel Aggregate Number 2 ref 40000002 size 2",
-                    "ifName": "WLAN Controller\n72 6F 63 2D 68 72 6F 63 63 2D 67 69 61 72 6D 2D \n31 00 ",
+                    "ifName": "WLAN Controller\n72 6F 63 2D 68 72 6F 63 63 2D 67 69 61 72 6D 2D \n31 00",
                     "portName": null,
                     "ifIndex": 40000002,
                     "ifSpeed": 0,
@@ -18409,7 +18409,7 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "Omnichannel Aggregate Number 10 ref 40000010 size 2",
-                    "ifName": "roc-hrocc-giarm-\n31 00 ",
+                    "ifName": "roc-hrocc-giarm-\n31 00",
                     "portName": null,
                     "ifIndex": 40000010,
                     "ifSpeed": 0,
@@ -18580,6 +18580,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18604,6 +18605,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18628,6 +18630,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18652,6 +18655,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateA"
                 },
                 {
@@ -18676,6 +18680,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateA"
                 },
                 {
@@ -18700,6 +18705,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateB"
                 },
                 {
@@ -18724,6 +18730,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateB"
                 },
                 {
@@ -18748,6 +18755,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alclnkaggAggNbrAttachedPorts"
                 },
                 {
@@ -18772,6 +18780,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alclnkaggAggNbrAttachedPorts"
                 },
                 {
@@ -18796,6 +18805,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasControlCertifyStatus"
                 },
                 {
@@ -18820,6 +18830,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasControlSynchronizationStatus"
                 },
                 {
@@ -18844,6 +18855,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18868,6 +18880,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18892,6 +18905,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18916,6 +18930,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18940,6 +18955,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18964,6 +18980,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

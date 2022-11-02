@@ -25,7 +25,7 @@ function rewrite_entity_descr($descr)
     $descr = preg_replace('/^voltages /', '', $descr);
     $descr = str_replace('PowerSupply', 'PSU ', $descr);
 
-    return $descr;
+    return trim($descr);
 }
 
 /**

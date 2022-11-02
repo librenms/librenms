@@ -281,7 +281,7 @@ class PrinterSupplies implements Module
                 return 0;
             }
         } elseif ($device['os'] == 'brother') {
-            if (! Str::contains($device['hardware'], 'MFC-L8850')) {
+            if (! Str::contains($device['hardware'] ?? '', 'MFC-L8850')) {
                 switch ($raw_value) {
                     case '0':
                         return 100;

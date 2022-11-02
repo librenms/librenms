@@ -10,11 +10,11 @@
                     "version": "K.15.04.0007",
                     "hardware": "J8697A 5406zl",
                     "features": null,
+                    "location": null,
                     "os": "procurve",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
+                    "icon": "hpe.svg"
                 }
             ]
         },

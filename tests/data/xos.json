@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.1916.2.175",
                     "sysDescr": "ExtremeXOS (X440-24p) version 15.5.1.6 v1551b6 by release-manager on Fri Apr 25 20:47:26 EDT 2014",
                     "sysContact": null,
                     "version": "15.5.1.6",
                     "hardware": "X440-24p",
                     "features": "v1551b6",
+                    "location": null,
                     "os": "xos",
                     "type": "network",
                     "serial": null,
-                    "icon": "extreme.svg",
-                    "location": null
+                    "icon": "extreme.svg"
                 }
             ]
         },

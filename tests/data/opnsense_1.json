@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.8072.3.2.8",
                     "sysDescr": "FreeBSD fw1-eri1.OPN 11.2-RELEASE-p16-HBSD FreeBSD 11.2-RELEASE-p16-HBSD  fc65add89c3(stable/20.1) amd64",
                     "sysContact": null,
                     "version": "20.1.2",
                     "hardware": "amd64/OpenSSL",
                     "features": null,
+                    "location": null,
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.svg",
-                    "location": null
+                    "icon": "opnsense.svg"
                 }
             ]
         },

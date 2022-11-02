@@ -283,7 +283,7 @@ foreach ($rule_list as $rule) {
         $location_query = 'SELECT locations.location, locations.id FROM alert_location_map, locations WHERE alert_location_map.rule_id=? and alert_location_map.location_id = locations.id ORDER BY location';
         $location_maps = dbFetchRows($location_query, [$rule['id']]);
         foreach ($location_maps as $location_map) {
-            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View Devices for Location" target="_blank">' . $location_map['location'] . '</a><br>';
+            $locations .= $except_device_or_group . '<a href="' . url('devices/location=' . $location_map['id']) . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="View Devices for Location" target="_blank">' . htmlentities($location_map['location']) . '</a><br>';
         }
     }
 
@@ -292,7 +292,7 @@ foreach ($rule_list as $rule) {
         $group_query = 'SELECT device_groups.name, device_groups.id FROM alert_group_map, device_groups WHERE alert_group_map.rule_id=? and alert_group_map.group_id = device_groups.id ORDER BY name';
         $group_maps = dbFetchRows($group_query, [$rule['id']]);
         foreach ($group_maps as $group_map) {
-            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . ' data-content="' . $group_map['name'] . '" title="' . $groups_msg . '" target="_blank">' . $group_map['name'] . '</a><br>';
+            $groups .= $except_device_or_group . '<a href="' . url('device-groups/' . $group_map['id'] . '/edit') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . ' data-content="' . htmlentities($group_map['name']) . '" title="' . $groups_msg . '" target="_blank">' . htmlentities($group_map['name']) . '</a><br>';
         }
     }
 
@@ -301,7 +301,7 @@ foreach ($rule_list as $rule) {
         $device_query = 'SELECT devices.device_id,devices.hostname FROM alert_device_map, devices WHERE alert_device_map.rule_id=? and alert_device_map.device_id = devices.device_id ORDER BY hostname';
         $device_maps = dbFetchRows($device_query, [$rule['id']]);
         foreach ($device_maps as $device_map) {
-            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . $device_map['hostname'] . '" title="' . $devices_msg . '" target="_blank">' . $device_map['hostname'] . '</a><br>';
+            $devices .= $except_device_or_group . '<a href="' . url('device/device=' . $device_map['device_id'] . '/tab=edit/') . '" data-container="body" data-toggle="popover" data-placement="' . $popover_position . '" data-content="' . htmlentities($device_map['hostname']) . '" title="' . $devices_msg . '" target="_blank">' . htmlentities($device_map['hostname']) . '</a><br>';
         }
     }
 

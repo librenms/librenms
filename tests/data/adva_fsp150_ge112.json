@@ -10,11 +10,11 @@
                     "version": "6.3.1-106",
                     "hardware": "FSP150CC-GE112 1.01",
                     "features": null,
+                    "location": "<private>",
                     "os": "adva_fsp150",
                     "type": "network",
                     "serial": "LBADVA71171203608",
-                    "icon": "adva.svg",
-                    "location": "<private>"
+                    "icon": "adva.svg"
                 }
             ]
         },
@@ -1315,6 +1315,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1339,6 +1340,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
