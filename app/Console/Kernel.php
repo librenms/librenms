@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
         return $this->artisan;
     }
 
-    public function handle(\Symfony\Component\Console\Input\InputInterface $input, ?\Symfony\Component\Console\Output\OutputInterface $output = null): int
+    public function handle($input, $output = null): int
     {
         // intercept input and check for debug
         if ($input->hasParameterOption(['-d', '--debug', '-vv', '-vvv'], true)) {
