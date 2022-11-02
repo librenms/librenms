@@ -30,14 +30,8 @@ use LibreNMS\Alert\AlertRules;
 
 class RunAlertRulesAction
 {
-    /**
-     * @var \LibreNMS\Alert\AlertRules
-     */
-    private $rules;
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
+    private AlertRules $rules;
+    private Device $device;
 
     public function __construct(Device $device, AlertRules $rules)
     {
