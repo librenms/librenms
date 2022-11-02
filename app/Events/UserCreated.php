@@ -10,12 +10,10 @@ use Illuminate\Queue\SerializesModels;
 class UserCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $user;
+    public User $user;
 
     /**
      * Create a new event instance.
-     *
-     * @param  User  $user
      */
     public function __construct(User $user)
     {
