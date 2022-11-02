@@ -171,7 +171,7 @@ trait YamlOSDiscovery
                 // check for a given replacement string (otherwise, remove)
                 if (is_array($replacements) && count($replacements) == 2) {
                     $search = $replacements[0];
-                    $replacement = $replacements[0];
+                    $replacement = $replacements[1];
                 }
 
                 // check for regex
