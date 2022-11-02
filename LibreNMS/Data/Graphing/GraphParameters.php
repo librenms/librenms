@@ -97,6 +97,7 @@ class GraphParameters
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
             'aggregate' => ! empty($vars['noagg']),
+            'previous' => isset($vars['previous']) && $vars['previous'] == 'yes',
         ];
 
         $this->from = Time::parseAt($vars['from'] ?? '-1d');

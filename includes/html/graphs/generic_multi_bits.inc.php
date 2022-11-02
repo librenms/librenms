@@ -36,7 +36,7 @@ foreach ($rrd_filenames as $key => $rrd_filename) {
     $seperator = ',';
     $plus = ',+';
 
-    if ($_GET['previous']) {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' DEF:' . $in . 'octets' . $i . 'X=' . $rrd_filename . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' DEF:' . $out . 'octets' . $i . 'X=' . $rrd_filename . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $in . 'octets' . $i . "X:$period";
@@ -73,7 +73,7 @@ if ($i) {
     $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,-1,*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
-    if ($_GET['previous'] == 'yes') {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' CDEF:' . $in . 'octetsX=' . $in_thingX . $pluses;
         $rrd_options .= ' CDEF:' . $out . 'octetsX=' . $out_thingX . $pluses;
         $rrd_options .= ' CDEF:doutoctetsX=outoctetsX,' . $stacked['stacked'] . ',*';
@@ -112,7 +112,7 @@ if ($i) {
     $rrd_options .= ' LINE1:percentile_in#aa0000';
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
-    if ($_GET['previous'] == 'yes') {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' AREA:inbitsX#9999966' . $stacked['transparency'] . ':';
         $rrd_options .= ' AREA:doutbitsX#99999966' . $stacked['transparency'] . ':';
     }
