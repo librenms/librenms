@@ -97,6 +97,7 @@ class GraphParameters
             'total' => ! ($vars['nototal'] ?? $this->is_small),
             'details' => ! ($vars['nodetails'] ?? $this->is_small),
             'aggregate' => ! empty($vars['noagg']),
+            'previous' => isset($vars['previous']) && $vars['previous'] == 'yes',
         ];
 
         $this->from = Time::parseAt($vars['from'] ?? '-1d');
@@ -154,16 +155,16 @@ class GraphParameters
         }
 
         // set up scaling scaling
-        if (! $this->scale_min && ! $this->scale_max) {
+        if ($this->scale_min === null && $this->scale_max === null) {
             $options[] = '--alt-autoscale-max';
             if ($this->scale_rigid === null) {
                 $this->scale_rigid = true;
             }
         }
-        if ($this->scale_min) {
+        if ($this->scale_min !== null) {
             array_push($options, '-l', $this->scale_min);
         }
-        if ($this->scale_max) {
+        if ($this->scale_max !== null) {
             array_push($options, '-u', $this->scale_max);
         }
         if ($this->scale_rigid) {
