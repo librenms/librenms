@@ -12,27 +12,20 @@ class PollingDevice
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * @var \App\Models\Device
-     */
-    public $device;
+    public Device $device;
 
     /**
      * Create a new event instance.
-     *
-     * @return void
      */
-    public function __construct(Device $device)
+    public function __construct(Device $device): void
     {
         $this->device = $device;
     }
 
     /**
      * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
      */
-    public function broadcastOn()
+    public function broadcastOn(): \Illuminate\Broadcasting\Channel|array
     {
         return new PrivateChannel('channel-name');
     }
