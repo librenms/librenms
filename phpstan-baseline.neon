@@ -6651,11 +6651,6 @@ parameters:
 			path: app/Console/LnmsCommand.php
 
 		-
-			message: "#^Property App\\\\Events\\\\UserCreated\\:\\:\\$user has no type specified\\.$#"
-			count: 1
-			path: app/Events/UserCreated.php
-
-		-
 			message: "#^PHPDoc type array of property App\\\\Exceptions\\\\Handler\\:\\:\\$dontReport is not covariant with PHPDoc type array\\<string\\> of overridden property Illuminate\\\\Foundation\\\\Exceptions\\\\Handler\\:\\:\\$dontReport\\.$#"
 			count: 1
 			path: app/Exceptions/Handler.php
