@@ -29,8 +29,10 @@ use Symfony\Component\Console\Input\InputOption;
 
 class DynamicInputOption extends InputOption
 {
-    private ?callable $descriptionCallable = null;
-    private ?callable $defaultCallable = null;
+    /** @var callable|null */
+    private $descriptionCallable = null;
+    /** @var callable|null */
+    private $defaultCallable = null;
 
     public function __construct(string $name, $shortcut = null, int $mode = null, string $description = '', $default = null, ?callable $defaultCallable = null, ?callable $descriptionCallable = null)
     {
