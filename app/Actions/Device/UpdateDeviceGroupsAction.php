@@ -31,19 +31,13 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
+    private Device $device;
 
     public function __construct(Device $device)
     {
         $this->device = $device;
     }
 
-    /**
-     * @return array[]
-     */
     public function execute(): array
     {
         if (! $this->device->exists) {
