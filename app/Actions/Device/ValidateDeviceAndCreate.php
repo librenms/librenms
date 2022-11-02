@@ -40,22 +40,10 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    /**
-     * @var \App\Models\Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $force;
-    /**
-     * @var bool
-     */
-    private $ping_fallback;
-    /**
-     * @var \LibreNMS\Polling\ConnectivityHelper
-     */
-    private $connectivity;
+    private Device $device;
+    private bool $force;
+    private bool $ping_fallback;
+    private \LibreNMS\Polling\ConnectivityHelper $connectivity;
 
     public function __construct(Device $device, bool $force = false, bool $ping_fallback = false)
     {
@@ -66,7 +54,6 @@ class ValidateDeviceAndCreate
     }
 
     /**
-     * @return bool
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
      * @throws \LibreNMS\Exceptions\HostUnreachablePingException
@@ -229,8 +216,6 @@ class ValidateDeviceAndCreate
     /**
      * Check if a device with match hostname or sysname exists in the database.
      * Throw and error if they do.
-     *
-     * @return void
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
      */
