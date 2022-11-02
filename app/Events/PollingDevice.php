@@ -17,7 +17,7 @@ class PollingDevice
     /**
      * Create a new event instance.
      */
-    public function __construct(Device $device): void
+    public function __construct(Device $device)
     {
         $this->device = $device;
     }
