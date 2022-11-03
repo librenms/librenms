@@ -2457,6 +2457,41 @@ setup. If the default does not work, check the docs for it at
 [MetaCPAN for
 suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
 
+
+## Systemd
+
+The systemd application polls systemd and scrapes systemd units' load, activation, and sub states.
+
+### SNMP Extend
+
+1. Copy the python script, systemd.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/systemd.py -O /etc/snmp/systemd.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/systemd.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend systemd /etc/snmp/systemd.py
+```
+
+4. (Optional) Create a /etc/snmp/systemd.json file and specify:
+    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+```
+{
+    "systemctl_cmd": "/bin/systemctl",
+    "include_inactive_units": "True"
+}
+```
+
+5. Restart snmpd.
+
+
 ## TinyDNS aka djbdns
 
 ### Agent

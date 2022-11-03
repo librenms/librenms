@@ -188,9 +188,11 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQueryInterface
+    public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->options = array_merge($this->options, ['-On']);
+        $this->options = $numeric
+            ? array_merge($this->options, ['-On'])
+            : array_diff($this->options, ['-On']);
 
         return $this;
     }

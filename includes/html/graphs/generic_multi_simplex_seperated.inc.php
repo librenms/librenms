@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $unitlen = $unitlen ?? 0;
 $descr_len = $descr_len ?? 0;
 $multiplier = $multiplier ?? false;
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 $stack = $stack ?? '';
 
 $seperatorX = '';

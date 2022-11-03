@@ -130,9 +130,9 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function numeric(): SnmpQueryInterface
+    public function numeric(bool $numeric = true): SnmpQueryInterface
     {
-        $this->numeric = true;
+        $this->numeric = $numeric;
 
         return $this;
     }
