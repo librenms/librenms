@@ -111,7 +111,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($previous == 'yes') {
+if ($previous) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {
