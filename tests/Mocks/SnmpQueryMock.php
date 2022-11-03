@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
-use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Oid;
 use Log;
 
 class SnmpQueryMock implements SnmpQueryInterface
@@ -101,7 +101,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate(string $oid, ?string $mib = null): SnmpResponse
+    public function translate(string $oid, ?string $mib = null): string
     {
         // call real snmptranslate
         $options = $this->options;
@@ -295,7 +295,7 @@ class SnmpQueryMock implements SnmpQueryInterface
             return "$num_oid = $data";
         }
 
-        if (! empty($oid) && YamlDiscovery::oidIsNumeric($oid)) {
+        if (! empty($oid) && Oid::isNumeric($oid)) {
             $oid = $this->translate($oid)->value();
         }
 
@@ -332,7 +332,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 return '1.3.6.1.4.1.6574.1.1.0';
         }
 
-        if (YamlDiscovery::oidIsNumeric($oid)) {
+        if (Oid::isNumeric($oid)) {
             return ltrim($oid, '.');
         }
 

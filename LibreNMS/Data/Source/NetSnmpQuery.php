@@ -33,6 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
@@ -283,13 +284,32 @@ class NetSnmpQuery implements SnmpQueryInterface
      * Translate an OID.
      * call numeric() on the query to output numeric OID
      */
-    public function translate(string $oid, ?string $mib = null): SnmpResponse
+    public function translate(string $oid, ?string $mib = null): string
     {
+        $this->options = array_diff($this->options, [self::DEFAULT_FLAGS]); // remove default options
+
+        $this->options[] = '-Pu'; // don't error on _
+
+        if (in_array('-On', $this->options)) {
+            $this->options[] = '-On'; // numeric
+        } else {
+            $this->options[] = '-OS'; // full text oid
+        }
+
+        // textual oid without mib, need to search or prepend
+        if (! str_contains($oid, '::') && ! Oid::isNumeric($oid)) {
+            if (empty($mib) || $mib == 'ALL' || str_contains($mib, ':')) {
+                $this->options[] = '-IR'; // search for mib
+            } else {
+                $oid = "$mib::$oid"; // single mib, just prepend it
+            }
+        }
+
         if ($mib) {
             $this->options = array_merge($this->options, ['-m', $mib]);
         }
 
-        return $this->exec('snmptranslate', [$oid]);
+        return $this->exec('snmptranslate', [$oid])->value();
     }
 
     private function buildCli(string $command, array $oids): array
