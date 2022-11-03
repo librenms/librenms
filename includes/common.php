@@ -786,7 +786,7 @@ function mw_to_dbm($value)
     return 10 * log10($value);
 }
 
-function set_null($value, $default = null, $min = null)
+function set_null(mixed $value, ?int $default = null, ?int $min = null)
 {
     if (! is_numeric($value)) {
         return $default;
