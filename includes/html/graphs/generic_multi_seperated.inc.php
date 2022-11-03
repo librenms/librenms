@@ -223,7 +223,7 @@ if ($previous) {
     $rrd_optionsb .= ' LINE1.25:dout' . $format . 'X#666666:';
 }
 
-if (! $nototal) {
+if (! $nototal && ! empty($rrd_list)) {
     $rrd_options .= ' CDEF:inB=' . $in_thing . $pluses;
     $rrd_options .= ' CDEF:outB=' . $out_thing . $pluses;
     $rrd_options .= ' CDEF:octets=inB,outB,+';
