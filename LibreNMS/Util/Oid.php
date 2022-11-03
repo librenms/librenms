@@ -58,7 +58,7 @@ class Oid
         }
         $key = 'Oid:toNumeric:' . $mib . '/' . $oid;
 
-        $numeric_oid = Cache::remember($key, $cache, function ($oid, $mib) {
+        $numeric_oid = Cache::remember($key, $cache, function () use ($oid, $mib) {
             return \SnmpQuery::numeric()->translate($oid, $mib);
         });
 
