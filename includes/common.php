@@ -23,14 +23,13 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
+use App\Models\Port;
+use App\Models\Vminfo;
 
 /**
  * Execute and snmp command, filter debug output unless -v is specified
- *
- * @param  array  $command
- * @return null|string
  */
-function external_exec($command)
+function external_exec(array $command) : null|string
 {
     $device = DeviceCache::getPrimary();
 
@@ -92,7 +91,7 @@ function external_exec($command)
     return $output;
 }
 
-function shorthost($hostname, $len = 12)
+function shorthost(string $hostname, ?int $len = 12) : string
 {
     // IP addresses should not be shortened
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
@@ -111,7 +110,7 @@ function shorthost($hostname, $len = 12)
     return $shorthost;
 }
 
-function print_error($text)
+function print_error(string $text) : void
 {
     if (Laravel::isCli()) {
         c_echo('%r' . $text . "%n\n");
@@ -120,7 +119,7 @@ function print_error($text)
     }
 }
 
-function print_message($text)
+function print_message(string $text) :void
 {
     if (Laravel::isCli()) {
         c_echo('%g' . $text . "%n\n");
@@ -129,7 +128,7 @@ function print_message($text)
     }
 }
 
-function get_sensor_rrd($device, $sensor)
+function get_sensor_rrd(array $device, $sensor) : Rrd
 {
     return Rrd::name($device['hostname'], get_sensor_rrd_name($device, $sensor));
 }
@@ -144,7 +143,7 @@ function get_sensor_rrd_name($device, $sensor)
     }
 }
 
-function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
+function get_port_rrdfile_path(string $hostname, int $port_id, ?string $suffix = '') : Rrd
 {
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
@@ -163,12 +162,12 @@ function get_port_by_index_cache($device_id, $ifIndex)
     return $port;
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
+function get_port_by_ifIndex(int $device_id, int $ifIndex)
 {
     return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
 }
 
-function table_from_entity_type($type)
+function table_from_entity_type(string $type) : string
 {
     // Fuck you, english pluralisation.
     if ($type == 'storage') {
@@ -194,40 +193,31 @@ function get_entity_by_id_cache($type, $id)
     return $entity;
 }
 
-function get_port_by_id($port_id)
+function get_port_by_id(int $id) : array|false
 {
-    if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
-        }
+    if ($port = Port::find($id)) {
+        return $port->toArray();
     }
+
+    return false;
 }
 
-function get_sensor_by_id($sensor_id)
+function get_sensor_by_id(int $id) : array|false
 {
-    if (is_numeric($sensor_id)) {
-        $sensor = dbFetchRow('SELECT * FROM `sensors` WHERE `sensor_id` = ?', [$sensor_id]);
-        if (is_array($sensor)) {
-            return $sensor;
-        } else {
-            return false;
-        }
+    if ($sensor = Sensor::find(id)) {
+        return $sensor->toArray();
     }
+    
+    return false;
 }
 
-function get_device_id_by_port_id($port_id)
+function get_device_id_by_port_id(int $id) : int|false
 {
-    if (is_numeric($port_id)) {
-        $device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_numeric($device_id)) {
-            return $device_id;
-        } else {
-            return false;
-        }
+    if ($port = Port::find($id)) {
+        return $port->device_id;
     }
+
+    return false;
 }
 
 function ifclass($ifOperStatus, $ifAdminStatus)
@@ -236,16 +226,18 @@ function ifclass($ifOperStatus, $ifAdminStatus)
     return \LibreNMS\Util\Url::portLinkDisplayClass((object) ['ifOperStatus' => $ifOperStatus, 'ifAdminStatus' => $ifAdminStatus]);
 }
 
-function device_by_name($name)
+function device_by_name(string $name) : array
 {
     return device_by_id_cache(getidbyname($name));
 }
 
-function accesspoint_by_id($ap_id, $refresh = '0')
+function accesspoint_by_id(int $id) : array
 {
-    $ap = dbFetchRow('SELECT * FROM `access_points` WHERE `accesspoint_id` = ?', [$ap_id]);
+    if ($ap = AccessPoint::find($id)) {
+        return $ap->toArray();
+    }
 
-    return $ap;
+    return false;
 }
 
 function device_by_id_cache($device_id, $refresh = false)
@@ -276,12 +268,12 @@ function truncate($substring, $max = 50, $rep = '...')
     }
 }
 
-function gethostbyid($device_id)
+function gethostbyid(int $device_id) : DeviceCache
 {
-    return DeviceCache::get((int) $device_id)->hostname;
+    return DeviceCache::get($device_id)->hostname;
 }
 
-function strgen($length = 16)
+function strgen(int $length = 16) : string
 {
     $entropy = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 'a', 'A', 'b', 'B', 'c', 'C', 'd', 'D', 'e',
         'E', 'f', 'F', 'g', 'G', 'h', 'H', 'i', 'I', 'j', 'J', 'k', 'K', 'l', 'L', 'm', 'M', 'n',
@@ -297,27 +289,27 @@ function strgen($length = 16)
     return $string;
 }
 
-function getpeerhost($id)
+function getpeerhost(int $id) : int
 {
-    return dbFetchCell('SELECT `device_id` from `bgpPeers` WHERE `bgpPeer_id` = ?', [$id]);
+    return BgpPeer::find($id)->device_id;
 }
 
-function getifindexbyid($id)
+function getifindexbyid(int $id) : int
 {
-    return dbFetchCell('SELECT `ifIndex` FROM `ports` WHERE `port_id` = ?', [$id]);
+    return Port::find($id)->ifIndex;
 }
 
-function getifbyid($id)
+function getifbyid(int $id)
 {
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
+    return Port::find($id)->toArray();
 }
 
-function getifdescrbyid($id)
+function getifdescrbyid(int $id) : string
 {
-    return dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `port_id` = ?', [$id]);
+    return Port::find($id)->ifDescr;
 }
 
-function getidbyname($hostname)
+function getidbyname(string $hostname) : int
 {
     return DeviceCache::getByHostname($hostname)->device_id;
 }
@@ -361,11 +353,8 @@ function del_dev_attrib($device, $attrib_type)
 /**
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
- *
- * @param  string  $string  the string to print with console color
- * @param  bool  $enabled  if set to false, this function does nothing
  */
-function c_echo($string, $enabled = true)
+function c_echo(string $string, bool $enabled = true) :void
 {
     if (! $enabled) {
         return;
@@ -403,7 +392,7 @@ function c_echo($string, $enabled = true)
 /*
  * @return true if client IP address is authorized to access graphs
  */
-function is_client_authorized($clientip)
+function is_client_authorized($clientip) : bool
 {
     if (Config::get('allow_unauth_graphs', false)) {
         d_echo("Unauthorized graphs allowed\n");
@@ -551,11 +540,8 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- *
- * @param  array  $device  (uses hostname and sysName fields)
- * @return string
  */
-function format_hostname($device): string
+function format_hostname(array $device): string
 {
     $hostname = $device['hostname'] ?? 'invalid hostname';
     $hostname_is_ip = IP::isValid($hostname);
@@ -573,12 +559,8 @@ function format_hostname($device): string
  * Query all ports of the given device (by ID) and build port array and
  * port association maps for ifIndex, ifName, ifDescr. Query port stats
  * if told to do so, too.
- *
- * @param  int  $device_id  ID of device to query ports for
- * @param  bool  $with_statistics  Query port statistics, too. (optional, default false)
- * @return array
  */
-function get_ports_mapped($device_id, $with_statistics = false)
+function get_ports_mapped(int $device_id, bool $with_statistics = false) : array
 {
     $ports = [];
     $maps = [
@@ -615,13 +597,8 @@ function get_ports_mapped($device_id, $with_statistics = false)
 
 /**
  * Calculate port_id of given port using given devices port information and port association mode
- *
- * @param  array  $ports_mapped  Port information of device queried by get_ports_mapped()
- * @param  array  $port  Port information as fetched from DB
- * @param  string  $port_association_mode  Port association mode to use for mapping
- * @return int port_id (or Null)
  */
-function get_port_id($ports_mapped, $port, $port_association_mode)
+function get_port_id(array $ports_mapped, array $port, string $port_association_mode) : int
 {
     // Get port_id according to port_association_mode used for this device
     $port_id = null;
@@ -644,15 +621,8 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
 
 /**
  * Create a glue-chain
- *
- * @param  array  $tables  Initial Tables to construct glue-chain
- * @param  string  $target  Glue to find (usual device_id)
- * @param  int  $x  Recursion Anchor
- * @param  array  $hist  History of processed tables
- * @param  array  $last  Glues on the fringe
- * @return array|false
  */
-function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
+function ResolveGlues(array $tables, string $target, int $x = 0, array $hist = [], array $last = []) : array|false
 {
     if (sizeof($tables) == 1 && $x != 0) {
         if (dbFetchCell('SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_NAME = ? && COLUMN_NAME = ?', [$tables[0], $target]) == 1) {
@@ -726,12 +696,8 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 
 /**
  * Determine if a given string contains a given substring.
- *
- * @param  string  $haystack
- * @param  string|array  $needles
- * @return bool
  */
-function str_i_contains($haystack, $needles)
+function str_i_contains(string $haystack, string|array $needles) : bool
 {
     foreach ((array) $needles as $needle) {
         if ($needle != '' && stripos($haystack, $needle) !== false) {
@@ -744,12 +710,8 @@ function str_i_contains($haystack, $needles)
 
 /**
  * Get alert_rules sql filter by minimal severity
- *
- * @param  string|int  $min_severity
- * @param  string  $alert_rules_name
- * @return string
  */
-function get_sql_filter_min_severity($min_severity, $alert_rules_name)
+function get_sql_filter_min_severity(string $min_severity, string $alert_rules_name) : string
 {
     $alert_severities = [
         // alert_rules.status is enum('ok','warning','critical')
@@ -775,12 +737,8 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 /**
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
- *
- * @param  float  $value
- * @param  string  $scale  fahrenheit or celsius
- * @return string (containing a float)
  */
-function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
+function fahrenheit_to_celsius(float $value, string $scale = 'fahrenheit') : string
 {
     if ($scale === 'fahrenheit') {
         $value = ($value - 32) / 1.8;
@@ -792,12 +750,8 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
 /**
  * Converts celsius to fahrenheit (with 2 decimal places)
  * if $scale is not celsius, it assumes celsius and  returns the value
- *
- * @param  float  $value
- * @param  string  $scale  fahrenheit or celsius
- * @return string (containing a float)
  */
-function celsius_to_fahrenheit($value, $scale = 'celsius')
+function celsius_to_fahrenheit(float $value, string $scale = 'celsius') : string
 {
     if ($scale === 'celsius') {
         $value = ($value * 1.8) + 32;
@@ -832,12 +786,6 @@ function mw_to_dbm($value)
     return 10 * log10($value);
 }
 
-/**
- * @param $value
- * @param  null  $default
- * @param  int  $min
- * @return null
- */
 function set_null($value, $default = null, $min = null)
 {
     if (! is_numeric($value)) {
@@ -875,13 +823,20 @@ function get_vm_parent_id($device)
         return false;
     }
 
-    return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
+    return Vminfo::where('vmwVmDisplayName', $device['hostname'])
+                ->orWhere('vmwVmDisplayName', $device['hostname'] . '.' . Config::get('mydomain'))
+                ->first()
+                ->device_id;
 }
 
 /**
  * Generate a class name from a lowercase string containing - or _
  * Remove - and _ and camel case words
  *
+ * @param $value
+ * @param  null  $default
+ * @param  int  $min
+ * @return null
  * @param  string  $name  The string to convert to a class name
  * @param  string  $namespace  namespace to prepend to the name for example: LibreNMS\
  * @return string Class name
@@ -893,12 +848,8 @@ function str_to_class($name, $namespace = null)
 
 /**
  * Index an array by a column
- *
- * @param  array  $array
- * @param  string|int  $column
- * @return array
  */
-function array_by_column($array, $column)
+function array_by_column(array $array, string|int $column) : array
 {
     return array_combine(array_column($array, $column), $array);
 }
