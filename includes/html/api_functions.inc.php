@@ -27,6 +27,7 @@ use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
@@ -85,12 +86,35 @@ function api_not_found()
     return api_error(404, "This API route doesn't exist.");
 }
 
-function api_get_graph(array $vars)
+function api_get_graph(Request $request, array $additional = [])
 {
     try {
-        $graph = Graph::get($vars);
+        $vars = $request->only([
+            'from',
+            'to',
+            'legend',
+            'title',
+            'absolute',
+            'font',
+            'bg',
+            'bbg',
+            'title',
+            'graph_title',
+            'nototal',
+            'nodetails',
+            'noagg',
+            'inverse',
+            'previous',
+        ]);
 
-        if ($vars['output'] === 'base64') {
+        $graph = Graph::get([
+            'width'  => $request->get('width', 1075),
+            'height' => $request->get('height', 300),
+            ...$additional,
+            ...$vars,
+        ]);
+
+        if ($request->get('output') === 'base64') {
             return api_success(['image' => $graph->base64(), 'content-type' => $graph->contentType()], 'image');
         }
 
@@ -127,32 +151,25 @@ function check_port_permission($port_id, $device_id, $callback)
     return $callback($port_id);
 }
 
-function get_graph_by_port_hostname(Illuminate\Http\Request $request, $ifname = null, $type = 'port_bits')
+function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'port_bits')
 {
     // This will return a graph for a given port by the ifName
     $hostname = $request->route('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     $vars = [
-        'port'   => $ifname ?: $request->route('ifname'),
-        'type'   => $request->route('type', $type),
-        'output' => $request->get('output', 'display'),
-        'width'  => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
+        'port' => $ifname ?: $request->route('ifname'),
+        'type' => $request->route('type', $type),
     ];
 
-    if ($request->has('from')) {
-        $vars['from'] = $request->get('from');
-    }
+    $port_field = $request->get('ifDescr') ? 'ifDescr' : 'ifName'; // don't accept user input
+    $vars['id'] = Port::where([
+        'device_id' => $device_id,
+        'deleted' => 0,
+        $port_field => $vars['port'],
+    ])->value('port_id');
 
-    if ($request->has('to')) {
-        $vars['to'] = $request->get('to');
-    }
-
-    $port = $request->get('ifDescr') ? 'ifDescr' : 'ifName';
-    $vars['id'] = dbFetchCell("SELECT `P`.`port_id` FROM `ports` AS `P` JOIN `devices` AS `D` ON `P`.`device_id` = `D`.`device_id` WHERE `D`.`device_id`=? AND `P`.`$port`=? AND `deleted` = 0 LIMIT 1", [$device_id, $vars['port']]);
-
-    return check_port_permission($vars['id'], $device_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_port_permission($vars['id'], $device_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -201,14 +218,13 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
     });
 }
 
-function get_graph_generic_by_hostname(Illuminate\Http\Request $request)
+function get_graph_generic_by_hostname(Request $request)
 {
     // This will return a graph type given a device id.
     $hostname = $request->route('hostname');
     $sensor_id = $request->route('sensor_id');
     $vars = [];
     $vars['type'] = $request->route('type', 'device_uptime');
-    $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id'] = $sensor_id;
         if (Str::contains($vars['type'], '_wireless')) {
@@ -225,18 +241,7 @@ function get_graph_generic_by_hostname(Illuminate\Http\Request $request)
     $vars['device'] = $device['device_id'];
 
     return check_device_permission($device_id, function () use ($request, $vars) {
-        if ($request->has('from')) {
-            $vars['from'] = $request->get('from');
-        }
-
-        if ($request->has('to')) {
-            $vars['to'] = $request->get('to');
-        }
-
-        $vars['width'] = $request->get('width', 1075);
-        $vars['height'] = $request->get('height', 300);
-
-        return api_get_graph($vars);
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -733,33 +738,22 @@ function list_ospf_ports(Illuminate\Http\Request $request)
     return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
-function get_graph_by_portgroup(Illuminate\Http\Request $request)
+function get_graph_by_portgroup(Request $request)
 {
-    $group = $request->route('group');
     $id = $request->route('id');
-    $vars = [
-        'output' => $request->get('output', 'display'),
-        'width'  => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
-        'type'   => 'multiport_bits_separate',
-    ];
-    if ($request->has('from')) {
-        $vars['from'] = $request->get('from');
-    }
-
-    if ($request->has('to')) {
-        $vars['to'] = $request->get('to');
-    }
 
     if (empty($id)) {
+        $group = $request->route('group');
         $ports = get_ports_from_type(explode(',', $group));
         $if_list = implode(',', Arr::pluck($ports, 'port_id'));
     } else {
         $if_list = $id;
     }
-    $vars['id'] = $if_list;
 
-    return api_get_graph($vars);
+    return api_get_graph($request, [
+        'type'   => 'multiport_bits_separate',
+        'id' => $if_list,
+    ]);
 }
 
 function get_components(Illuminate\Http\Request $request)
@@ -1616,12 +1610,10 @@ function get_bill_graph(Illuminate\Http\Request $request)
     $vars = [
         'type' => "bill_$graph_type",
         'id' => $bill_id,
-        'width' => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
     ];
 
-    return check_bill_permission($bill_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
@@ -1670,8 +1662,6 @@ function get_bill_history_graph(Illuminate\Http\Request $request)
         'type' => "bill_$graph_type",
         'id' => $bill_id,
         'bill_hist_id' => $bill_hist_id,
-        'width' => $request->get('width', 1075),
-        'height' => $request->get('height', 300),
     ];
 
     switch ($graph_type) {
@@ -1690,8 +1680,8 @@ function get_bill_history_graph(Illuminate\Http\Request $request)
             return api_error(400, "Unknown Graph Type $graph_type");
     }
 
-    return check_bill_permission($bill_id, function () use ($vars) {
-        return api_get_graph($vars);
+    return check_bill_permission($bill_id, function () use ($request, $vars) {
+        return api_get_graph($request, $vars);
     });
 }
 
