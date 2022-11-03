@@ -2,7 +2,7 @@
 
 use LibreNMS\Config;
 
-$dest = device_by_id_cache($_GET['dest']);
+$dest = device_by_id_cache($vars['dest']);
 
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>
