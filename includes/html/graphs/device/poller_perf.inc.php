@@ -11,6 +11,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 use LibreNMS\Config;
 
 $scale_min = '0';
@@ -29,7 +30,7 @@ if (Config::get('applied_site_style') == 'dark') {
 $rrd_options .= ' GPRINT:poller:LAST:%6.2lf  GPRINT:poller:MIN:%6.2lf';
 $rrd_options .= " GPRINT:poller:MAX:%6.2lf  'GPRINT:poller:AVERAGE:%6.2lf\\n'";
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= " COMMENT:' \\n'";
     $rrd_options .= " DEF:pollerX=$rrd_filename:poller:AVERAGE:start=$prev_from:end=$from";
     $rrd_options .= " SHIFT:pollerX:$period";
