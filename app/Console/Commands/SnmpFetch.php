@@ -69,6 +69,7 @@ class SnmpFetch extends LnmsCommand
 
             if ($type == 'translate') {
                 $this->line($res);
+
                 return 0;
             }
 
