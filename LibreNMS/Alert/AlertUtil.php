@@ -41,7 +41,7 @@ class AlertUtil
      */
     private static function getRuleId(int $alert_id)
     {
-        return Alert::query('rule_id')->where('id', $alert_id)->get();
+        return Alert::select('rule_id')->where('id', $alert_id)->get();
     }
 
     /**
