@@ -150,7 +150,7 @@ class IRCBot
             }
         }
 
-        return $this->log('Cached ' . sizeof($this->external) . ' commands.');
+        return $this->log('Cached ' . count($this->external) . ' commands.');
     }
 
     //end load_external()
@@ -678,7 +678,7 @@ class IRCBot
 
     private function ircRaw($params)
     {
-        return fputs($this->socket['irc'], $params . "\r\n");
+        return fwrite($this->socket['irc'], $params . "\r\n");
     }
 
     //end irc_raw()
@@ -775,9 +775,9 @@ class IRCBot
 
     private function _help($params)
     {
-        $msg = join(', ', $this->commands);
+        $msg = implode(', ', $this->commands);
         if (count($this->external) > 0) {
-            $msg .= ', ' . join(', ', array_keys($this->external));
+            $msg .= ', ' . implode(', ', array_keys($this->external));
         }
 
         return $this->respond("Available commands: $msg");

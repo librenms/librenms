@@ -226,7 +226,7 @@ class RunAlerts
             return 'none';
         }
 
-        return join(' ', $ret);
+        return implode(' ', $ret);
     }
 
     public function clearStaleAlerts()
@@ -329,8 +329,8 @@ class RunAlerts
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
-                $o = sizeof($alert['details']['rule']);
-                $n = sizeof($chk);
+                $o = count($alert['details']['rule']);
+                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
                 if ($n > $o) {
