@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Alert;
 
+use App\Models\Alert;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
@@ -35,15 +36,10 @@ class AlertUtil
 {
     /**
      * Get the rule_id for a specific alert
-     *
-     * @param  int  $alert_id
-     * @return mixed|null
      */
-    private static function getRuleId($alert_id)
+    private static function getRuleId(int $alert_id): mixed|null
     {
-        $query = 'SELECT `rule_id` FROM `alerts` WHERE `id`=?';
-
-        return dbFetchCell($query, [$alert_id]);
+        return Alert::query('rule_id')->where('id', $alert_id)->get();
     }
 
     /**
