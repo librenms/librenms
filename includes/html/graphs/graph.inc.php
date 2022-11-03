@@ -42,13 +42,12 @@ if ($auth && is_customoid_graph($type, $subtype)) {
 } elseif ($auth && is_file(Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php")) {
     include Config::get('install_dir') . "/includes/html/graphs/$type/$subtype.inc.php";
 } else {
-    graph_error("$type*$subtype ");
-    // Graph Template Missing");
+    graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
 }
 
 if ($auth === null) {
     // We are unauthenticated :(
-    graph_error($width < 200 ? 'No Auth' : 'No Authorization');
+    graph_error('No Authorization', 'No Auth');
 
     return;
 }
@@ -76,7 +75,7 @@ if (! empty($command_only)) {
 }
 
 if (empty($rrd_options)) {
-    graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+    graph_error('Graph Definition Error', 'Def Error');
 
     return;
 }
@@ -98,8 +97,8 @@ try {
     }
 
     if (isset($rrd_filename) && ! Rrd::checkRrdExists($rrd_filename)) {
-        graph_error($width < 200 ? 'No Data' : 'No Data file ' . basename($rrd_filename));
+        graph_error('No Data file ' . basename($rrd_filename), 'No Data');
     } else {
-        graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph: ' . $e->getMessage());
+        graph_error('Error Drawing Graph: ' . $e->getMessage(), 'Draw Error');
     }
 }
