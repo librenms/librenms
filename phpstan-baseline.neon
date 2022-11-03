@@ -2451,22 +2451,7 @@ parameters:
 			path: LibreNMS/Device/WirelessSensor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has parameter \\$oid with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
 			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:preCache\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Property LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:\\$cache_time has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Device/YamlDiscovery.php
 
@@ -3486,16 +3471,6 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:memValid\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
@@ -3966,16 +3941,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:parseRegex\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php
@@ -4106,16 +4071,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Unix.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:parseRegex\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Unix.php
@@ -4182,16 +4137,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:findFirst\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Zyxel.php
 

@@ -288,7 +288,7 @@ class SnmpQueryMock implements SnmpQueryInterface
     private function outputLine(string $oid, string $num_oid, string $type, string $data): string
     {
         if ($type == 6) {
-            $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid))->value();
+            $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid));
         }
 
         if ($this->numeric) {
@@ -296,7 +296,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oid) && Oid::isNumeric($oid)) {
-            $oid = $this->translate($oid)->value();
+            $oid = $this->translate($oid);
         }
 
         return "$oid = $data";
@@ -342,7 +342,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         $number = NetSnmpQuery::make()->mibDir($this->mibDir)
-            ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
+            ->options(array_merge($options, $this->options))->numeric()->translate($oid);
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
