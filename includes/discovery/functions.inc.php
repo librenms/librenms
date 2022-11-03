@@ -186,7 +186,7 @@ function discover_device(&$device, $force_module = false)
 //end discover_device()
 
 // Discover sensors
-function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null)
+function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE')
 {
     $guess_limits = Config::get('sensors.guess_limits', true);
 
@@ -203,7 +203,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         return false;
     }
 
-    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit)\n");
+    d_echo("Discover sensor: $oid, $index, $type, $descr, $poller_type, $divisor, $multiplier, $entPhysicalIndex, $current, (limits: LL: $low_limit, LW: $low_warn_limit, W: $warn_limit, H: $high_limit), rrd_type = $rrd_type \n");
 
     if (isset($warn_limit, $low_warn_limit) && $low_warn_limit > $warn_limit) {
         // Fix high/low thresholds (i.e. on negative numbers)
@@ -243,6 +243,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
             'entPhysicalIndex_measured' => $entPhysicalIndex_measured,
             'user_func' => $user_func,
             'group' => $group,
+            'rrd_type' => $rrd_type,
         ];
 
         foreach ($insert as $key => $val_check) {
@@ -883,7 +884,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         // For temp sensors, try and detect fahrenheit values
-                        if (Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
@@ -967,8 +968,16 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                         $value = $user_function($value);
                     }
 
-                    $uindex = str_replace('{{ $index }}', $index, isset($data['index']) ? $data['index'] : $index);
-                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group);
+                    $uindex = $index;
+                    if (isset($data['index'])) {
+                        if (Str::contains($data['index'], '{{')) {
+                            $uindex = trim(YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache));
+                        } else {
+                            $uindex = $data['index'];
+                        }
+                    }
+
+                    discover_sensor($valid['sensor'], $sensor_class, $device, $oid, $uindex, $sensor_name, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $value, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, $user_function, $group, $data['rrd_type']);
 
                     if ($sensor_class === 'state') {
                         create_sensor_to_state_index($device, $sensor_name, $uindex);

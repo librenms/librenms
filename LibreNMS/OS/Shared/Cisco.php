@@ -118,7 +118,7 @@ class Cisco extends OS implements
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
+        } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
@@ -294,7 +294,7 @@ class Cisco extends OS implements
              * Could be dynamically changed to appropriate value if config had pol interval value
              */
             $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
-            $qfp_usage = $entry['fiveMinute'];
+            $qfp_usage = $entry['fiveMinute'] ?? null;
 
             if ($entQfpPhysicalIndex) {
                 $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];

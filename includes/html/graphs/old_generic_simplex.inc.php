@@ -9,7 +9,7 @@ $print_total = $print_total ?? false;
 $percentile = $percentile ?? false;
 $unit_text = $unit_text ?? '';
 $line_text = $line_text ?? '';
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 
 $unit_text = str_pad(substr($unit_text, 0, 18), 18);
 $line_text = str_pad(substr($line_text, 0, 12), 12);

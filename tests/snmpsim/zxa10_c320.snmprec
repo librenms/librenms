@@ -466,7 +466,7 @@
 1.3.6.1.2.1.1.9.1.3.91|4| zxAnFileServerGroup in ZTE-AN-FILE-SERVER-MIB.mib
 1.3.6.1.2.1.1.9.1.3.92|4| A collection of objects providing the abilities,configuration, and status of an Ethernet OAM entity.
 1.3.6.1.2.1.1.9.1.3.93|4| A collection of objects providing the abilities,configuration, and status of a peer Ethernet OAM entity.
-1.3.6.1.2.1.1.9.1.3.94|4| A collection of objects providing the statistics for the number of various transmit and receive events for OAM on an Ethernet-like interface. 
+1.3.6.1.2.1.1.9.1.3.94|4| A collection of objects providing the statistics for the number of various transmit and receive events for OAM on an Ethernet-like interface.
 1.3.6.1.2.1.1.9.1.3.95|4| A collection of objects for controlling the OAM remote loopback function.
 1.3.6.1.2.1.1.9.1.3.96|4| A collection of objects for configuring the thresholds for an Errored Symbol Period Event.
 1.3.6.1.2.1.1.9.1.3.97|4| A collection of objects for configuring the thresholds for an Errored Frame Period Event.
@@ -641,7 +641,7 @@
 1.3.6.1.2.1.1.9.1.3.266|4|vacmBasicGroup in SNMP-VIEW-BASED-ACM-MIB.mib
 1.3.6.1.2.1.1.9.1.3.267|4|snmpNotifyGroup in SNMP-NOTIFICATION-MIB.mib
 1.3.6.1.2.1.1.9.1.3.268|4|snmpNotifyFilterGroup in SNMP-NOTIFICATION-MIB.mib
-1.3.6.1.2.1.1.9.1.3.269|4| The group of BFD session 
+1.3.6.1.2.1.1.9.1.3.269|4| The group of BFD session
 1.3.6.1.2.1.1.9.1.3.270|4| The group of BFD session performance
 1.3.6.1.2.1.1.9.1.3.271|4| The group of BFD session notification
 1.3.6.1.2.1.1.9.1.3.272|4| The group of BFD read only object
@@ -1885,7 +1885,7 @@
 1.3.6.1.2.1.31.1.1.1.19.268632064|2|0
 1.3.6.1.2.1.31.1.1.1.19.268632320|2|0
 1.3.6.1.2.1.31.1.1.1.19.268632576|2|0
-1.3.6.1.2.1.47.1.1.1.1.2.1|4|C320 shelf 
+1.3.6.1.2.1.47.1.1.1.1.2.1|4|C320 shelf
 1.3.6.1.2.1.47.1.1.1.1.2.2|4|
 1.3.6.1.2.1.47.1.1.1.1.2.10|4|8 ports GPON OLT line card.
 1.3.6.1.2.1.47.1.1.1.1.2.30|4|General Power Card.
@@ -2604,9 +2604,6 @@
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.7.1.1.1|2|8
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.7.1.1.3|2|3
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.7.1.1.4|2|3
-1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.1|2|11
-1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.3|2|0
-1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.1.1.4|2|8
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.10.1.1.1|2|100
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.10.1.1.3|2|100
 1.3.6.1.4.1.3902.1082.10.1.2.4.1.10.1.1.4|2|100

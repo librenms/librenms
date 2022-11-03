@@ -31,7 +31,14 @@ $rrd_def = RrdDefinition::make()
 
 $metrics = [];
 foreach ($pwrstatd_data as $data) {
-    $sn = $data['sn'];
+    $sn = is_string($data['sn']) ? filter_var($data['sn'], FILTER_SANITIZE_STRING) : null;
+
+    if (is_null($data['sn'])) {
+        echo PHP_EOL . $name . ':' . ' Invalid or no psu serial number found.' . PHP_EOL;
+
+        continue;
+    }
+
     $mruntime = $data['mruntime'];
     $pcapacity = $data['pcapacity'];
     $pload = $data['pload'];

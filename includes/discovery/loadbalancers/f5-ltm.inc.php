@@ -27,7 +27,7 @@ $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id']);
 
 // We only care about our device id.
-$components = $components[$device['device_id']];
+$components = $components[$device['device_id']] ?? [];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = [];
@@ -280,7 +280,7 @@ if (! empty($ltmBwcEntry) || ! empty($ltmVirtualServEntry) || ! empty($ltmPoolEn
                 $result['priority'] = $ltmPoolMemberEntry['priority']['1.3.6.1.4.1.3375.2.2.5.3.2.1.8.' . $index];
                 $result['state'] = $ltmPoolMemberEntry['state']['1.3.6.1.4.1.3375.2.2.5.6.2.1.5.' . $index];
                 $result['available'] = $ltmPoolMemberEntry['available']['1.3.6.1.4.1.3375.2.2.5.6.2.1.6.' . $index];
-                $result['nodename'] = $ltmPoolMemberEntry['nodename']['1.3.6.1.4.1.3375.2.2.5.3.2.1.19.' . $index];
+                $result['nodename'] = $ltmPoolMemberEntry['nodename']['1.3.6.1.4.1.3375.2.2.5.3.2.1.19.' . $index] ?? null;
 
                 // If available and bad state
                 // 0 = None, 1 = Green, 2 = Yellow, 3 = Red, 4 = Blue

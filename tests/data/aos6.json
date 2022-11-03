@@ -18580,6 +18580,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18604,6 +18605,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18628,6 +18630,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaChasEntPhysFanStatus"
                 },
                 {
@@ -18652,6 +18655,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateA"
                 },
                 {
@@ -18676,6 +18680,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateA"
                 },
                 {
@@ -18700,6 +18705,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateB"
                 },
                 {
@@ -18724,6 +18730,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alaStackMgrLocalLinkStateB"
                 },
                 {
@@ -18748,6 +18755,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alclnkaggAggNbrAttachedPorts"
                 },
                 {
@@ -18772,6 +18780,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "alclnkaggAggNbrAttachedPorts"
                 },
                 {
@@ -18796,6 +18805,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasControlCertifyStatus"
                 },
                 {
@@ -18820,6 +18830,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasControlSynchronizationStatus"
                 },
                 {
@@ -18844,6 +18855,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18868,6 +18880,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18892,6 +18905,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18916,6 +18930,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "chasEntPhysOperStatus"
                 },
                 {
@@ -18940,6 +18955,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18964,6 +18980,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

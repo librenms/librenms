@@ -9,11 +9,11 @@ $adapter = new NeonAdapter();
 $config = [];
 
 if (PHP_VERSION_ID < 80000) {
-    $config = array_merge_recursive($config, $adapter->load(__DIR__ . '/phpstan-php7.neon'));
+    //$config = array_merge_recursive($config, $adapter->load(__DIR__ . '/phpstan-php7.neon'));
 }
 
 if (PHP_VERSION_ID < 80100) {
-    $config = array_merge_recursive($config, $adapter->load(__DIR__ . '/phpstan-php80.neon'));
+    //$config = array_merge_recursive($config, $adapter->load(__DIR__ . '/phpstan-php80.neon'));
 }
 
 // If we loaded any extra config

@@ -48,6 +48,14 @@ if (! empty($entity_oids)) {
         $low_warn_limit = null;
         $warn_limit = null;
         $high_limit = null;
+        $group = null;
+        $type = null;
+        $oid = null;
+        $descr = null;
+        $divisor = null;
+        $multiplier = null;
+        $current = null;
+        $entPhysicalIndex = null;
 
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
@@ -64,7 +72,7 @@ if (! empty($entity_oids)) {
                 } elseif (count($card) === 4) {
                     $card = $card[0] . $card[1] . '00';
                 }
-                $descr = ucwords($entity_array[$card]['entPhysicalName']) . ' ' . ucwords($entity_array[$index]['entPhysicalDescr']);
+                $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
             } else {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
@@ -75,7 +83,13 @@ if (! empty($entity_oids)) {
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match('/(Input|Output) (voltage|current) sensor/i', $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
-                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . ' ' . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
+                        $descr = (ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr'] ?? ''))
+                                 . ' '
+                                 . preg_replace(
+                                      '/(Voltage|Current|Power Supply) Sensor$/i',
+                                      '',
+                                      ucwords($entity_array[$index]['entPhysicalDescr'])
+                                  );
                     }
                     if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
                         $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
@@ -217,7 +231,7 @@ if (! empty($entity_oids)) {
                     // End grouping sensors
                 }
                 $descr = trim($descr);
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach
