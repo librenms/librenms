@@ -546,7 +546,7 @@ parameters:
 					#^Call to deprecated function dbFetchCell\\(\\)\\:
 					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 				"""
-			count: 7
+			count: 3
 			path: includes/common.php
 
 		-
