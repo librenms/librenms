@@ -162,9 +162,11 @@ function get_port_by_index_cache($device_id, $ifIndex)
     return $port;
 }
 
-function get_port_by_ifIndex(int $device_id, int $ifIndex)
+function get_port_by_ifIndex(int $device_id, int $ifIndex) : array
 {
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
+    return Port::where('device_id', $device_id)
+               ->where('ifIndex', $ifIndex)
+               ->toArray();
 }
 
 function table_from_entity_type(string $type) : string
@@ -299,7 +301,7 @@ function getifindexbyid(int $id) : int
     return Port::find($id)->ifIndex;
 }
 
-function getifbyid(int $id)
+function getifbyid(int $id) : array
 {
     return Port::find($id)->toArray();
 }
@@ -324,17 +326,17 @@ function set_dev_attrib($device, $attrib_type, $attrib_value)
     return DeviceCache::get((int) $device['device_id'])->setAttrib($attrib_type, $attrib_value);
 }
 
-function get_dev_attribs($device_id)
+function get_dev_attribs(int $device_id)
 {
     return DeviceCache::get((int) $device_id)->getAttribs();
 }
 
-function get_dev_entity_state($device)
+function get_dev_entity_state($device) : array
 {
     $state = [];
-    foreach (dbFetchRows('SELECT * FROM entPhysical_state WHERE `device_id` = ?', [$device]) as $entity) {
-        $state['group'][$entity['group']][$entity['entPhysicalIndex']][$entity['subindex']][$entity['key']] = $entity['value'];
-        $state['index'][$entity['entPhysicalIndex']][$entity['subindex']][$entity['group']][$entity['key']] = $entity['value'];
+    foreach (EthPhysical::where('device_id', $device)->get() as $entity) {
+        $state['group'][$entity->group][$entity->entPhysicalIndex][$entity->subindex][$entity->key] = $entity->value;
+        $state['index'][$entity->entPhysicalIndex][$entity->subindex][$entity->group][$entity->key] = $entity->value;
     }
 
     return $state;
