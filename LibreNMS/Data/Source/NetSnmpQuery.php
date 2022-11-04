@@ -77,9 +77,9 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     private $context = '';
     /**
-     * @var string
+     * @var string[]
      */
-    private $mibDir;
+    private array $mibDirs = [];
     /**
      * @var array|string
      */
@@ -159,7 +159,7 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function mibDir(?string $dir): SnmpQueryInterface
     {
-        $this->mibDir = $dir;
+        $this->mibDirs[] = $dir;
 
         return $this;
     }
@@ -458,8 +458,8 @@ class NetSnmpQuery implements SnmpQueryInterface
             $dirs[] = $base . '/' . $this->device->os;
         }
 
-        if ($this->mibDir) {
-            $dirs[] = "$base/$this->mibDir";
+        foreach ($this->mibDirs as $mibDir) {
+            $dirs[] = "$base/$mibDir";
         }
 
         // remove trailing /, remove empty dirs, and remove duplicates
