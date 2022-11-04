@@ -63,9 +63,7 @@ class AlertUtil
      */
     public static function getDefaultAlertTransports()
     {
-        $query = 'SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true';
-
-        return dbFetchRows($query);
+        return AlertTransport::where('is_default', true)->select('transport_id', 'transport_type', 'transport_name')->get()->toArray();
     }
 
     /**
