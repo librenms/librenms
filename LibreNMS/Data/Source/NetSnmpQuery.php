@@ -394,7 +394,6 @@ class NetSnmpQuery implements SnmpQueryInterface
         $measure = Measurement::start($command);
 
         $proc = new Process($this->buildCli($command, $oids));
-        dump($proc->getCommandLine());
         $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
         $this->logCommand($proc->getCommandLine());
