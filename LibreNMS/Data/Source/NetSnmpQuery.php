@@ -308,6 +308,7 @@ class NetSnmpQuery implements SnmpQueryInterface
                 $this->options = array_merge($this->options, ['-m', $mib]);
             }
         }
+        dump('snmptranslate ' . implode(' ',  $this->options) . " $oid");
 
         return $this->exec('snmptranslate', [$oid])->value();
     }
