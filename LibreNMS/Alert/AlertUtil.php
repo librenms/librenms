@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\Alert;
+use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
