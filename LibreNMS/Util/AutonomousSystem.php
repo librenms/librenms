@@ -38,7 +38,7 @@ class AutonomousSystem
 
     public static function get(int|string $asn): self
     {
-        return new static((int) $asn);
+        return app(AutonomousSystem::class, ['asn' => (int) $asn]);
     }
 
     /**

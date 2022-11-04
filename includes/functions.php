@@ -501,7 +501,7 @@ function snmp2ipv6($ipv6_snmp)
 
 function get_astext(string|int|null $asn): string
 {
-    return app(\LibreNMS\Util\AutonomousSystem::class, ['asn' => (int) $asn])->name();
+    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
 
 /**
