@@ -56,6 +56,12 @@ class Oid
         if (Oid::isNumeric($oid)) {
             return $oid;
         }
+
+        // we already have a specific mib, don't add a bunch of others
+        if (str_contains($oid, '::')) {
+            $mib = null;
+        }
+
         $key = 'Oid:toNumeric:' . $oid . '/' . $mib;
 
         $numeric_oid = Cache::remember($key, $cache, function () use ($oid, $mib) {
