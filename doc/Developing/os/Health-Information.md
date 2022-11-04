@@ -3,7 +3,7 @@
 This document will guide you through adding health / sensor
 information for your new device.
 
-Currently we have support for the following health metrics along with
+Currently, we have support for the following health metrics along with
 the values we expect to see the data in:
 
 | Class                           | Measurement                 |
@@ -50,9 +50,9 @@ files so that you don't need to know how to write PHP.
 All yaml files are located in
 `includes/definitions/discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
-sensible with the MIBs they generate. Only snmp walks are supported
+sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
-all of the data you need. We will use netbotz as an example here.
+all the data you need. We will use netbotz as an example here.
 
 `includes/definitions/discovery/netbotz.yaml`
 
@@ -220,12 +220,14 @@ will most likely need to use Advanced health discovery.
 #### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
-the discovery code in php.
+the discovery code in php. If it is possible to create via yaml, php discovery
+will likely be rejected due to the much higher chance of later problems,
+so it is highly suggested to use yaml.
 
 The directory structure for sensor information is
-`includes/discovery/sensors/$class/$os.inc.php`. The format of all of
-the sensors follows the same code format which is to collect sensor information
-via SNMP and then call the `discover_sensor()` function; with the exception of state
+`includes/discovery/sensors/$class/$os.inc.php`. The format of all the
+sensors follows the same code format which is to collect sensor information
+via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
 well. Sensor information is first collected by
@@ -242,12 +244,12 @@ then passed to `discover_sensor()`.
 - $oid = Required. This must be the numerical OID for where the data
   can be found, i.e .1.2.3.4.5.6.7.0
 - $index = Required. This must be unique for this sensor class, device
-  and type. Typically it's the index from the table being walked or it
+  and type. Typically it's the index from the table being walked, or it
   could be the name of the OID if it's a single value.
-- $type = Required. This should be the OS name, i.e pulse.
+- $type = Required. This should be the OS name, i.e. pulse.
 - $descr = Required. This is a descriptive value for the sensor. Some
   devices will provide names to use.
-- $divisor = Defaults to 1. This is used to divided the returned value.
+- $divisor = Defaults to 1. This is used to divide the returned value.
 - $multiplier = Defaults to 1. This is used to multiply the returned value.
 - $low_limit = Defaults to null. Sets the low threshold limit for the
   sensor, used in alerting to report out range sensors.
