@@ -303,10 +303,10 @@ class NetSnmpQuery implements SnmpQueryInterface
             } else {
                 $oid = "$mib::$oid"; // single mib, just prepend it
             }
-        }
 
-        if ($mib) {
-            $this->options = array_merge($this->options, ['-m', $mib]);
+            if ($mib) {
+                $this->options = array_merge($this->options, ['-m', $mib]);
+            }
         }
 
         return $this->exec('snmptranslate', [$oid])->value();
