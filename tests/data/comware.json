@@ -53,7 +53,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "AS65503-MOCK-TEXT'",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "95.43.23.53",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
