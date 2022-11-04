@@ -36,12 +36,10 @@ class AlertUtil
 {
     /**
      * Get the rule_id for a specific alert
-     *
-     * @return mixed|null
      */
-    private static function getRuleId(int $alert_id)
+    private static function getRuleId(int $alert_id): int
     {
-        return Alert::where('id', $alert_id)->value('rule_id');
+        return (int) Alert::where('id', $alert_id)->value('rule_id');
     }
 
     /**
