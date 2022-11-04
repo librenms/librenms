@@ -124,6 +124,11 @@ are as follows:
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)
+- `snmp_flags` (optional): this sets the flags to be sent to snmpwalk, it 
+  overrides flags set on the sensor type and os.  The default is `'-OQUb'`.
+  A common issue is dealing with string indexes, setting `'-OQUsbe'` will change them to 
+  numeric oids. Setting `['-OQUsbe', '-Pu']` will also allow _ in oid names. You can find more
+  in the [Man Page](https://linux.die.net/man/1/snmpcmd)
 - `rrd_type` (optional): You can change the type of the RRD file that will be created to
   store the data. By default, type GAUGE is used. More details can be found here:
   https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
@@ -136,7 +141,7 @@ For `options:` you have the following available:
 - `skip_value_lt`: If sensor value is less than this, skip the discovery.
 - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
-Multiple variables can be used in the sensors definition. The syntax
+Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
