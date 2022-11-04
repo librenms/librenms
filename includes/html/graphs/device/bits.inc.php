@@ -7,7 +7,7 @@ $ds_out = 'OUTOCTETS';
 $ports = dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled` = 0 AND `deleted` = 0', [$device['device_id']]);
 
 if (empty($ports)) {
-    graph_text_and_exit('No Ports');
+    throw new \LibreNMS\Exceptions\RrdGraphException('No Ports');
 }
 
 $i = 0;
