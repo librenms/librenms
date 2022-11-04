@@ -58,10 +58,8 @@ class AlertUtil
 
     /**
      * Returns the default transports
-     *
-     * @return array
      */
-    public static function getDefaultAlertTransports()
+    public static function getDefaultAlertTransports(): array
     {
         return AlertTransport::where('is_default', true)->select('transport_id', 'transport_type', 'transport_name')->get()->toArray();
     }
