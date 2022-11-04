@@ -248,6 +248,10 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
+        if (empty($oid)) {
+            return new SnmpResponse('');
+        }
+
         return $this->exec('snmpget', $this->parseOid($oid));
     }
 
