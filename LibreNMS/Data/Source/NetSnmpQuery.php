@@ -308,7 +308,6 @@ class NetSnmpQuery implements SnmpQueryInterface
                 $this->options = array_merge($this->options, ['-m', $mib]);
             }
         }
-        dump('snmptranslate ' . implode(' ',  $this->options) . " $oid");
 
         return $this->exec('snmptranslate', [$oid])->value();
     }
@@ -395,6 +394,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         $measure = Measurement::start($command);
 
         $proc = new Process($this->buildCli($command, $oids));
+        dump($proc->getCommandLine());
         $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
 
         $this->logCommand($proc->getCommandLine());
