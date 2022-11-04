@@ -543,33 +543,6 @@ parameters:
 		-
 			message:
 				"""
-					#^Call to deprecated function dbFetchCell\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 3
-			path: includes/common.php
-
-		-
-			message:
-				"""
-					#^Call to deprecated function dbFetchRow\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 7
-			path: includes/common.php
-
-		-
-			message:
-				"""
-					#^Call to deprecated function dbFetchRows\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 4
-			path: includes/common.php
-
-		-
-			message:
-				"""
 					#^Call to deprecated function dbDelete\\(\\)\\:
 					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
 				"""
