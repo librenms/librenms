@@ -71,6 +71,7 @@ class Oid
         if (empty($numeric_oid)) {
             throw new InvalidOidException("Unable to translate oid $oid");
         }
+        dump($key, $numeric_oid);
 
         return $numeric_oid;
     }
