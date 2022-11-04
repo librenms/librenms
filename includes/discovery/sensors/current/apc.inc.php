@@ -165,9 +165,17 @@ if (isset($oids) && $oids) {
             // rPDU2OutletMeteredStatusName
             $voltage = snmp_get($device, $voltage_oid, '-Oqv', '');
             $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
-            $limit = (snmp_get($device, $limit_oid, '-Oqv', '') / $voltage);
-            $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', '') / $voltage);
-            $warnlimit = (snmp_get($device, $warnlimit_oid, '-Oqv', '') / $voltage);
+
+            $limit = null;
+            $lowlimit = null;
+            $warnlimit = null;
+
+            if ($voltage) {
+                $limit = (snmp_get($device, $limit_oid, '-Oqv', '') / $voltage);
+                $lowlimit = (snmp_get($device, $lowlimit_oid, '-Oqv', '') / $voltage);
+                $warnlimit = (snmp_get($device, $warnlimit_oid, '-Oqv', '') / $voltage);
+            }
+
             $descr = 'Outlet ' . $index . ' - ' . snmp_get($device, $name_oid, '-Oqv', '');
             discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
         }
