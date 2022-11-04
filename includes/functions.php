@@ -499,9 +499,9 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
-    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
+    return app( \LibreNMS\Util\AutonomousSystem::class, ['asn' => (int) $asn])->name();
 }
 
 /**

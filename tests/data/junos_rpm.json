@@ -13285,7 +13285,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.13",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "idle",
@@ -13308,7 +13308,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.17",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "idle",
@@ -13331,7 +13331,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.25",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -13354,7 +13354,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.29",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -13479,7 +13479,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.13",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "established",
@@ -13502,7 +13502,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.17",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "established",
@@ -13525,7 +13525,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.25",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -13548,7 +13548,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.29",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -13608,12 +13608,12 @@
                     "AdvertisedPrefixes": 24,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 21,
-                    "AcceptedPrefixes_prev": 0,
-                    "DeniedPrefixes_delta": 21,
-                    "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 24,
-                    "AdvertisedPrefixes_prev": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 21,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 21,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 24,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
@@ -13632,12 +13632,12 @@
                     "AdvertisedPrefixes": 27,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 21,
-                    "AcceptedPrefixes_prev": 0,
-                    "DeniedPrefixes_delta": 12,
-                    "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 27,
-                    "AdvertisedPrefixes_prev": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 21,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 12,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 27,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
@@ -13656,12 +13656,12 @@
                     "AdvertisedPrefixes": 27,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 21,
-                    "AcceptedPrefixes_prev": 0,
-                    "DeniedPrefixes_delta": 21,
-                    "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 27,
-                    "AdvertisedPrefixes_prev": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 21,
+                    "DeniedPrefixes_delta": 0,
+                    "DeniedPrefixes_prev": 21,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 27,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,

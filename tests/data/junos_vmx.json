@@ -13329,7 +13329,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13352,7 +13352,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13512,12 +13512,12 @@
                     "AdvertisedPrefixes": 2,
                     "SuppressedPrefixes": 0,
                     "WithdrawnPrefixes": 0,
-                    "AcceptedPrefixes_delta": 1,
-                    "AcceptedPrefixes_prev": 0,
+                    "AcceptedPrefixes_delta": 0,
+                    "AcceptedPrefixes_prev": 1,
                     "DeniedPrefixes_delta": 0,
                     "DeniedPrefixes_prev": 0,
-                    "AdvertisedPrefixes_delta": 2,
-                    "AdvertisedPrefixes_prev": 0,
+                    "AdvertisedPrefixes_delta": 0,
+                    "AdvertisedPrefixes_prev": 2,
                     "SuppressedPrefixes_delta": 0,
                     "SuppressedPrefixes_prev": 0,
                     "WithdrawnPrefixes_delta": 0,
