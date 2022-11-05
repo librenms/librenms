@@ -176,7 +176,7 @@ class PingCheck implements ShouldQueue
 
         // working collections
         $this->tiered = $this->devices->groupBy('max_depth', true);
-        $this->deferred = collect();
+        $this->deferred = new Collection();
 
         // start with tier 1 (the root nodes, 0 is standalone)
         $this->current_tier = 1;

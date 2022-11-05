@@ -31,7 +31,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class OspfNbrStateChange implements SnmptrapHandler
 {
@@ -58,7 +57,7 @@ class OspfNbrStateChange implements SnmptrapHandler
             $severity = 5;
         }
 
-        Log::event("OSPF neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $device->device_id, 'trap', $severity);
+        $trap->log("OSPF neighbor $ospfNbrIpAddr changed state to $ospfNbr->ospfNbrState", $severity);
 
         $ospfNbr->save();
     }

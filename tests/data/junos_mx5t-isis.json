@@ -13030,7 +13030,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4294967294-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.250.255",
                     "bgpPeerRemoteAs": 4294967294,
                     "bgpPeerState": "idle",
@@ -13057,7 +13057,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4294967294-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.250.255",
                     "bgpPeerRemoteAs": 4294967294,
                     "bgpPeerState": "idle",

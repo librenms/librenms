@@ -24394,7 +24394,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64512-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
@@ -24447,7 +24447,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64512-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",

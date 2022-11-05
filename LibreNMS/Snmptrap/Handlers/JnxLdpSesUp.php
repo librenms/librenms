@@ -52,6 +52,6 @@ class JnxLdpSesUp implements SnmptrapHandler
             return;
         }
 
-        Log::event("LDP session on interface $port->ifDescr is $state", $device->device_id, 'trap', 1);
+        $trap->log("LDP session on interface $port->ifDescr is $state", 1);
     }
 }
