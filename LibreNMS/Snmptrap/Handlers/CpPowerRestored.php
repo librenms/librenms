@@ -30,7 +30,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class CpPowerRestored implements SnmptrapHandler
 {
@@ -45,6 +44,6 @@ class CpPowerRestored implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $power = CyberPowerUtil::getMessage($trap);
-        Log::event("$power", $device->device_id, 'trap', 1);
+        $trap->log("$power", 1);
     }
 }

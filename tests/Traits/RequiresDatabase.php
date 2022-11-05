@@ -1,10 +1,8 @@
 <?php
 /**
- * CpUpsWokeUp.php
+ * RequiresDatabase.php
  *
  * -Description-
- *
- * CyberPower UPS trap UPS is leaving sleep mode.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,29 +19,20 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 KanREN Inc.
- * @author     Heath Barnhart <hbarnhart@kanren.net>
+ * @copyright  2022 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Snmptrap\Handlers;
+namespace LibreNMS\Tests\Traits;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\SnmptrapHandler;
-use LibreNMS\Snmptrap\Trap;
-
-class CpUpsWokeUp implements SnmptrapHandler
+trait RequiresDatabase
 {
-    /**
-     * Handle snmptrap.
-     * Data is pre-parsed and delivered as a Trap.
-     *
-     * @param  Device  $device
-     * @param  Trap  $trap
-     * @return void
-     */
-    public function handle(Device $device, Trap $trap)
+    public static function setUpBeforeClass(): void
     {
-        $status = CyberPowerUtil::getMessage($trap);
-        $trap->log("$status", 1);
+        if (! getenv('DBTEST')) {
+            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        parent::setUpBeforeClass();
     }
 }

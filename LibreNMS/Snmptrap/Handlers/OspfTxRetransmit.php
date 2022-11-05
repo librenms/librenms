@@ -28,7 +28,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class OspfTxRetransmit implements SnmptrapHandler
 {
@@ -50,11 +49,11 @@ class OspfTxRetransmit implements SnmptrapHandler
         $ospfLsdbLsid = $trap->getOidData($trap->findOid('OSPF-MIB::ospfLsdbLsid'));
 
         if ($ospfPacketType != 'lsUpdate') {
-            Log::event('SNMP TRAP: ' . $device->displayName() . "(Router ID: $ospfRouterId) sent a $ospfPacketType packet to $ospfNbrRtrId.", $device->device_id, 'trap', 2);
+            $trap->log('SNMP TRAP: ' . $device->displayName() . "(Router ID: $ospfRouterId) sent a $ospfPacketType packet to $ospfNbrRtrId.");
 
             return;
         }
 
-        Log::event('SNMP Trap: OSPFTxRetransmit trap recieved from ' . $device->displayName() . "(Router ID: $ospfRouterId). A $ospfPacketType packet was sent to $ospfNbrRtrId. LSType: $ospfLsdbType, route ID: $ospfLsdbLsid, originating from $ospfLsdbRouterId.", $device->device_id, 'trap', 2);
+        $trap->log('SNMP Trap: OSPFTxRetransmit trap received from ' . $device->displayName() . "(Router ID: $ospfRouterId). A $ospfPacketType packet was sent to $ospfNbrRtrId. LSType: $ospfLsdbType, route ID: $ospfLsdbLsid, originating from $ospfLsdbRouterId.");
     }
 }

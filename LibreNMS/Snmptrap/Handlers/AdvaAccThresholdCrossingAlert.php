@@ -31,7 +31,6 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
 {
@@ -43,7 +42,7 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
      * @param  Trap  $trap
      * @return void
      */
-    public function handle(Device $device, Trap $trap)
+    public function handle(Device $device, Trap $trap): void
     {
         $interval = $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval'));
         $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
@@ -52,10 +51,10 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
             $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable'))
         );
 
-        Log::event("$ifName $thresholdMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
+        $trap->log("$ifName $thresholdMessage threshold exceeded for $interval");
     }
 
-    public function getThresholdMessage($thresholdOid)
+    public function getThresholdMessage(string $thresholdOid): string
     {
         foreach ($this->getThresholds() as $oid => $descr) {
             if (Str::contains($thresholdOid, $oid)) {
@@ -66,7 +65,7 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
         return 'unknown';
     }
 
-    public function getThresholds()
+    public function getThresholds(): array
     {
         return [
             'CM-PERFORMANCE-MIB::cmEthernetAccPortStatsUAS' => 'unavailable seconds',
