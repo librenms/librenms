@@ -88,15 +88,23 @@ class Core implements Module
 
     public function poll(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()
-            ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
-
         $device = $os->getDevice();
+        $oids = [];
+
+        // fill required fields if they are empty
+        if (! isset($device->sysDescr)) {
+            $oids[] = 'SNMPv2-MIB::sysDescr.0';
+        }
+        if (! isset($device->sysObjectID)) {
+            $oids[] = 'SNMPv2-MIB::sysObjectID.0';
+        }
+        $oids[] = 'SNMPv2-MIB::sysUpTime.0'; // always poll uptime
+
+        $snmpdata = SnmpQuery::numeric()->get($oids)->values();
+
         $device->fill([
-            'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
-            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
-            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? $device->sysDescr,
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? $device->sysObjectID,
         ]);
 
         $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
@@ -198,19 +206,19 @@ class Core implements Module
             }
 
             if ($key == 'sysObjectID') {
-                if (Str::startsWith($device['sysObjectID'], $value) == $check) {
+                if (Str::startsWith($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr') {
-                if (Str::contains($device['sysDescr'], $value) == $check) {
+                if (Str::contains($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr_regex') {
-                if (preg_match_any($device['sysDescr'], $value) == $check) {
+                if (preg_match_any($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysObjectID_regex') {
-                if (preg_match_any($device['sysObjectID'], $value) == $check) {
+                if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpget') {

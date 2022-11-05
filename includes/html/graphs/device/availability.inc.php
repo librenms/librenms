@@ -18,7 +18,6 @@ $line_text = \LibreNMS\Util\Time::humanTime($vars['duration']);
 $graph_title .= '::' . $line_text;
 
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'Availability(%)';
 

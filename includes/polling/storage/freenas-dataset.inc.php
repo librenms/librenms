@@ -1,6 +1,6 @@
 <?php
 
-if (! is_array($storage_cache['dataset'])) {
+if (! isset($storage_cache['dataset'])) {
     $storage_cache['dataset'] = snmpwalk_cache_oid($device, 'datasetTable', null, 'FREENAS-MIB');
     d_echo($storage_cache);
 }

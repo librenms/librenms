@@ -107,8 +107,8 @@ function getLastMeasurement($bill_id)
     $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
     if (! is_null($row)) {
         $return['delta'] = $row['delta'];
-        $return['delta_in'] = $row['delta_in'];
-        $return['delta_out'] = $row['delta_out'];
+        $return['in_delta'] = $row['in_delta'];
+        $return['out_delta'] = $row['out_delta'];
         $return['timestamp'] = $row['timestamp'];
         $return['state'] = 'ok';
     } else {

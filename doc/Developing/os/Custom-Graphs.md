@@ -74,7 +74,7 @@ includes/html/graphs/device/pulse_sessions.inc.php
 
 $rrd_filename = Rrd::name($device['hostname'], 'pulse_sessions');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'sessions';
 
@@ -84,7 +84,6 @@ $colour_line = '0000cc';
 $colour_area_max = '9999cc';
 
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'Sessions';
 

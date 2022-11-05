@@ -94,7 +94,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $rate_average = $bill['rate_average'];
     $url = \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
     $used95th = Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
-    $notes = $bill['bill_notes'];
+    $notes = htmlentities($bill['bill_notes']);
 
     if ($prev) {
         $percent = $bill['bill_percent'];
@@ -142,7 +142,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $left_background = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
-    $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>${bill['bill_name']}</span></a><br />" .
+    $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
     $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
     $actions = '';

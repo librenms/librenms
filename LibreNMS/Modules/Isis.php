@@ -68,7 +68,7 @@ class Isis implements Module
             ? $os->discoverIsIs()
             : $this->discoverIsIsMib($os);
 
-        ModuleModelObserver::observe('\App\Models\IsisAdjacency');
+        ModuleModelObserver::observe(\App\Models\IsisAdjacency::class);
         $this->syncModels($os->getDevice(), 'isisAdjacencies', $adjacencies);
     }
 
@@ -180,7 +180,7 @@ class Isis implements Module
 
     protected function parseAdjacencyTime($data): int
     {
-        return (int) max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100;
+        return (int) (max($data['isisISAdjLastUpTime'] ?? 1, 1) / 100);
     }
 
     /**

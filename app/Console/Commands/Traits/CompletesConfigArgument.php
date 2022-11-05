@@ -55,7 +55,7 @@ trait CompletesConfigArgument
 
     protected function suggestionsForSelect(DynamicConfigItem $config, ?string $value): array
     {
-        $options = collect($config['options']);
+        $options = new \Illuminate\Support\Collection($config['options']);
         $keyStartsWith = $options->filter(function ($description, $key) use ($value) {
             return Str::startsWith($key, $value);
         });

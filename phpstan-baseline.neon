@@ -916,11 +916,6 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFilter.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderParser.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alerting\\\\QueryBuilderParser\\:\\:\\$builder has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
@@ -3646,11 +3641,6 @@ parameters:
 			path: LibreNMS/OS/ArrisDsr4410md.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/ArubaInstant.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/ArubaInstant.php
@@ -5421,22 +5411,12 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has no return type specified\\.$#"
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Variable \\$rrd_filename in isset\\(\\) always exists and is always null\\.$#"
+			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
@@ -6384,96 +6364,6 @@ parameters:
 			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$authlevel \\('authNoPriv'\\|'authPriv'\\|'noAuthNoPriv'\\) does not accept null\\.$#"
 			count: 1
 			path: app/Actions/Device/ValidateDeviceAndCreate.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$client has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BingApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BingApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GoogleMapsApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GoogleMapsApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:getAddresses\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:getStreams\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:isConfigured\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GraylogApi\\:\\:\\$api_prefix has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GraylogApi\\:\\:\\$client has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/MapquestApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/MapquestApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/NominatimApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/NominatimApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$abuse_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$whois_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
 
 		-
 			message: "#^Method App\\\\Checks\\:\\:postAuth\\(\\) has no return type specified\\.$#"
@@ -11419,4 +11309,5 @@ parameters:
 			message: "#^Property LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:\\$excluded has no type specified\\.$#"
 			count: 1
 			path: tests/YamlSchemaTest.php
+
 

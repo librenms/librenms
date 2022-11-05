@@ -51,11 +51,11 @@
                     <td>{{ $version_database }}</td>
                 </tr>
                 <tr>
-                    <td><a href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>
+                    <td><a target="_blank" href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>
                     <td>{{ $version_laravel }}</td>
                 </tr>
                 <tr>
-                    <td><a href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
+                    <td><a target="_blank" href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
                 </tr>
             </table>
@@ -77,7 +77,7 @@
 
           <h3>{{ __('Contributors') }}</h3>
 
-          <p>{!! __('See the <a href=":url">list of contributors</a> on GitHub.', ['url' => 'https://github.com/librenms/librenms/graphs/contributors']) !!}</p>
+          <p>{!! __('See the <a target="_blank" href=":url">list of contributors</a> on GitHub.', ['url' => 'https://github.com/librenms/librenms/graphs/contributors']) !!}</p>
 
           <h3>{{ __('Acknowledgements') }}</h3>
 
@@ -232,7 +232,7 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
 
     var ver_date = $('#version_date');
     if (ver_date.text()) {
-        ver_date.text(' - '.concat(moment.unix(ver_date.text()))).show();
+        ver_date.text(' - '.concat(moment(ver_date.text()))).show();
     }
 </script>
 @endsection

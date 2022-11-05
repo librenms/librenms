@@ -34,7 +34,7 @@ $divisor = 1000;
 foreach (array_keys($pre_cache['adva_fsp150']) as $index) {
     foreach ($sensors_adva as $entry) {
         $sensor_name = $entry['sensor_name'];
-        if ($pre_cache['adva_fsp150'][$index][$sensor_name]) {
+        if (isset($pre_cache['adva_fsp150'][$index][$sensor_name])) {
             $oid = $entry['sensor_oid'] . '.' . $index;
             $descr = $pre_cache['adva_fsp150'][$index]['slotCardUnitName'] . ' [#' . $pre_cache['adva_fsp150'][$index]['slotIndex'] . ']';
             $current = $pre_cache['adva_fsp150'][$index][$entry['sensor_name']] / $divisor;
@@ -64,7 +64,7 @@ unset($sensors_adva, $entry);
 // FSP150 Pro Series SFP Current
 
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
-    if ($entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetNetPortMediaType']) && $entry['cmEthernetNetPortMediaType'] == 'fiber' && $entry['cmEthernetNetPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.32.' . $index . '.3';
         $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetNetPortStatsLBC'];
         if ($current != 0) {
@@ -94,7 +94,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         }
     }
 
-    if ($entry['cmEthernetAccPortMediaType'] && $entry['cmEthernetAccPortMediaType'] == 'fiber' && $entry['cmEthernetAccPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetAccPortMediaType']) && $entry['cmEthernetAccPortMediaType'] == 'fiber' && $entry['cmEthernetAccPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.32.' . $index . '.3';
         $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetAccPortStatsLBC'];
         if ($current != 0) {
@@ -123,7 +123,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
         }
     }
 
-    if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber' && $entry['cmEthernetTrafficPortOperationalState'] == 'normal') {
+    if (isset($entry['cmEthernetTrafficPortMediaType']) && $entry['cmEthernetTrafficPortMediaType'] == 'fiber' && $entry['cmEthernetTrafficPortOperationalState'] == 'normal') {
         $oid = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.32.' . $index . '.3';
         $current = $pre_cache['adva_fsp150_perfs'][$index . '.3']['cmEthernetTrafficPortStatsLBC'];
         if ($current != 0) {

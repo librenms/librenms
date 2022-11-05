@@ -87,7 +87,7 @@ if (bill_permitted($bill_id)) {
         echo '</div></div>';
     }//end print_port_list?>
 
-    <h2><?php   echo "Bill: ${bill_data['bill_name']}"; ?></h2>
+    <h2>Bill: <?php echo htmlentities($bill_data['bill_name']); ?></h2>
 
     <?php
     print_optionbar_start();

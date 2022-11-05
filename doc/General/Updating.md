@@ -28,14 +28,14 @@ php includes/sql-schema/update.php
 
 ## Disabling automatic updates
 
-LibreNMS by default performs updates on a daily basis.  
+LibreNMS by default performs updates on a daily basis.
 This can be disabled in the WebUI Global Settings under System -> Updates, or using lnms
 
 !!! warning
-	You should never remove daily.sh from the cronjob!  
-	This does database cleanup and other processes in addition to updating.
+    You should never remove daily.sh from the cronjob!
+    This does database cleanup and other processes in addition to updating.
 
 !!! setting "settings/system/updates"
-	```bash
-	lnms config:set update false
-	```
+    ```bash
+    lnms config:set update false
+    ```

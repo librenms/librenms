@@ -97,8 +97,8 @@ class AirosAfLtu extends OS implements
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'afLTUStaRxPowerLevel1', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb');
 
         foreach ($oids as $index => $entry) {
-            $sensors[] = new WirelessSensor('quality', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.9.' . $index, 'airos-af-ltu-level-rx-chain-0', 1, 'Signal Level Chain 0', $entry['afLTUStaRxPower0']); //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel0
-            $sensors[] = new WirelessSensor('quality', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.10.' . $index, 'airos-af-ltu-level-rx-chain-1', 1, 'Signal Level Chain 1', $entry['afLTUStaRxPower1']); //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel1
+            $sensors[] = new WirelessSensor('quality', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.9.' . $index, 'airos-af-ltu-level-rx-chain-0', 1, 'Signal Level Chain 0', $entry['afLTUStaRxPowerLevel0']); //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel0
+            $sensors[] = new WirelessSensor('quality', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.10.' . $index, 'airos-af-ltu-level-rx-chain-1', 1, 'Signal Level Chain 1', $entry['afLTUStaRxPowerLevel1']); //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel1
             break;
         }
 

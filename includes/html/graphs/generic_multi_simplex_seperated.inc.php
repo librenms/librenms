@@ -5,7 +5,7 @@ require 'includes/html/graphs/common.inc.php';
 $unitlen = $unitlen ?? 0;
 $descr_len = $descr_len ?? 0;
 $multiplier = $multiplier ?? false;
-$previous = $_GET['previous'] ?? 'no';
+$previous = $graph_params->visible('previous');
 $stack = $stack ?? '';
 
 $seperatorX = '';
@@ -111,7 +111,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($previous == 'yes') {
+if ($previous) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {

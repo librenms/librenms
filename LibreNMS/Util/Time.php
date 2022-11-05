@@ -132,4 +132,35 @@ class Time
 
         return implode(' ,', $ret);
     }
+
+    /**
+     * Parse a time string into a timestamp including signed relative times using:
+     * m - month
+     * d - day
+     * h - hour
+     * y - year
+     */
+    public static function parseAt(string|int $time): int
+    {
+        if (is_numeric($time)) {
+            return $time < 0 ? time() + $time : intval($time);
+        }
+
+        if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
+            $units = [
+                'm' => 60,
+                'h' => 3600,
+                'd' => 86400,
+                'y' => 31557600,
+            ];
+            $value = Number::cast(substr($time, 1, -1));
+            $unit = substr($time, -1);
+
+            $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
+
+            return time() + $offset;
+        }
+
+        return (int) strtotime($time);
+    }
 }

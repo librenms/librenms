@@ -2,7 +2,7 @@
 <div class="form-group">
   <label for="bill_name" class="col-sm-4 control-label">Description</label>
   <div class="col-sm-8">
-    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo $bill_data['bill_name']; ?>">
+    <input class="form-control input-sm" type="text" id="bill_name" name="bill_name" value="<?php echo htmlentities($bill_data['bill_name']); ?>">
   </div>
 </div>
 <div class="form-group">
@@ -91,19 +91,19 @@
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_custid">Customer Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo $bill_data['bill_custid'] ?>">
+        <input class="form-control input-sm" type="text" name="bill_custid" value="<?php echo htmlentities($bill_data['bill_custid']); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_ref">Billing Reference</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo $bill_data['bill_ref']; ?>">
+        <input class="form-control input-sm" type="text" name="bill_ref" value="<?php echo htmlentities($bill_data['bill_ref']); ?>">
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-4 control-label" for="bill_notes">Notes</label>
       <div class="col-sm-8">
-        <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo $bill_data['bill_notes']; ?>">
+        <input class="form-control input-sm" type="textarea" name="bill_notes" value="<?php echo htmlentities($bill_data['bill_notes']); ?>">
       </div>
     </div>
 </fieldset>

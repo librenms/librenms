@@ -5461,6 +5461,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -5485,6 +5486,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosCentralOrchestrationLicRegStatus"
                 },
                 {
@@ -5509,6 +5511,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosDeviceCurrentHAState"
                 },
                 {
@@ -5533,6 +5536,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosDevicePeerHAState"
                 },
                 {
@@ -5557,6 +5561,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosEnhancedPlusLicRegStatus"
                 },
                 {
@@ -5581,6 +5586,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosEnhancedSupportLicRegStatus"
                 },
                 {
@@ -5605,6 +5611,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosHAStatus"
                 },
                 {
@@ -5629,6 +5636,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosMailProtectionLicRegStatus"
                 },
                 {
@@ -5653,6 +5661,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosNetProtectionLicRegStatus"
                 },
                 {
@@ -5677,6 +5686,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosSandstromLicRegStatus"
                 },
                 {
@@ -5701,6 +5711,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosWebProtectionLicRegStatus"
                 },
                 {
@@ -5725,6 +5736,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "sfosWebServerProtectionLicRegStatus"
                 }
             ],
