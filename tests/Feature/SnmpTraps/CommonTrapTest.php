@@ -51,7 +51,7 @@ class CommonTrapTest extends SnmpTrapTestCase
 
     public function testFindByIp(): void
     {
-        Config::set('snmptraps.eventlog', 'unhandled');
+        Config::set('snmptraps.eventlog', 'all');
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(); /** @var Port $port */
         $device->ports()->save($port);
