@@ -26,6 +26,7 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\YamlDiscovery;
 
 trait YamlMempoolsDiscovery
@@ -42,7 +43,7 @@ trait YamlMempoolsDiscovery
 
     public function discoverYamlMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $mempools_yaml = $this->getDiscovery('mempools');
 
         foreach ($mempools_yaml['pre-cache']['oids'] ?? [] as $oid) {

@@ -133,7 +133,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
-        $mempools = collect();
+        $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
         foreach (Arr::wrap($cemp) as $index => $entry) {
@@ -318,7 +318,7 @@ class Cisco extends OS implements
 
     public function discoverSlas()
     {
-        $slas = collect();
+        $slas = new Collection();
 
         $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
 
@@ -372,7 +372,7 @@ class Cisco extends OS implements
 
     public function pollNac()
     {
-        $nac = collect();
+        $nac = new Collection();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
         if (! empty($portAuthSessionEntry)) {
