@@ -78579,7 +78579,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.34",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "idle",
@@ -78602,7 +78602,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.35",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "idle",
@@ -78625,7 +78625,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.50",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "idle",
@@ -78648,7 +78648,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.51",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "idle",
@@ -78773,7 +78773,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.34",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "established",
@@ -78796,7 +78796,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.35",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "established",
@@ -78819,7 +78819,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.50",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "established",
@@ -78842,7 +78842,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64600-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.248.3.51",
                     "bgpPeerRemoteAs": 64600,
                     "bgpPeerState": "established",
