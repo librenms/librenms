@@ -11,7 +11,7 @@ modules:
                 used: dEntityExtMemUtilUsed
                 free: dEntityExtMemUtilFree
                 descr: '{{ $subindex1 }} Memory'
-                snmp_flags: '-OQUsb'
+                snmp_flags: '-OQUs'
 
     os:
         sysDescr_regex: '/(D-Link )?(?<hardware>\S+) (?<version>[0-9.]+)?/'
