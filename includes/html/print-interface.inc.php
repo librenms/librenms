@@ -204,7 +204,7 @@ echo '<td width=375 valign=top class="interface-desc">';
 $neighborsCount = 0;
 $nbLinks = 0;
 $int_links = [];
-if (strpos($port['label'], 'oopback') === false && ! empty($graph_type)) {
+if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', [$if_id]) as $link) {
         $int_links[$link['port_id']] = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
