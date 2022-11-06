@@ -321,10 +321,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round(($value['sapLastMgmtChange'] ?? 0) / 100),
                 'sapLastStatusChange' => round(($value['sapLastStatusChange'] ?? 0) / 100),
-                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? null,
-                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? null,
-                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? null,
-                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? null,
+                'sapIngressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0),
+                'sapEgressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0),
+                'sapIngressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0),
+                'sapEgressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0),
             ]));
         }
 
@@ -692,10 +692,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
             $fields = [
-                'sapIngressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) * 8,
-                'sapIngressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) * 8,
+                'sapIngressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0)) * 8,
+                'sapIngressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0)) * 8,
             ];
 
             $tags = [
