@@ -290,10 +290,9 @@ class NetSnmpQuery implements SnmpQueryInterface
 
         $this->options[] = '-Pu'; // don't error on _
 
-        if (in_array('-On', $this->options)) {
-            $this->options[] = '-On'; // numeric
-        } else {
-            $this->options[] = '-OS'; // full text oid
+        // user did not specify numeric, output full text
+        if (! in_array('-On', $this->options)) {
+            $this->options[] = '-OS';
         }
 
         // textual oid without mib, need to search or prepend
