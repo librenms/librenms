@@ -74,7 +74,7 @@ abstract class LnmsCommand extends Command
     public function addArgument(string $name, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.arguments.' . $name);
         }
 
@@ -99,7 +99,7 @@ abstract class LnmsCommand extends Command
     public function addOption(string $name, array|string|null $shortcut = null, ?int $mode = null, string $description = '', mixed $default = null): static
     {
         // use a generated translation location by default
-        if (is_null($description)) {
+        if (empty($description)) {
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 

@@ -31,7 +31,7 @@ use Spatie\FlareClient\Report;
 class AddGitInformation
 {
     /**
-     * @param  \Facade\FlareClient\Report  $report
+     * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next  next in the pipeline
      * @return mixed
      */

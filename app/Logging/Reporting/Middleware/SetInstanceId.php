@@ -30,7 +30,7 @@ class SetInstanceId
     /**
      * Middleware to add instance ID, piggybacks on the "user id" feature.
      *
-     * @param  \Facade\FlareClient\Report  $report
+     * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next
      * @return mixed
      */

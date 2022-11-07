@@ -90,7 +90,6 @@ class ObjectCache implements ArrayAccess
      * @param  mixed  $obj  Name of Data-Object
      * @return mixed
      */
-    #[\ReturnTypeWillChange]
     public function offsetGet($obj): mixed
     {
         if (isset($this->data[$obj])) {
