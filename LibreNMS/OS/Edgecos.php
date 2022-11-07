@@ -30,10 +30,10 @@ use App\Models\Mempool;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
-use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Oid;
 
 class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
 {
@@ -56,9 +56,9 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         ]);
 
         if (! empty($data['memoryAllocated.0'])) {
-            $mempool->mempool_used_oid = YamlDiscovery::oidToNumeric('memoryAllocated.0', $this->getDeviceArray(), $mib);
+            $mempool->mempool_used_oid = Oid::toNumeric('memoryAllocated.0', $mib);
         } else {
-            $mempool->mempool_free_oid = YamlDiscovery::oidToNumeric('memoryFreed.0', $this->getDeviceArray(), $mib);
+            $mempool->mempool_free_oid = Oid::toNumeric('memoryFreed.0', $mib);
         }
 
         $mempool->fillUsage($data['memoryAllocated.0'] ?? null, $data['memoryTotal.0'] ?? null, $data['memoryFreed.0']);

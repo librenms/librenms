@@ -37,7 +37,7 @@ class Junose extends \LibreNMS\OS
             return;
         }
 
-        $junose_hardware = \SnmpQuery::translate($device->sysObjectID, 'Juniper-Products-MIB')->value();
+        $junose_hardware = \SnmpQuery::translate($device->sysObjectID, 'Juniper-Products-MIB');
         $device->hardware = $this->rewriteHardware($junose_hardware) ?: null;
 
         $junose_version = \SnmpQuery::get('Juniper-System-MIB::juniSystemSwVersion.0')->value();

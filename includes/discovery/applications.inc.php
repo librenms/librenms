@@ -42,6 +42,7 @@ if ($results) {
     $applications['dhcpstats'] = 'dhcp-stats';
     $applications['fbsdnfsclient'] = 'fbsd-nfs-client';
     $applications['fbsdnfsserver'] = 'fbsd-nfs-server';
+    $applications['hv-monitor'] = 'hv-monitor';
     $applications['mailq'] = 'postfix';
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
