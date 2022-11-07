@@ -90,6 +90,11 @@ class SnmpTranslateTest extends TestCase
         $actual = \SnmpQuery::translate('ifTable.0', 'IP-MIB');
         $this->assertEquals('IF-MIB::ifTable.0', $actual);
 
+        $actual = \SnmpQuery::translate('iso.3.6.1.2.1.1.1.0', 'SNMPv2-MIB');
+        $this->assertEquals('SNMPv2-MIB::sysDescr.0', $actual);
+
+        $actual = \SnmpQuery::numeric()->translate('iso.3.6.1.2.1.1.1.0', 'SNMPv2-MIB');
+        $this->assertEquals('.1.3.6.1.2.1.1.1.0', $actual);
     }
 
     public function testFailedInput()
@@ -130,6 +135,9 @@ class SnmpTranslateTest extends TestCase
         // partial numeric
         $device = Device::factory()->make(['os' => 'dlink']);
         $actual = \SnmpQuery::device($device)->numeric()->translate('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.dram', 'EQUIPMENT-MIB:DLINKSW-ENTITY-EXT-MIB');
+        $this->assertEquals('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.1', $actual);
+
+        $actual = \SnmpQuery::device($device)->numeric()->translate('iso.3.6.1.4.1.171.14.5.1.4.1.4.1.dram', 'EQUIPMENT-MIB:DLINKSW-ENTITY-EXT-MIB');
         $this->assertEquals('.1.3.6.1.4.1.171.14.5.1.4.1.4.1.1', $actual);
     }
 }

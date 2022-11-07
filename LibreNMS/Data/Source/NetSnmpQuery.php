@@ -481,7 +481,6 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function logCommand(string $command): void
     {
-        dump((Arr::first((new \Exception())->getTrace(), fn($t) => $t['file'] == '/home/murrant/projects/librenms/tests/Unit/SnmpTranslateTest.php')['line'] + 1) . ": $command");
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
             $debug_command = preg_replace($this->cleanup['command'][0], $this->cleanup['command'][1], $command);
             Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
