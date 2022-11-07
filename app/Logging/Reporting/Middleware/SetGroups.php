@@ -33,7 +33,7 @@ class SetGroups
     /**
      * Middleware to set LibreNMS and Tools grouping data
      *
-     * @param  \Facade\FlareClient\Report  $report
+     * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next
      * @return mixed
      */
