@@ -417,6 +417,19 @@ $graphs['sagan'] = [
     'uptime',
     'alert',
 ];
+$graphs['hv-monitor'] = [
+    'status',
+    'memory',
+    'pmem',
+    'time',
+    'pcpu',
+    'flt',
+    'csw',
+    'cow',
+    'etimes',
+    'snaps',
+    'snaps_size',
+];
 $graphs['pwrstatd'] = [
     'wattage',
     'voltage',
