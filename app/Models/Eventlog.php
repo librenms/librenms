@@ -40,6 +40,7 @@ class Eventlog extends DeviceRelatedModel
     // ---- Helper Functions ----
     /**
      * This is used to be able to mock _log()
+     *
      * @see _log()
      *
      * @param  string  $text  message describing the event
