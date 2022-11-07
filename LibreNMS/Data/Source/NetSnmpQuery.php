@@ -293,19 +293,17 @@ class NetSnmpQuery implements SnmpQueryInterface
         // user did not specify numeric, output full text
         if (! in_array('-On', $this->options)) {
             $this->options[] = '-OS';
+        } elseif(Oid::isNumeric($oid)) {
+            return Str::start($oid, '.'); // numeric to numeric optimization
         }
 
-        // textual oid without mib, need to search or prepend
-        if (! str_contains($oid, '::') && ! Oid::isNumeric($oid)) {
-            if (empty($mib) || $mib == 'ALL' || str_contains($mib, ':')) {
-                $this->options[] = '-IR'; // search for mib
-            } else {
-                $oid = "$mib::$oid"; // single mib, just prepend it
-            }
+        // if mib is not directly specified and it doesn't have a numeric root
+        if (! str_contains($oid, '::') && ! Oid::hasNumericRoot($oid)) {
+            $this->options[] = '-IR'; // search for mib
+        }
 
-            if ($mib) {
-                $this->options = array_merge($this->options, ['-m', $mib]);
-            }
+        if ($mib) {
+            array_push($this->options, '-m', $mib);
         }
 
         return $this->exec('snmptranslate', [$oid])->value();
@@ -483,6 +481,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function logCommand(string $command): void
     {
+        dump((Arr::first((new \Exception())->getTrace(), fn($t) => $t['file'] == '/home/murrant/projects/librenms/tests/Unit/SnmpTranslateTest.php')['line'] + 1) . ": $command");
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
             $debug_command = preg_replace($this->cleanup['command'][0], $this->cleanup['command'][1], $command);
             Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);

@@ -35,6 +35,11 @@ class Oid
         return (bool) preg_match('/^[.\d]+$/', $oid);
     }
 
+    public static function hasNumericRoot(string $oid): bool
+    {
+        return (bool) preg_match('/^\.?1/', $oid);
+    }
+
     public static function hasNumeric(array $oids): bool
     {
         foreach ($oids as $oid) {
