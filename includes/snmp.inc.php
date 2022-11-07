@@ -858,7 +858,7 @@ function snmp_gen_auth(&$device, $cmd = [])
  * Default options for a textual oid is -On
  * You may override these by setting $options (an empty string for no options)
  *
- * @param  string  $oid
+ * @param  string|null  $oid
  * @param  string  $mib
  * @param  string  $mibdir  the mib directory (relative to the LibreNMS mibs directory)
  * @param  array|string  $options  Options to pass to snmptranslate
@@ -867,10 +867,14 @@ function snmp_gen_auth(&$device, $cmd = [])
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
+    if (empty($oid)) {
+        return '';
+    }
+
     $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
-    if (Oid::isNumeric($oid ?? '')) {
+    if (Oid::isNumeric($oid)) {
         $default_options = ['-Os', '-Pu'];
     } else {
         if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
