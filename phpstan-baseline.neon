@@ -6316,11 +6316,6 @@ parameters:
 			path: app/Exceptions/Handler.php
 
 		-
-			message: "#^Method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Facades/LogManager.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\AboutController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/AboutController.php

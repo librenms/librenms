@@ -43,10 +43,10 @@ class Eventlog extends DeviceRelatedModel
      * Log events to the event table
      *
      * @param  string  $text  message describing the event
-     * @param  Device  $device  related device
+     * @param  Device|int|null  $device  related device
      * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
      * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
-     * @param  int  $reference  the id of the referenced entity.  Supported types: interface
+     * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
      */
     public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {
@@ -58,6 +58,10 @@ class Eventlog extends DeviceRelatedModel
             'message' => $text,
             'username'  => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
         ]);
+
+        if (is_numeric($device)) {
+            $log->device_id = $device;
+        }
 
         if ($device instanceof Device) {
             $device->eventlogs()->save($log);
