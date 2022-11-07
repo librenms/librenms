@@ -105,7 +105,6 @@ class ObjectCache implements ArrayAccess
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             }
         }
-
     }
 
     //end offsetGet()
