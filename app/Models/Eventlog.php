@@ -64,7 +64,7 @@ class Eventlog extends DeviceRelatedModel
      * @param  int  $severity
      * @param  int|string|null  $reference
      */
-    public static function _log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
+    public function _log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
     {
         $log = new static([
             'reference' => $reference,
