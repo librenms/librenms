@@ -12,6 +12,7 @@ class UpdateUsersWidgetsSettings extends Migration
      */
     public function up()
     {
+        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;
@@ -31,6 +32,7 @@ class UpdateUsersWidgetsSettings extends Migration
      */
     public function down()
     {
+        /** @phpstan-ignore-next-line */
         $widgets = UserWidget::where('widget_id', 1)->get();
         foreach ($widgets as $widget) {
             $settings = $widget->settings;

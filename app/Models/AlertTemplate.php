@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AlertTemplate extends BaseModel
 {
@@ -33,7 +34,7 @@ class AlertTemplate extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function map()
+    public function map(): HasMany
     {
         return $this->hasMany(\App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id');
     }
