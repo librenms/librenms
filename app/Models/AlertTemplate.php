@@ -25,8 +25,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class AlertTemplate extends BaseModel
 {
