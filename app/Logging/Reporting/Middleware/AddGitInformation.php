@@ -28,7 +28,7 @@ namespace App\Logging\Reporting\Middleware;
 use LibreNMS\Util\Git;
 use Spatie\FlareClient\Report;
 
-class AddGitInformation
+class AddGitInformation implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * @param  \Spatie\FlareClient\Report  $report

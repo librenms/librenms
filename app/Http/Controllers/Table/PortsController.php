@@ -107,8 +107,8 @@ class PortsController extends TableController
             ->where('deleted', $request->get('deleted', 0)) // always filter deleted
             ->when($request->get('hostname'), function (Builder $query, $hostname) {
                 $query->where(function (Builder $query) use ($hostname) {
-                    $query->where('hostname', 'like', "%$hostname%")
-                        ->orWhere('sysName', 'like', "%$hostname%");
+                    $query->where('devices.hostname', 'like', "%$hostname%")
+                        ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
             ->when($request->get('ifAlias'), function (Builder $query, $ifAlias) {

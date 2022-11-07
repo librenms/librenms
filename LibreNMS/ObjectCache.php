@@ -88,7 +88,6 @@ class ObjectCache implements ArrayAccess
      * Get Data-Object
      *
      * @param  mixed  $obj  Name of Data-Object
-     * @return mixed
      */
     public function offsetGet($obj): mixed
     {
@@ -106,6 +105,7 @@ class ObjectCache implements ArrayAccess
                 return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
             }
         }
+        return;
     }
 
     //end offsetGet()
