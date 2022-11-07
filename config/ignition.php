@@ -236,6 +236,6 @@ return [
         DumpRecorder::class,
         JobRecorder::class,
         LogRecorder::class,
-        QueryRecorder::class
-    ]
+        QueryRecorder::class,
+    ],
 ];
