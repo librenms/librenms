@@ -38,6 +38,14 @@ class Eventlog extends DeviceRelatedModel
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     // ---- Helper Functions ----
+    /**
+     * This is used to be able to mock _log()
+     */
+    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
+    {
+        $model = app()->make(Eventlog::class);
+        $model->_log($text, $device, $type, $severity, $reference);
+    }
 
     /**
      * Log events to the event table
@@ -48,7 +56,7 @@ class Eventlog extends DeviceRelatedModel
      * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
      */
-    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
+    public static function _log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
     {
         $log = new static([
             'reference' => $reference,
