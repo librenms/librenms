@@ -28,7 +28,7 @@ namespace App\Logging\Reporting\Middleware;
 use LibreNMS\Util\Version;
 use Spatie\FlareClient\Report;
 
-class SetGroups
+class SetGroups implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to set LibreNMS and Tools grouping data

@@ -27,7 +27,7 @@ namespace App\Logging\Reporting\Middleware;
 
 use Spatie\FlareClient\Report;
 
-class CleanContext
+class CleanContext implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
 {
     /**
      * Middleware to remove sensitive data from the context.
