@@ -293,7 +293,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         // user did not specify numeric, output full text
         if (! in_array('-On', $this->options)) {
             $this->options[] = '-OS';
-        } elseif(Oid::isNumeric($oid)) {
+        } elseif (Oid::isNumeric($oid)) {
             return Str::start($oid, '.'); // numeric to numeric optimization
         }
 

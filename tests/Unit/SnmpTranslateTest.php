@@ -30,7 +30,7 @@ use LibreNMS\Tests\TestCase;
 
 class SnmpTranslateTest extends TestCase
 {
-    public function testSimpleInput()
+    public function testSimpleInput(): void
     {
         $actual = \SnmpQuery::numeric()->translate('IF-MIB::ifTable');
         $this->assertEquals('.1.3.6.1.2.1.2.2', $actual);
@@ -97,7 +97,7 @@ class SnmpTranslateTest extends TestCase
         $this->assertEquals('.1.3.6.1.2.1.1.1.0', $actual);
     }
 
-    public function testFailedInput()
+    public function testFailedInput(): void
     {
         $actual = \SnmpQuery::numeric()->translate('ifTable');
         $this->assertEquals('', $actual);
@@ -118,7 +118,7 @@ class SnmpTranslateTest extends TestCase
         $this->assertEquals('', $actual);
     }
 
-    public function testComplexInput()
+    public function testComplexInput(): void
     {
         $actual = \SnmpQuery::translate('.1.3.6.1.2.1.2.2', 'RFC1213-MIB:IF-MIB');
         $this->assertEquals('RFC1213-MIB::ifTable', $actual);
