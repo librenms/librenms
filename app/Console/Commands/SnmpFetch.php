@@ -56,18 +56,22 @@ class SnmpFetch extends LnmsCommand
         }
 
         $return = 0;
+        $type = $this->option('type');
+        $output = $this->option('output') ?: ($type == 'walk' ? 'table' : 'value');
 
         foreach ($device_ids as $device_id) {
             DeviceCache::setPrimary($device_id);
             $this->info(DeviceCache::getPrimary()->displayName() . ':');
 
-            $type = $this->option('type');
-            $output = $this->option('output')
-                ?: ($type == 'walk' ? 'table' : 'value');
-
             /** @var \LibreNMS\Data\Source\SnmpResponse $res */
             $res = SnmpQuery::numeric($this->option('numeric'))
                 ->$type($this->argument('oid'));
+
+            if ($type == 'translate') {
+                $this->line($res);
+
+                return 0;
+            }
 
             if (! $res->isValid()) {
                 $this->warn(trans('commands.snmp:fetch.failed'));

@@ -20,6 +20,7 @@ use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
@@ -857,7 +858,7 @@ function snmp_gen_auth(&$device, $cmd = [])
  * Default options for a textual oid is -On
  * You may override these by setting $options (an empty string for no options)
  *
- * @param  string  $oid
+ * @param  string|null  $oid
  * @param  string  $mib
  * @param  string  $mibdir  the mib directory (relative to the LibreNMS mibs directory)
  * @param  array|string  $options  Options to pass to snmptranslate
@@ -866,10 +867,14 @@ function snmp_gen_auth(&$device, $cmd = [])
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
+    if (empty($oid)) {
+        return '';
+    }
+
     $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
-    if (oid_is_numeric($oid)) {
+    if (Oid::isNumeric($oid)) {
         $default_options = ['-Os', '-Pu'];
     } else {
         if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
@@ -965,15 +970,4 @@ function get_device_max_repeaters($device)
 {
     return $device['attribs']['snmp_max_repeaters'] ??
         Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
-}
-
-/**
- * Check if a given oid is numeric.
- *
- * @param  string  $oid
- * @return bool
- */
-function oid_is_numeric($oid)
-{
-    return \LibreNMS\Device\YamlDiscovery::oidIsNumeric($oid);
 }
