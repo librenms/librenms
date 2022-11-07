@@ -58,6 +58,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",
         "barryvdh/laravel-ide-helper": "^2.12",
+        "composer/composer": "^2.4",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^v3.4",
         "laravel/dusk": "^7.1",
