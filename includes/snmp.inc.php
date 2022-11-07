@@ -870,7 +870,7 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
-    if (Oid::isNumeric($oid)) {
+    if (Oid::isNumeric($oid ?? '')) {
         $default_options = ['-Os', '-Pu'];
     } else {
         if ($mib != 'ALL' && ! Str::contains($oid, '::')) {
