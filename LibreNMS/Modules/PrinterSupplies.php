@@ -142,7 +142,7 @@ class PrinterSupplies implements Module
 
     private function discoveryLevels($device): Collection
     {
-        $levels = collect();
+        $levels = new Collection();
 
         $oids = snmpwalk_cache_oid($device, 'prtMarkerSuppliesLevel', [], 'Printer-MIB');
         if (! empty($oids)) {
@@ -212,7 +212,7 @@ class PrinterSupplies implements Module
     private function discoveryPapers($device): Collection
     {
         echo 'Tray Paper Level: ';
-        $papers = collect();
+        $papers = new Collection();
 
         $tray_oids = snmpwalk_cache_oid($device, 'prtInputName', [], 'Printer-MIB');
         if (! empty($tray_oids)) {

@@ -38884,7 +38884,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "VFNZ-VPN-AS Vodafone NZ Ltd, NZ",
+                    "astext": "AS7714-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.255.0.49",
                     "bgpPeerRemoteAs": 7714,
                     "bgpPeerState": "idle",
@@ -38907,7 +38907,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65506-MOCK-TEXT",
                     "bgpPeerIdentifier": "99.99.132.50",
                     "bgpPeerRemoteAs": 65506,
                     "bgpPeerState": "idle",
@@ -38934,7 +38934,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "VFNZ-VPN-AS Vodafone NZ Ltd, NZ",
+                    "astext": "AS7714-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.255.0.49",
                     "bgpPeerRemoteAs": 7714,
                     "bgpPeerState": "established",
@@ -38957,7 +38957,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65506-MOCK-TEXT",
                     "bgpPeerIdentifier": "99.99.132.50",
                     "bgpPeerRemoteAs": 65506,
                     "bgpPeerState": "established",

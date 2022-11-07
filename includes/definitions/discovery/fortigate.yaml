@@ -62,7 +62,6 @@ modules:
                     states:
                         - { value: 1, descr: Disabled, graph: 1, generic: 3 }
                         - { value: 2, descr: Enabled, graph: 1, generic: 0 }
-
                 -
                     oid: fdLteSessConnStat
                     num_oid: '.1.3.6.1.4.1.12356.101.19.5.1.1.4.{{ $index }}'
@@ -76,7 +75,16 @@ modules:
                         - { value: 2, descr: Connected, graph: 1, generic: 0 }
                         - { value: 3, descr: Suspended, graph: 1, generic: 2 }
                         - { value: 4, descr: Authenticating, graph: 1, generic: 1 }
-
+                -
+                    oid: fgVWLHealthCheckLinkTable
+                    value: fgVWLHealthCheckLinkState
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.4.{{ $index }}'
+                    descr: '{{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    group: SD-Wan
+                    index: 'fgVWLHealthCheckLinkState.{{ $index }}'
+                    states:
+                        - { descr: Alive, graph: 1, value: 0, generic: 0 }
+                        - { descr: Dead, graph: 0, value: 1, generic: 2 }
         count:
             data:
                 -
@@ -97,7 +105,20 @@ modules:
                     index: 'fgVpnSslStatsActiveTunnels.{{ $index }}'
                     descr: SSL VPN Active tunnels
                     group: VPN
-
+                -
+                    oid: fgVWLHealthCheckLinkTable
+                    value: fgVWLHealthCheckLinkLatency
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.5.{{ $index }}'
+                    descr: 'Link Latency {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    group: SD-WAN
+                    index: 'fgVWLHealthCheckLinkLatency.{{ $index }}'
+                -
+                    oid: fgVWLHealthCheckLinkTable
+                    value: fgVWLHealthCheckLinkJitter
+                    num_oid: '.1.3.6.1.4.1.12356.101.4.9.2.1.6.{{ $index }}'
+                    descr: 'Link Jitter {{ $fgVWLHealthCheckLinkName }}\{{ $fgVWLHealthCheckLinkIfName }}'
+                    group: SD-WAN
+                    index: 'fgVWLHealthCheckLinkJitter.{{ $index }}'
 
         signal:
             data:

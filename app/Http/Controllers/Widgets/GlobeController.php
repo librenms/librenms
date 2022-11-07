@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Widgets;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use LibreNMS\Config;
 
@@ -58,7 +59,7 @@ class GlobeController extends WidgetController
     public function getView(Request $request)
     {
         $data = $this->getSettings();
-        $locations = collect();
+        $locations = new Collection();
 
         $eager_load = $data['markers'] == 'ports' ? ['devices.ports'] : ['devices'];
         $query = Location::hasAccess($request->user())
@@ -71,7 +72,7 @@ class GlobeController extends WidgetController
         foreach ($query->get() as $location) {
             $count = 0;
             $up = 0;
-            $down_items = collect();
+            $down_items = new Collection();
 
             if ($data['markers'] == 'devices') {
                 $count = $location->devices->count();

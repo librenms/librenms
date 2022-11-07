@@ -1841,7 +1841,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1864,7 +1864,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1887,7 +1887,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1914,7 +1914,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "opensent",
@@ -1937,7 +1937,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",
@@ -1960,7 +1960,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",

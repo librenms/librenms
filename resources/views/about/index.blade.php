@@ -51,11 +51,11 @@
                     <td>{{ $version_database }}</td>
                 </tr>
                 <tr>
-                    <td><a href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>
+                    <td><a target="_blank" href="https://laravel.com/"><b>{{ __('Laravel') }}</b></a></td>
                     <td>{{ $version_laravel }}</td>
                 </tr>
                 <tr>
-                    <td><a href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
+                    <td><a target="_blank" href="https://oss.oetiker.ch/rrdtool/"><b>{{ __('RRDtool') }}</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
                 </tr>
             </table>

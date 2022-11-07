@@ -248,6 +248,10 @@ class NetSnmpQuery implements SnmpQueryInterface
      */
     public function get($oid): SnmpResponse
     {
+        if (empty($oid)) {
+            return new SnmpResponse('');
+        }
+
         return $this->exec('snmpget', $this->parseOid($oid));
     }
 
@@ -420,18 +424,18 @@ class NetSnmpQuery implements SnmpQueryInterface
         $base = Config::get('mib_dir');
         $dirs = [$base];
 
-        // os directory
-        if ($os_mibdir = Config::get("os.{$this->device->os}.mib_dir")) {
-            $dirs[] = "$base/$os_mibdir";
-        } elseif (file_exists($base . '/' . $this->device->os)) {
-            $dirs[] = $base . '/' . $this->device->os;
-        }
-
         // os group
         if ($os_group = Config::get("os.{$this->device->os}.group")) {
             if (file_exists("$base/$os_group")) {
                 $dirs[] = "$base/$os_group";
             }
+        }
+
+        // os directory
+        if ($os_mibdir = Config::get("os.{$this->device->os}.mib_dir")) {
+            $dirs[] = "$base/$os_mibdir";
+        } elseif (file_exists($base . '/' . $this->device->os)) {
+            $dirs[] = $base . '/' . $this->device->os;
         }
 
         if ($this->mibDir) {

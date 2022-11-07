@@ -3,7 +3,7 @@
 This document will guide you through adding health / sensor
 information for your new device.
 
-Currently we have support for the following health metrics along with
+Currently, we have support for the following health metrics along with
 the values we expect to see the data in:
 
 | Class                           | Measurement                 |
@@ -50,9 +50,9 @@ files so that you don't need to know how to write PHP.
 All yaml files are located in
 `includes/definitions/discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
-sensible with the MIBs they generate. Only snmp walks are supported
+sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
-all of the data you need. We will use netbotz as an example here.
+all the data you need. We will use netbotz as an example here.
 
 `includes/definitions/discovery/netbotz.yaml`
 
@@ -124,6 +124,11 @@ are as follows:
 - `user_func` (optional): You can provide a function name for the
   sensors value to be processed through (i.e. Convert fahrenheit to
   celsius use `fahrenheit_to_celsius`)
+- `snmp_flags` (optional): this sets the flags to be sent to snmpwalk, it 
+  overrides flags set on the sensor type and os.  The default is `'-OQUb'`.
+  A common issue is dealing with string indexes, setting `'-OQUsbe'` will change them to 
+  numeric oids. Setting `['-OQUsbe', '-Pu']` will also allow _ in oid names. You can find more
+  in the [Man Page](https://linux.die.net/man/1/snmpcmd)
 - `rrd_type` (optional): You can change the type of the RRD file that will be created to
   store the data. By default, type GAUGE is used. More details can be found here:
   https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
@@ -136,7 +141,7 @@ For `options:` you have the following available:
 - `skip_value_lt`: If sensor value is less than this, skip the discovery.
 - `skip_value_gt`: If sensor value is greater than this, skip the discovery.
 
-Multiple variables can be used in the sensors definition. The syntax
+Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
@@ -215,12 +220,14 @@ will most likely need to use Advanced health discovery.
 #### Advanced health discovery
 
 If you can't use the yaml files as above, then you will need to create
-the discovery code in php.
+the discovery code in php. If it is possible to create via yaml, php discovery
+will likely be rejected due to the much higher chance of later problems,
+so it is highly suggested to use yaml.
 
 The directory structure for sensor information is
-`includes/discovery/sensors/$class/$os.inc.php`. The format of all of
-the sensors follows the same code format which is to collect sensor information
-via SNMP and then call the `discover_sensor()` function; with the exception of state
+`includes/discovery/sensors/$class/$os.inc.php`. The format of all the
+sensors follows the same code format which is to collect sensor information
+via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
 well. Sensor information is first collected by
@@ -237,12 +244,12 @@ then passed to `discover_sensor()`.
 - $oid = Required. This must be the numerical OID for where the data
   can be found, i.e .1.2.3.4.5.6.7.0
 - $index = Required. This must be unique for this sensor class, device
-  and type. Typically it's the index from the table being walked or it
+  and type. Typically it's the index from the table being walked, or it
   could be the name of the OID if it's a single value.
-- $type = Required. This should be the OS name, i.e pulse.
+- $type = Required. This should be the OS name, i.e. pulse.
 - $descr = Required. This is a descriptive value for the sensor. Some
   devices will provide names to use.
-- $divisor = Defaults to 1. This is used to divided the returned value.
+- $divisor = Defaults to 1. This is used to divide the returned value.
 - $multiplier = Defaults to 1. This is used to multiply the returned value.
 - $low_limit = Defaults to null. Sets the low threshold limit for the
   sensor, used in alerting to report out range sensors.

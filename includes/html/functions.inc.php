@@ -11,6 +11,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -436,28 +437,10 @@ function generate_port_image($args)
  * @param  string  $text
  * @param  int[]  $color
  */
-function graph_error($text, $color = [128, 0, 0])
+function graph_error($text, $short = null, $color = [128, 0, 0])
 {
-    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
-}
-
-/**
- * Output message to user in image format.
- *
- * @param  string  $text  string to display
- */
-function graph_text_and_exit($text)
-{
-    global $vars;
-
-    if ($vars['showcommand'] == 'yes') {
-        echo $text;
-
-        return;
-    }
-
-    graph_error($text, [13, 21, 210]);
-    exit;
+    header('Content-Type: ' . ImageFormat::forGraph()->contentType());
+    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
 function print_port_thumbnail($args)
