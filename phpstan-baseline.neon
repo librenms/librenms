@@ -8056,11 +8056,6 @@ parameters:
 			path: app/Models/DeviceRelatedModel.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Eventlog\\:\\:log\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Eventlog.php
-
-		-
 			message: "#^Method App\\\\Models\\\\IsisAdjacency\\:\\:device\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/IsisAdjacency.php
