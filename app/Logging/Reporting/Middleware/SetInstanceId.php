@@ -29,7 +29,7 @@ class SetInstanceId implements \Spatie\FlareClient\FlareMiddleware\FlareMiddlewa
 {
     /**
      * Middleware to add instance ID, piggybacks on the "user id" feature.
-         *
+     *
      * @param  \Spatie\FlareClient\Report  $report
      * @param  callable  $next
      * @return mixed
