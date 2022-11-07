@@ -40,6 +40,13 @@ class Eventlog extends DeviceRelatedModel
     // ---- Helper Functions ----
     /**
      * This is used to be able to mock _log()
+     * @see _log()
+     *
+     * @param  string  $text  message describing the event
+     * @param  Device|int|null  $device  related device
+     * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+     * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+     * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
      */
     public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
     {
@@ -50,11 +57,11 @@ class Eventlog extends DeviceRelatedModel
     /**
      * Log events to the event table
      *
-     * @param  string  $text  message describing the event
-     * @param  Device|int|null  $device  related device
-     * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
-     * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
-     * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
+     * @param  string  $text
+     * @param  Device|int|null  $device
+     * @param  string  $type
+     * @param  int  $severity
+     * @param  int|string|null  $reference
      */
     public static function _log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
     {
