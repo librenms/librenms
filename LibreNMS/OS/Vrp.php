@@ -31,6 +31,7 @@ use App\Models\PortsNac;
 use App\Models\Sla;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
@@ -59,7 +60,7 @@ class Vrp extends OS implements
 {
     public function discoverMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityMemSize', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'hwEntityBomEnDesc', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
@@ -336,7 +337,7 @@ class Vrp extends OS implements
      */
     public function pollNac()
     {
-        $nac = collect();
+        $nac = new Collection();
         // We collect the first table
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'hwAccessInterface', [], 'HUAWEI-AAA-MIB');
 
@@ -483,7 +484,7 @@ class Vrp extends OS implements
 
     public function discoverSlas()
     {
-        $slas = collect();
+        $slas = new Collection();
         // Get the index of the last finished test
         // NQA-MIB::nqaScheduleLastFinishIndex
 

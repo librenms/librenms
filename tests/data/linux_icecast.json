@@ -10,11 +10,11 @@
                     "version": "4.18.0-147.8.1.el8_1.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": "<private>"
+                    "icon": "linux.svg"
                 }
             ]
         },
@@ -908,7 +908,8 @@
                     "discovered": 1,
                     "app_state_prev": null,
                     "app_status": "",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ]
         },
@@ -920,7 +921,8 @@
                     "discovered": 1,
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
-                    "app_instance": ""
+                    "app_instance": "",
+                    "data": null
                 }
             ],
             "application_metrics": [

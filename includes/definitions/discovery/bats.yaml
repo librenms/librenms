@@ -1,0 +1,155 @@
+mib: AATS-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: aatsDot1
+                    value: cpuTemp
+                    num_oid: '.1.3.6.1.4.1.37069.1.1.4.{{ $index }}'
+                    descr: 'System CPU'
+                    index: 'cpuTemp.{{ $index }}'
+        count:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: aatsDot1
+                    value: status
+                    group: Positioner
+                    num_oid: '.1.3.6.1.4.1.37069.1.1.1.{{ $index }}'
+                    descr: 'Link distance (km)'
+                    index: 'status.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: currentHeading360ScaleFloat
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.7.2.5.{{ $index }}'
+                    descr: 'GPS Heading'
+                    index: 'currentHeading360ScaleFloat.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: currentHeading360ScaleInt
+                    group: 'Currently used GPS / Heading'
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.7.2.4.{{ $index }}'
+                    descr: 'GPS Heading / 100'
+                    index: 'currentHeading360ScaleInt.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: azimuth360ScaleFloat
+                    group: Positioner
+                    num_oid: '.1.3.6.1.4.1.37069.1.3.1.3.5.{{ $index }}'
+                    descr: 'Azimuth'
+                    index: 'azimuth360ScaleFloat.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: antennaHeading360ScaleFloat
+                    group: Positioner
+                    num_oid: '.1.3.6.1.4.1.37069.1.3.1.5.5.{{ $index }}'
+                    descr: 'Antenna heading'
+                    index: 'antennaHeading360ScaleFloat.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: currentGPSAltitudeFloat
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.6.3.{{ $index }}'
+                    descr: 'GPS height (m)'
+                    index: 'currentGPSAltitudeFloat.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: currentPitchFloat
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.8.1.3.{{ $index }}'
+                    descr: 'Pitch'
+                    index: 'currentPitchFloat.{{ $index }}'
+                -
+                    oid: aatsDot1
+                    value: currentRollFloat
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.8.2.3.{{ $index }}'
+                    descr: 'Roll'
+                    index: 'currentRollFloat.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: aatsDot1
+                    value: linkStatusInt
+                    group: Radio
+                    num_oid: '.1.3.6.1.4.1.37069.1.2.3.2.{{ $index }}'
+                    descr: 'Link status'
+                    index: 'linkStatusInt.{{ $index }}'
+                    state_name: linkStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Disconnected }
+                        - { value:  1, generic: 1, graph: 0, descr: Marginal }
+                        - { value:  2, generic: 0, graph: 0, descr: Connected }
+                -
+                    oid: aatsDot1
+                    value: currentGPSStatusInt
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.2.2.{{ $index }}'
+                    descr: 'Overall GPS status'
+                    index: 'currentGPSStatusInt.{{ $index }}'
+                    state_name: GPSLinkStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
+                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                -
+                    oid: aatsDot1
+                    value: localGPSStatusInt
+                    group: 'Local GPS'
+                    num_oid: '.1.3.6.1.4.1.37069.1.5.2.2.{{ $index }}'
+                    descr: 'Local GPS status'
+                    index: 'localGPSStatusInt.{{ $index }}'
+                    state_name: LocalGPSLinkStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
+                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                -
+                    oid: aatsDot1
+                    value: networkGPSStatusInt
+                    group: 'Network GPS'
+                    num_oid: '.1.3.6.1.4.1.37069.1.6.2.2.{{ $index }}'
+                    descr: 'Network GPS status'
+                    index: 'networkGPSStatusInt.{{ $index }}'
+                    state_name: NetworkGPSLinkStatus
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
+                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+                -
+                    oid: aatsDot1
+                    value: positionerConnected
+                    group: Positioner
+                    num_oid: '.1.3.6.1.4.1.37069.1.3.1.1.{{ $index }}'
+                    descr: 'Positioner Connection'
+                    index: 'positionerConnected.{{ $index }}'
+                    state_name: PositionerConnection
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Disconnected }
+                        - { value:  1, generic: 0, graph: 0, descr: Connected }
+                -
+                    oid: aatsDot1
+                    value: positionerMoving
+                    group: Positioner
+                    num_oid: '.1.3.6.1.4.1.37069.1.3.1.2.{{ $index }}'
+                    descr: 'Positioner Movement'
+                    index: 'positionerMoving.{{ $index }}'
+                    state_name: PositionerMovement
+                    states:
+                        - { value:  0, generic: 0, graph: 0, descr: Stopped }
+                        - { value:  1, generic: 0, graph: 0, descr: Moving }
+                -
+                    oid: aatsDot1
+                    value: currentHeadingStatusInt
+                    group: 'Currently used GPS / Heading'
+                    num_oid: '.1.3.6.1.4.1.37069.1.4.7.1.2.{{ $index }}'
+                    descr: 'Heading status'
+                    index: 'currentHeadingStatusInt.{{ $index }}'
+                    state_name: PositionerHeadingState
+                    states:
+                        - { value:  0, generic: 2, graph: 0, descr: Invalid }
+                        - { value:  1, generic: 0, graph: 0, descr: Valid }
+    os:
+        sysDescr_regex: '/ radio;(?<hardware>.*) v(?<version>[0-9.]*);.*;SN: (?<serial>[0-9]+);/'
+

@@ -12,7 +12,6 @@ $colour_line = '00cc00';
 $colour_area_max = '99cc99';
 $scale_min = '0';
 $graph_max = 1;
-$graph_min = 0;
 
 $unit_text = 'PPPoE Sessions';
 

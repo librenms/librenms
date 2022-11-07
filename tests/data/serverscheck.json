@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "SC-TS01",
                     "features": null,
+                    "location": "<private>",
                     "os": "serverscheck",
                     "type": "environment",
                     "serial": null,
-                    "icon": "serverscheck.svg",
-                    "location": "<private>"
+                    "icon": "serverscheck.svg"
                 }
             ]
         },
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Serverscheck_FloodSensor"
                 },
                 {
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -120,6 +122,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 1,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Serverscheck_FloodSensor"
                 },
                 {
@@ -144,6 +147,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

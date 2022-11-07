@@ -65,7 +65,7 @@ class Googlechat extends Transport
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         curl_close($ch);
 
-        Log::debug($code);
+        Log::debug("$code");
 
         if ($code != 200) {
             Log::error('Google Chat Transport Error');

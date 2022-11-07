@@ -10,11 +10,11 @@
                     "version": "3.00",
                     "hardware": "SuperStack 3 Switch 4200",
                     "features": "07 09 14 15 17 1A 1B 1C 1E 20 21 22 23 25 26 28 0A 32 39 20 32 41 20 33 38 20 34 32 20 34 33 20 34 34",
+                    "location": "<private>",
                     "os": "3com",
                     "type": "network",
                     "serial": "L3ZV7LJ6449A0",
-                    "icon": "3com.png",
-                    "location": "<private>"
+                    "icon": "3com.png"
                 }
             ]
         },

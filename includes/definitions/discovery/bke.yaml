@@ -1,0 +1,97 @@
+mib: PNETMOD-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: accuTemperature
+                    num_oid: '.1.3.6.1.4.1.27533.5.3.3.{{ $index }}'
+                    index: 'accuTemperature.{{ $index }}'
+                    descr: Temperature
+                    divisor: 10
+
+                    skip_values:
+                        -
+                            oid: accuTemperature
+                            op: '>='
+                            value: 100000
+
+        state:
+            data:
+                -
+                    oid: powerSourceState
+                    num_oid: '.1.3.6.1.4.1.27533.5.2.1.{{ $index }}'
+                    index: 'powerSourceState.{{ $index }}'
+                    descr: 'Power state'
+                    states:
+                        - { descr: Battery, graph: 0, value: 1, generic: 1 }
+                        - { descr: Online, graph: 0, value: 0, generic: 0 }
+                -
+                    oid: gridState
+                    num_oid: '.1.3.6.1.4.1.27533.5.1.1.{{ $index }}'
+                    index: 'gridState.{{ $index }}'
+                    descr: 'Grid state'
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
+                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                -
+                    oid: gridFuse
+                    num_oid: '.1.3.6.1.4.1.27533.5.1.2.{{ $index }}'
+                    index: 'gridFuse.{{ $index }}'
+                    descr: 'Grid fuse state'
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
+                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                -
+                    oid: outState
+                    num_oid: '.1.3.6.1.4.1.27533.5.4.2.{{ $index }}'
+                    index: 'outState.{{ $index }}'
+                    descr: 'Output state'
+                    states:
+                        - { descr: On, graph: 0, value: 1, generic: 0 }
+                        - { descr: Off, graph: 0, value: 2, generic: 1 }
+                -
+                    oid: outFuse
+                    num_oid: '.1.3.6.1.4.1.27533.5.4.1.{{ $index }}'
+                    index: 'outFuse.{{ $index }}'
+                    descr: 'Output fuse state'
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
+                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                -
+                    oid: accuFuse
+                    num_oid: '.1.3.6.1.4.1.27533.5.3.4.{{ $index }}'
+                    index: 'accuFuse.{{ $index }}'
+                    descr: 'Accumulator fuse state'
+                    states:
+                        - { descr: Fail, graph: 0, value: 1, generic: 1 }
+                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+
+        current:
+            data:
+                -
+                    oid: powerSourceCurrent
+                    num_oid: '.1.3.6.1.4.1.27533.5.2.2.{{ $index }}'
+                    index: 'powerSourceCurrent.{{ $index }}'
+                    descr: 'Power source current'
+                    divisor: 10
+                -
+                    oid: accuCurrent
+                    num_oid: '.1.3.6.1.4.1.27533.5.3.2.{{ $index }}'
+                    index: 'accuCurrent.{{ $index }}'
+                    descr: 'Charge current'
+                    divisor: 10
+
+        voltage:
+            data:
+                -
+                    oid: accuVoltage
+                    num_oid: '.1.3.6.1.4.1.27533.5.3.1.{{ $index }}'
+                    index: 'accuVoltage.{{ $index }}'
+                    descr: 'Voltage'
+                    divisor: 10
+                    low_warn_limit: 42
+                    low_limit: 41
+                    warn_limit: 57
+                    high_limit: 60
+

@@ -30,20 +30,17 @@ use LibreNMS\Exceptions\ApiException;
 
 class RipeApi extends BaseApi
 {
-    protected $base_uri = 'https://stat.ripe.net';
+    protected string $base_uri = 'https://stat.ripe.net';
 
-    protected $whois_uri = '/data/whois/data.json';
-    protected $abuse_uri = '/data/abuse-contact-finder/data.json';
+    protected string $whois_uri = '/data/whois/data.json';
+    protected string $abuse_uri = '/data/abuse-contact-finder/data.json';
 
     /**
      * Get whois info
      *
-     * @param  string  $resource  ASN/IPv4/IPv6
-     * @return array
-     *
      * @throws ApiException
      */
-    public function getWhois($resource)
+    public function getWhois(string $resource): array
     {
         return $this->makeApiCall($this->whois_uri, [
             'query' => [
@@ -55,12 +52,9 @@ class RipeApi extends BaseApi
     /**
      * Get Abuse contact
      *
-     * @param  string  $resource  prefix, single IP address or ASN
-     * @return array|mixed
-     *
      * @throws ApiException
      */
-    public function getAbuseContact($resource)
+    public function getAbuseContact(string $resource): mixed
     {
         return $this->makeApiCall($this->abuse_uri, [
             'query' => [
@@ -70,11 +64,9 @@ class RipeApi extends BaseApi
     }
 
     /**
-     * @return array|mixed
-     *
      * @throws ApiException
      */
-    private function makeApiCall(string $uri, array $options)
+    private function makeApiCall(string $uri, array $options): mixed
     {
         try {
             $response_data = $this->getClient()->get($uri, $options)->json();

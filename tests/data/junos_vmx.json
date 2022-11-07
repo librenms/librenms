@@ -10,11 +10,11 @@
                     "version": "18.2R1.9",
                     "hardware": "Juniper VMX Internet Backbone Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "VM600B272BD3",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },
@@ -4559,7 +4559,7 @@
                     "ifDuplex": null,
                     "ifMtu": null,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34 ",
+                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -10653,7 +10653,7 @@
                     "ifDuplex": "fullDuplex",
                     "ifMtu": 1514,
                     "ifType": "ethernetCsmacd",
-                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34 ",
+                    "ifAlias": "DCI: to LAU-DC01\n20 67 65 2D 30 C2 A7 2F 30 2F 34",
                     "ifPhysAddress": "0c2016e8b706",
                     "ifHardType": null,
                     "ifLastChange": 3220,
@@ -12372,6 +12372,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12396,6 +12397,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12420,6 +12422,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12444,6 +12447,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12468,6 +12472,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12492,6 +12497,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12516,6 +12522,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12540,6 +12547,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12564,6 +12572,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12588,6 +12597,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12612,6 +12622,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -12636,6 +12647,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 }
             ],
@@ -12778,6 +12790,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 2538860,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12802,6 +12815,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12826,6 +12840,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12850,6 +12865,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 6592546,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12874,6 +12890,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": 100000000,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12898,6 +12915,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12922,6 +12940,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12946,6 +12965,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12970,6 +12990,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12994,6 +13015,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -13018,6 +13040,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -13042,6 +13065,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 }
             ],
@@ -13305,7 +13329,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13313,6 +13337,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13327,7 +13352,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13335,6 +13360,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13403,7 +13429,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",
@@ -13411,6 +13437,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.1.1.2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13425,7 +13452,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",
@@ -13433,6 +13460,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.1.1.6",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",

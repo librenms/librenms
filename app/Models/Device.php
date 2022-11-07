@@ -51,6 +51,7 @@ class Device extends BaseModel
         'display',
         'icon',
         'ip',
+        'notes',
         'os',
         'overwrite_ip',
         'poller_group',
@@ -79,7 +80,7 @@ class Device extends BaseModel
 
     // ---- Helper Functions ----
 
-    public static function findByHostname($hostname)
+    public static function findByHostname(string $hostname): ?Device
     {
         return static::where('hostname', $hostname)->first();
     }
@@ -110,7 +111,7 @@ class Device extends BaseModel
         return $overwrite_ip ?: $hostname;
     }
 
-    public static function findByIp($ip)
+    public static function findByIp(?string $ip): ?Device
     {
         if (! IP::isValid($ip)) {
             return null;
@@ -210,7 +211,7 @@ class Device extends BaseModel
 
                 if ($this->groups->isNotEmpty()) {
                     $query->orWhereHas('deviceGroups', function (Builder $query) {
-                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
+                        $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
@@ -242,7 +243,7 @@ class Device extends BaseModel
 
         $length = \LibreNMS\Config::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
-            $take = substr_count($name, '.', 0, $length) + 1;
+            $take = max(substr_count($name, '.', 0, $length), 1);
 
             return implode('.', array_slice(explode('.', $name), 0, $take));
         }
@@ -561,8 +562,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -572,8 +573,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -583,8 +584,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }
@@ -594,8 +595,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }
@@ -782,6 +783,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
     }
 
+    public function portsAdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortAdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
+    }
+
     public function portsFdb(): HasMany
     {
         return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
@@ -795,6 +801,11 @@ class Device extends BaseModel
     public function portsStp(): HasMany
     {
         return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVdsl(): HasManyThrough
+    {
+        return $this->hasManyThrough(\App\Models\PortVdsl::class, \App\Models\Port::class, 'device_id', 'port_id');
     }
 
     public function portsVlan(): HasMany

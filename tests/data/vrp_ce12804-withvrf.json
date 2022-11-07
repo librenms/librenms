@@ -10,11 +10,11 @@
                     "version": "8.150 (V200R002C50SPC800) [patch]",
                     "hardware": "CE12800",
                     "features": null,
+                    "location": "<private>",
                     "os": "vrp",
                     "type": "network",
                     "serial": null,
-                    "icon": "huawei.svg",
-                    "location": "<private>"
+                    "icon": "huawei.svg"
                 }
             ]
         },
@@ -24394,7 +24394,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64512-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
@@ -24402,6 +24402,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
                     "bgpPeerDescr": "PeerDesc1",
@@ -24446,7 +24447,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64512-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.189.96",
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
@@ -24454,6 +24455,7 @@
                     "bgpPeerLastErrorCode": 2,
                     "bgpPeerLastErrorSubCode": 2,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
                     "bgpPeerDescr": "PeerDesc1",

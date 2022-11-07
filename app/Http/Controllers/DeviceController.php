@@ -52,7 +52,6 @@ class DeviceController extends Controller
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
-        'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
         'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
@@ -91,7 +90,7 @@ class DeviceController extends Controller
         $data = $tabs[$current_tab]->data($device);
 
         // Device Link Menu, select the primary link
-        $device_links = $this->deviceLinkMenu($device);
+        $device_links = $this->deviceLinkMenu($device, $current_tab);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
         if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
@@ -112,6 +111,7 @@ class DeviceController extends Controller
     {
         ob_start();
         $device = $device->toArray();
+        $device['os_group'] = Config::get("os.{$device['os']}.group");
         Debug::set(false);
         chdir(base_path());
         $init_modules = ['web', 'auth'];
@@ -150,15 +150,33 @@ class DeviceController extends Controller
         return $graphs;
     }
 
-    private function deviceLinkMenu(Device $device)
+    private function deviceLinkMenu(Device $device, string $current_tab): array
     {
         $device_links = [];
 
         if (Gate::allows('update', $device)) {
+            $suffix = 'edit';
+            $title = __('Edit');
+
+            // check if metric has more specific edit page
+            if (preg_match('#health/metric=(\w+)#', \Request::path(), $matches)) {
+                if ($this->editTabExists($matches[1])) {
+                    $current_tab = $matches[1];
+                } elseif ($this->editTabExists($matches[1] . 's')) {
+                    $current_tab = $matches[1] . 's';
+                }
+            }
+
+            // check if edit page exists
+            if ($this->editTabExists($current_tab)) {
+                $suffix .= "/section=$current_tab";
+                $title .= ' ' . ucfirst($current_tab);
+            }
+
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
-                'url' => route('device', [$device->device_id, 'edit']),
-                'title' => __('Edit'),
+                'url' => route('device', [$device->device_id, $suffix]),
+                'title' => $title,
                 'external' => false,
             ];
         }
@@ -211,5 +229,10 @@ class DeviceController extends Controller
         }
 
         return $device_links;
+    }
+
+    private function editTabExists(string $tab): bool
+    {
+        return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
     }
 }

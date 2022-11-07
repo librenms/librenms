@@ -25,25 +25,23 @@
 
 namespace LibreNMS\Util;
 
+use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Models\Device;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Poller;
-use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
 {
-    private static $module_tables;
-
     private $quiet = false;
     private $modules;
     private $variant;
-    private $os;
     private $snmprec_file;
     private $json_file;
     private $snmprec_dir;
@@ -57,18 +55,6 @@ class ModuleTestHelper
     // Definitions
     // ignore these when dumping all modules
     private $exclude_from_all = ['arp-table', 'fdb-table'];
-    private static $module_deps = [
-        'arp-table' => ['ports', 'arp-table'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
-        'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'isis' => ['ports', 'isis'],
-        'mpls' => ['ports', 'vrf', 'mpls'],
-        'nac' => ['ports', 'nac'],
-        'ospf' => ['ports', 'ospf'],
-        'stp' => ['ports', 'vlans', 'stp'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
-    ];
 
     /**
      * ModuleTester constructor.
@@ -82,7 +68,6 @@ class ModuleTestHelper
     public function __construct($modules, $os, $variant = '')
     {
         $this->modules = self::resolveModuleDependencies((array) $modules);
-        $this->os = strtolower($os);
         $this->variant = strtolower($variant);
 
         // preset the file names
@@ -102,11 +87,6 @@ class ModuleTestHelper
         Config::set('influxdb.enable', false);
         Config::set('graphite.enable', false);
         Config::set('prometheus.enable', false);
-
-        if (is_null(self::$module_tables)) {
-            // only load the yaml once, then keep it in memory
-            self::$module_tables = Yaml::parse(file_get_contents($install_dir . '/tests/module_tables.yaml'));
-        }
     }
 
     private static function compareOid($a, $b)
@@ -148,7 +128,7 @@ class ModuleTestHelper
     public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
     {
         if ($full) {
-            $snmp_oids[] = [
+            $snmp_oids[][] = [
                 'oid' => '.',
                 'method' => 'walk',
                 'mib' => null,
@@ -211,14 +191,16 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):[^:]+:[0-9]+\' \'(.+)\']/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\']/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
-        $snmp_oids = [null => [
-            'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-            'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-        ]];
+        $snmp_oids = [
+            null => [
+                'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+                'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
+            ],
+        ];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
@@ -257,13 +239,17 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [])
+    public static function findOsWithData($modules = [], string $os_filter = null)
     {
         $os_list = [];
 
         foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
+
+            if ($os_filter != '' && $os_filter != $os) {
+                continue;
+            }
 
             // calculate valid modules
             $decoded = json_decode(file_get_contents($file), true);
@@ -329,7 +315,7 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    private static function resolveModuleDependencies($modules)
+    private static function resolveModuleDependencies(array $modules): array
     {
         // generate a full list of modules
         $full_list = [];
@@ -339,11 +325,8 @@ class ModuleTestHelper
                 throw new InvalidModuleException("Invalid module name: $module");
             }
 
-            if (isset(self::$module_deps[$module])) {
-                $full_list = array_merge($full_list, self::$module_deps[$module]);
-            } else {
-                $full_list[] = $module;
-            }
+            $full_list = array_merge($full_list, Module::fromName($module)->dependencies());
+            $full_list[] = $module;
         }
 
         return array_unique($full_list);
@@ -547,22 +530,37 @@ class ModuleTestHelper
         Config::set('rrd.enable', false); // disable rrd
         Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
+        // don't allow external DNS queries that could fail
+        app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
+            $asn = $parameters['asn'];
+            $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
+                return "AS$asn-MOCK-TEXT";
+            });
+
+            return $mock;
+        });
+
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
         }
 
         // Remove existing device in case it didn't get removed previously
-        if ($existing_device = device_by_name($snmpsim->getIp())) {
+        if (($existing_device = device_by_name($snmpsim->getIp())) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
-            Config::set('snmp.community', [$this->file_name]);
-            $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
-
-            // disable to block normal pollers
-            dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
+            $new_device = new Device([
+                'hostname' => $snmpsim->getIp(),
+                'version' => 'v2c',
+                'community' => $this->file_name,
+                'port' => $snmpsim->getPort(),
+                'disabled' => 1, // disable to block normal pollers
+            ]);
+            (new ValidateDeviceAndCreate($new_device, true))->execute();
+            $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
         } catch (\Exception $e) {
@@ -710,76 +708,17 @@ class ModuleTestHelper
     public function dumpDb($device_id, $modules, $type)
     {
         $data = [];
-        $module_dump_info = $this->getTableData();
 
         // don't dump some modules by default unless they are manually listed
         if (empty($this->modules)) {
             $modules = array_diff($modules, $this->exclude_from_all);
         }
 
-        // only dump data for the given modules
+        // only dump data for the given modules (and modules that support dumping)
         foreach ($modules as $module) {
-            foreach ($module_dump_info[$module] ?? [] as $table => $info) {
-                if ($table == 'component') {
-                    $components = $this->collectComponents($device_id);
-                    if (! empty($components)) {
-                        $data[$module][$type][$table] = $components;
-                    }
-                    continue;
-                }
-
-                // check for custom where
-                $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
-                $params = [$device_id];
-
-                // build joins
-                $join = '';
-                $select = ["`$table`.*"];
-                foreach ($info['joins'] ?? [] as $join_info) {
-                    if (isset($join_info['custom'])) {
-                        $join .= ' ' . $join_info['custom'];
-
-                        $default_select = [];
-                    } else {
-                        [$left, $lkey] = explode('.', $join_info['left']);
-                        [$right, $rkey] = explode('.', $join_info['right']);
-                        $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
-
-                        $default_select = ["`$right`.*"];
-                    }
-
-                    // build selects
-                    $select = array_merge($select, isset($join_info['select']) ? (array) $join_info['select'] : $default_select);
-                }
-
-                if (isset($info['order_by'])) {
-                    $order_by = " ORDER BY {$info['order_by']}";
-                } else {
-                    $order_by = '';
-                }
-
-                $fields = implode(', ', $select);
-                $rows = dbFetchRows("SELECT $fields FROM `$table` $join $where $order_by", $params);
-
-                // don't include empty tables
-                if (empty($rows)) {
-                    continue;
-                }
-
-                // remove unwanted fields
-                if (isset($info['included_fields'])) {
-                    $keys = array_flip($info['included_fields']);
-                    $rows = array_map(function ($row) use ($keys) {
-                        return array_intersect_key($row, $keys);
-                    }, $rows);
-                } elseif (isset($info['excluded_fields'])) {
-                    $keys = array_flip($info['excluded_fields']);
-                    $rows = array_map(function ($row) use ($keys) {
-                        return array_diff_key($row, $keys);
-                    }, $rows);
-                }
-
-                $data[$module][$type][$table] = $rows;
+            $module_data = Module::fromName($module)->dump(DeviceCache::get($device_id));
+            if ($module_data !== false) {
+                $data[$module][$type] = $this->dumpToArray($module_data);
             }
         }
 
@@ -787,14 +726,22 @@ class ModuleTestHelper
     }
 
     /**
-     * Get list of tables used by a module
-     * Includes a list of fields that will not be considered for testing
-     *
+     * @param  array|\Illuminate\Support\Collection|\stdClass  $data
      * @return array
      */
-    public function getTableData()
+    private function dumpToArray($data): array
     {
-        return array_intersect_key(self::$module_tables, array_flip($this->getModules()));
+        $output = [];
+
+        foreach ($data as $table => $table_data) {
+            foreach ($table_data as $item) {
+                $output[$table][] = is_a($item, Model::class)
+                    ? Arr::except($item->getAttributes(), $item->getHidden()) // don't apply accessors
+                    : (array) $item;
+            }
+        }
+
+        return $output;
     }
 
     /**
@@ -837,27 +784,6 @@ class ModuleTestHelper
         return $this->poller_output;
     }
 
-    /**
-     * Get a list of all modules that support capturing data
-     *
-     * @return array
-     */
-    public function getSupportedModules()
-    {
-        return array_keys(self::$module_tables);
-    }
-
-    /**
-     * Get a list of modules to capture data for
-     * If modules is empty, returns all supported modules
-     *
-     * @return array
-     */
-    private function getModules()
-    {
-        return empty($this->modules) ? $this->getSupportedModules() : $this->modules;
-    }
-
     public function getTestData()
     {
         return json_decode(file_get_contents($this->json_file), true);
@@ -870,15 +796,5 @@ class ModuleTestHelper
         }
 
         return $this->json_file;
-    }
-
-    private function collectComponents(int $device_id): array
-    {
-        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, function ($item) {
-            return $item['type'] . $item['label'];
-        });
-
-        return array_values($components);
     }
 }

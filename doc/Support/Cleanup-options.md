@@ -21,7 +21,7 @@ $config['authlog_purge']                             = 30;
 $config['ports_fdb_purge']                           = 10;
 $config['device_perf_purge']                         = 7;
 $config['rrd_purge']                                 = 0;
-$config['ports_purge']                               = 10;
+$config['ports_purge']                               = true;
 ```
 
 These options will ensure data within LibreNMS over X days old is

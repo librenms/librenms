@@ -159,11 +159,6 @@
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
                         </li>
-                        @config('poller_modules.mib')
-                            <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('mibs') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                           aria-hidden="true"></i> {{ __('MIB definitions') }}</a></li>
-                        @endconfig
                     </ul>
                 </li>
 {{-- Devices --}}
@@ -339,9 +334,17 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> {{ __('Manage Groups') }}
-                            </a></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+                            @if($port_groups->isNotEmpty())
+                                <li class="dropdown-submenu">
+                                <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                @foreach($port_groups as $group)
+                                    <li><a href="{{ url("ports/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
+                                @endforeach
+                                </ul>
+                                </li>
+                            @endif
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
@@ -589,7 +592,7 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endif
-                        <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg"
+                        <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
                     </ul>

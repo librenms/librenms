@@ -6,6 +6,8 @@ $(function () {
 <?php
 
 use App\Models\Port;
+use App\Models\PortAdsl;
+use App\Models\PortVdsl;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
@@ -18,17 +20,20 @@ $if_id = $port['port_id'];
 
 $port = cleanPort($port);
 
-if ($int_colour) {
+if (isset($int_colour)) {
     $row_colour = $int_colour;
 } else {
+    $i = $i ?? 0;
     if (! is_integer($i / 2)) {
         $row_colour = Config::get('list_colour.even');
     } else {
         $row_colour = Config::get('list_colour.odd');
     }
+    $i++;
 }
 
-$port_adsl = dbFetchRow('SELECT * FROM `ports_adsl` WHERE `port_id` = ?', [$port['port_id']]);
+$port_adsl = PortAdsl::where('port_id', '=', $port['port_id']);
+$port_vdsl = PortVdsl::where('port_id', '=', $port['port_id']);
 
 if ($port['ifInErrors_delta'] > 0 || $port['ifOutErrors_delta'] > 0) {
     $error_img = generate_port_link($port, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'port_errors');
@@ -58,9 +63,9 @@ if ($port['ifAlias']) {
     echo '<br />';
 }
 
-unset($break);
+$break = '';
 
-if ($port_details) {
+if (! empty($port_details)) {
     foreach (dbFetchRows('SELECT * FROM `ipv4_addresses` WHERE `port_id` = ?', [$port['port_id']]) as $ip) {
         echo "$break <a class=interface-desc href=\"javascript:popUp('ajax/netcmd?cmd=whois&amp;query=$ip[ipv4_address]')\">" . $ip['ipv4_address'] . '/' . $ip['ipv4_prefixlen'] . '</a>';
         $break = '<br />';
@@ -80,7 +85,7 @@ echo '</td><td width=100>';
 echo implode('<br>', $port_group_name_list);
 echo "</td><td width=100 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
 
-if ($port_details) {
+if (! empty($port_details)) {
     $port['graph_type'] = 'port_bits';
     echo generate_port_link($port, "<img src='graph.php?type=port_bits&amp;id=" . $port['port_id'] . '&amp;from=' . Config::get('time.day') . '&amp;to=' . Config::get('time.now') . '&amp;width=100&amp;height=20&amp;legend=no&amp;bg=' . str_replace('#', '', $row_colour) . "00'>");
     $port['graph_type'] = 'port_upkts';
@@ -94,8 +99,8 @@ echo "</td><td width=120 onclick=\"location.href='" . generate_port_url($port) .
 if ($port['ifOperStatus'] == 'up') {
     $port['in_rate'] = ($port['ifInOctets_rate'] * 8);
     $port['out_rate'] = ($port['ifOutOctets_rate'] * 8);
-    $in_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
-    $out_perc = empty($port['ifSpeed']) ? 0 : round(($port['in_rate'] / $port['ifSpeed'] * 100));
+    $in_perc = Number::calculatePercent($port['in_rate'], $port['ifSpeed'], 0);
+    $out_perc = Number::calculatePercent($port['in_rate'], $port['ifSpeed'], 0);
     echo "<i class='fa fa-long-arrow-left fa-lg' style='color:green' aria-hidden='true'></i> <span style='color: " . percent_colour($in_perc) . "'>" . Number::formatSi($port['in_rate'], 2, 3, 'bps') . "<br />
         <i class='fa fa-long-arrow-right fa-lg' style='color:blue' aria-hidden='true'></i> <span style='color: " . percent_colour($out_perc) . "'>" . Number::formatSi($port['out_rate'], 2, 3, 'bps') . "<br />
         <i class='fa fa-long-arrow-left fa-lg' style='color:purple' aria-hidden='true'></i> " . Number::formatBi($port['ifInUcastPkts_rate'], 2, 3, 'pps') . "</span><br />
@@ -139,22 +144,30 @@ if ($vlan_count > 1) {
     echo "<p style='color: green;'>" . $vrf['vrf_name'] . '</p>';
 }//end if
 
-if ($port_adsl['adslLineCoding']) {
+if (! empty($port_adsl->adslLineCoding)) {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo $port_adsl['adslLineCoding'] . '/' . rewrite_adslLineType($port_adsl['adslLineType']);
+    echo $port_adsl->adslLineCoding . '/' . rewrite_adslLineType($port_adsl->adslLineType);
     echo '<br />';
     // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
     // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
-    echo 'Sync:' . Number::formatSi($port_adsl['adslAtucChanCurrTxRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAturChanCurrTxRate'], 2, 3, 'bps');
+    echo 'Sync:' . Number::formatSi($port_adsl->adslAtucChanCurrTxRate, 2, 3, 'bps') . '/' . Number::formatSi($port_adsl->adslAturChanCurrTxRate, 2, 3, 'bps');
     echo '<br />';
     // This is the Receive Max AttainableRate, so :
     //    adslAturCurrAttainableRate is DownloadMaxRate
     //    adslAtucCurrAttainableRate is UploadMaxRate
-    echo 'Max:' . Number::formatSi($port_adsl['adslAturCurrAttainableRate'], 2, 3, 'bps') . '/' . Number::formatSi($port_adsl['adslAtucCurrAttainableRate'], 2, 3, 'bps');
+    echo 'Max:' . Number::formatSi($port_adsl->adslAturCurrAttainableRate, 2, 3, 'bps') . '/' . Number::formatSi($port_adsl->adslAtucCurrAttainableRate, 2, 3, 'bps');
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
-    echo 'Atten:' . $port_adsl['adslAturCurrAtn'] . 'dB/' . $port_adsl['adslAtucCurrAtn'] . 'dB';
+    echo 'Atten:' . $port_adsl->adslAturCurrAtn . 'dB/' . $port_adsl->adslAtucCurrAtn . 'dB';
     echo '<br />';
-    echo 'SNR:' . $port_adsl['adslAturCurrSnrMgn'] . 'dB/' . $port_adsl['adslAtucCurrSnrMgn'] . 'dB';
+    echo 'SNR:' . $port_adsl->adslAturCurrSnrMgn . 'dB/' . $port_adsl->adslAtucCurrSnrMgn . 'dB';
+} elseif (! empty($port_vdsl->xdsl2LineStatusAttainableRateDs)) {
+    echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
+    echo '<br />';
+    // ATU-C is CO       -> ATU-C TX is the download speed for the CPE
+    // ATU-R is the CPE  -> ATU-R TX is the upload speed of the CPE
+    echo 'Sync:' . Number::formatSi($port_vdsl->xdsl2ChStatusActDataRateXtur, 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl->xdsl2ChStatusActDataRateXtuc, 2, 3, 'bps');
+    echo '<br />';
+    echo 'Max:' . Number::formatSi($port_vdsl->xdsl2LineStatusAttainableRateDs, 2, 3, 'bps') . '/' . Number::formatSi($port_vdsl->xdsl2LineStatusAttainableRateUs, 2, 3, 'bps');
 } else {
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifType'] && $port['ifType'] != '') {
@@ -164,7 +177,7 @@ if ($port_adsl['adslLineCoding']) {
     }
 
     echo '<br />';
-    if ($ifHardType && $ifHardType != '') {
+    if (! empty($ifHardType)) {
         echo '<span class=box-desc>' . $ifHardType . '</span>';
     } else {
         echo '-';
@@ -172,7 +185,7 @@ if ($port_adsl['adslLineCoding']) {
 
     echo "</td><td width=150 onclick=\"location.href='" . generate_port_url($port) . "'\" >";
     if ($port['ifPhysAddress'] && $port['ifPhysAddress'] != '') {
-        echo '<span class=box-desc>' . \LibreNMS\Util\Rewrite::readableMac($port['ifPhysAddress']) . '</span>';
+        echo '<span class=box-desc>' . $port->ifPhysAddress . '</span>';
     } else {
         echo '-';
     }
@@ -191,7 +204,7 @@ echo '<td width=375 valign=top class="interface-desc">';
 $neighborsCount = 0;
 $nbLinks = 0;
 $int_links = [];
-if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
+if (strpos($port['label'], 'oopback') === false && empty($graph_type)) {
     foreach (dbFetchRows('SELECT * FROM `links` AS L, `ports` AS I, `devices` AS D WHERE L.local_port_id = ? AND L.remote_port_id = I.port_id AND I.device_id = D.device_id', [$if_id]) as $link) {
         $int_links[$link['port_id']] = $link['port_id'];
         $int_links_phys[$link['port_id']] = 1;
@@ -200,7 +213,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
 
     unset($br);
 
-    if ($port_details && Config::get('enable_port_relationship') === true) {
+    if (! empty($port_details) && Config::get('enable_port_relationship') === true) {
         // Show which other devices are on the same subnet as this interface
         foreach (dbFetchRows("SELECT `ipv4_network_id` FROM `ipv4_addresses` WHERE `port_id` = ? AND `ipv4_address` NOT LIKE '127.%'", [$port['port_id']]) as $net) {
             $ipv4_network_id = $net['ipv4_network_id'];
@@ -251,7 +264,7 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
                <span class="neighbors-interface-list-firsts" style="display: inline;">';
     }
 
-    if ($port_details && Config::get('enable_port_relationship') === true && port_permitted($int_link, $device['device_id'])) {
+    if (! empty($port_details) && Config::get('enable_port_relationship') === true && port_permitted($int_link, $device['device_id'])) {
         foreach ($int_links as $int_link) {
             $neighborsCount++;
             if ($neighborsCount == 4) {
@@ -286,7 +299,8 @@ if (strpos($port['label'], 'oopback') === false && ! $graph_type) {
     // unset($int_links, $int_links_v6, $int_links_v4, $int_links_phys, $br);
 }//end if
 
-if ($port_details && Config::get('enable_port_relationship') === true && port_permitted($port['port_id'], $device['device_id'])) {
+$br = '';
+if (! empty($port_details) && Config::get('enable_port_relationship') === true && port_permitted($port['port_id'], $device['device_id'])) {
     foreach (dbFetchRows('SELECT * FROM `pseudowires` WHERE `port_id` = ?', [$port['port_id']]) as $pseudowire) {
         // `port_id`,`peer_device_id`,`peer_ldp_id`,`cpwVcID`,`cpwOid`
         $pw_peer_dev = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$pseudowire['peer_device_id']]);
@@ -337,18 +351,20 @@ if ($nbLinks > 3) {
 echo '</td></tr>';
 
 // If we're showing graphs, generate the graph and print the img tags
-if ($graph_type == 'etherlike') {
-    $graph_file = get_port_rrdfile_path($device['hostname'], $if_id, 'dot3');
-} else {
-    $graph_file = get_port_rrdfile_path($device['hostname'], $if_id);
-}
+if (isset($graph_type)) {
+    if ($graph_type == 'etherlike') {
+        $graph_file = get_port_rrdfile_path($device['hostname'], $if_id, 'dot3');
+    } else {
+        $graph_file = get_port_rrdfile_path($device['hostname'], $if_id);
+    }
 
-if ($graph_type && is_file($graph_file)) {
-    $type = $graph_type;
+    if (is_file($graph_file)) {
+        $type = $graph_type;
 
-    echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
+        echo "<tr style='background-color: $row_colour; padding: 0px;'><td colspan=7>";
 
-    include 'includes/html/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
 
-    echo '</td></tr>';
+        echo '</td></tr>';
+    }
 }

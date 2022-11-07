@@ -23,7 +23,7 @@ class BillFactory extends Factory
     public function definition()
     {
         return [
-            'bill_name' => $this->faker->text,
+            'bill_name' => $this->faker->text(),
         ];
     }
 }

@@ -1,15 +1,19 @@
 <?php
 
+use App\Models\Port;
+use LibreNMS\Config;
+use LibreNMS\Util\Url;
+
+if (empty($vars['view'])) {
+    $vars['view'] = trim(Config::get('ports_page_default'), '/');
+}
+
 if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
     if (isset($vars['graph'])) {
         $graph_type = 'port_' . $vars['graph'];
     } else {
         $graph_type = 'port_bits';
     }
-}
-
-if (! $vars['view']) {
-    $vars['view'] = trim(\LibreNMS\Config::get('ports_page_default'), '/');
 }
 
 $link_array = [
@@ -29,8 +33,8 @@ if (dbFetchCell("SELECT * FROM links AS L, ports AS I WHERE I.device_id = '" . $
     $menu_options['neighbours'] = 'Neighbours';
 }
 
-if (dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `ifType` = 'adsl'")) {
-    $menu_options['adsl'] = 'ADSL';
+if (DeviceCache::getPrimary()->portsAdsl()->exists() || DeviceCache::getPrimary()->portsVdsl()->exists()) {
+    $menu_options['xdsl'] = 'xDSL';
 }
 
 $sep = '';
@@ -59,12 +63,14 @@ $graph_types = [
     'errors'    => 'Errors',
 ];
 
-if (\LibreNMS\Config::get('enable_ports_etherlike')) {
+if (Config::get('enable_ports_etherlike')) {
     $graph_types['etherlike'] = 'Etherlike';
 }
 
+$type_sep = '';
+$vars['graph'] = $vars['graph'] ?? '';
 foreach ($graph_types as $type => $descr) {
-    echo "$type_sep";
+    echo $type_sep;
     if ($vars['graph'] == $type && $vars['view'] == 'graphs') {
         echo "<span class='pagemenu-selected'>";
     }
@@ -101,13 +107,23 @@ if ($vars['view'] == 'minigraphs') {
     echo "<div style='display: block; clear: both; margin: auto; min-height: 500px;'>";
     unset($seperator);
 
-    foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', [$device['device_id']]) as $port) {
-        $port = cleanPort($port, $device);
-        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . '</div></div>';
+    foreach (Port::where('device_id', $device['device_id'])->where('disabled', 0)->orderBy('ifIndex')->get() as $port) {
+        echo '<div class="minigraph-div">'
+            . Url::portLink($port,
+                '<div style="font-weight: bold;">' . $port->getShortLabel() . '</div>' .
+                Url::graphTag([
+                    'type' => $graph_type,
+                    'id' => $port['port_id'],
+                    'from' => $from,
+                    'width' => 180,
+                    'height' => 55,
+                    'legend' => 'no',
+                ]))
+        . '</div>';
     }
 
     echo '</div>';
-} elseif ($vars['view'] == 'arp' || $vars['view'] == 'adsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
+} elseif ($vars['view'] == 'arp' || $vars['view'] == 'xdsl' || $vars['view'] == 'neighbours' || $vars['view'] == 'fdb') {
     include 'ports/' . $vars['view'] . '.inc.php';
 } else {
     if ($vars['view'] == 'details') {
@@ -115,10 +131,10 @@ if ($vars['view'] == 'minigraphs') {
     } ?>
 <div style='margin: 0px;'><table class='table'>
   <tr>
-    <th width="350"><A href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'port']); ?>">Port</a></th>
+    <th width="350"><A href="<?php echo Url::generate($vars, ['sort' => 'port']); ?>">Port</a></th>
     <th width="100">Port Group</a></th>
     <th width="100"></th>
-    <th width="120"><a href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'traffic']); ?>">Traffic</a></th>
+    <th width="120"><a href="<?php echo Url::generate($vars, ['sort' => 'traffic']); ?>">Traffic</a></th>
     <th width="75">Speed</th>
     <th width="100">Media</th>
     <th width="100">Mac Address</th>
@@ -128,30 +144,24 @@ if ($vars['view'] == 'minigraphs') {
 
     $i = '1';
 
-    global $port_cache, $port_index_cache;
+    global $port_index_cache;
 
-    $ports = dbFetchRows("SELECT * FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' AND `disabled` = 0 ORDER BY `ifIndex` ASC", [$device['device_id']]);
+    /** @var \Illuminate\Support\Collection<\App\Models\Port> $ports */
+    $ports = DeviceCache::getPrimary()->ports()->orderBy('ifIndex')->isValid()->get();
+
     // As we've dragged the whole database, lets pre-populate our caches :)
-    // FIXME - we should probably split the fetching of link/stack/etc into functions and cache them here too to cut down on single row queries.
-
     foreach ($ports as $key => $port) {
-        $port_cache[$port['port_id']] = $port;
         $port_index_cache[$port['device_id']][$port['ifIndex']] = $port;
-        $ports[$key]['ifOctets_rate'] = $port['ifInOctets_rate'] + $port['ifOutOctets_rate'];
     }
 
-    switch ($vars['sort']) {
-        case 'traffic':
-            $ports = array_sort_by_column($ports, 'ifOctets_rate', SORT_DESC);
-            break;
-        default:
-            $ports = array_sort_by_column($ports, 'ifIndex', SORT_ASC);
-            break;
+    if (isset($vars['sort']) && $vars['sort'] == 'traffic') {
+        $ports = $ports->sortByDesc(function (Port $port) {
+            return $port->ifInOctets_rate + $port->ifOutOctets_rate;
+        });
     }
 
     foreach ($ports as $port) {
         include 'includes/html/print-interface.inc.php';
-        $i++;
     }
 
     echo '</table></div>';

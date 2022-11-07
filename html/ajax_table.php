@@ -21,12 +21,13 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-Debug::set($_REQUEST['debug']);
+Debug::set(! empty($_REQUEST['debug']));
 
 $current = $_REQUEST['current'];
 settype($current, 'integer');
 $rowCount = $_REQUEST['rowCount'];
 settype($rowCount, 'integer');
+$sort = '';
 if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
     foreach ($_REQUEST['sort'] as $k => $v) {
         $k = preg_replace('/[^A-Za-z0-9_]/', '', $k); // only allow plain columns

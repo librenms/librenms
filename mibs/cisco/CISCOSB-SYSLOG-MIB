@@ -16,7 +16,7 @@ IMPORTS
                                             FROM INET-ADDRESS-MIB;
 
  rlSyslog MODULE-IDENTITY
-          LAST-UPDATED "200602120000Z"
+          LAST-UPDATED "200602120001Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO

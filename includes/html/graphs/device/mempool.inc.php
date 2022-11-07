@@ -43,7 +43,7 @@ if (! $swap_present) {
 }
 
 $colors = \LibreNMS\Config::get('graph_colours.varied');
-$legend_sections = [0 => '', 1 => ''];
+$legend_sections = [0 => '', 1 => '', 2 => ''];
 $section = 0;
 $free_indexes = [];
 $rrd_options .= " COMMENT:'                            Min   Max    Cur      \\n'";
@@ -120,6 +120,6 @@ if (! empty($free_indexes)) {
     }
 }
 
-$rrd_options .= implode(" COMMENT:' \\l'", $legend_sections);
+$rrd_options .= implode(" COMMENT:' \\l'", array_filter($legend_sections));
 
 $rrd_options .= ' HRULE:0#999999';

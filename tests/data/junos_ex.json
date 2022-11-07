@@ -10,11 +10,11 @@
                     "version": "15.1X53-D59.4",
                     "hardware": "Juniper EX3400-48T",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": null,
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },
@@ -24,7 +24,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "idle",
@@ -32,6 +32,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -46,7 +47,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -54,6 +55,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -68,7 +70,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "idle",
@@ -76,6 +78,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -94,7 +97,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65502-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.4",
                     "bgpPeerRemoteAs": 65502,
                     "bgpPeerState": "established",
@@ -102,6 +105,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.43",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -116,7 +120,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.186",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -124,6 +128,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.185",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -138,7 +143,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65504-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.226",
                     "bgpPeerRemoteAs": 65504,
                     "bgpPeerState": "established",
@@ -146,6 +151,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.1.225",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -263,6 +269,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -287,6 +294,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -311,6 +319,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -335,6 +344,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -359,6 +369,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -383,6 +394,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -407,6 +419,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -431,6 +444,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -455,6 +469,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -479,6 +494,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -503,6 +519,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 },
                 {
@@ -527,6 +544,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -551,6 +569,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

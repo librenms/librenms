@@ -1,7 +1,6 @@
 <?php
 
 $name = 'fbsd-nfs-server';
-$app_id = $app['app_id'];
 $scale_min = 0;
 $colours = 'mixed';
 $unit_text = 'per second';
@@ -13,7 +12,7 @@ $printtotal = 0;
 $addarea = 1;
 $transparency = 15;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app_id]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [

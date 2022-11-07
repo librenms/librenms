@@ -18,14 +18,16 @@ if (Config::get('enable_bgp')) {
 
     foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $device['context_name'] = $context_name;
+        $peer2 = false;
+        $peers_data = '';
+        $bgp4_mib = false;
+
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
                 dbUpdate(['bgpLocalAs' => $bgpLocalAs], 'devices', 'device_id=?', [$device['device_id']]);
                 echo 'Updated AS ';
             }
-
-            $peer2 = false;
 
             if ($device['os_group'] === 'arista') {
                 $peers_data = snmp_walk($device, 'aristaBgp4V2PeerRemoteAs', '-Oq', 'ARISTA-BGP4V2-MIB');
@@ -34,6 +36,9 @@ if (Config::get('enable_bgp')) {
                 $peers_data = snmp_walk($device, 'jnxBgpM2PeerRemoteAs', '-Onq', 'BGP4-V2-MIB-JUNIPER', 'junos');
             } elseif ($device['os_group'] === 'cisco') {
                 $peers_data = snmp_walk($device, 'cbgpPeer2RemoteAs', '-Oq', 'CISCO-BGP4-MIB');
+                $peer2 = ! empty($peers_data);
+            } elseif ($device['os'] === 'cumulus') {
+                $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'CUMULUS-BGPUN-MIB');
                 $peer2 = ! empty($peers_data);
             }
 
@@ -98,8 +103,9 @@ if (Config::get('enable_bgp')) {
                     $safis[133] = 'flow';
 
                     if (! isset($j_peerIndexes)) {
-                        $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerEntry', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
                         d_echo($j_bgp);
+                        $j_peerIndexes = [];
                         foreach ($j_bgp as $index => $entry) {
                             $peer_index = $entry['jnxBgpM2PeerIndex'];
                             try {
@@ -113,14 +119,15 @@ if (Config::get('enable_bgp')) {
                     }
 
                     if (! isset($j_afisafi)) {
-                        $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', $jbgp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
+                        $j_afisafi = [];
                         foreach (array_keys($j_prefixes) as $key) {
                             [$index,$afisafi] = explode('.', $key, 2);
                             $j_afisafi[$index][] = $afisafi;
                         }
                     }
 
-                    foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] as $afisafi) {
+                    foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] ?? [] as $afisafi) {
                         [$afi,$safi] = explode('.', $afisafi);
                         $afi = $afis[$afi];
                         $safi = $safis[$safi];

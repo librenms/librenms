@@ -143,6 +143,6 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-database';
+        return 'fa-solid fa-database';
     }
 }

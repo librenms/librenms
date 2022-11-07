@@ -10,11 +10,11 @@
                     "version": "5.20.99",
                     "hardware": "A5500-24G EI Switch with 2 Interface Slots",
                     "features": "2222P08",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "CN50A1Z4BN",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
@@ -7030,6 +7030,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -7054,6 +7055,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -7078,6 +7080,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

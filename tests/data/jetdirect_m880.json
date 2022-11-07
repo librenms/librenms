@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": "Color LaserJet flow MFP M880",
                     "features": null,
+                    "location": "<private>",
                     "os": "jetdirect",
                     "type": "printer",
                     "serial": null,
-                    "icon": "hp.svg",
-                    "location": "<private>"
+                    "icon": "hp.svg"
                 }
             ]
         },
@@ -475,6 +475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrDeviceStatus"
                 },
                 {
@@ -499,6 +500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrPrinterDetectedErrorState"
                 }
             ],

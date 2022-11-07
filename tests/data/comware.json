@@ -3,7 +3,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "95.43.23.53",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -11,6 +11,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -25,7 +26,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.57",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -33,6 +34,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -51,7 +53,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "95.43.23.53",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -59,6 +61,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.3.51",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -73,7 +76,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.57",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -81,6 +84,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.2.58",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -48838,11 +48842,11 @@
                     "version": "7.1.045",
                     "hardware": "FF 5700-40XG-2QSFP",
                     "features": "2416",
+                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": "DM20F3000F",
-                    "icon": "hpe.svg",
-                    "location": "<private>"
+                    "icon": "hpe.svg"
                 }
             ]
         },
@@ -51165,6 +51169,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMFanStatusTable"
                 },
                 {
@@ -51189,6 +51194,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51213,6 +51219,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51237,6 +51244,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51261,6 +51269,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51285,6 +51294,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 },
                 {
@@ -51309,6 +51319,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hh3cdevMPowerStatusTable"
                 }
             ],

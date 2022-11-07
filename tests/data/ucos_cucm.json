@@ -10,11 +10,11 @@
                     "version": "11.5.1.15900-18",
                     "hardware": "ciscoUCVirtualMachine",
                     "features": "CUCM",
+                    "location": "<private>",
                     "os": "ucos",
                     "type": "collaboration",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

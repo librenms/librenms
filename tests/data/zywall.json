@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.890.1.15",
                     "sysDescr": "ZyWALL 2X",
                     "sysContact": null,
                     "version": null,
                     "hardware": "ZyWALL 2X",
                     "features": null,
+                    "location": null,
                     "os": "zywall",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "zyxel.svg",
-                    "location": null
+                    "icon": "zyxel.svg"
                 }
             ]
         },

@@ -10,11 +10,11 @@
                     "version": "FSOS Software, Version 5.3.7",
                     "hardware": "8TF12S",
                     "features": null,
+                    "location": "<private>",
                     "os": "fs-switch",
                     "type": "network",
                     "serial": "CG1805255992N013",
-                    "icon": "fs.svg",
-                    "location": "<private>"
+                    "icon": "fs.svg"
                 }
             ]
         },

@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
@@ -286,7 +287,7 @@ echo "      </select>
         <select name='port_assoc_mode' id='port_assoc_mode' class='form-control input-sm'>
 ";
 
-foreach (get_port_assoc_modes() as $pam_id => $pam) {
+foreach (PortAssociationMode::getModes() as $pam_id => $pam) {
     echo "           <option value='$pam_id'";
 
     if ($pam_id == $device['port_association_mode']) {

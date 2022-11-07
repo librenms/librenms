@@ -3,11 +3,15 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.44.32.13",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -19,17 +23,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.63.161",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -41,17 +46,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e1:000d",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -63,17 +69,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a1",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -85,10 +92,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -193,11 +197,15 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.44.32.13",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.44.32.14",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -209,17 +217,18 @@
                     "bgpPeerInUpdateElapsedTime": 8491,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.45.63.161",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.45.63.162",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -231,17 +240,18 @@
                     "bgpPeerInUpdateElapsedTime": 8491,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e1:000d",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "2001:0db8:85a3:0000:341a:8a2e:03e1:000e",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -253,17 +263,18 @@
                     "bgpPeerInUpdateElapsedTime": 8486,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65083-MOCK-TEXT",
                     "bgpPeerIdentifier": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a1",
                     "bgpPeerRemoteAs": 65083,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "2001:0db8:85a3:0000:341a:8a2e:03e2:00a2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -275,10 +286,7 @@
                     "bgpPeerInUpdateElapsedTime": 8486,
                     "context_name": "",
                     "bgpLocalAs": 65031,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -392,11 +400,11 @@
                     "version": "15.5(3)S1a",
                     "hardware": "ciscoASR1002F",
                     "features": "ADVENTERPRISEK9",
+                    "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -6848,7 +6856,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 5,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 },
                 {
@@ -6878,7 +6886,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 1,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 }
             ],
@@ -6899,7 +6907,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "true",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -6914,7 +6922,7 @@
                     "ospfAreaLsaCksumSum": 23452697,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -6932,7 +6940,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 },
                 {
                     "port_id": null,
@@ -6948,7 +6956,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

@@ -1,8 +1,6 @@
 <?php
 
-if ($_GET['legend']) {
-    $legend = $_GET['legend'];
-}
+$legend = $graph_params->visible('legend');
 
 $rrd_options = "--alt-autoscale-max -E --start $from --end " . ($to - 150) . " --width $width --height $height ";
 $rrd_options .= \LibreNMS\Config::get('rrdgraph_def_text') . ' -c FONT#' . ltrim(\LibreNMS\Config::get('rrdgraph_def_text_color'), '#');
@@ -12,7 +10,7 @@ if ($height < '99') {
 
 $i = 1;
 
-foreach (explode(',', $_GET['id']) as $ifid) {
+foreach (explode(',', $vars['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
@@ -30,7 +28,7 @@ foreach (explode(',', $_GET['id']) as $ifid) {
 unset($seperator);
 unset($plus);
 
-foreach (explode(',', $_GET['idb']) as $ifid) {
+foreach (explode(',', $vars['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {

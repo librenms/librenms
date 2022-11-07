@@ -61,11 +61,11 @@
                     "version": "03.07.05E",
                     "hardware": "cat36xxstack",
                     "features": "UNIVERSALK9",
+                    "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

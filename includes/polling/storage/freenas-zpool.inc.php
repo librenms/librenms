@@ -1,6 +1,6 @@
 <?php
 
-if (! is_array($storage_cache['zpool'])) {
+if (! isset($storage_cache['zpool'])) {
     $storage_cache['zpool'] = snmpwalk_cache_oid($device, 'zpoolTable', null, 'FREENAS-MIB');
     d_echo($storage_cache);
 }

@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.1588.3.3.1.131",
                     "sysDescr": "Brocade VDX6740 Switch (FABM1-PA3 FABM2-PA3), BR-VDX6740, Network Operating System Software Version 6.0.1a.",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "nos",
                     "type": "network",
                     "serial": null,
-                    "icon": "brocade.svg",
-                    "location": null
+                    "icon": "brocade.svg"
                 }
             ]
         },

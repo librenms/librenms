@@ -118,7 +118,7 @@ class Cisco extends OS implements
             $hardware = $data[1000]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1000]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1000]['entPhysicalContainedIn']]['entPhysicalName'];
-        } elseif ((preg_match('/stack/i', $hardware) || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
+        } elseif ((preg_match('/stack/i', $hardware ?? '') || empty($hardware)) && ! empty($data[1001]['entPhysicalModelName'])) {
             $hardware = $data[1001]['entPhysicalModelName'];
         } elseif (empty($hardware) && ! empty($data[1001]['entPhysicalContainedIn'])) {
             $hardware = $data[$data[1001]['entPhysicalContainedIn']]['entPhysicalName'];
@@ -133,7 +133,7 @@ class Cisco extends OS implements
             return parent::discoverMempools(); // yaml
         }
 
-        $mempools = collect();
+        $mempools = new Collection();
         $cemp = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'cempMemPoolTable', [], 'CISCO-ENHANCED-MEMPOOL-MIB');
 
         foreach (Arr::wrap($cemp) as $index => $entry) {
@@ -237,14 +237,14 @@ class Cisco extends OS implements
             }
 
             if (isset($entry['cpmCPUTotalPhysicalIndex'])) {
-                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']];
+                $descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex']] ?? null;
             }
 
             if (empty($descr)) {
                 $descr = "Processor $index";
             }
 
-            if (is_array($entry['cpmCore5min'])) {
+            if (isset($entry['cpmCore5min']) && is_array($entry['cpmCore5min'])) {
                 // This CPU has data per individual core
                 foreach ($entry['cpmCore5min'] as $core_index => $core_usage) {
                     $processors[] = Processor::discover(
@@ -294,7 +294,7 @@ class Cisco extends OS implements
              * Could be dynamically changed to appropriate value if config had pol interval value
              */
             $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
-            $qfp_usage = $entry['fiveMinute'];
+            $qfp_usage = $entry['fiveMinute'] ?? null;
 
             if ($entQfpPhysicalIndex) {
                 $qfp_descr = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entQfpPhysicalIndex];
@@ -318,7 +318,7 @@ class Cisco extends OS implements
 
     public function discoverSlas()
     {
-        $slas = collect();
+        $slas = new Collection();
 
         $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
 
@@ -372,7 +372,7 @@ class Cisco extends OS implements
 
     public function pollNac()
     {
-        $nac = collect();
+        $nac = new Collection();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDeviceArray(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
         if (! empty($portAuthSessionEntry)) {
@@ -405,8 +405,8 @@ class Cisco extends OS implements
                     'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
                     'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
                     'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'],
-                    'authc_status' => $session_info['authc_status'],
-                    'method' => $session_info['method'],
+                    'authc_status' => $session_info['authc_status'] ?? '',
+                    'method' => $session_info['method'] ?? '',
                 ]));
             }
         }
@@ -431,7 +431,7 @@ class Cisco extends OS implements
 
             // Lets process each SLA
             $unixtime = intval(($data[$sla_nr]['rttMonLatestRttOperTime'] / 100 + $time_offset));
-            $time = strftime('%Y-%m-%d %H:%M:%S', $unixtime);
+            $time = date('Y-m-d H:i:s', $unixtime);
 
             // Save data
             $sla->rtt = $data[$sla_nr]['rttMonLatestRttOperCompletionTime'];

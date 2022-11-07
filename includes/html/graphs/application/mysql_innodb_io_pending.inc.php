@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 $descr_len = 16;
 
-$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app->app_id]);
 
 $array = [
     'IBILog' => 'AIO Log',

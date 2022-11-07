@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 print_optionbar_start();
 
 $link_array = [
@@ -126,7 +128,7 @@ if ($vars['view'] == 'lsp') {
             $path_status_color = 'warning';
         }
 
-        $avail = round($lsp['mplsLspPrimaryTimeUp'] / $lsp['mplsLspAge'] * 100, 5);
+        $avail = Number::calculatePercent($lsp['mplsLspPrimaryTimeUp'], $lsp['mplsLspAge'], 5);
 
         $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$lsp['mplsLspToAddr']]);
         $destination = $lsp['mplsLspToAddr'];

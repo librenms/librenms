@@ -48,12 +48,20 @@ if (! empty($entity_oids)) {
         $low_warn_limit = null;
         $warn_limit = null;
         $high_limit = null;
+        $group = null;
+        $type = null;
+        $oid = null;
+        $descr = null;
+        $divisor = null;
+        $multiplier = null;
+        $current = null;
+        $entPhysicalIndex = null;
 
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
-        if ($entitysensor[$entry['entPhySensorType']] && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
+        if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
             $current = $entry['entPhySensorValue'];
@@ -64,7 +72,7 @@ if (! empty($entity_oids)) {
                 } elseif (count($card) === 4) {
                     $card = $card[0] . $card[1] . '00';
                 }
-                $descr = ucwords($entity_array[$card]['entPhysicalName']) . ' ' . ucwords($entity_array[$index]['entPhysicalDescr']);
+                $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
             } else {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
@@ -75,7 +83,13 @@ if (! empty($entity_oids)) {
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match('/(Input|Output) (voltage|current) sensor/i', $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
-                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . ' ' . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
+                        $descr = (ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr'] ?? ''))
+                                 . ' '
+                                 . preg_replace(
+                                      '/(Voltage|Current|Power Supply) Sensor$/i',
+                                      '',
+                                      ucwords($entity_array[$index]['entPhysicalDescr'])
+                                  );
                     }
                     if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
                         $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
@@ -144,11 +158,11 @@ if (! empty($entity_oids)) {
                     $valid_sensor = false;
                 }
             }
-            if ($current == '-127' || ($device['os'] == 'asa' && Str::endsWith($device['hardware'], 'sc'))) {
+            if ($current == '-127' || ($device['os'] == 'asa' && is_string($device['hardware']) && Str::endsWith($device['hardware'], 'sc'))) {
                 $valid_sensor = false;
             }
             // Check for valid sensors
-            if ($entry['entPhySensorOperStatus'] === 'unavailable') {
+            if (isset($entry['entPhySensorOperStatus']) && $entry['entPhySensorOperStatus'] === 'unavailable') {
                 $valid_sensor = false;
             }
             if ($valid_sensor && dbFetchCell("SELECT COUNT(*) FROM `sensors` WHERE device_id = ? AND `sensor_class` = ? AND `sensor_type` = 'cisco-entity-sensor' AND `sensor_index` = ?", [$device['device_id'], $type, $index]) == '0') {
@@ -216,7 +230,8 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
+                $descr = trim($descr);
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach

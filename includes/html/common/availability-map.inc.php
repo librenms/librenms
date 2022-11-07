@@ -30,7 +30,7 @@ if (Config::get('webui.availability_map_compact') == 1) {
     $compact_tile = $settings['tile_size'];
 }
 
-$show_disabled_ignored = $settings['show_disabled_and_ignored'];
+$show_disabled_ignored = $settings['show_disabled_and_ignored'] ?? false;
 
 if (defined('SHOW_SETTINGS')) {
     $common_output[] = '
@@ -170,7 +170,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`display`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (! Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
@@ -380,11 +380,9 @@ if (defined('SHOW_SETTINGS')) {
         $serviceClass = 'widget-availability-service';
     }
 
-    if ($show_disabled_ignored == 1) {
-        $disabled_ignored_header = '
+    $disabled_ignored_header = $show_disabled_ignored == 1 ? '
             <span class="label label-default label-font-border label-border">alert-disabled: ' . $host_disable_notify_count . '</span>
-            <span class="label blackbg label-font-border label-border">disabled: ' . $host_disabled_count . '</span>';
-    }
+            <span class="label blackbg label-font-border label-border">disabled: ' . $host_disabled_count . '</span>' : '';
 
     if ($mode == 0 || $mode == 2) {
         $temp_header[] = '

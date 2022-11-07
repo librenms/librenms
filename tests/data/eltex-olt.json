@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.35265.1.22",
                     "sysDescr": "Linux AT-LTP8X-BG-1 2.6.22.18 #1 Fri Sep 2 10:00:29 UTC 2016 armv5tejl",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "eltex-olt",
                     "type": "network",
                     "serial": null,
-                    "icon": "eltex.png",
-                    "location": null
+                    "icon": "eltex.png"
                 }
             ]
         },

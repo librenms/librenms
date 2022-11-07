@@ -3,6 +3,7 @@
 // Build SNMP Cache Array
 use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 
 $descrSnmpFlags = '-OQUs';
@@ -20,6 +21,16 @@ $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
+
+//Get UFiber OLT ports
+if ($device['os'] == 'edgeosolt') {
+    require base_path('includes/discovery/ports/edgeosolt.inc.php');
+}
+
+//Change Zynos ports from swp to 1/1
+if ($device['os'] == 'zynos') {
+    require base_path('includes/discovery/ports/zynos.inc.php');
+}
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
@@ -42,7 +53,7 @@ d_echo($port_stats);
 // compatibility reasons.
 $port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
-    $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
+    $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
@@ -75,16 +86,16 @@ $default_port_group = Config::get('default_port_group');
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
-    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias'] ?? null);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
 
     if (is_port_valid($snmp_data, $device)) {
-        port_fill_missing($snmp_data, $device);
+        port_fill_missing_and_trim($snmp_data, $device);
 
         // Port newly discovered?
-        if (! is_array($ports_db[$port_id])) {
+        if (! isset($ports_db[$port_id]) || ! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
 
@@ -110,7 +121,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         }
     } else {
         // Port vanished (mark as deleted)
-        if (is_array($ports_db[$port_id])) {
+        if (isset($ports_db[$port_id]) && is_array($ports_db[$port_id])) {
             if ($ports_db[$port_id]['deleted'] != 1) {
                 dbUpdate(['deleted' => 1], 'ports', '`port_id` = ?', [$port_id]);
                 $ports_db[$port_id]['deleted'] = 1;

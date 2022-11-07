@@ -25,7 +25,7 @@ function rewrite_entity_descr($descr)
     $descr = preg_replace('/^voltages /', '', $descr);
     $descr = str_replace('PowerSupply', 'PSU ', $descr);
 
-    return $descr;
+    return trim($descr);
 }
 
 /**
@@ -41,9 +41,10 @@ function cleanPort($interface, $device = null)
     if (! $interface) {
         return $interface;
     }
-    $interface['ifAlias'] = htmlentities($interface['ifAlias']);
-    $interface['ifName'] = htmlentities($interface['ifName']);
-    $interface['ifDescr'] = htmlentities($interface['ifDescr']);
+
+    $interface['ifAlias'] = htmlentities($interface['ifAlias'] ?? '');
+    $interface['ifName'] = htmlentities($interface['ifName'] ?? '');
+    $interface['ifDescr'] = htmlentities($interface['ifDescr'] ?? '');
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
@@ -261,20 +262,6 @@ function apc_relay_state($state)
             return 2;
             break;
     }
-}
-
-/**
- * @param $value
- * @return mixed
- */
-function return_number($value)
-{
-    preg_match('/[\d\.\-]+/', $value, $temp_response);
-    if (! empty($temp_response[0])) {
-        $value = $temp_response[0];
-    }
-
-    return $value;
 }
 
 function parse_entity_state($state, $value)

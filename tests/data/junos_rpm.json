@@ -10,11 +10,11 @@
                     "version": "12.1X46-D86",
                     "hardware": "Juniper SRX240H Internet Router",
                     "features": null,
+                    "location": "<private>",
                     "os": "junos",
                     "type": "network",
                     "serial": "AG3213AK0210",
-                    "icon": "junos.png",
-                    "location": "<private>"
+                    "icon": "junos.png"
                 }
             ]
         },
@@ -8848,7 +8848,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #2 ",
+                    "port_descr_type": "vlan #2",
                     "port_descr_descr": "Servers",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -8953,7 +8953,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #5 ",
+                    "port_descr_type": "vlan #5",
                     "port_descr_descr": "VoIP",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9058,7 +9058,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #10 ",
+                    "port_descr_type": "vlan #10",
                     "port_descr_descr": "LAN",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -9163,7 +9163,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vlan #112 ",
+                    "port_descr_type": "vlan #112",
                     "port_descr_descr": "PELNET Co-Lo",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -12311,6 +12311,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12335,6 +12336,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12359,6 +12361,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12383,6 +12386,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12407,6 +12411,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12431,6 +12436,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12455,6 +12461,7 @@
                     "entPhysicalIndex_measured": "probes",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12479,6 +12486,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12503,6 +12511,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12527,6 +12536,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12551,6 +12561,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12575,6 +12586,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12599,6 +12611,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12623,6 +12636,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12647,6 +12661,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12671,6 +12686,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12695,6 +12711,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxFruTable"
                 },
                 {
@@ -12719,6 +12736,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxRedAlarmState"
                 },
                 {
@@ -12743,6 +12761,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "jnxYellowAlarmState"
                 },
                 {
@@ -12767,6 +12786,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -13265,7 +13285,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.13",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "idle",
@@ -13273,6 +13293,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13287,7 +13308,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.17",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "idle",
@@ -13295,6 +13316,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13309,7 +13331,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.25",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -13317,6 +13339,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13331,7 +13354,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.29",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "idle",
@@ -13339,6 +13362,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13455,7 +13479,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.13",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "established",
@@ -13463,6 +13487,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.0.251.14",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13477,7 +13502,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65501-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.17",
                     "bgpPeerRemoteAs": 65501,
                     "bgpPeerState": "established",
@@ -13485,6 +13510,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.0.251.18",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13499,7 +13525,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.25",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -13507,6 +13533,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.0.251.26",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -13521,7 +13548,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65503-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.0.251.29",
                     "bgpPeerRemoteAs": 65503,
                     "bgpPeerState": "established",
@@ -13529,6 +13556,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.0.251.30",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",

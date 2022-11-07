@@ -31,13 +31,23 @@ use LibreNMS\Config;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Compare;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use Log;
 use SnmpQuery;
 
 class Core implements Module
 {
-    public function discover(OS $os)
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
+    public function discover(OS $os): void
     {
         $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
@@ -76,26 +86,42 @@ class Core implements Module
         echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
     }
 
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()
-            ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
-
         $device = $os->getDevice();
+        $oids = [];
+
+        // fill required fields if they are empty
+        if (! isset($device->sysDescr)) {
+            $oids[] = 'SNMPv2-MIB::sysDescr.0';
+        }
+        if (! isset($device->sysObjectID)) {
+            $oids[] = 'SNMPv2-MIB::sysObjectID.0';
+        }
+        $oids[] = 'SNMPv2-MIB::sysUpTime.0'; // always poll uptime
+
+        $snmpdata = SnmpQuery::numeric()->get($oids)->values();
+
         $device->fill([
-            'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
-            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
-            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? $device->sysDescr,
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? $device->sysObjectID,
         ]);
 
         $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
         $device->save();
     }
 
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
         // nothing to cleanup
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return false; // all data here is stored in the devices table and covered by the os module
     }
 
     /**
@@ -180,19 +206,19 @@ class Core implements Module
             }
 
             if ($key == 'sysObjectID') {
-                if (Str::startsWith($device['sysObjectID'], $value) == $check) {
+                if (Str::startsWith($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr') {
-                if (Str::contains($device['sysDescr'], $value) == $check) {
+                if (Str::contains($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr_regex') {
-                if (preg_match_any($device['sysDescr'], $value) == $check) {
+                if (preg_match_any($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysObjectID_regex') {
-                if (preg_match_any($device['sysObjectID'], $value) == $check) {
+                if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpget') {
@@ -201,7 +227,7 @@ class Core implements Module
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->value();
-                if (compare_var($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                if (Compare::values($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpwalk') {
@@ -210,7 +236,7 @@ class Core implements Module
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->raw();
-                if (compare_var($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
+                if (Compare::values($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
                 }
             }
@@ -235,9 +261,9 @@ class Core implements Module
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
             $uptime = max(
-                round($sysUpTime / 100),
-                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0,
-                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
+                round(Number::cast($sysUpTime) / 100),
+                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
+                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
             );
             Log::debug("Uptime seconds: $uptime\n");
         }
@@ -263,7 +289,7 @@ class Core implements Module
         }
     }
 
-    protected static function discoveryIsSlow($def): bool
+    protected static function discoveryIsSlow(array $def): bool
     {
         foreach ($def['discovery'] as $item) {
             if (array_key_exists('snmpget', $item) || array_key_exists('snmpwalk', $item)) {

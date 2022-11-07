@@ -2,8 +2,8 @@
     <table id="component-status" class="table table-hover table-condensed table-striped">
         <thead>
         <tr>
-            <th data-column-id="status" data-order="desc">Status</th>
-            <th data-column-id="count">Count</th>
+            <th data-column-id="status" data-order="desc">{{ __('Status') }}</th>
+            <th data-column-id="count">{{ __('Count') }}</th>
         </tr>
         </thead>
         <tbody>

@@ -4,13 +4,16 @@ use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
+use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
+use LibreNMS\Exceptions\JsonAppGzipDecodeException;
 use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppPollingFailedException;
 use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Debug;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -22,7 +25,7 @@ function bulk_sensor_snmpget($device, $sensors)
             return $data['sensor_oid'];
         }, $chunk);
         $oids = implode(' ', $oids);
-        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQnte');
+        $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);
     }
 
@@ -72,20 +75,22 @@ function poll_sensor($device, $class)
         if ($sensor['poller_type'] == 'snmp') {
             $mibdir = null;
 
-            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']]));
+            $sensor_value = trim(str_replace('"', '', $snmp_data[$sensor['sensor_oid']] ?? ''));
 
             if (file_exists('includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os'] . '.inc.php';
-            } elseif (file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
+            } elseif (isset($device['os_group']) && file_exists('includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php')) {
                 require 'includes/polling/sensors/' . $class . '/' . $device['os_group'] . '.inc.php';
             }
 
-            if ($class == 'temperature') {
-                preg_match('/[\d\.\-]+/', $sensor_value, $temp_response);
+            if (! is_numeric($sensor_value)) {
+                preg_match('/-?\d*\.?\d+/', $sensor_value, $temp_response);
                 if (! empty($temp_response[0])) {
                     $sensor_value = $temp_response[0];
                 }
-            } elseif ($class == 'state') {
+            }
+
+            if ($class == 'state') {
                 if (! is_numeric($sensor_value)) {
                     $state_value = dbFetchCell(
                         'SELECT `state_value`
@@ -181,7 +186,7 @@ function record_sensor_data($device, $all_sensors)
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
 
-        $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
+        $rrd_def = RrdDefinition::make()->addDataset('sensor', $sensor['rrd_type']);
 
         echo "$sensor_value $unit\n";
 
@@ -313,12 +318,18 @@ function poll_device($device, $force_module = false)
         $measurements->checkpoint(); // don't count previous stats
 
         foreach (Config::get('poller_modules') as $module => $module_status) {
+            if (! is_file("includes/polling/$module.inc.php")) {
+                echo "Module $module does not exist, please remove it from your configuration";
+
+                continue;
+            }
+
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
             d_echo('Device' . (isset($device['attribs']['poll_' . $module]) ? ($device['attribs']['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
-                $device['attribs']['poll_' . $module] ||
+                ! empty($device['attribs']['poll_' . $module]) ||
                 ($os_module_status && ! isset($device['attribs']['poll_' . $module])) ||
                 ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
@@ -329,8 +340,9 @@ function poll_device($device, $force_module = false)
                     include "includes/polling/$module.inc.php";
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    Log::error("%rError polling $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
                     Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    report($e);
                 }
 
                 $module_time = microtime(true) - $module_start;
@@ -439,46 +451,43 @@ function poll_device($device, $force_module = false)
  * The group name (key) will be prepended to each metric in that group, separated by an underscore
  * The special group "none" will not be prefixed.
  *
- * @param  array  $app  app from the db, including app_id
+ * @param  \App\Models\Application  $app  app from the db, including app_id
  * @param  string  $response  This should be the return state of Application polling
  * @param  array  $metrics  an array of additional metrics to store in the database for alerting
  * @param  string  $status  This is the current value for alerting
  */
 function update_application($app, $response, $metrics = [], $status = '')
 {
-    if (! is_numeric($app['app_id'])) {
-        d_echo('$app does not contain app_id, could not update');
+    if (! $app) {
+        d_echo('$app does not exist, could not update');
 
         return;
     }
 
-    $data = [
-        'app_state'  => 'UNKNOWN',
-        'app_status' => $status,
-        'timestamp'  => ['NOW()'],
-    ];
+    $app->app_state = 'UNKNOWN';
+    $app->app_status = $status;
+    $app->timestamp = DB::raw('NOW()');
 
     if ($response != '' && $response !== false) {
+        // if the response indicates an error, set it and set app_status to the raw response
         if (Str::contains($response, [
             'Traceback (most recent call last):',
         ])) {
-            $data['app_state'] = 'ERROR';
-        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
-            $data['app_state'] = $response;
+            $app->app_state = 'ERROR';
+            $app->app_status = $response;
+        } elseif (preg_match('/^(ERROR|LEGACY|UNSUPPORTED)/', $response, $matches)) {
+            $app->app_state = $matches[1];
+            $app->app_status = $response;
         } else {
             // should maybe be 'unknown' as state
-            $data['app_state'] = 'OK';
+            $app->app_state = 'OK';
         }
     }
 
-    if ($data['app_state'] != $app['app_state']) {
-        $data['app_state_prev'] = $app['app_state'];
+    if ($app->isDirty('app_state')) {
+        $app->app_state_prev = $app->getOriginal('app_state');
 
-        $device = dbFetchRow('SELECT * FROM devices LEFT JOIN applications ON devices.device_id=applications.device_id WHERE applications.app_id=?', [$app['app_id']]);
-
-        $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
-
-        switch ($data['app_state']) {
+        switch ($app->app_state) {
             case 'OK':
                 $severity = Alert::OK;
                 $event_msg = 'changed to OK';
@@ -500,9 +509,10 @@ function update_application($app, $response, $metrics = [], $status = '')
                 $event_msg = 'has UNKNOWN state';
                 break;
         }
-        log_event('Application ' . $app_name . ' ' . $event_msg, $device, 'application', $severity);
+        Log::event('Application ' . $app->displayName() . ' ' . $event_msg, DeviceCache::getPrimary(), 'application', $severity);
     }
-    dbUpdate($data, 'applications', '`app_id` = ?', [$app['app_id']]);
+
+    $app->save();
 
     // update metrics
     if (! empty($metrics)) {
@@ -579,6 +589,10 @@ function update_application($app, $response, $metrics = [], $status = '')
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  *
+ * If the data has is in base64, it will be converted and then gunzipped.
+ * https://github.com/librenms/librenms-agent/blob/master/utils/lnms_return_optimizer
+ * May be used to convert output from extends to that via piping it through it.
+ *
  * The required keys for the returned JSON are as below.
  *  version     - The version of the snmp extend script. Should be numeric and at least 1.
  *  error       - Error code from the snmp extend script. Should be > 0 (0 will be ignored and negatives are reserved)
@@ -594,16 +608,20 @@ function update_application($app, $response, $metrics = [], $status = '')
  * -4 : Empty JSON parsed, meaning blank JSON was returned.
  * -5 : Valid json, but missing required keys
  * -6 : Returned version is less than the min version.
+ * -7 : Base64 decode failure.
+ * -8 : Gzip decode failure.
  *
  * Error checking may also be done via checking the exceptions listed below.
- *   JsonAppPollingFailedException, -2 : Empty return from SNMP.
- *   JsonAppParsingFailedException, -3 : Could not parse the JSON.
- *   JsonAppBlankJsonException, -4     : Blank JSON.
- *   JsonAppMissingKeysException, -5   : Missing required keys.
- *   JsonAppWrongVersionException , -6 : Older version than supported.
- *   JsonAppExtendErroredException     : Polling and parsing was good, but the returned data has an error set.
- *                                       This may be checked via $e->getParsedJson() and then checking the
- *                                       keys error and errorString.
+ *   JsonAppPollingFailedException, -2        : Empty return from SNMP.
+ *   JsonAppParsingFailedException, -3        : Could not parse the JSON.
+ *   JsonAppBlankJsonException, -4            : Blank JSON.
+ *   JsonAppMissingKeysException, -5          : Missing required keys.
+ *   JsonAppWrongVersionException , -6        : Older version than supported.
+ *   JsonAppExtendErroredException            : Polling and parsing was good, but the returned data has an error set.
+ *                                              This may be checked via $e->getParsedJson() and then checking the
+ *                                              keys error and errorString.
+ *   JsonAppPollingBase64DecodeException , -7 : Base64 decoding failed.
+ *   JsonAppPollingGzipDecodeException , -8   : Gzip decoding failed.
  * The error value can be accessed via $e->getCode()
  * The output can be accessed via $->getOutput() Only returned for code -3 or lower.
  * The parsed JSON can be access via $e->getParsedJson()
@@ -628,9 +646,33 @@ function json_app_get($device, $extend, $min_version = 1)
 {
     $output = snmp_get($device, 'nsExtendOutputFull.' . string_to_oid($extend), '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
+    // save for returning if not JSON
+    $orig_output = $output;
+
     // make sure we actually get something back
     if (empty($output)) {
         throw new JsonAppPollingFailedException('Empty return from snmp_get.', -2);
+    }
+
+    // checks for base64 decoding and converts it to non-base64 so it can gunzip
+    if (preg_match('/^[A-Za-z0-9\/\+\n]+\=*\n*$/', $output) && ! preg_match('/^[0-9]+\n/', $output)) {
+        $output = base64_decode($output);
+        if (! $output) {
+            if (Debug::isEnabled()) {
+                echo "Decoding Base64 Failed...\n\n";
+            }
+            throw new JsonAppBase64DecodeException('Base64 decode failed.', $orig_output, -7);
+        }
+        $output = gzdecode($output);
+        if (! $output) {
+            if (Debug::isEnabled()) {
+                echo "Decoding GZip failed...\n\n";
+            }
+            throw new JsonAppGzipDecodeException('Gzip decode failed.', $orig_output, -8);
+        }
+        if (Debug::isVerbose()) {
+            echo 'Decoded Base64+GZip Output: ' . $output . "\n\n";
+        }
     }
 
     //  turn the JSON into a array
@@ -638,7 +680,7 @@ function json_app_get($device, $extend, $min_version = 1)
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
-        throw new JsonAppParsingFailedException('Invalid JSON', $output, -3);
+        throw new JsonAppParsingFailedException('Invalid JSON', $orig_output, -3);
     }
 
     // There no keys in the array, meaning '{}' was was returned

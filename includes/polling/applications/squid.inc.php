@@ -3,7 +3,6 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'squid';
-$app_id = $app['app_id'];
 
 $oids = [
     '.1.3.6.1.4.1.3495.1.2.5.1.0',
@@ -86,7 +85,7 @@ $requestbyteratio1 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.1'];
 $requestbyteratio5 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.5'];
 $requestbyteratio60 = $returnedoids['.1.3.6.1.4.1.3495.1.3.2.2.1.10.60'];
 
-$rrd_name = ['app', $name, $app_id];
+$rrd_name = ['app', $name, $app->app_id];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('memmaxsize', 'GAUGE', 0)
@@ -172,7 +171,7 @@ $fields = [
     'reqbyteratio60' => $requestbyteratio60,
 ];
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $squid_app_status = ($returnedoids == false) ? false : 'Data ok';

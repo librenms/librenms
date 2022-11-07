@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": "R9861520EU.",
+                    "location": "Zentraler Semina72 72 61 75 6D 00",
                     "os": "clickshare",
                     "type": "collaboration",
                     "serial": "1874830543.",
-                    "icon": "barco.svg",
-                    "location": "Zentraler Semina72 72 61 75 6D 00"
+                    "icon": "barco.svg"
                 }
             ]
         },
@@ -877,10 +877,10 @@
                     "sensor_deleted": 0,
                     "sensor_class": "fanspeed",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.7312.2468.1.2.1.0",
-                    "sensor_index": "sensorCaseFanSpeed",
+                    "sensor_oid": ".1.3.6.1.4.1.7312.2468.1.2.2.0",
+                    "sensor_index": "sensorCpuFanSpeed",
                     "sensor_type": "clickshare",
-                    "sensor_descr": "Case",
+                    "sensor_descr": "CPU",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -895,30 +895,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "fanspeed",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.7312.2468.1.2.2.0",
-                    "sensor_index": "sensorCpuFanSpeed",
-                    "sensor_type": "clickshare",
-                    "sensor_descr": "CPU",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 30,
-                    "sensor_limit": 54,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 24,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -932,10 +909,10 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 35,
-                    "sensor_limit": 55,
+                    "sensor_current": 55.652,
+                    "sensor_limit": 95,
                     "sensor_limit_warn": null,
-                    "sensor_limit_low": 25,
+                    "sensor_limit_low": 45.652,
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
@@ -943,6 +920,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

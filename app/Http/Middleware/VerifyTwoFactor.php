@@ -21,7 +21,8 @@ class VerifyTwoFactor
         // check twofactor
         if (Config::get('twofactor') === true) {
             // don't apply on 2fa checking routes
-            if (Str::startsWith($request->route()->getName(), '2fa.')) {
+            $route_name = $request->route()->getName();
+            if ($route_name && Str::startsWith($route_name, '2fa.')) {
                 return $next($request);
             }
 

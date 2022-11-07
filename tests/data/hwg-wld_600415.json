@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "hwg-wld",
                     "type": "environment",
                     "serial": "27C0A91E02590ADA",
-                    "icon": "hwg.svg",
-                    "location": "<private>"
+                    "icon": "hwg.svg"
                 }
             ]
         },
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "wldState"
                 },
                 {
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "wldValue"
                 }
             ],

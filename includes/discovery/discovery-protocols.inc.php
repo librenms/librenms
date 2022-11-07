@@ -314,7 +314,7 @@ if (($device['os'] == 'routeros')) {
                     $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
 
                     if (! $remote_device_id && Config::get('discovery_by_ip', false)) {
-                        $ptopo_array = snmpwalk_group($device, 'ptopoConnEntry', 'PTOPO-MIB');
+                        $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
                         d_echo($ptopo_array);
                         foreach ($ptopo_array as $ptopo) {
                             if (strcmp(trim($ptopo['ptopoConnRemoteChassis']), trim($lldp['lldpRemChassisId'])) == 0) {
@@ -345,6 +345,18 @@ if (($device['os'] == 'routeros')) {
                         $n_port = (int) $slot_port[0];
                     }
                     $remote_port_name = (string) ($n_slot * 1000 + $n_port);
+                }
+
+                if ($remote_device['os'] == 'netgear' &&
+                    $remote_device['sysDescr'] == 'GS108T' &&
+                    $lldp['lldpRemSysDesc'] == 'Smart Switch') {
+                    // Some netgear switches, as Netgear GS108Tv1 presents it's port name over snmp as
+                    // "Port 1 Gigabit Ethernet" but as 'lldpRemPortId' => 'g1' and
+                    // 'lldpRemPortDesc' => 'Port #1' over lldp.
+                    // So remap g1 to 1 so it matches ifIndex
+                    if (preg_match("/^g(\d+)$/", $lldp['lldpRemPortId'], $matches)) {
+                        $remote_port_name = $matches[1];
+                    }
                 }
 
                 $remote_port_id = find_port_id(

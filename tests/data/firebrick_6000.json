@@ -10,11 +10,11 @@
                     "version": "V1.56.000D29",
                     "hardware": "FB6010",
                     "features": null,
+                    "location": "<private>",
                     "os": "firebrick",
                     "type": "network",
                     "serial": null,
-                    "icon": "firebrick.svg",
-                    "location": "<private>"
+                    "icon": "firebrick.svg"
                 }
             ]
         },
@@ -1105,6 +1105,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1129,6 +1130,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1153,6 +1155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1177,6 +1180,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1201,6 +1205,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1225,6 +1230,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1249,6 +1255,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1273,6 +1280,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1297,6 +1305,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1321,6 +1330,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1345,6 +1355,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1369,6 +1380,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1393,6 +1405,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1417,6 +1430,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1441,6 +1455,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1465,6 +1480,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1489,6 +1505,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1513,6 +1530,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1537,6 +1555,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1561,6 +1580,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1585,6 +1605,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1609,6 +1630,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1633,6 +1655,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1657,6 +1680,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1681,6 +1705,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1705,6 +1730,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1729,6 +1755,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1753,6 +1780,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1777,6 +1805,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1801,6 +1830,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
@@ -1811,7 +1841,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1819,6 +1849,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "00 00 00 00",
                     "bgpPeerRemoteAddr": "0A 02 03 04",
                     "bgpPeerDescr": "",
@@ -1833,7 +1864,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1841,6 +1872,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0A 02 03 06",
                     "bgpPeerRemoteAddr": "0A 02 03 05",
                     "bgpPeerDescr": "",
@@ -1855,7 +1887,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "idle",
@@ -1863,6 +1895,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "FD 01 08 B0 00 00 00 FB 00 00 00 00 00 00 00 02",
                     "bgpPeerRemoteAddr": "FD 01 08 B0 00 00 00 FB 00 00 00 00 00 00 00 01",
                     "bgpPeerDescr": "",
@@ -1881,7 +1914,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.4",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "opensent",
@@ -1889,6 +1922,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "10.2.3.4",
                     "bgpPeerDescr": "",
@@ -1903,7 +1937,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.2.3.5",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",
@@ -1911,6 +1945,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.2.3.6",
                     "bgpPeerRemoteAddr": "10.2.3.5",
                     "bgpPeerDescr": "",
@@ -1925,7 +1960,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "AS20712 Andrews & Arnold Ltd, GB",
+                    "astext": "AS20712-MOCK-TEXT",
                     "bgpPeerIdentifier": "fd01:8b0:0:fb::1",
                     "bgpPeerRemoteAs": 20712,
                     "bgpPeerState": "established",
@@ -1933,6 +1968,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "fd01:08b0:0000:00fb:0000:0000:0000:0002",
                     "bgpPeerRemoteAddr": "fd01:8b0:0:fb::1",
                     "bgpPeerDescr": "",
@@ -1955,7 +1991,6 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "0.0.0.0",
-                    "local_addr": "127.1.6.2",
                     "local_port": 0,
                     "tunnel_name": "House",
                     "tunnel_status": "waiting"
@@ -1963,10 +1998,23 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "10.2.3.4",
-                    "local_addr": "127.1.6.2",
                     "local_port": 0,
                     "tunnel_name": "ToToothless",
                     "tunnel_status": "waiting"
+                }
+            ]
+        }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "firebrick.44",
+                    "vrf_name": "44",
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
                 }
             ]
         }

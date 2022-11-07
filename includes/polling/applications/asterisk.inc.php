@@ -3,7 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'asterisk';
-$app_id = $app['app_id'];
+$app_id = $app->app_id;
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -25,7 +25,7 @@ foreach ($lines as $line) {
 unset($lines);
 
 // Asterisk stats
-$rrd_name = ['app', $name, 'stats', $app_id];
+$rrd_name = ['app', $name, 'stats', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('calls', 'GAUGE', 0, 10000)
     ->addDataset('channels', 'GAUGE', 0, 20000)
@@ -52,7 +52,7 @@ data_update($device, 'app', $sip_tags, $sip_fields);
 unset($rrd_name, $rrd_def, $sip_fields, $sip_tags);
 
 // Additional iax2 stats
-$rrd_name = ['app', $name, 'iax2', $app_id];
+$rrd_name = ['app', $name, 'iax2', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('iax2peers', 'GAUGE', 0, 10000)
     ->addDataset('iax2online', 'GAUGE', 0, 10000)
@@ -74,4 +74,4 @@ update_application($app, $rawdata, $asterisk_metrics);
 
 unset($rrd_name, $rrd_def, $iax2_fields, $iax2_tags);
 
-unset($asterisk, $asterisk_metrics, $rawdata); // these are used for all rrds
+unset($asterisk, $asterisk_metrics, $rawdata, $app_id); // these are used for all rrds

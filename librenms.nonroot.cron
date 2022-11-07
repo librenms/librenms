@@ -13,4 +13,4 @@
 # If you want to modify updates:
 #  Switch to monthly stable release: https://docs.librenms.org/General/Releases/
 #  Disable updates: https://docs.librenms.org/General/Updating/
-15   0    * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1
+19   0    * * *   librenms    /opt/librenms/daily.sh >> /dev/null 2>&1

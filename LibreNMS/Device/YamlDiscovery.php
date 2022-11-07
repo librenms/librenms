@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use LibreNMS\Util\Compare;
 
 class YamlDiscovery
 {
@@ -99,7 +100,7 @@ class YamlDiscovery
                     }
 
                     foreach ($data as $name => $value) {
-                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags'])) {
+                        if (in_array($name, ['oid', 'skip_values', 'snmp_flags', 'rrd_type'])) {
                             $current_data[$name] = $value;
                         } elseif (Str::contains($value, '{{')) {
                             // replace embedded values
@@ -225,7 +226,9 @@ class YamlDiscovery
         $sub_index = 0;
         $sub_index_end = null;
         if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            [,$name, $sub_index, $sub_index_end] = $matches;
+            $name = $matches[1] ?? null;
+            $sub_index = $matches[2] ?? null;
+            $sub_index_end = $matches[3] ?? null;
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -290,14 +293,14 @@ class YamlDiscovery
                     $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
-                        foreach ((array) $data['oid'] as $oid) {
+                        foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUS'];
+                                    $snmp_flag = ['-OteQUSa'];
                                 } else {
-                                    $snmp_flag = ['-OteQUs'];
+                                    $snmp_flag = ['-OteQUsa'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
@@ -306,7 +309,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $os->getDiscovery()['mib'];
+                                $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
@@ -352,7 +355,7 @@ class YamlDiscovery
                     }
                 }
 
-                if (compare_var($tmp_value, $skip_value['value'], $op)) {
+                if (Compare::values($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
             }

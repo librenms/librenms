@@ -92,7 +92,7 @@ class Ciscowlc extends Cisco implements
                 d_echo($ap->toArray());
 
                 // if there is a numeric channel, assume the rest of the data is valid, I guess
-                if (! is_numeric($ap->channel)) {
+                if (! is_numeric($channel)) {
                     continue;
                 }
 
@@ -109,7 +109,7 @@ class Ciscowlc extends Cisco implements
                     'name' => $ap->name,
                     'radionum' => $ap->radio_number,
                     'rrd_name' => ['arubaap', $ap->name . $ap->radio_number],
-                    'rrd_dev' => $rrd_def,
+                    'rrd_def' => $rrd_def,
                 ], $ap->only([
                     'channel',
                     'txpow',

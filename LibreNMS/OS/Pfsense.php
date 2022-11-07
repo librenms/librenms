@@ -85,11 +85,11 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_inserts');
         }
 
-        if (is_numeric($oids[0]['pfStateTableCount'] ?? null)) {
+        if (is_numeric($oids[0]['pfStateTableRemovals'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('removals', 'COUNTER', 0);
 
             $fields = [
-                'removals' => $oids[0]['pfStateTableCount'],
+                'removals' => $oids[0]['pfStateTableRemovals'],
             ];
 
             $tags = compact('rrd_def');

@@ -10,11 +10,11 @@
                     "version": "9.14(1.7)",
                     "hardware": "S4048T-ON",
                     "features": null,
+                    "location": null,
                     "os": "dnos",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": null
+                    "icon": "dell.svg"
                 }
             ]
         },
@@ -22603,7 +22603,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff18 eth4 ",
+                    "port_descr_type": "xyzserverff18 eth4",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -22708,7 +22708,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff19 eth4 ",
+                    "port_descr_type": "xyzserverff19 eth4",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23128,7 +23128,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff22 eth2 ",
+                    "port_descr_type": "xyzserverff22 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23233,7 +23233,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff23 eth2 ",
+                    "port_descr_type": "xyzserverff23 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23548,7 +23548,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff20 eth2 ",
+                    "port_descr_type": "xyzserverff20 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23653,7 +23653,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff21 eth2 ",
+                    "port_descr_type": "xyzserverff21 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23863,7 +23863,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 idrac ",
+                    "port_descr_type": "xyzserverff24 idrac",
                     "port_descr_descr": "actually eth0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -23968,7 +23968,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 eth2 ",
+                    "port_descr_type": "xyzserverff24 eth2",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -24388,7 +24388,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vodafone ",
+                    "port_descr_type": "vodafone",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,
@@ -28063,7 +28063,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff18 eth5 ",
+                    "port_descr_type": "xyzserverff18 eth5",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28168,7 +28168,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff19 eth5 ",
+                    "port_descr_type": "xyzserverff19 eth5",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28588,7 +28588,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff22 eth3 ",
+                    "port_descr_type": "xyzserverff22 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28693,7 +28693,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff23 eth3 ",
+                    "port_descr_type": "xyzserverff23 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29008,7 +29008,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff20 eth3 ",
+                    "port_descr_type": "xyzserverff20 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29113,7 +29113,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff21 eth3 ",
+                    "port_descr_type": "xyzserverff21 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29323,7 +29323,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 idrac standby ",
+                    "port_descr_type": "xyzserverff24 idrac standby",
                     "port_descr_descr": "actually eth0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29428,7 +29428,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "xyzserverff24 eth3 ",
+                    "port_descr_type": "xyzserverff24 eth3",
                     "port_descr_descr": "bond0",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29638,7 +29638,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vocus ",
+                    "port_descr_type": "vocus",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,
@@ -29848,7 +29848,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "vodafone ",
+                    "port_descr_type": "vodafone",
                     "port_descr_descr": "REDACTED",
                     "port_descr_circuit": "REDACTED",
                     "port_descr_speed": null,
@@ -38884,7 +38884,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "VFNZ-VPN-AS Vodafone NZ Ltd, NZ",
+                    "astext": "AS7714-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.255.0.49",
                     "bgpPeerRemoteAs": 7714,
                     "bgpPeerState": "idle",
@@ -38892,6 +38892,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -38906,7 +38907,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65506-MOCK-TEXT",
                     "bgpPeerIdentifier": "99.99.132.50",
                     "bgpPeerRemoteAs": 65506,
                     "bgpPeerState": "idle",
@@ -38914,6 +38915,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -38932,7 +38934,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "VFNZ-VPN-AS Vodafone NZ Ltd, NZ",
+                    "astext": "AS7714-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.255.0.49",
                     "bgpPeerRemoteAs": 7714,
                     "bgpPeerState": "established",
@@ -38940,6 +38942,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "10.2.0.51",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -38954,7 +38957,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65506-MOCK-TEXT",
                     "bgpPeerIdentifier": "99.99.132.50",
                     "bgpPeerRemoteAs": 65506,
                     "bgpPeerState": "established",
@@ -38962,6 +38965,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "99.99.132.49",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",

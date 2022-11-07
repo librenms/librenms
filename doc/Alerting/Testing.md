@@ -1,4 +1,4 @@
-### Rules
+# Rules
 
 The simplest way of testing if an alert rule will match a device is by
 going to the device, clicking edit (the cog), select Capture. From
@@ -11,7 +11,7 @@ See [Device Troubleshooting](../Support/Device-Troubleshooting.md)
 
 ---
 
-### Transports
+## Transports
 
 You can test your transports by forcing an actual active alert to run
 regardless of the interval or delay values.
@@ -21,7 +21,7 @@ for the device id or hostname and -d for debug.
 
 ---
 
-### Templates
+## Templates
 
 It's possible to test your new template before assigning it to a
 rule. To do so you can run `./scripts/test-template.php`. The script

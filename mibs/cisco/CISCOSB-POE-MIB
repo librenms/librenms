@@ -14,7 +14,7 @@ IMPORTS
 
 
 rlPoe    MODULE-IDENTITY
-         LAST-UPDATED "200911260000Z"
+         LAST-UPDATED "202105190000Z"
          ORGANIZATION "Cisco Systems, Inc."
 
          CONTACT-INFO
@@ -27,7 +27,7 @@ rlPoe    MODULE-IDENTITY
 
          DESCRIPTION
                 "Add a new field in the PoE MIB to indicate Max power allocation allowed"
-         REVISION "201006020000Z"
+         REVISION "202105190000Z"
          DESCRIPTION
                 "The private MIB module definition for Power Over Ethernet."
          REVISION "200911260000Z"

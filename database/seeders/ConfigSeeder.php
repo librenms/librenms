@@ -57,11 +57,15 @@ class ConfigSeeder extends Seeder
             return; // nothing to do
         }
 
-        if (\App\Models\Config::exists()) {
-            if (! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
+        $reapply = getenv('REAPPLY_YAML_CONFIG');
+
+        if (Config::get('config_seeded') && ! $reapply) {
+            if (! app()->runningInConsole() || ! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
                 return; // don't overwrite existing settings.
             }
         }
+
+        $skipped_existing = false;
 
         foreach ($files as $file) {
             $settings = Yaml::parse(file_get_contents($file));
@@ -71,8 +75,22 @@ class ConfigSeeder extends Seeder
                     continue;
                 }
 
+                if (! $reapply && \App\Models\Config::where('config_name', $key)->exists()) {
+                    if (! \App\Models\Config::where('config_name', $key)->value('config_value') == $value) {
+                        echo 'Skipped existing config key: ' . json_encode($key) . PHP_EOL;
+                        $skipped_existing = true;
+                    }
+                    continue;
+                }
+
                 Config::persist($key, $value);
             }
+        }
+
+        Config::persist('config_seeded', true);
+
+        if ($skipped_existing) {
+            echo 'Skipped overwriting existing config settings.  To overwrite them, run: REAPPLY_YAML_CONFIG=1 lnms db:seed' . PHP_EOL;
         }
     }
 }

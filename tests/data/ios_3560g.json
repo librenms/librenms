@@ -3,11 +3,15 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.20",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -19,17 +23,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64513,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.25",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -41,10 +46,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64513,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -149,11 +151,15 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.20",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.99.21",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -165,17 +171,18 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64513,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS64513-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.99.25",
                     "bgpPeerRemoteAs": 64513,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "192.168.99.21",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -187,10 +194,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 64513,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -304,11 +308,11 @@
                     "version": "15.0(2)SE11",
                     "hardware": "WS-C3560G-24TS-S",
                     "features": "IPSERVICESK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": "FOC1426Y2AY",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

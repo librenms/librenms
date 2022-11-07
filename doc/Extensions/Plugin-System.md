@@ -57,11 +57,11 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
                 <div class="row">
                     <div class="col-sm-12">
                          {{ $device->hostname }}
-		    	 <!-- Do you stuff here -->
+                 <!-- Do you stuff here -->
                     </div>
-		</div>
-	    </div>
-	</div>
+        </div>
+        </div>
+    </div>
     </div>
 </div>
 ```
@@ -71,7 +71,7 @@ class in 'app/Plugins/PluginName' and overload the hook methods.
   enabled. In this blade, you can do your work and display your
   results in a frame.
 
-- menu.blade.php :: For a menu entry 
+- menu.blade.php :: For a menu entry
 
 - page.blade.pho :: Here is a good place to add a own LibreNMS page without dependence with a device. A good place to create your own lists with special requirements and behavior.
 

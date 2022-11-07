@@ -4,15 +4,22 @@ on:
   pull_request:
     branches: [master, main]
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   super-linter:
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+      checks: write # to mark the status of each individual linter run
+
     name: Lint Code Base
     runs-on: ubuntu-latest
 
     steps:
       -
         name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -21,7 +28,7 @@ jobs:
         uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
-          VALIDATE_PHP_BUILTIN: true
+          # VALIDATE_PHP_BUILTIN: true # temp disable until it supports PHP 8.1
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
 
@@ -32,17 +39,22 @@ jobs:
   phpstan:
     name: PHP Static Analysis
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [8.1]
     steps:
       -
         name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: ${{ matrix.php }}
           tools: composer
+          coverage: none
 
       -
         name: Get composer cache directory
@@ -51,15 +63,15 @@ jobs:
 
       -
         name: Cache composer
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-
 
       -
         name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
@@ -71,8 +83,8 @@ jobs:
 
       -
         name: Run PHPStan (Deprecated functions)
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G --configuration=phpstan-deprecated.neon
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G --configuration=phpstan-deprecated.neon
 
       -
         name: Run PHPStan
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G

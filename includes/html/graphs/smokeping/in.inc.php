@@ -2,7 +2,7 @@
 
 use LibreNMS\Config;
 
-$src = device_by_id_cache($_GET['src']);
+$src = device_by_id_cache($vars['src']);
 
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>

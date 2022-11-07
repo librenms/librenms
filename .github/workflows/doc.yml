@@ -16,13 +16,16 @@ on:
       - 'doc/**'
       - 'mkdocs.yml'
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       -
         name: Build mkdocs Docker image
         run: |

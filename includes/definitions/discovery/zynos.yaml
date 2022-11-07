@@ -1,4 +1,4 @@
-mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB
+mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB:ZYXEL-TRANSCEIVER-MIB:ZYXEL-STACKING-MIB
 modules:
     mempools:
         data:
@@ -26,6 +26,55 @@ modules:
                 oid: sysMgmtCPU5SecUsage
                 num_oid: '.1.3.6.1.4.1.890.1.15.3.2.7.{{ $index }}'
     sensors:
+        state:
+            data:
+                -
+                    oid: zyxelStackingSlotInfoTable
+                    value: zyStackingSlotInfoRole
+                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.1.1.5.{{ $index }}'
+                    descr: 'Switch {{ $index }} Stacking Role'
+                    group: Switch Role
+                    index: 'zyStackingSlotInfoRole.{{ $index }}'
+                    state_name: zyStackingSlotInfoRole
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: master }
+                        - { value: 2, generic: 0, graph: 0, descr: backup }
+                        - { value: 3, generic: 0, graph: 0, descr: linecard }
+                        - { value: 0, generic: 3, graph: 0, descr: none }
+                    skip_values:
+                        -
+                            oid: zyStackingSlotInfoStackingStatus
+                            op: '=='
+                            value: '0'
+                -
+                    oid: zyxelStackingSlotChannelInfoTable
+                    value: zyStackingSlotChannelInfoNeighbor
+                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.2.1.5.{{ $index }}'
+                    descr: 'Switch {{ $subindex0 }} Port {{ $subindex1 }} Neighbor'
+                    group: Stacking Neighbor
+                    index: 'zyStackingSlotChannelInfoNeighbor.{{ $index }}'
+                    state_name: zyStackingSlotChannelInfoNeighbor
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Switch 1' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Switch 2' }
+                        - { value: 3, generic: 0, graph: 0, descr: 'Switch 3' }
+                        - { value: 4, generic: 0, graph: 0, descr: 'Switch 4' }
+                        - { value: 0, generic: 3, graph: 0, descr: none }
+                -
+                    oid: zyStackingTopology
+                    value: zyStackingTopology
+                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.3.{{ $index }}'
+                    descr: 'Stacking Topology'
+                    group: Stacking Topology
+                    index: 'zyStackingTopology.{{ $index }}'
+                    state_name: zyStackingTopology
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: chain }
+                        - { value: 2, generic: 0, graph: 0, descr: ring }
+                        - { value: 0, generic: 3, graph: 0, descr: none }
         fanspeed:
             options:
                 skip_value_lt: 0
@@ -34,7 +83,7 @@ modules:
                     oid: zyxelHwMonitorFanRpmTable
                     value: zyHwMonitorFanRpmCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{{ $index }}'
-                    descr: zyHwMonitorFanRpmDescription
+                    descr: 'Switch {{ $zyHwMonitorFanRpmDescription }}'
                     index: 'zyHwMonitorFanRpmCurrentValue.{{ $index }}'
                     high_limit: zyHwMonitorFanRpmMaxValue
                     low_limit: zyHwMonitorFanRpmMinValue
@@ -53,7 +102,7 @@ modules:
                     oid: zyxelHwMonitorTemperatureTable
                     value: zyHwMonitorTemperatureCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{{ $index }}'
-                    descr: zyHwMonitorTemperatureDescription
+                    descr: 'Switch {{ $zyHwMonitorTemperatureDescription }}'
                     index: 'zyHwMonitorTemperatureCurrentValue.{{ $index }}'
                     high_limit: zyHwMonitorTemperatureMaxValue
                     low_limit: zyHwMonitorTemperatureMinValue
@@ -85,16 +134,62 @@ modules:
                             oid: transceiverDdmInfoEntryDescription
                             op: '!='
                             value: 'Temperature'
+        dbm:
+            options:
+                divisor: 100
+            data:
+                -
+                    oid: zyxelTransceiverDdmiTable
+                    value: zyTransceiverDdmiCurrent
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $subindex0 }} Tx Power'
+                    index: 'zyTransceiverDdmiCurrent.{{ $index }}'
+                    high_limit: zyTransceiverDdmiAlarmMax
+                    low_limit: zyTransceiverDdmiAlarmMin
+                    warn_limit: zyTransceiverDdmiWarnMax
+                    low_warn_limit: zyTransceiverDdmiWarnMin
+                    skip_values:
+                        -
+                            oid: zyTransceiverDdmiDescription
+                            op: '!='
+                            value: 'TxPower'
+                        -
+                            oid: zyTransceiverDdmiCurrent
+                            op: '=='
+                            value: '0'
+                -
+                    oid: zyxelTransceiverDdmiTable
+                    value: zyTransceiverDdmiCurrent
+                    num_oid: '.1.3.6.1.4.1.890.1.15.3.84.1.2.1.6.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: 'ports'
+                    descr: '{{ $subindex0 }} Rx Power'
+                    index: 'zyTransceiverDdmiCurrent.{{ $index }}'
+                    high_limit: zyTransceiverDdmiAlarmMax
+                    low_limit: zyTransceiverDdmiAlarmMin
+                    warn_limit: zyTransceiverDdmiWarnMax
+                    low_warn_limit: zyTransceiverDdmiWarnMin
+                    skip_values:
+                        -
+                            oid: zyTransceiverDdmiDescription
+                            op: '!='
+                            value: 'RxPower'
+                        -
+                            oid: zyTransceiverDdmiCurrent
+                            op: '=='
+                            value: '0'
         voltage:
             options:
                 skip_value_lt: 0
-                divisor: 1000
             data:
                 -
                     oid: zyxelHwMonitorVoltageTable
                     value: zyHwMonitorVoltageCurrentValue
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.3.1.3.{{ $index }}'
-                    descr: zyHwMonitorVoltageDescription
+                    divisor: 1000
+                    descr: 'Switch {{ $zyHwMonitorVoltageDescription }}'
                     index: 'zyHwMonitorVoltageCurrentValue.{{ $index }}'
                     high_limit: zyHwMonitorVoltageMaxValue
                     low_limit: zyHwMonitorVoltageMinValue
@@ -104,6 +199,7 @@ modules:
                     value: voltageCurValue
                     snmp_flags: ['-OteQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.{{ $index }}'
+                    divisor: 1000
                     descr: '{{ $voltageNominalValue }}mV ({{ $voltageDescr }})'
                     index: 'voltageCurValue.{{ $index }}'
                     low_limit: voltageLowThresh

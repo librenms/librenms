@@ -12,15 +12,17 @@ use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostnameExistsException;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
@@ -112,123 +114,12 @@ function logfile($string)
     fclose($fd);
 }
 
-/**
- * Check an array of regexes against a subject if any match, return true
- *
- * @param  string  $subject  the string to match against
- * @param  array|string  $regexes  an array of regexes or single regex to check
- * @return bool if any of the regexes matched, return true
- */
-function preg_match_any($subject, $regexes)
-{
-    foreach ((array) $regexes as $regex) {
-        if (preg_match($regex, $subject)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
- * Perform comparison of two items based on give comparison method
- * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
- * contains, starts, ends: $a haystack, $b needle(s)
- * regex: $a subject, $b regex
- *
- * @param  mixed  $a
- * @param  mixed  $b
- * @param  string  $comparison  =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
- * @return bool
- */
-function compare_var($a, $b, $comparison = '=')
-{
-    // handle PHP8 change to implicit casting
-    if (is_numeric($a) || is_numeric($b)) {
-        $a = cast_number($a);
-        $b = is_array($b) ? $b : cast_number($b);
-    }
-
-    switch ($comparison) {
-        case '=':
-            return $a == $b;
-        case '!=':
-            return $a != $b;
-        case '==':
-            return $a === $b;
-        case '!==':
-            return $a !== $b;
-        case '>=':
-            return $a >= $b;
-        case '<=':
-            return $a <= $b;
-        case '>':
-            return $a > $b;
-        case '<':
-            return $a < $b;
-        case 'contains':
-            return Str::contains($a, $b);
-        case 'not_contains':
-            return ! Str::contains($a, $b);
-        case 'starts':
-            return Str::startsWith($a, $b);
-        case 'not_starts':
-            return ! Str::startsWith($a, $b);
-        case 'ends':
-            return Str::endsWith($a, $b);
-        case 'not_ends':
-            return ! Str::endsWith($a, $b);
-        case 'regex':
-            return (bool) preg_match($b, $a);
-        case 'not_regex':
-            return ! ((bool) preg_match($b, $a));
-        case 'in_array':
-            return in_array($a, $b);
-        case 'not_in_array':
-            return ! in_array($a, $b);
-        case 'exists':
-            return isset($a) == $b;
-        default:
-            return false;
-    }
-}
-
 function percent_colour($perc)
 {
     $r = min(255, 5 * ($perc - 25));
     $b = max(0, 255 - (5 * ($perc + 25)));
 
     return sprintf('#%02x%02x%02x', $r, $b, $b);
-}
-
-/**
- * @param $device
- * @return string the logo image path for this device. Images are often wide, not square.
- */
-function getLogo($device)
-{
-    $img = getImageName($device, true, 'images/logos/');
-    if (! Str::startsWith($img, 'generic')) {
-        return 'images/logos/' . $img;
-    }
-
-    return getIcon($device);
-}
-
-/**
- * @param  array  $device
- * @param  string  $class  to apply to the image tag
- * @return string an image tag with the logo for this device. Images are often wide, not square.
- */
-function getLogoTag($device, $class = null)
-{
-    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
-    if (isset($class)) {
-        $tag .= " class=\"$class\" ";
-    }
-    $tag .= ' />';
-
-    return  $tag;
 }
 
 /**
@@ -256,7 +147,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -330,12 +221,12 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 {
     // Test Database Exists
     if (host_exists($host)) {
-        throw new HostExistsException("Already have host $host");
+        throw new HostnameExistsException($host);
     }
 
     // Valid port assoc mode
-    if (! in_array($port_assoc_mode, get_port_assoc_modes())) {
-        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
+    if (! in_array($port_assoc_mode, PortAssociationMode::getModes())) {
+        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', PortAssociationMode::getModes()));
     }
 
     // check if we have the host by IP
@@ -348,19 +239,14 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $device = device_has_ip($ip)) {
-        $message = "Cannot add $host, already have device with this IP $ip";
-        if ($ip != $device->hostname) {
-            $message .= " ($device->hostname)";
-        }
-        $message .= '. You may force add to ignore this.';
-        throw new HostIpExistsException($message);
+    if ($force_add !== true && $existing = device_has_ip($ip)) {
+        throw new HostIpExistsException($host, $existing->hostname, $ip);
     }
 
     // Test reachability
     if (! $force_add) {
         if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
-            throw new HostUnreachablePingException("Could not ping $host");
+            throw new HostUnreachablePingException($host);
         }
     }
 
@@ -374,7 +260,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
         return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
     }
-    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableSnmpException($host);
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === 'v3') {
@@ -384,7 +270,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . '/' . $v3['authlevel']);
+                    $host_unreachable_exception->addReason($snmpver, $v3['authname'] . '/' . $v3['authlevel']);
                 }
             }
         } elseif ($snmpver === 'v2c' || $snmpver === 'v1') {
@@ -395,11 +281,11 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
+                    $host_unreachable_exception->addReason($snmpver, $community);
                 }
             }
         } else {
-            throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
+            throw new SnmpVersionUnsupportedException($snmpver);
         }
     }
     if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
@@ -422,7 +308,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     /* Get port_assoc_mode id if neccessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
     $device['port_association_mode'] = $port_assoc_mode;
 
@@ -518,7 +404,7 @@ function createHost(
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
 
     $device = new Device(array_merge([
@@ -543,7 +429,7 @@ function createHost(
 
         $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
         if (host_exists($host, $device->sysName)) {
-            throw new HostExistsException("Already have host $host ({$device->sysName}) due to duplicate sysName");
+            throw new HostSysnameExistsException($host, $device->sysName);
         }
     }
     if ($device->save()) {
@@ -613,28 +499,9 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
-    global $cache;
-
-    if (Config::has("astext.$asn")) {
-        return Config::get("astext.$asn");
-    }
-
-    if (isset($cache['astext'][$asn])) {
-        return $cache['astext'][$asn];
-    }
-
-    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
-    if (! empty($result[0]['txt'])) {
-        $txt = explode('|', $result[0]['txt']);
-        $result = trim($txt[4], ' "');
-        $cache['astext'][$asn] = $result;
-
-        return $result;
-    }
-
-    return '';
+    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
 
 /**
@@ -741,9 +608,9 @@ function is_port_valid($port, $device)
 
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'];
-    $ifAlias = $port['ifAlias'];
+    $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
-    $ifOperStatus = $port['ifOperStatus'];
+    $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
@@ -803,14 +670,24 @@ function is_port_valid($port, $device)
 /**
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
+ * Also trims the data
  *
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device)
 {
+    if (isset($port['ifDescr'])) {
+        $port['ifDescr'] = trim($port['ifDescr']);
+    }
+    if (isset($port['ifAlias'])) {
+        $port['ifAlias'] = trim($port['ifAlias']);
+    }
+    if (isset($port['ifName'])) {
+        $port['ifName'] = trim($port['ifName']);
+    }
     // When devices do not provide data, populate with other data if available
-    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+    if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
@@ -818,12 +695,12 @@ function port_fill_missing(&$port, $device)
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+    } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
 
-    if ($port['ifName'] == '' || $port['ifName'] == null) {
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
@@ -920,23 +797,7 @@ function fix_integer_value($value)
  */
 function device_has_ip($ip)
 {
-    if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
-            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->with('port.device')
-            ->first();
-    } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
-            ->where('ipv4_address', $ip)
-            ->with('port.device')
-            ->first();
-    }
-
-    if (isset($ip_address) && $ip_address->port) {
-        return $ip_address->port->device;
-    }
-
-    return false; // not an ipv4 or ipv6 address...
+    return Device::findByIp($ip);
 }
 
 /**
@@ -994,7 +855,7 @@ function dnslookup($device, $type = false, $return = false)
     }
     $record = dns_get_record($device['hostname'], $type);
 
-    return $record[0][$return];
+    return $record[0][$return] ?? null;
 }//end dnslookup
 
 /**
@@ -1169,7 +1030,7 @@ function hytera_h2f($number, $nd)
     }
 
     $tmppoint = array_reverse($tmppoint);
-    $tpointnumber = number_format($tmppoint[0] / 2, strlen($binpoint), '.', '');
+    $tpointnumber = min(number_format($tmppoint[0] / 2, strlen($binpoint), '.', ''), 1);
 
     $pointnumber = '';
     for ($i = 1; $i < strlen($binpoint); $i++) {
@@ -1312,17 +1173,6 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-function update_device_logo(&$device)
-{
-    $icon = getImageName($device, false);
-    if ($icon != $device['icon']) {
-        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
-        $device['icon'] = $icon;
-        dbUpdate(['icon' => $icon], 'devices', 'device_id=?', [$device['device_id']]);
-        echo "Changed Icon! : $icon\n";
-    }
-}
-
 /**
  * Function to generate Mac OUI Cache
  */
@@ -1409,7 +1259,7 @@ function cache_peeringdb()
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs as $ix) {
+                foreach ($ixs ?? [] as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
                     if ($tmp_ix) {
@@ -1430,7 +1280,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers as $index => $peer) {
+                    foreach ($peers ?? [] as $index => $peer) {
                         $peer_name = get_astext($peer->{'asn'});
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {

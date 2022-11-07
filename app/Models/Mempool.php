@@ -139,7 +139,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
 
     public function setMempoolPercAttribute($percent)
     {
-        $this->attributes['mempool_perc'] = round($percent);
+        $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
     }
 
     public function getCompositeKey()
