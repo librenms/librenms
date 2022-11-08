@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;

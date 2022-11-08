@@ -11,7 +11,7 @@
  * See COPYING for more details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $query = 'SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ?';
 $params = [$device['device_id']];

@@ -25,7 +25,7 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use InfluxDB\Point;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Data\Store\InfluxDB;
 use LibreNMS\Tests\TestCase;
 

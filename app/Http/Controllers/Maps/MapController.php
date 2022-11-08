@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Maps;
 
 use App\Http\Controllers\Controller;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class MapController extends Controller
 {

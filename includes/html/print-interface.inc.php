@@ -8,7 +8,7 @@ $(function () {
 use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
 

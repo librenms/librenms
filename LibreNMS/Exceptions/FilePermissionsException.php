@@ -26,7 +26,7 @@
 namespace LibreNMS\Exceptions;
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 

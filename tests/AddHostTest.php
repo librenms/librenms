@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class AddHostTest extends DBTestCase
 {

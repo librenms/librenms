@@ -28,7 +28,7 @@ namespace App\Http\ViewComposers;
 use App\Checks;
 use App\Models\UserPref;
 use Illuminate\View\View;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class LayoutComposer
 {

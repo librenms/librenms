@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Alert;
-use App\Models\Eventlog;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class AlertController extends Controller
 {

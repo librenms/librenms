@@ -29,7 +29,7 @@ namespace LibreNMS\Data\Store;
 use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Proxy;
 use Log;
 

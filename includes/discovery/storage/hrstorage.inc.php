@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $hrstorage_array = $os->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 

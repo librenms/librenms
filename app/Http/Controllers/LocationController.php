@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Location;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Html;
 
 class LocationController extends Controller

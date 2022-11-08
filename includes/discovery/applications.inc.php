@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 echo "\nApplications: ";
 

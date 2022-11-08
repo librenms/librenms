@@ -26,7 +26,7 @@
 namespace LibreNMS\Util;
 
 use App;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Proc;
 
 class Snmpsim

@@ -32,7 +32,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 

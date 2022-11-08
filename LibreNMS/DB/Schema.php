@@ -27,7 +27,7 @@ namespace LibreNMS\DB;
 
 use DB;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Version;
 use PDOException;
 use Schema as LaravelSchema;

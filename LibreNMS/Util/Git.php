@@ -28,7 +28,7 @@ namespace LibreNMS\Util;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Traits\RuntimeClassCache;
 use Symfony\Component\Process\Process;
 

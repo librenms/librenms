@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Source;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Oid;
 use Log;
 

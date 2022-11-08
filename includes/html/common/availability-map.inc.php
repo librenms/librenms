@@ -13,7 +13,7 @@
  */
 
 use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $mode = Session::get('map_view', 0);
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {

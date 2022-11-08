@@ -52,7 +52,7 @@ use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Version;
 

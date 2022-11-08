@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\RRD\RrdDefinition;
 
 $os->enableGraph('availability');

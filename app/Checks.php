@@ -31,7 +31,7 @@ use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class Checks
 {

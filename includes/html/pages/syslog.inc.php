@@ -14,7 +14,7 @@
 */
 
 use Carbon\Carbon;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $no_refresh = true;
 $param = [];

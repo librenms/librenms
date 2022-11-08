@@ -15,7 +15,7 @@
 * along with this program. If not, see <https://www.gnu.org/licenses/>. */
 
 // This one only will work with the CISCO-CONTEXT-MAPPING-MIB V2 of cisco
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (Config::get('enable_vrf_lite_cisco')) {
     $ids = [];

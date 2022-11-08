@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if ($int_colour) {
     $row_colour = $int_colour;

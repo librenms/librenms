@@ -13,7 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Number;
 
 require 'includes/html/graphs/common.inc.php';

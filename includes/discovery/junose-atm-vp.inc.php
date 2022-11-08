@@ -3,7 +3,7 @@
 // We're discovering this MIB
 // snmpwalk -v2c -c <community> <hostname> -M mibs/junose/ -m Juniper-UNI-ATM-MIB juniAtmVpStatsEntry
 // JunOSe ATM vps
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if ($device['os'] == 'junose' && Config::get('enable_ports_junoseatmvp')) {
     $vp_array = snmpwalk_cache_multi_oid($device, 'juniAtmVpStatsInCells', $vp_array, 'Juniper-UNI-ATM-MIB', 'junose');

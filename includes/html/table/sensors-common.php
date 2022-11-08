@@ -15,7 +15,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $graph_type = $vars['graph_type'];
 $unit = $vars['unit'];

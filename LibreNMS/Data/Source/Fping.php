@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Data\Source;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use Log;
 use Symfony\Component\Process\Process;
 

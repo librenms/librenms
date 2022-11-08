@@ -31,7 +31,7 @@ use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController

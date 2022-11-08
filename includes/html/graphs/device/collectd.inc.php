@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 require 'includes/html/collectd/config.php';
 require 'includes/html/collectd/functions.php';

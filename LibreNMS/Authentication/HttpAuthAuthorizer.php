@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class HttpAuthAuthorizer extends MysqlAuthorizer

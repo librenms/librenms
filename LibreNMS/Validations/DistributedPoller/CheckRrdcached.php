@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validations\Rrd\CheckRrdcachedConnectivity;
 

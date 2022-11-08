@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use App\Facades\Config;
+use LibreNMS\Config;
 
 class ConfigServiceProvider extends ServiceProvider implements DeferrableProvider
 {

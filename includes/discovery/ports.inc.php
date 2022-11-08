@@ -2,7 +2,7 @@
 
 // Build SNMP Cache Array
 use App\Models\PortGroup;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 

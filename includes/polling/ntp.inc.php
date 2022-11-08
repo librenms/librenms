@@ -18,7 +18,7 @@
  *      DS:dispersion:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (isset($device['os_group']) && file_exists(Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php")) {
     include Config::get('install_dir') . "/includes/polling/ntp/{$device['os_group']}.inc.php";

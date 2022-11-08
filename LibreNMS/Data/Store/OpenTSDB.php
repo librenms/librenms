@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Store;
 
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
-use LibreNMS\Config;
+use App\Facades\Config;
 use Log;
 
 class OpenTSDB extends BaseDatastore

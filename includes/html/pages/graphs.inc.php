@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Time;
 
 unset($vars['page']);

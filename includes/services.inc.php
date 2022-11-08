@@ -2,7 +2,7 @@
 
 use App\Models\Device;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;

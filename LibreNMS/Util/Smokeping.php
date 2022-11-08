@@ -27,7 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class Smokeping
 {

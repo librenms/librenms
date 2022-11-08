@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class StoreUserRequest extends FormRequest
 {

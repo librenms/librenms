@@ -11,7 +11,7 @@
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 

@@ -6,7 +6,7 @@ use App\Models\AlertTransport;
 use App\View\SimpleTemplate;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 

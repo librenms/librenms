@@ -5,7 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\UserPref;
 use Closure;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class VerifyTwoFactor
 {

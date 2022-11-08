@@ -26,7 +26,7 @@
 namespace LibreNMS\Authentication;
 
 use Carbon\Carbon;
-use LibreNMS\Config;
+use App\Facades\Config;
 use Session;
 
 trait LdapSessionCache

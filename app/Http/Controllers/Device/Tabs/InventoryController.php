@@ -27,7 +27,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class InventoryController implements DeviceTab

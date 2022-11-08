@@ -26,7 +26,7 @@
 namespace LibreNMS\Validations;
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation

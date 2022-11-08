@@ -34,7 +34,7 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 

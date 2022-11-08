@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if ($device['os'] == 'netapp') {
     $netapp_storage = snmpwalk_cache_oid($device, 'dfEntry', null, 'NETAPP-MIB');

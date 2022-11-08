@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 require 'includes/html/graphs/common.inc.php';
 

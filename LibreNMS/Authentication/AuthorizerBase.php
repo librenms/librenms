@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 abstract class AuthorizerBase implements Authorizer

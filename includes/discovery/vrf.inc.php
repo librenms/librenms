@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (Config::get('enable_vrfs')) {
     if (in_array($device['os_group'], ['vrp', 'cisco']) ||

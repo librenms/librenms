@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Feature\Commands;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
 class TestConfigCommands extends InMemoryDbTestCase

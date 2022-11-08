@@ -13,7 +13,7 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $default_severity = Config::get('alert_rule.severity');
 $default_max_alerts = Config::get('alert_rule.max_alerts');

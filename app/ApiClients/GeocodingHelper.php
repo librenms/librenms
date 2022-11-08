@@ -27,7 +27,7 @@ namespace App\ApiClients;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
+use App\Facades\Config;
 use Log;
 
 trait GeocodingHelper

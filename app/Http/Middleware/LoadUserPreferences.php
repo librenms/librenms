@@ -3,7 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class LoadUserPreferences
 {

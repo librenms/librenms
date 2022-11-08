@@ -28,7 +28,7 @@
  */
 
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 

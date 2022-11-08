@@ -31,7 +31,7 @@ use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\TwoFactor;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
 

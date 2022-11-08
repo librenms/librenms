@@ -1,7 +1,7 @@
 <?php
 
 // This file prints a table row for each interface
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\IP;
 
 $port['device_id'] = $device['device_id'];

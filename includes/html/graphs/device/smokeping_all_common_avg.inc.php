@@ -2,7 +2,7 @@
 
 // This is my translation of Smokeping's graphing.
 // Thanks to Bill Fenner for Perl->Human translation:>
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $scale_min = 0;
 $scale_rigid = true;

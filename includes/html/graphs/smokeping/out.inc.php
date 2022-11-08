@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $dest = device_by_id_cache($vars['dest']);
 

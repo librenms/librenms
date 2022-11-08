@@ -16,7 +16,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;

@@ -27,7 +27,7 @@
 use App\Action;
 use App\Actions\Device\UpdateDeviceGroupsAction;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 

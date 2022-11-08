@@ -1,7 +1,7 @@
 <?php
 
 use App\Facades\DeviceCache;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (! Auth::user()->hasGlobalRead()) {
     include 'includes/html/error-no-perm.inc.php';

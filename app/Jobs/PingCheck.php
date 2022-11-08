@@ -35,7 +35,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Process;

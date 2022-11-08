@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\RRD\RrdDefinition;
 
 class RrdDefinitionTest extends TestCase

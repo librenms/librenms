@@ -23,7 +23,7 @@
 
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $install_dir = Config::get('install_dir');
 

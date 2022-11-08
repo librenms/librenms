@@ -31,7 +31,7 @@ use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;

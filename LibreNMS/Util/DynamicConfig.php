@@ -27,7 +27,7 @@ namespace LibreNMS\Util;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class DynamicConfig
 {

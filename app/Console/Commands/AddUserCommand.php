@@ -29,7 +29,7 @@ use App\Console\LnmsCommand;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
+use App\Facades\Config;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 

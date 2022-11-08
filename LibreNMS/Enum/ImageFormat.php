@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Enum;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 enum ImageFormat: string
 {

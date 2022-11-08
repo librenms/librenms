@@ -25,7 +25,7 @@
 
 namespace LibreNMS\RRD;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
 class RrdDefinition

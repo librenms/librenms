@@ -27,7 +27,7 @@ namespace LibreNMS\Util;
 
 use App\Models\Device;
 use Cache;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class Rewrite
 {

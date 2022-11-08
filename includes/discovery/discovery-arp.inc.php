@@ -14,7 +14,7 @@
 // License: GPLv3
 //
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $hostname = $device['hostname'];
 $deviceid = $device['device_id'];

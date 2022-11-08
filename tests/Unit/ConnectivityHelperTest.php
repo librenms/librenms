@@ -3,7 +3,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Data\Source\SnmpResponse;

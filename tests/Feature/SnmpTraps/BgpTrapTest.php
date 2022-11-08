@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
 class BgpTrapTest extends SnmpTrapTestCase

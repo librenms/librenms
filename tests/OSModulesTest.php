@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;

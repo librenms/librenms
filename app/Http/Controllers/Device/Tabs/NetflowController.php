@@ -26,7 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class NetflowController implements DeviceTab

@@ -42,7 +42,7 @@ use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
 use PluginManager;

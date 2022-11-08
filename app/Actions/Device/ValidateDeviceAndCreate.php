@@ -27,7 +27,7 @@ namespace App\Actions\Device;
 
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;

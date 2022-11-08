@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations\Rrd;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
 

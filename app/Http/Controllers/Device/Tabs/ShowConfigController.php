@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\DeviceCache;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ShowConfigController extends Controller implements DeviceTab

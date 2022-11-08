@@ -24,7 +24,7 @@
  * @author     LibreNMS Contributors
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {

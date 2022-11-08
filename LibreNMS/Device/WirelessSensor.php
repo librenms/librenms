@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Device;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\OS;
 
 class WirelessSensor extends Sensor

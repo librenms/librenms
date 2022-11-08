@@ -35,7 +35,7 @@ use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Git;
 
 class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider

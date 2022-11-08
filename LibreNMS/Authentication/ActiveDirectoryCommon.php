@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 trait ActiveDirectoryCommon
 {

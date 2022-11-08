@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $highlight_node = $vars['highlight_node'] ?? 0;
 $group = $vars['group'] ?? 0;

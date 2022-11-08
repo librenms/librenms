@@ -27,7 +27,7 @@ namespace App\ApiClients;
 
 use App\Models\Device;
 use GuzzleHttp\Client;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class GraylogApi
 {

@@ -8,7 +8,7 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Debug;
 
 $links = 1;

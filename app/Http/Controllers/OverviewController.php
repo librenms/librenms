@@ -9,7 +9,7 @@ use App\Models\Service;
 use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class OverviewController extends Controller
 {

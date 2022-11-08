@@ -26,7 +26,7 @@
 
 use App\Models\BgpPeer;
 use App\Models\Vrf;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {

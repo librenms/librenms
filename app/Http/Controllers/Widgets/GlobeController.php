@@ -29,7 +29,7 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class GlobeController extends WidgetController
 {

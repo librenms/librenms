@@ -18,7 +18,7 @@
       </tr>
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $language = \config('app.locale');
 $settings = (include Config::get('install_dir') . '/resources/lang/' . $language . '/settings.php')['settings'];

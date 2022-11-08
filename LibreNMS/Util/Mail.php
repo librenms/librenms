@@ -26,7 +26,7 @@
 namespace LibreNMS\Util;
 
 use Exception;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 

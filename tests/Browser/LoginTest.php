@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use Hash;
 use Laravel\Dusk\Browser;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
 use LibreNMS\Tests\Browser\Pages\TwoFactorPage;
 use LibreNMS\Tests\DuskTestCase;

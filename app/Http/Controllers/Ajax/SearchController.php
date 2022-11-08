@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Ajax;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 abstract class SearchController
 {

@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     $pws_db = [];

@@ -24,7 +24,7 @@
  */
 
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 header('Content-type: application/json');
 

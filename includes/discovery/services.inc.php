@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\ServiceTemplateController;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if (Config::get('discover_services_templates')) {
     (new ServiceTemplateController())->applyAll(); // FIXME applyAll() should not be on a controller

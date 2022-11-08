@@ -9,7 +9,7 @@ use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\ValidationException;
 use JsonSchema\Validator;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
 use LibreNMS\Util\OS;

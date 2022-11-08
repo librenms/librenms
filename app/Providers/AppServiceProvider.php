@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;

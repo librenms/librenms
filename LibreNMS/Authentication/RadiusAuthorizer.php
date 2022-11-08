@@ -3,7 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use Dapphp\Radius\Radius;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
 

@@ -2,7 +2,7 @@
 <?php
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Debug;
 
 $install_dir = realpath(__DIR__ . '/..');

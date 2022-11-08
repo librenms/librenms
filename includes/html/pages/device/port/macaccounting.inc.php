@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 // FIXME - REWRITE!
 $hostname = $device['hostname'];

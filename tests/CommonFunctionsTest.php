@@ -26,7 +26,7 @@
 namespace LibreNMS\Tests;
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Validate;

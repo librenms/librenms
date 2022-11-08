@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 

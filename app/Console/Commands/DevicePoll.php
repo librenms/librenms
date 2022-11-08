@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Poller;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

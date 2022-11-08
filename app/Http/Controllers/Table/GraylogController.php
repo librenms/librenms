@@ -31,7 +31,7 @@ use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Url;
 
 class GraylogController extends SimpleTableController

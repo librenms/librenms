@@ -33,7 +33,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class DashboardController extends Controller
 {

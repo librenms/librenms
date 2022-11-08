@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Validator;
 
 class Mail extends BaseValidation

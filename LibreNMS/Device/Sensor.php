@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Device;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Polling\PollerModule;
 use LibreNMS\OS;

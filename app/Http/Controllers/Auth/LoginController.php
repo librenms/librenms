@@ -7,7 +7,7 @@ use App\Models\Device;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class LoginController extends Controller
 {

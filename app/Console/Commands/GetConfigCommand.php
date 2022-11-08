@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\OS;
 use Symfony\Component\Console\Input\InputArgument;
 

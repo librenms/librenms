@@ -24,7 +24,7 @@
  */
 
 use App\Models\Device;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $scale_min = '0';
 $colors = Config::get('graph_colours.manycolours');

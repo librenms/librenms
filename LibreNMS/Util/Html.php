@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\PowerState;
 
 class Html

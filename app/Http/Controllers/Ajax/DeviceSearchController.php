@@ -28,7 +28,7 @@ namespace App\Http\Controllers\Ajax;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Color;
 
 class DeviceSearchController extends SearchController

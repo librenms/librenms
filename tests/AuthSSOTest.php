@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class AuthSSOTest extends DBTestCase
 {

@@ -11,7 +11,7 @@
  */
 
 use App\Facades\DeviceCache;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;

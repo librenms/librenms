@@ -29,7 +29,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\ComposerHelper;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;

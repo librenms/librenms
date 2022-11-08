@@ -3,7 +3,7 @@
 namespace LibreNMS\Authentication;
 
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 class LegacyAuth

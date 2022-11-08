@@ -1,7 +1,7 @@
 <?php
 
 // Pre-cache the existing state of VLANs for this device from the database
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $vlans_db = [];
 $vlans_db_raw = dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ?', [$device['device_id']]);

@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $hops = [];
 $links = [];

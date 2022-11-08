@@ -2,7 +2,7 @@
 
 namespace App\Listeners;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use Log;
 
 class SocialiteWasCalledListener

@@ -21,7 +21,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-use LibreNMS\Config;
+use App\Facades\Config;
 
 if ($device['os'] == 'nimbleos') {
     $nimble_storage = snmpwalk_cache_oid($device, 'volEntry', null, 'NIMBLE-MIB');

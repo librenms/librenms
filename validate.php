@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 

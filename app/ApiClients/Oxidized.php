@@ -25,7 +25,7 @@
 
 namespace App\ApiClients;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class Oxidized extends BaseApi
 {

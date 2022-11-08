@@ -17,7 +17,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Enum\CheckStatus;
 use LibreNMS\Enum\SyslogSeverity;
 

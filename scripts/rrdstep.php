@@ -24,7 +24,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 
 $init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';

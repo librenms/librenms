@@ -35,7 +35,7 @@ use Auth;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
+use App\Facades\Config;
 use URL;
 
 class UserController extends Controller

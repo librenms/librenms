@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Util\Debug;
 
 $init_modules = ['web', 'auth'];

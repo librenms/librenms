@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Unit;
 
 use App\Models\AlertTransport;
 use GuzzleHttp\Psr7\Response;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Tests\Traits\MockGuzzleClient;
 

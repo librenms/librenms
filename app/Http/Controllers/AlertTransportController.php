@@ -6,7 +6,7 @@ use App\Models\AlertTransport;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertUtil;
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class AlertTransportController extends Controller

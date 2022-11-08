@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Config;
+use App\Facades\Config;
 
 class QueryBuilderTest extends TestCase
 {

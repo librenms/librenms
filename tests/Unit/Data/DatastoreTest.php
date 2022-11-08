@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use LibreNMS\Config;
+use App\Facades\Config;
 use LibreNMS\Tests\TestCase;
 
 /**
