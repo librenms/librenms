@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
-use LibreNMS\Config;
+use App\Facades\Config;
 
-class ConfigServiceProvider extends ServiceProvider
+class ConfigServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Register services.
@@ -14,16 +15,18 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->singleton(Config::class, function ($app) {
+            return new Config();
+        });
     }
 
     /**
-     * Bootstrap services.
+     * Get the services provided by the provider.
      *
-     * @return void
+     * @return array
      */
-    public function boot()
+    public function provides()
     {
-        Config::load();
+        return [Config::class];
     }
 }
