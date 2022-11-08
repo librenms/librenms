@@ -13,7 +13,7 @@
 
 if (Auth::user()->hasGlobalAdmin()) {
     // Build the types list.
-    $dir = \LibreNMS\Config::get('nagios_plugins');
+    $dir = \App\Facades\Config::get('nagios_plugins');
     if (file_exists($dir) && is_dir($dir)) {
         $files = scandir($dir);
         $dir .= DIRECTORY_SEPARATOR;

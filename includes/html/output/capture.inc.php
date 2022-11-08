@@ -32,7 +32,7 @@ $type = $_REQUEST['type'];
 
 switch ($type) {
     case 'poller':
-        $cmd = ['php', \LibreNMS\Config::get('install_dir') . '/poller.php', '-h', $hostname, '-r', '-f', '-d'];
+        $cmd = ['php', \App\Facades\Config::get('install_dir') . '/poller.php', '-h', $hostname, '-r', '-f', '-d'];
         $filename = "poller-$hostname.txt";
         break;
     case 'snmpwalk':
@@ -43,7 +43,7 @@ switch ($type) {
         $filename = $device['os'] . '-' . $device['hostname'] . '.snmpwalk';
         break;
     case 'discovery':
-        $cmd = ['php', \LibreNMS\Config::get('install_dir') . '/discovery.php', '-h', $hostname, '-d'];
+        $cmd = ['php', \App\Facades\Config::get('install_dir') . '/discovery.php', '-h', $hostname, '-d'];
         $filename = "discovery-$hostname.txt";
         break;
     default:

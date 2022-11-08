@@ -1,11 +1,11 @@
 <x-panel footer-class="text-center">
     <x-slot name="title">
-        <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
+        <img class="logon-logo img-responsive" src="{{ asset(\App\Facades\Config::get('title_image', 'images/librenms_logo_light.svg')) }}">
     </x-slot>
 
     @config('login_message')
     <x-slot name="footer">
-        <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div>
+        <div class="logon-message">{{ \App\Facades\Config::get('login_message') }}</div>
     </x-slot>
     @endconfig
 
@@ -48,7 +48,7 @@
                     </button>
         </form>
 
-                    @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+                    @foreach (\App\Facades\Config::get('auth.socialite.configs', []) as $provider => $config)
                     <br>
                     <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
                         {{ csrf_field() }}

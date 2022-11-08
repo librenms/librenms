@@ -7,7 +7,7 @@ $no_refresh = true;
             <th data-column-id="interface">Port</th>
             <th data-column-id="mac_address" data-formatter="tooltip">MAC address</th>
 <?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+if (\App\Facades\Config::get('mac_oui.enabled') === true) {
     echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
 }
 ?>

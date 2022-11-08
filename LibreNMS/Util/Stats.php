@@ -40,7 +40,7 @@ class Stats
         if ($stats->isEnabled()) {
             $response = \Http::withOptions(['proxy' => Proxy::forGuzzle()])
                 ->asForm()
-                ->post(\LibreNMS\Config::get('callback_post'), [
+                ->post(\App\Facades\Config::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
                 ]);
         }
@@ -65,7 +65,7 @@ class Stats
 
         $response = \Http::withOptions(['proxy' => Proxy::forGuzzle()])
             ->asForm()
-            ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
+            ->post(\App\Facades\Config::get('callback_clear'), ['uuid' => $uuid]);
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();

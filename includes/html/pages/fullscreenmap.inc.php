@@ -33,7 +33,7 @@
  */
 $pagetitle[] = 'Geographical Map';
 
-if (\LibreNMS\Config::get('map.engine') == 'leaflet') {
+if (\App\Facades\Config::get('map.engine') == 'leaflet') {
     require_once 'includes/html/common/worldmap.inc.php';
     echo implode('', $common_output);
 }

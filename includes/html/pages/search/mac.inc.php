@@ -9,7 +9,7 @@
                 <th data-column-id="interface">Interface</th>
                 <th data-column-id="address" data-sortable="false" data-formatter="tooltip">MAC Address</th>
 <?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+if (\App\Facades\Config::get('mac_oui.enabled') === true) {
     echo '                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
 }
 ?>                <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th></tr>

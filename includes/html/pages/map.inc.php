@@ -12,7 +12,7 @@
  */
 $pagetitle[] = 'Map';
 
-if (\LibreNMS\Config::get('gui.network-map.style') == 'old') {
+if (\App\Facades\Config::get('gui.network-map.style') == 'old') {
     print_error('You are using the old style network map, a global map is not available');
 } else {
     require_once 'includes/html/print-map.inc.php';

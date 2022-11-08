@@ -7,9 +7,9 @@ $row = 1;
 $duration_list = dbFetchRows('SELECT * FROM `availability` WHERE `device_id` = ? ORDER BY `duration`', [$device['device_id']]);
 foreach ($duration_list as $duration) {
     if (is_integer($row / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
+        $row_colour = \App\Facades\Config::get('list_colour.even');
     } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+        $row_colour = \App\Facades\Config::get('list_colour.odd');
     }
 
     $graph_array['device'] = $duration['device_id'];

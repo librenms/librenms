@@ -73,7 +73,7 @@ if (! empty($filter_device)) {
 ';
 }
 
-if (\LibreNMS\Config::has('graylog.timezone')) {
+if (\App\Facades\Config::has('graylog.timezone')) {
     $timezone = 'row.timestamp;';
 } else {
     $timezone = 'moment.parseZone(row.timestamp).local().format("YYYY-MM-DD HH:MM:SS");';

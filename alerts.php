@@ -39,10 +39,10 @@ if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
 
-$alerts_lock = Cache::lock('alerts', \LibreNMS\Config::get('service_alerting_frequency'));
+$alerts_lock = Cache::lock('alerts', \App\Facades\Config::get('service_alerting_frequency'));
 if ($alerts_lock->get()) {
     $alerts = new RunAlerts();
-    if (! defined('TEST') && \LibreNMS\Config::get('alert.disable') != 'true') {
+    if (! defined('TEST') && \App\Facades\Config::get('alert.disable') != 'true') {
         echo 'Start: ' . date('r') . "\r\n";
         echo 'ClearStaleAlerts():' . PHP_EOL;
         $alerts->clearStaleAlerts();

@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
-    <base href="{{ LibreNMS\Config::get('base_url') }}">
+    <base href="{{ App\Facades\Config::get('base_url') }}">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @if(!LibreNMS\Config::get('favicon', false))
+    @if(!App\Facades\Config::get('favicon', false))
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
         <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
     @else
-        <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}">
+        <link rel="shortcut icon" href="{{ App\Facades\Config::get('favicon') }}">
     @endif
 
     <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
@@ -42,9 +42,9 @@
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=20220910" rel="stylesheet">
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
-    @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
+    <link href="{{ asset(App\Facades\Config::get('stylesheet', 'css/styles.css')) }}?ver=20220910" rel="stylesheet">
+    <link href="{{ asset('css/' . App\Facades\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
+    @foreach(App\Facades\Config::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
     @endforeach
     @yield('css')
@@ -83,7 +83,7 @@
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
+        if ('{{ App\Facades\Config::get('applied_site_style') }}' === 'dark') {
             document.documentElement.classList.add('tw-dark')
         } else {
             document.documentElement.classList.remove('tw-dark')

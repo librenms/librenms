@@ -82,7 +82,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT R.severity, D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+$sql = "SELECT R.severity, D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \App\Facades\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {

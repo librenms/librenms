@@ -47,10 +47,10 @@ foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        if (! \App\Facades\Config::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+        $colour = \App\Facades\Config::get("graph_colours.$colours.$iter");
         $iter++;
     }
 

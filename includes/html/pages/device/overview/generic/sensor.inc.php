@@ -31,10 +31,10 @@ if (count($sensors)) {
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\Config::get('time.now');
         $graph_array['id'] = $sensor['sensor_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\Config::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
@@ -50,7 +50,7 @@ if (count($sensors)) {
 
         $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor['sensor_descr'] . '</span><br />';
         foreach (['day', 'week', 'month', 'year'] as $period) {
-            $graph_array['from'] = \LibreNMS\Config::get("time.$period");
+            $graph_array['from'] = \App\Facades\Config::get("time.$period");
             $overlib_content .= str_replace('"', "\'", \LibreNMS\Util\Url::graphTag($graph_array));
         }
 
@@ -60,7 +60,7 @@ if (count($sensors)) {
         $graph_array['height'] = 20;
         $graph_array['bg'] = 'ffffff00';
         // the 00 at the end makes the area transparent.
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\Config::get('time.day');
         $sensor_minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         $sensor_current = $graph_type == 'sensor_state' ? get_state_label($sensor) : get_sensor_label_color($sensor);

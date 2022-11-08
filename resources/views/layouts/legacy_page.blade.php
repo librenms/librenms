@@ -78,7 +78,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <h5>Powered by <a href="{{ \LibreNMS\Config::get('project_home') }}" target="_blank" rel="noopener" class="red">{{ \LibreNMS\Config::get('project_name') }}</a>.</h5>
+                    <h5>Powered by <a href="{{ \App\Facades\Config::get('project_home') }}" target="_blank" rel="noopener" class="red">{{ \App\Facades\Config::get('project_name') }}</a>.</h5>
                 </div>
             </div>
         </div>

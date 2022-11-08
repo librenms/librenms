@@ -38,7 +38,7 @@ if ($device['os'] === 'vrp') {
                     <th data-column-id="port_id" data-width="100px">Port</th>
                     <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
 <?php
-if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
+if (\App\Facades\Config::get('mac_oui.enabled') === true) {
     echo '                    <th data-column-id="mac_oui" data-sortable="false" data-width="130px" data-visible="false" data-formatter="tooltip">Vendor</th>';
 }
 ?>

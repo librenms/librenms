@@ -45,14 +45,14 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
 
-        $current = \LibreNMS\Config::get($id);
+        $current = \App\Facades\Config::get($id);
         $config_item = $config->get($id);
 
         if (! $config_item->checkValue($value)) {
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
-        if (\LibreNMS\Config::persist($id, $value)) {
+        if (\App\Facades\Config::persist($id, $value)) {
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 

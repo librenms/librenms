@@ -44,7 +44,7 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
             return ValidationResult::ok(trans('validation.validations.poller.CheckRedis.ok'));
         }
 
-        if (\LibreNMS\Config::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2) {
+        if (\App\Facades\Config::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckRedis.unavailable'));
         }
 

@@ -82,7 +82,7 @@ class Location extends Model
             return true;
         }
 
-        if ($hostname && \LibreNMS\Config::get('geoloc.dns')) {
+        if ($hostname && \App\Facades\Config::get('geoloc.dns')) {
             $coord = app(Dns::class)->getCoordinates($hostname);
 
             if (! empty($coord)) {
@@ -92,7 +92,7 @@ class Location extends Model
             }
         }
 
-        if ($this->location && ! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+        if ($this->location && ! $this->hasCoordinates() && \App\Facades\Config::get('geoloc.latlng', true)) {
             return $this->fetchCoordinates();
         }
 

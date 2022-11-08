@@ -80,7 +80,7 @@ function get_mib_dir($device)
  * If null return the default mib dir
  * If $mibdir is empty '', return an empty string
  *
- * @param  string  $mibdir  should be the name of the directory within \LibreNMS\Config::get('mib_dir')
+ * @param  string  $mibdir  should be the name of the directory within \App\Facades\Config::get('mib_dir')
  * @param  array|null  $device
  * @return string The option string starting with -M
  */

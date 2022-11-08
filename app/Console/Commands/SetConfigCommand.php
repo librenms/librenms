@@ -214,7 +214,7 @@ class SetConfigCommand extends LnmsCommand
     {
         // prep data to be validated
         OS::loadDefinition($os);
-        $os_data = \LibreNMS\Config::get("os.$os");
+        $os_data = \App\Facades\Config::get("os.$os");
         if ($os_data === null) {
             throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
         }

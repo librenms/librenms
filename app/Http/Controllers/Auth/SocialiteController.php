@@ -30,7 +30,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
-use LibreNMS\Config as LibreNMSConfig;
+use App\Facades\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class SocialiteController extends Controller

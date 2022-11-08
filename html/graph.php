@@ -26,7 +26,7 @@ if (! Auth::check()) {
 
 Debug::set(isset($_GET['debug']));
 
-require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
+require \App\Facades\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
 Datastore::terminate();
 

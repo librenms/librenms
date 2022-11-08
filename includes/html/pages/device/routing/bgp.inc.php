@@ -118,18 +118,18 @@ $i = '1';
 foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql ORDER BY `bgpPeerRemoteAs`, `bgpPeerIdentifier`", [$device['device_id']]) as $peer) {
     $has_macaccounting = dbFetchCell('SELECT COUNT(*) FROM `ipv4_mac` AS I, mac_accounting AS M WHERE I.ipv4_address = ? AND M.mac = I.mac_address', [$peer['bgpPeerIdentifier']]);
     if (! is_integer($i / 2)) {
-        $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        $bg_colour = \App\Facades\Config::get('list_colour.even');
     } else {
-        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        $bg_colour = \App\Facades\Config::get('list_colour.odd');
     }
 
     unset($alert);
     unset($peerhost, $peername);
 
     if (! is_integer($i / 2)) {
-        $bg_colour = \LibreNMS\Config::get('list_colour.odd');
+        $bg_colour = \App\Facades\Config::get('list_colour.odd');
     } else {
-        $bg_colour = \LibreNMS\Config::get('list_colour.even');
+        $bg_colour = \App\Facades\Config::get('list_colour.even');
     }
 
     if ($peer['bgpPeerState'] == 'established') {
@@ -210,8 +210,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $graph_array = [];
     $graph_array['type'] = 'bgp_updates';
     $graph_array['id'] = $peer['bgpPeer_id'];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['to'] = \App\Facades\Config::get('time.now');
+    $graph_array['from'] = \App\Facades\Config::get('time.day');
     $graph_array['height'] = '110';
     if (isset($width)) {
         $graph_array['width'] = $width;
@@ -290,7 +290,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     if (! empty($peer['graph'])) {
         $graph_array['height'] = '100';
         $graph_array['width'] = '216';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\Config::get('time.now');
         echo '<tr bgcolor="' . $bg_colour . '"><td colspan="7">';
 
         include 'includes/html/print-graphrow.inc.php';

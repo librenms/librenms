@@ -19,7 +19,7 @@ if ($perf->isNotEmpty()) {
     $graph = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth([
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_ping_perf',
-        'from' => \LibreNMS\Config::get('time.day'),
+        'from' => \App\Facades\Config::get('time.day'),
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Ping Response',
     ]);

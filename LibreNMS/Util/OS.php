@@ -60,9 +60,9 @@ class OS
      */
     public static function loadAllDefinitions($existing = false, $cached = true)
     {
-        $install_dir = \LibreNMS\Config::get('install_dir');
+        $install_dir = \App\Facades\Config::get('install_dir');
         $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
+        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \App\Facades\Config::get('os_def_cache_time'))) {
             // Cached
             $os_defs = unserialize(file_get_contents($cache_file));
             if ($existing) {
@@ -70,7 +70,7 @@ class OS
                 $exists = Device::query()->whereNotNull('os')->distinct()->pluck('os')->flip()->all();
                 $os_defs = array_intersect_key($os_defs, $exists);
             }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
+            \App\Facades\Config::set('os', array_replace_recursive($os_defs, \App\Facades\Config::get('os')));
         } else {
             // load from yaml
             if ($existing && Eloquent::isConnected()) {

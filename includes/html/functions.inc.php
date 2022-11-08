@@ -403,7 +403,7 @@ function generate_sensor_link($args, $text = null, $type = null)
 
     $content .= '</div>';
 
-    $url = \LibreNMS\Util\Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \LibreNMS\Config::get('time.day')], []);
+    $url = \LibreNMS\Util\Url::generate(['page' => 'graphs', 'id' => $args['sensor_id'], 'type' => $args['graph_type'], 'from' => \App\Facades\Config::get('time.day')], []);
 
     return \LibreNMS\Util\Url::overlibLink($url, $text, $content);
 }//end generate_sensor_link()

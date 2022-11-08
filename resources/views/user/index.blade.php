@@ -123,7 +123,7 @@
                 }
             });
 
-            @if(\LibreNMS\Config::get('auth_mechanism') == 'mysql')
+            @if(\App\Facades\Config::get('auth_mechanism') == 'mysql')
                 $('.actionBar').append('<div class="pull-left"><a href="{{ route('users.create') }}" type="button" class="btn btn-primary">{{ __('Add User') }}</a></div>');
             @endif
 

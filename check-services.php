@@ -84,7 +84,7 @@ $poller_end = microtime(true);
 $poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
-$string = $argv[0] . ' ' . date(\LibreNMS\Config::get('dateformat.compact'))
+$string = $argv[0] . ' ' . date(\App\Facades\Config::get('dateformat.compact'))
     . " - $polled_services services polled in $poller_time secs";
 d_echo("$string\n");
 

@@ -77,7 +77,7 @@ if (isset($valid_wireless_types[$class])) {
     $graph_type = 'wireless_' . $class;
     $unit = __("wireless.$class.unit");
     $pagetitle[] = 'Wireless :: ' . $class;
-    include \LibreNMS\Config::get('install_dir') . '/includes/html/pages/wireless/sensors.inc.php';
+    include \App\Facades\Config::get('install_dir') . '/includes/html/pages/wireless/sensors.inc.php';
 } else {
     echo 'No sensors of type ' . $class . ' found.';
 }

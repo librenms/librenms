@@ -4,9 +4,9 @@ $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_descr`', [$class, $device['device_id']]) as $sensor) {
     if (! is_integer($row / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
+        $row_colour = \App\Facades\Config::get('list_colour.even');
     } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+        $row_colour = \App\Facades\Config::get('list_colour.odd');
     }
 
     if ($sensor['poller_type'] == 'ipmi') {

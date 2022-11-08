@@ -22,8 +22,8 @@ $total_data = $bill_data['total_data'];
 $in_data = $bill_data['total_data_in'];
 $out_data = $bill_data['total_data_out'];
 
-$fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
-$totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \LibreNMS\Config::get('dateformat.mysql.date') . "')");
+$fromtext = dbFetchCell("SELECT DATE_FORMAT($datefrom, '" . \App\Facades\Config::get('dateformat.mysql.date') . "')");
+$totext = dbFetchCell("SELECT DATE_FORMAT($dateto, '" . \App\Facades\Config::get('dateformat.mysql.date') . "')");
 $unixfrom = dbFetchCell("SELECT UNIX_TIMESTAMP('$datefrom')");
 $unixto = dbFetchCell("SELECT UNIX_TIMESTAMP('$dateto')");
 $unix_prev_from = dbFetchCell("SELECT UNIX_TIMESTAMP('$lastfrom')");
@@ -67,7 +67,7 @@ $out['bg'] = \LibreNMS\Util\Color::percentage($out['per'], null);
 
 $ousage['over'] = ($bill_data['total_data'] - ($bill_data['bill_quota']));
 $ousage['over'] = (($ousage['over'] < 0) ? '0' : $ousage['over']);
-$ousage['data'] = \LibreNMS\Util\Number::formatBase($ousage['over'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
+$ousage['data'] = \LibreNMS\Util\Number::formatBase($ousage['over'], \App\Facades\Config::get('billing.base'), 2, 3, '');
 $ousage['allow'] = $total['allow'];
 $ousage['ave'] = format_bytes_billing(($ousage['over'] / $cur_days));
 $ousage['est'] = format_bytes_billing(($ousage['over'] / $cur_days * $total_days));
@@ -165,7 +165,7 @@ $bi .= '&amp;width=1190&amp;height=250';
 $bi .= "'>";
 
 $di = "<img src='graph.php?type=bill_historictransfer&id=" . $bill_id;
-$di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
+$di .= '&amp;from=' . \App\Facades\Config::get('time.day') . '&amp;to=' . \App\Facades\Config::get('time.now');
 $di .= '&amp;imgtype=hour';
 $di .= '&amp;width=1190&amp;height=250';
 $di .= "'>";

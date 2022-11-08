@@ -286,11 +286,11 @@ if ($options['f'] === 'purgeusers') {
     $lock = Cache::lock('purgeusers', 86000);
     if ($lock->get()) {
         $purge = 0;
-        if (is_numeric(\LibreNMS\Config::get('radius.users_purge')) && Config::get('auth_mechanism') === 'radius') {
-            $purge = \LibreNMS\Config::get('radius.users_purge');
+        if (is_numeric(\App\Facades\Config::get('radius.users_purge')) && Config::get('auth_mechanism') === 'radius') {
+            $purge = \App\Facades\Config::get('radius.users_purge');
         }
-        if (is_numeric(\LibreNMS\Config::get('active_directory.users_purge')) && Config::get('auth_mechanism') === 'active_directory') {
-            $purge = \LibreNMS\Config::get('active_directory.users_purge');
+        if (is_numeric(\App\Facades\Config::get('active_directory.users_purge')) && Config::get('auth_mechanism') === 'active_directory') {
+            $purge = \App\Facades\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
             $users = \App\Models\AuthLog::where('datetime', '>=', \Carbon\Carbon::now()->subDays($purge))
@@ -341,9 +341,9 @@ if ($options['f'] === 'refresh_device_groups') {
 }
 
 if ($options['f'] === 'notify') {
-    if (\LibreNMS\Config::has('alert.default_mail')) {
+    if (\App\Facades\Config::has('alert.default_mail')) {
         send_mail(
-            \LibreNMS\Config::get('alert.default_mail'),
+            \App\Facades\Config::get('alert.default_mail'),
             '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
             "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
         );

@@ -20,7 +20,7 @@ $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
 if (! isset($options['q'])) {
-    echo \LibreNMS\Config::get('project_name') . " Discovery\n";
+    echo \App\Facades\Config::get('project_name') . " Discovery\n";
 }
 
 if (isset($options['h'])) {
@@ -96,8 +96,8 @@ $module_override = parse_modules('discovery', $options);
 
 $discovered_devices = 0;
 
-if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
-    $where .= ' AND poller_group IN(' . \LibreNMS\Config::get('distributed_poller_group') . ')';
+if (! empty(\App\Facades\Config::get('distributed_poller_group'))) {
+    $where .= ' AND poller_group IN(' . \App\Facades\Config::get('distributed_poller_group') . ')';
 }
 
 global $device;
@@ -114,7 +114,7 @@ if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
 }
 
-$string = $argv[0] . " $doing " . date(\LibreNMS\Config::get('dateformat.compact')) . " - $discovered_devices devices discovered in $proctime secs";
+$string = $argv[0] . " $doing " . date(\App\Facades\Config::get('dateformat.compact')) . " - $discovered_devices devices discovered in $proctime secs";
 d_echo("$string\n");
 
 if (! isset($options['q'])) {

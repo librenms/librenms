@@ -61,20 +61,20 @@
              'ignore_exceptions' => false,
          ],
 
-         'single' => [
-             'driver' => 'single',
-             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-             'formatter' => \App\Logging\NoColorFormatter::class,
-             'level' => env('LOG_LEVEL', 'error'),
-         ],
+        'single' => [
+            'driver' => 'single',
+            'path' => env('APP_LOG', \App\Facades\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
+            'level' => env('LOG_LEVEL', 'error'),
+        ],
 
-         'daily' => [
-             'driver' => 'daily',
-             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
-             'formatter' => \App\Logging\NoColorFormatter::class,
-             'level' => env('LOG_LEVEL', 'error'),
-             'days' => 14,
-         ],
+        'daily' => [
+            'driver' => 'daily',
+            'path' => env('APP_LOG', \App\Facades\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
+            'level' => env('LOG_LEVEL', 'error'),
+            'days' => 14,
+        ],
 
          'slack' => [
              'driver' => 'slack',
