@@ -36,7 +36,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
             // attribute 11 is "Filter-Id", apply and enforce user role (level) if set
 
             $filter_id_attribute = $this->radius->getAttribute(11);
-            $level = match($filter_id_attribute) {
+            $level = match ($filter_id_attribute) {
                 'librenms_role_admin' => 10,
                 'librenms_role_normal' => 1,
                 'librenms_role_global-read' => 5,
@@ -45,8 +45,8 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
             // if Filter-Id was given and the user exists, update the level
             if ($filter_id_attribute && $this->userExists($credentials['username'])) {
-                            $user = \App\Models\User::find($this->getUserid($credentials['username']));
-                            $user->level = $level;
+                $user = \App\Models\User::find($this->getUserid($credentials['username']));
+                $user->level = $level;
                 $user->save();
                 return true;
             }
