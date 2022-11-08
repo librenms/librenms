@@ -51,7 +51,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 return true;
             }
 
-            $this->addUser($credentials['username'], $password, $level, '', $credentials['username'], false);
+            $this->addUser($credentials['username'], $password, $level, '', $credentials['username'], 0);
 
             return true;
         }
