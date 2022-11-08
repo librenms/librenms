@@ -33,47 +33,25 @@ class RadiusAuthorizer extends MysqlAuthorizer
 
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
+            // attribute 11 is "Filter-Id", apply and enforce user role (level) if set
 
-                //attribute 11 is "Filter-Id"
-            //Always set password change to 0 - password resides in AAA, not LibreNMS
-            //If attribute 11 is sent in reply after accept - update user
-            //If user exists - update, not add.
-            //If new user - add user with attribute value if present, or use default from config.
+            $filter_id_attribute = $this->radius->getAttribute(11);
+            $level = match($filter_id_attribute) {
+                'librenms_role_admin' => 10,
+                'librenms_role_normal' => 1,
+                'librenms_role_global-read' => 5,
+                default => Config::get('radius.default_level', 1)
+            };
 
-            $attribute = '';
-            if ($this->radius->getAttribute(11)) {
-                switch ($this->radius->getAttribute(11)) {
-                        case 'lnms_admin':
-                            $attribute = 10;
-                            break;
-                        case 'lnms_normal':
-                            $attribute = 1;
-                            break;
-                        case 'lnms_globalRead':
-                            $attribute = 5;
-                            break;
-                        case 'lnms_demo':
-                            $attribute = 11;
-                            break;
-
-                    }
+            // if Filter-Id was given and the user exists, update the level
+            if ($filter_id_attribute && $this->userExists($credentials['username'])) {
+                            $user = \App\Models\User::find($this->getUserid($credentials['username']));
+                            $user->level = $level;
+                $user->save();
+                return true;
             }
 
-            if ($this->userExists($credentials['username'])) {
-                if ($attribute) {
-                    $this->updateUser($this->getUserid($credentials['username']), $credentials['username'], $attribute, 0, '');
-                } else {
-                    $this->updateUser($this->getUserid($credentials['username']), $credentials['username'], Config::get('radius.default_level', 1), 0, '');
-                }
-            }
-
-            if (! $this->userExists($credentials['username'])) {
-                if ($attribute) {
-                    $this->addUser($credentials['username'], $password, $attribute, '', $credentials['username'], 0, '');
-                } else {
-                    $this->addUser($credentials['username'], $password, Config::get('radius.default_level', 1), '', $credentials['username'], 0, '');
-                }
-            }
+            $this->addUser($credentials['username'], $password, $level, '', $credentials['username'], false);
 
             return true;
         }
