@@ -77,7 +77,7 @@ class AlertRules
                     $qry[$i]['ip'] = inet6_ntop($qry[$i]['ip']);
                 }
             }
-            $s = count($qry);
+            $s = sizeof($qry);
             if ($s == 0 && $inv === false) {
                 $doalert = false;
             } elseif ($s > 0 && $inv === false) {
