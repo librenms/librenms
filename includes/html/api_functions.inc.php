@@ -2601,9 +2601,11 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
         $param[] = $to;
     }
 
+    $sort_order = $request->get('sortorder') === 'DESC' ? 'DESC' : 'ASC';
+
     $count_query = $count_query . $query;
     $count = dbFetchCell($count_query, $param);
-    $full_query = $full_query . $query . " ORDER BY $timestamp ASC LIMIT $start,$limit";
+    $full_query = $full_query . $query . " ORDER BY $timestamp $sort_order LIMIT $start,$limit";
     $logs = dbFetchRows($full_query, $param);
 
     if ($type === 'list_alertlog') {
