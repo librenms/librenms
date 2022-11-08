@@ -816,6 +816,56 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+## HV Monitor
+
+HV Monitor provides a generic way to monitor hypervisors. Currently
+CBSD+bhyve on FreeBSD and Libvirt+QEMU on Linux are support.
+
+For more information see
+HV::Monitor on
+[Github](https://github.com/VVelox/HV-Monitor)
+or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
+
+### SNMP Extend
+
+1. Install the SNMP Extend.
+
+For Debian based systems this is as below.
+
+```
+apt-get install zlib1g-dev cpanminus libjson-perl
+cpanm HV::Monitor
+```
+
+And on FreeBSD as below.
+
+```
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+cpanm HV::Monitor
+```
+
+2. Set it up to be be ran by cron by root. Yes, you can directly call
+   this script from SNMPD, but be aware, especially with Libvirt,
+   there is a very real possibility of the snmpget timing out,
+   especially if a VM is spinning up/down as virsh domstats can block
+   for a few seconds or so then.
+
+```
+*/5 * * * * /usr/local/bin/hv_monitor > /var/cache/hv_monitor.json -c 2> /dev/null
+```
+
+3. Setup snmpd.conf as below.
+
+```
+extend hv-monitor /bin/cat
+/var/cache/hv_monitor.json
+
+```
+
+4. Restart SNMPD.
+
+5. Either wait for it to be re-discovered or manually enable it.
+
 ## Icecast
 
 Shell script that reports load average/memory/open-files stats of Icecast

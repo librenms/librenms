@@ -13329,7 +13329,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13352,7 +13352,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "idle",
@@ -13429,7 +13429,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.1",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",
@@ -13452,7 +13452,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "PROTON, CH",
+                    "astext": "AS62371-MOCK-TEXT",
                     "bgpPeerIdentifier": "10.1.1.5",
                     "bgpPeerRemoteAs": 62371,
                     "bgpPeerState": "established",

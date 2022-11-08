@@ -127,5 +127,5 @@ interface SnmpQueryInterface
      * Translate an OID.
      * Call numeric method prior output numeric OID.
      */
-    public function translate(string $oid, ?string $mib = null): SnmpResponse;
+    public function translate(string $oid, ?string $mib = null): string;
 }

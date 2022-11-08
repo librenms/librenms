@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\Sla;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -71,7 +72,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
     public function discoverSlas()
     {
-        $slas = collect();
+        $slas = new Collection();
         $sla_table = snmpwalk_cache_oid($this->getDeviceArray(), 'pingCtlTable', [], 'DISMAN-PING-MIB');
 
         if (! empty($sla_table)) {
