@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-use Illuminate\Support\Str;
 use App\Facades\Config;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 
 $install_dir = realpath(__DIR__ . '/..');

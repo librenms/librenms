@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\Alert;
 use Illuminate\Http\Request;
-use App\Facades\Config;
+use App\Models\Eventlog;
 
 class AlertController extends Controller
 {

@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\Config;
 use Hash;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Facades\Config;
 
 class UpdateUserRequest extends FormRequest
 {

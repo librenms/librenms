@@ -23,8 +23,8 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
-use App\Models\Vrf;
 use App\Facades\Config;
+use App\Models\Vrf;
 use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');

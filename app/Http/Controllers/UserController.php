@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\AuthLog;
@@ -35,7 +36,6 @@ use Auth;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use App\Facades\Config;
 use URL;
 
 class UserController extends Controller

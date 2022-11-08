@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
 use App\Facades\Config;
+use Closure;
 
 class LoadUserPreferences
 {

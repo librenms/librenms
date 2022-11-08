@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use App\Facades\Config;
 use App\Models\AlertTransport;
 use GuzzleHttp\Psr7\Response;
-use App\Facades\Config;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Tests\Traits\MockGuzzleClient;
 

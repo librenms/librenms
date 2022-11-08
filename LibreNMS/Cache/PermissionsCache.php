@@ -24,13 +24,13 @@
 
 namespace LibreNMS\Cache;
 
+use App\Facades\Config;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
 use DB;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 
 class PermissionsCache
 {

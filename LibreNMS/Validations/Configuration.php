@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Validations;
 
-use Illuminate\Contracts\Encryption\DecryptException;
 use App\Facades\Config;
+use Illuminate\Contracts\Encryption\DecryptException;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Validator;
 

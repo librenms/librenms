@@ -25,11 +25,11 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\Config;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use App\Facades\Config;
 
 class GlobeController extends WidgetController
 {

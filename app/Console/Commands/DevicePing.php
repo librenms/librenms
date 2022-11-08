@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\Config;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
-use App\Facades\Config;
 use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
 

@@ -5,10 +5,10 @@ $(function () {
 </script>
 <?php
 
+use App\Facades\Config;
 use App\Models\Port;
 use App\Models\PortAdsl;
 use App\Models\PortVdsl;
-use App\Facades\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Number;
 

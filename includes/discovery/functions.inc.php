@@ -12,11 +12,11 @@
  * See COPYING for more details.
  */
 
+use App\Facades\Config;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Port;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\HostExistsException;

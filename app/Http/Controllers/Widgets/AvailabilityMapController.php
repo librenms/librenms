@@ -25,13 +25,13 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\Config;
 use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController

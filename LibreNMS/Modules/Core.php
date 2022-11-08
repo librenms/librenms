@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;

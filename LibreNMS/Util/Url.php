@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Port;
 use Carbon\Carbon;
@@ -32,7 +33,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 

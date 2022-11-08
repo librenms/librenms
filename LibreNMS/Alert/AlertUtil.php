@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Alert;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
-use App\Facades\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil

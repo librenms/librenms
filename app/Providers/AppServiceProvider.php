@@ -2,13 +2,13 @@
 
 namespace App\Providers;
 
+use App\Facades\Config;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
-use App\Facades\Config;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
 use Validator;

@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use ErrorException;
 use Illuminate\Support\Facades\Cache;
-use App\Facades\Config;
 
 class AutonomousSystem
 {

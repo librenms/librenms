@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Checks;
+use App\Facades\Config;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Util\Debug;
 
 class LegacyController extends Controller

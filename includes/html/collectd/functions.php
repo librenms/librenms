@@ -18,8 +18,8 @@
 
 require 'includes/html/collectd/CollectdColor.php';
 
-use LibreNMS\CollectdColor;
 use App\Facades\Config;
+use LibreNMS\CollectdColor;
 
 define('REGEXP_HOST', '/^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/');
 define('REGEXP_PLUGIN', '/^[a-zA-Z0-9_.-]+$/');

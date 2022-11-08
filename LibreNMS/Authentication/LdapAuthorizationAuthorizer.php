@@ -24,8 +24,8 @@
 
 namespace LibreNMS\Authentication;
 
-use App\Models\User;
 use App\Facades\Config;
+use App\Models\User;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
 

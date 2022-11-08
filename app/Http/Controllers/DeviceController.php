@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\Vminfo;
@@ -11,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use App\Facades\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Url;

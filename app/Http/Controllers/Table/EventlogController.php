@@ -25,9 +25,9 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\Config;
 use App\Models\Eventlog;
 use Carbon\Carbon;
-use App\Facades\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Url;
 

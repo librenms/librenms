@@ -25,8 +25,8 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use Illuminate\Http\Request;
 use App\Facades\Config;
+use Illuminate\Http\Request;
 use LibreNMS\Util\ObjectCache;
 
 abstract class DeviceSummaryController extends WidgetController

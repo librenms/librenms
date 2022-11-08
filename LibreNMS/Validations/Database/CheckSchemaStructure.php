@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Validations\Database;
 
+use App\Facades\Config;
 use DB;
 use Illuminate\Database\QueryException;
-use App\Facades\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\Validation;

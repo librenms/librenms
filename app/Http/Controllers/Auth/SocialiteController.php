@@ -22,6 +22,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\Config as LibreNMSConfig;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Config;
@@ -30,7 +31,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
-use App\Facades\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class SocialiteController extends Controller

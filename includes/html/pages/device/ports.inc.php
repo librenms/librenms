@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Port;
 use App\Facades\Config;
+use App\Models\Port;
 use LibreNMS\Util\Url;
 
 if (empty($vars['view'])) {

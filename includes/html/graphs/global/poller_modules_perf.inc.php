@@ -23,8 +23,8 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use App\Models\Device;
 use App\Facades\Config;
+use App\Models\Device;
 
 $scale_min = '0';
 $colors = Config::get('graph_colours.manycolours');

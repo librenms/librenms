@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertUtil;
-use App\Facades\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
 class AlertTransportController extends Controller

@@ -25,9 +25,9 @@
 
 namespace App\ApiClients;
 
+use App\Facades\Config;
 use App\Models\Device;
 use GuzzleHttp\Client;
-use App\Facades\Config;
 
 class GraylogApi
 {

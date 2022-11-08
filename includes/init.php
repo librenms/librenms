@@ -27,8 +27,8 @@
  * @param  array  $modules  Which modules to initialize
  */
 
-use LibreNMS\Authentication\LegacyAuth;
 use App\Facades\Config;
+use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 

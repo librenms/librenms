@@ -25,13 +25,13 @@
 
 namespace App;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Notification;
 use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 
 class Checks
 {

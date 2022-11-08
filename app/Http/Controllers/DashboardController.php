@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -33,7 +34,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 
 class DashboardController extends Controller
 {

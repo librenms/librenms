@@ -25,9 +25,9 @@
 
 namespace App\ApiClients;
 
+use App\Facades\Config;
 use Exception;
 use Illuminate\Http\Client\Response;
-use App\Facades\Config;
 use LibreNMS\Interfaces\Geocoder;
 
 class MapquestApi extends BaseApi implements Geocoder

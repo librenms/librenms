@@ -1,8 +1,8 @@
 <?php
 
+use App\Facades\Config;
 use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\JsonAppBase64DecodeException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;

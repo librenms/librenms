@@ -25,9 +25,9 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\Config;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
-use App\Facades\Config;
 use LibreNMS\Util\Url;
 
 class OutagesController extends TableController

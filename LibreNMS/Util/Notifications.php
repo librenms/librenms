@@ -27,9 +27,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use App\Models\Notification;
 use Illuminate\Support\Arr;
-use App\Facades\Config;
 
 class Notifications
 {

@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
+use App\Facades\Config;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
-use App\Facades\Config;
 use LibreNMS\Util\Debug;
 
 $options = getopt('u:rldvh');

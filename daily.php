@@ -6,11 +6,11 @@
  * (c) 2013 LibreNMS Contributors
  */
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\Alert\AlertDB;
-use App\Facades\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Notifications;
 use LibreNMS\Validations\Php;

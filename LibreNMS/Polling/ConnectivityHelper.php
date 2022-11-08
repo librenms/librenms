@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Polling;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use App\Models\Eventlog;
-use App\Facades\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\RRD\RrdDefinition;

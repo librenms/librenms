@@ -26,12 +26,12 @@
 namespace App\Http\Controllers\Table;
 
 use App\ApiClients\GraylogApi;
+use App\Facades\Config;
 use App\Models\Device;
 use DateInterval;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
-use App\Facades\Config;
 use LibreNMS\Util\Url;
 
 class GraylogController extends SimpleTableController

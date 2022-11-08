@@ -25,6 +25,7 @@
 
 namespace App\Http\ViewComposers;
 
+use App\Facades\Config;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
 use App\Models\Dashboard;
@@ -42,7 +43,6 @@ use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use App\Facades\Config;
 use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
 use PluginManager;

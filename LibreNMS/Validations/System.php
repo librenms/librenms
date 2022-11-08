@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Validations;
 
-use Illuminate\Support\Arr;
 use App\Facades\Config;
+use Illuminate\Support\Arr;
 use LibreNMS\Validator;
 
 class System extends BaseValidation

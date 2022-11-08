@@ -20,8 +20,8 @@
 
 //We can use RFC1213 or IP-FORWARD-MIB or MPLS-L3VPN-STD-MIB
 
-use App\Models\Device;
 use App\Facades\Config;
+use App\Models\Device;
 use LibreNMS\Util\IPv4;
 
 $ipForwardMibRoutesNumber = snmp_get($device, 'IP-FORWARD-MIB::inetCidrRouteNumber.0', '-Osqn');

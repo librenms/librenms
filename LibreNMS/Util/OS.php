@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Util;
 
-use App\Models\Device;
 use App\Facades\Config;
+use App\Models\Device;
 use LibreNMS\DB\Eloquent;
 use Log;
 use Symfony\Component\Yaml\Yaml;

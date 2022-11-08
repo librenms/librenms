@@ -25,9 +25,9 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\Config;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use App\Facades\Config;
 
 class WorldMapController extends WidgetController
 {

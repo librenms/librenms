@@ -12,8 +12,8 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alerting\QueryBuilderFilter;
 use App\Facades\Config;
+use LibreNMS\Alerting\QueryBuilderFilter;
 
 $default_severity = Config::get('alert_rule.severity');
 $default_max_alerts = Config::get('alert_rule.max_alerts');

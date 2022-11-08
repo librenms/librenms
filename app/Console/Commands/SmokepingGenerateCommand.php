@@ -26,8 +26,8 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
-use App\Models\Device;
 use App\Facades\Config;
+use App\Models\Device;
 use Symfony\Component\Console\Input\InputOption;
 
 class SmokepingGenerateCommand extends LnmsCommand

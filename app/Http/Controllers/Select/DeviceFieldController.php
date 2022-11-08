@@ -25,8 +25,8 @@
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\Device;
 use App\Facades\Config;
+use App\Models\Device;
 
 class DeviceFieldController extends SelectController
 {

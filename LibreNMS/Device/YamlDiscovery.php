@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Device;
 
+use App\Facades\Config;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;

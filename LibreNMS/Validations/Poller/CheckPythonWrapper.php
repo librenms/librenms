@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Validations\Poller;
 
+use App\Facades\Config;
 use App\Models\Poller;
 use App\Models\PollerCluster;
-use App\Facades\Config;
 use LibreNMS\ValidationResult;
 
 class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation

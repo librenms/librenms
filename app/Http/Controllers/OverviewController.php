@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Port;
@@ -9,7 +10,6 @@ use App\Models\Service;
 use App\Models\Syslog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 
 class OverviewController extends Controller
 {

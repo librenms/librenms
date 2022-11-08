@@ -25,10 +25,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\Config;
 use App\Models\Device;
 use Carbon\Carbon;
 use DB;
-use App\Facades\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
 use Request;

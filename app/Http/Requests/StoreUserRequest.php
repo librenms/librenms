@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\Config;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
-use App\Facades\Config;
 
 class StoreUserRequest extends FormRequest
 {

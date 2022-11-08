@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\Config;
 use App\Models\Application;
 use App\Models\Bill;
 use App\Models\Device;
@@ -34,7 +35,6 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use App\Facades\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 

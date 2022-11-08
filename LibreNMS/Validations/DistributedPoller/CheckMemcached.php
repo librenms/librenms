@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
-use App\Models\Poller;
 use App\Facades\Config;
+use App\Models\Poller;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
 

@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\ServiceTemplateController;
 use App\Facades\Config;
+use App\Http\Controllers\ServiceTemplateController;
 
 if (Config::get('discover_services_templates')) {
     (new ServiceTemplateController())->applyAll(); // FIXME applyAll() should not be on a controller

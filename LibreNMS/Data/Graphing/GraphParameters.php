@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Data\Graphing;
 
+use App\Facades\Config;
 use App\Facades\DeviceCache;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;

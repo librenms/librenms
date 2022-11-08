@@ -25,13 +25,13 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\Config;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\TwoFactor;
-use App\Facades\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
 

@@ -26,9 +26,9 @@
 
 namespace Database\Seeders;
 
+use App\Facades\Config;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
-use App\Facades\Config;
 use Symfony\Component\Yaml\Yaml;
 
 class ConfigSeeder extends Seeder

@@ -25,13 +25,13 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use App\Facades\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;

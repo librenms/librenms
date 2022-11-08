@@ -8,10 +8,10 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use App\Facades\Config;
 use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;

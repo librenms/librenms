@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -9,7 +10,6 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use App\Facades\Config;
 
 class PollerController extends Controller
 {

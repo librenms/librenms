@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use HTMLPurifier;
 use HTMLPurifier_Config;
-use App\Facades\Config;
 
 class Clean
 {

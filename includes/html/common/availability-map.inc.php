@@ -12,8 +12,8 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alert\AlertUtil;
 use App\Facades\Config;
+use LibreNMS\Alert\AlertUtil;
 
 $mode = Session::get('map_view', 0);
 if (isset($settings['mode_select']) && $settings['mode_select'] !== '') {

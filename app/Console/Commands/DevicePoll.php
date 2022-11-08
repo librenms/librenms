@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\Config;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
-use App\Facades\Config;
 use LibreNMS\Poller;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;

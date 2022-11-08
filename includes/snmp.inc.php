@@ -15,10 +15,10 @@
  * the source code distribution for details.
  */
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;

@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\Config;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
-use App\Facades\Config;
 use Log;
 
 class Graphite extends BaseDatastore

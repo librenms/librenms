@@ -22,11 +22,11 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\Config;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
-use App\Facades\Config;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Proxy;
 

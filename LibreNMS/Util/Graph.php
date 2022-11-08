@@ -25,11 +25,11 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use App\Facades\Config;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;

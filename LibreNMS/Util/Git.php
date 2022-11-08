@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\Config;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Traits\RuntimeClassCache;
 use Symfony\Component\Process\Process;
 

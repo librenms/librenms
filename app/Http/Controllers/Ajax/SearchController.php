@@ -25,10 +25,10 @@
 
 namespace App\Http\Controllers\Ajax;
 
+use App\Facades\Config;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Facades\Config;
 
 abstract class SearchController
 {

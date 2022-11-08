@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\Config;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;

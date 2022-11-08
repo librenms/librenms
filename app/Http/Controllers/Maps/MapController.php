@@ -25,8 +25,8 @@
 
 namespace App\Http\Controllers\Maps;
 
-use App\Http\Controllers\Controller;
 use App\Facades\Config;
+use App\Http\Controllers\Controller;
 
 class MapController extends Controller
 {

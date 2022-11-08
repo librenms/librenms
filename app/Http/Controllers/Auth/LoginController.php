@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Facades\Config;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
-use App\Facades\Config;
 
 class LoginController extends Controller
 {

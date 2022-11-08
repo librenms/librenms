@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\Config;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;

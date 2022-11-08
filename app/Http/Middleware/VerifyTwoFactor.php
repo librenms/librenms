@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\Config;
 use App\Models\UserPref;
 use Closure;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 
 class VerifyTwoFactor
 {

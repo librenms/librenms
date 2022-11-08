@@ -25,6 +25,7 @@
 
 namespace App\Providers;
 
+use App\Facades\Config;
 use App\Logging\Reporting\Middleware\AddGitInformation;
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
@@ -35,7 +36,6 @@ use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Util\Git;
 
 class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider

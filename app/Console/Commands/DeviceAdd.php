@@ -4,11 +4,11 @@ namespace App\Console\Commands;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\PollerGroup;
 use Exception;
 use Illuminate\Validation\Rule;
-use App\Facades\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;

@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Data\Store;
 
-use Illuminate\Support\Collection;
 use App\Facades\Config;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 class Datastore

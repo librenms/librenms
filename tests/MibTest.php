@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\Config;
 use Exception;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;

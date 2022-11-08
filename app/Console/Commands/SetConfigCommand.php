@@ -4,12 +4,12 @@ namespace App\Console\Commands;
 
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
+use App\Facades\Config;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\ValidationException;
 use JsonSchema\Validator;
-use App\Facades\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
 use LibreNMS\Util\OS;

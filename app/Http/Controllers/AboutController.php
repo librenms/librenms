@@ -26,6 +26,7 @@
 namespace App\Http\Controllers;
 
 use App;
+use App\Facades\Config;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -52,7 +53,6 @@ use App\Models\Vrf;
 use App\Models\WirelessSensor;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Facades\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Version;
 

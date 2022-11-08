@@ -25,10 +25,10 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\Config;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use App\Facades\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Tests\Traits\MockGuzzleClient;

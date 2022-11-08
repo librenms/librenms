@@ -25,13 +25,13 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\Config;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;

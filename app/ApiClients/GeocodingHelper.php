@@ -24,10 +24,10 @@
 
 namespace App\ApiClients;
 
+use App\Facades\Config;
 use Exception;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
-use App\Facades\Config;
 use Log;
 
 trait GeocodingHelper

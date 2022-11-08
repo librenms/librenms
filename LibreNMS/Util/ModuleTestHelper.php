@@ -26,12 +26,12 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\Config;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;

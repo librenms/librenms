@@ -37,8 +37,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Alert\Transport;
 use App\Facades\Config;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Proxy;
 

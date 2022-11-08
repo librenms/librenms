@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Config;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
@@ -33,7 +34,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
-use App\Facades\Config;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 

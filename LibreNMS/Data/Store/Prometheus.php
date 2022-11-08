@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\Config;
 use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Util\Proxy;
 use Log;
 

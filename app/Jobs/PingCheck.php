@@ -25,6 +25,7 @@
 
 namespace App\Jobs;
 
+use App\Facades\Config;
 use App\Models\Device;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -35,7 +36,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use LibreNMS\Alert\AlertRules;
-use App\Facades\Config;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Process\Process;

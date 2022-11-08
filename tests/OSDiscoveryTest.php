@@ -25,9 +25,9 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\Config;
 use App\Models\Device;
 use Illuminate\Support\Str;
-use App\Facades\Config;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
