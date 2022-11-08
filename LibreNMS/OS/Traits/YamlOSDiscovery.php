@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Location;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use Log;
 
@@ -62,7 +63,7 @@ trait YamlOSDiscovery
 
         $oids = Arr::only($os_yaml, $this->osFields);
         $fetch_oids = array_unique(Arr::flatten($oids));
-        $numeric = $this->isNumeric($fetch_oids);
+        $numeric = Oid::hasNumeric($fetch_oids);
         $data = $this->fetch($fetch_oids, $numeric);
 
         Log::debug('Yaml OS data:', $data);
@@ -93,7 +94,7 @@ trait YamlOSDiscovery
         $lng = $os_yaml['long'] ?? null;
 
         $oids = array_filter([$name, $lat, $lng]);
-        $numeric = $this->isNumeric($oids);
+        $numeric = Oid::hasNumeric($oids);
         $data = $this->fetch($oids, $numeric);
 
         Log::debug('Yaml location data:', $data);
@@ -111,7 +112,7 @@ trait YamlOSDiscovery
     {
         foreach (Arr::wrap($oids) as $oid) {
             // translate all to numeric to make it easier to match
-            $oid = ($numeric && ! oid_is_numeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
+            $oid = ($numeric && ! Oid::isNumeric($oid)) ? snmp_translate($oid, 'ALL', null, null, $this->getDeviceArray()) : $oid;
             if (! empty($data[$oid])) {
                 return $data[$oid];
             }
@@ -148,17 +149,6 @@ trait YamlOSDiscovery
     private function fetch(array $oids, $numeric)
     {
         return snmp_get_multi_oid($this->getDeviceArray(), $oids, $numeric ? '-OUQn' : '-OUQ');
-    }
-
-    private function isNumeric($oids)
-    {
-        foreach ($oids as $oid) {
-            if (oid_is_numeric($oid)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private function replaceStringsInFields(Device $device, array $os_yaml): void

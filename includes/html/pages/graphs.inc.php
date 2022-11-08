@@ -181,7 +181,7 @@ if (! $auth) {
         print_optionbar_start();
         echo '<div style="float: left; width: 30px;">
             <div style="margin: auto auto;">
-            <i class="fa fa-info-circle fa-lg icon-theme" aria-hidden="true"></i>
+            <i class="fa-solid fa-circle-info fa-lg icon-theme" aria-hidden="true"></i>
             </div>
             </div>';
         echo Config::get('graph_descr.' . $vars['type']);

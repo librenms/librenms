@@ -26,19 +26,16 @@
 namespace LibreNMS\Device;
 
 use App\View\SimpleTemplate;
-use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\Oid;
 
 class YamlDiscovery
 {
-    private static $cache_time = 1800; // 30 min, Used for oid translation cache
-
     /**
      * @param  OS  $os
      * @param  DiscoveryItem|string  $class
@@ -145,7 +142,7 @@ class YamlDiscovery
         }
 
         try {
-            $num_oid = static::oidToNumeric($data['value'], $os->getDeviceArray(), $search_mib);
+            $num_oid = Oid::toNumeric($data['value'], $search_mib);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -379,47 +376,5 @@ class YamlDiscovery
         }
 
         return false;
-    }
-
-    /**
-     * Translate an oid to numeric format (if already numeric, return as-is)
-     *
-     * @param  string  $oid
-     * @param  array|null  $device
-     * @param  string  $mib
-     * @return string numeric oid
-     *
-     * @throws \LibreNMS\Exceptions\InvalidOidException
-     */
-    public static function oidToNumeric($oid, $device = null, $mib = 'ALL')
-    {
-        if (self::oidIsNumeric($oid)) {
-            return $oid;
-        }
-        $key = 'YamlDiscovery:oidToNumeric:' . $mib . '/' . $oid;
-        if (Cache::has($key)) {
-            $numeric_oid = Cache::get($key);
-        } else {
-            foreach (explode(':', $mib) as $mib_name) {
-                $numeric_oid = snmp_translate($oid, $mib_name, null, null, $device);
-                if ($numeric_oid) {
-                    break;
-                }
-            }
-        }
-
-        //Store the value
-        Cache::put($key, $numeric_oid, self::$cache_time);
-
-        if (empty($numeric_oid)) {
-            throw new InvalidOidException("Unable to translate oid $oid");
-        }
-
-        return $numeric_oid;
-    }
-
-    public static function oidIsNumeric($oid)
-    {
-        return (bool) preg_match('/^[.\d]+$/', $oid);
     }
 }

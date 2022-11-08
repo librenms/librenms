@@ -54,6 +54,6 @@ class JnxDomLaneAlarmSet implements SnmptrapHandler
             return;
         }
 
-        Log::event("DOM lane alarm on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", $device->device_id, 'trap', 5);
+        $trap->log("DOM lane alarm on interface $port->ifDescr lane $lane. Current alarm(s): $alarmList", 5);
     }
 }

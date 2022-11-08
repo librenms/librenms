@@ -130,7 +130,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspLastChange', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
-        $lsps = collect();
+        $lsps = new Collection();
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode('.', $key);
 
@@ -173,7 +173,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathLastChange', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia', '-OQUst');
         }
 
-        $paths = collect();
+        $paths = new Collection();
         foreach ($mplsPathCache as $key => $value) {
             [$vrf_oid, $lsp_oid, $path_oid] = explode('.', $key);
             $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
@@ -208,7 +208,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
-        $sdps = collect();
+        $sdps = new Collection();
         foreach ($mplsSdpCache as $value) {
             if ((! empty($value['sdpFarEndInetAddress'])) && ($value['sdpFarEndInetAddressType'] == 'ipv4')) {
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
@@ -245,7 +245,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
-        $svcs = collect();
+        $svcs = new Collection();
 
         // Workaround, remove some defalt entries we do not want to see
         $filter = '/^\w* Service for internal purposes only/';
@@ -291,7 +291,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
-        $saps = collect();
+        $saps = new Collection();
 
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
@@ -321,10 +321,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapOperStatus' => $value['sapOperStatus'],
                 'sapLastMgmtChange' => round(($value['sapLastMgmtChange'] ?? 0) / 100),
                 'sapLastStatusChange' => round(($value['sapLastStatusChange'] ?? 0) / 100),
-                'sapIngressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? null,
-                'sapEgressBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? null,
-                'sapIngressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? null,
-                'sapEgressDroppedBytes' => $mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? null,
+                'sapIngressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0),
+                'sapEgressBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0),
+                'sapIngressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0),
+                'sapEgressDroppedBytes' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0),
             ]));
         }
 
@@ -339,7 +339,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
-        $binds = collect();
+        $binds = new Collection();
         foreach ($mplsBindCache as $key => $value) {
             [$svcId] = explode('.', $key);
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
@@ -388,7 +388,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $preemptionPending = 0b00001000;
         $nodeId = 0b00000100;
 
-        $arhops = collect();
+        $arhops = new Collection();
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
@@ -435,7 +435,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
 
         $lsp_ids = $paths->pluck('lsp_path_id', 'mplsLspPathTunnelCHopListIndex');
-        $chops = collect();
+        $chops = new Collection();
         foreach ($mplsTunnelCHopCache as $key => $value) {
             [$mplsTunnelCHopListIndex, $mplsTunnelCHopIndex] = explode('.', $key);
             $lsp_path_id = $lsp_ids->get($mplsTunnelCHopListIndex);
@@ -468,7 +468,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsLspCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspStatTable', $mplsLspCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
-        $lsps = collect();
+        $lsps = new Collection();
         foreach ($mplsLspCache as $key => $value) {
             [$vrf_oid, $lsp_oid] = explode('.', $key);
 
@@ -521,7 +521,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $mplsPathCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsLspPathStatTable', $mplsPathCache, 'TIMETRA-MPLS-MIB', 'nokia');
         }
 
-        $paths = collect();
+        $paths = new Collection();
         foreach ($mplsPathCache as $key => $value) {
             [$vrf_oid, $lsp_oid, $path_oid] = explode('.', $key);
             $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
@@ -559,7 +559,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mplsSdpCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpInfoTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUst');
 
-        $sdps = collect();
+        $sdps = new Collection();
         foreach ($mplsSdpCache as $value) {
             if ((! empty($value['sdpFarEndInetAddress'])) && ($value['sdpFarEndInetAddressType'] == 'ipv4')) {
                 $ip = long2ip(hexdec(str_replace(' ', '', $value['sdpFarEndInetAddress'])));
@@ -596,7 +596,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcBaseInfoTable', [], 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
         $mplsSvcCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'svcTlsInfoTable', $mplsSvcCache, 'TIMETRA-SERV-MIB', 'nokia', '-OQUst');
 
-        $svcs = collect();
+        $svcs = new Collection();
 
         // Workaround, remove some default entries we do not want to see
         $filter = '/^\w* Service for internal purposes only/';
@@ -641,7 +641,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsSapCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseInfoTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
         $mplsSapTrafficCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sapBaseStatsTable', [], 'TIMETRA-SAP-MIB', 'nokia', '-OQUst');
 
-        $saps = collect();
+        $saps = new Collection();
 
         // Workaround, there are some oids not covered by actual MIB, try to filter them
         // i.e. sapBaseInfoEntry.300.118208001.1342177283.10
@@ -692,10 +692,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             ->addDataset('sapEgressDroppedBits', 'COUNTER', 0);
 
             $fields = [
-                'sapIngressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) * 8,
-                'sapIngressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) * 8,
-                'sapEgressDroppedBits' => ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) * 8,
+                'sapIngressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressPchipOfferedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipForwardedInProfOctets'] ?? 0)) * 8,
+                'sapIngressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedLoPrioOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsIngressQchipDroppedHiPrioOctets'] ?? 0)) * 8,
+                'sapEgressDroppedBits' => (($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedOutProfOctets'] ?? 0) + ($mplsSapTrafficCache[$traffic_id]['sapBaseStatsEgressQchipDroppedInProfOctets'] ?? 0)) * 8,
             ];
 
             $tags = [
@@ -719,7 +719,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindTable', [], 'TIMETRA-SDP-MIB', 'nokia', '-OQUsbt');
         $mplsBindCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'sdpBindBaseStatsTable', $mplsBindCache, 'TIMETRA-SDP-MIB', 'nokia', '-OQUsb');
 
-        $binds = collect();
+        $binds = new Collection();
         foreach ($mplsBindCache as $key => $value) {
             [$svcId] = explode('.', $key);
             $bind_id = str_replace(' ', '', $value['sdpBindId']);
@@ -768,7 +768,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $preemptionPending = 0b00001000;
         $nodeId = 0b00000100;
 
-        $arhops = collect();
+        $arhops = new Collection();
         foreach ($mplsTunnelArHopCache as $key => $value) {
             [$mplsTunnelARHopListIndex, $mplsTunnelARHopIndex] = explode('.', $key);
             $lsp_path_id = $paths->firstWhere('mplsLspPathTunnelARHopListIndex', $mplsTunnelARHopListIndex)->lsp_path_id;
@@ -815,7 +815,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         $mplsTunnelCHopCache = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'vRtrMplsTunnelCHopTable', [], 'TIMETRA-MPLS-MIB', 'nokia', '-OQUsb');
         $path_ids = $paths->pluck('lsp_path_id', 'mplsLspPathTunnelCHopListIndex');
 
-        $chops = collect();
+        $chops = new Collection();
         foreach ($mplsTunnelCHopCache as $key => $value) {
             [$mplsTunnelCHopListIndex, $mplsTunnelCHopIndex] = explode('.', $key);
             $lsp_path_id = $path_ids[$mplsTunnelCHopListIndex] ?? null;

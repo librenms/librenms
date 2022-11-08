@@ -270,10 +270,10 @@ class Xdsl implements Module
         ]);
 
         // actual data rates
-        data_update($os->getDeviceArray(), 'xdsl2LineStatusActRate', [
+        data_update($os->getDeviceArray(), 'xdsl2ChStatusActDataRate', [
             'ifName' => $os->ifIndexToName($ifIndex),
             'rrd_name' => Rrd::portName($port->port_id, 'xdsl2ChStatusActDataRate'),
-            'rrd_dev' => RrdDefinition::make()
+            'rrd_def' => RrdDefinition::make()
                 ->addDataset('xtuc', 'GAUGE', 0)
                 ->addDataset('xtur', 'GAUGE', 0),
         ], [

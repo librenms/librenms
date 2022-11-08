@@ -45,6 +45,7 @@ class DeviceFactory extends Factory
                 'wireless',
                 'workstation',
             ]),
+            'sysDescr' => $this->faker->text(64),
             'status' => $status = random_int(0, 1),
             'status_reason' => $status == 0 ? $this->faker->randomElement(['snmp', 'icmp']) : '', // allow invalid states?
         ];

@@ -26,6 +26,7 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 
 trait UcdResources
@@ -54,7 +55,7 @@ trait UcdResources
 
     public function discoverMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $data = snmp_get_multi($this->getDeviceArray(), [
             'memTotalSwap.0',
             'memAvailSwap.0',
