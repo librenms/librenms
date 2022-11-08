@@ -48,6 +48,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
                 $user = \App\Models\User::find($this->getUserid($credentials['username']));
                 $user->level = $level;
                 $user->save();
+                
                 return true;
             }
 
