@@ -3,6 +3,7 @@ text: 'Delta UPS'
 type: power
 icon: delta
 rfc1628_compat: true
+snmp_bulk: false
 mib_dir: delta
 over:
     - { graph: device_current, text: Current }
