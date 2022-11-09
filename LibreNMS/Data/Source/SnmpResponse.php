@@ -93,6 +93,7 @@ class SnmpResponse
      * Gets the first value of this response.
      * If an oid or list of oids is given, return the first one found.
      * If forceNumeric is set, force the search to use numeric oids even if textual oids are given
+     *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     public function value(array|string $oids = [], bool $forceNumeric = false): string
@@ -244,7 +245,6 @@ class SnmpResponse
             '/^.*No Such Instance currently exists.*$/m',
             '/\n[^\r\n]+No more variables left[^\r\n]+$/s',
         ], '', $this->raw);
-
     }
 
     public function append(SnmpResponse $response): SnmpResponse
