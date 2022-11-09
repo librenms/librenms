@@ -341,7 +341,7 @@ function poll_device($device, $force_module = false)
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                    Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
                     report($e);
                 }
 
@@ -509,7 +509,7 @@ function update_application($app, $response, $metrics = [], $status = '')
                 $event_msg = 'has UNKNOWN state';
                 break;
         }
-        Log::event('Application ' . $app->displayName() . ' ' . $event_msg, DeviceCache::getPrimary(), 'application', $severity);
+        \App\Models\Eventlog::log('Application ' . $app->displayName() . ' ' . $event_msg, DeviceCache::getPrimary(), 'application', $severity);
     }
 
     $app->save();

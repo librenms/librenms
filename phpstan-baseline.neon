@@ -6261,11 +6261,6 @@ parameters:
 			path: app/Exceptions/Handler.php
 
 		-
-			message: "#^Method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Facades/LogManager.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\AboutController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/AboutController.php
@@ -8004,11 +7999,6 @@ parameters:
 			message: "#^Method App\\\\Models\\\\DeviceRelatedModel\\:\\:scopeInDeviceGroup\\(\\) has parameter \\$query with no type specified\\.$#"
 			count: 1
 			path: app/Models/DeviceRelatedModel.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Eventlog\\:\\:log\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Eventlog.php
 
 		-
 			message: "#^Method App\\\\Models\\\\IsisAdjacency\\:\\:device\\(\\) has no return type specified\\.$#"

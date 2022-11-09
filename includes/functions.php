@@ -520,7 +520,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    Log::event($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)

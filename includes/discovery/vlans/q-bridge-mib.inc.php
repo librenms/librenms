@@ -68,12 +68,12 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         //vlan does not exist
         if (! $vlanDB->exists) {
-            Log::event("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan added: $vlan_id with name $vlan_name ", $device['device_id'], 'vlan', 4);
         }
 
         if ($vlanDB->vlan_name != $vlan_name) {
             $vlanDB->vlan_name = $vlan_name;
-            Log::event("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
+            \App\Models\Eventlog::log("Vlan changed: $vlan_id new name $vlan_name", $device['device_id'], 'vlan', 4);
         }
 
         $vlanDB->save();
