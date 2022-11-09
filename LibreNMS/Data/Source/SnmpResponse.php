@@ -34,7 +34,7 @@ use Log;
 
 class SnmpResponse
 {
-    protected const DELIMITER = ' = ';
+    protected const KEY_VALUE_DELIMITER = ' = ';
 
     public readonly string $raw;
     public readonly int $exitCode;
@@ -133,14 +133,14 @@ class SnmpResponse
                 continue;
             }
 
-            $parts = explode(self::DELIMITER, $line, 2);
+            $parts = explode(self::KEY_VALUE_DELIMITER, $line, 2);
             if (count($parts) == 1) {
                 array_unshift($parts, '');
             }
             [$oid, $value] = $parts;
 
             $line = strtok(PHP_EOL); // get the next line and concatenate multi-line values
-            while ($line !== false && ! Str::contains($line, self::DELIMITER)) {
+            while ($line !== false && ! Str::contains($line, self::KEY_VALUE_DELIMITER)) {
                 $value .= PHP_EOL . $line;
                 $line = strtok(PHP_EOL);
             }
@@ -164,7 +164,10 @@ class SnmpResponse
     public function valuesByIndex(array &$array = []): array
     {
         foreach ($this->values() as $oid => $value) {
-            [$name, $index] = array_pad(explode('.', $oid, 2), 2, '');
+            $parts = $this->getOidParts($oid);
+            $name = array_shift($parts);
+            $index = implode('.', $parts);
+
             $array[$index][$name] = $value;
         }
 
@@ -174,14 +177,7 @@ class SnmpResponse
     public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
-            if (Str::contains($key, '[')) {
-                // table
-                preg_match_all('/([^[\]]+)/', $key, $parts);
-                $parts = $parts[1]; // get all group 1 matches
-            } else {
-                // regular oid
-                $parts = explode('.', $key);
-            }
+            $parts = $this->getOidParts($key);
 
             // move the oid name to the correct depth
             array_splice($parts, $group, 0, array_shift($parts));
@@ -210,11 +206,12 @@ class SnmpResponse
 
         return collect($this->values())
             ->map(function ($value, $oid) {
-                $parts = explode('[', rtrim($oid, ']'), 2);
+                $parts = $this->getOidParts($oid);
+                $key = array_shift($parts);
 
                 return [
-                    '_index' => $parts[1] ?? '',
-                    $parts[0] => $value,
+                    '_index' => implode('][', $parts),
+                    $key => $value,
                 ];
             })
             ->groupBy('_index')
@@ -263,5 +260,17 @@ class SnmpResponse
     public function __toString(): string
     {
         return $this->raw;
+    }
+
+    private function getOidParts(string $key): array
+    {
+        // table
+        if (Str::contains($key, '[')) {
+            preg_match_all('/([^[\]]+)/', $key, $parts);
+            return $parts[1]; // get all group 1 matches
+        }
+
+        // regular oid
+        return explode('.', $key);
     }
 }
