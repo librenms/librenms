@@ -267,9 +267,23 @@ setsebool -P httpd_can_connect_ldap 1
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
-successfully. User level 1 is assigned to those accounts so you will
-then need to assign the relevant permissions unless you set
-`$config['radius']['userlevel']` to be something other than 1.
+successfully. User level 1 is assigned by default to those accounts 
+unless radius sends a reply attribute with the correct userlevel. 
+
+You can change the default userlevel by setting
+`$config['radius']['userlevel']` to something other than 1.
+
+The attribute `Filter-ID` is a standard Radius-Reply-Attribute (string) that
+can be assigned a value which translates into a userlevel in LibreNMS. 
+
+The strings to send in `Filter-ID` reply attribute is *one* of the following:
+
+- `librenms_role_normal` - Sets the value `1`, which is the normal user level.
+- `librenms_role_admin` - Sets the value `5`, which is the administrator level.
+- `librenms_role_global-read` - Sets the value `10`, which is the global read level.
+
+LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default userlevel that is set in `config.php`.
+
 
 ```php
 $config['radius']['hostname']      = 'localhost';
@@ -279,6 +293,11 @@ $config['radius']['timeout']       = 3;
 $config['radius']['users_purge']   = 14;  // Purge users who haven't logged in for 14 days.
 $config['radius']['default_level'] = 1;  // Set the default user level when automatically creating a user.
 ```
+
+### Radius Huntgroup
+
+Freeradius has a function called `Radius Huntgroup` which allows to send different attributes based on NAS.
+This may be utilized if you already use `Filter-ID` in your environment and also want to use radius with LibreNMS.
 
 ### Old account cleanup
 
