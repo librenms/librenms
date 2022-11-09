@@ -26,6 +26,7 @@
 namespace LibreNMS\Snmptrap;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Alert;
@@ -129,6 +130,6 @@ class Trap
      */
     public function log(string $message, int $severity = Alert::INFO, string $type = 'trap', int|null|string $reference = null): void
     {
-        \Log::event($message, $this->getDevice(), $type, $severity, $reference);
+        Eventlog::log($message, $this->getDevice(), $type, $severity, $reference);
     }
 }

@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Source;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
@@ -471,9 +472,9 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         if ($code) {
             if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
-                Log::event('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP authentication algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
             } elseif (Str::startsWith($error, 'Invalid privacy protocol specified')) {
-                Log::event('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
+                Eventlog::log('Unsupported SNMP privacy algorithm - ' . $code, $this->device, 'poller', Alert::ERROR);
             }
             Log::debug('Exitcode: ' . $code, [$error]);
         }

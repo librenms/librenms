@@ -38,17 +38,33 @@ class Eventlog extends DeviceRelatedModel
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     // ---- Helper Functions ----
+    /**
+     * This is used to be able to mock _log()
+     *
+     * @see _log()
+     *
+     * @param  string  $text  message describing the event
+     * @param  Device|int|null  $device  related device
+     * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+     * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+     * @param  int|string|null  $reference  the id of the referenced entity.  Supported types: interface
+     */
+    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
+    {
+        $model = app()->make(Eventlog::class);
+        $model->_log($text, $device, $type, $severity, $reference);
+    }
 
     /**
      * Log events to the event table
      *
-     * @param  string  $text  message describing the event
-     * @param  Device  $device  related device
-     * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
-     * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
-     * @param  int  $reference  the id of the referenced entity.  Supported types: interface
+     * @param  string  $text
+     * @param  Device|int|null  $device
+     * @param  string  $type
+     * @param  int  $severity
+     * @param  int|string|null  $reference
      */
-    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
+    public function _log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null): void
     {
         $log = new static([
             'reference' => $reference,
@@ -58,6 +74,10 @@ class Eventlog extends DeviceRelatedModel
             'message' => $text,
             'username'  => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
         ]);
+
+        if (is_numeric($device)) {
+            $log->device_id = $device;
+        }
 
         if ($device instanceof Device) {
             $device->eventlogs()->save($log);
