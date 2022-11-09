@@ -29,27 +29,19 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Oid;
 use Log;
 
 class SnmpResponse
 {
     protected const DELIMITER = ' = ';
-    /**
-     * @var string
-     */
-    private $raw;
-    /**
-     * @var int
-     */
-    private $exitCode;
-    /**
-     * @var string
-     */
-    private $errorMessage;
-    /**
-     * @var string
-     */
-    private $stderr;
+
+    public readonly string $raw;
+    public readonly int $exitCode;
+    public readonly string $stderr;
+
+    private ?string $errorMessage = null;
+    private ?array $values = null;
 
     /**
      * Create a new response object filling with output from the net-snmp command.
@@ -60,22 +52,24 @@ class SnmpResponse
      */
     public function __construct(string $output, string $errorOutput = '', int $exitCode = 0)
     {
-        $this->exitCode = $exitCode;
-        $this->raw = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
         $this->stderr = $errorOutput;
+        $this->exitCode = $exitCode;
     }
 
-    public function isValid(): bool
+    public function isValid(bool $ignore_partial = false): bool
     {
         $this->errorMessage = '';
+        $raw = $ignore_partial ? $this->getRawWithoutBadLines() : $this->raw;
+
         // not checking exitCode because I think it may lead to false negatives
         $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
-            || empty($this->raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
+            || empty($raw)
+            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $raw, $errors);
 
         if ($invalid) {
             $this->errorMessage = $errors[0] ?? 'Empty Output';
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $errors[0] ?? 'not found'));
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($raw), true), $errors[0] ?? 'not found'));
 
             return false;
         }
@@ -96,21 +90,40 @@ class SnmpResponse
     }
 
     /**
-     * Get the raw output returned by net-snmp
+     * Gets the first value of this response.
+     * If an oid or list of oids is given, return the first one found.
+     * If forceNumeric is set, force the search to use numeric oids even if textual oids are given
+     * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public function raw(): string
+    public function value(array|string $oids = [], bool $forceNumeric = false): string
     {
-        return $this->raw;
-    }
+        $values = $this->values();
 
-    public function value(): string
-    {
-        return Arr::first($this->values(), null, '');
+        if (empty($oids)) {
+            return Arr::first($values, null, '');
+        }
+
+        foreach (Arr::wrap($oids) as $oid) {
+            if ($forceNumeric) {
+                // translate all to numeric to make it easier to match
+                $oid = Oid::toNumeric($oid);
+            }
+
+            if (! empty($values[$oid])) {
+                return $values[$oid];
+            }
+        }
+
+        return '';
     }
 
     public function values(): array
     {
-        $values = [];
+        if (isset($this->values)) {
+            return $this->values;
+        }
+
+        $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
             if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
@@ -138,13 +151,13 @@ class SnmpResponse
 
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $values[$oid] = trim(stripslashes($value), "\" \n\r");
+                $this->values[$oid] = trim(stripslashes($value), "\" \n\r");
             } else {
-                $values[$oid] = trim($value);
+                $this->values[$oid] = trim($value);
             }
         }
 
-        return $values;
+        return $this->values;
     }
 
     public function valuesByIndex(array &$array = []): array
@@ -190,7 +203,7 @@ class SnmpResponse
      */
     public function mapTable(callable $callback): Collection
     {
-        if (! $this->filterBadLines()->isValid()) {
+        if (! $this->isValid(true)) {
             return new Collection;
         }
 
@@ -225,22 +238,26 @@ class SnmpResponse
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
      */
-    public function filterBadLines(): SnmpResponse
+    public function getRawWithoutBadLines(): string
     {
-        $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/m', '', $this->raw);
-        $this->raw = preg_replace('/\n[^\r\n]+No more variables left[^\r\n]+$/s', '', $this->raw);
+        return (string) preg_replace([
+            '/^.*No Such Instance currently exists.*$/m',
+            '/\n[^\r\n]+No more variables left[^\r\n]+$/s',
+        ], '', $this->raw);
 
-        return $this;
     }
 
     public function append(SnmpResponse $response): SnmpResponse
     {
-        $this->raw .= $response->raw;
-        $this->stderr .= $response->stderr;
-        $this->exitCode = $this->exitCode ?: $response->exitCode;
-        $this->errorMessage = $this->errorMessage ?: $response->errorMessage;
+        $newResponse = new static(
+            $this->raw . $response->raw,
+            $this->stderr . $response->stderr,
+            $this->exitCode ?: $response->exitCode,
+        );
 
-        return $this;
+        $newResponse->errorMessage = $this->errorMessage ?: $response->errorMessage;
+
+        return $newResponse;
     }
 
     public function __toString(): string
