@@ -3606,11 +3606,6 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$version \\(string\\|null\\) does not accept int\\.$#"
-			count: 1
-			path: LibreNMS/OS/Aix.php
-
-		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
 			count: 2
 			path: LibreNMS/OS/ArrisDsr4410md.php
