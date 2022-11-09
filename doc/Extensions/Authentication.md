@@ -280,7 +280,7 @@ The strings to send in `Filter-ID` reply attribute is *one* of the following:
 
 - `librenms_role_normal` - Sets the value `1`, which is the normal user level.
 - `librenms_role_admin` - Sets the value `5`, which is the administrator level.
-- `llibrenms_role_global-read` - Sets the value `10`, which is the global read level.
+- `librenms_role_global-read` - Sets the value `10`, which is the global read level.
 
 LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default userlevel that is set in `config.php`.
 
