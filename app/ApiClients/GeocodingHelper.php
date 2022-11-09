@@ -80,7 +80,7 @@ trait GeocodingHelper
      * @param  array  $data
      * @return array
      */
-    abstract protected function parseLatLng(array $data): array
+    abstract protected function parseLatLng(array $data): array;
 
     /**
      * Build Guzzle request option array
@@ -90,5 +90,5 @@ trait GeocodingHelper
      *
      * @throws \Exception you may throw an Exception if validation fails
      */
-    abstract protected function buildGeocodingOptions(string $address): array
+    abstract protected function buildGeocodingOptions(string $address): array;
 }
