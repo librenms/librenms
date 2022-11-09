@@ -39,10 +39,8 @@ abstract class SnmpFetch extends LnmsCommand
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $this->validate([
             'output' => ['nullable', Rule::in(['value', 'values', 'table', 'index-table'])],
@@ -106,7 +104,7 @@ abstract class SnmpFetch extends LnmsCommand
 
                     continue 2;
                 case 'index-table':
-                    $this->printYamlCombinedKey($res->table(999));
+                    $this->printYamlCombinedKey($res->valuesByIndex());
 
                     continue 2;            }
         }
