@@ -1140,16 +1140,13 @@ function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate
 function list_alert_rules(Illuminate\Http\Request $request)
 {
     $id = $request->route('id');
-    $sql = '';
-    $param = [];
-    if ($id > 0) {
-        $sql = 'WHERE id=?';
-        $param = [$id];
-    }
 
-    $rules = dbFetchRows("SELECT * FROM `alert_rules` $sql", $param);
+    $rules = \App\Http\Resources\AlertRule::collection(
+        \App\Models\AlertRule::when($id, fn ($query) => $query->where('id', $id))
+        ->with(['devices:device_id', 'groups:id', 'locations:id'])->get()
+    );
 
-    return api_success($rules, 'rules');
+    return api_success($rules->toArray($request), 'rules');
 }
 
 function list_alerts(Illuminate\Http\Request $request)
