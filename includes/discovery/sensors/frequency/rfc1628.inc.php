@@ -14,7 +14,7 @@ foreach ($input_freq as $index => $data) {
         $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
         $freq_oid .= '.0';
     }
-    $data['upsInputFrequency'] = cast_number( $data['upsInputFrequency'] );
+    $data['upsInputFrequency'] = cast_number($data['upsInputFrequency']);
 
     discover_sensor(
         $valid['sensor'],

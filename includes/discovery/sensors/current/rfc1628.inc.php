@@ -38,7 +38,7 @@ foreach ($output_current as $index => $data) {
         $data['upsOutputCurrent'] = $data['upsOutputCurrent'][0];
         $oid .= '.0';
     }
-    $data['upsOutputCurrent'] = cast_number( $data['upsOutputCurrent'] );
+    $data['upsOutputCurrent'] = cast_number($data['upsOutputCurrent']);
 
     discover_sensor(
         $valid['sensor'],
@@ -70,7 +70,7 @@ foreach ($input_current as $index => $data) {
         $data['upsInputCurrent'] = $data['upsInputCurrent'][0];
         $oid .= '.0';
     }
-    $data['upsInputCurrent'] = cast_number( $data['upsInputCurrent'] );
+    $data['upsInputCurrent'] = cast_number($data['upsInputCurrent']);
 
     discover_sensor(
         $valid['sensor'],
@@ -102,7 +102,7 @@ foreach ($bypass_current as $index => $data) {
         $data['upsBypassCurrent'] = $data['upsBypassCurrent'][0];
         $oid .= '.0';
     }
-    $data['upsBypassCurrent'] = cast_number( $data['upsBypassCurrent'] );
+    $data['upsBypassCurrent'] = cast_number($data['upsBypassCurrent']);
 
     discover_sensor(
         $valid['sensor'],
