@@ -391,7 +391,7 @@ class CiHelper
         $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
-            $proc->setTty(Process::isTtySupported());
+            $proc->setTty(true);
         }
 
         $proc->run();
