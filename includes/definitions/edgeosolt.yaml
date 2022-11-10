@@ -1,0 +1,17 @@
+os: edgeosolt
+text: UFiber
+type: network
+icon: ubiquiti
+mib_dir: ubnt
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.41112.1.5
+        snmpget:
+          oid: .1.3.6.1.4.1.41112.1.5.1.1.0
+          op: 'contains'
+          value: 'UFiber'

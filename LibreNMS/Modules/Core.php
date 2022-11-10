@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Module;
@@ -60,7 +61,7 @@ class Core implements Module
         ]);
 
         foreach ($device->getDirty() as $attribute => $value) {
-            Log::event($value . ' -> ' . $device->$attribute, $device, 'system', 3);
+            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', 3);
             $os->getDeviceArray()[$attribute] = $value; // update device array
         }
 
@@ -68,7 +69,7 @@ class Core implements Module
         $device->os = self::detectOS($device, false);
 
         if ($device->isDirty('os')) {
-            Log::event('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
+            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
             $os->getDeviceArray()['os'] = $device->os;
 
             echo 'Changed ';
@@ -88,15 +89,23 @@ class Core implements Module
 
     public function poll(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()
-            ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
-            ->values();
-
         $device = $os->getDevice();
+        $oids = [];
+
+        // fill required fields if they are empty
+        if (! isset($device->sysDescr)) {
+            $oids[] = 'SNMPv2-MIB::sysDescr.0';
+        }
+        if (! isset($device->sysObjectID)) {
+            $oids[] = 'SNMPv2-MIB::sysObjectID.0';
+        }
+        $oids[] = 'SNMPv2-MIB::sysUpTime.0'; // always poll uptime
+
+        $snmpdata = SnmpQuery::numeric()->get($oids)->values();
+
         $device->fill([
-            'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
-            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
-            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
+            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? $device->sysDescr,
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? $device->sysObjectID,
         ]);
 
         $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
@@ -198,19 +207,19 @@ class Core implements Module
             }
 
             if ($key == 'sysObjectID') {
-                if (Str::startsWith($device['sysObjectID'], $value) == $check) {
+                if (Str::startsWith($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr') {
-                if (Str::contains($device['sysDescr'], $value) == $check) {
+                if (Str::contains($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysDescr_regex') {
-                if (preg_match_any($device['sysDescr'], $value) == $check) {
+                if (preg_match_any($device['sysDescr'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'sysObjectID_regex') {
-                if (preg_match_any($device['sysObjectID'], $value) == $check) {
+                if (preg_match_any($device['sysObjectID'] ?? '', $value) == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpget') {
@@ -263,7 +272,7 @@ class Core implements Module
         // set it if unless it is wrong
         if ($uptime > 0) {
             if ($uptime < $device->uptime) {
-                Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+                Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
                 if (Config::get('discovery_on_reboot')) {
                     $device->last_discovered = null;
                     $device->save();

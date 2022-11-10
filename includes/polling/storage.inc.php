@@ -3,6 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
+$storage_cache = $storage_cache ?? [];
 foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['device_id']]) as $storage) {
     $descr = $storage['storage_descr'];
     $mib = $storage['storage_mib'];

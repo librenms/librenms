@@ -55,10 +55,10 @@ if ($device['os_group'] == 'cisco') {
 
                 $mac_entries++;
 
-                $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'];
-                $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'];
-                $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'];
-                $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'];
+                $b_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['input'] ?? null;
+                $b_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedBytes']['output'] ?? null;
+                $p_in = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['input'] ?? null;
+                $p_out = $cip_array[$ifIndex][$mac]['cipMacHCSwitchedPkts']['output'] ?? null;
 
                 $this_ma = &$cip_array[$ifIndex][$mac];
 
@@ -66,10 +66,10 @@ if ($device['os_group'] == 'cisco') {
                 foreach ($cip_oids as $oid) {
                     foreach (['input', 'output'] as $dir) {
                         $oid_dir = $oid . '_' . $dir;
-                        $acc['update'][$oid_dir] = $this_ma[$oid][$dir];
+                        $acc['update'][$oid_dir] = $this_ma[$oid][$dir] ?? null;
                         $acc['update'][$oid_dir . '_prev'] = $acc[$oid_dir];
                         $oid_prev = $oid_dir . '_prev';
-                        if ($this_ma[$oid][$dir]) {
+                        if (isset($this_ma[$oid][$dir])) {
                             $oid_diff = ($this_ma[$oid][$dir] - $acc[$oid_dir]);
                             $oid_rate = ($oid_diff / $polled_period);
                             $acc['update'][$oid_dir . '_rate'] = $oid_rate;
@@ -79,7 +79,7 @@ if ($device['os_group'] == 'cisco') {
                     }
                 }
 
-                d_echo("\n" . $acc['hostname'] . ' ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
+                d_echo("\nDevice id: " . $acc['device_id'] . ' -> ' . $acc['ifDescr'] . "  $mac -> $b_in:$b_out:$p_in:$p_out ");
 
                 $rrd_name = ['cip', $ifIndex, $mac];
                 $rrd_def = RrdDefinition::make()

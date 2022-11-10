@@ -54,7 +54,7 @@ class PermissionsTest extends TestCase
                 break;
         }
 
-        return collect($data);
+        return new \Illuminate\Support\Collection($data);
     }
 
     public function testUserCanAccessDevice()

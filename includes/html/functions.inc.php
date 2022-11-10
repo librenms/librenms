@@ -11,6 +11,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
@@ -436,28 +437,10 @@ function generate_port_image($args)
  * @param  string  $text
  * @param  int[]  $color
  */
-function graph_error($text, $color = [128, 0, 0])
+function graph_error($text, $short = null, $color = [128, 0, 0])
 {
-    echo \LibreNMS\Util\Graph::error($text, null, 300, null, $color);
-}
-
-/**
- * Output message to user in image format.
- *
- * @param  string  $text  string to display
- */
-function graph_text_and_exit($text)
-{
-    global $vars;
-
-    if ($vars['showcommand'] == 'yes') {
-        echo $text;
-
-        return;
-    }
-
-    graph_error($text, [13, 21, 210]);
-    exit;
+    header('Content-Type: ' . ImageFormat::forGraph()->contentType());
+    echo \LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
 function print_port_thumbnail($args)
@@ -989,17 +972,6 @@ function eventlog_severity($eventlog_severity)
     }
 } // end eventlog_severity
 
-/**
- * Get the http content type of the image
- *
- * @param  string  $type  svg or png
- * @return string
- */
-function get_image_type(string $type)
-{
-    return \LibreNMS\Util\Graph::imageType($type);
-}
-
 function get_oxidized_nodes_list()
 {
     $context = stream_context_create([
@@ -1043,36 +1015,6 @@ function generate_stacked_graphs($transparency = '88')
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
     }
-}
-
-/**
- * Parse AT time spec, does not handle the entire spec.
- *
- * @param  string|int  $time
- * @return int
- */
-function parse_at_time($time)
-{
-    if (is_numeric($time)) {
-        return $time < 0 ? time() + $time : intval($time);
-    }
-
-    if (preg_match('/^[+-]\d+[hdmy]$/', $time)) {
-        $units = [
-            'm' => 60,
-            'h' => 3600,
-            'd' => 86400,
-            'y' => 31557600,
-        ];
-        $value = substr($time, 1, -1);
-        $unit = substr($time, -1);
-
-        $offset = ($time[0] == '-' ? -1 : 1) * $units[$unit] * $value;
-
-        return time() + $offset;
-    }
-
-    return (int) strtotime($time);
 }
 
 /**
@@ -1158,6 +1100,11 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
+    }
+
+    if (in_array($sensor['rrd_type'], ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+        //compute and display an approx rate for this sensor
+        return "<span class='label $label_style'>" . trim(Number::formatSi(max(0, $sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';
     }
 
     if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {

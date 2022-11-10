@@ -25858,7 +25858,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r422-hl02 ",
+                    "port_descr_type": "ams1-r422-hl02",
                     "port_descr_descr": "P1-03",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -28588,7 +28588,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-vbs-r122  ",
+                    "port_descr_type": "ams1-vbs-r122",
                     "port_descr_descr": "P1-29",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29008,7 +29008,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r305-bl01 ",
+                    "port_descr_type": "ams1-r305-bl01",
                     "port_descr_descr": "P1-33",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29113,7 +29113,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r306-bl02 ",
+                    "port_descr_type": "ams1-r306-bl02",
                     "port_descr_descr": "P1-34",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29218,7 +29218,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r416-hl01 ",
+                    "port_descr_type": "ams1-r416-hl01",
                     "port_descr_descr": "P1-35",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29323,7 +29323,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r416-hl02 ",
+                    "port_descr_type": "ams1-r416-hl02",
                     "port_descr_descr": "P1-36",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29428,7 +29428,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r417-hl01 ",
+                    "port_descr_type": "ams1-r417-hl01",
                     "port_descr_descr": "P1-37",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29533,7 +29533,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r417-hl02 ",
+                    "port_descr_type": "ams1-r417-hl02",
                     "port_descr_descr": "P1-38",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29638,7 +29638,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r418-hl01 ",
+                    "port_descr_type": "ams1-r418-hl01",
                     "port_descr_descr": "P1-39",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29743,7 +29743,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r418-hl02 ",
+                    "port_descr_type": "ams1-r418-hl02",
                     "port_descr_descr": "P1-40",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29848,7 +29848,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r419-hl01 ",
+                    "port_descr_type": "ams1-r419-hl01",
                     "port_descr_descr": "P1-41",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -29953,7 +29953,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r419-hl02 ",
+                    "port_descr_type": "ams1-r419-hl02",
                     "port_descr_descr": "P1-42",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -30058,7 +30058,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r420-hl01 ",
+                    "port_descr_type": "ams1-r420-hl01",
                     "port_descr_descr": "P1-43",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -30163,7 +30163,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r420-hl02 ",
+                    "port_descr_type": "ams1-r420-hl02",
                     "port_descr_descr": "P1-44",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -30268,7 +30268,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r421-hl01 ",
+                    "port_descr_type": "ams1-r421-hl01",
                     "port_descr_descr": "P1-45",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -30373,7 +30373,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r421-hl02 ",
+                    "port_descr_type": "ams1-r421-hl02",
                     "port_descr_descr": "P1-46",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -30478,7 +30478,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r422-hl01 ",
+                    "port_descr_type": "ams1-r422-hl01",
                     "port_descr_descr": "P1-47",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31108,7 +31108,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-01 ",
+                    "port_descr_type": "ghost_p6-01",
                     "port_descr_descr": "P2A-01",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31213,7 +31213,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-02 ",
+                    "port_descr_type": "ghost_p6-02",
                     "port_descr_descr": "P2A-02",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31318,7 +31318,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-03 ",
+                    "port_descr_type": "ghost_p6-03",
                     "port_descr_descr": "P2A-03",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31423,7 +31423,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-04 ",
+                    "port_descr_type": "ghost_p6-04",
                     "port_descr_descr": "P2A-04",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31528,7 +31528,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-05 ",
+                    "port_descr_type": "ghost_p6-05",
                     "port_descr_descr": "P2A-05",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31633,7 +31633,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-06 ",
+                    "port_descr_type": "ghost_p6-06",
                     "port_descr_descr": "P2A-06",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31738,7 +31738,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-07 ",
+                    "port_descr_type": "ghost_p6-07",
                     "port_descr_descr": "P2A-07",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31843,7 +31843,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-08 ",
+                    "port_descr_type": "ghost_p6-08",
                     "port_descr_descr": "P2A-08",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -31948,7 +31948,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-09 ",
+                    "port_descr_type": "ghost_p6-09",
                     "port_descr_descr": "P2A-09",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -32053,7 +32053,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ghost_p6-10 ",
+                    "port_descr_type": "ghost_p6-10",
                     "port_descr_descr": "P2A-10",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -42658,7 +42658,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r101-hl01 ",
+                    "port_descr_type": "ams1-r101-hl01",
                     "port_descr_descr": "P4-31",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -42763,7 +42763,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r102-hl01 ",
+                    "port_descr_type": "ams1-r102-hl01",
                     "port_descr_descr": "P4-32",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
@@ -43603,7 +43603,7 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": "ams1-r102-hl02 ",
+                    "port_descr_type": "ams1-r102-hl02",
                     "port_descr_descr": "P4-40",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,

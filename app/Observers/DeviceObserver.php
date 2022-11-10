@@ -5,6 +5,7 @@ namespace App\Observers;
 use App;
 use App\ApiClients\Oxidized;
 use App\Models\Device;
+use App\Models\Eventlog;
 use File;
 use Log;
 
@@ -18,7 +19,7 @@ class DeviceObserver
      */
     public function created(Device $device): void
     {
-        Log::event("Device $device->hostname has been created", $device, 'system', 3);
+        Eventlog::log("Device $device->hostname has been created", $device, 'system', 3);
         (new Oxidized)->reloadNodes();
     }
 
@@ -39,17 +40,17 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            Log::event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+            Eventlog::log('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
         }
 
         // key attribute changes
         foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type', 'ip'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
+                Eventlog::log(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
             }
         }
         if ($device->isDirty('location_id')) {
-            Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
+            Eventlog::log(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
         }
     }
 
@@ -70,7 +71,7 @@ class DeviceObserver
             Log::error("Could not delete RRD files for: $device->hostname", [$e]);
         }
 
-        Log::event("Device $device->hostname has been removed", 0, 'system', 3);
+        Eventlog::log("Device $device->hostname has been removed", 0, 'system', 3);
 
         (new Oxidized)->reloadNodes();
     }

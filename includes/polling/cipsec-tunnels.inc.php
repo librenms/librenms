@@ -180,7 +180,10 @@ if ($device['os_group'] == 'firebrick') {
     ];
 
     foreach ($ipsec_array as $index => $tunnel) {
-        if (! is_array($tunnels[$tunnel['fbIPsecConnectionName']]) && ! empty($tunnel['fbIPsecConnectionName'])) {
+        if (
+            (! isset($tunnels[$tunnel['fbIPsecConnectionName']]) || ! is_array($tunnels[$tunnel['fbIPsecConnectionName']]))
+            && ! empty($tunnel['fbIPsecConnectionName'])
+        ) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
                 'peer_addr' => $tunnel['fbIPsecConnectionPeerAddress'],

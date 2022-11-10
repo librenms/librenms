@@ -62,6 +62,8 @@ class Ciscosb extends OS implements OSDiscovery
         if ($firmware) {
             $device->version .= ", Firmware $firmware";
         }
-        $device->version = trim($device->version, ', ');
+        if ($device->version) {
+            $device->version = trim($device->version, ', ');
+        }
     }
 }

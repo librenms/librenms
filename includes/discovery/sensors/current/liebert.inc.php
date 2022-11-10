@@ -82,7 +82,7 @@ foreach (array_keys($ps_data) as $index) {
 
     $oid = '.1.3.6.1.4.1.476.1.42.3.8.30.20.1.70.' . $index;
     $type = 'liebert';
-    $descr = 'Neutral ' . $ps_data[$index]['lgpPduPsLineEntryId'];
+    $descr = trim('Neutral ' . $ps_data[$index]['lgpPduPsEntryId']);
     $divisor = 10;
     $multiplier = 1;
 

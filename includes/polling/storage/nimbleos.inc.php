@@ -21,7 +21,7 @@
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
-if (! is_array($storage_cache['nimbleos'])) {
+if (! isset($storage_cache['nimbleos'])) {
     $storage_cache['nimbleos'] = snmpwalk_cache_oid($device, 'volEntry', null, 'NIMBLE-MIB');
     d_echo($storage_cache);
 }

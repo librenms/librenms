@@ -55,17 +55,6 @@ class Clean
     }
 
     /**
-     * Sanitize string to only contain alpha, numeric, dashes, underscores, and spaces
-     *
-     * @param  string  $string
-     * @return string
-     */
-    public static function alphaDashSpace($string)
-    {
-        return preg_replace('/[^a-zA-Z0-9\-_ ]/', '', $string);
-    }
-
-    /**
      * Clean a string for display in an html page.
      * For use in non-blade pages
      *

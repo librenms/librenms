@@ -72,9 +72,9 @@ function external_exec($command)
 
     if ($proc->getExitCode()) {
         if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            Log::event('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
         } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            Log::event('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
         }
         d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());
@@ -636,7 +636,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
     $maps = $ports_mapped['maps'];
 
     if (in_array($port_association_mode, ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'])) {
-        $port_id = $maps[$port_association_mode][$port[$port_association_mode]];
+        $port_id = $maps[$port_association_mode][$port[$port_association_mode]] ?? null;
     }
 
     return $port_id;

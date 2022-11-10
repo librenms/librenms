@@ -3,7 +3,7 @@
 use LibreNMS\Util\ObjectCache;
 
 if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
-    $colors = collect(['green', 'yellow', 'red']);
+    $colors = new \Illuminate\Support\Collection(['green', 'yellow', 'red']);
     $output = \App\Models\Service::query()
         ->where('device_id', $device['device_id'])
         ->orderBy('service_type')
@@ -13,8 +13,9 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
             $color = $colors->get($service->service_status, 'grey');
             $type = strtolower($service->service_type);
             $name = $service->service_name;
+            $name_type = ($name == '' || $name == $type) ? $type : $name . ' (' . $type . ')';
 
-            return "<span title='$message' class='$color'>$name ($type)</span>";
+            return "<span title='$message' class='$color'>$name_type</span>";
         })->implode(', ');
 
     $services = ObjectCache::serviceCounts(['total', 'ok', 'warning', 'critical'], $device['device_id']); ?>

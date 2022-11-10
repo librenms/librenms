@@ -1,6 +1,6 @@
 <?php
 /**
- * Aix.php
+ * Edgeos.php
  *
  * -Description-
  *
@@ -26,23 +26,19 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS;
 
-class Aix extends OS implements OSDiscovery
+class Edgeosolt extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
-        $aix_descr = explode("\n", $device->sysDescr);
-        // AIX standard snmp deamon
-        if (! empty($aix_descr[1])) {
-            $device->serial = explode('Processor id: ', $aix_descr[1])[1];
-            $aix_long_version = explode(' version: ', $aix_descr[2])[1];
-            [$device->version, $aix_version_min] = array_map('intval', explode('.', $aix_long_version));
-        // AIX net-snmp
-        } else {
-            [, , $aix_version_min, $device->version, $device->serial] = explode(' ', $aix_descr[0]);
+        parent::discoverOS($device); // yaml
+
+        $hw = snmpwalk_cache_oid($this->getDeviceArray(), 'hrSWRunParameters', [], 'HOST-RESOURCES-MIB');
+        foreach ($hw as $entry) {
+            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $entry['hrSWRunParameters'], $matches)) {
+                $this->getDevice()->hardware = $matches[0];
+                break;
+            }
         }
-        $device->version .= '.' . $aix_version_min;
     }
 }

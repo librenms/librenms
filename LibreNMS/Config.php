@@ -114,7 +114,9 @@ class Config
     private static function loadUserConfigFile(&$config)
     {
         // Load user config file
-        @include base_path('config.php');
+        if (is_file(base_path('config.php'))) {
+            @include base_path('config.php');
+        }
     }
 
     /**
@@ -412,10 +414,10 @@ class Config
             isset($_SERVER['HTTPS']) ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
         ) {
-            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
+            self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url', '')));
         }
 
-        self::set('base_url', Str::finish(self::get('base_url'), '/'));
+        self::set('base_url', Str::finish(self::get('base_url', ''), '/'));
 
         if (! self::get('email_from')) {
             self::set('email_from', '"' . self::get('project_name') . '" <' . self::get('email_user') . '@' . php_uname('n') . '>');
