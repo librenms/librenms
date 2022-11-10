@@ -182,6 +182,7 @@ jobs:
       -
         name: lnms dev:check ci
         run: |
+          SNMPSIM=1 DBTEST=1 vendor/bin/phpunit --colors=always --stop-on-error --stop-on-failure
           php lnms dev:check ci
         env:
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
