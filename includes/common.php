@@ -72,9 +72,9 @@ function external_exec($command)
 
     if ($proc->getExitCode()) {
         if (Str::startsWith($proc->getErrorOutput(), 'Invalid authentication protocol specified')) {
-            Log::event('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP authentication algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
         } elseif (Str::startsWith($proc->getErrorOutput(), 'Invalid privacy protocol specified')) {
-            Log::event('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
+            \App\Models\Eventlog::log('Unsupported SNMP privacy algorithm - ' . $proc->getExitCode(), optional($device)->device_id, 'poller', Alert::ERROR);
         }
         d_echo('Exitcode: ' . $proc->getExitCode());
         d_echo($proc->getErrorOutput());

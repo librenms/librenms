@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
-use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Oid;
 use Log;
 
 class SnmpQueryMock implements SnmpQueryInterface
@@ -101,7 +101,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate(string $oid, ?string $mib = null): SnmpResponse
+    public function translate(string $oid, ?string $mib = null): string
     {
         // call real snmptranslate
         $options = $this->options;
@@ -288,15 +288,15 @@ class SnmpQueryMock implements SnmpQueryInterface
     private function outputLine(string $oid, string $num_oid, string $type, string $data): string
     {
         if ($type == 6) {
-            $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid))->value();
+            $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid));
         }
 
         if ($this->numeric) {
             return "$num_oid = $data";
         }
 
-        if (! empty($oid) && YamlDiscovery::oidIsNumeric($oid)) {
-            $oid = $this->translate($oid)->value();
+        if (! empty($oid) && Oid::isNumeric($oid)) {
+            $oid = $this->translate($oid);
         }
 
         return "$oid = $data";
@@ -332,7 +332,7 @@ class SnmpQueryMock implements SnmpQueryInterface
                 return '1.3.6.1.4.1.6574.1.1.0';
         }
 
-        if (YamlDiscovery::oidIsNumeric($oid)) {
+        if (Oid::isNumeric($oid)) {
             return ltrim($oid, '.');
         }
 
@@ -342,7 +342,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         $number = NetSnmpQuery::make()->mibDir($this->mibDir)
-            ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
+            ->options(array_merge($options, $this->options))->numeric()->translate($oid);
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
