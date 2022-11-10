@@ -394,15 +394,15 @@ class CiHelper
 
             if (Process::isTtySupported()) {
                 $proc->setTty(true);
-                $proc->run(); 
+                $proc->run();
             } else {
                 $proc->run(function ($type, $buffer) {
                     echo $buffer;
                 });
             }
         } else {
-            $proc->run();    
-        }  
+            $proc->run();
+        }
 
         $duration = sprintf('%.2fs', microtime(true) - $start);
         if ($proc->getExitCode() > 0) {
