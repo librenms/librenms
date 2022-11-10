@@ -40,6 +40,7 @@ foreach ($output_volts as $index => $data) {
         $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
         $volt_oid .= '.0';
     }
+    $upsOutputVoltage_value = intval($upsOutputVoltage_value);
 
     discover_sensor(
         $valid['sensor'],
@@ -74,6 +75,7 @@ foreach ($input_volts as $index => $data) {
         $upsInputVoltage_value = $data['upsInputVoltage'][0];
         $volt_oid .= '.0';
     }
+    $upsInputVoltage_value = intval($upsInputVoltage_value);
 
     discover_sensor(
         $valid['sensor'],
@@ -105,6 +107,7 @@ foreach ($bypass_volts as $index => $data) {
         $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
         $volt_oid .= '.0';
     }
+    $data['upsBypassVoltage'] = intval($data['upsBypassVoltage']);
 
     discover_sensor(
         $valid['sensor'],

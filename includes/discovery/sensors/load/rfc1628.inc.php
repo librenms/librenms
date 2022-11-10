@@ -13,6 +13,7 @@ foreach ($load_data as $index => $data) {
     } else {
         $value = $data['upsOutputPercentLoad'];
     }
+    $value = intval($value);
 
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'load', $load_oid);
     $descr = 'Percentage load';
