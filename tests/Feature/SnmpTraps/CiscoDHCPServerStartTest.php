@@ -32,9 +32,9 @@ class CiscoDHCPServerStartTest extends SnmpTrapTestCase
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 [UDP: [{{ ip }}]:51988->[10.0.0.1]:162]:
-SNMPv2-MIB::sysUpTime.0 = Timeticks: (45460476) 5 days, 6:16:44.76
-SNMPv2-MIB::snmpTrapOID.0 = OID: CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime
-CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime = Hex-STRING: 07 E6 0B 0A 03 0F 25 00 2B 00
+   SNMPv2-MIB::sysUpTime.0 = Timeticks: (45460476) 5 days, 6:16:44.76
+   SNMPv2-MIB::snmpTrapOID.0 = OID: CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime
+   CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerStartTime = Hex-STRING: 07 E6 0B 0A 03 0F 25 00 2B 00
 TRAP,
             'SNMP Trap: Device DHCP service started.',
             'Could not handle CiscoDHCPServerStart Test trap',

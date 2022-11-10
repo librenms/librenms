@@ -32,10 +32,10 @@ class CiscoDHCPServerFreeAddressHighTest extends SnmpTrapTestCase
         $this->assertTrapLogsMessage(<<<'TRAP'
 {{ hostname }}
 [UDP: [{{ ip }}]:49563->[10.0.0.1]:162]:
-SNMPv2-MIB::sysUpTime.0 = Timeticks: (1714266504) 198 days, 9:51:05.04
-SNMPv2-MIB::snmpTrapOID.0 = OID: CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerFreeAddressHigh
-CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddrHighThreshold."some-dhcp-pool" = INTEGER: 228
-CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool" = INTEGER: 99
+   SNMPv2-MIB::sysUpTime.0 = Timeticks: (1714266504) 198 days, 9:51:05.04
+   SNMPv2-MIB::snmpTrapOID.0 = OID: CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerFreeAddressHigh
+   CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddrHighThreshold."some-dhcp-pool" = INTEGER: 228
+   CISCO-IETF-DHCP-SERVER-MIB::cDhcpv4ServerSharedNetFreeAddresses."some-dhcp-pool" = INTEGER: 99
 TRAP,
             'SNMP Trap: DHCP pool "some-dhcp-pool" address space high. Free addresses: \'99\' addresses.',
             'Could not handle CiscoDHCPServerFreeAddressHigh Test trap',
