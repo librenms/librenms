@@ -83,6 +83,7 @@ Example Logstash Config:
      						http_method => "post"
      						url => "http://sink1.fqdn/syslog-http-sink.php"
      						format => "json_batch"
+                            retry_failed => false
      		}
 }
 </pre>
