@@ -129,7 +129,7 @@ class EventlogController extends TableController
      */
     private function severityLabel($eventlog_severity)
     {
-        return match($eventlog_severity) {
+        return match ($eventlog_severity) {
             Severity::Ok => 'label-success',
             Severity::Info => 'label-info',
             Severity::Notice => 'label-primary',
