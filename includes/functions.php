@@ -12,6 +12,7 @@ use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -518,7 +519,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, Severity::tryFrom((int) $severity) ?? Severity::Info, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)

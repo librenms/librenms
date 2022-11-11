@@ -30,6 +30,7 @@ use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Traits\RequiresDatabase;
@@ -152,7 +153,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::topologyChange
 TRAP,
             'SNMP Trap: Topology of Spanning Tree Instance on device {{ hostname }} was changed', // assertTrapLogsMessage sets display to hostname
             'Failed to handle BRIDGE-MIB::topologyChange',
-            [3, 'stp'],
+            [Severity::Notice, 'stp'],
         );
     }
 
@@ -166,7 +167,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart
 TRAP,
             'SNMP Trap: Device {{ hostname }} cold booted',
             'Failed to handle SNMPv2-MIB::coldStart',
-            [4, 'reboot'],
+            [Severity::Warning, 'reboot'],
         );
     }
 
@@ -180,7 +181,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart
 TRAP,
             'SNMP Trap: Device {{ hostname }} warm booted',
             'Failed to handle SNMPv2-MIB::warmStart',
-            [4, 'reboot'],
+            [Severity::Warning, 'reboot'],
         );
     }
 
@@ -194,7 +195,7 @@ SNMPv2-MIB::snmpTrapOID.0 ENTITY-MIB::entConfigChange
 TRAP,
             'SNMP Trap: Configuration of Entity Database on device {{ hostname }} was changed',
             'Failed to handle ENTITY-MIB::entConfigChange',
-            [3, 'system'],
+            [Severity::Notice, 'system'],
         );
     }
 }

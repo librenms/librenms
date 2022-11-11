@@ -6,7 +6,7 @@ use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 
-class VeeamWinFLRToOriginalFinished implements SnmptrapHandler
+class VeeamWinFLRToOriginalFinished extends VeeamTrap implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -21,8 +21,8 @@ class VeeamWinFLRToOriginalFinished implements SnmptrapHandler
         $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $result = $trap->getOidData('VEEAM-MIB::transferStatus');
-        $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
+        $severity = $this->getResultSeverity($result);
 
-        $trap->log('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name, $color[$result], 'backup');
+        $trap->log('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name, $severity, 'backup');
     }
 }

@@ -1,8 +1,8 @@
 <?php
 /**
- * Alert.php
+ * VeeamTrap.php
  *
- * Enumerates alarming Level
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +19,23 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
+ * @copyright  2022 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Enum;
+namespace LibreNMS\Snmptrap\Handlers;
 
-abstract class Alert
+use LibreNMS\Enum\Severity;
+
+abstract class VeeamTrap
 {
-    const UNKNOWN = 0;
-    const OK = 1;
-    const INFO = 2;
-    const NOTICE = 3;
-    const WARNING = 4;
-    const ERROR = 5;
-
-    const SEVERITIES = ['unknown' => self::UNKNOWN,
-        'ok'      => self::OK,
-        'info'    => self::INFO,
-        'notice'  => self::NOTICE,
-        'warning' => self::WARNING,
-        'error'   => self::ERROR,
-    ];
+    protected function getResultSeverity(string $result): Severity
+    {
+        return match ($result) {
+            'Success' => Severity::Ok,
+            'Warning' => Severity::Warning,
+            'Failed' => Severity::Error,
+            default => Severity::Unknown,
+        };
+    }
 }

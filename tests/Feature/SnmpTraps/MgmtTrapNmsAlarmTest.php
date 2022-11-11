@@ -30,6 +30,8 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
+use LibreNMS\Enum\Severity;
+
 class MgmtTrapNmsAlarmTest extends SnmpTrapTestCase
 {
     public function testAlarmClear(): void
@@ -56,7 +58,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
             "Alarm on slot {$alarm['slotNum']}, {$alarm['srcPm']} Issue: {$alarm['specific']} Possible Cause: Unknown",
             'Could not handle mgnt2TrapNMSAlarm trap CLEARED',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -85,7 +87,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
             "Alarm on slot {$alarm['slotNum']}, {$alarm['srcPm']} Issue: {$alarm['specific']} Additional info: {$alarm['addText']} Possible Cause: Unknown",
             'Could not handle mgnt2TrapNMSAlarm trap with additional text',
-            [1],
+            [Severity::Ok],
         );
     }
 
@@ -114,7 +116,7 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogNodeControllerIpAddress 0.0.0.0
 EKINOPS-MGNT2-NMS-MIB::mgnt2AlmLogChassisId {{ ip }}",
             "Alarm on slot {$alarm['slotNum']}, {$alarm['srcPm']} Port: {$alarm['portType']} {$alarm['portNum']} Issue: {$alarm['specific']} Possible Cause: {$alarm['probCause']}",
             'Could not handle mgnt2TrapNMSAlarm trap with additional text',
-            [5],
+            [Severity::Error],
         );
     }
 

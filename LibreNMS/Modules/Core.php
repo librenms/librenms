@@ -29,6 +29,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -61,7 +62,7 @@ class Core implements Module
         ]);
 
         foreach ($device->getDirty() as $attribute => $value) {
-            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', 3);
+            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
             $os->getDeviceArray()[$attribute] = $value; // update device array
         }
 
@@ -69,7 +70,7 @@ class Core implements Module
         $device->os = self::detectOS($device, false);
 
         if ($device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
+            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
             $os->getDeviceArray()['os'] = $device->os;
 
             echo 'Changed ';
@@ -272,7 +273,7 @@ class Core implements Module
         // set it if unless it is wrong
         if ($uptime > 0) {
             if ($uptime < $device->uptime) {
-                Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+                Eventlog::log('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', Severity::Warning, $device->uptime);
                 if (Config::get('discovery_on_reboot')) {
                     $device->last_discovered = null;
                     $device->save();
