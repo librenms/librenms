@@ -135,7 +135,7 @@ $tmp_output .= '
             return {
                 stream: "' . (isset($_POST['stream']) ? $_POST['stream'] : '') . '",
                 device: "' . (isset($filter_device) ? $filter_device : '') . '",
-                range: "' . (isset($_POST['range']) ? $_POST['range'] : '') . '",
+                range: "' . (isset($_POST['range']) ? $_POST['range'] : 0) . '",
                 loglevel: "' . (isset($_POST['loglevel']) ? $_POST['loglevel'] : '') . '",
             };
         },
