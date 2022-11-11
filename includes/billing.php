@@ -192,9 +192,9 @@ function getRates($bill_id, $datefrom, $dateto, $dir_95th)
     $data['total_data'] = $mtot;
     $data['total_data_in'] = $mtot_in;
     $data['total_data_out'] = $mtot_out;
-    $data['rate_average'] = ($mtot / $ptot * 8);
-    $data['rate_average_in'] = ($mtot_in / $ptot * 8);
-    $data['rate_average_out'] = ($mtot_out / $ptot * 8);
+    $data['rate_average'] = ! empty($ptot) ? ($mtot / $ptot * 8) : 0;
+    $data['rate_average_in'] = ! empty($ptot) ? ($mtot_in / $ptot * 8) : 0;
+    $data['rate_average_out'] = ! empty($ptot) ? ($mtot_out / $ptot * 8) : 0;
 
     // print_r($data);
     return $data;
