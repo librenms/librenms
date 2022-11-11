@@ -41,6 +41,6 @@ class CiscoDHCPServerStart implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Device DHCP service started.', 2, 'dhcp-server');
+        $trap->log('SNMP Trap: Device DHCP service started.', 2);
     }
 }

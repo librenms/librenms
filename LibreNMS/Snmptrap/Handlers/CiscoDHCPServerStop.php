@@ -41,6 +41,6 @@ class CiscoDHCPServerStop implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Device DHCP service stopped.', 5, 'dhcp-server');
+        $trap->log('SNMP Trap: Device DHCP service stopped.', 5);
     }
 }
