@@ -1644,10 +1644,11 @@ extend postgres /etc/snmp/postgres
 correct.
 
 7. (Optional) If you wish to change the DB username (default: pgsql), enable
-totalling (e.g. set ignorePG to 0, default: 1), or set a hostname for
-check_postgres.pl to connect to (default: the Unix Socket postgresql is running
-on), then create the file /etc/snmp/postgres.config with the following contents
-(note that not all of them need be defined, just whichever you'd like to change):
+the postgres DB in totalling (e.g. set ignorePG to 0, default: 1), or set a
+hostname for check_postgres.pl to connect to (default: the Unix Socket postgresql
+is running on), then create the file /etc/snmp/postgres.config with the following
+contents (note that not all of them need be defined, just whichever you'd like to
+change):
 ```
 DBuser=monitoring
 ignorePG=0
