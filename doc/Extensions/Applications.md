@@ -2718,6 +2718,44 @@ chmod +x /etc/snmp/voipmon-stats.sh
 extend voipmon /etc/snmp/voipmon-stats.sh
 ```
 
+## Wireguard
+
+The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+
+### SNMP Extend
+
+1. Copy the python script, wireguard.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/wireguard.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.py
+```
+
+4. Create a /etc/snmp/wireguard.json file and specify:
+a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
+b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+```
+{
+    "wg_cmd": "/bin/wg",
+    "public_key_to_arbitrary_name": {
+        "wg0": {
+            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
+            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
+        }
+    }
+}
+```
+
+5. Restart snmpd.
+
 ## ZFS
 
 ### SNMP Extend
