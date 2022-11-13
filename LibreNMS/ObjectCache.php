@@ -91,21 +91,21 @@ class ObjectCache implements ArrayAccess
      */
     public function offsetGet($obj): mixed
     {
-        if (isset($this->data[$obj])) {
-            if (isset($this->data[$obj]['value'])) {
-                return $this->data[$obj]['value'];
-            } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
-                return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
-            } else {
-                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], isset($this->data[$obj]['params']) ? $this->data[$obj]['params'] : []);
-                if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
-                    $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
-                }
-
-                return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
-            }
+        if (! isset($this->data[$obj])) {
+            return null;
         }
+        if (isset($this->data[$obj]['value'])) {
+            return $this->data[$obj]['value'];
+        } elseif (isset($GLOBALS['_ObjCache'][$this->obj][$obj]['value'])) {
+            return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
+        } else {
+            $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = dbFetchRows($this->data[$obj]['query'], isset($this->data[$obj]['params']) ? $this->data[$obj]['params'] : []);
+            if (sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value']) == 1 && sizeof($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]) == 1) {
+                $GLOBALS['_ObjCache'][$this->obj][$obj]['value'] = current($GLOBALS['_ObjCache'][$this->obj][$obj]['value'][0]);
+            }
 
+            return $GLOBALS['_ObjCache'][$this->obj][$obj]['value'];
+        }
     }
 
     //end offsetGet()
