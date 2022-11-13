@@ -441,6 +441,10 @@ $graphs['systemd'] = [
     'active',
     'load',
 ];
+$graphs['wireguard'] = [
+    'traffic',
+    'time',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
