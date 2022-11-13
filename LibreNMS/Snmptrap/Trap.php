@@ -51,8 +51,10 @@ class Trap
 
         $this->hostname = array_shift($lines);
 
-        $line = array_shift($lines);
-        preg_match('/\[([0-9.:a-fA-F]+)]/', $line, $matches);
+        if ($line = array_shift($lines)) {
+            preg_match('/\[([0-9.:a-fA-F]+)]/', $line, $matches);
+        }
+
         $this->ip = $matches[1] ?? '';
 
         // parse the oid data
