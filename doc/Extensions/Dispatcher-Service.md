@@ -172,18 +172,20 @@ could also be used with a little modification.
 ### systemd service
 
 A systemd unit file can be found in `misc/librenms.service`. To
-install run `cp /opt/librenms/misc/librenms.service
-/etc/systemd/system/librenms.service && systemctl enable --now
-librenms.service`
+install run:
+```bash
+cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
 ### systemd service with watchdog
 
 This service file is an alternative to the above service file. It uses the systemd WatchdogSec= option to restart the service if it does not receive a keep-alive from the running process.
 
 A systemd unit file can be found in `misc/librenms-watchdog.service`. To
-install run `cp /opt/librenms/misc/librenms-watchdog.service
-/etc/systemd/system/librenms.service && systemctl enable --now
-librenms.service`
+install run:
+```bash
+cp /opt/librenms/misc/librenms-watchdog.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
+```
 
 This requires: python3-systemd (or python-systemd on older systems)
 or https://pypi.org/project/systemd-python/
@@ -239,7 +241,7 @@ available, but the testing package is working fine, you can grab it on
 <https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
 package may be updated and have a new version number).
 
-```
+```bash
 apt install python3 python-mysqldb
 cd /tmp
 wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
