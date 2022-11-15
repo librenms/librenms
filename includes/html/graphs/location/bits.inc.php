@@ -10,7 +10,7 @@ foreach ($devices as $device) {
         $ignore = 0;
         if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
             foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
-                if (preg_match($iftype.'i', $int['ifType'])) {
+                if (preg_match($iftype.'i', $int['ifType']) || preg_match($iftype.'i', $int['ifOperStatus'])) {
                     $ignore = 1;
                 }
             }
@@ -18,7 +18,7 @@ foreach ($devices as $device) {
 
         if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
             foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
-                if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName'])) {
+                if (preg_match($ifdescr.'i', $int['ifDescr']) || preg_match($ifdescr.'i', $int['ifName']) || preg_match($ifdescr.'i', $int['ifAlias'])) {
                     $ignore = 1;
                 }
             }

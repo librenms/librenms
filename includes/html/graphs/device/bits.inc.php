@@ -14,7 +14,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
                 // This patch will ignore l2vlan for ASA.
                 continue;
             }
-            if (preg_match($iftype.'i', $port['ifType'])) {
+            if (preg_match($iftype . 'i', $port['ifType']) || preg_match($iftype . 'i', $port['ifOperStatus'])) {
                 $ignore = 1;
             }
         }
@@ -22,7 +22,7 @@ foreach (dbFetchRows('SELECT * FROM `ports` WHERE `device_id` = ? AND `disabled`
 
     if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
         foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
-            if (preg_match($ifdescr.'i', $port['ifDescr']) || preg_match($ifdescr.'i', $port['ifName'])) {
+            if (preg_match($ifdescr . 'i', $port['ifDescr']) || preg_match($ifdescr . 'i', $port['ifName']) || preg_match($ifdescr . 'i', $port['ifAlias'])) {
                 $ignore = 1;
             }
         }
