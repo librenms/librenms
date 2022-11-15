@@ -40,30 +40,59 @@ if (! $ups_nut) {
 //print_r(array_values(explode("\n", $ups_nut)));
 
 // (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
-[
-    $charge,
-    $battery_low,
-    $remaining,
-    $bat_volt,
-    $bat_nom,
-    $line_nom,
-    $input_volt,
-    $load,
-    $UPSOnLine,
-    $UPSOnBattery,
-    $UPSLowBattery,
-    $UPSHighBattery,
-    $UPSBatteryReplace,
-    $UPSBatteryCharging,
-    $UPSBatteryDischarging,
-    $UPSUPSBypass,
-    $UPSRuntimeCalibration,
-    $UPSOffline,
-    $UPSUPSOverloaded,
-    $UPSUPSBuck,
-    $UPSUPSBoost,
-    $UPSForcedShutdown
+if (count(explode("\n", $ups_nut)) == 23) {
+    [
+        $charge,
+        $battery_low,
+        $remaining,
+        $bat_volt,
+        $bat_nom,
+        $line_nom,
+        $input_volt,
+        $load,
+        $UPSOnLine,
+        $UPSOnBattery,
+        $UPSLowBattery,
+        $UPSHighBattery,
+        $UPSBatteryReplace,
+        $UPSBatteryCharging,
+        $UPSBatteryDischarging,
+        $UPSUPSBypass,
+        $UPSRuntimeCalibration,
+        $UPSOffline,
+        $UPSUPSOverloaded,
+        $UPSUPSBuck,
+        $UPSUPSBoost,
+        $UPSForcedShutdown,
+        $UPSAlarm
     ] = explode("\n", $ups_nut);
+} else {
+    [
+        $charge,
+        $battery_low,
+        $remaining,
+        $bat_volt,
+        $bat_nom,
+        $line_nom,
+        $input_volt,
+        $load,
+        $UPSOnLine,
+        $UPSOnBattery,
+        $UPSLowBattery,
+        $UPSHighBattery,
+        $UPSBatteryReplace,
+        $UPSBatteryCharging,
+        $UPSBatteryDischarging,
+        $UPSUPSBypass,
+        $UPSRuntimeCalibration,
+        $UPSOffline,
+        $UPSUPSOverloaded,
+        $UPSUPSBuck,
+        $UPSUPSBoost,
+        $UPSForcedShutdown,
+    ] = explode("\n", $ups_nut);
+    $UPSAlarm = 0;
+}
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
@@ -102,6 +131,7 @@ $sensors = [
     ['state_name' => 'UPSUPSBuck', 'value' => $UPSUPSBuck],
     ['state_name' => 'UPSUPSBoost', 'value' => $UPSUPSBoost],
     ['state_name' => 'UPSForcedShutdown', 'value' => $UPSForcedShutdown],
+    ['state_name' => 'UPSAlarm', 'value' => $UPSAlarm],
 ];
 
 foreach ($sensors as $index => $sensor) {
