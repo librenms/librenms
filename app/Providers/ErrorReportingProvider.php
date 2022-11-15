@@ -163,7 +163,7 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []): bool
     {
-        if (defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING === true) {
+        if (error_reporting() & $level && defined('PHPUNIT_RUNNING') && PHPUNIT_RUNNING === true) {
             debug_print_backtrace();
             dd('----------------------handleError--------------------', $message, $file, $line, '!---------------------handleError-------------------!');
         }

@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Str;
+
 class StringHelpers
 {
     /**
