@@ -9,14 +9,14 @@
  */
 
 //portName OID is based on each device model/MIB
-$oid = $device['sysObjectID'].".1.9.1.1.7";
+$oid = $device['sysObjectID'] . '.1.9.1.1.7';
 
 $port_names = snmpwalk_cache_oid($device, $oid, $port_names);
 
 foreach ($port_names as $oid => $value) {
-    if (!empty($value['iso'])) {
+    if (! empty($value['iso'])) {
         // determine index
-        $index = end(explode('.',$oid));
+        $index = end(explode('.', $oid));
         $port_stats[$index]['ifAlias'] = $value['iso'];
     }
 }
