@@ -19,10 +19,13 @@ unset($seperator);
 
 // show title from config file (but ucwords it)
 $ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($descr) {
+    if (is_array($descr)) {
+        return strtolower($descr[0]);
+    }
     return strtolower($descr);
 });
 array_walk($types_array, function (&$type) use ($ctypes) {
-    $type = ucwords($ctypes->get(strtolower($type), $type));
+    $type = ucwords($ctypes->get(strtolower($type[0]), $type));
 });
 
 $types = implode(' + ', $types_array);
