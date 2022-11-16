@@ -19,7 +19,6 @@ ksort($modules);
 
 require 'includes/html/graphs/common.inc.php';
 
-$count = 0;
 foreach ($modules as $module => $module_status) {
     $rrd_filename = Rrd::name($device['hostname'], ['poller-perf', $module]);
     if ($attribs['poll_' . $module] || ($module_status && ! isset($attribs['poll_' . $module])) ||
@@ -29,14 +28,13 @@ foreach ($modules as $module => $module_status) {
             $ds['descr'] = $module;
             $ds['filename'] = $rrd_filename;
             $rrd_list[] = $ds;
-            $count++;
         }
     }
 }
 
 $unit_text = 'Seconds';
 $simple_rrd = false;
-$nototal = false;
+$nototal = true;
 $text_orig = true;
 $colours = 'manycolours';
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';
