@@ -185,7 +185,7 @@ if (Config::get('enable_vrfs')) {
                 'vrf_name' => $vrf_name,
                 'bgpLocalAs' => $vrf_as,
                 'mplsVpnVrfRouteDistinguisher' => $vrf_rd,
-                'mplsVpnVrfDescription' => $$vrf_desc,
+                'mplsVpnVrfDescription' => $vrf_desc,
                 'device_id' => $device['device_id'],
             ];
 
@@ -198,8 +198,12 @@ if (Config::get('enable_vrfs')) {
             $vrf_id = dbFetchCell('SELECT vrf_id FROM vrfs WHERE device_id = ? AND `vrf_oid`=?', [$device['device_id'], $vrf_oid]);
             $valid_vrf[$vrf_id] = 1;
             echo "\n  [VRF $vrf_name] PORTS - ";
-            foreach ($port_table[$vrf_oid] as $if_index => $if_name) {
+            foreach ($port_table[$vrf_oid] ?? [] as $if_index => $if_name) {
                 $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_index]);
+                // TODO: Shouldn't the port always exist?
+                if (! $interface) {
+                    continue;
+                }
                 echo makeshortif($interface['ifDescr']) . ' ';
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];

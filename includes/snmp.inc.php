@@ -943,9 +943,12 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
             // strip the leading . if it exists.
             $line = substr($line, 1);
         }
-        [$key, $value] = explode(' ', $line, 2);
+
+        $split = explode(' ', $line, 2);
+        $key = $split[0];
+        $value = trim($split[1] ?? "");
+
         $prop_id = explode('.', $key);
-        $value = trim($value);
 
         // if we have requested more levels that exist, set to the max.
         if ($indexes > count($prop_id)) {

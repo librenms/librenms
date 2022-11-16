@@ -482,8 +482,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                 ->addDataset('bgpPeerEstablished', 'GAUGE', 0);
             // Validate data
             $peer_data['bgpPeerFsmEstablishedTime'] = set_numeric($peer_data['bgpPeerFsmEstablishedTime']);
-            $peer_data['bgpPeerInUpdates'] = set_numeric($peer_data['bgpPeerInUpdates']);
-            $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates']);
+            $peer_data['bgpPeerInUpdates'] = set_numeric($peer_data['bgpPeerInUpdates'] ?? 0);
+            $peer_data['bgpPeerOutUpdates'] = set_numeric($peer_data['bgpPeerOutUpdates'] ?? 0);
             $peer_data['bgpPeerInTotalMessages'] = set_numeric($peer_data['bgpPeerInTotalMessages']);
             $peer_data['bgpPeerOutTotalMessages'] = set_numeric($peer_data['bgpPeerOutTotalMessages']);
 

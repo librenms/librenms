@@ -35,8 +35,8 @@ class Pbn extends OS implements ProcessorDiscovery
     {
         parent::__construct($device);
 
-        preg_match('/^.* Build (?<build>\d+)/', $this->getDevice()->version, $version);
-        if ($version['build'] <= 16607) { // Buggy version :-(
+        preg_match('/^.* Build (?<build>\d+)/', $this->getDevice()->sysDescr, $version);
+        if (isset($version['build']) && $version['build'] <= 16607) { // Buggy version :-(
             $this->stpTimeFactor = 1;
         }
     }

@@ -75,4 +75,15 @@ class StringHelperTest extends TestCase
         };
         $this->assertFalse(StringHelpers::isStringable($nonstringable));
     }
+
+    public function testIsRegexPatternMaybe(): void
+    {
+        $this->assertTrue(StringHelpers::IsRegexPatternMaybe('/hello/'));
+        $this->assertTrue(StringHelpers::IsRegexPatternMaybe('#hello#'));
+        $this->assertTrue(StringHelpers::IsRegexPatternMaybe('~hello~i'));
+
+        $this->assertFalse(StringHelpers::IsRegexPatternMaybe('\hello\\'));
+        $this->assertFalse(StringHelpers::IsRegexPatternMaybe('hello'));
+        $this->assertFalse(StringHelpers::IsRegexPatternMaybe('  '));
+    }
 }

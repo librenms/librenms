@@ -30,12 +30,11 @@ $counter = 0;
 foreach (explode("\n", $temps) as $i => $t) {
     $t = explode(' ', $t);
     $oid = $t[0];
-    $val = $t[1];
 
     if (substr($oid, -1) == '1') {
         // This code will only pull CPU temp for each stack member, but there is no reason why the additional values couldn't be graphed
         $counter = $counter + 1;
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
+        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $t[1]);
     }
 }
 

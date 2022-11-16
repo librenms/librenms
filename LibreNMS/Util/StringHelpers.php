@@ -161,4 +161,20 @@ class StringHelpers
     {
         return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
     }
+
+    /**
+     * Check if variable is maybe a regex pattern
+     * Only a "best effort" test, therefor "Maybe"
+     */
+    public static function isRegexPatternMaybe(string $pattern): bool
+    {
+        $delimiter = Str::substr($pattern, 0, 1);
+
+        return Str::length($pattern) > 1
+        // Can only end with starting delimiter or one of the modifiers (PCRE2)
+        && Str::endsWith($pattern, [$delimiter, 'g','m','i','x','s','u','U','A','J','D'])
+        // Can only start with a valid delimiter
+        && preg_match('/[^A-Za-z0-9\s\\\]/', $delimiter);
+
+    }
 }

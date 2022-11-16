@@ -166,7 +166,7 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
                 zeropad($index),
                 "Processor $count",
                 1,
-                $entry['s5ChasUtilCPUUsageLast10Minutes']
+                $entry['sgProxyCpuCoreBusyPerCent']
             );
 
             $count++;

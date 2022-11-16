@@ -3128,7 +3128,7 @@
                     "vrf_name": "Base",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "Base",
                     "ifIndices": "1,3,4"
                 },
                 {
@@ -3136,7 +3136,7 @@
                     "vrf_name": "vpls-management",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "vpls-management",
                     "ifIndices": null
                 },
                 {
@@ -3144,7 +3144,7 @@
                     "vrf_name": "management",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "management",
                     "ifIndices": null
                 }
             ]

@@ -45,14 +45,14 @@ class RutosRutx extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.12.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSSI',
+                'Modem ' . $name . ' RSSI',
                 $entry['mSignal']
             );
         }
@@ -66,14 +66,15 @@ class RutosRutx extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+
+            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.20.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSRP',
+                'Modem ' . $name . ' RSRP',
                 $entry['mRSRP']
             );
         }
@@ -87,14 +88,14 @@ class RutosRutx extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.21.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSRQ',
+                'Modem ' . $name . ' RSRQ',
                 $entry['mRSRQ']
             );
         }
@@ -108,14 +109,14 @@ class RutosRutx extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.19.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' SINR',
+                'Modem ' . $name . ' SINR',
                 $entry['mSINR']
             );
         }
@@ -126,18 +127,17 @@ class RutosRutx extends OS implements
     public function discoverWirelessCell()
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
-
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
+            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'cell',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.18.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' CELL ID',
-                $entry['CELLID']
+                'Modem ' . $name . ' CELL ID',
+                $entry['mCellID']
             );
         }
 

@@ -5123,7 +5123,7 @@
                     "vrf_name": "Base",
                     "bgpLocalAs": 65000,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "Base",
                     "ifIndices": "1"
                 },
                 {
@@ -5131,7 +5131,7 @@
                     "vrf_name": "vprn14",
                     "bgpLocalAs": 65002,
                     "mplsVpnVrfRouteDistinguisher": "65002:1",
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "vprn14",
                     "ifIndices": "5"
                 },
                 {
@@ -5139,7 +5139,7 @@
                     "vrf_name": "vprn2002",
                     "bgpLocalAs": 65010,
                     "mplsVpnVrfRouteDistinguisher": "65010:2002",
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "vprn2002",
                     "ifIndices": "2"
                 },
                 {
@@ -5147,7 +5147,7 @@
                     "vrf_name": "mw-management",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "mw-management",
                     "ifIndices": null
                 },
                 {
@@ -5155,7 +5155,7 @@
                     "vrf_name": "vpls-management",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "vpls-management",
                     "ifIndices": null
                 },
                 {
@@ -5163,7 +5163,7 @@
                     "vrf_name": "management",
                     "bgpLocalAs": 0,
                     "mplsVpnVrfRouteDistinguisher": null,
-                    "mplsVpnVrfDescription": "",
+                    "mplsVpnVrfDescription": "management",
                     "ifIndices": null
                 }
             ]

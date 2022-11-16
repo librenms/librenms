@@ -13,7 +13,7 @@ modules:
         data:
             -
                 oid: rosMgmtCpuUtilizationTable
-                value: rosMgmtCpuUtilization.oneMin
+                value: rosMgmtCpuUtilization
                 num_oid: '.1.3.6.1.4.1.8886.60.1.1.1.2.1.1.1.3.{{ $index }}'
                 snmp_flags: ['-OeQUsb'] # workaround for one Min index
                 descr: 'Processor'

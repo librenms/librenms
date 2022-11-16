@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 $divisor = '100';
 $outlet_divisor = $divisor;
 $multiplier = '1';
@@ -34,7 +36,7 @@ while ($towers <= $tower_count) {
             $low_limit = null;
             $high_warn_limit = snmp_get($device, "infeedLoadHighThresh.$towers.$infeed_index", '-Ovq', 'Sentry3-MIB');
             $high_limit = snmp_get($device, "infeedCapacity.$towers.$infeed_index", '-Ovq', 'Sentry3-MIB');
-            $current = (snmp_get($device, "$infeed_oid", '-Ovq', 'Sentry3-MIB') / $divisor);
+            $current = (Number::cast(snmp_get($device, $infeed_oid, '-Ovq', 'Sentry3-MIB')) / $divisor);
 
             if ($current >= 0) {
                 $tmp_index = "infeedID.$towers.$infeed_index";
@@ -68,7 +70,7 @@ while ($towers <= $tower_count) {
                     $outlet_high_warn_limit = null;
                     // Should be "outletCapacity" but is always -1. According to MIB: "A negative value indicates that the capacity was not available."
                     $outlet_high_limit = snmp_get($device, "outletLoadHighThresh.$outletsuffix", '-Ovq', 'Sentry3-MIB');
-                    $outlet_current = (snmp_get($device, "$outlet_oid", '-Ovq', 'Sentry3-MIB') / $outlet_divisor);
+                    $outlet_current = (Number::cast(snmp_get($device, "$outlet_oid", '-Ovq', 'Sentry3-MIB')) / $outlet_divisor);
 
                     if ($outlet_current >= 0) {
                         $outlet_insert_index = "outletID.$towers.$infeed_index.$outlet_index";

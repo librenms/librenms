@@ -4,7 +4,7 @@ $multiplier = 1;
 $divisor = 1000000;
 $divisor_alarm = 1000000;
 foreach ($pre_cache['procurve_hpicfXcvrInfoTable'] as $index => $entry) {
-    if (is_numeric($entry['hpicfXcvrBias']) && $entry['hpicfXcvrBias'] != 0) {
+    if (isset($entry['hpicfXcvrBias']) && is_numeric($entry['hpicfXcvrBias']) && $entry['hpicfXcvrBias'] != 0) {
         $oid = '.1.3.6.1.4.1.11.2.14.11.5.1.82.1.1.1.1.13.' . $index;
         $dbquery = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$index, $device['device_id']]);
         $limit_low = $entry['hpicfXcvrBiasLoAlarm'] / $divisor_alarm;

@@ -476,7 +476,7 @@ class Pmp extends OS implements
     {
         $device = $this->getDeviceArray();
 
-        return Str::contains($device['hardware'], 'AP') || Str::contains($device['hardware'], 'Master');
+        return isset($device['hardware']) && (Str::contains($device['hardware'], 'AP') || Str::contains($device['hardware'], 'Master'));
     }
 
     /**

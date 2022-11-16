@@ -165,7 +165,7 @@ trait YamlOSDiscovery
                 }
 
                 // check for regex
-                if (@preg_match($search, $device->$field) !== false) {
+                if (StringHelpers::isRegexPatternMaybe($search) && @preg_match($search, $device->$field) !== false) {
                     $device->$field = preg_replace($search, $replacement, $device->$field);
                 } else {
                     $device->$field = str_replace($search, $replacement, $device->$field);
