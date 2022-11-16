@@ -2,16 +2,14 @@
 
 echo 'RFC1628 ';
 
-$load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
+$load_data = SnmpQuery::walk('UPS-MIB::upsOutputPercentLoad')->filterBadLines()->table()['UPS-MIB::upsOutputPercentLoad'] ?? [];
 
 foreach ($load_data as $index => $data) {
     $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.$index";
 
-    if (is_array($data['upsOutputPercentLoad'])) {
+    if (is_array($data)) {
         $load_oid .= '.0';
-        $value = $data['upsOutputPercentLoad'][0];
-    } else {
-        $value = $data['upsOutputPercentLoad'];
+        $data = $data[0];
     }
 
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'load', $load_oid);
@@ -34,6 +32,6 @@ foreach ($load_data as $index => $data) {
         null,
         null,
         null,
-        $value / $divisor
+        $data / $divisor
     );
 }

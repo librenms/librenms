@@ -3,7 +3,7 @@
 // RFC1628 UPS
 echo 'RFC1628 ';
 
-$value = snmp_get($device, 'upsEstimatedChargeRemaining.0', '-OvqU', 'UPS-MIB');
+$value = SnmpQuery::get('UPS-MIB::upsEstimatedChargeRemaining.0')->value();
 
 if (is_numeric($value)) {
     discover_sensor(

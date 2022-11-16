@@ -2,15 +2,15 @@
 
 echo 'RFC1628 ';
 
-$output_power = snmpwalk_group($device, 'upsOutputPower', 'UPS-MIB');
+$output_power = SnmpQuery::walk('UPS-MIB::upsOutputPower')->filterBadLines()->table()['UPS-MIB::upsOutputPower'] ?? [];
 foreach ($output_power as $index => $data) {
     $pwr_oid = ".1.3.6.1.2.1.33.1.4.4.1.4.$index";
     $descr = 'Output';
     if (count($output_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsOutputPower'])) {
-        $data['upsOutputPower'] = $data['upsOutputPower'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $pwr_oid .= '.0';
     }
 
@@ -28,7 +28,7 @@ foreach ($output_power as $index => $data) {
         null,
         null,
         null,
-        $data['upsOutputPower']
+        $data
     );
 }
 
@@ -58,19 +58,19 @@ foreach ($input_power as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputTruePower']
+        $data
     );
 }
 
-$bypass_power = snmpwalk_group($device, 'upsBypassPower', 'UPS-MIB');
+$bypass_power = SnmpQuery::walk('UPS-MIB::upsBypassPower')->filterBadLines()->table()['UPS-MIB::upsBypassPower'] ?? [];
 foreach ($bypass_power as $index => $data) {
     $pwr_oid = ".1.3.6.1.2.1.33.1.5.3.1.4.$index";
     $descr = 'Bypass';
     if (count($bypass_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsBypassPower'])) {
-        $data['upsBypassPower'] = $data['upsBypassPower'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $pwr_oid .= '.0';
     }
 
@@ -88,7 +88,7 @@ foreach ($bypass_power as $index => $data) {
         null,
         null,
         null,
-        $data['upsBypassPower']
+        $data
     );
 }
 

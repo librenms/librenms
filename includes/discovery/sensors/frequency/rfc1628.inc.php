@@ -2,7 +2,7 @@
 
 echo 'RFC1628 ';
 
-$input_freq = snmpwalk_group($device, 'upsInputFrequency', 'UPS-MIB');
+$input_freq = SnmpQuery::walk('UPS-MIB::upsInputFrequency')->filterBadLines()->table()['UPS-MIB::upsInputFrequency'] ?? [];
 foreach ($input_freq as $index => $data) {
     $freq_oid = ".1.3.6.1.2.1.33.1.3.3.1.2.$index";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);
@@ -10,8 +10,8 @@ foreach ($input_freq as $index => $data) {
     if (count($input_freq) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsInputFrequency'])) {
-        $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $freq_oid .= '.0';
     }
 
@@ -29,11 +29,11 @@ foreach ($input_freq as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputFrequency'] / $divisor
+        $data / $divisor
     );
 }
 
-$output_freq = snmp_get($device, 'upsOutputFrequency.0', '-OqvU', 'UPS-MIB');
+$output_freq = SnmpQuery::get('UPS-MIB::upsOutputFrequency.0')->value();
 if (is_numeric($output_freq)) {
     $freq_oid = '.1.3.6.1.2.1.33.1.4.2.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);
@@ -56,7 +56,7 @@ if (is_numeric($output_freq)) {
     );
 }
 
-$bypass_freq = snmp_get($device, 'upsBypassFrequency.0', '-OqvU', 'UPS-MIB');
+$bypass_freq = SnmpQuery::get('UPS-MIB::upsBypassFrequency.0')->value();
 if (is_numeric($bypass_freq)) {
     $freq_oid = '.1.3.6.1.2.1.33.1.5.1.0';
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'frequency', $freq_oid);

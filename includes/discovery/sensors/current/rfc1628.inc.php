@@ -3,6 +3,7 @@
 echo 'RFC1628 ';
 
 $battery_current = snmp_get($device, 'upsBatteryCurrent.0', '-OqvU', 'UPS-MIB');
+dump($battery_current);
 
 if (is_numeric($battery_current)) {
     $oid = '.1.3.6.1.2.1.33.1.2.6.0';
@@ -26,7 +27,7 @@ if (is_numeric($battery_current)) {
     );
 }
 
-$output_current = snmpwalk_group($device, 'upsOutputCurrent', 'UPS-MIB');
+$output_current = SnmpQuery::walk('UPS-MIB::upsOutputCurrent')->filterBadLines()->table()['UPS-MIB::upsOutputCurrent'] ?? [];
 foreach ($output_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.4.4.1.3.$index";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
@@ -34,8 +35,8 @@ foreach ($output_current as $index => $data) {
     if (count($output_current) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsOutputCurrent'])) {
-        $data['upsOutputCurrent'] = $data['upsOutputCurrent'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $oid .= '.0';
     }
 
@@ -53,11 +54,11 @@ foreach ($output_current as $index => $data) {
         null,
         null,
         null,
-        $data['upsOutputCurrent'] / $divisor
+        $data / $divisor
     );
 }
 
-$input_current = snmpwalk_group($device, 'upsInputCurrent', 'UPS-MIB');
+$input_current = SnmpQuery::walk('UPS-MIB::upsInputCurrent')->filterBadLines()->table()['UPS-MIB::upsInputCurrent'] ?? [];
 foreach ($input_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.3.3.1.4.$index";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
@@ -65,8 +66,8 @@ foreach ($input_current as $index => $data) {
     if (count($input_current) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsInputCurrent'])) {
-        $data['upsInputCurrent'] = $data['upsInputCurrent'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $oid .= '.0';
     }
 
@@ -84,11 +85,11 @@ foreach ($input_current as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputCurrent'] / $divisor
+        $data / $divisor
     );
 }
 
-$bypass_current = snmpwalk_group($device, 'upsBypassCurrent', 'UPS-MIB');
+$bypass_current = SnmpQuery::walk('UPS-MIB::upsBypassCurrent')->filterBadLines()->table()['UPS-MIB::upsBypassCurrent'] ?? [];
 foreach ($bypass_current as $index => $data) {
     $oid = ".1.3.6.1.2.1.33.1.5.3.1.3.$index";
     $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'current', $oid);
@@ -96,8 +97,8 @@ foreach ($bypass_current as $index => $data) {
     if (count($bypass_current) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsBypassCurrent'])) {
-        $data['upsBypassCurrent'] = $data['upsBypassCurrent'][0];
+    if (is_array($data)) {
+        $data = $data[0];
         $oid .= '.0';
     }
 
@@ -115,7 +116,7 @@ foreach ($bypass_current as $index => $data) {
         null,
         null,
         null,
-        $data['upsBypassCurrent'] / $divisor
+        $data / $divisor
     );
 }
 

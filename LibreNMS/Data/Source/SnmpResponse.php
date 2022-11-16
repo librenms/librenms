@@ -244,15 +244,28 @@ class SnmpResponse
     }
 
     /**
+     * Filter bad lines, examples:
+     * "No Such Instance currently exists at this OID"
+     * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     */
+    public function filterBadLines(): SnmpResponse
+    {
+        return new static($this->getRawWithoutBadLines(), $this->stderr, $this->exitCode);
+    }
+
+
+    /**
      * Filter bad lines from the raw output, examples:
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     * "MIB::oidName = NULL"
      */
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
             '/^.*No Such Instance currently exists.*$/m',
-            '/\n[^\r\n]+No more variables left[^\r\n]+$/s',
+            '/\n[^\r\n]+No more variables left[^\r\n]+$/',
+            '/^.*' . self::KEY_VALUE_DELIMITER . 'NULL$/m', // null response lines
         ], '', $this->raw);
     }
 
