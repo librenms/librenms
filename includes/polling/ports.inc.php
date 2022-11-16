@@ -574,7 +574,7 @@ foreach ($ports as $port) {
         // Check to make sure Port data is cached.
         $this_port = &$port_stats[$ifIndex];
 
-        if (Str::startsWith($device['os'], 'vmware') && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
             $this_port['ifDescr'] = $matches[1];
         }
 
