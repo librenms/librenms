@@ -4,7 +4,7 @@ echo ' NetScaler ';
 
 echo ' Caching OIDs:';
 
-if (! is_array($ns_sensor_array)) {
+if (!isset($ns_sensor_array) || ! is_array($ns_sensor_array)) {
     $ns_sensor_array = [];
     echo ' sysHealthCounterValue ';
     $ns_sensor_array = snmpwalk_cache_multi_oid($device, 'sysHealthCounterValue', $ns_sensor_array, 'NS-ROOT-MIB');
@@ -12,6 +12,9 @@ if (! is_array($ns_sensor_array)) {
 
 foreach ($ns_sensor_array as $descr => $data) {
     $current = $data['sysHealthCounterValue'];
+    $divisor = 1;
+    $type = false;
+    $multiplier = 0;
 
     $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . string_to_oid($descr);
 

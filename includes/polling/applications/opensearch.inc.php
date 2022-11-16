@@ -4,7 +4,7 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'opensearch';
-
+$app_id = $app->app_id;
 try {
     $returned = json_app_get($device, 'opensearch');
 } catch (JsonAppException $e) {

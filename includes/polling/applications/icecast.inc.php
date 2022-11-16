@@ -3,6 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'icecast';
+$app_id = $app->app_id;
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -35,7 +36,7 @@ $rrd_def = RrdDefinition::make()
 $fields = [
     'cpu' => (float) $icecast['CPU Load'],
     'kbyte' => (int) $icecast['Used Memory'],
-    'openfiles' => (int) $icecast['Open files'],
+    'openfiles' => (int) $icecast['Open files'] ?? 0,
 ];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
@@ -43,3 +44,5 @@ $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $fields);
+
+unset($name, $app_id, $app, $tags, $fields);

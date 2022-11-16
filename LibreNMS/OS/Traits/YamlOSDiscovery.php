@@ -154,6 +154,10 @@ trait YamlOSDiscovery
     private function replaceStringsInFields(Device $device, array $os_yaml): void
     {
         foreach ($this->osFields as $field) {
+            // Nothing to replace if its empty
+            if (empty($device->$field)) {
+                continue;
+            }
             foreach ($os_yaml["{$field}_replace"] ?? [] as $replacements) {
                 $search = $replacements;
                 $replacement = '';

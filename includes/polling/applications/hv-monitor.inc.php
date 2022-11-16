@@ -17,19 +17,19 @@ try {
 
 $app_data['hv'] = $return_data['hv'];
 
-if (! is_array($app_data['VMs'])) {
+if (! is_array($app_data['VMs'] ?? null)) {
     $app_data['VMs'] = [];
 }
 
-if (! is_array($app_data['VMdisks'])) {
+if (! is_array($app_data['VMdisks'] ?? null)) {
     $app_data['VMdisks'] = [];
 }
 
-if (! is_array($app_data['VMifs'])) {
+if (! is_array($app_data['VMifs'] ?? null)) {
     $app_data['VMdifs'] = [];
 }
 
-if (! is_array($app_data['VMstatus'])) {
+if (! is_array($app_data['VMstatus'] ?? null)) {
     $app_data['VMdstatus'] = [];
 }
 
@@ -118,11 +118,11 @@ $totals_fields = [
     'nostate' => $return_data['totals']['nostate'],
     'pmsuspended' => $return_data['totals']['pmsuspended'],
     'rbytes' => $return_data['totals']['rbytes'],
-    'rtime' => $return_data['totals']['rtime'],
-    'rreqs' => $return_data['totals']['rreqs'],
+    'rtime' => $return_data['totals']['rtime']  ?? null,
+    'rreqs' => $return_data['totals']['rreqs']  ?? null,
     'wbytes' => $return_data['totals']['wbytes'],
-    'wtime' => $return_data['totals']['wtime'],
-    'wreqs' => $return_data['totals']['wreqs'],
+    'wtime' => $return_data['totals']['wtime']  ?? null,
+    'wreqs' => $return_data['totals']['wreqs']  ?? null,
     'disk_alloc' => $return_data['totals']['disk_alloc'],
     'disk_in_use' => $return_data['totals']['disk_in_use'],
     'disk_on_disk' => $return_data['totals']['disk_on_disk'],
@@ -214,11 +214,11 @@ foreach ($return_data['VMs'] as $vm => $vm_info) {
         'nswap' => $vm_info['nswap'],
         'status_int' => $vm_info['status_int'],
         'rbytes' => $vm_info['rbytes'],
-        'rtime' => $vm_info['rtime'],
-        'rreqs' => $vm_info['rreqs'],
+        'rtime' => $vm_info['rtime'] ?? null,
+        'rreqs' => $vm_info['rreqs'] ?? null,
         'wbytes' => $vm_info['wbytes'],
-        'wtime' => $vm_info['wtime'],
-        'wreqs' => $vm_info['wreqs'],
+        'wtime' => $vm_info['wtime']  ?? null,
+        'wreqs' => $vm_info['wreqs']  ?? null,
         'disk_alloc' => $vm_info['disk_alloc'],
         'disk_in_use' => $vm_info['disk_in_use'],
         'disk_on_disk' => $vm_info['disk_on_disk'],

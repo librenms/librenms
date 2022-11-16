@@ -20,6 +20,7 @@ use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'powermon';
+$app_id = $app->app_id;
 
 try {
     $result = json_app_get($device, $name);

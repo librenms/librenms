@@ -30,7 +30,7 @@ $mappings = [];
 
 // Parse json data for interfaces and their respective clients' metrics.
 foreach ($interface_client_map as $interface => $client_list) {
-    $finterface = is_string($interface) ? filter_var($interface, FILTER_SANITIZE_STRING) : null;
+    $finterface = is_string($interface) ? htmlspecialchars($interface) : null;
 
     if (is_null($finterface)) {
         echo PHP_EOL . $name . ':' . ' Invalid or no interface found.' . PHP_EOL;
@@ -40,7 +40,7 @@ foreach ($interface_client_map as $interface => $client_list) {
 
     $mappings[$finterface] = [];
     foreach ($client_list as $client => $client_data) {
-        $fclient = is_string($client) ? filter_var($client, FILTER_SANITIZE_STRING) : null;
+        $fclient = is_string($client) ? htmlspecialchars($client) : null;
 
         if (is_null($fclient)) {
             echo PHP_EOL . $name . ':' . ' Invalid or no client found.' . PHP_EOL;

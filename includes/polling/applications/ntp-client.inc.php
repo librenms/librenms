@@ -5,7 +5,7 @@ use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ntp-client';
-
+$app_id = $app->app_id;
 try {
     $ntp = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {

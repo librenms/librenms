@@ -77,7 +77,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('diremisses', 'DERIVE', 0)
     ->addDataset('accshits', 'DERIVE', 0)
     ->addDataset('accsmisses', 'DERIVE', 0);
-
+dump($nfs['data']);
 $fields = [
     'getattr' => $nfs['data']['Getattr'],
     'setattr' => $nfs['data']['Setattr'],
@@ -89,7 +89,7 @@ $fields = [
     'remove' => $nfs['data']['Remove'],
     'rename' => $nfs['data']['Rename'],
     'link' => $nfs['data']['Link'],
-    'symlink' => $nfs['data']['SymLink'],
+    'symlink' => $nfs['data']['SymLink'] ?? null,
     'mkdir' => $nfs['data']['Mkdir'],
     'rmdir' => $nfs['data']['Rmdir'],
     'readdir' => $nfs['data']['Readdir'],
