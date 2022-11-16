@@ -151,7 +151,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     unset($entry['inetCidrRouteMetric4']);
                     unset($entry['inetCidrRouteMetric5']);
                     unset($entry['inetCidrRouteStatus']);
-                    $entryPerType[$inetCidrRouteDestType] = isset($entryPerType[$inetCidrRouteDestType]) ? $entryPerType[$inetCidrRouteDestType]+1 : 1;
+                    $entryPerType[$inetCidrRouteDestType] = isset($entryPerType[$inetCidrRouteDestType]) ? $entryPerType[$inetCidrRouteDestType] + 1 : 1;
 
                     $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop] ?? [];
                     if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {

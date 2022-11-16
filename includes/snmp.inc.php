@@ -946,7 +946,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
 
         $split = explode(' ', $line, 2);
         $key = $split[0];
-        $value = trim($split[1] ?? "");
+        $value = trim($split[1] ?? '');
 
         $prop_id = explode('.', $key);
 

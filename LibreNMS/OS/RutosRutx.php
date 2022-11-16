@@ -66,7 +66,6 @@ class RutosRutx extends OS implements
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-
             $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex')[$index] ?? 1;
             $sensors[] = new WirelessSensor(
                 'rsrp',

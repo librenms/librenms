@@ -172,9 +172,8 @@ class StringHelpers
 
         return Str::length($pattern) > 1
         // Can only end with starting delimiter or one of the modifiers (PCRE2)
-        && Str::endsWith($pattern, [$delimiter, 'g','m','i','x','s','u','U','A','J','D'])
+        && Str::endsWith($pattern, [$delimiter, 'g', 'm', 'i', 'x', 's', 'u', 'U', 'A', 'J', 'D'])
         // Can only start with a valid delimiter
         && preg_match('/[^A-Za-z0-9\s\\\]/', $delimiter);
-
     }
 }
