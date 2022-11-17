@@ -975,7 +975,7 @@ function get_port_graphs(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $columns = $request->get('columns', 'ifName');
 
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 
@@ -1056,9 +1056,13 @@ function search_ports(Illuminate\Http\Request $request)
 {
     $field = $request->route('field');
     $search = $request->route('search');
+    $columns = $request->get('columns');
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
+        return $validate;
+    }
 
     $query = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName', $columns]);
 
     if (isset($search)) {
         $query->where($field, 'like', "%$search%");
@@ -1082,7 +1086,7 @@ function search_ports(Illuminate\Http\Request $request)
 function get_all_ports(Illuminate\Http\Request $request)
 {
     $columns = $request->get('columns', 'port_id, ifName');
-    if ($validate = validate_column_list($columns, 'ports') !== true) {
+    if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 

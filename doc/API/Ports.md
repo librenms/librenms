@@ -51,7 +51,7 @@ Route: `/api/v0/ports/search/:search`
 
 Input:
 
-  -
+- columns: Comma separated list of columns you want returned.
 
 Example:
 
@@ -97,7 +97,7 @@ Route: `/api/v0/ports/search/:field/:search`
 
 Input:
 
-  -
+- columns: Comma separated list of columns you want returned.
 
 Example:
 
