@@ -421,7 +421,7 @@ lnms config:set overview_show_sysDescr true
 Enable or disable the sysDescr output for a device.
 
 ```bash
-lnms config:set device_default_display '{{ $hostname }}'
+lnms config:set device_display_default '{{ $hostname }}'
 ```
 
 This is a simple template to control the display of device names by default.
