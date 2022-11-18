@@ -218,7 +218,12 @@ class IRCBot
 
     private function connectAlert()
     {
-        $f = $this->config['install_dir'] . '/.ircbot.alert';
+        $container_dir = '/data';
+        if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
+            $f = $container_dir . '/.ircbot.alert';
+        } else {
+            $f = $this->config['install_dir'] . '/.ircbot.alert';
+        }
         if ((file_exists($f) && filetype($f) != 'fifo' && ! unlink($f)) || (! file_exists($f) && ! shell_exec("mkfifo $f && echo 1"))) {
             $this->log('Error - Cannot create Alert-File');
 
