@@ -27,6 +27,7 @@ use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -35,13 +36,14 @@ use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\InvalidTableColumnException;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
+function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
     if (isset($result) && ! isset($result_name)) {
         return api_error(500, 'Result name not specified');
@@ -68,12 +70,12 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     return response()->json($output, $code, [], JSON_PRETTY_PRINT);
 } // end api_success()
 
-function api_success_noresult($code, $message = null)
+function api_success_noresult($code, $message = null): JsonResponse
 {
     return api_success(null, null, $message, $code);
 } // end api_success_noresult
 
-function api_error($statusCode, $message)
+function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
         'status'  => 'error',
@@ -81,7 +83,7 @@ function api_error($statusCode, $message)
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
 
-function api_not_found()
+function api_not_found(): JsonResponse
 {
     return api_error(404, "This API route doesn't exist.");
 }
@@ -970,25 +972,16 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
     });
 }
 
-function get_port_graphs(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
 {
-    $hostname = $request->route('hostname');
-    $columns = $request->get('columns', 'ifName');
+    $device = DeviceCache::get($request->route('hostname'));
+    $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
 
-    if (($validate = validate_column_list($columns, 'ports')) !== true) {
-        return $validate;
-    }
-
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    $sql = '';
-    $params = [$device_id];
-    if (! device_permitted($device_id)) {
-        $sql = 'AND `port_id` IN (select `port_id` from `ports_perms` where `user_id` = ?)';
-        array_push($params, Auth::id());
-    }
-
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `device_id` = ? AND `deleted` = '0' $sql ORDER BY `ifIndex`", $params);
+    $ports = $device->ports()->isNotDeleted()->hasAccess(Auth::user())
+        ->select($columns)->orderBy('ifIndex')->get();
 
     return api_success($ports, 'ports');
 }
@@ -1052,29 +1045,31 @@ function get_port_info(Illuminate\Http\Request $request)
     });
 }
 
-function search_ports(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function search_ports(Illuminate\Http\Request $request): JsonResponse
 {
+    $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName']);
     $field = $request->route('field');
     $search = $request->route('search');
-    $columns = $request->get('columns');
-    if (($validate = validate_column_list($columns, 'ports')) !== true) {
-        return $validate;
+
+    // if only field is set, swap values
+    if (empty($search)) {
+        [$field, $search] = [$search, $field];
     }
+    $fields = validate_column_list($field, 'ports', ['ifAlias', 'ifDescr', 'ifName']);
 
-    $query = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName', $columns]);
-
-    if (isset($search)) {
-        $query->where($field, 'like', "%$search%");
-    } else {
-        $value = "%$field%";
-        $query->where('ifAlias', 'like', $value)
-            ->orWhere('ifDescr', 'like', $value)
-            ->orWhere('ifName', 'like', $value);
-    }
-
-    $ports = $query->orderBy('ifName')
-                   ->get();
+    $ports = Port::hasAccess(Auth::user())
+        ->isNotDeleted()
+        ->where(function ($query) use ($fields, $search) {
+            foreach ($fields as $field) {
+                $query->orWhere($field, 'like', "%$search%");
+            }
+        })
+        ->select($columns)
+        ->orderBy('ifName')
+        ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1083,21 +1078,17 @@ function search_ports(Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
-function get_all_ports(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function get_all_ports(Illuminate\Http\Request $request): JsonResponse
 {
-    $columns = $request->get('columns', 'port_id, ifName');
-    if (($validate = validate_column_list($columns, 'ports')) !== true) {
-        return $validate;
-    }
+    $columns = validate_column_list($request->get('columns'), 'ports', ['port_id', 'ifName']);
 
-    $params = [];
-    $sql = '';
-    if (! Auth::user()->hasGlobalRead()) {
-        $sql = ' AND (device_id IN (SELECT device_id FROM devices_perms WHERE user_id = ?) OR port_id IN (SELECT port_id FROM ports_perms WHERE user_id = ?))';
-        array_push($params, Auth::id());
-        array_push($params, Auth::id());
-    }
-    $ports = dbFetchRows("SELECT $columns FROM `ports` WHERE `deleted` = 0 $sql", $params);
+    $ports = Port::hasAccess(Auth::user())
+        ->select($columns)
+        ->isNotDeleted()
+        ->get();
 
     return api_success($ports, 'ports');
 }
@@ -1119,7 +1110,7 @@ function get_port_stack(Illuminate\Http\Request $request)
     });
 }
 
-function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
 {
     $portid = $request->route('portid');
 
@@ -1153,7 +1144,10 @@ function list_alert_rules(Illuminate\Http\Request $request)
     return api_success($rules->toArray($request), 'rules');
 }
 
-function list_alerts(Illuminate\Http\Request $request)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 
@@ -1191,9 +1185,7 @@ function list_alerts(Illuminate\Http\Request $request)
 
     if ($request->has('order')) {
         [$sort_column, $sort_order] = explode(' ', $request->get('order'), 2);
-        if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
-            return $res;
-        }
+        validate_column_list($sort_column, 'alerts');
         if (in_array($sort_order, ['asc', 'desc'])) {
             $order = $request->get('order');
         }
@@ -2618,22 +2610,29 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
     return api_success($logs, 'logs', null, 200, null, ['total' => $count]);
 }
 
-function validate_column_list($columns, $tableName)
+/**
+ * @throws \LibreNMS\Exceptions\ApiException
+ */
+function validate_column_list(?string $columns, string $table, array $default = []): array
 {
+    if ($columns == '') { // no user input, return default
+        return $default;
+    }
+
     static $schema;
     if (is_null($schema)) {
         $schema = new \LibreNMS\DB\Schema();
     }
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
-    $valid_columns = $schema->getColumns($tableName);
+    $valid_columns = $schema->getColumns($table);
     $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
-        return api_error(400, 'Invalid columns: ' . join(',', $invalid_columns));
+        throw new InvalidTableColumnException($invalid_columns);
     }
 
-    return true;
+    return $column_names;
 }
 
 function missing_fields($required_fields, $data)

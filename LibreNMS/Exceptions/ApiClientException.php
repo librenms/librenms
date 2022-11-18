@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * ApiException.php
  *
  * -Description-
@@ -15,40 +15,33 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2022 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-use Illuminate\Http\JsonResponse;
-
-class ApiException extends \Exception
+class ApiClientException extends \Exception
 {
+    /** @var array */
+    private $output;
+
     /**
      * @param  string  $message
-     * @param  int  $code
-     * @param  \Throwable|null  $previous
+     * @param  array  $output
      */
-    public function __construct($message = '', $code = 400, $previous = null)
+    public function __construct($message = '', $output = [])
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, 0, null);
+        $this->output = $output;
     }
 
-    /**
-     * Render the exception into an HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     */
-    public function render($request): JsonResponse
+    public function getOutput(): array
     {
-        return response()->json([
-            'status'  => 'error',
-            'message' => $this->getMessage(),
-        ], $this->getCode(), [], JSON_PRETTY_PRINT);
+        return $this->output;
     }
 }
