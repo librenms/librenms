@@ -1421,31 +1421,6 @@ parameters:
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$field with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<int,mixed\\>\\:\\:get\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$devices has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$primary has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
 			message: "#^Property LibreNMS\\\\Cache\\\\PermissionsCache\\:\\:\\$billPermissions has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Cache/PermissionsCache.php
