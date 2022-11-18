@@ -63,7 +63,7 @@ class Device
     /**
      * Get a device by device_id or hostname
      *
-     * @param  int|string|null  $device device_id or hostname
+     * @param  int|string|null  $device  device_id or hostname
      * @return \App\Models\Device
      */
     public function get(int|string|null $device): \App\Models\Device
