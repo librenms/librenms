@@ -41,7 +41,7 @@ class Irc extends Transport
         if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
             $f = $container_dir . '/.ircbot.alert';
         } else {
-            $f = $this->config['install_dir'] . '/.ircbot.alert';
+            $f = Config::get('install_dir') . '/.ircbot.alert';
         }
         if (file_exists($f) && filetype($f) == 'fifo') {
             $f = fopen($f, 'w+');
