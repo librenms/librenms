@@ -1057,12 +1057,14 @@ function search_ports(Illuminate\Http\Request $request)
     $field = $request->route('field');
     $search = $request->route('search');
     $columns = $request->get('columns');
+    $columns = $columns ? explode(',', $columns) : [];
+
     if (($validate = validate_column_list($columns, 'ports')) !== true) {
         return $validate;
     }
 
     $query = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName', $columns]);
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName', ...$columns]);
 
     if (isset($search)) {
         $query->where($field, 'like', "%$search%");
