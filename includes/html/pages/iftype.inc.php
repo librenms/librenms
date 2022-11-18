@@ -27,7 +27,7 @@ $ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($d
 });
 array_walk($types_array, function (&$type) use ($ctypes) {
     $name = $ctypes->get(strtolower($type), $type);
-    $type = ucwords(is_array($name)? $name[0] : $name);
+    $type = ucwords(is_array($name) ? $name[0] : $name);
 });
 
 $types = implode(' + ', $types_array);
