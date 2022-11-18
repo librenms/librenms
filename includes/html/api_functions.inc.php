@@ -1061,7 +1061,7 @@ function search_ports(Illuminate\Http\Request $request)
 
     $ports = Port::hasAccess(Auth::user())
         ->isNotDeleted()
-        ->where(function($query) use ($fields, $search) {
+        ->where(function ($query) use ($fields, $search) {
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', "%$search%");
             }
