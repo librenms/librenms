@@ -52,7 +52,7 @@ class Pmp extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $data = snmp_get_multi_oid($this->getDeviceArray(), ['boxDeviceType.0', 'bhTimingMode.0', 'boxDeviceTypeID.0'], '-OQUs', 'WHISP-BOX-MIBV2-MIB');
+        $data = snmp_get_multi_oid($this->getDeviceArray(), ['boxDeviceType.0', 'bhTimingMode.0', 'boxDeviceTypeID.0', 'productTypeName.0'], '-OQUs', 'WHISP-BOX-MIBV2-MIB');
         $device->features = $data['boxDeviceType.0'] ?? null;
 
         $ptp = [
@@ -70,7 +70,6 @@ class Pmp extends OS implements
         }
 
         $pmp = [
-            'MU-MIMO OFDM' => 'PMP 450m',
             'MIMO OFDM' => 'PMP 450',
             'OFDM' => 'PMP 430',
         ];
@@ -82,6 +81,9 @@ class Pmp extends OS implements
                     $hardware = $model;
                     break;
                 }
+            }
+            if (Str::contains($hardware, 'PMP 450')) {
+                $hardware = $data['productTypeName.0'] ?? $hardware;
             }
             if (Str::contains($device->sysDescr, 'AP')) {
                 $hardware .= ' AP';
