@@ -963,9 +963,11 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
                     $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
 
-                    //user_func must be applied after divisor/multiplier
+                    // user_func must be applied after divisor/multiplier
+                    // It also sends the raw value from snmp and the full sensor, to be used by more "advanced" functions
+                    // For example: Time::dateToDays()
                     if (isset($user_function) && is_callable($user_function)) {
-                        $value = $user_function($value);
+                        $value = $user_function($value, $snmp_data[$data['value']], $data);
                     }
 
                     $uindex = $index;

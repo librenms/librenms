@@ -181,7 +181,7 @@ function record_sensor_data($device, $all_sensors)
         }
 
         if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
-            $sensor_value = $sensor['user_func']($sensor_value);
+            $sensor_value = $sensor['user_func']($sensor_value, $sensor['new_value'], $sensor);
         }
 
         $rrd_name = get_sensor_rrd_name($device, $sensor);
