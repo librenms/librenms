@@ -1,6 +1,6 @@
 <?php
-/*
- * InvalidTableColumnException.php
+/**
+ * ApiException.php
  *
  * -Description-
  *
@@ -15,21 +15,28 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2022 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
-class InvalidTableColumnException extends ApiException
+class ApiClientException extends \Exception
 {
-    public function __construct(
-        public readonly array $columns
-    ) {
-        parent::__construct('Invalid columns: ' . join(',', $this->columns));
+    private $output;
+
+    public function __construct($message = '', $output = [])
+    {
+        parent::__construct($message, 0, null);
+        $this->output = $output;
+    }
+
+    public function getOutput()
+    {
+        return $this->output;
     }
 }
