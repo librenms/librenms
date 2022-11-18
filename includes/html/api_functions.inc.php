@@ -972,7 +972,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 }
 
 /**
- * @throws \LibreNMS\Exceptions\InvalidTableColumnException
+ * @throws \LibreNMS\Exceptions\ApiException
  */
 function get_port_graphs(Illuminate\Http\Request $request)
 {
@@ -1045,7 +1045,7 @@ function get_port_info(Illuminate\Http\Request $request)
 }
 
 /**
- * @throws \LibreNMS\Exceptions\InvalidTableColumnException
+ * @throws \LibreNMS\Exceptions\ApiException
  */
 function search_ports(Illuminate\Http\Request $request)
 {
@@ -1078,7 +1078,7 @@ function search_ports(Illuminate\Http\Request $request)
 }
 
 /**
- * @throws \LibreNMS\Exceptions\InvalidTableColumnException
+ * @throws \LibreNMS\Exceptions\ApiException
  */
 function get_all_ports(Illuminate\Http\Request $request)
 {
@@ -1144,7 +1144,7 @@ function list_alert_rules(Illuminate\Http\Request $request)
 }
 
 /**
- * @throws \LibreNMS\Exceptions\InvalidTableColumnException
+ * @throws \LibreNMS\Exceptions\ApiException
  */
 function list_alerts(Illuminate\Http\Request $request)
 {
@@ -2610,7 +2610,7 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
 }
 
 /**
- * @throws \LibreNMS\Exceptions\InvalidTableColumnException
+ * @throws \LibreNMS\Exceptions\ApiException
  */
 function validate_column_list(?string $columns, string $table, array $default = []): array
 {
