@@ -729,19 +729,19 @@ there.
 Exact Matching:
 
 ```bash
-lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Matching:
 
 ```bash
-lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Match Substitution:
 
 ```bash
-lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
+lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match

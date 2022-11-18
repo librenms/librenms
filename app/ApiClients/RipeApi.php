@@ -26,7 +26,7 @@
 namespace App\ApiClients;
 
 use GuzzleHttp\Exception\RequestException;
-use LibreNMS\Exceptions\ApiException;
+use LibreNMS\Exceptions\ApiClientException;
 
 class RipeApi extends BaseApi
 {
@@ -38,7 +38,7 @@ class RipeApi extends BaseApi
     /**
      * Get whois info
      *
-     * @throws ApiException
+     * @throws ApiClientException
      */
     public function getWhois(string $resource): array
     {
@@ -52,7 +52,7 @@ class RipeApi extends BaseApi
     /**
      * Get Abuse contact
      *
-     * @throws ApiException
+     * @throws ApiClientException
      */
     public function getAbuseContact(string $resource): mixed
     {
@@ -64,7 +64,7 @@ class RipeApi extends BaseApi
     }
 
     /**
-     * @throws ApiException
+     * @throws ApiClientException
      */
     private function makeApiCall(string $uri, array $options): mixed
     {
@@ -73,13 +73,13 @@ class RipeApi extends BaseApi
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
-                throw new ApiException('RIPE API call failed', $response_data);
+                throw new ApiClientException('RIPE API call failed', $response_data);
             }
         } catch (RequestException $e) {
             $message = 'RIPE API call to ' . $e->getRequest()->getUri() . ' failed: ';
             $message .= $e->getResponse()->getReasonPhrase() . ' ' . $e->getResponse()->getStatusCode();
 
-            throw new ApiException(
+            throw new ApiClientException(
                 $message,
                 json_decode($e->getResponse()->getBody(), true)
             );
