@@ -27,6 +27,7 @@ use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -42,7 +43,7 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
-function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
+function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null): JsonResponse
 {
     if (isset($result) && ! isset($result_name)) {
         return api_error(500, 'Result name not specified');
@@ -69,12 +70,12 @@ function api_success($result, $result_name, $message = null, $code = 200, $count
     return response()->json($output, $code, [], JSON_PRETTY_PRINT);
 } // end api_success()
 
-function api_success_noresult($code, $message = null)
+function api_success_noresult($code, $message = null): JsonResponse
 {
     return api_success(null, null, $message, $code);
 } // end api_success_noresult
 
-function api_error($statusCode, $message)
+function api_error($statusCode, $message): JsonResponse
 {
     return response()->json([
         'status'  => 'error',
@@ -82,7 +83,7 @@ function api_error($statusCode, $message)
     ], $statusCode, [], JSON_PRETTY_PRINT);
 } // end api_error()
 
-function api_not_found()
+function api_not_found(): JsonResponse
 {
     return api_error(404, "This API route doesn't exist.");
 }
@@ -974,7 +975,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function get_port_graphs(Illuminate\Http\Request $request)
+function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
 {
     $device = DeviceCache::get($request->route('hostname'));
     $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
@@ -1047,7 +1048,7 @@ function get_port_info(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function search_ports(Illuminate\Http\Request $request)
+function search_ports(Illuminate\Http\Request $request): JsonResponse
 {
     $columns = validate_column_list($request->get('columns'), 'ports', ['device_id', 'port_id', 'ifIndex', 'ifName']);
     $field = $request->route('field');
@@ -1080,7 +1081,7 @@ function search_ports(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function get_all_ports(Illuminate\Http\Request $request)
+function get_all_ports(Illuminate\Http\Request $request): JsonResponse
 {
     $columns = validate_column_list($request->get('columns'), 'ports', ['port_id', 'ifName']);
 
@@ -1109,7 +1110,7 @@ function get_port_stack(Illuminate\Http\Request $request)
     });
 }
 
-function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
 {
     $portid = $request->route('portid');
 
@@ -1146,7 +1147,7 @@ function list_alert_rules(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function list_alerts(Illuminate\Http\Request $request)
+function list_alerts(Illuminate\Http\Request $request): JsonResponse
 {
     $id = $request->route('id');
 

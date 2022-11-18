@@ -2431,26 +2431,6 @@ parameters:
 			path: LibreNMS/Device/YamlDiscovery.php
 
 		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:getOutput\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\ApiException\\:\\:\\$output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\AuthenticationException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/AuthenticationException.php
