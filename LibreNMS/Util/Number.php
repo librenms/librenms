@@ -93,7 +93,7 @@ class Number
      * @param  mixed  $number
      * @return float|int
      */
-    public static function cast($number)
+    public static function cast(mixed $number): float|int
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
@@ -107,6 +107,21 @@ class Number
         $int = (int) $number;
 
         return $float == $int ? $int : $float;
+    }
+
+    /**
+     * Extract the first number found from a string
+     */
+    public static function extract(mixed $string): float|int
+    {
+        if (! is_numeric($string)) {
+            preg_match('/-?\d*\.?\d+/', $string, $matches);
+            if (! empty($matches[0])) {
+                $string = $matches[0];
+            }
+        }
+
+        return self::cast($string);
     }
 
     /**
