@@ -1,0 +1,22 @@
+{
+    "get_nm_version": {
+        "requestPattern": "raw 0x2e 0xca 0x57 0x01 0x00",
+        "response": null,
+        "expected": null
+    },
+    "platform_global_power": {
+        "requestPattern": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x00 0x00",
+        "response": null,
+        "expected": null
+    },
+    "cpu_global_power": {
+        "requestPattern": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x01 0x00",
+        "response": null,
+        "expected": null
+    },
+    "memory_global_power": {
+        "requestPattern": "raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x02 0x00",
+        "response": null,
+        "expected": null
+    }
+}
