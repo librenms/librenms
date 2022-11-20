@@ -31,7 +31,7 @@ abstract class SnmpFetch extends LnmsCommand
     {
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED, trans('commands.snmp:fetch.arguments.device spec'));
-        $this->addArgument('oid(s)', InputArgument::OPTIONAL|InputArgument::IS_ARRAY, trans('commands.snmp:fetch.arguments.oid(s)'));
+        $this->addArgument('oid(s)', InputArgument::OPTIONAL | InputArgument::IS_ARRAY, trans('commands.snmp:fetch.arguments.oid(s)'));
         $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '[value, values, table]']));
         $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.depth'), 1);
         $this->addOption('numeric', 'i', InputOption::VALUE_NONE, trans('commands.snmp:fetch.options.numeric'));
@@ -106,7 +106,8 @@ abstract class SnmpFetch extends LnmsCommand
                 case 'index-table':
                     $this->printYamlCombinedKey($res->valuesByIndex());
 
-                    continue 2;            }
+                    continue 2;
+            }
         }
 
         return $return;
@@ -159,6 +160,7 @@ abstract class SnmpFetch extends LnmsCommand
     protected function fetchData(): SnmpResponse
     {
         $type = $this->type;
+
         return SnmpQuery::make()
             ->numeric($this->numeric)
             ->$type($this->oids);
