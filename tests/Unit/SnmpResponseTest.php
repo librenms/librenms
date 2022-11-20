@@ -64,7 +64,9 @@ class SnmpResponseTest extends TestCase
             6 => '\\single\\',
             9 => '\\\\double\\\\',
         ]], $response->table());
+
         Config::set('snmp.unescape', true); // for buggy versions of net-snmp
+        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
             'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => 'single',
