@@ -117,7 +117,7 @@ class SnmpResponse
         }
 
         // try to match table format
-         if (str_contains($this->raw, '[')) {
+        if (str_contains($this->raw, '[')) {
             foreach ($oids as $oid) {
                 $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', $oid);
                 // if new oid is different and exists and is not an empty string
