@@ -109,7 +109,7 @@ class SnmpResponseTest extends TestCase
             2 => [
                 'IF-MIB::ifIndex' => '2',
                 'IF-MIB::ifDescr' => 'enp4s0',
-            ]
+            ],
         ], $response->valuesByIndex());
 
         $existing = [0 => 'first', 1 => ['IF-MIB::ifDescr' => 'previous', 'IF-MIB::ifName' => 'lo']];
@@ -123,9 +123,8 @@ class SnmpResponseTest extends TestCase
             2 => [
                 'IF-MIB::ifIndex' => '2',
                 'IF-MIB::ifDescr' => 'enp4s0',
-            ]
+            ],
         ], $response->valuesByIndex($existing));
-
     }
 
     public function testMultiLine(): void

@@ -279,6 +279,7 @@ class SnmpResponse
         // table
         if (Str::contains($key, '[')) {
             preg_match_all('/([^[\]]+)/', $key, $parts);
+
             return $parts[1]; // get all group 1 matches
         }
 
