@@ -443,14 +443,14 @@ class NetSnmpQuery implements SnmpQueryInterface
         $dirs = [$base];
 
         // os group
-        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+        if ($os_group = Config::getOsSetting($this->device->os, 'group')) {
             if (file_exists("$base/$os_group")) {
                 $dirs[] = "$base/$os_group";
             }
         }
 
         // os directory
-        if ($os_mibdir = Config::get("os.{$this->device->os}.mib_dir")) {
+        if ($os_mibdir = Config::getOsSetting($this->device->os, 'mib_dir')) {
             $dirs[] = "$base/$os_mibdir";
         } elseif (file_exists($base . '/' . $this->device->os)) {
             $dirs[] = $base . '/' . $this->device->os;
