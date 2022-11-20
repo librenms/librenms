@@ -198,14 +198,14 @@ return [
         'description' => 'Run snmp query against a device',
         'arguments' => [
             'device spec' => 'Device to query: device_id, hostname/ip, hostname regex, or all',
-            'oid' => 'SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
+            'oid(s)' => 'One or more SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
         'failed' => 'SNMP command failed!',
         'oid' => 'OID',
         'options' => [
-            'type' => 'The type of snmp query to perform :types',
             'output' => 'Specify the output format :formats',
             'numeric' => 'Numeric OIDs',
+            'depth' => 'Depth to group the snmp table at. Usually the same number as the items in the index of the table',
         ],
         'not_found' => 'Device not found',
         'value' => 'Value',
