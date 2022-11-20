@@ -101,17 +101,29 @@ class SnmpResponse
         $values = $this->values();
 
         if (empty($oids)) {
-            return Arr::first($values, null, '');
+            return Arr::first($values, default: '');
         }
 
-        foreach (Arr::wrap($oids) as $oid) {
+        $oids = Arr::wrap($oids);
+        foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
                 $oid = Oid::toNumeric($oid);
             }
 
-            if (! empty($values[$oid])) {
+            if (isset($values[$oid]) && $values[$oid] !== '') {
                 return $values[$oid];
+            }
+        }
+
+        // try to match table format
+         if (str_contains($this->raw, '[')) {
+            foreach ($oids as $oid) {
+                $dot_index_oid = preg_replace('/\.([^.]+)/', '[$1]', $oid);
+                // if new oid is different and exists and is not an empty string
+                if ($dot_index_oid !== $oid && isset($values[$dot_index_oid]) && $values[$dot_index_oid] !== '') {
+                    return $values[$dot_index_oid];
+                }
             }
         }
 
