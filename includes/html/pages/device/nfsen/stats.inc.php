@@ -142,7 +142,7 @@ if (isset($vars['process'])) {
     $current_time = lowest_time(time() - 300);
     $last_time = lowest_time($current_time - $lastN - 300);
 
-    $command = \LibreNMS\Config::get('nfdump') . ' -M ' . nfsen_live_dir($device['hostname']) . ' -T -R ' .
+    $command = \LibreNMS\Config::getExecutable('nfdump') . ' -M ' . nfsen_live_dir($device['hostname']) . ' -T -R ' .
              time_to_nfsen_subpath($last_time) . ':' . time_to_nfsen_subpath($current_time) .
              ' -n ' . $topN . ' -s ' . $stat_type . '/' . $stat_order;
 

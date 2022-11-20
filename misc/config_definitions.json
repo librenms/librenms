@@ -1407,7 +1407,7 @@
             "type": "boolean"
         },
         "dot": {
-            "default": "/usr/bin/dot",
+            "default": "dot",
             "type": "executable"
         },
         "email_auto_tls": {
@@ -1456,7 +1456,7 @@
             "type": "boolean"
         },
         "email_sendmail_path": {
-            "default": "/usr/sbin/sendmail",
+            "default": "sendmail",
             "group": "alerting",
             "section": "email",
             "order": 5,
@@ -3741,7 +3741,7 @@
             "type": "array"
         },
         "ipmitool": {
-            "default": "/usr/bin/ipmitool",
+            "default": "ipmitool",
             "group": "external",
             "section": "binaries",
             "order": 3,
@@ -3921,7 +3921,7 @@
             "type": "text"
         },
         "mtr": {
-            "default": "/usr/bin/mtr",
+            "default": "mtr",
             "group": "external",
             "section": "binaries",
             "order": 4,
@@ -4008,7 +4008,7 @@
             "type": "text"
         },
         "nfdump": {
-            "default": "/usr/bin/nfdump",
+            "default": "nfdump",
             "group": "external",
             "section": "binaries",
             "order": 8,
@@ -4134,7 +4134,7 @@
             "type": "text"
         },
         "nmap": {
-            "default": "/usr/bin/nmap",
+            "default": "nmap",
             "group": "external",
             "section": "binaries",
             "order": 5,
@@ -4412,7 +4412,7 @@
             "type": "integer"
         },
         "ping": {
-            "default": "/bin/ping",
+            "default": "ping",
             "group": "external",
             "section": "binaries",
             "order": 6,
@@ -5146,7 +5146,7 @@
             "type": "boolean"
         },
         "sfdp": {
-            "default": "/usr/bin/sfdp",
+            "default": "sfdp",
             "group": "external",
             "section": "binaries",
             "order": 7,
@@ -5302,14 +5302,14 @@
             }
         },
         "snmpbulkwalk": {
-            "default": "/usr/bin/snmpbulkwalk",
+            "default": "snmpbulkwalk",
             "group": "external",
             "section": "binaries",
             "order": 8,
             "type": "executable"
         },
         "snmpget": {
-            "default": "/usr/bin/snmpget",
+            "default": "snmpget",
             "group": "external",
             "section": "binaries",
             "order": 9,
@@ -5323,14 +5323,14 @@
             "type": "executable"
         },
         "snmptranslate": {
-            "default": "/usr/bin/snmptranslate",
+            "default": "snmptranslate",
             "group": "external",
             "section": "binaries",
             "order": 11,
             "type": "executable"
         },
         "snmpwalk": {
-            "default": "/usr/bin/snmpwalk",
+            "default": "snmpwalk",
             "group": "external",
             "section": "binaries",
             "order": 12,
@@ -5491,7 +5491,7 @@
             "type": "integer"
         },
         "virsh": {
-            "default": "/usr/bin/virsh",
+            "default": "virsh",
             "group": "external",
             "section": "binaries",
             "order": 15,
@@ -5598,7 +5598,7 @@
             "type": "integer"
         },
         "whois": {
-            "default": "/usr/bin/whois",
+            "default": "whois",
             "group": "external",
             "section": "binaries",
             "order": 16,

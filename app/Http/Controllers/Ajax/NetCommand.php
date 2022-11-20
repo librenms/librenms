@@ -45,19 +45,19 @@ class NetCommand extends Controller
 
         switch ($request->get('cmd')) {
             case 'whois':
-                $cmd = [Config::get('whois', 'whois'), $request->get('query')];
+                $cmd = [Config::getExecutable('whois'), $request->get('query')];
                 break;
             case 'ping':
-                $cmd = [Config::get('ping', 'ping'), '-c', '5', $request->get('query')];
+                $cmd = [Config::getExecutable('ping'), '-c', '5', $request->get('query')];
                 break;
             case 'tracert':
-                $cmd = [Config::get('mtr', 'mtr'), '-r', '-c', '5', $request->get('query')];
+                $cmd = [Config::getExecutable('mtr'), '-r', '-c', '5', $request->get('query')];
                 break;
             case 'nmap':
                 if (! $request->user()->isAdmin()) {
                     return response('Insufficient privileges');
                 } else {
-                    $cmd = [Config::get('nmap', 'nmap'), $request->get('query')];
+                    $cmd = [Config::getExecutable('nmap'), $request->get('query')];
                 }
                 break;
             default:

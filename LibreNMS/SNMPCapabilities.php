@@ -96,7 +96,7 @@ class SNMPCapabilities
 
     private static function detectCapabilities(): void
     {
-        $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
+        $process = new Process([Config::getExecutable('snmpget'), '--help']);
         $process->run();
 
         self::$sha2 = Str::contains($process->getErrorOutput(), 'SHA-512');

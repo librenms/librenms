@@ -93,7 +93,7 @@ class RrdCheck extends BaseValidation
     private function test($path, &$stdOutput, &$stdError)
     {
         //rrdtool info <escaped rrd path>
-        $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
+        $command = Config::getExecutable('rrdtool') . ' info ' . escapeshellarg($path);
         $process = proc_open(
             $command,
             [

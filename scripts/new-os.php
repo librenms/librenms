@@ -106,7 +106,7 @@ discovery:
         $mib_name = array_pop($tmp_mib);
     }
 
-    $translate_cmd = Config::get('snmptranslate') . ' -M ' . Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$vendor -m $mib_name -TB '.*Table$' -Os";
+    $translate_cmd = Config::getExecutable('snmptranslate') . ' -M ' . Config::get('mib_dir') . ':' . Config::get('mib_dir') . "/$vendor -m $mib_name -TB '.*Table$' -Os";
     $tables = shell_exec($translate_cmd);
     foreach (explode(PHP_EOL, $tables) as $table_name) {
         if ($table_name) {
