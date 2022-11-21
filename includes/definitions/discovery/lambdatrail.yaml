@@ -33,7 +33,7 @@ modules:
                 -
                     oid: lt2sTemperature
                     value: lt2sTemperature
-                    num_oid: '.1.3.6.1.4.1.35616.5.2.1.0'
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.1.{{ $index }}'
                     descr: Chassis Temp
         dbm:
             data:
@@ -161,5 +161,5 @@ modules:
                 -
                     oid: lt2sPowerFanRPM
                     value: lt2sPowerFanRPM
-                    num_oid: '.1.3.6.1.4.1.35616.5.2.5.0'
+                    num_oid: '.1.3.6.1.4.1.35616.5.2.5.{{ $index }}'
                     descr: 'Fan Speed'
