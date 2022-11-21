@@ -50,6 +50,10 @@ modules:
                             oid: lt2sMgmtSfpRxPower
                             op: '='
                             value: 0
+                        -
+                            oid: lt2sMgmtSfpRxPower
+                            op: '='
+                            value: -1                                                        
 
                 -
                     oid: lt2sMgmtPortTable
@@ -64,6 +68,10 @@ modules:
                             oid: lt2sMgmtSfpTxPower
                             op: '='
                             value: 0
+                        -
+                            oid: lt2sMgmtSfpTxPower
+                            op: '='
+                            value: -1                            
                 -
                     oid: lt2sPortTable
                     value: lt2sLineTxPower
