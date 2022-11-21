@@ -1,0 +1,20 @@
+mib: LOOP-AM3440A-CCPB-V23.03.01
+modules:
+  os:
+    hardware: 'LOOP-AM3440A-CCPB-V23.03.01::SysObjectID.0'
+    serial: 'LOOP-AM3440A-CCPB-V23.03.01:ccSerialNumber.0'
+    version: 'LOOP-AM3440A-CCPB-V23.03.01:ccPROMVersion.0'
+
+  sensors:
+    state:
+      data:         
+        - oid: ethernetStatusTable
+          value: ethernetStatusLink
+          num_oid: '.1.3.6.1.4.1.823.34441.1.33.3.1.4.{{ $index }}'
+          state_name: ethernetStatusLink
+          group: Ethernet Status
+          descr: 'ETH State'
+          index: 'ethernetStatusLink.{{ $index }}'
+          states:
+              - { descr: linkup, graph: 0, value: 1, generic: 0 }
+              - { descr: linkdown, graph: 0, value: 2, generic: 0 }
