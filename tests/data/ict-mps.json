@@ -8,7 +8,7 @@
                     "sysDescr": "ICT Modular Power System",
                     "sysContact": "Example, Inc",
                     "version": "1.04",
-                    "hardware": "2",
+                    "hardware": "Modular Power Series 48V",
                     "features": null,
                     "location": "my_ict_ups",
                     "os": "ict-mps",
