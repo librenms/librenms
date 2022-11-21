@@ -10,3 +10,4 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.35616
+mib_dir: deltanet
