@@ -8,6 +8,7 @@ modules:
     sensors: 
         temperature:
             data:
+                #LT2-S Variant
                 -
                     oid: lt2sMgmtPortTable
                     value: lt2sMgmtSfpLaserTemp
@@ -51,10 +52,11 @@ modules:
                 -
                     oid: systemTemperature
                     value: systemTemperature
-                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.1.0'
+                    num_oid: '.1.3.6.1.4.1.35616.2.1.1.1.{{ $index }}'
                     descr: Chassis Temp                            
         dbm:
             data:
+                #LT2-S Variant
                 -
                     oid: lt2sMgmtPortTable
                     value: lt2sMgmtSfpRxPower
@@ -165,7 +167,6 @@ modules:
                             oid: portLineRxPower
                             op: '='
                             value: -1
-
                 -
                     oid: portEntry
                     value: portClientTxPower
@@ -199,8 +200,7 @@ modules:
                         -
                             oid: portLineRxPower
                             op: '='
-                            value: -1
-                                                     
+                            value: -1                              
         state:
             data:
                 -
