@@ -89,7 +89,7 @@
             document.documentElement.classList.remove('tw-dark')
         }
     </script>
-    @if(session('timezone_static') !== null && ! session('timezone_static'))
+    @if(session('timezone_static') == null || ! session('timezone_static'))
     <script>
         $(document).ready(function() {
             var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
