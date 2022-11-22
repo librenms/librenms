@@ -6,7 +6,7 @@ use LibreNMS\Config;
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'IPMI : ';
-    $ipmi['port'] = filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623';
+    $ipmi['port'] = filter_var(get_dev_attrib($device, 'ipmi_port'), FILTER_VALIDATE_INT) ? get_dev_attrib($device, 'ipmi_port') : '623';
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
