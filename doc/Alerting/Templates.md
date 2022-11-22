@@ -272,7 +272,7 @@ email or just the hostname in any other transport:
 
 ```text
 @if ($alert->status == 0)
-    @if ($alert->status == icmp)
+    @if ($alert->status == 'icmp')
         {{ $alert->debug['traceroute'] }}
     @endif
 @endif
