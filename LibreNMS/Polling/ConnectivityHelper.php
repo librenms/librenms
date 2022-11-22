@@ -140,7 +140,7 @@ class ConnectivityHelper
 
     public function traceroute(): array
     {
-        $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', $this->target];
+        $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', '-I', $this->target];
         if ($this->ipFamily() == 'ipv6') {
             $command[] = '-6';
         }
