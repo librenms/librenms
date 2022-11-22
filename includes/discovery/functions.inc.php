@@ -923,7 +923,11 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     $oid = str_replace('{{ $index }}', $index, $data['num_oid']);
                     // if index is a string, we need to convert it to OID
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
-                    $oid = str_replace('{{ $index_string }}', strlen($index) . '.' . implode('.', unpack('c*', $index)), $oid);
+                    if (preg_match_all('/"([^"]+)"/', $index, $index_string_match)) {
+                        $oid = str_replace('{{ $index_string }}', array_reduce($index_string_match[1], function ($result, $string) {
+                            return strlen($string) . '.' . implode('.', unpack('c*', $string));
+                        }, ''), $oid);
+                    }
 
                     // process the description
                     $descr = trim(YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));
