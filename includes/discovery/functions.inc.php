@@ -925,7 +925,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                     // strlen($index) as first number, and each letter converted to a number, separated by dots
                     if (preg_match_all('/"([^"]+)"/', $index, $index_string_match)) {
                         $oid = str_replace('{{ $index_string }}', array_reduce($index_string_match[1], function ($result, $string) {
-                            return strlen($string) . '.' . implode('.', unpack('c*', $string));
+                            return $result . strlen($string) . '.' . implode('.', unpack('c*', $string));
                         }, ''), $oid);
                     }
 
