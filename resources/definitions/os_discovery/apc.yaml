@@ -880,7 +880,6 @@ modules:
                     oid: xATSSource1VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.2.{{ $index }}'
                     index: 'xATSSource1VoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source1 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -888,7 +887,6 @@ modules:
                     oid: xATSSource1VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.3.{{ $index }}'
                     index: 'xATSSource1VoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source1 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -896,7 +894,6 @@ modules:
                     oid: xATSSource2VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.2.{{ $index }}'
                     index: 'xATSSource2VoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source2 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -904,7 +901,6 @@ modules:
                     oid: xATSSource2VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.3.{{ $index }}'
                     index: 'xATSSource2VoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source2 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -912,7 +908,6 @@ modules:
                     oid: xATSSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.2.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -920,7 +915,6 @@ modules:
                     oid: xATSSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.3.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -928,7 +922,6 @@ modules:
                     oid: xATSGeneratorAdvStatusBatteryVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.1.{{ $index }}'
                     index: 'xATSGeneratorAdvStatusBatteryVoltage.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Generator Battery'
                     divisor: 10
                     skip_values: -1

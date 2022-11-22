@@ -10,7 +10,6 @@ modules:
                 -
                     oid:
                         - ibServiceName
-                    snmp_flags: ['-OQUsb']
 
         state:
             data:
@@ -35,7 +34,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.7779.3.1.1.2.1.9.1.2.{{ $index }}'
                     index: 'ibServiceStatus.{{ $index }}'
                     descr: '{{ $ibServiceName }} Status'
-                    snmp_flags: ['-OQUsbe', '-Pu']
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: Working }
                         - { value: 2, generic: 1, graph: 0, descr: Warning }
