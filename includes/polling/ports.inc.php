@@ -575,7 +575,7 @@ foreach ($ports as $port) {
         $this_port = &$port_stats[$ifIndex];
 
         if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
-            $this_port['ifDescr'] = $matches[1];
+            $this_port['ifName'] = $matches[1];
         }
 
         $polled_period = ($polled - $port['poll_time']);
