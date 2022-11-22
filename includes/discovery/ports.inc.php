@@ -81,6 +81,13 @@ if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
+//Detect loop line card interfaces
+if ($device['os'] == 'loop-telecom') {
+    print_r('test');
+    require base_path('includes/discovery/ports/loop-telecom.php');
+}
+
+
 $default_port_group = Config::get('default_port_group');
 
 // New interface detection

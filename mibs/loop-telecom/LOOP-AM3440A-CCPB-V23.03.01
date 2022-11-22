@@ -7709,8 +7709,8 @@ loop-AM3440-CCPB-A 	OBJECT IDENTIFIER ::= { loopTelecom 34441 }
         ccbDpllClockState  OBJECT-TYPE
             SYNTAX  INTEGER {
                     normal(1),
-                    normal_m(2),
-                    normal_s(3)
+                    normal-m(2),
+                    normal-s(3)
                 }
             ACCESS  read-only
             STATUS  mandatory
