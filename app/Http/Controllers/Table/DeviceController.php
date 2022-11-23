@@ -54,7 +54,7 @@ class DeviceController extends TableController
             'disabled' => 'nullable|in:0,1',
             'ignore' => 'nullable|in:0,1',
             'disable_notify' => 'nullable|in:0,1',
-            'group' => 'nullable|int',
+            'group' => ['nullable', 'regex:/^(\d+|none)$/'],
             'poller_group' => 'nullable|int',
             'device_id' => 'nullable|int',
         ];
@@ -102,9 +102,13 @@ class DeviceController extends TableController
 
         // filter device group, not sure this is the most efficient query
         if ($group = $request->get('group')) {
-            $query->whereHas('groups', function ($query) use ($group) {
-                $query->where('id', $group);
-            });
+            if ($group == 'none') {
+                $query->whereDoesntHave('groups');
+            } else {
+                $query->whereHas('groups', function ($query) use ($group) {
+                    $query->where('id', $group);
+                });
+            }
         }
 
         if ($request->get('poller_group') !== null) {
