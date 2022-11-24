@@ -1,8 +1,10 @@
-os: loop-os
+os: loop-telecom
 text: Loop Telecom Operating System
 type: network
 icon: loop-telecom
 mib_dir: loop-telecom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
 
 discovery:
     - sysObjectID:
