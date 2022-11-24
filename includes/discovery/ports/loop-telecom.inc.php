@@ -12,7 +12,7 @@ foreach ($eth_stats as $index => $port) {
     $curIfIndex = $curIfIndex + 1;
     $portname = snmp_hexstring($port['ethernetStatusName']); // Convert hex to readable string
     $port_stats[$curIfIndex]['ifName'] = $portname;
-    $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1 ? 'up' : 'down');
+    $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down';
     $port_stats[$curIfIndex]['ifDescr'] = $portname;
     $port_stats[$curIfIndex]['ifType'] = $port['ethernetStatusMode']; //Set mode copper
 
@@ -51,13 +51,15 @@ foreach ($eth_stats as $index => $port) {
     switch ($port['ethernetStatusMode']) {
         case 1: //Copper
             $port_stats[$curIfIndex]['ifType'] = 'copper';
-
             break;
         case 2: //optical
             $port_stats[$curIfIndex]['ifType'] = 'optical';
             break;
         case 3: //none
             $port_stats[$curIfIndex]['ifType'] = 'none';
+            break;
+        default: 
+            $port_stats[$curIfIndex]['ifType'] = 'none'; 
             break;
     }
 
