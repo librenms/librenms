@@ -3,7 +3,6 @@
 unset($port_stats); //Unsetting stats to prevent adding the interfaces found with the IF-MIB
 
 $curIfIndex = 0;
-//$fxs_stats = snmpwalk_group($device, 'fxsPortStatusStatus', 'L-AM3440-A-Private');
 $eth_stats = snmpwalk_group($device, 'ethernetStatusTable', 'L-AM3440-A-Private'); //Get eth status
 $eth_traffic = snmpwalk_group($device, 'ethernetCountTable', 'L-AM3440-A-Private'); //Get eth traffic
 
@@ -16,9 +15,8 @@ foreach ($eth_stats as $index => $port) {
     $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1 ? 'up' : 'down');
     $port_stats[$curIfIndex]['ifDescr'] = $portname;
     $port_stats[$curIfIndex]['ifType'] = $port['ethernetStatusMode']; //Set mode copper
-    //$port_stats[$curIfIndex]['ifAlias'] = $port['ethernetStatusName'];
 
-    //Set interface speed
+    //Set interface speed and duplex type
     switch ($port['ethernetStatusSpeed']) {
         case 1: //Port is in auto mode. We asume 1gbps
             $port_stats[$curIfIndex]['ifSpeed'] = 1000000000;
@@ -63,15 +61,16 @@ foreach ($eth_stats as $index => $port) {
             break;
     }
 
-    if ($port_stats[$curIfIndex]['ifOperStatus'] = 'up') {
-        print_r('test test test ');
-        print_r($eth_traffic[$index]['ethernetTxGoodPkt']);
-        print_r($eth_traffic[$index]['ethernetRxGoodPkt']);
-        print_r('stop');
-        $port_stats[$curIfIndex]['ifInOctets'] = $eth_traffic[$index]['ethernetTxGoodPkt'];
-        $port_stats[$curIfIndex]['ifOutOctets'] = $eth_traffic[$index][' ethernetRxGoodPkt'];
-        $port_stats[$curIfIndex]['ifInErrors'] = $eth_traffic[$index]['ethernetRxBadCount'];
+    //Loop over eth ports and match ports to get correct data. The SNMP port is not defined in the ethernetCountTable oid
+    foreach ($eth_traffic as $key => $value) {  
+        $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
+        if($portname == $portCountername){
+            $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetTxGoodPkt']);
+            $port_stats[$curIfIndex]['ifOutOctets'] = abs($value['ethernetRxGoodPkt']);
+            $port_stats[$curIfIndex]['ifInErrors'] = abs($value['ethernetRxBadCount']);
+        }
     }
+
 }
 
 unset($eth_stats);

@@ -61,9 +61,15 @@ foreach ($eth_stats as $index => $port) {
             break;
     }
 
-    $port_stats[$curIfIndex]['ifInOctets'] = abs($eth_traffic[$index]['ethernetTxGoodPkt']);
-    $port_stats[$curIfIndex]['ifOutOctets'] = abs($eth_traffic[$index]['ethernetRxGoodPkt']);
-    $port_stats[$curIfIndex]['ifInErrors'] = abs($eth_traffic[$index]['ethernetRxBadCount']);
+    //Loop over eth ports and match ports to get correct data. The SNMP port is not defined in the ethernetCountTable oid
+    foreach ($eth_traffic as $key => $value) {  
+        $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
+        if($portname == $portCountername){
+            $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetTxGoodPkt']);
+            $port_stats[$curIfIndex]['ifOutOctets'] = abs($value['ethernetRxGoodPkt']);
+            $port_stats[$curIfIndex]['ifInErrors'] = abs($value['ethernetRxBadCount']);
+        }
+    }
 
 }
 
