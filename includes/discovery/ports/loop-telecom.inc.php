@@ -13,6 +13,7 @@ foreach ($eth_stats as $index => $port) {
     $portname = snmp_hexstring($port['ethernetStatusName']); // Convert hex to readable string
     $port_stats[$curIfIndex]['ifName'] = $portname;
     $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down';
+    $port_stats[$curIfIndex]['ifAdminStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down'; #Set this to same as operator stat since the mib does not have admin status
     $port_stats[$curIfIndex]['ifDescr'] = $portname;
     $port_stats[$curIfIndex]['ifType'] = $port['ethernetStatusMode']; //Set mode copper
 
@@ -67,9 +68,10 @@ foreach ($eth_stats as $index => $port) {
     foreach ($eth_traffic as $key => $value) {  
         $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
         if($portname == $portCountername){
-            $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetTxGoodPkt']);
-            $port_stats[$curIfIndex]['ifOutOctets'] = abs($value['ethernetRxGoodPkt']);
+            $port_stats[$curIfIndex]['ifInOctets'] = abs($value['ethernetRxGoodPkt']);
+            $port_stats[$curIfIndex]['ifOutOctets'] = abs($value['ethernetTxGoodPkt']);
             $port_stats[$curIfIndex]['ifInErrors'] = abs($value['ethernetRxBadCount']);
+            
         }
     }
 

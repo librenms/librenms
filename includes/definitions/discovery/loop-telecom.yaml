@@ -4,7 +4,6 @@ modules:
     hardware: SNMPv2-MIB::sysObjectID.0
     serial: L-AM3440-A-Private::ccSerialNumber.0
     version: L-AM3440-A-Private::ccPROMVersion.0
-    features: L-AM3440-A-Private::slotModelTable.0
   sensors:
     state:
       data:
@@ -41,8 +40,9 @@ modules:
 
         - oid: slotModelTable
           value: ccCardState
-          num_oid: '.1.3.6.1.4.1.823.34441.1.9.1.1.{{ $index }}'
-          descr: '{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.9.1.9.{{ $index }}'
+          snmp_flags: '-OQUsbe'
+          descr: 'Slot number-{{ $index }}'
           states:
             - { value: 1, generic: 3, graph: 0, descr: 'Empty' }
             - { value: 2, generic: 1, graph: 0, descr: 'Initializing' }
