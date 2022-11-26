@@ -955,6 +955,47 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Linux IW
+
+The Linux IW application polls wireless access points and wireless clients with the "iw" command.  Wireless statistics are scraped for the host's wireless interfaces.  If the host is an AP, all client statistics known to the AP are polled as well.  If the host is a wireless managed client, all AP statistics known to the client are polled.  For environments with a large number of wireless clients, the administrator has the option of configuring the "linux_iw_cap_lifetime" option in the LibreNMS config.php file to the number of days to display "dead" clients in the graphs.  This lifetime can be set in the script JSON file (see below) as well to override the global value on a host-by-host basis.  If no value is set in either the config.php file or the script JSON file, the default is set to '0', which is a special value that displays "dead" clients indefinitely.  The administrator can also set this value to a negative value; the result of which will display NO client graphs in LibreNMS.  Note that though the clients are not displayed in graphs, their RRD files are always updated and stored indefinitely.  Below is an example of setting the lifetime to 365 days in config.php:
+```
+$config['linux_iw_cap_lifetime'] = 365;
+```
+
+### SNMP Extend
+
+1. Copy the python script, linux_iw.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/linux_iw.py -O /etc/snmp/linux_iw.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/linux_iw.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend linux_iw /etc/snmp/linux_iw.py
+```
+
+4. (Optional) Create a /etc/snmp/linux_iw.json file and specify:
+      a.) (Optional) "linux_iw_cap_lifetime" - Specify the number of days a dead client or wireless AP should remain on the graphs in LibreNMS before being removed (the associated RRD is not removed, however).  There are two special values that can be used: specifying '0' will never expire any client and specifying '-1' (or any negative value) will result in NO client wireless metrics being graphed in LibreNMS. [Default: 0, never expire]
+      b.) (Optional) "iw_cmd" - String path to the wg binary. [Default: "/usr/sbin/iw"]
+      c.) (Optional) "mac_addr_to_friendly_name" - A dictionary to convert between a client or access point's wireless interface mac address and a friendly, arbitrary name.  This name is only used on the graph titles in LibreNMS, so it's just for readability and easier human parsing of data.
+```
+{
+    "linux_iw_cap_lifetime": 50,
+    "iw_cmd": "/bin/iw",
+    "mac_addr_to_friendly_name": {
+        "00:53:00:00:00:01": "client_1.domain.tlv",
+        "00:53:ff:ff:ff:ff": "my_tablet"
+    }
+}
+```
+
+5. Restart snmpd.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend

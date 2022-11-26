@@ -47,33 +47,30 @@ foreach ($rrd_list as $rrd) {
         $colour_iter++;
     }
     $i++;
-    $ds = $rrd['ds'];
-    $filename = $rrd['filename'];
 
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
-    $id = 'ds' . $i;
 
-    $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
-
-    if ($simple_rrd) {
-        $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
-        $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
+    if (isset($rrd['cdef_rpn'])) {
+        $rrd_options .= ' CDEF:' . $rrd['ds'] . '=' . $rrd['cdef_rpn']['val1'] . ',' . $rrd['cdef_rpn']['val2'] . ',' . $rrd['cdef_rpn']['oper'] . ' ';
     } else {
-        $rrd_options .= ' DEF:' . $rrd['ds'] . $i . 'min=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MIN ';
-        $rrd_options .= ' DEF:' . $rrd['ds'] . $i . 'max=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MAX ';
+        $rrd_options .= ' DEF:' . $rrd['ds'] . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
     }
 
-    if ($graph_params->visible('previous')) {
-        $rrd_options .= ' DEF:' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
-        $rrd_options .= ' SHIFT:' . $i . "X:$period";
-        $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
-        $plusesX .= $plusX;
-        $seperatorX = ',';
-        $plusX = ',+';
+    if ($simple_rrd) {
+        $rrd_options .= ' CDEF:' . $rrd['ds'] . 'min=' . $rrd['ds'] . ' ';
+        $rrd_options .= ' CDEF:' . $rrd['ds'] . 'max=' . $rrd['ds'] . ' ';
+    } else {
+        if (isset($rrd['cdef_rpn'])) {
+            $rrd_options .= ' CDEF:' . $rrd['ds'] . 'min=' . $rrd['cdef_rpn']['val1'] . 'min,' . $rrd['cdef_rpn']['val2'] . 'min,' . $rrd['cdef_rpn']['oper'] . ' ';
+            $rrd_options .= ' CDEF:' . $rrd['ds'] . 'max=' . $rrd['cdef_rpn']['val1'] . 'max,' . $rrd['cdef_rpn']['val2'] . 'max,' . $rrd['cdef_rpn']['oper'] . ' ';
+        } else {
+            $rrd_options .= ' DEF:' . $rrd['ds'] . 'min=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MIN ';
+            $rrd_options .= ' DEF:' . $rrd['ds'] . 'max=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MAX ';
+        }
     }
 
     if ($printtotal === 1) {
-        $rrd_options .= ' VDEF:tot' . $rrd['ds'] . $i . '=' . $rrd['ds'] . $i . ',TOTAL';
+        $rrd_options .= ' VDEF:tot' . $rrd['ds'] . '=' . $rrd['ds'] . ',TOTAL';
     }
 
     $g_defname = $rrd['ds'];
@@ -116,25 +113,13 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options .= ' LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
-    $rrd_options .= ' GPRINT:' . $t_defname . $i . ':LAST:' . $print_format . ' GPRINT:' . $t_defname . $i . 'min:MIN:' . $print_format;
-    $rrd_options .= ' GPRINT:' . $t_defname . $i . 'max:MAX:' . $print_format . ' GPRINT:' . $t_defname . $i . ':AVERAGE:' . $print_format . "'\\n'";
+    $rrd_options .= ' LINE2:' . $g_defname . '#' . $colour . ":'" . $descr . "'$stack";
+    $rrd_options .= ' GPRINT:' . $t_defname . ':LAST:' . $print_format . ' GPRINT:' . $t_defname . 'min:MIN:' . $print_format;
+    $rrd_options .= ' GPRINT:' . $t_defname . 'max:MAX:' . $print_format . ' GPRINT:' . $t_defname . ':AVERAGE:' . $print_format . "'\\n'";
 
     if ($printtotal === 1) {
-        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . $i . ":%6.2lf%s'" . Rrd::safeDescr($total_units) . "'";
+        $rrd_options .= ' GPRINT:tot' . $rrd['ds'] . ":%6.2lf%s'" . Rrd::safeDescr($total_units) . "'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
-
-if ($graph_params->visible('previous')) {
-    $rrd_options .= ' CDEF:X=' . $thingX . $plusesX;
-
-    if ($f_multiplier) {
-        $rrd_options .= ',' . $f_multiplier . ',*';
-    } elseif ($f_divider) {
-        $rrd_options .= ',' . $rrd['divider'] . ',/';
-    }
-
-    $rrd_options .= ' HRULE:0#555555';
-}

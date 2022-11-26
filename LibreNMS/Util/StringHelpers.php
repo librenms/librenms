@@ -80,6 +80,7 @@ class StringHelpers
             'smart' => 'SMART',
             'ups-apcups' => 'UPS apcups',
             'ups-nut' => 'UPS nut',
+            'linux_iw' => 'Linux IW',
             'zfs' => 'ZFS',
         ];
 
