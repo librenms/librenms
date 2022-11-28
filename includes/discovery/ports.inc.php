@@ -32,7 +32,6 @@ if ($device['os'] == 'loop-telecom') {
     require base_path('includes/discovery/ports/loop-telecom.inc.php');
 }
 
-
 //Change Zynos ports from swp to 1/1
 if ($device['os'] == 'zynos') {
     require base_path('includes/discovery/ports/zynos.inc.php');
@@ -86,7 +85,6 @@ if ($device['os'] == 'fabos') {
 if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
-
 
 $default_port_group = Config::get('default_port_group');
 

@@ -48,7 +48,6 @@ if ($device['os'] == 'loop-telecom') {
     include 'includes/discovery/sensors/temperature/loop-telecom.inc.php';
 }
 
-
 $run_sensors = [
     'airflow',
     'current',
