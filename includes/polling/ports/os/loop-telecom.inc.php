@@ -72,7 +72,6 @@ foreach ($eth_stats as $index => $port) {
             $port_stats[$curIfIndex]['ifInErrors'] = abs($value['ethernetRxBadCount']);
         }
     }
-
 }
 
 unset($eth_stats);
