@@ -2,9 +2,9 @@
 
 $temperature = snmp_get($device, 'c1Temperature.0', '-Oqv', 'L-AM3440-A-Private');
 
-if (isHexString($temperature)){ # Loop provides the value as hex 
-    $temperature = snmp_hexstring($temperature); # Convert from hex to string
-    $temperature = preg_replace('/[^0-9]/', '', $temperature); #Remove everything thats not an integer
+if (isHexString($temperature)) { // Loop provides the value as hex
+    $temperature = snmp_hexstring($temperature); // Convert from hex to string
+    $temperature = preg_replace('/[^0-9]/', '', $temperature); //Remove everything thats not an integer
 }
 
 if (is_numeric($temperature) && $temperature > '0') {
