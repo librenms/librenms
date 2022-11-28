@@ -6,7 +6,6 @@ $curIfIndex = 0;
 $eth_stats = snmpwalk_group($device, 'ethernetStatusTable', 'L-AM3440-A-Private'); //Get eth status
 $eth_traffic = snmpwalk_group($device, 'ethernetCountTable', 'L-AM3440-A-Private'); //Get eth traffic
 
-
 //Set eth interfaces
 foreach ($eth_stats as $index => $port) {
     $curIfIndex = $curIfIndex + 1;
