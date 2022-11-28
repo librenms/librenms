@@ -14,7 +14,7 @@ foreach ($eth_stats as $index => $port) {
     $port_stats[$curIfIndex]['ifOperStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down';
     $port_stats[$curIfIndex]['ifAdminStatus'] = ($port['ethernetStatusLink'] == 1) ? 'up' : 'down'; //Set this to same as operator stat since the mib does not have admin status
     $port_stats[$curIfIndex]['ifDescr'] = $portname;
-    $port_stats[$curIfIndex]['ifType'] = $port['ethernetStatusMode']; //Set mode copper
+    $port_stats[$curIfIndex]['ifType'] = 'ethernetCsmacd'; //Set mode to ethernet
 
     //Set interface speed and duplex type
     switch ($port['ethernetStatusSpeed']) {
@@ -45,21 +45,6 @@ foreach ($eth_stats as $index => $port) {
         case 7: //10mbps half duplex
             $port_stats[$curIfIndex]['ifSpeed'] = 10000000;
             $port_stats[$curIfIndex]['ifDuplex'] = 'halfDuplex';
-            break;
-    }
-    //Set port mode
-    switch ($port['ethernetStatusMode']) {
-        case 1: //Copper
-            $port_stats[$curIfIndex]['ifType'] = 'copper';
-            break;
-        case 2: //optical
-            $port_stats[$curIfIndex]['ifType'] = 'optical';
-            break;
-        case 3: //none
-            $port_stats[$curIfIndex]['ifType'] = 'none';
-            break;
-        default:
-            $port_stats[$curIfIndex]['ifType'] = 'none';
             break;
     }
 

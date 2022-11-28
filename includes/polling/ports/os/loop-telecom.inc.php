@@ -47,7 +47,7 @@ foreach ($eth_stats as $index => $port) {
             $port_stats[$curIfIndex]['ifDuplex'] = 'halfDuplex';
             break;
     }
-    
+
     //Loop over eth ports and match ports to get correct data. The SNMP port is not defined in the ethernetCountTable oid
     foreach ($eth_traffic as $key => $value) {
         $portCountername = snmp_hexstring($value['ethernetCountName']); // Convert hex to readable string
