@@ -1,7 +1,7 @@
 mib: L-AM3440-A-Private
 modules:
   os:
-    hardware: SNMPv2-MIB::sysObjectID.0
+    hardware_mib: L-AM3440-A-Private
     serial: L-AM3440-A-Private::ccSerialNumber.0
     version: L-AM3440-A-Private::ccPROMVersion.0
   sensors:
