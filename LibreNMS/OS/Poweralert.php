@@ -79,7 +79,8 @@ class Poweralert extends \LibreNMS\OS implements OSPolling
         $device->sysName = \SnmpQuery::get('.1.3.6.1.2.1.33.1.1.5.0')->value() ?: $device->sysName;
     }
 
-    private function getVersion() {
+    private function getVersion()
+    {
         if (! isset($this->cache['poweralert_version'])) {
             $this->cache['poweralert_version'] = \SnmpQuery::get('TRIPPLITE-MIB::tlUpsSnmpCardSerialNum.0')->value();
         }

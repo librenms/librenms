@@ -29,7 +29,7 @@ class HpeRtups extends \LibreNMS\OS
 {
     public function getUpsMibDivisor(string $oid): int
     {
-        return match($oid) {
+        return match ($oid) {
             'UPS-MIB::upsOutputVoltage', 'UPS-MIB::upsBypassVoltage' => 1,
             default => parent::getUpsMibDivisor($oid),
         };

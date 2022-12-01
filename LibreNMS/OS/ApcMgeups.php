@@ -29,7 +29,7 @@ class ApcMgeups extends \LibreNMS\OS
 {
     public function getUpsMibDivisor(string $oid): int
     {
-        return match($oid) {
+        return match ($oid) {
             'UPS-MIB::upsOutputVoltage', 'UPS-MIB::upsInputVoltage', 'UPS-MIB::upsBypassVoltage' => 10,
             default => parent::getUpsMibDivisor($oid),
         };
