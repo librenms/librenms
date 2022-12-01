@@ -35,6 +35,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\Rewrite;
 
 class Lcos extends OS implements
@@ -47,21 +48,6 @@ class Lcos extends OS implements
     WirelessRateDiscovery,
     WirelessRssiDiscovery
 {
-    /**
-     * Convert String to decimal encoded string notation
-     *
-     * @param  string  $index
-     * @return string decimal encoded OID string
-     */
-    private function strToDecOid($index)
-    {
-        $dec_index = [];
-        for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-            $dec_index[] = ord($index[$i]);
-        }
-
-        return implode('.', $dec_index);
-    }
 
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
@@ -83,7 +69,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . '6.' . $this->strToDecOid($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . '6.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Frequency ($radio)",
@@ -126,7 +112,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'capacity',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . '6.' . $this->strToDecOid($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . '6.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Modem Load ($radio)",
@@ -157,7 +143,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'noise-floor',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . '6.' . $this->strToDecOid($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . '6.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Noise Floor ($radio)",
@@ -189,7 +175,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . '6.' . $this->strToDecOid($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . '6.' . Oid::encodeString($index),
                 'lcos-tx',
                 $radio,
                 "Tx Power ($radio)",

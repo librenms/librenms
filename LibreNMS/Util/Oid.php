@@ -79,4 +79,35 @@ class Oid
 
         return $numeric_oid;
     }
+
+    /**
+     * Returns a numeric oid representation of a string.  The first octet is the string length.
+     */
+    public static function encodeString(string $string): string
+    {
+        return strlen($string) . '.' . implode('.', unpack('c*', $string));
+    }
+
+    public static function stringFromOid(string $oid, int $position = 0): string
+    {
+        $parts = explode('.', $oid);
+        $count = count($parts);
+
+        // walk through the parts
+        $offset = 0;
+        for ($i = 0; $i < $count; $i++) {
+            $length = (int) $parts[$offset]; // get the string length
+            $offset++; // skip over string length position
+
+            if ($i == $position) {
+                // convert the parts to a string
+                return pack("c*", ...array_slice($parts, $offset, $length));
+            }
+
+            // skip processed parts
+            $offset += $length;
+        }
+
+        return '';
+    }
 }

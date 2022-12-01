@@ -178,6 +178,11 @@ class YamlDiscovery
             // search discovery data for values
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
+                // convert the numeric index to a string
+                if (Str::startsWith($matches[1], 'index_string')) {
+                    return Oid::stringFromOid($index, (int) substr($matches[1], 12));
+                }
+
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
                     \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
@@ -295,9 +300,9 @@ class YamlDiscovery
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (Str::contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUSa'];
+                                    $snmp_flag = ['-OteQUSab', '-Pu'];
                                 } else {
-                                    $snmp_flag = ['-OteQUsa'];
+                                    $snmp_flag = ['-OteQUsab', '-Pu'];
                                 }
                                 $snmp_flag[] = '-Ih';
 
@@ -343,6 +348,9 @@ class YamlDiscovery
                 if (isset($skip_value['device'])) {
                     // field from device model
                     $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } elseif($skip_value['oid'] == 'index') {
+                    // matching the index of the table row
+                    $tmp_value = $index;
                 } else {
                     // oid previously fetched from the device
                     $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);

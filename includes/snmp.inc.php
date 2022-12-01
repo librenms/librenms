@@ -25,12 +25,7 @@ use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
 function string_to_oid($string)
 {
-    $oid = strlen($string);
-    for ($i = 0; $i != strlen($string); $i++) {
-        $oid .= '.' . ord($string[$i]);
-    }
-
-    return $oid;
+    return \LibreNMS\Util\Oid::encodeString((string) $string);
 }//end string_to_oid()
 
 function prep_snmp_setting($device, $setting)

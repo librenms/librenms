@@ -90,7 +90,6 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $index_string }}` can be used instead.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
 - `low_limit` (optional): This is the critical low threshold that
@@ -111,8 +110,8 @@ are as follows:
   displaying this text. Not specifying this will put the sensors in
   the default group.
 - `index` (optional): This is the index value we use to uniquely
-  identify this sensor. `{{ $index }}` will be replaced by the `index`
-  from the snmp walk.
+  identify this sensor. `{{ $index }}` will be replaced by the numeric
+  `index` of this row in the table the snmp walk.
 - `skip_values` (optional): This is an array of values we should skip
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
@@ -146,6 +145,8 @@ is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
+If you want access a string in an index, `{{ $index_string }}` can be used,
+optionally suffixed with the position of the one you want.
 
 When referencing an oid in another table the full index will be used to match the other table.
 If this is undesirable, you may use a single sub index by appending the sub index after a colon to
