@@ -151,7 +151,7 @@ class ConnectivityHelper
 
         return [
             'traceroute' => $process->getOutput(),
-            'output' => $process->getErrorOutput(),
+            'traceroute_output' => $process->getErrorOutput(),
         ];
     }
 
