@@ -348,7 +348,7 @@ class YamlDiscovery
                 if (isset($skip_value['device'])) {
                     // field from device model
                     $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
-                } elseif($skip_value['oid'] == 'index') {
+                } elseif ($skip_value['oid'] == 'index') {
                     // matching the index of the table row
                     $tmp_value = $index;
                 } else {

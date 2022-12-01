@@ -105,7 +105,7 @@ class Oid
 
             if ($i == $position) {
                 // convert the parts to a string
-                return pack("c*", ...array_slice($parts, $offset, $length));
+                return pack('c*', ...array_slice($parts, $offset, $length));
             }
 
             // skip processed parts

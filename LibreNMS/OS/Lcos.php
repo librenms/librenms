@@ -48,7 +48,6 @@ class Lcos extends OS implements
     WirelessRateDiscovery,
     WirelessRssiDiscovery
 {
-
     /**
      * Discover wireless frequency.  This is in Hz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
