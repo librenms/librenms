@@ -44,6 +44,6 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:LAST:%5.1lf$unit";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MIN:%5.1lf$unit";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MAX:%5.1lf$unit";
-    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:AVERAGE:%5.2lf\\l ";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:AVERAGE:%5.2lf$unit\\l ";
     $iter++;
 }//end foreach
