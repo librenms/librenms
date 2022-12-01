@@ -4,6 +4,7 @@ echo 'RFC1628 ';
 
 $battery_temp = SnmpQuery::get('UPS-MIB::upsBatteryTemperature.0')->value();
 if (is_numeric($battery_temp)) {
+    $divisor = $os->getUpsMibDivisor('UPS-MIB::upsBatteryTemperature');
     discover_sensor(
         $valid['sensor'],
         'temperature',
@@ -12,13 +13,8 @@ if (is_numeric($battery_temp)) {
         0,
         'rfc1628',
         'Battery',
-        1,
-        1,
-        null,
-        null,
-        null,
-        null,
-        $battery_temp
+        $divisor,
+        current: $battery_temp / $divisor
     );
 }
 

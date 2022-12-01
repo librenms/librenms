@@ -5,14 +5,7 @@ echo 'RFC1628 ';
 $load_data = SnmpQuery::walk('UPS-MIB::upsOutputPercentLoad')->filterBadLines()->table()['UPS-MIB::upsOutputPercentLoad'] ?? [];
 
 foreach ($load_data as $index => $data) {
-    $load_oid = ".1.3.6.1.2.1.33.1.4.4.1.5.$index";
-
-    if (is_array($data)) {
-        $load_oid .= '.0';
-        $data = $data[0];
-    }
-
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? 0, 'load', $load_oid);
+    $divisor = $os->getUpsMibDivisor('UPS-MIB::upsOutputPercentLoad');
     $descr = 'Percentage load';
     if (count($load_data) > 1) {
         $descr .= " $index";
@@ -22,16 +15,11 @@ foreach ($load_data as $index => $data) {
         $valid['sensor'],
         'load',
         $device,
-        $load_oid,
+        ".1.3.6.1.2.1.33.1.4.4.1.5.$index",
         500 + $index,
         'rfc1628',
         $descr,
         $divisor,
-        1,
-        null,
-        null,
-        null,
-        null,
-        $data / $divisor
+        current: $data / $divisor
     );
 }

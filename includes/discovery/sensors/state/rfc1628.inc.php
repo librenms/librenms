@@ -26,15 +26,7 @@ if (is_numeric($state)) {
         $sensor_index,
         $state_name,
         'Battery Status',
-        1,
-        1,
-        null,
-        null,
-        null,
-        null,
-        $state,
-        'snmp',
-        0
+        current: $state,
     );
 
     //Create Sensor To State Index
@@ -68,15 +60,7 @@ if (is_numeric($state)) {
         $sensor_index,
         $state_name,
         'Output Source',
-        1,
-        1,
-        null,
-        null,
-        null,
-        null,
-        $state,
-        'snmp',
-        0
+        current: $state,
     );
 
     //Create Sensor To State Index

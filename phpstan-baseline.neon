@@ -3481,11 +3481,6 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Property LibreNMS\\\\OS\\:\\:\\$cache has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
 			message: "#^Property LibreNMS\\\\OS\\:\\:\\$device has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php

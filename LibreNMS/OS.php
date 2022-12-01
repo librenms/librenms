@@ -50,6 +50,7 @@ use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\UpsMib;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\Util\StringHelpers;
@@ -82,6 +83,7 @@ class OS implements
     use NetstatsPolling;
     use ResolvesPortIds;
     use BridgeMib;
+    use UpsMib;
 
     /**
      * @var float|null
@@ -89,7 +91,7 @@ class OS implements
     public $stpTimeFactor; // for stp time quirks
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
-    private $cache; // data cache
+    protected array $cache = []; // data cache
     private $pre_cache; // pre-fetch data cache
 
     /**

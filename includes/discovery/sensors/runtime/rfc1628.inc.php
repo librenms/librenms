@@ -6,7 +6,7 @@ echo 'RFC1628 ';
 $secs_on_battery = SnmpQuery::get('UPS-MIB::upsSecondsOnBattery.0')->value();
 
 if (is_numeric($secs_on_battery)) {
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', '.1.3.6.1.2.1.33.1.2.2.0');
+    $divisor = $os->getUpsMibDivisor('UPS-MIB::upsSecondsOnBattery');
     discover_sensor(
         $valid['sensor'],
         'runtime',
@@ -29,7 +29,7 @@ if (is_numeric($secs_on_battery)) {
 $est_battery_time = SnmpQuery::get('UPS-MIB::upsEstimatedMinutesRemaining.0')->value();
 
 if (is_numeric($est_battery_time)) {
-    $divisor = get_device_divisor($device, $pre_cache['poweralert_serial'] ?? '', 'runtime', '.1.3.6.1.2.1.33.1.2.3.0');
+    $divisor = $os->getUpsMibDivisor('UPS-MIB::upsEstimatedMinutesRemaining');
     discover_sensor(
         $valid['sensor'],
         'runtime',

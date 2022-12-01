@@ -466,6 +466,18 @@ class Routeros extends OS implements
         return $sensors;
     }
 
+    public function getUpsMibDivisor(string $oid): int
+    {
+        $version = $this->getDevice()->version;
+        if ($version && version_compare($version, '6.47', '<') &&
+            ($oid == 'UPS-MIB::upsSecondsOnBattery' || $oid == 'UPS-MIB::upsEstimatedMinutesRemaining')
+        ) {
+            return 60;
+        }
+
+        return parent::getUpsMibDivisor($oid);
+    }
+
     public function pollOS(): void
     {
         $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');

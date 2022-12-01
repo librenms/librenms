@@ -42,11 +42,48 @@ class Poweralert extends \LibreNMS\OS implements OSPolling
         $this->customSysName($this->getDevice());
     }
 
+    public function getUpsMibDivisor(string $oid): int
+    {
+        if (in_array($oid, [
+            'UPS-MIB::upsBatteryCurrent',
+            'UPS-MIB::upsOutputCurrent',
+            'UPS-MIB::upsInputCurrent',
+            'UPS-MIB::upsBypassCurrent',
+            'UPS-MIB::upsInputFrequency',
+            'UPS-MIB::upsOutputFrequency',
+            'UPS-MIB::upsBypassFrequency',
+        ])) {
+            if (version_compare($this->getVersion(), '12.06.0068', '>=')) {
+                return 10;
+            } elseif (version_compare($this->getVersion(), '12.04.0055', '=')) {
+                return 10;
+            } elseif (version_compare($this->getVersion(), '12.04.0056', '>=')) {
+                return 1;
+            }
+        } elseif ($oid == 'UPS-MIB::upsOutputPercentLoad') {
+            if (version_compare($this->getVersion(), '12.06.0064', '=')) {
+                return 10;
+            } else {
+                return 1;
+            }
+        }
+
+        return parent::getUpsMibDivisor($oid); // fallback
+    }
+
     /**
      * @param  \App\Models\Device  $device
      */
     private function customSysName(Device $device): void
     {
         $device->sysName = \SnmpQuery::get('.1.3.6.1.2.1.33.1.1.5.0')->value() ?: $device->sysName;
+    }
+
+    private function getVersion() {
+        if (! isset($this->cache['poweralert_version'])) {
+            $this->cache['poweralert_version'] = \SnmpQuery::get('TRIPPLITE-MIB::tlUpsSnmpCardSerialNum.0')->value();
+        }
+
+        return $this->cache['poweralert_version'];
     }
 }
