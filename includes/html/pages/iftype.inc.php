@@ -72,7 +72,7 @@ if ($if_list) {
 
         echo '<br />';
 
-        if (file_exists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
+        if (Rrd::checkRrdExists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
             $graph_type = 'port_bits';
 
             include 'includes/html/print-interface-graphs.inc.php';
