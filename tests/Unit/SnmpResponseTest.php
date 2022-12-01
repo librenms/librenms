@@ -38,6 +38,12 @@ class SnmpResponseTest extends TestCase
         $this->assertTrue($response->isValid());
         $this->assertEquals(['IF-MIB::ifDescr[1]' => 'lo', 'IF-MIB::ifDescr[2]' => 'enp4s0'], $response->values());
         $this->assertEquals('lo', $response->value());
+        $this->assertEquals('lo', $response->value('IF-MIB::ifDescr[1]'));
+        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr[2]'));
+        $this->assertEquals('enp4s0', $response->value('IF-MIB::ifDescr.2'));
+        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr[1]', 'IF-MIB::ifDescr[2]']));
+        $this->assertEquals('enp4s0', $response->value(['IF-MIB::ifName[2]', 'IF-MIB::ifDescr[2]', 'IF-MIB::ifDescr[1]']));
+        $this->assertEquals('lo', $response->value(['IF-MIB::ifDescr.1', 'IF-MIB::ifDescr.2']));
         $this->assertEquals(['IF-MIB::ifDescr' => [1 => 'lo', 2 => 'enp4s0']], $response->table());
         $this->assertEquals([1 => ['IF-MIB::ifDescr' => 'lo'], 2 => ['IF-MIB::ifDescr' => 'enp4s0']], $response->table(1));
 
@@ -64,7 +70,9 @@ class SnmpResponseTest extends TestCase
             6 => '\\single\\',
             9 => '\\\\double\\\\',
         ]], $response->table());
+
         Config::set('snmp.unescape', true); // for buggy versions of net-snmp
+        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
             'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => 'single',
@@ -75,6 +83,48 @@ class SnmpResponseTest extends TestCase
             6 => 'single',
             9 => '\\double\\',
         ]], $response->table());
+    }
+
+    public function testEmptyValues(): void
+    {
+        $response = new SnmpResponse("IF-MIB::ifAlias[1] = \nIF-MIB::ifAlias[2] = 0\nIF-MIB::ifAlias[3] = \"\"\n\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('', $response->value());
+        $this->assertEquals('', $response->value('IF-MIB::ifAlias[1]'));
+        $this->assertEquals('0', $response->value('IF-MIB::ifAlias[2]'));
+        $this->assertEquals('', $response->value('IF-MIB::ifAlias[3]'));
+        $this->assertEquals('0', $response->value(['IF-MIB::ifAlias[1]', 'IF-MIB::ifAlias[2]', 'IF-MIB::ifAlias[3]']));
+    }
+
+    public function testValuesByIndex(): void
+    {
+        $response = new SnmpResponse("IF-MIB::ifIndex[1] = 1\nIF-MIB::ifIndex[2] = 2\nIF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals([
+            1 => [
+                'IF-MIB::ifIndex' => '1',
+                'IF-MIB::ifDescr' => 'lo',
+            ],
+            2 => [
+                'IF-MIB::ifIndex' => '2',
+                'IF-MIB::ifDescr' => 'enp4s0',
+            ],
+        ], $response->valuesByIndex());
+
+        $existing = [0 => 'first', 1 => ['IF-MIB::ifDescr' => 'previous', 'IF-MIB::ifName' => 'lo']];
+        $this->assertEquals([
+            0 => 'first',
+            1 => [
+                'IF-MIB::ifIndex' => '1',
+                'IF-MIB::ifDescr' => 'lo',
+                'IF-MIB::ifName' => 'lo',
+            ],
+            2 => [
+                'IF-MIB::ifIndex' => '2',
+                'IF-MIB::ifDescr' => 'enp4s0',
+            ],
+        ], $response->valuesByIndex($existing));
     }
 
     public function testMultiLine(): void
