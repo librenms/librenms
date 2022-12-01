@@ -88,6 +88,10 @@ class Oid
         return strlen($string) . '.' . implode('.', unpack('c*', $string));
     }
 
+    /**
+     * Try to parse an oid into a string.
+     * If the oid contains multiple strings, skip until we get to the given position
+     */
     public static function stringFromOid(string $oid, int $position = 0): string
     {
         $parts = explode('.', $oid);

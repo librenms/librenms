@@ -23,11 +23,6 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Oid;
 use Symfony\Component\Process\Exception\ProcessTimedOutException;
 
-function string_to_oid($string)
-{
-    return \LibreNMS\Util\Oid::encodeString((string) $string);
-}//end string_to_oid()
-
 function prep_snmp_setting($device, $setting)
 {
     if (isset($device[$setting]) && is_numeric($device[$setting]) && $device[$setting] > 0) {

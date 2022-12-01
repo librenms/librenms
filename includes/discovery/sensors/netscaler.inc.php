@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Oid;
+
 echo ' NetScaler ';
 
 echo ' Caching OIDs:';
@@ -13,7 +15,7 @@ if (! is_array($ns_sensor_array)) {
 foreach ($ns_sensor_array as $descr => $data) {
     $current = $data['sysHealthCounterValue'];
 
-    $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . string_to_oid($descr);
+    $oid = '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . Oid::encodeString($descr);
 
     if (strpos($descr, 'Temp') !== false) {
         $divisor = 0;
