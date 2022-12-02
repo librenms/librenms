@@ -1250,10 +1250,17 @@ function add_edit_rule(Illuminate\Http\Request $request)
         $disabled = 0;
     }
 
+    $invert_map = $data['invert_map'];
+    if ($invert_map != '0' && $invert_map != '1') {
+        $invert_map = 0;
+    }
+
     $count = $data['count'];
     $mute = $data['mute'];
     $delay = $data['delay'];
     $interval = $data['interval'];
+    $recovery = $data['recovery'];
+    $invert = $data['invert'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
     $delay_sec = convert_delay($delay);
@@ -1269,6 +1276,8 @@ function add_edit_rule(Illuminate\Http\Request $request)
         'count' => $count,
         'delay' => $delay_sec,
         'interval' => $interval_sec,
+        'recovery' => $recovery,
+        'invert' => $invert,
         'options' => [
             'override_query' => $override_query,
         ],
@@ -1293,10 +1302,10 @@ function add_edit_rule(Illuminate\Http\Request $request)
     }
 
     if (is_numeric($rule_id)) {
-        if (! (dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
+        if (! (dbUpdate(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'invert_map' => $invert_map, 'extra' => $extra_json], 'alert_rules', 'id=?', [$rule_id]) >= 0)) {
             return api_error(500, 'Failed to update existing alert rule');
         }
-    } elseif (! $rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'extra' => $extra_json], 'alert_rules')) {
+    } elseif (! $rule_id = dbInsert(['name' => $name, 'builder' => $builder, 'query' => $query, 'severity' => $severity, 'disabled' => $disabled, 'invert_map' => $invert_map, 'extra' => $extra_json], 'alert_rules')) {
         return api_error(500, 'Failed to create new alert rule');
     }
 
