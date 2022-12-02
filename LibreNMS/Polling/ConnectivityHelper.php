@@ -201,7 +201,7 @@ class ConnectivityHelper
     private function savePingStats(FpingResponse $ping_response): void
     {
         $perf = $ping_response->toModel();
-        $perf->debug = array("poller_name"=>$config['distributed_poller_name']);
+        $perf->debug = array("poller_name"=>Config::get('distributed_poller_name'));
         if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
             $perf->debug = array_merge($perf->debug,$this->traceroute());
         }
