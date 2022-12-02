@@ -1,0 +1,1147 @@
+LibreNMS Poller
+SQL[[1;33mselect `migration` from `migrations` order by `id` desc limit 1 [0;33m[][0m 0.42ms] 
+  
+SQL[[1;33mselect count(*) as aggregate from `migrations` [0;33m[][0m 0.26ms] 
+  
+SQL[[1;33mselect version() [0;33m[][0m 0.2ms] 
+  
+===========================================
+Component | Version
+--------- | -------
+LibreNMS  | 22.10.0-165-gf00d881c3 (2022-11-29T16:36:22+01:00)
+DB Schema | 2022_08_15_084507_add_rrd_type_to_wireless_sensors_table (248)
+PHP       | 8.1.2-1ubuntu2.8
+Python    | 3.10.6
+Database  | MariaDB 10.6.11-MariaDB-0ubuntu0.22.04.1
+RRDTool   | 1.7.2
+SNMP      | 5.9.1
+===========================================
+DEBUG!
+Updating os_def.cache  
+Starting polling run:
+
+SQL[[1;33mSELECT * FROM `devices` WHERE `disabled` = 0 AND `hostname` = '172.30.35.200' ORDER BY `device_id` ASC [0;33m[][0m 0.87ms] 
+  
+SQL[[1;33mselect * from `devices` where `device_id` = ? limit 1 [0;33m[20][0m 0.49ms] 
+  
+SQL[[1;33mselect * from `devices_attribs` where `devices_attribs`.`device_id` = ? and `devices_attribs`.`device_id` is not null [0;33m[20][0m 0.28ms] 
+  
+Attempting to initialize OS: loop-telecom  
+OS initialized as Generic  
+Hostname:    172.30.35.200
+Device ID:   20
+OS:          loop-telecom
+
+
+[FPING] '/usr/bin/fping' '-e' '-q' '-c' '3' '-p' '500' '-t' '500' '-O' '0' '172.30.35.200'
+  
+response: xmt/rcv/%loss = 3/3/0%, min/avg/max = 0.352/0.435/0.518  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'SNMPv2-MIB::sysObjectID.0'[0m]  
+SNMPv2-MIB::sysObjectID.0 = SNMPv2-SMI::enterprises.823.34441
+  
+  
+SQL[[1;33minsert into `device_perf` (`min`, `max`, `avg`, `xmt`, `rcv`, `loss`, `device_id`, `timestamp`) values (?, ?, ?, ?, ?, ?, ?, ?) [0;33m[0.352,0.518,0.435,3,3,0,20,"2022-12-02 09:04:02"][0m 0.53ms] 
+  
+SQL[[1;33mupdate `devices` set `last_ping_timetaken` = ? where `device_id` = ? [0;33m[0.435,20][0m 0.39ms] 
+  
+SQL[[1;33mselect * from `device_outages` where `device_outages`.`device_id` = ? and `device_outages`.`device_id` is not null and `up_again` is null order by `going_down` desc limit 1 [0;33m[20][0m 0.44ms] 
+  
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module core ####
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' '-On' 'udp:HOSTNAME:161' 'SNMPv2-MIB::sysUpTime.0'[0m]  
+.*.*.0 = 2279983601
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'SNMP-FRAMEWORK-MIB::snmpEngineTime.0' 'HOST-RESOURCES-MIB::hrSystemUptime.0'[0m]  
+Exitcode: 2 ["Error in packet\nReason: (noSuchName) There is no such variable name in this MIB.\nFailed object: HOST-RESOURCES-MIB::hrSystemUptime.0\n\nError in packet\nReason: (noSuchName) There is no such variable name in this MIB.\nFailed object: SNMP-FRAMEWORK-MIB::snmpEngineTime.0\n\n"] 
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: HOST-RESOURCES-MIB::hrSystemUptime.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: SNMP-FRAMEWORK-MIB::snmpEngineTime.0
+
+  
+Uptime seconds: 22799836
+  
+Uptime:  263 days 21 hours 17 minutes 16 seconds
+SQL[[1;33mupdate `devices` set `uptime` = ? where `device_id` = ? [0;33m[22799836,20][0m 0.5ms] 
+  
+
+>> Runtime for poller module 'core': 0.0304 seconds with 78264 bytes
+>> [0;36mSNMP[0m: [2/0.03s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module core ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ unix-agent ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module os ####
+Generic :(
+SQL[[1;33mselect * from `locations` where `locations`.`id` = ? limit 1 [0;33m[2][0m 0.43ms] 
+  
+Location: 6F, No.8, HSIN ANN ROADSCIENCE-BASED INDUSTRIAL PARKHSINCHU, 300092 TAIWAN
+Hardware: loop-AM3440-CCPB-A
+OS Version: V23.03.01 (0025)
+OS Features: 
+Serial: 190
+
+>> Runtime for poller module 'os': 0.0043 seconds with 186096 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module os ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module availability ####
+SQL[[1;33mSELECT duration FROM availability WHERE device_id = ? [0;33m[20][0m 0.35ms] 
+  
+Availability: 
+SQL[[1;33mSELECT * FROM availability WHERE device_id = ? [0;33m[20][0m 0.31ms] 
+  
+SQL[[1;33mselect * from `device_outages` where `device_id` = ? and `up_again` >= ? order by `going_down` asc [0;33m[20,1669881842][0m 0.32ms] 
+  
+SQL[[1;33mUPDATE `availability` set `availability_perc`=? WHERE `availability_id` = ? [0;33m[100,77][0m 0.22ms] 
+  
+1 day : 100%
+SQL[[1;33mselect * from `device_outages` where `device_id` = ? and `up_again` >= ? order by `going_down` asc [0;33m[20,1669363442][0m 0.3ms] 
+  
+SQL[[1;33mUPDATE `availability` set `availability_perc`=? WHERE `availability_id` = ? [0;33m[100,78][0m 0.2ms] 
+  
+7 days : 100%
+SQL[[1;33mselect * from `device_outages` where `device_id` = ? and `up_again` >= ? order by `going_down` asc [0;33m[20,1667376242][0m 0.31ms] 
+  
+SQL[[1;33mUPDATE `availability` set `availability_perc`=? WHERE `availability_id` = ? [0;33m[100,79][0m 0.22ms] 
+  
+30 days : 100%
+SQL[[1;33mselect * from `device_outages` where `device_id` = ? and `up_again` >= ? order by `going_down` asc [0;33m[20,1638432242][0m 0.34ms] 
+  
+SQL[[1;33mUPDATE `availability` set `availability_perc`=? WHERE `availability_id` = ? [0;33m[100,80][0m 0.2ms] 
+  
+365 days : 100%
+
+>> Runtime for poller module 'availability': 0.0060 seconds with 18664 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [10/0.03s]   
+#### Unload poller module availability ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ipmi ####
+SQL[[1;33mSELECT * FROM sensors WHERE device_id = ? AND poller_type='ipmi' [0;33m[20][0m 0.43ms] 
+  
+array (
+)  
+
+>> Runtime for poller module 'ipmi': 0.0009 seconds with 2016 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module ipmi ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module sensors ####
+SQL[[1;33mSELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? GROUP BY `sensor_class` [0;33m[20][0m 0.34ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? [0;33m["current",20][0m 0.44ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.10.21.0' '.1.3.6.1.4.1.823.34441.1.10.22.0' '.1.3.6.1.4.1.823.34441.1.10.23.0' '.1.3.6.1.4.1.823.34441.1.10.24.0'[0m]
+.*.4.1.823.344*.0 = "0.151187 A ."
+.*.4.1.823.344*.0 = "0.681477 A ."
+.*.4.1.823.344*.0 = "0.548707 A ."
+.*.4.1.823.344*.0 = "0.993372 A ."  
+  
+Checking (snmp) current DWMP Chanel 0 current... 
+Checking (snmp) current DWMP Chanel 1 current... 
+Checking (snmp) current DWMP Chanel 2 current... 
+Checking (snmp) current DWMP Chanel 3 current... 
+0.151187 A
+SQL[[1;33mUPDATE `sensors` set `sensor_current`=?,`sensor_prev`=?,`lastupdate`=NOW() WHERE `sensor_class` = ? AND `sensor_id` = ? [0;33m[0.151187,0.24378,"current",976][0m 0.42ms] 
+  
+0.681477 A
+0.548707 A
+SQL[[1;33mUPDATE `sensors` set `sensor_current`=?,`sensor_prev`=?,`lastupdate`=NOW() WHERE `sensor_class` = ? AND `sensor_id` = ? [0;33m[0.548707,0.641299,"current",978][0m 0.31ms] 
+  
+0.993372 A
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? [0;33m["power",20][0m 0.4ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.10.5.0'[0m]
+.*.4.1.823.344*.0 = 41  
+  
+Checking (snmp) power Power consumption... 
+41 W
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? [0;33m["state",20][0m 0.57ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.9.1.9.1' '.1.3.6.1.4.1.823.34441.1.9.1.9.2' '.1.3.6.1.4.1.823.34441.1.9.1.9.3' '.1.3.6.1.4.1.823.34441.1.9.1.9.4' '.1.3.6.1.4.1.823.34441.1.9.1.9.5' '.1.3.6.1.4.1.823.34441.1.9.1.9.6' '.1.3.6.1.4.1.823.34441.1.9.1.9.7' '.1.3.6.1.4.1.823.34441.1.9.1.9.8' '.1.3.6.1.4.1.823.34441.1.9.1.9.9' '.1.3.6.1.4.1.823.34441.1.9.1.9.10'[0m]
+.*.4.1.823.344*.9.1 = 3
+.*.4.1.823.344*.9.2 = 1
+.*.4.1.823.344*.9.3 = 1
+.*.4.1.823.344*.9.4 = 1
+.*.4.1.823.344*.9.5 = 3
+.*.4.1.823.344*.9.6 = 3
+.*.4.1.823.344*.9.7 = 3
+.*.4.1.823.344*.9.8 = 3
+.*.4.1.823.344*.9.9 = 3
+.*.4.1.823.344*.9.10 = 3  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.9.1.9.11' '.1.3.6.1.4.1.823.34441.1.9.1.9.12' '.1.3.6.1.4.1.823.34441.1.9.1.9.13' '.1.3.6.1.4.1.823.34441.1.9.1.9.14' '.1.3.6.1.4.1.823.34441.1.9.1.9.15' '.1.3.6.1.4.1.823.34441.1.9.1.9.16' '.1.3.6.1.4.1.823.34441.1.10.3.0' '.1.3.6.1.4.1.823.34441.1.10.4.0' '.1.3.6.1.4.1.823.34441.1.4.21.0' '.1.3.6.1.4.1.823.34441.1.4.34.0'[0m]
+.*.4.1.823.344*.9.11 = 3
+.*.4.1.823.344*.9.12 = 3
+.*.4.1.823.344*.9.13 = 3
+.*.4.1.823.344*.9.14 = 3
+.*.4.1.823.344*.9.15 = 1
+.*.4.1.823.344*.9.16 = 1
+.*.4.1.823.344*.0 = 3
+.*.4.1.823.344*.0 = 1
+.*.4.1.823.344*.0 = 1
+.*.4.1.823.344*.0 = 2  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.4.35.0'[0m]
+.*.4.1.823.344*.0 = 2  
+  
+Checking (snmp) state slot-A (clka)... 
+Checking (snmp) state slot-B (empty)... 
+Checking (snmp) state slot-C (empty)... 
+Checking (snmp) state slot-D (empty)... 
+Checking (snmp) state slot-1 (fxs)... 
+Checking (snmp) state slot-2 (fxs)... 
+Checking (snmp) state slot-3 (fxs)... 
+Checking (snmp) state slot-4 (fxs)... 
+Checking (snmp) state slot-5 (fxs)... 
+Checking (snmp) state slot-6 (fxs)... 
+Checking (snmp) state slot-7 (fxs)... 
+Checking (snmp) state slot-8 (fxs)... 
+Checking (snmp) state slot-9 (fxs)... 
+Checking (snmp) state slot-10 (fxs)... 
+Checking (snmp) state slot-11 (empty)... 
+Checking (snmp) state slot-12 (empty)... 
+Checking (snmp) state Power 1 Status... 
+Checking (snmp) state Power 2 Status... 
+Checking (snmp) state Console state... 
+Checking (snmp) state Local console state... 
+Checking (snmp) state Remote console state... 
+3 #
+1 #
+1 #
+1 #
+3 #
+3 #
+3 #
+3 #
+3 #
+3 #
+3 #
+3 #
+3 #
+3 #
+1 #
+1 #
+3 #
+1 #
+1 #
+2 #
+2 #
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? [0;33m["temperature",20][0m 0.63ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.10.11.0' '.1.3.6.1.4.1.823.34441.1.10.16.0'[0m]
+.*.4.1.823.344*.0 = " 61.XC"
+.*.4.1.823.344*.0 = "47.000000 .XC."  
+  
+Checking (snmp) temperature Chassis 1... 
+Checking (snmp) temperature DPWM Temperature... 
+61 C
+47 C
+SQL[[1;33mUPDATE `sensors` set `sensor_current`=?,`sensor_prev`=?,`lastupdate`=NOW() WHERE `sensor_class` = ? AND `sensor_id` = ? [0;33m[47,52,"temperature",972][0m 0.38ms] 
+  
+SQL[[1;33mSELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? [0;33m["voltage",20][0m 0.46ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQntea' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.823.34441.1.10.15.0' '.1.3.6.1.4.1.823.34441.1.10.17.0' '.1.3.6.1.4.1.823.34441.1.10.18.0' '.1.3.6.1.4.1.823.34441.1.10.19.0' '.1.3.6.1.4.1.823.34441.1.10.20.0'[0m]
+.*.4.1.823.344*.0 = "5.800000 V ."
+.*.4.1.823.344*.0 = "2.520000 V ."
+.*.4.1.823.344*.0 = "1.800000 V ."
+.*.4.1.823.344*.0 = "1.005000 V ."
+.*.4.1.823.344*.0 = "3.300000 V ."  
+  
+Checking (snmp) voltage DWMP Input Voltage... 
+Checking (snmp) voltage DWMP Chanel 0 Voltage... 
+Checking (snmp) voltage DWMP Chanel 1 Voltage... 
+Checking (snmp) voltage DWMP Chanel 2 Voltage... 
+Checking (snmp) voltage DWMP Chanel 3 Voltage... 
+5.8 V
+2.52 V
+1.8 V
+1.005 V
+3.3 V
+
+>> Runtime for poller module 'sensors': 0.0859 seconds with 5896 bytes
+>> [0;36mSNMP[0m: [7/0.08s] [1;33mMySQL[0m: [9/0.04s]   
+#### Unload poller module sensors ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module processors ####
+Attempting to initialize OS: loop-telecom  
+OS initialized as Generic  
+SQL[[1;33mSELECT * FROM processors WHERE device_id=? [0;33m[20][0m 0.37ms] 
+  
+
+>> Runtime for poller module 'processors': 0.0016 seconds with 60640 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module processors ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module mempools ####
+SQL[[1;33mselect * from `mempools` where `mempools`.`device_id` = ? and `mempools`.`device_id` is not null [0;33m[20][0m 0.48ms] 
+  
+
+>> Runtime for poller module 'mempools': 0.0018 seconds with 79824 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module mempools ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module storage ####
+SQL[[1;33mSELECT * FROM storage WHERE device_id = ? [0;33m[20][0m 0.28ms] 
+  
+
+>> Runtime for poller module 'storage': 0.0006 seconds with 1328 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module storage ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module netstats ####
+icmp SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'IP-MIB::icmpInMsgs.0' 'IP-MIB::icmpOutMsgs.0' 'IP-MIB::icmpInErrors.0' 'IP-MIB::icmpOutErrors.0' 'IP-MIB::icmpInEchos.0' 'IP-MIB::icmpOutEchos.0' 'IP-MIB::icmpInEchoReps.0' 'IP-MIB::icmpOutEchoReps.0' 'IP-MIB::icmpInDestUnreachs.0' 'IP-MIB::icmpOutDestUnreachs.0' 'IP-MIB::icmpInParmProbs.0' 'IP-MIB::icmpInTimeExcds.0' 'IP-MIB::icmpInSrcQuenchs.0' 'IP-MIB::icmpInRedirects.0' 'IP-MIB::icmpInTimestamps.0' 'IP-MIB::icmpInTimestampReps.0' 'IP-MIB::icmpInAddrMasks.0' 'IP-MIB::icmpInAddrMaskReps.0' 'IP-MIB::icmpOutTimeExcds.0' 'IP-MIB::icmpOutParmProbs.0' 'IP-MIB::icmpOutSrcQuenchs.0' 'IP-MIB::icmpOutRedirects.0' 'IP-MIB::icmpOutTimestamps.0' 'IP-MIB::icmpOutTimestampReps.0' 'IP-MIB::icmpOutAddrMasks.0' 'IP-MIB::icmpOutAddrMaskReps.0'[0m]  
+IP-MIB::icmpInMsgs.0 = 42831
+IP-MIB::icmpOutMsgs.0 = 42826
+IP-MIB::icmpInErrors.0 = 0
+IP-MIB::icmpOutErrors.0 = 0
+IP-MIB::icmpInEchos.0 = 42826
+IP-MIB::icmpOutEchos.0 = 0
+IP-MIB::icmpInEchoReps.0 = 0
+IP-MIB::icmpOutEchoReps.0 = 42826
+IP-MIB::icmpInDestUnreachs.0 = 5
+IP-MIB::icmpOutDestUnreachs.0 = 0
+IP-MIB::icmpInParmProbs.0 = 0
+IP-MIB::icmpInTimeExcds.0 = 0
+IP-MIB::icmpInSrcQuenchs.0 = 0
+IP-MIB::icmpInRedirects.0 = 0
+IP-MIB::icmpInTimestamps.0 = 0
+IP-MIB::icmpInTimestampReps.0 = 0
+IP-MIB::icmpInAddrMasks.0 = 0
+IP-MIB::icmpInAddrMaskReps.0 = 0
+IP-MIB::icmpOutTimeExcds.0 = 0
+IP-MIB::icmpOutParmProbs.0 = 0
+IP-MIB::icmpOutSrcQuenchs.0 = 0
+IP-MIB::icmpOutRedirects.0 = 0
+IP-MIB::icmpOutTimestamps.0 = 0
+IP-MIB::icmpOutTimestampReps.0 = 0
+IP-MIB::icmpOutAddrMasks.0 = 0
+IP-MIB::icmpOutAddrMaskReps.0 = 0
+  
+  
+ip SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'IP-MIB::ipForwDatagrams.0' 'IP-MIB::ipInDelivers.0' 'IP-MIB::ipInReceives.0' 'IP-MIB::ipOutRequests.0' 'IP-MIB::ipInDiscards.0' 'IP-MIB::ipOutDiscards.0' 'IP-MIB::ipOutNoRoutes.0' 'IP-MIB::ipReasmReqds.0' 'IP-MIB::ipReasmOKs.0' 'IP-MIB::ipReasmFails.0' 'IP-MIB::ipFragOKs.0' 'IP-MIB::ipFragFails.0' 'IP-MIB::ipFragCreates.0' 'IP-MIB::ipInUnknownProtos.0' 'IP-MIB::ipInHdrErrors.0' 'IP-MIB::ipInAddrErrors.0'[0m]  
+IP-MIB::ipForwDatagrams.0 = 0
+IP-MIB::ipInDelivers.0 = 1325356
+IP-MIB::ipInReceives.0 = 1375183
+IP-MIB::ipOutRequests.0 = 1017767
+IP-MIB::ipInDiscards.0 = 0
+IP-MIB::ipOutDiscards.0 = 0
+IP-MIB::ipOutNoRoutes.0 = 0
+IP-MIB::ipReasmReqds.0 = 0
+IP-MIB::ipReasmOKs.0 = 0
+IP-MIB::ipReasmFails.0 = 0
+IP-MIB::ipFragOKs.0 = 0
+IP-MIB::ipFragFails.0 = 0
+IP-MIB::ipFragCreates.0 = 0
+IP-MIB::ipInUnknownProtos.0 = 0
+IP-MIB::ipInHdrErrors.0 = 0
+IP-MIB::ipInAddrErrors.0 = 0
+  
+  
+ip_forward SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'IP-FORWARD-MIB::ipCidrRouteNumber.0'[0m]  
+Exitcode: 2 ["Error in packet\nReason: (noSuchName) There is no such variable name in this MIB.\nFailed object: IP-FORWARD-MIB::ipCidrRouteNumber.0\n\n"] 
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: IP-FORWARD-MIB::ipCidrRouteNumber.0
+
+  
+snmp SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'SNMPv2-MIB::snmpInPkts.0' 'SNMPv2-MIB::snmpOutPkts.0' 'SNMPv2-MIB::snmpInBadVersions.0' 'SNMPv2-MIB::snmpInBadCommunityNames.0' 'SNMPv2-MIB::snmpInBadCommunityUses.0' 'SNMPv2-MIB::snmpInASNParseErrs.0' 'SNMPv2-MIB::snmpInTooBigs.0' 'SNMPv2-MIB::snmpInNoSuchNames.0' 'SNMPv2-MIB::snmpInBadValues.0' 'SNMPv2-MIB::snmpInReadOnlys.0' 'SNMPv2-MIB::snmpInGenErrs.0' 'SNMPv2-MIB::snmpInTotalReqVars.0' 'SNMPv2-MIB::snmpInTotalSetVars.0' 'SNMPv2-MIB::snmpInGetRequests.0' 'SNMPv2-MIB::snmpInGetNexts.0' 'SNMPv2-MIB::snmpInSetRequests.0' 'SNMPv2-MIB::snmpInGetResponses.0' 'SNMPv2-MIB::snmpInTraps.0' 'SNMPv2-MIB::snmpOutTooBigs.0' 'SNMPv2-MIB::snmpOutNoSuchNames.0' 'SNMPv2-MIB::snmpOutBadValues.0' 'SNMPv2-MIB::snmpOutGenErrs.0' 'SNMPv2-MIB::snmpOutGetRequests.0' 'SNMPv2-MIB::snmpOutGetNexts.0' 'SNMPv2-MIB::snmpOutSetRequests.0' 'SNMPv2-MIB::snmpOutGetResponses.0' 'SNMPv2-MIB::snmpOutTraps.0' 'SNMPv2-MIB::snmpSilentDrops.0' 'SNMPv2-MIB::snmpProxyDrops.0'[0m]  
+Exitcode: 2 ["Error in packet\nReason: (noSuchName) There is no such variable name in this MIB.\nFailed object: SNMPv2-MIB::snmpSilentDrops.0\n\nError in packet\nReason: (noSuchName) There is no such variable name in this MIB.\nFailed object: SNMPv2-MIB::snmpProxyDrops.0\n\n"] 
+SNMPv2-MIB::snmpInPkts.0 = 970281
+SNMPv2-MIB::snmpOutPkts.0 = 970168
+SNMPv2-MIB::snmpInBadVersions.0 = 0
+SNMPv2-MIB::snmpInBadCommunityNames.0 = 0
+SNMPv2-MIB::snmpInBadCommunityUses.0 = 0
+SNMPv2-MIB::snmpInASNParseErrs.0 = 0
+SNMPv2-MIB::snmpInTooBigs.0 = 0
+SNMPv2-MIB::snmpInNoSuchNames.0 = 0
+SNMPv2-MIB::snmpInBadValues.0 = 0
+SNMPv2-MIB::snmpInReadOnlys.0 = 0
+SNMPv2-MIB::snmpInGenErrs.0 = 0
+SNMPv2-MIB::snmpInTotalReqVars.0 = 1408421
+SNMPv2-MIB::snmpInTotalSetVars.0 = 0
+SNMPv2-MIB::snmpInGetRequests.0 = 183279
+SNMPv2-MIB::snmpInGetNexts.0 = 786890
+SNMPv2-MIB::snmpInSetRequests.0 = 0
+SNMPv2-MIB::snmpInGetResponses.0 = 0
+SNMPv2-MIB::snmpInTraps.0 = 0
+SNMPv2-MIB::snmpOutTooBigs.0 = 0
+SNMPv2-MIB::snmpOutNoSuchNames.0 = 132182
+SNMPv2-MIB::snmpOutBadValues.0 = 0
+SNMPv2-MIB::snmpOutGenErrs.0 = 0
+SNMPv2-MIB::snmpOutGetRequests.0 = 0
+SNMPv2-MIB::snmpOutGetNexts.0 = 0
+SNMPv2-MIB::snmpOutSetRequests.0 = 0
+SNMPv2-MIB::snmpOutGetResponses.0 = 970168
+SNMPv2-MIB::snmpOutTraps.0 = 0
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: SNMPv2-MIB::snmpSilentDrops.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: SNMPv2-MIB::snmpProxyDrops.0
+
+  
+udp SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'UDP-MIB::udpInDatagrams.0' 'UDP-MIB::udpOutDatagrams.0' 'UDP-MIB::udpInErrors.0' 'UDP-MIB::udpNoPorts.0'[0m]  
+UDP-MIB::udpInDatagrams.0 = 970282
+UDP-MIB::udpOutDatagrams.0 = 970169
+UDP-MIB::udpInErrors.0 = 0
+UDP-MIB::udpNoPorts.0 = 350775
+  
+  
+tcp SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'TCP-MIB::tcpActiveOpens.0' 'TCP-MIB::tcpPassiveOpens.0' 'TCP-MIB::tcpAttemptFails.0' 'TCP-MIB::tcpEstabResets.0' 'TCP-MIB::tcpCurrEstab.0' 'TCP-MIB::tcpInSegs.0' 'TCP-MIB::tcpOutSegs.0' 'TCP-MIB::tcpRetransSegs.0' 'TCP-MIB::tcpInErrs.0' 'TCP-MIB::tcpOutRsts.0'[0m]  
+TCP-MIB::tcpActiveOpens.0 = 0
+TCP-MIB::tcpPassiveOpens.0 = 233
+TCP-MIB::tcpAttemptFails.0 = 0
+TCP-MIB::tcpEstabResets.0 = 1
+TCP-MIB::tcpCurrEstab.0 = 0
+TCP-MIB::tcpInSegs.0 = 4304
+TCP-MIB::tcpOutSegs.0 = 4758
+TCP-MIB::tcpRetransSegs.0 = 23
+TCP-MIB::tcpInErrs.0 = 0
+TCP-MIB::tcpOutRsts.0 = 0
+  
+  
+
+
+>> Runtime for poller module 'netstats': 0.0796 seconds with 23488 bytes
+>> [0;36mSNMP[0m: [6/0.08s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module netstats ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module hr-mib ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQs' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'hrSystemMaxProcesses.0' 'hrSystemProcesses.0' 'hrSystemNumUsers.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemMaxProcesses.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemProcesses.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemNumUsers.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemMaxProcesses.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemProcesses.0
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: hrSystemNumUsers.0  
+
+
+>> Runtime for poller module 'hr-mib': 0.0130 seconds with 512 bytes
+>> [0;36mSNMP[0m: [1/0.01s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module hr-mib ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ucd-mib ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'systemStats'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'laLoadInt.1' 'laLoadInt.2' 'laLoadInt.3'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.1
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.2
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.3  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.1
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.2
+
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: laLoadInt.3  
+
+>> Runtime for poller module 'ucd-mib': 0.0274 seconds with 64 bytes
+>> [0;36mSNMP[0m: [2/0.03s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module ucd-mib ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ipSystemStats ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'ipSystemStats'[0m]
+  
+  
+
+
+>> Runtime for poller module 'ipSystemStats': 0.0148 seconds with 808 bytes
+>> [0;36mSNMP[0m: [1/0.01s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module ipSystemStats ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ports ####
+SQL[[1;33mSELECT *, `ports_statistics`.`port_id` AS `ports_statistics_port_id`, `ports`.`port_id` AS `port_id` FROM `ports` LEFT OUTER JOIN `ports_statistics` ON `ports`.`port_id` = `ports_statistics`.`port_id` WHERE `ports`.`device_id` = ? ORDER BY ports.port_id [0;33m[20][0m 0.94ms] 
+  
+Caching Oids: Full ports polling SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'ifXEntry'[0m]
+  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUst' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'ifEntry'[0m]
+ifIndex.1 = 1
+ifIndex.2 = 2
+ifDescr.1 = lo
+ifDescr.2 = BrgMng_0
+ifType.1 = softwareLoopback
+ifType.2 = ethernetCsmacd
+ifMtu.1 = 1514
+ifMtu.2 = 1500
+ifSpeed.1 = 2147483647
+ifSpeed.2 = 100000000
+ifPhysAddress.1 = 
+ifPhysAddress.2 = 0:50:c6:cc:2:38
+ifAdminStatus.1 = up
+ifAdminStatus.2 = up
+ifOperStatus.1 = up
+ifOperStatus.2 = up
+ifLastChange.1 = 0
+ifLastChange.2 = 2058492300
+ifInOctets.1 = 0
+ifInOctets.2 = 714265868
+ifInUcastPkts.1 = 0
+ifInUcastPkts.2 = 1043959
+ifInNUcastPkts.1 = 0
+ifInNUcastPkts.2 = 1735422
+ifInDiscards.1 = 0
+ifInDiscards.2 = 495
+ifInErrors.1 = 0
+ifInErrors.2 = 0
+ifInUnknownProtos.1 = 0
+ifInUnknownProtos.2 = 423060
+ifOutOctets.1 = 0
+ifOutOctets.2 = 98014326
+ifOutUcastPkts.1 = 0
+ifOutUcastPkts.2 = 1043746
+ifOutNUcastPkts.1 = 0
+ifOutNUcastPkts.2 = 629
+ifOutDiscards.1 = 0
+ifOutDiscards.2 = 0
+ifOutErrors.1 = 0
+ifOutErrors.2 = 0
+ifOutQLen.1 = 0
+ifOutQLen.2 = 0
+ifSpecific.1 = zeroDotZero
+ifSpecific.2 = zeroDotZero  
+  
+dot3StatsDuplexStatusSNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'EtherLike-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'dot3StatsDuplexStatus'[0m]
+  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'dot1qPvid'[0m]
+  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'L-AM3440-A-Private' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'ethernetStatusTable'[0m]
+ethernetStatusIndex[1] = 1
+ethernetStatusIndex[2] = 2
+ethernetStatusIndex[3] = 3
+ethernetStatusName[1] = "53 4E 4D 50 00 "
+ethernetStatusName[2] = "45 54 48 31 00 "
+ethernetStatusName[3] = "45 54 48 32 00 "
+ethernetStatusMode[1] = 1
+ethernetStatusMode[2] = 3
+ethernetStatusMode[3] = 3
+ethernetStatusLink[1] = 1
+ethernetStatusLink[2] = 2
+ethernetStatusLink[3] = 2
+ethernetStatusSpeed[1] = 2
+ethernetStatusSpeed[2] = 8
+ethernetStatusSpeed[3] = 8
+ethernetStatusUnidirectional[1] = 3
+ethernetStatusUnidirectional[2] = 2
+ethernetStatusUnidirectional[3] = 2  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'L-AM3440-A-Private' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' 'udp:HOSTNAME:161' 'ethernetCountTable'[0m]
+ethernetCountIndex[1] = 1
+ethernetCountIndex[2] = 2
+ethernetCountName[1] = "45 54 48 31 00 "
+ethernetCountName[2] = "45 54 48 32 00 "
+ethernetTxGoodPkt[1] = 2074871003
+ethernetTxGoodPkt[2] = 17
+ethernetTxMultiPkt[1] = 45
+ethernetTxMultiPkt[2] = 42
+ethernetTxBroadcastPkt[1] = 45
+ethernetTxBroadcastPkt[2] = 42
+ethernetTxLength[1] = 32382
+ethernetTxLength[2] = 4369
+ethernetRxGoodPkt[1] = 444961444
+ethernetRxGoodPkt[2] = 0
+ethernetRxFCSerror[1] = 0
+ethernetRxFCSerror[2] = 0
+ethernetRxBadCount[1] = 0
+ethernetRxBadCount[2] = 0
+ethernetRxLength[1] = 10794
+ethernetRxLength[2] = 0  
+  
+array (
+  1 => 
+  array (
+    'ifName' => 'SNMP',
+    'ifOperStatus' => 'up',
+    'ifAdminStatus' => 'up',
+    'ifDescr' => 'SNMP',
+    'ifType' => 'ethernetCsmacd',
+    'ifSpeed' => 1000000000,
+    'ifDuplex' => 'fullDuplex',
+  ),
+  2 => 
+  array (
+    'ifName' => 'ETH1',
+    'ifOperStatus' => 'down',
+    'ifAdminStatus' => 'down',
+    'ifDescr' => 'ETH1',
+    'ifType' => 'ethernetCsmacd',
+    'ifInOctets' => 444961444,
+    'ifOutOctets' => 2074871003,
+    'ifInErrors' => 0,
+  ),
+  3 => 
+  array (
+    'ifName' => 'ETH2',
+    'ifOperStatus' => 'down',
+    'ifAdminStatus' => 'down',
+    'ifDescr' => 'ETH2',
+    'ifType' => 'ethernetCsmacd',
+    'ifInOctets' => 0,
+    'ifOutOctets' => 17,
+    'ifInErrors' => 0,
+  ),
+)  
+ valid  
+ valid  
+ valid  
+
+Port SNMP: SNMP (1 / #93) ifInOctets  
+ifOutOctets  
+ifInUcastPkts  
+ifOutUcastPkts  
+ifInBroadcastPkts  
+ifOutBroadcastPkts  
+ifInMulticastPkts  
+ifOutMulticastPkts  
+ifSpeed (1000000000)  
+VLAN = ?  Using ifDescr as ifAlias  
+Reporting disabled by user setting  
+SNMP
+ ifInOctets (0 B) 0 Bps 233 secs  
+
+ ifOutOctets (0 B) 0 Bps 233 secs  
+
+ ifInErrors (0 B) 0 Bps 233 secs  
+
+ ifOutErrors (0 B) 0 Bps 233 secs  
+
+ ifInUcastPkts (0 B) 0 Bps 233 secs  
+
+ ifOutUcastPkts (0 B) 0 Bps 233 secs  
+
+ ifInNUcastPkts (0 B) 0 Bps 233 secs  
+
+ ifOutNUcastPkts (0 B) 0 Bps 233 secs  
+
+ ifInDiscards (0 B) 0 Bps 233 secs  
+
+ ifOutDiscards (0 B) 0 Bps 233 secs  
+
+ ifInUnknownProtos (0 B) 0 Bps 233 secs  
+
+ ifInBroadcastPkts (0 B) 0 Bps 233 secs  
+
+ ifOutBroadcastPkts (0 B) 0 Bps 233 secs  
+
+ ifInMulticastPkts (0 B) 0 Bps 233 secs  
+
+ ifOutMulticastPkts (0 B) 0 Bps 233 secs  
+bps(0 bps/0 bps)bytes(0 B/0 B)pkts(0 pps/0 pps)SQL[[1;33mUPDATE `ports` set `ifInOctets`=?,`ifInOctets_prev`=?,`ifInOctets_rate`=?,`ifInOctets_delta`=?,`ifOutOctets`=?,`ifOutOctets_prev`=?,`ifOutOctets_rate`=?,`ifOutOctets_delta`=?,`ifInErrors`=?,`ifInErrors_prev`=?,`ifInErrors_rate`=?,`ifInErrors_delta`=?,`ifOutErrors`=?,`ifOutErrors_prev`=?,`ifOutErrors_rate`=?,`ifOutErrors_delta`=?,`ifInUcastPkts`=?,`ifInUcastPkts_prev`=?,`ifInUcastPkts_rate`=?,`ifInUcastPkts_delta`=?,`ifOutUcastPkts`=?,`ifOutUcastPkts_prev`=?,`ifOutUcastPkts_rate`=?,`ifOutUcastPkts_delta`=?,`poll_time`=?,`poll_prev`=?,`poll_period`=? WHERE `port_id` = ? [0;33m[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1669968242,1669968009,233,93][0m 0.59ms] 
+  
+SQL[[1;33mUPDATE `ports_statistics` set `ifInNUcastPkts`=?,`ifInNUcastPkts_prev`=?,`ifInNUcastPkts_rate`=?,`ifInNUcastPkts_delta`=?,`ifOutNUcastPkts`=?,`ifOutNUcastPkts_prev`=?,`ifOutNUcastPkts_rate`=?,`ifOutNUcastPkts_delta`=?,`ifInDiscards`=?,`ifInDiscards_prev`=?,`ifInDiscards_rate`=?,`ifInDiscards_delta`=?,`ifOutDiscards`=?,`ifOutDiscards_prev`=?,`ifOutDiscards_rate`=?,`ifOutDiscards_delta`=?,`ifInUnknownProtos`=?,`ifInUnknownProtos_prev`=?,`ifInUnknownProtos_rate`=?,`ifInUnknownProtos_delta`=?,`ifInBroadcastPkts`=?,`ifInBroadcastPkts_prev`=?,`ifInBroadcastPkts_rate`=?,`ifInBroadcastPkts_delta`=?,`ifOutBroadcastPkts`=?,`ifOutBroadcastPkts_prev`=?,`ifOutBroadcastPkts_rate`=?,`ifOutBroadcastPkts_delta`=?,`ifInMulticastPkts`=?,`ifInMulticastPkts_prev`=?,`ifInMulticastPkts_rate`=?,`ifInMulticastPkts_delta`=?,`ifOutMulticastPkts`=?,`ifOutMulticastPkts_prev`=?,`ifOutMulticastPkts_rate`=?,`ifOutMulticastPkts_delta`=? WHERE `port_id` = ? [0;33m[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,93][0m 0.27ms] 
+  
+1 updated  
+
+Port ETH1: ETH1 (2 / #94) ifInOctets  
+ifOutOctets  
+ifInUcastPkts  
+ifOutUcastPkts  
+ifInBroadcastPkts  
+ifOutBroadcastPkts  
+ifInMulticastPkts  
+ifOutMulticastPkts  
+No ifSpeed  
+VLAN = ?  Using ifDescr as ifAlias  
+ETH194 skipped because port is still down since last polling.  
+SQL[[1;33mUPDATE `ports` set `ifSpeed_prev`=?,`poll_time`=?,`poll_prev`=?,`poll_period`=? WHERE `port_id` = ? [0;33m[0,1669968242,1669968009,233,94][0m 0.28ms] 
+  
+1 updated  
+
+Port ETH2: ETH2 (3 / #95) ifInOctets  
+ifOutOctets  
+ifInUcastPkts  
+ifOutUcastPkts  
+ifInBroadcastPkts  
+ifOutBroadcastPkts  
+ifInMulticastPkts  
+ifOutMulticastPkts  
+No ifSpeed  
+VLAN = ?  Using ifDescr as ifAlias  
+ETH295 skipped because port is still down since last polling.  
+SQL[[1;33mUPDATE `ports` set `ifSpeed_prev`=?,`poll_time`=?,`poll_prev`=?,`poll_period`=? WHERE `port_id` = ? [0;33m[0,1669968242,1669968009,233,95][0m 0.22ms] 
+  
+1 updated  
+
+SQL[[1;33mupdate `ports` set `poll_time` = ?, `poll_prev` = ?, `poll_period` = ? where 0 = 1 [0;33m[1669968242,1669968009,null][0m 0.16ms] 
+  
+0 updated  
+
+>> Runtime for poller module 'ports': 0.2162 seconds with 56160 bytes
+>> [0;36mSNMP[0m: [4/0.08s] [1;33mMySQL[0m: [6/0.02s]   
+#### Unload poller module ports ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ xdsl ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module customoid ####
+SQL[[1;33mSELECT * FROM `customoids` WHERE `customoid_passed` = 1 AND `device_id` = ? [0;33m[20][0m 0.36ms] 
+  
+
+>> Runtime for poller module 'customoid': 0.0007 seconds with 1744 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module customoid ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module bgp-peers ####
+SQL[[1;33mSELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ? [0;33m[20][0m 1.06ms] 
+  
+
+>> Runtime for poller module 'bgp-peers': 0.0027 seconds with 13448 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.01s]   
+#### Unload poller module bgp-peers ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ junose-atm-vp ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ printer-supplies ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ucd-diskio ####
+SQL[[1;33mSELECT * FROM `ucd_diskio` WHERE `device_id`  = ? [0;33m[20][0m 0.38ms] 
+  
+
+>> Runtime for poller module 'ucd-diskio': 0.0007 seconds with 1208 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module ucd-diskio ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ wifi ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module wireless ####
+Attempting to initialize OS: loop-telecom  
+OS initialized as Generic  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id` = ? [0;33m[20][0m 0.34ms] 
+  
+
+>> Runtime for poller module 'wireless': 0.0018 seconds with 103448 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module wireless ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ospf ####
+SQL[[1;33mselect * from `vrf_lite_cisco` where `vrf_lite_cisco`.`device_id` = ? and `vrf_lite_cisco`.`device_id` is not null [0;33m[20][0m 0.37ms] 
+  
+ Processes: SNMP[[0;36m'/usr/bin/snmpwalk' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/loop-telecom' '-v1' '-c' 'COMMUNITY' '-OQXUt' '-Os' 'udp:HOSTNAME:161' 'OSPF-MIB::ospfGeneralGroup'[0m]  
+  
+  
+SQL[[1;33mdelete from `ospf_instances` where `ospf_instances`.`device_id` = ? and `ospf_instances`.`device_id` is not null and `context_name` = ? and 1 = 1 [0;33m[20,""][0m 0.37ms] 
+  
+0
+>> Runtime for poller module 'ospf': 0.0216 seconds with 166448 bytes
+>> [0;36mSNMP[0m: [1/0.02s] [1;33mMySQL[0m: [2/0.01s]   
+#### Unload poller module ospf ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ isis ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-ipsec-flow-monitor ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-remote-access-monitor ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-cef ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ slas ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-mac-accounting ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cipsec-tunnels ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-ace-loadbalancer ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-ace-serverfarms ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-asa-firewall ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-voice ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-cbqos ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-otv ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-qfp ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-vpdn ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ nac ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ netscaler-vsvr ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ aruba-controller ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module entity-physical ####
+
+>> Runtime for poller module 'entity-physical': 0.0002 seconds with 392 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module entity-physical ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ entity-state ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module applications ####
+SQL[[1;33mselect * from `applications` where `applications`.`device_id` = ? and `applications`.`device_id` is not null [0;33m[20][0m 0.41ms] 
+  
+
+>> Runtime for poller module 'applications': 0.0013 seconds with 28360 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s]   
+#### Unload poller module applications ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module stp ####
+Instances: SQL[[1;33mselect * from `stp` where `stp`.`device_id` = ? and `stp`.`device_id` is not null [0;33m[20][0m 0.35ms] 
+  
+
+Ports: SQL[[1;33mselect * from `ports_stp` where `ports_stp`.`device_id` = ? and `ports_stp`.`device_id` is not null [0;33m[20][0m 0.38ms] 
+  
+
+>> Runtime for poller module 'stp': 0.0024 seconds with 84616 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [2/0.01s]   
+#### Unload poller module stp ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module ntp ####
+
+>> Runtime for poller module 'ntp': 0.0001 seconds with 320 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module ntp ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ loadbalancers ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ mef ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load poller module mpls ####
+
+>> Runtime for poller module 'mpls': 0.0004 seconds with 36712 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s]   
+#### Unload poller module mpls ####
+
+Enabling graphs: SQL[[1;33mselect * from `device_graphs` where `device_graphs`.`device_id` = ? and `device_graphs`.`device_id` is not null [0;33m[20][0m 0.37ms] 
+  
+
+SQL[[1;33mUPDATE `devices` set `last_polled`=NOW(),`last_polled_timetaken`=? WHERE `device_id` = ? [0;33m[1.578,20][0m 0.66ms] 
+  
+Updating 172.30.35.200  
+
+Polled in 1.578 seconds
+### Start Device Groups ###
+SQL[[1;33mselect * from `device_groups` [0;33m[][0m 0.26ms] 
+  
+SQL[[1;33mselect `devices`.`device_id`, `device_group_device`.`device_group_id` as `pivot_device_group_id`, `device_group_device`.`device_id` as `pivot_device_id` from `devices` inner join `device_group_device` on `devices`.`device_id` = `device_group_device`.`device_id` where `device_group_device`.`device_group_id` in (1) [0;33m[][0m 0.41ms] 
+  
+SQL[[1;33mselect * from `device_group_device` where `device_group_device`.`device_id` = ? [0;33m[20][0m 0.32ms] 
+  
+Groups Added:  
+Groups Removed:  
+### End Device Groups, runtime: 0.0085s ### 
+
+#### Start Alerts ####
+SQL[[1;33mselect `device_groups`.*, `device_group_device`.`device_id` as `pivot_device_id`, `device_group_device`.`device_group_id` as `pivot_device_group_id` from `device_groups` inner join `device_group_device` on `device_groups`.`id` = `device_group_device`.`device_group_id` where `device_group_device`.`device_id` = ? [0;33m[20][0m 0.39ms] 
+  
+SQL[[1;33mselect exists(select * from `alert_schedule` where (`start` <= ? and `end` >= ? and (`recurring` = ? or (`recurring` = ? and ((time(`start`) < time(`end`) and time(`start`) <= ? and time(`end`) > ?) or (time(`start`) > time(`end`) and (time(`start`) <= ? or time(`end`) > ?))) and (`recurring_day` like ? or `recurring_day` is null)))) and (exists (select * from `devices` inner join `alert_schedulables` on `devices`.`device_id` = `alert_schedulables`.`alert_schedulable_id` where `alert_schedule`.`schedule_id` = `alert_schedulables`.`schedule_id` and `alert_schedulables`.`alert_schedulable_type` = ? and `alert_schedulables`.`alert_schedulable_id` = ?) or exists (select * from `locations` inner join `alert_schedulables` on `locations`.`id` = `alert_schedulables`.`alert_schedulable_id` where `alert_schedule`.`schedule_id` = `alert_schedulables`.`schedule_id` and `alert_schedulables`.`alert_schedulable_type` = ? and `alert_schedulables`.`alert_schedulable_id` = ?))) as `exists` [0;33m["2022-12-02T08:04:02.858143Z","2022-12-02T08:04:02.858143Z",0,1,"08:04:02","08:04:02","08:04:02","08:04:02","[45m%","device",20,"location",2][0m 0.88ms] 
+  
+SQL[[1;33mselect * from `devices` where `devices`.`device_id` = ? limit 1 [0;33m[20][0m 0.49ms] 
+  
+SQL[[1;33mSELECT DISTINCT a.* FROM alert_rules a
+        LEFT JOIN alert_device_map d ON a.id=d.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND d.device_id = ?)
+        LEFT JOIN alert_group_map g ON a.id=g.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+        LEFT JOIN alert_location_map l ON a.id=l.rule_id AND (a.invert_map = 0 OR a.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+        LEFT JOIN devices ld ON l.location_id=ld.location_id AND ld.device_id = ?
+        LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+        WHERE a.disabled = 0 AND (
+            (d.device_id IS NULL AND g.group_id IS NULL AND l.location_id IS NULL)
+            OR (a.invert_map = 0 AND (d.device_id=? OR dg.device_id=? OR ld.device_id=?))
+            OR (a.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL) AND (ld.device_id != ? OR ld.device_id IS NULL))
+        ) [0;33m[20,20,20,20,20,20,20,20,20,20,20][0m 1.45ms] 
+  
+Rule [0;35m#1 (Device Down! Due to no ICMP response.):[0m   
+  
+SQL[[1;33mSELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 0 && (devices.disabled = 0 && devices.ignore = 0)) = 1 AND devices.status_reason = "icmp" [0;33m[20][0m 0.39ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[1,20][0m 0.28ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#2 (SNMP not responding on Device - Check on SNMP Service - Device marked Down!):[0m   
+  
+SQL[[1;33mSELECT * FROM devices WHERE (devices.device_id = ?) AND (devices.status = 0 && (devices.disabled = 0 && devices.ignore = 0)) = 1 AND devices.status_reason = "snmp" [0;33m[20][0m 0.41ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[2,20][0m 0.25ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#3 (Device rebooted):[0m   
+  
+SQL[[1;33mSELECT * FROM devices WHERE (devices.device_id = ?) AND devices.uptime < 300 AND (devices.disabled = 0 && devices.ignore = 0) = 1 [0;33m[20][0m 0.49ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[3,20][0m 0.27ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#4 (Port status up/down):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOperStatus = "down" && ports.ifAdminStatus != "down" && (ports.deleted = 0 && ports.ignore = 0 && ports.disabled = 0)) = 1 [0;33m[20][0m 0.73ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[4,20][0m 0.26ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#5 (Ping Latency):[0m   
+  
+SQL[[1;33mSELECT * FROM devices WHERE (devices.device_id = ?) AND devices.last_ping_timetaken > 10 [0;33m[20][0m 0.37ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[5,20][0m 0.27ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#6 (Port utilisation over threshold):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) >= 80 AND (ports.ifOperStatus = "up" && ports.ifAdminStatus = "up" && (ports.deleted = 0 && ports.ignore = 0 && ports.disabled = 0)) = 1 [0;33m[20][0m 0.7ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[6,20][0m 0.28ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#7 (Sensor over limit - Check Device Health Settings):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit AND sensors.sensor_alert = 1 AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 [0;33m[20][0m 0.61ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[7,20][0m 0.25ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#8 (Sensor under limit - Check Device Health Settings):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current < sensors.sensor_limit_low AND sensors.sensor_alert = 1 AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 [0;33m[20][0m 0.55ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[8,20][0m 0.28ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#9 (Service up/down):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,services WHERE (devices.device_id = ? AND devices.device_id = services.device_id) AND services.service_status != 0 AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 [0;33m[20][0m 0.5ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[9,20][0m 0.27ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#10 (Wireless Sensor over limit):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,wireless_sensors WHERE (devices.device_id = ? AND devices.device_id = wireless_sensors.device_id) AND wireless_sensors.sensor_current >= wireless_sensors.sensor_limit AND wireless_sensors.sensor_alert = 1 AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 [0;33m[20][0m 0.47ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[10,20][0m 0.26ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#11 (Wireless Sensor under limit):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,wireless_sensors WHERE (devices.device_id = ? AND devices.device_id = wireless_sensors.device_id) AND wireless_sensors.sensor_current <= wireless_sensors.sensor_limit_low AND wireless_sensors.sensor_alert = 1 AND (devices.status = 1 && (devices.disabled = 0 && devices.ignore = 0)) = 1 [0;33m[20][0m 0.71ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[11,20][0m 0.28ms] 
+  
+Status: [0;34mNOCHG[0m  
+Rule [0;35m#12 (State Sensor Critical):[0m   
+  
+SQL[[1;33mSELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1 AND sensors.sensor_alert = 1 [0;33m[20][0m 0.89ms] 
+  
+SQL[[1;33mSELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 [0;33m[12,20][0m 0.24ms] 
+  
+Status: [0;34mNOCHG[0m  
+#### End Alerts ####
+./poller.php 172.30.35.200 2022-12-02 09:04:02 - 1 devices polled in 1.821 secs  
+
+[0;36mSNMP[0m [25/0.35s]: Snmpget[18/0.23s] Snmpwalk[7/0.12s]  
+[1;33mSQL[0m [83/0.35s]: Select[66/0.29s] Insert[1/0.01s] Update[15/0.05s] Delete[1/0.00s]  

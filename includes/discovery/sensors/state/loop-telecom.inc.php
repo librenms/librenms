@@ -94,11 +94,10 @@ if (!empty($oids)) {
         if (!is_null($modelName)) {
             $description = "$index ($modelName)"; //Set description equials to slot name with card type. Ex. Slot-A (mpls) or Slot-1 (FXS)
         } else {
-            $description = $index;//Set description equials to slot name. Ex. Slot-A or Slot-1
+            $description = $index; //Set description equials to slot name. Ex. Slot-A or Slot-1
         }
 
-        discover_sensor($valid['sensor'], 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', $index);
-
+        discover_sensor($valid['sensor'], 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', $index, null, null, 'Line cards');
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $num_index = $num_index + 1;
