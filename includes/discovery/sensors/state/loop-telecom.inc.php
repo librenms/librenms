@@ -1,7 +1,7 @@
 <?php
 $oids = snmpwalk_group($device, 'slotModelTable', 'L-AM3440-A-Private');
 $current = $entry['sensorValue'];
-if (!empty($oids)) {
+if (! empty($oids)) {
     //Create State Index
     $state_name = 'ccCardState';
     $states = [
@@ -88,10 +88,10 @@ if (!empty($oids)) {
     foreach ($oids as $index => $entry) {
         //Discover Sensors
         $currentValue = $entry['ccCardState'];
-        $modelint = $entry['ccModelType']; //Number representing card model 
+        $modelint = $entry['ccModelType']; //Number representing card model
         $description = null;
         $modelName = array_search($modelint, $models);
-        if (!is_null($modelName)) {
+        if (! is_null($modelName)) {
             $description = "$index ($modelName)"; //Set description equials to slot name with card type. Ex. Slot-A (mpls) or Slot-1 (FXS)
         } else {
             $description = $index; //Set description equials to slot name. Ex. Slot-A or Slot-1
