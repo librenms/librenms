@@ -51,14 +51,13 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $ifsep = '';
 
     if ($device['type'] == 'network') {
-      //a semicolon list for >10 Ports does not makes sense, so we save queries/rendering and make a link for network devices
-      echo '<a href="' . url('device') . '/' . DeviceCache::getPrimary()->device_id . '/ports/' . '">Go to Port list</a>';
+        //a semicolon list for >10 Ports does not makes sense, so we save queries/rendering and make a link for network devices
+        echo '<a href="' . url('device') . '/' . DeviceCache::getPrimary()->device_id . '/ports/' . '">Go to Port list</a>';
+    } else {
+        foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
+        }
     }
-    else {
-      foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
-      }
-    }
-
+    
     unset($ifsep);
     echo '  </td>';
     echo '</tr>';

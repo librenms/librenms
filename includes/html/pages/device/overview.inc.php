@@ -39,14 +39,13 @@ echo '
     <div class="col-md-6">
 ';
 // Right Pane
-if ($device['type'] == 'server') {
+if ($device['type'] == 'network') {
+    require 'overview/ping.inc.php';
+    require 'overview/device_availability.inc.php';
+} else{
     require 'overview/processors.inc.php';
     require 'overview/mempools.inc.php';
     require 'overview/storage.inc.php';
-}
-elseif ($device['type'] == 'network') {
-    require 'overview/ping.inc.php';
-    require 'overview/device_availability.inc.php';
 }
 
 if (! isset($entity_state)) {

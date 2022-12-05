@@ -20,7 +20,7 @@ if ($perf->isNotEmpty()) {
         'device' => DeviceCache::getPrimary()->device_id,
         'type' => 'device_availability',
         'from' => \LibreNMS\Config::get('time.day'),
-        'duration' => 86400,    
+        'duration' => 86400,
         'legend' => 'yes',
         'popup_title' => DeviceCache::getPrimary()->hostname . ' - Availability',
     ]);
@@ -32,4 +32,4 @@ if ($perf->isNotEmpty()) {
         </div>
         </div>
         </div>';
-}//end if
+}
