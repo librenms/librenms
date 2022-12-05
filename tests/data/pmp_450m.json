@@ -8,7 +8,7 @@
                     "sysDescr": "CANOPY 16.0.0.1 AP",
                     "sysContact": "<private>",
                     "version": "16.0.0.1",
-                    "hardware": "PMP 450 AP",
+                    "hardware": "PMP 450m AP",
                     "features": "5.7GHz MIMO OFDM - Multipoint - Access Point",
                     "location": "<private>",
                     "os": "pmp",

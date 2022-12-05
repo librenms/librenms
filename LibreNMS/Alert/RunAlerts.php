@@ -31,6 +31,7 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
@@ -478,7 +479,7 @@ class RunAlerts
 
             if ($this->isParentDown($alert['device_id'])) {
                 $noiss = true;
-                Log::event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
+                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
             }
 
             if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
@@ -540,7 +541,7 @@ class RunAlerts
                     $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Log::event($e->getMessage(), $obj['device_id'], 'alert', Alert::ERROR);
+                    Eventlog::log($e->getMessage(), $obj['device_id'], 'alert', Alert::ERROR);
                     $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
@@ -578,13 +579,13 @@ class RunAlerts
 
         if ($result === true) {
             echo 'OK';
-            Log::event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
+            Eventlog::log('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
         } else {
             echo "ERROR: $result\r\n";
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
         }
     }
 

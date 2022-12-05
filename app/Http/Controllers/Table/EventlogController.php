@@ -109,7 +109,7 @@ class EventlogController extends TableController
             }
         }
 
-        return $eventlog->type;
+        return htmlspecialchars($eventlog->type);
     }
 
     private function formatDatetime($eventlog)

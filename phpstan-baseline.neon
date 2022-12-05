@@ -1421,31 +1421,6 @@ parameters:
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$field with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<int,mixed\\>\\:\\:get\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$devices has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$primary has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
 			message: "#^Property LibreNMS\\\\Cache\\\\PermissionsCache\\:\\:\\$billPermissions has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Cache/PermissionsCache.php
@@ -2454,26 +2429,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:preCache\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:getOutput\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\ApiException\\:\\:\\$output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
 
 		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\AuthenticationException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
@@ -3604,11 +3559,6 @@ parameters:
 			message: "#^Property LibreNMS\\\\OS\\:\\:\\$validOtherMemory has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
-
-		-
-			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$version \\(string\\|null\\) does not accept int\\.$#"
-			count: 1
-			path: LibreNMS/OS/Aix.php
 
 		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
@@ -6261,11 +6211,6 @@ parameters:
 			path: app/Exceptions/Handler.php
 
 		-
-			message: "#^Method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Facades/LogManager.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\AboutController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/AboutController.php
@@ -8004,11 +7949,6 @@ parameters:
 			message: "#^Method App\\\\Models\\\\DeviceRelatedModel\\:\\:scopeInDeviceGroup\\(\\) has parameter \\$query with no type specified\\.$#"
 			count: 1
 			path: app/Models/DeviceRelatedModel.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Eventlog\\:\\:log\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Eventlog.php
 
 		-
 			message: "#^Method App\\\\Models\\\\IsisAdjacency\\:\\:device\\(\\) has no return type specified\\.$#"

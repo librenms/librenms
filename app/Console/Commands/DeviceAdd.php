@@ -114,7 +114,7 @@ class DeviceAdd extends LnmsCommand
         ]);
 
         if ($this->option('ping-only')) {
-            $device->snmp_disable = 1;
+            $device->snmp_disable = true;
             $device->os = $this->option('os');
             $device->hardware = $this->option('hardware');
             $device->sysName = $this->option('sysName');

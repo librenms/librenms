@@ -21,6 +21,7 @@
 namespace LibreNMS\Modules;
 
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\PrinterSupply;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
@@ -94,7 +95,7 @@ class PrinterSupplies implements Module
 
             // Log empty supplies (but only once)
             if ($tonerperc == 0 && $toner['supply_current'] > 0) {
-                Log::event(
+                Eventlog::log(
                     'Toner ' . $toner['supply_descr'] . ' is empty',
                     $os->getDevice(),
                     'toner',
@@ -105,7 +106,7 @@ class PrinterSupplies implements Module
 
             // Log toner swap
             if ($tonerperc > $toner['supply_current']) {
-                Log::event(
+                Eventlog::log(
                     'Toner ' . $toner['supply_descr'] . ' was replaced (new level: ' . $tonerperc . '%)',
                     $os->getDevice(),
                     'toner',
