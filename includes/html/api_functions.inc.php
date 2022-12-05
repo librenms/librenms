@@ -2911,6 +2911,27 @@ function edit_service_for_host(Illuminate\Http\Request $request)
     return api_error(500, "Failed to update the service with id $service_id");
 }
 
+
+/**
+ * recieve syslog messages via json https://github.com/librenms/librenms/pull/14424
+ */
+function put_syslogsink(Illuminate\Http\Request $request)
+{
+    $json = json_decode($request->getContent(), true);
+
+    if (array_is_list($json)) {
+        // multi message
+        foreach ($json as $entry) {
+            process_syslog($entry, 1);
+        }
+    } else {
+        //single message
+        $return[] = process_syslog($json, 1);        
+    }
+
+    return api_success_noresult(200, 'Syslog recived: ' . count($json));
+}
+
 /**
  * Display Librenms Instance Info
  */
