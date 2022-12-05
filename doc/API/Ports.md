@@ -51,7 +51,7 @@ Route: `/api/v0/ports/search/:search`
 
 Input:
 
-  -
+- columns: Comma separated list of columns you want returned.
 
 Example:
 
@@ -87,17 +87,18 @@ Output:
 }
 ```
 
-### `search_ports in specific column`
+### `search_ports in specific field(s)`
 
 Specific search for ports matching the query.
 
 Route: `/api/v0/ports/search/:field/:search`
 
-- search string to search in field specified by field
+- field: comma separated list of field(s) to search
+- search: string to search in fields
 
 Input:
 
-  -
+- columns: Comma separated list of columns you want returned.
 
 Example:
 

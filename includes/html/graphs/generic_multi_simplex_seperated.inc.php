@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $unitlen = $unitlen ?? 0;
-$descr_len = $descr_len ?? 0;
+$descr_len = $descr_len ?? 12;
 $multiplier = $multiplier ?? false;
 $previous = $graph_params->visible('previous');
 $stack = $stack ?? '';
@@ -13,10 +13,6 @@ $thingX = '';
 $plusX = '';
 $plusesX = '';
 
-if (! isset($descr_len)) {
-    $descr_len = 12;
-}
-
 if ($nototal) {
     $descr_len += 2;
     $unitlen += 2;
@@ -24,7 +20,7 @@ if ($nototal) {
 
 $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
-$unitlen = '10';
+$unitlen = 10;
 if ($nototal) {
     $descr_len += 2;
     $unitlen += 2;
