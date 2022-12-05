@@ -57,7 +57,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
         foreach (dbFetchRows("SELECT * FROM `ports` WHERE device_id = ? AND `deleted` != '1' AND `disabled` = 0 ORDER BY ifName", [$device['device_id']]) as $data) {
         }
     }
-    
+
     unset($ifsep);
     echo '  </td>';
     echo '</tr>';

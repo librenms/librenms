@@ -42,7 +42,7 @@ echo '
 if ($device['type'] == 'network') {
     require 'overview/ping.inc.php';
     require 'overview/device_availability.inc.php';
-} else{
+} else {
     require 'overview/processors.inc.php';
     require 'overview/mempools.inc.php';
     require 'overview/storage.inc.php';
