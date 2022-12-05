@@ -39,9 +39,15 @@ echo '
     <div class="col-md-6">
 ';
 // Right Pane
-require 'overview/processors.inc.php';
-require 'overview/mempools.inc.php';
-require 'overview/storage.inc.php';
+if ($device['type'] == 'server') {
+    require 'overview/processors.inc.php';
+    require 'overview/mempools.inc.php';
+    require 'overview/storage.inc.php';
+}
+elseif ($device['type'] == 'network') {
+    require 'overview/ping.inc.php';
+    require 'overview/device_availability.inc.php';
+}
 
 if (! isset($entity_state)) {
     $entity_state = get_dev_entity_state($device['device_id']);
