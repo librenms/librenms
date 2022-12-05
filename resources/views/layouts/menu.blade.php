@@ -571,7 +571,7 @@
                         </li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
+                            <a href="{{ url('api-access') }}"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('API Settings') }}
