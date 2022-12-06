@@ -23,6 +23,7 @@
  * @author     Vitali Kari <vitali.kari@gmail.com>
  */
 
+
 // get all virtual router ports and statistics
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfName', [], 'TIMETRA-VRTR-MIB');
 $timos_vrf_stats = snmpwalk_cache_twopart_oid($device, 'vRtrIfAlias', $timos_vrf_stats, 'TIMETRA-VRTR-MIB');
@@ -66,5 +67,28 @@ foreach ($timos_stats as $index => $value) {
         $timos_ports[$index]['ifDescr'] = $timos_ports[$index]['ifName'];
     }
 }
+
 $port_stats = array_replace_recursive($timos_ports, $port_stats);
 unset($timos_ports);
+
+# adding MPLS interface stats
+$mplsStatCache = snmpwalk_cache_multi_oid($device, 'vRtrMplsifStatTable', [], 'TIMETRA-MPLS-MIB', 'nokia');
+# the following for-loop changes the array keys to use the [$ifEntry] instead of [$index.$ifEntry]
+foreach ($mplsStatCache as $key => $value) {
+    [$index, $ifEntry] = explode('.', $key);
+    $mplsStatCache[$ifEntry] = $mplsStatCache[$key];
+    unset($mplsStatCache[$key]);
+}
+# the below simply adds the vRtrMplsifStats to the [$port_stats] array where applicable
+$port_stats = array_replace_recursive($mplsStatCache, $port_stats);
+
+# the following for-loop adds the checks if vRtrMplsifStats exist, if so it is being added to the ifHC counters
+# this way the exisiting code in the main port poller definition can be kept as it is
+foreach ($port_stats as $key => $value) {
+    if (isset($port_stats[$key]['vRtrMplsIfTxPktCount'])) {
+       $port_stats[$key]['ifHCOutUcastPkts'] = $port_stats[$key]['ifHCOutUcastPkts'] + $port_stats[$key]['vRtrMplsIfTxPktCount'];
+       $port_stats[$key]['ifHCInUcastPkts'] = $port_stats[$key]['ifHCInUcastPkts'] + $port_stats[$key]['vRtrMplsIfRxPktCount'];
+       $port_stats[$key]['ifHCOutOctets'] = $port_stats[$key]['ifHCOutOctets'] + $port_stats[$key]['vRtrMplsIfTxOctetCount'];
+       $port_stats[$key]['ifHCInOctets'] = $port_stats[$key]['ifHCInOctets'] + $port_stats[$key]['vRtrMplsIfRxOctetCount'];
+    }
+}
