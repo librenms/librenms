@@ -23,12 +23,37 @@ use LibreNMS\OS\Shared\Zyxel;
 
 class Zyxelnwa extends Zyxel implements OSDiscovery, WirelessClientsDiscovery
 {
+    
     public function discoverWirelessClients()
     {
-        $oid = '.1.3.6.1.4.1.890.1.15.3.5.1.1.2.1'; //ZYXEL-ES-SMI::esMgmt.5.1.1.2.1
+        $sensors = [];
+        $data = $this->getCacheTable('ZYXEL-ES-WIRELESS::wlanRadioTable');
+        foreach ($data as $index => $entry) {
+            $mode = '';
+            switch ($entry['wlanMode']) {
+              case 1:
+                $mode = '2.4Ghz';
+                break;
+              case 2:
+                $mode = '5Ghz';
+                break;
+              default:
+                $mode = "Unknown";
+            }
 
-        return [
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'zyxelnwa', 1, 'Clients'),
-        ];
+
+            $sensors[] = new WirelessSensor(
+                'clients',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.890.1.15.3.5.1.1.2.' . $index,
+                'zyxelnwa',
+                $index,
+                "$mode",
+                $entry['wlanStationCount']
+            );
+        }
+
+        return $sensors;
     }
+
 }
