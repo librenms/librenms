@@ -311,7 +311,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '<div class="config">';
         echo '<input id="linenumbers" class="btn btn-primary" type="submit" value="Hide line numbers"/>';
         if ($download_uri) {
-            echo '<a class="btn btn-primary" href="' . $download_uri . '">Download</a>';
+            echo '<a class="btn btn-primary" href="' . $download_uri . '" download target="_blank">Download</a>';
         }
         echo $geshi->parse_code();
         echo '</div>';
