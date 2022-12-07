@@ -208,6 +208,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
                 unset($key);
                 continue;
             }
+            if ($value['svcId'] == null) {
+                unset($key);
+                continue;
+            }
 
             $svcs->push(new MplsService([
                 'svc_oid' => $value['svcId'],
@@ -449,6 +453,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling
         foreach ($mplsSvcCache as $key => $value) {
             $garbage = preg_match($filter, $value['svcDescription']);
             if ($garbage) {
+                unset($key);
+                continue;
+            }
+            if ($value['svcId'] == null) {
                 unset($key);
                 continue;
             }
