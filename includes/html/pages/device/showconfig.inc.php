@@ -206,9 +206,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $download_uri = Config::get('oxidized.url') . $uri;
             }
         } else {  // just fetch the only version
-		    $uri = '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname;
+            $uri = '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname;
             $text = (new \App\ApiClients\Oxidized())->getContent($uri);
-			$download_uri = Config::get('oxidized.url') . $uri;
+            $download_uri = Config::get('oxidized.url') . $uri;
         }
 
         if (is_array($node_info) || $config_total > 1) {
