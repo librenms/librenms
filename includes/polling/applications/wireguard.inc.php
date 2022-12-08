@@ -21,8 +21,8 @@ try {
 
 $rrd_name = [$polling_type, $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
-    ->addDataset('bytes_rcvd', 'DERIVE', 0, 125000000000)
-    ->addDataset('bytes_sent', 'DERIVE', 0, 125000000000)
+    ->addDataset('bytes_rcvd', 'DERIVE', 0)
+    ->addDataset('bytes_sent', 'DERIVE', 0)
     ->addDataset('minutes_since_last_handshake', 'GAUGE', 0);
 
 $metrics = [];
