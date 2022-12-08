@@ -587,5 +587,10 @@
     "rule": "storage.storage_deleted = 0 AND storage.storage_descr = \"/\" AND storage.storage_perc >= 95",
     "name": "Space on / is >= 95% in use",
     "severity":"critical"
+  },
+  {
+    "rule": "applications.app_type = \"systemd\" && application_metrics.metric = \"sub_service_failed\" && application_metrics.value > \"0\"",
+    "name": "Systemd Services Failed > 0",
+    "severity": "warning"
   }
 ]
