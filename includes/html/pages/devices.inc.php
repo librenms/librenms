@@ -133,8 +133,8 @@ if ($format == 'graph') {
     }
 
     if (! empty($vars['searchquery'])) {
-        $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
-        $sql_param += array_fill(count($param), 5, '%' . $vars['searchquery'] . '%');
+        $where .= ' AND (sysName LIKE ? OR hostname LIKE ? OR display LIKE ? OR hardware LIKE ? OR os LIKE ? OR location LIKE ?)';
+        $sql_param += array_fill(count($param), 6, '%' . $vars['searchquery'] . '%');
     }
     if (! empty($vars['os'])) {
         $where .= ' AND os = ?';
@@ -344,7 +344,7 @@ if ($format == 'graph') {
             },
             post: function () {
                 return {
-                    format: ' <?php echo $vars['format']; ?>',
+                    format: '<?php echo $vars['format']; ?>',
                     searchPhrase: '<?php echo htmlspecialchars($vars['searchquery'] ?? ''); ?>',
                     os: '<?php echo $vars['os'] ?? ''; ?>',
                     version: '<?php echo $vars['version'] ?? ''; ?>',
@@ -372,7 +372,7 @@ if ($format == 'graph') {
             "<form method='post' action='' class='form-inline devices-search-header' role='form'>" +
             "<?php echo addslashes(csrf_field()) ?>"+
             "<div class='form-group'>" +
-            "<input type='text' name='searchquery' id='searchquery' value=''<?php echo $vars['searchquery'] ?? ''; ?>'' class='form-control' placeholder='Search'>" +
+            "<input type='text' name='searchquery' id='searchquery' value='<?php echo $vars['searchquery'] ?? ''; ?>' class='form-control' placeholder='Search'>" +
             "</div>" +
             "<div class='form-group'><?php echo $state_selection ?></div>" +
             "<div class='form-group'><select name='os' id='os' class='form-control'></select></div>" +
