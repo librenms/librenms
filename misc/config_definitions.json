@@ -226,6 +226,13 @@
             "section": "general",
             "order": 1
         },
+        "discovery_remove_domain": {
+            "default": false,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 0
+        },
         "allow_entity_sensor.amperes": {
             "default": true,
             "type": "boolean"
