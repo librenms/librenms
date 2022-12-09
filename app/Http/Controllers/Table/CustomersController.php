@@ -75,13 +75,13 @@ class CustomersController extends TableController
             ->groupBy('port_descr_descr');
 
         $rows = $customers->reduce(function ($rows, $customer) use ($ports) {
+            if(!is_array($ports))
+                return collect();
             $graph_row = $this->getGraphRow($customer);
-            if (is_array($ports)) {
-                foreach ($ports->get($customer) as $port) {
-                    $port->port_descr_descr = $customer;
-                    $rows->push($this->formatItem($port));
-                    $customer = ''; // only display customer in the first row
-                }
+            foreach ($ports->get($customer) as $port) {
+                $port->port_descr_descr = $customer;
+                $rows->push($this->formatItem($port));
+                $customer = ''; // only display customer in the first row
             }
             // add graphs row
             $rows->push($graph_row);
