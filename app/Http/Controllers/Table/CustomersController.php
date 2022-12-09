@@ -86,6 +86,7 @@ class CustomersController extends TableController
                 // add graphs row
                 $rows->push($graph_row);
             }
+            
             return $rows;
         }, collect());
 
