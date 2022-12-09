@@ -76,7 +76,7 @@ class CustomersController extends TableController
 
         $rows = $customers->reduce(function ($rows, $customer) use ($ports) {
             $cust_ports = $ports->get($customer);
-            if(is_array($cust_ports)){
+            if(is_object($cust_ports)){
                 echo($customer); //testing
                 $graph_row = $this->getGraphRow($customer);
                 foreach ($cust_ports as $port) {
