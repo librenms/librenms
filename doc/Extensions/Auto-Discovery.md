@@ -72,6 +72,12 @@ If your devices only return a short hostname such as lax-fa0-dc01 but
 the full name should be lax-fa0-dc01.example.com then you can
 set `$config['mydomain'] = 'example.com';`
 
+### Remove domainname from full hostname
+
+If you want to add the devices by short hostname but may have a domainname defined
+then you can strip the domainname with this setting:
+set `$config['discovery_remove_domain'] = 'true`
+
 ### Allow Duplicate sysName
 
 By default we require unique sysNames when adding devices (this is
