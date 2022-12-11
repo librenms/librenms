@@ -58,8 +58,8 @@ Connect to the server command line and follow the instructions below.
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:8.1
-        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        dnf module enable php:remi-8.1
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip gcc python3-devel
         ```
 
 === "Debian 11"
