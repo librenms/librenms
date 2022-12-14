@@ -403,12 +403,15 @@ Content of an example /etc/snmp/certificate.json . Please edit with your own set
     {"fqdn": "www.mydomain.com"},
     {"fqdn": "some.otherdomain.org",
      "port": 8443},
-    {"fqdn": "personal.domain.net"}
+    {"fqdn": "personal.domain.net"},
+    {"fqdn": "selfsignedcert_host.domain.com",
+     "cert_location": "/etc/pki/tls/certs/localhost.pem"}
 ]
 }
 ```
-Key 'domains' contains a list of domains to check.
-Optional you can define a port. By default it checks on port 443.
+a. (Required): Key 'domains' contains a list of domains to check.
+b. (Optional): You can define a port. By default it checks on port 443.
+c. (Optional): You may define a certificate location for self-signed certificates.
 
 ### SNMP Extend
 1. Copy the shell script to the desired host.
