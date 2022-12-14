@@ -123,7 +123,12 @@ def scan_host(scan_ip):
             if gethostbyname(tmp) == scan_ip:  # check that forward resolves
                 hostname = tmp
                 if re.match(args.pattern, hostname):
-                    return Result(scan_ip, hostname, Outcome.FAILED, "matched exlusion pattern: " + args.pattern)
+                    return Result(
+                        scan_ip,
+                        hostname,
+                        Outcome.FAILED,
+                        "matched exlusion pattern: " + args.pattern
+                    )
         except (herror, gaierror):
             pass
 
