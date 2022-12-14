@@ -243,7 +243,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
         "-e",
         "--exclude",
         help="Exclude pattern to check hostnames against",
-        dest="pattern",
+        dest="pattern"
     )
 
     args = parser.parse_args()
