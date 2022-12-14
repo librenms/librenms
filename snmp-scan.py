@@ -121,6 +121,8 @@ def scan_host(scan_ip):
             tmp = gethostbyaddr(scan_ip)[0]
             if gethostbyname(tmp) == scan_ip:  # check that forward resolves
                 hostname = tmp
+                if re.match(args.pattern, hostname):
+                    return Result(scan_ip, hostname, Outcome.FAILED, "matched exlusion pattern: " + args.pattern)
         except (herror, gaierror):
             pass
 
@@ -230,6 +232,12 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
         default="",
         help="Deprecated; Use --ping-fallback instead.",
         # help=argparse.SUPPRESS, #uncomment after grace period
+    )
+    parser.add_argument(
+        "-e",
+        "--exclude",
+        help="Exclude pattern to check hostnames against",
+        dest="pattern",
     )
 
     args = parser.parse_args()
