@@ -1014,8 +1014,11 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - location_id: serach by locaiton_id
   - hostname: search by hostname
+  - sysName: search by sysName
   - device_id: exact match by device-id
+  - type: search by device type
 - query: If searching by, then this will be used as the input.
 
 Example:

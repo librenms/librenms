@@ -97,7 +97,7 @@ class Number
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
-            if (! preg_match('/^-?\d+(\.\d+)?/', $number ?? '', $matches)) {
+            if (! preg_match('/^\s*-?\d+(\.\d+)?/', $number ?? '', $matches)) {
                 return 0;
             }
             $number = $matches[0];
