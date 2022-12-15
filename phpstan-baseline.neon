@@ -5631,41 +5631,6 @@ parameters:
 			path: LibreNMS/Util/StringHelpers.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$format with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$interval with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has parameter \\$s with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has parameter \\$description with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\Url\\:\\:escapeBothQuotes\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Url.php
