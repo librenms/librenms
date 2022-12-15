@@ -341,6 +341,15 @@ function list_devices(Illuminate\Http\Request $request)
         $sql = 'a.`ipv6_address`=? OR a.`ipv6_compressed`=?';
         $select .= ',p.* ';
         $param = [$query, $query];
+    } elseif ($type == 'sysName') {
+        $sql = '`d`.`sysName`=?';
+        $param[] = $query;
+    } elseif ($type == 'location_id') {
+        $sql = '`d`.`location_id`=?';
+        $param[] = $query;
+    } elseif ($type == 'type') {
+        $sql = '`d`.`type`=?';
+        $param[] = $query;
     } else {
         $sql = '1';
     }
