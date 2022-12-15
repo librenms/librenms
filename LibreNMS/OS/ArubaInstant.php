@@ -41,6 +41,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessApCountPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
