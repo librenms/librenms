@@ -1,4 +1,5 @@
 <?php
+
 $oids = snmpwalk_group($device, 'slotModelTable', 'L-AM3440-A-Private');
 $current = $entry['sensorValue'];
 if (! empty($oids)) {
