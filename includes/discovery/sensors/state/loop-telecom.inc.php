@@ -12,7 +12,7 @@ if (! empty($oids)) {
         ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'Failed'],
         ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'UnknownCard'],
         ['value' => 11, 'generic' => 1, 'graph' => 0, 'descr' => 'BrandMismatch'],
-        ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'cardTypeMismatch']
+        ['value' => 12, 'generic' => 1, 'graph' => 0, 'descr' => 'cardTypeMismatch'],
     ];
     //Model names corresponding to ccModelType
     $models = [
@@ -79,7 +79,7 @@ if (! empty($oids)) {
         'clka' => 66,
         'other' => 98,
         'unknown' => 99,
-        'ctrl' => 100
+        'ctrl' => 100,
     ];
 
     $test = create_state_index($state_name, $states);
