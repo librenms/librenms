@@ -30,7 +30,7 @@ use Carbon\CarbonInterval;
 
 class Time
 {
-    public static function legacyTimeSpecToSecs($description): int
+    public static function legacyTimeSpecToSecs(string $description): int
     {
         $conversion = [
             'now' => 0,
