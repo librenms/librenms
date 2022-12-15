@@ -103,13 +103,13 @@ if ($device['sysContact']) {
 
 if (! empty($device['inserted']) && preg_match('/^0/', $device['inserted']) == 0) {
     $inserted_text = 'Device Added';
-    $inserted = (\LibreNMS\Util\Time::formatInterval(- (time() - strtotime($device['inserted']))));
+    $inserted = (\LibreNMS\Util\Time::formatInterval(-(time() - strtotime($device['inserted']))));
     echo "<div class='row'><div class='col-sm-4'>$inserted_text</div><div class='col-sm-8' title='$inserted_text on " . $device['inserted'] . "'>$inserted</div></div>";
 }
 
 if (! empty($device['last_discovered'])) {
     $last_discovered_text = 'Last Discovered';
-    $last_discovered = (empty($device['last_discovered']) ? 'Never' : \LibreNMS\Util\Time::formatInterval(- (time() - strtotime($device['last_discovered']))));
+    $last_discovered = (empty($device['last_discovered']) ? 'Never' : \LibreNMS\Util\Time::formatInterval(-(time() - strtotime($device['last_discovered']))));
     echo "<div class='row'><div class='col-sm-4'>$last_discovered_text</div><div class='col-sm-8' title='$last_discovered_text at " . $device['last_discovered'] . "'>$last_discovered</div></div>";
 }
 

@@ -74,10 +74,10 @@ class Time
             }
 
             return CarbonInterval::seconds($seconds)->cascade()->forHumans([
-                    'syntax' => CarbonInterface::DIFF_ABSOLUTE,
-                    'parts' => $parts,
-                    'short' => $short,
-                ]);
+                'syntax' => CarbonInterface::DIFF_ABSOLUTE,
+                'parts' => $parts,
+                'short' => $short,
+            ]);
         } catch (\Exception) {
             return '';
         }
