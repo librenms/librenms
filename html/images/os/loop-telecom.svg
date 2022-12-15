@@ -1,8 +1,6 @@
 <?xml version="1.0" standalone="no"?>
-<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="340.000000pt" height="203.000000pt" viewBox="0 0 340.000000 203.000000"
- preserveAspectRatio="xMidYMid meet">
- <rect width="100%" height="100%" fill="white"/>
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+<rect width="100%" height="100%" fill="white"/>
 <g transform="translate(0.000000,203.000000) scale(0.100000,-0.100000)"
 fill="#2596be" stroke="#2596be">
 <path d="M40 1655 l0 -45 198 0 c175 1 195 2 178 15 -11 8 -34 15 -52 15 -30
@@ -67,7 +65,7 @@ l-6 40 -52 3 c-50 3 -53 2 -53 -21 0 -50 -34 -122 -79 -167 -102 -102 -251
 -3 26 -18 39 -31 27z"/>
 <path d="M1926 544 c-3 -9 -6 -46 -6 -84 0 -49 4 -71 16 -81 24 -20 34 4 34
 83 0 74 -6 98 -25 98 -7 0 -16 -7 -19 -16z"/>
-<width="100%" height="100%"path d="M2254 527 c-3 -8 -4 -45 -2 -83 2 -53 6 -69 18 -69 12 0 16 17 18 83
+<path d="M2254 527 c-3 -8 -4 -45 -2 -83 2 -53 6 -69 18 -69 12 0 16 17 18 83
 2 69 0 82 -13 82 -9 0 -18 -6 -21 -13z"/>
 </g>
 
