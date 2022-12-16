@@ -2919,14 +2919,8 @@ function put_syslogsink(Illuminate\Http\Request $request)
     $json = $request->json();
     $logs = array_is_list($json) ? $json : [$json];
 
-    if (array_is_list($json)) {
-        // multi message
-        foreach ($json as $entry) {
-            process_syslog($entry, 1);
-        }
-    } else {
-        //single message
-        $return[] = process_syslog($json, 1);
+    foreach ($logs as $entry) {
+        process_syslog($entry, 1);
     }
 
     return api_success_noresult(200, 'Syslog recived: ' . count($json));
