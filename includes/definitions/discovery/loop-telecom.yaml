@@ -87,14 +87,14 @@ modules:
     temperature:
       data:
         - oid: c1Temperature
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.{{ $index }}'
           snmp_flags: '-OQUsb'
           index: 'c1Temperature.{{ $index }}'
           descr: Chassis 1 
           user_func: snmp_hexstring, Number::cast
           high_limit: 90
         - oid:  dpwmTemperature
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.{{ $index }}'
           snmp_flags: '-OQUsb'
           index: ' dpwmTemperature.{{ $index }}'
           descr: DPWM Temperature 
@@ -104,47 +104,47 @@ modules:
     voltage:
       data:
         - oid: dpwmInputVoltage
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.15.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.15.{{ $index }}'
           descr:  DWMP Input Voltage
           index: 'dpwmInputVoltage.{{ $index }}'
 
         - oid: dpwmCH0Voltage
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.17.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.17.{{ $index }}'
           descr:  DWMP Chanel 0 Voltage
           index: 'dpwmCH0Voltage.{{ $index }}'
 
         - oid: dpwmCH1Voltage
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.18.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.18.{{ $index }}'
           descr:  DWMP Chanel 1 Voltage
           index: 'dpwmCH1Voltage.{{ $index }}'
 
         - oid: dpwmCH2Voltage
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.19.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.19.{{ $index }}'
           descr:  DWMP Chanel 2 Voltage
           index: 'dpwmCH2Voltage.{{ $index }}'
 
         - oid: dpwmCH3Voltage
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.20.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.20.{{ $index }}'
           descr:  DWMP Chanel 3 Voltage
           index: 'dpwmCH3Voltage.{{ $index }}'
     current:
       data:
         - oid: dpwmCH0Current
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.21.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.21.{{ $index }}'
           descr:  DWMP Chanel 0 current
           index: 'dpwmCH0Current.{{ $index }}'
 
         - oid: dpwmCH1Current
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.22.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.22.{{ $index }}'
           descr:  DWMP Chanel 1 current
           index: 'dpwmCH1Current.{{ $index }}'
 
         - oid: dpwmCH2Current
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.23.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.23.{{ $index }}'
           descr:  DWMP Chanel 2 current
           index: 'dpwmCH2Current.{{ $index }}'
 
         - oid: dpwmCH3Current
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.24.0'
+          num_oid: '.1.3.6.1.4.1.823.34441.1.10.24.{{ $index }}'
           descr:  DWMP Chanel 3 current
           index: 'dpwmCH3Current.{{ $index }}'
