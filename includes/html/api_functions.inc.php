@@ -2923,7 +2923,7 @@ function put_syslogsink(Illuminate\Http\Request $request)
         process_syslog($entry, 1);
     }
 
-    return api_success_noresult(200, 'Syslog recived: ' . count($json));
+    return api_success_noresult(200, 'Syslog received: ' . count($logs));
 }
 
 /**
