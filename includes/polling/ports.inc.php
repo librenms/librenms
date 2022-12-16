@@ -1,13 +1,12 @@
 <?php
 
-// Build SNMP Cache Array
-use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
 
+// Build SNMP Cache Array
 $data_oids = [
     'ifName',
     'ifDescr',
