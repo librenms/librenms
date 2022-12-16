@@ -1491,8 +1491,8 @@ return [
         'update_channel' => [
             'description' => 'Set update Channel',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [
