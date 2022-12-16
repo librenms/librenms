@@ -2916,7 +2916,8 @@ function edit_service_for_host(Illuminate\Http\Request $request)
  */
 function put_syslogsink(Illuminate\Http\Request $request)
 {
-    $json = json_decode($request->getContent(), true);
+    $json = $request->json();
+    $logs = array_is_list($json) ? $json : [$json];
 
     if (array_is_list($json)) {
         // multi message
