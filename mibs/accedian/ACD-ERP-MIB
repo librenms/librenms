@@ -1,0 +1,2401 @@
+--
+
+-- Accedian Enterprise Specific MIB
+
+--
+
+-- Copyright (c) 2005-2012, Accedian Networks, Inc.
+
+-- All rights reserved.
+
+--
+
+-- The contents of this document are subject to change without notice.
+
+--
+
+
+
+
+
+ACD-ERP-MIB DEFINITIONS ::= BEGIN
+
+
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE,
+
+    Unsigned32
+
+        FROM SNMPv2-SMI
+
+    DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION, MacAddress
+
+        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+
+        FROM SNMPv2-CONF
+
+
+
+    acdMibs
+
+        FROM ACCEDIAN-SMI;
+
+
+
+acdErp MODULE-IDENTITY
+
+
+
+    LAST-UPDATED "201201110100Z"
+
+    ORGANIZATION "Accedian Networks, Inc."
+
+    CONTACT-INFO
+
+            "Accedian Technical Assistance Center
+
+             Accedian Networks, Inc.
+
+             2351 Alfred-Nobel blvd., Suite N-410
+
+             Saint-Laurent, Quebec Canada H4S 2A9
+
+             E-mail: support@accedian.com"
+
+    DESCRIPTION
+
+            "The ERP database for this Accedian Networks device."
+
+
+
+    REVISION "201201110100Z"        -- 11 JAN 2012
+
+    DESCRIPTION
+
+            "Initial version of MIB module ACD-ERP-MIB."
+
+
+
+    ::= { acdMibs 15 }
+
+
+
+acdErpMIBObjects         OBJECT IDENTIFIER ::= { acdErp 0 }
+
+acdErpConformance        OBJECT IDENTIFIER ::= { acdErp 1 }
+
+                        
+
+acdErpConfig             OBJECT IDENTIFIER ::= { acdErpMIBObjects 1 }
+
+acdErpCounter            OBJECT IDENTIFIER ::= { acdErpMIBObjects 2 }
+
+acdErpStatus             OBJECT IDENTIFIER ::= { acdErpMIBObjects 3 }
+
+acdErpVlanFdb            OBJECT IDENTIFIER ::= { acdErpMIBObjects 4 }
+
+   
+
+---------------------------------------------------------------------------
+
+
+-- Textual conventions
+
+---------------------------------------------------------------------------
+
+
+
+
+AcdErpVlanType ::= TEXTUAL-CONVENTION
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "The type of VLAN to be used."
+
+    SYNTAX      INTEGER {
+
+                    cvlan(1),
+
+                    svlan(2)
+
+    }
+
+
+
+AcdErpPortStateType ::= TEXTUAL-CONVENTION
+
+	STATUS      current
+
+	DESCRIPTION
+
+	"The status of the port's forwarding."
+
+	SYNTAX      INTEGER {
+
+		    forwarding(0),
+
+		    blocked(1)
+
+	}
+
+
+
+AcdErpStateType ::= TEXTUAL-CONVENTION
+
+	STATUS      current
+
+	DESCRIPTION
+
+	"The state of the ERP instance."
+
+	SYNTAX      INTEGER {
+
+		    idle(1),
+
+		    prot(2),
+
+		    ms(3),
+
+		    fs(4),
+
+		    pending(5)
+
+	}
+
+
+
+AcdErpPortStatusType ::= TEXTUAL-CONVENTION
+
+	STATUS      current
+
+	DESCRIPTION
+
+	"The state of the port's signal."
+
+	SYNTAX      INTEGER {
+
+		    ok(1),
+
+		    sd(2),
+
+		    sf(3)
+
+	}
+
+
+
+---------------------------------------------------------------------------
+
+ -- The Erp configuration table
+
+ -- This table contains all Service entry configurations.
+
+---------------------------------------------------------------------------
+
+
+
+acdErpConfigTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF AcdErpConfigEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This table contains all instance of ERP of this unit."
+
+    ::= { acdErpConfig 1 }
+
+
+
+acdErpConfigEntry OBJECT-TYPE
+
+    SYNTAX      AcdErpConfigEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An entry consisting of all settings for an instance."
+
+    INDEX   { acdErpIndex }
+
+    ::=  { acdErpConfigTable 1 }
+
+
+
+AcdErpConfigEntry ::= SEQUENCE {
+
+    acdErpIndex                   Unsigned32,
+
+    acdErpConfigRowStatus         RowStatus,
+
+    acdErpConfigName              DisplayString,    
+
+    acdErpConfigRPLRole           DisplayString,
+
+    acdErpConfigRPLPort		  Unsigned32,
+
+    acdErpConfigHoldOffTimer      Unsigned32,
+
+    acdErpConfigRevertive         TruthValue,
+
+    acdErpConfigGuardTimer        Unsigned32,
+
+    acdErpConfigWTRTimer          Unsigned32,
+
+    acdErpConfigMDLevel           Unsigned32,
+
+    acdErpConfigAPSVid            Unsigned32,
+
+    acdErpConfigVids0to1023       OCTET STRING,
+
+    acdErpConfigVids1024to2047    OCTET STRING,
+
+    acdErpConfigVids2048to3071    OCTET STRING,
+
+    acdErpConfigVids3072to4095    OCTET STRING,
+
+    acdErpConfigLAGPort           DisplayString,
+
+    acdErpConfigMep0Idx           Unsigned32,
+
+    acdErpConfigMep1Idx           Unsigned32
+
+}
+
+
+
+acdErpIndex  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Unique value for each instance."
+
+    ::= { acdErpConfigEntry 1 }
+
+
+
+acdErpConfigRowStatus OBJECT-TYPE
+
+    SYNTAX      RowStatus
+
+    MAX-ACCESS  read-create
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "All columns must have a valid value before a row can be activated. To
+
+        create a new Service you shall provide a unique name for an empty
+
+        row with the RowStatus set to Create and Go."
+
+    ::= { acdErpConfigEntry 2 }
+
+
+
+acdErpConfigName  OBJECT-TYPE
+
+    SYNTAX      DisplayString (SIZE (1..32))
+
+    MAX-ACCESS  read-create
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "A unique name used to identify the instance"
+
+    ::= { acdErpConfigEntry 3 }
+
+
+
+acdErpConfigRPLRole OBJECT-TYPE
+
+    SYNTAX      DisplayString (SIZE (1..32))
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "RPL role (Owner, Neighbor or None)."
+
+    ::= { acdErpConfigEntry 4 }
+
+
+
+acdErpConfigRPLPort OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 1)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The index of the port used as RPL."
+
+    DEFVAL      { 0 }
+
+    ::= { acdErpConfigEntry 5 }
+
+
+
+acdErpConfigHoldOffTimer OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 10000)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The hold off timer duration in ms."
+
+    ::= { acdErpConfigEntry 6 }
+
+
+
+acdErpConfigRevertive OBJECT-TYPE
+
+    SYNTAX      TruthValue
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This indicates if the ERP is in revertive state."
+
+    DEFVAL      { 1 }
+
+    ::= { acdErpConfigEntry 7 }
+
+    
+
+acdErpConfigGuardTimer OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 2000)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The guard timer duration in ms."
+
+    DEFVAL      { 500 }
+
+    ::= { acdErpConfigEntry 8 }
+
+
+
+acdErpConfigWTRTimer OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 2000)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The WTR timer duration in minutes."
+
+    DEFVAL      { 5 }
+
+    ::= { acdErpConfigEntry 9 }
+
+
+
+acdErpConfigMDLevel OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 7)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The maintenance domain level."
+
+    DEFVAL      { 0 }
+
+    ::= { acdErpConfigEntry 10 }
+
+
+
+acdErpConfigAPSVid OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 4095)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The APS VID."
+
+    ::= { acdErpConfigEntry 11 }
+
+
+
+acdErpConfigVids0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpConfigEntry 12 }
+
+
+
+acdErpConfigVids1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpConfigEntry 13 }
+
+
+
+acdErpConfigVids2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpConfigEntry 14 }
+
+
+
+acdErpConfigVids3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpConfigEntry 15 }
+
+
+
+
+
+acdErpConfigLAGPort OBJECT-TYPE
+
+    SYNTAX      DisplayString  (SIZE (1..32))
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The LAG port name"
+
+    ::= { acdErpConfigEntry 16 }
+
+   
+
+acdErpConfigMep0Idx OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 1000)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The MEP0 port index."
+
+    ::= { acdErpConfigEntry 17 }
+
+   
+
+acdErpConfigMep1Idx OBJECT-TYPE
+
+    SYNTAX      Unsigned32 (0 .. 1000)
+
+    MAX-ACCESS  read-write
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The MEP1 port index."
+
+    ::= { acdErpConfigEntry 18 }
+
+
+
+---------------------------------------------------------------------------
+
+ -- The instance counters table
+
+ -- This table contains all ERP counters.
+
+---------------------------------------------------------------------------
+
+
+
+acdErpCounterTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF AcdErpCounterEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This table contains all instance of ERP of this unit."
+
+    ::= { acdErpCounter 1 }
+
+
+
+acdErpCounterEntry OBJECT-TYPE
+
+    SYNTAX      AcdErpCounterEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An entry consisting of all counters for an instance."
+
+    INDEX   { acdErpCounterIndex }
+
+    ::=  { acdErpCounterTable 1 }
+
+
+
+AcdErpCounterEntry ::= SEQUENCE {
+
+    acdErpCounterIndex            Unsigned32,
+
+    acdErpCounterPort0LocalClear       Unsigned32,
+
+    acdErpCounterPort0LocalFs          Unsigned32,
+
+    acdErpCounterPort0LocalSf          Unsigned32,
+
+    acdErpCounterPort0LocalMs          Unsigned32,
+
+    acdErpCounterPort0RxAps            Unsigned32,
+
+    acdErpCounterPort0RxApsFs          Unsigned32,
+
+    acdErpCounterPort0RxApsSf          Unsigned32,
+
+    acdErpCounterPort0RxApsMs          Unsigned32,
+
+    acdErpCounterPort0RxApsNrRb        Unsigned32,
+
+    acdErpCounterPort0RxApsNr          Unsigned32,
+
+    acdErpCounterPort0TxAps            Unsigned32,
+
+    acdErpCounterPort0TxApsFs          Unsigned32,
+
+    acdErpCounterPort0TxApsSf          Unsigned32,
+
+    acdErpCounterPort0TxApsMs          Unsigned32,
+
+    acdErpCounterPort0TxApsNrRb        Unsigned32,
+
+    acdErpCounterPort0TxApsNr          Unsigned32,
+
+    acdErpCounterPort0DropGuard        Unsigned32,
+
+    acdErpCounterPort0DropUnknown      Unsigned32,
+
+    acdErpCounterPort0DropMismatch     Unsigned32,
+
+    acdErpCounterPort1LocalClear       Unsigned32,
+
+    acdErpCounterPort1LocalFs          Unsigned32,
+
+    acdErpCounterPort1LocalSf          Unsigned32,
+
+    acdErpCounterPort1LocalMs          Unsigned32,
+
+    acdErpCounterPort1RxAps            Unsigned32,
+
+    acdErpCounterPort1RxApsFs          Unsigned32,
+
+    acdErpCounterPort1RxApsSf          Unsigned32,
+
+    acdErpCounterPort1RxApsMs          Unsigned32,
+
+    acdErpCounterPort1RxApsNrRb        Unsigned32,
+
+    acdErpCounterPort1RxApsNr          Unsigned32,
+
+    acdErpCounterPort1TxAps            Unsigned32,
+
+    acdErpCounterPort1TxApsFs          Unsigned32,
+
+    acdErpCounterPort1TxApsSf          Unsigned32,
+
+    acdErpCounterPort1TxApsMs          Unsigned32,
+
+    acdErpCounterPort1TxApsNrRb        Unsigned32,
+
+    acdErpCounterPort1TxApsNr          Unsigned32,
+
+    acdErpCounterPort1DropGuard        Unsigned32,
+
+    acdErpCounterPort1DropUnknown      Unsigned32,
+
+    acdErpCounterPort1DropMismatch     Unsigned32
+
+}
+
+
+
+acdErpCounterIndex  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An index that uniquely identifies this instance."
+
+    ::= { acdErpCounterEntry 1 }
+
+
+
+acdErpCounterPort0LocalClear  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local clear event processed."
+
+    ::= { acdErpCounterEntry 2 }
+
+
+
+acdErpCounterPort0LocalFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local force switch event processed."
+
+    ::= { acdErpCounterEntry 3 }
+
+
+
+acdErpCounterPort0LocalSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local signal failed event processed."
+
+    ::= { acdErpCounterEntry 4 }
+
+
+
+acdErpCounterPort0LocalMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local manual switch event processed."
+
+    ::= { acdErpCounterEntry 5 }
+
+
+
+acdErpCounterPort0RxAps  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of APS messages received."
+
+    ::= { acdErpCounterEntry 6 }
+
+
+
+acdErpCounterPort0RxApsFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of force switch messages received."
+
+    ::= { acdErpCounterEntry 7 }
+
+
+
+acdErpCounterPort0RxApsSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of signal failed messages received."
+
+    ::= { acdErpCounterEntry 8 }
+
+
+
+
+
+acdErpCounterPort0RxApsMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of manual switch messages received."
+
+    ::= { acdErpCounterEntry 9 }
+
+
+
+acdErpCounterPort0RxApsNrRb  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request RPL blocked messages received."
+
+    ::= { acdErpCounterEntry 10 }
+
+
+
+acdErpCounterPort0RxApsNr  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request messages received."
+
+    ::= { acdErpCounterEntry 11 }
+
+
+
+
+
+acdErpCounterPort0TxAps  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of APS messages transmitted."
+
+    ::= { acdErpCounterEntry 12 }
+
+
+
+acdErpCounterPort0TxApsFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of force switch messages transmitted."
+
+    ::= { acdErpCounterEntry 13 }
+
+
+
+acdErpCounterPort0TxApsSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of signal failed messages transmitted."
+
+    ::= { acdErpCounterEntry 14 }
+
+
+
+
+
+acdErpCounterPort0TxApsMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of manual switch messages transmitted."
+
+    ::= { acdErpCounterEntry 15 }
+
+
+
+acdErpCounterPort0TxApsNrRb  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request RPL blocked messages transmitted."
+
+    ::= { acdErpCounterEntry 16 }
+
+
+
+acdErpCounterPort0TxApsNr  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request messages transmitted."
+
+    ::= { acdErpCounterEntry 17 }
+
+
+
+acdErpCounterPort0DropGuard  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of the guard timer."
+
+    ::= { acdErpCounterEntry 18 }
+
+
+
+acdErpCounterPort0DropUnknown  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of unrecognized op codes."
+
+    ::= { acdErpCounterEntry 19 }
+
+
+
+acdErpCounterPort0DropMismatch  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of erp version mismatch."
+
+    ::= { acdErpCounterEntry 20 }
+
+
+
+acdErpCounterPort1LocalClear  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local clear event processed."
+
+    ::= { acdErpCounterEntry 21 }
+
+
+
+acdErpCounterPort1LocalFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local force switch event processed."
+
+    ::= { acdErpCounterEntry 22 }
+
+
+
+acdErpCounterPort1LocalSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local signal failed event processed."
+
+    ::= { acdErpCounterEntry 23 }
+
+
+
+acdErpCounterPort1LocalMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of local manual switch event processed."
+
+    ::= { acdErpCounterEntry 24 }
+
+
+
+acdErpCounterPort1RxAps  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of APS messages received."
+
+    ::= { acdErpCounterEntry 25 }
+
+
+
+acdErpCounterPort1RxApsFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of force switch messages received."
+
+    ::= { acdErpCounterEntry 26 }
+
+
+
+acdErpCounterPort1RxApsSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of signal failed messages received."
+
+    ::= { acdErpCounterEntry 27 }
+
+
+
+
+
+acdErpCounterPort1RxApsMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of manual switch messages received."
+
+    ::= { acdErpCounterEntry 28 }
+
+
+
+acdErpCounterPort1RxApsNrRb  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request RPL blocked messages received."
+
+    ::= { acdErpCounterEntry 29 }
+
+
+
+acdErpCounterPort1RxApsNr  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request messages received."
+
+    ::= { acdErpCounterEntry 30 }
+
+
+
+
+
+acdErpCounterPort1TxAps  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of APS messages transmitted."
+
+    ::= { acdErpCounterEntry 31 }
+
+
+
+acdErpCounterPort1TxApsFs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of force switch messages transmitted."
+
+    ::= { acdErpCounterEntry 32 }
+
+
+
+acdErpCounterPort1TxApsSf  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of signal failed messages transmitted."
+
+    ::= { acdErpCounterEntry 33 }
+
+
+
+
+
+acdErpCounterPort1TxApsMs  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of manual switch messages transmitted."
+
+    ::= { acdErpCounterEntry 34 }
+
+
+
+acdErpCounterPort1TxApsNrRb  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request RPL blocked messages transmitted."
+
+    ::= { acdErpCounterEntry 35 }
+
+
+
+acdErpCounterPort1TxApsNr  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of no request messages transmitted."
+
+    ::= { acdErpCounterEntry 36 }
+
+
+
+acdErpCounterPort1DropGuard  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of the guard timer."
+
+    ::= { acdErpCounterEntry 37 }
+
+
+
+acdErpCounterPort1DropUnknown  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of unrecognized op codes."
+
+    ::= { acdErpCounterEntry 38 }
+
+
+
+acdErpCounterPort1DropMismatch  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The number of messages dropped because of erp version mismatch."
+
+    ::= { acdErpCounterEntry 39 }
+
+
+
+---------------------------------------------------------------------------
+
+ -- The status table
+
+ -- This table contains all erp entry status.
+
+---------------------------------------------------------------------------
+
+acdErpStatusTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF AcdErpStatusEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This table contains all instance of ERP of this unit."
+
+    ::= { acdErpStatus 1 }
+
+
+
+acdErpStatusEntry OBJECT-TYPE
+
+    SYNTAX      AcdErpStatusEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An entry consisting of all status for an instance"
+
+    INDEX   { acdErpStatusIdx }
+
+    ::=  { acdErpStatusTable 1 }
+
+
+
+AcdErpStatusEntry ::= SEQUENCE {
+
+    acdErpStatusIdx                Unsigned32,
+
+    acdErpStatusName               DisplayString,
+
+    acdErpStatusNodeId             MacAddress,
+
+    acdErpStatusRPLNodeId          MacAddress,
+
+    acdErpStatusState              AcdErpStateType,
+
+    acdErpStatusRequestNodeId      MacAddress,
+
+    acdErpStatusRequest            Unsigned32,
+
+    acdErpPort0Status              AcdErpPortStatusType,
+
+    acdErpPort0State               AcdErpPortStateType,
+
+    acdErpPort1Status              AcdErpPortStatusType,
+
+    acdErpPort1State               AcdErpPortStateType
+
+}
+
+
+
+acdErpStatusIdx  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Unique index for each service instance."
+
+    ::= { acdErpStatusEntry 1 }
+
+
+
+acdErpStatusName  OBJECT-TYPE
+
+    SYNTAX      DisplayString (SIZE (1..32))
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "A unique name used to identify the instance."
+
+    ::= { acdErpStatusEntry 2 }
+
+
+
+acdErpStatusNodeId OBJECT-TYPE
+
+    SYNTAX      MacAddress
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The instance node ID."
+
+    ::= { acdErpStatusEntry 3 }
+
+
+
+acdErpStatusRPLNodeId OBJECT-TYPE
+
+    SYNTAX      MacAddress
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The RPL node ID."
+
+    ::= { acdErpStatusEntry 4 }
+
+
+
+acdErpStatusState OBJECT-TYPE
+
+    SYNTAX      AcdErpStateType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The ERP state."
+
+    ::= { acdErpStatusEntry 5 }
+
+
+
+acdErpStatusRequestNodeId OBJECT-TYPE
+
+    SYNTAX      MacAddress
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The ERP latest top priority request node ID."
+
+    ::= { acdErpStatusEntry 6 }
+
+
+
+acdErpStatusRequest OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The ERP latest top priority request."
+
+    ::= { acdErpStatusEntry 7 }
+
+
+
+acdErpPort0Status OBJECT-TYPE
+
+    SYNTAX      AcdErpPortStatusType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The status of Port 0."
+
+    ::= { acdErpStatusEntry 8 }
+
+
+
+acdErpPort0State OBJECT-TYPE
+
+    SYNTAX      AcdErpPortStateType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The state of Port 0."
+
+    ::= { acdErpStatusEntry 9 }
+
+
+
+acdErpPort1Status OBJECT-TYPE
+
+    SYNTAX      AcdErpPortStatusType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The status of Port 1."
+
+    ::= { acdErpStatusEntry 10 }
+
+
+
+acdErpPort1State OBJECT-TYPE
+
+    SYNTAX      AcdErpPortStateType
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "The state of Port 1."
+
+    ::= { acdErpStatusEntry 11 }
+
+
+
+---------------------------------------------------------------------------
+
+ -- The vlan fdb table
+
+ -- This table contains all vlan fdb entry.
+
+---------------------------------------------------------------------------
+
+
+
+acdErpVlanFdbTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF AcdErpVlanFdbEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This table contains all instance of ERP of this unit."
+
+    ::= { acdErpVlanFdb 1 }
+
+
+
+acdErpVlanFdbEntry OBJECT-TYPE
+
+    SYNTAX      AcdErpVlanFdbEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An entry consisting of all vlan fdb info for an instance"
+
+    INDEX   { acdErpVlanFdbIdx }
+
+    ::=  { acdErpVlanFdbTable 1 }
+
+
+
+AcdErpVlanFdbEntry ::= SEQUENCE {
+
+    acdErpVlanFdbIdx                     Unsigned32,
+
+    acdErpVlanFdbPort0Vids0to1023        OCTET STRING,
+
+    acdErpVlanFdbPort0Vids1024to2047     OCTET STRING,
+
+    acdErpVlanFdbPort0Vids2048to3071     OCTET STRING,
+
+    acdErpVlanFdbPort0Vids3072to4095     OCTET STRING,
+
+    acdErpVlanFdbPort1Vids0to1023        OCTET STRING,
+
+    acdErpVlanFdbPort1Vids1024to2047     OCTET STRING,
+
+    acdErpVlanFdbPort1Vids2048to3071     OCTET STRING,
+
+    acdErpVlanFdbPort1Vids3072to4095     OCTET STRING,
+
+    acdErpVlanFdbFloodingVids0to1023     OCTET STRING,
+
+    acdErpVlanFdbFloodingVids1024to2047  OCTET STRING,
+
+    acdErpVlanFdbFloodingVids2048to3071  OCTET STRING,
+
+    acdErpVlanFdbFloodingVids3072to4095  OCTET STRING,
+
+    acdErpVlanFdbFlappingVids0to1023     OCTET STRING,
+
+    acdErpVlanFdbFlappingVids1024to2047  OCTET STRING,
+
+    acdErpVlanFdbFlappingVids2048to3071  OCTET STRING,
+
+    acdErpVlanFdbFlappingVids3072to4095  OCTET STRING
+
+}
+
+
+
+acdErpVlanFdbIdx  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Unique index for each instance."
+
+    ::= { acdErpVlanFdbEntry 1 }
+
+
+
+acdErpVlanFdbPort0Vids0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 2 }
+
+
+
+acdErpVlanFdbPort0Vids1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 3 }
+
+
+
+acdErpVlanFdbPort0Vids2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 4 }
+
+
+
+acdErpVlanFdbPort0Vids3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 5 }
+
+
+
+acdErpVlanFdbPort1Vids0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 6 }
+
+
+
+
+
+acdErpVlanFdbPort1Vids1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 7 }
+
+
+
+acdErpVlanFdbPort1Vids2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 8 }
+
+
+
+acdErpVlanFdbPort1Vids3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 9 }
+
+
+
+
+
+acdErpVlanFdbFloodingVids0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 10 }
+
+
+
+acdErpVlanFdbFloodingVids1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 11 }
+
+
+
+acdErpVlanFdbFloodingVids2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 12 }
+
+
+
+acdErpVlanFdbFloodingVids3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 13 }
+
+
+
+acdErpVlanFdbFlappingVids0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 14 }
+
+
+
+acdErpVlanFdbFlappingVids1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 15 }
+
+
+
+acdErpVlanFdbFlappingVids2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 16 }
+
+
+
+acdErpVlanFdbFlappingVids3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-only
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdErpVlanFdbEntry 17 }
+
+
+
+---------------------------------------------------------------------------
+
+ -- ACD-ERP-MIB Module - Conformance Information
+
+---------------------------------------------------------------------------
+
+
+
+acdErpCompliances    OBJECT IDENTIFIER ::= { acdErpConformance 1 }
+
+acdErpGroups         OBJECT IDENTIFIER ::= { acdErpConformance 2 }
+
+                    
+
+---------------------------------------------------------------------------
+
+ -- Units of conformance
+
+---------------------------------------------------------------------------
+
+
+
+acdErpConfigGroup OBJECT-GROUP
+
+    OBJECTS {
+
+	acdErpConfigRowStatus,
+
+	acdErpConfigName,
+
+	acdErpConfigRPLRole,
+
+	acdErpConfigRPLPort,
+
+	acdErpConfigHoldOffTimer,
+
+	acdErpConfigRevertive,
+
+	acdErpConfigGuardTimer,
+
+	acdErpConfigWTRTimer,
+
+	acdErpConfigMDLevel,
+
+	acdErpConfigAPSVid,
+
+	acdErpConfigVids0to1023,
+
+	acdErpConfigVids1024to2047,
+
+	acdErpConfigVids2048to3071,
+
+	acdErpConfigVids3072to4095,
+
+	acdErpConfigLAGPort,
+
+	acdErpConfigMep0Idx,
+
+	acdErpConfigMep1Idx
+
+    }
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "Objects for the ERP configuration Group."
+
+    ::= { acdErpGroups 1 }
+
+
+
+acdErpCounterGroup OBJECT-GROUP
+
+    OBJECTS {    
+
+	acdErpCounterPort0LocalClear,
+
+	acdErpCounterPort0LocalFs,
+
+	acdErpCounterPort0LocalSf,
+
+	acdErpCounterPort0LocalMs,
+
+	acdErpCounterPort0RxAps,
+
+	acdErpCounterPort0RxApsFs,
+
+	acdErpCounterPort0RxApsSf,
+
+	acdErpCounterPort0RxApsMs,
+
+	acdErpCounterPort0RxApsNrRb,
+
+	acdErpCounterPort0RxApsNr,
+
+	acdErpCounterPort0TxAps,
+
+	acdErpCounterPort0TxApsFs,
+
+	acdErpCounterPort0TxApsSf,
+
+	acdErpCounterPort0TxApsMs,
+
+	acdErpCounterPort0TxApsNrRb,
+
+	acdErpCounterPort0TxApsNr,
+
+	acdErpCounterPort0DropGuard,
+
+	acdErpCounterPort0DropUnknown,
+
+	acdErpCounterPort0DropMismatch,
+
+	acdErpCounterPort1LocalClear,
+
+	acdErpCounterPort1LocalFs,
+
+	acdErpCounterPort1LocalSf,
+
+	acdErpCounterPort1LocalMs,
+
+	acdErpCounterPort1RxAps,
+
+	acdErpCounterPort1RxApsFs,
+
+	acdErpCounterPort1RxApsSf,
+
+	acdErpCounterPort1RxApsMs,
+
+	acdErpCounterPort1RxApsNrRb,
+
+	acdErpCounterPort1RxApsNr,
+
+	acdErpCounterPort1TxAps,
+
+	acdErpCounterPort1TxApsFs,
+
+	acdErpCounterPort1TxApsSf,
+
+	acdErpCounterPort1TxApsMs,
+
+	acdErpCounterPort1TxApsNrRb,
+
+	acdErpCounterPort1TxApsNr,
+
+	acdErpCounterPort1DropGuard,
+
+	acdErpCounterPort1DropUnknown,
+
+	acdErpCounterPort1DropMismatch
+
+    }
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "Objects for the ERP Counter Group."
+
+    ::= { acdErpGroups 2 }
+
+
+
+acdErpStatusGroup OBJECT-GROUP
+
+    OBJECTS {
+
+	acdErpStatusName,
+
+	acdErpStatusNodeId,
+
+	acdErpStatusRPLNodeId,
+
+	acdErpStatusState,
+
+	acdErpStatusRequestNodeId,
+
+	acdErpStatusRequest,
+
+	acdErpPort0Status,
+
+	acdErpPort0State,
+
+	acdErpPort1Status,
+
+	acdErpPort1State
+
+    }
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "Objects for the ERP Status Group."
+
+    ::= { acdErpGroups 3 }
+
+
+
+acdErpVlanFdbGroup OBJECT-GROUP
+
+    OBJECTS {
+
+	acdErpVlanFdbPort0Vids0to1023,
+
+	acdErpVlanFdbPort0Vids1024to2047,
+
+	acdErpVlanFdbPort0Vids2048to3071,
+
+	acdErpVlanFdbPort0Vids3072to4095,
+
+	acdErpVlanFdbPort1Vids0to1023,
+
+	acdErpVlanFdbPort1Vids1024to2047,
+
+	acdErpVlanFdbPort1Vids2048to3071,
+
+	acdErpVlanFdbPort1Vids3072to4095,
+
+	acdErpVlanFdbFloodingVids0to1023,
+
+	acdErpVlanFdbFloodingVids1024to2047,
+
+	acdErpVlanFdbFloodingVids2048to3071,
+
+	acdErpVlanFdbFloodingVids3072to4095,
+
+	acdErpVlanFdbFlappingVids0to1023,
+
+	acdErpVlanFdbFlappingVids1024to2047,
+
+	acdErpVlanFdbFlappingVids2048to3071,
+
+	acdErpVlanFdbFlappingVids3072to4095
+
+    }
+
+
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "Objects for the Erp vlan forwarding Group."
+
+    ::= { acdErpGroups 4 }
+
+
+
+acdErpCompliance MODULE-COMPLIANCE
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "The compliance statement for support of the ACD-ERP-MIB module."
+
+    MODULE
+
+        MANDATORY-GROUPS {
+
+            acdErpConfigGroup,
+
+            acdErpCounterGroup,
+
+            acdErpStatusGroup,
+
+            acdErpVlanFdbGroup
+
+         }
+
+
+
+    OBJECT  acdErpConfigRowStatus
+
+      SYNTAX       RowStatus { active(1) }
+
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+
+      DESCRIPTION "Support for createAndWait is not required."
+
+
+
+    ::= { acdErpCompliances 1 }
+
+
+
+END

@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
 --
 -- CIENA-CES-CONFIG-MGMT-MIB
 --
@@ -16,17 +15,21 @@ IMPORTS
         FROM CIENA-SMI;
 
 cienaCesConfigMgmtMIB MODULE-IDENTITY
-        LAST-UPDATED "201502110000Z"
-        ORGANIZATION "Ciena, Inc"
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
         CONTACT-INFO
-            "       Mib Meister
-                    115 North Sullivan Road
-                    Spokane Valley, WA 99037
-                    USA             
-                    Phone:  +1 509 242 9000
-                    Email:  support@ciena.com"   
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
         DESCRIPTION
             "This module defines device configuration information and associated notifications."
+
+        REVISION "201706070000Z"
+        DESCRIPTION
+            "Updated contact info."
 
         REVISION "201502110000Z"
         DESCRIPTION
@@ -40,11 +43,11 @@ CienaCesConfigMgmtContext ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The context in which the configuration change was done.
-         
+
          unknown(1)     An unknown context. This value is used
                         when the system cannot find what mechanism
                         was used to modify the configuration state
-         
+
          cli(2)         The configuration state was modified using
                         the command line interface
 
@@ -150,18 +153,18 @@ cienaCesConfigMgmtConfigChangeNotification NOTIFICATION-TYPE
                         cienaCesConfigMgmtConfigLastContext,
                         cienaCesConfigMgmtConfigLastUser,
                         cienaCesConfigMgmtConfigLastOrigin,
-                        cienaCesConfigMgmtConfigLastChanged                        
+                        cienaCesConfigMgmtConfigLastChanged
                 }
         STATUS  current
         DESCRIPTION
             "This notification is sent when the configuration on the device changes.
-             
+
              A hysteresis mechanism is evaluated before sending in an effort to limit the
              number of events generated. This mechanism will send out one notification
              when an accumulation rate threshold is crossed. If the context/user/origin
-             of a configuration change does not match the currently tracked 
+             of a configuration change does not match the currently tracked
              context/user/origin, then this notification will automatically be sent.
-             The hysteresis algorithm will then be evaluated based on the new 
+             The hysteresis algorithm will then be evaluated based on the new
              context/user/origin."
         ::= { cienaCesConfigMgmtMIBNotifications 2 }
 

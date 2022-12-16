@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-TIME-SYNC-MIB.my
  --
@@ -8,7 +7,7 @@
  IMPORTS
     Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    DisplayString, TEXTUAL-CONVENTION
+    DisplayString, MacAddress, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
     cienaCesConfig, cienaCesNotifications 
         FROM CIENA-SMI
@@ -21,18 +20,65 @@
 
 
  cienaCesTimeSyncMIB MODULE-IDENTITY
-        LAST-UPDATED "201601210000Z"
-        ORGANIZATION "Ciena, Inc"
+        LAST-UPDATED "202101180000Z"
+        ORGANIZATION "Ciena Corp."
         CONTACT-INFO
-            "   Mib Meister
-            115 North Sullivan Road
-            Spokane Valley, WA 99037
-                USA
-                Phone:  +1 509 242 9000
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
             Email:  support@ciena.com"
         DESCRIPTION
             "This MIB module defines objects and associated notifications
              for the System Timing feature."
+        
+        REVISION
+            "202101180000Z"
+        DESCRIPTION
+            "Fix MIB OID conflicts for cienaCesInputPUSignalCondition."
+
+        REVISION
+            "202006050000Z"
+        DESCRIPTION
+            "Rename enum types in antenna signal condition type."
+
+        REVISION
+            "202005120000Z"
+        DESCRIPTION
+            "Add new 10.5 sync snmp traps."
+
+        REVISION
+            "201806010000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncOutputStateChangeNotification trap.
+             Adding holdoveroutofspec(7) value to cienaCesInputPGOperationalStatus."
+
+        REVISION
+            "201803060000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncPTPOutputPriority1 to cienaCesSyncPTPOutputConfig."
+
+        REVISION
+            "201802160000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncPTPOutputAnnounceTxRate, cienaCesSyncPTPOutputSyncTxRate 
+            and cienaCesSyncPTPOutputPriority2 to cienaCesSyncPTPOutputConfig."
+
+        REVISION
+            "201801310000Z"
+        DESCRIPTION
+            "Adding cienaCesSyncPTPProfile to cienaCesSyncPTPGlobalConfig."
+        
+        REVISION
+            "201708310000Z"
+        DESCRIPTION
+            "Adding cienaCesInputPUTDMClockMode to cienaCesSyncInputProtectionUnitEntry."
+        
+        REVISION
+            "201706070000Z"
+        DESCRIPTION
+            "Updated contact info."
 
         REVISION
             "201601210000Z"
@@ -173,7 +219,8 @@
                      synce(3),
                      ptp(4),
                      gps(5),
-                     tdm(6)
+                     tdm(6),
+                     gnss(7)
                   }
 
  SyncBITSSignalMode ::= TEXTUAL-CONVENTION
@@ -243,7 +290,10 @@
                      qlnotconfigured(18),
                      noconnectivity(19),
                      unsupportedhardware(20),
-                     unusable(21)
+                     unusable(21),
+                     acquiringsatellites(22),
+                     acquiringlock(23),
+                     locked(24)
                   }
 
  SyncTimingType ::= TEXTUAL-CONVENTION
@@ -299,6 +349,29 @@
                      udpoveripv4(2),
                      udpoveripv6(3),
                      ieee802dot3(4)
+                  }
+
+ SyncTDMClockMode ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "The recovery mode of the clock for a TDM input reference."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     acr(2),
+                     dcr(3),
+                     line(4),
+                     internal(5)
+                  }                
+
+SyncRefSignalCondition ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Signal Condition of an input reference."
+     SYNTAX       INTEGER
+                  {
+                     unknown(1),
+                     normal(2),
+                     degrade(3),
+                     fault(4)
                   }
 
  --
@@ -492,7 +565,8 @@ CienaCesSyncInputProtectionGroupEntry ::= SEQUENCE {
                    holdover(3),
                    locked(4),
                    acquiringlock(5),
-                   holdoverexpired(6)
+                   holdoverexpired(6),
+                   holdoveroutofspec(7)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -538,6 +612,20 @@ cienaCesSyncInputProtectionUnitEntry OBJECT-TYPE
     INDEX       { cienaCesInputPUEntityId }
     ::= { cienaCesSyncInputProtectionUnitTable 1 }
 
+cienaCesSyncGnssAlmanacStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   unknown(1),
+                   notavailable(2),
+                   acquiring(3),
+                   complete(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The status of the almanac."
+    ::= { cienaCesTimeSyncObjects 12 }
+
 CienaCesSyncInputProtectionUnitEntry ::= SEQUENCE {
         cienaCesInputPUEntityId                  Integer32,
         cienaCesInputPUEntityName                DisplayString,
@@ -557,7 +645,9 @@ CienaCesSyncInputProtectionUnitEntry ::= SEQUENCE {
         cienaCesInputPUPTPEncapType              SyncPTPEncapType,
         cienaCesInputPUGPSClockMode              SyncTimingType,
         cienaCesInputPUGPSFreqClock              SyncGPSFreqClock,
-        cienaCesInputPUBITSSignalSsmLocation     INTEGER
+        cienaCesInputPUBITSSignalSsmLocation     INTEGER,
+        cienaCesInputPUTDMClockMode              SyncTDMClockMode,
+        cienaCesInputPUSignalCondition           SyncRefSignalCondition
         }
 
  cienaCesInputPUEntityId OBJECT-TYPE
@@ -728,6 +818,22 @@ CienaCesSyncInputProtectionUnitEntry ::= SEQUENCE {
     DESCRIPTION
         "BITS Signal Ssm Location, set if BITS signal is used as an input reference."
     ::= { cienaCesSyncInputProtectionUnitEntry 19 }
+
+  cienaCesInputPUTDMClockMode OBJECT-TYPE
+    SYNTAX      SyncTDMClockMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TDM clock mode, set if a TDM input is used as a protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 20 }   
+
+ cienaCesInputPUSignalCondition OBJECT-TYPE
+    SYNTAX      SyncRefSignalCondition
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal Condition of this input protection unit."
+    ::= { cienaCesSyncInputProtectionUnitEntry 25 }
 
 --
 -- SyncOutputTable
@@ -999,6 +1105,18 @@ CienaCesSyncOutputEntry ::= SEQUENCE {
         "PTP DSCP."
     ::= { cienaCesSyncPTPGlobalConfig 9 }
 
+ cienaCesSyncPTPProfile OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   none(1),
+                   g8265dot1(2),
+                   g8275dot1(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP Profile Type."
+    ::= { cienaCesSyncPTPGlobalConfig 10 }
 --
 -- cienaCesSyncPTPInputConfig 
 --
@@ -1067,6 +1185,38 @@ CienaCesSyncOutputEntry ::= SEQUENCE {
     DESCRIPTION
         "PTP timestamp mode."
     ::= { cienaCesSyncPTPOutputConfig 2 }
+ 
+ cienaCesSyncPTPOutputAnnounceTxRate OBJECT-TYPE
+    SYNTAX      SyncPTPRatePps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP output announce Tx rate (pps)."
+    ::= { cienaCesSyncPTPOutputConfig 3 }
+
+ cienaCesSyncPTPOutputSyncTxRate OBJECT-TYPE
+    SYNTAX      SyncPTPRatePps
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP output sync Tx rate (pps)."
+    ::= { cienaCesSyncPTPOutputConfig 4 } 
+
+ cienaCesSyncPTPOutputPriority1 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP output priority1"
+    ::= { cienaCesSyncPTPOutputConfig 5 } 
+
+ cienaCesSyncPTPOutputPriority2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP output priority2"
+    ::= { cienaCesSyncPTPOutputConfig 6 }
 
 --
 -- cienaCesSyncGPSConfig 
@@ -1117,11 +1267,12 @@ CienaCesSyncOutputEntry ::= SEQUENCE {
                cienaCesInputPUPGEntityName,
                cienaCesInputPUTimingInterfaceName,
                cienaCesInputPUTimingInterfaceProtocol,
-               cienaCesInputPUOperationalStatus
+               cienaCesInputPUOperationalStatus,
+               cienaCesInputPUSignalCondition
             }
     STATUS  current
     DESCRIPTION
-        "Sent when a configured timing reference transitions states." 
+        "Sent when a configured input timing reference transitions states."
     ::= { cienaCesTimeSyncMIBNotifications 1 }
  
  cienaCesSyncInputProtectionGroupStateChangeNotification NOTIFICATION-TYPE
@@ -1149,6 +1300,30 @@ cienaCesSyncModuleSlotClockStateChangeNotification NOTIFICATION-TYPE
         "Sent when a slot other than the primary CTX experiences a timing state change. Only applicable in SAOS 8.x." 
     ::= { cienaCesTimeSyncMIBNotifications 3 }
  
+  cienaCesSyncOutputStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS {
+               cienaGlobalSeverity,
+               cienaGlobalMacAddress,
+               cienaCesOutputEntityName,
+               cienaCesOutputTimingInterfaceName,
+               cienaCesOutputTimingInterfaceProtocol,
+               cienaCesOutputOperationalStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "Sent when a configured output timing reference transitions states."
+    ::= { cienaCesTimeSyncMIBNotifications 4 }
+
+ cienaCesSyncAlmanacStatusChangeNotification NOTIFICATION-TYPE
+    OBJECTS {  
+               cienaGlobalSeverity,
+               cienaCesSyncGnssAlmanacStatus
+            }
+    STATUS  current
+    DESCRIPTION
+        "Sent when the almanac status changes."
+    ::= { cienaCesTimeSyncMIBNotifications 5 }
+
   END
  
  --

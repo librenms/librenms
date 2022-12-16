@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
  --
  -- CIENA-CES-CHASSIS-MIB.my
  --
@@ -12,7 +11,7 @@
        FROM SNMPv2-TC
    OBJECT-GROUP, NOTIFICATION-GROUP
        FROM SNMPv2-CONF
-    cienaGlobalSeverity
+    cienaGlobalSeverity, cienaGlobalMacAddress
        FROM CIENA-GLOBAL-MIB
    cienaCesNotifications, cienaCesConfig
        FROM CIENA-SMI
@@ -20,7 +19,7 @@
        FROM CIENA-CES-MODULE-MIB;
 
  cienaCesChassisMIB MODULE-IDENTITY
-              LAST-UPDATED "201810170000Z"
+              LAST-UPDATED "202112140000Z"
               ORGANIZATION "Ciena Corp."
               CONTACT-INFO
               "   Mib Meister
@@ -33,7 +32,37 @@
                        "This module defines the chassis configuration objects and also the objects required for
                        any chassis related notifications."
 
-              REVISION "201810170000Z"
+              REVISION "202112140000Z"
+              DESCRIPTION "Augmented cienaCesChassisRebootReasonErrorType with systemTempOutOfOTR(20)."
+
+              REVISION "202111290000Z"
+              DESCRIPTION "Augmented cienaCesChassisRebootReasonErrorType with shutdownTempReached(19)"
+
+              REVISION "202102060000Z"
+              DESCRIPTION "Added cienaCesChassisFanSpeedMaxThresholdNotification notification."
+
+              REVISION "202101150000Z"
+              DESCRIPTION "Augmented cienaCesChassisRebootReasonErrorType with resetToFactoryDefaults(17) and resetToGoldenConfig(18)
+                           enumeration, cienaCesChassisDiskHealthSubCategory with flash0MntConfigPartition(4), flash0MntLogPartition(5),
+                           flash0MntSecurePartition(6) and flash0MntAppsPartition(7) enumeration and cienaCesChassisMemoryHealthSubCategory
+						   with physical(7) enumeration."
+
+              REVISION "202003020000Z"
+              DESCRIPTION "Added a new sub-tree cienaCesChassisExternalAlarm under cienaCesChassis.
+                          Added new notification helper objects cienaCesChassisExternalAlarmInterfaceNumber,
+                          cienaCesChassisExternalAlarmDescription and cienaCesChassisExternalAlarmTimestamp
+                          as varbinds for external alarm notifications.
+                          Added cienaCesChassisExternalAlarmSetNotification and
+                          cienaCesChassisExternalAlarmClearNotification notifications objects."
+
+              REVISION "201907080000Z"
+              DESCRIPTION "Marked cienaCesChassisModuleTempHealthMinThreshold object obsolete and replaced by
+                          a new object cienaCesChassisModuleTempHealthWideRangedMinThreshold to allow to hold
+                          negative threshold values in the cienaCesChassisModuleTempHealthTable. Also added
+                          cienaCesChassisModuleTempHealthOriginName to the same table to provide name of the
+                          sensor being monitored by health monitor"
+
+              REVISION "201806070000Z"
               DESCRIPTION "Augmented cienaCesChassisPowerSupplyType with following enumeration: unknown(99)."
                            
               REVISION "201801310000Z"
@@ -247,6 +276,10 @@
  cienaCesChassisIOM  OBJECT IDENTIFIER ::= { cienaCesChassis 6 }
 
 
+ -- Chassis External Alarm Information
+ cienaCesChassisExternalAlarm  OBJECT IDENTIFIER ::= { cienaCesChassis 7 }
+
+
  cienaCesChassisMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 4 }
  cienaCesChassisMIBNotifications       OBJECT IDENTIFIER ::=
                        { cienaCesChassisMIBNotificationPrefix 0 }
@@ -352,7 +385,11 @@
                                 snmp(13),
                                 appLoad(14),
                                 errorHandler(15),
-                                watchdog(16)
+                                watchdog(16),
+                                resetToFactoryDefaults(17),
+                                resetToGoldenConfig(18),
+                                shutdownTempReached(19),
+                                systemTempOutOfOTR(20)
                          }
      MAX-ACCESS  accessible-for-notify
      STATUS      current
@@ -1566,7 +1603,11 @@
                                                          none(0),
                                                          flash0(1),
                                                          ram(2),
-                                                         usb(3)
+                                                         usb(3),
+							                             flash0MntConfigPartition(4),
+							                             flash0MntLogPartition(5),
+							                             flash0MntSecurePartition(6),
+							                             flash0MntAppsPartition(7)
                 }
                 MAX-ACCESS      not-accessible
                 STATUS          current
@@ -1635,14 +1676,16 @@
         ::= { cienaCesChassisModuleTempHealthTable 1 }
 
  CienaCesChassisModuleTempHealthEntry ::= SEQUENCE {
-        cienaCesChassisModuleTempHealthSubCategory                      INTEGER,
-        cienaCesChassisModuleTempHealthOriginIndex                  Unsigned32,
-        cienaCesChassisModuleTempHealthState                            TceHealthStatus,
-        cienaCesChassisModuleTempHealthCurrMeasurement                  Unsigned32,
+        cienaCesChassisModuleTempHealthSubCategory              INTEGER,
+        cienaCesChassisModuleTempHealthOriginIndex              Unsigned32,
+        cienaCesChassisModuleTempHealthState                    TceHealthStatus,
+        cienaCesChassisModuleTempHealthCurrMeasurement          Unsigned32,
         cienaCesChassisModuleTempHealthMinMeasurement           Unsigned32,
         cienaCesChassisModuleTempHealthMaxMeasurement           Unsigned32,
         cienaCesChassisModuleTempHealthMinThreshold             Unsigned32,
-                cienaCesChassisModuleTempHealthMaxThreshold             Unsigned32
+        cienaCesChassisModuleTempHealthMaxThreshold             Unsigned32,
+        cienaCesChassisModuleTempHealthWideRangedMinThreshold   Integer32,
+        cienaCesChassisModuleTempHealthOriginName               DisplayString
  }
 
  cienaCesChassisModuleTempHealthSubCategory             OBJECT-TYPE
@@ -1730,9 +1773,11 @@
                 SYNTAX          Unsigned32
                 UNITS           "deg C"
                 MAX-ACCESS      read-only
-                STATUS          current
+                STATUS          obsolete 
                 DESCRIPTION
-                        "The minimum operational temperature of the module temperature sub-category."
+                        "This object is obsolete as it does not allow to display
+                         negative threshold values. This is replaced by a new object
+                         cienaCesChassisModuleTempHealthWideRangedMinThreshold."
                 ::= { cienaCesChassisModuleTempHealthEntry 7 }
 
  cienaCesChassisModuleTempHealthMaxThreshold                    OBJECT-TYPE
@@ -1744,6 +1789,22 @@
                         "The maximum operational temperature of the module temperature sub-category."
                 ::= { cienaCesChassisModuleTempHealthEntry 8 }
 
+ cienaCesChassisModuleTempHealthWideRangedMinThreshold    OBJECT-TYPE
+                SYNTAX          Integer32(-5..100)
+                UNITS           "deg C"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The minimum operational temperature of the module temperature sub-category."
+                ::= { cienaCesChassisModuleTempHealthEntry 9 }
+
+ cienaCesChassisModuleTempHealthOriginName  OBJECT-TYPE
+               SYNTAX        DisplayString
+               MAX-ACCESS    read-only
+               STATUS        current
+               DESCRIPTION
+                       "This object indicates the name of the sensor being monitored"
+               ::= { cienaCesChassisModuleTempHealthEntry 10 }
  --
  -- Module samples
  --
@@ -2609,7 +2670,8 @@
                                                          heap2(3),
                                                          pool1(4),
                                                          pool2(5),
-                                                         heap(6)
+                                                         heap(6),
+														 physical(7)
                 }
                 MAX-ACCESS      not-accessible
                 STATUS          current
@@ -4697,6 +4759,30 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
           Value of notSupported is returned when the IOM is not presently installed."
      ::= { cienaCesChassisIOMAlarmInputEntry 3 }
 
+-- External Alarm Notification Object Definitions
+ cienaCesChassisExternalAlarmInterfaceNumber  OBJECT-TYPE
+     SYNTAX           Unsigned32(1..16)
+     MAX-ACCESS       accessible-for-notify 
+     STATUS           current
+     DESCRIPTION
+        "This object represents the external alarm input interface number."
+     ::= { cienaCesChassisExternalAlarm 1 }
+
+ cienaCesChassisExternalAlarmDescription  OBJECT-TYPE
+     SYNTAX           DisplayString
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+         "This object describes the external alarm input source name."
+     ::= { cienaCesChassisExternalAlarm 2 }
+
+ cienaCesChassisExternalAlarmTimestamp    OBJECT-TYPE
+     SYNTAX           DateAndTime
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+             "This object represents the date and time of external alarm trigger."
+     ::= { cienaCesChassisExternalAlarm 3 }
 
  --
  -- Notification
@@ -4808,6 +4894,24 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
                 The above object is set to enabled by default."
         ::= { cienaCesChassisMIBNotifications 5 }
 
+ cienaCesChassisFanSpeedMaxThresholdNotification NOTIFICATION-TYPE
+        OBJECTS         {
+                            cienaGlobalSeverity,
+                            cienaCesChassisMacAddress,
+                            cienaCesChassisFanTrayNotifIndex,
+                            cienaCesChassisFanNotifIndex,
+                            cienaCesChassisFanAvgSpeed,
+                            cienaCesChassisFanName,
+                            cienaCesChassisFanChassisIndx,
+                            cienaCesChassisFanShelfIndx
+                        }
+        STATUS  current
+        DESCRIPTION
+                "A cienaCesChassisFanSpeedMaxThresholdNotification is sent if the fan speed shoots to
+                maximum threshold.
+                The above object is set to enabled by default."
+        ::= { cienaCesChassisMIBNotifications 6 }
+
  cienaCesChassisFanSpeedMinThresholdNotification NOTIFICATION-TYPE
         OBJECTS         {
                                  cienaGlobalSeverity,
@@ -4888,16 +4992,16 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 10 }
 
  cienaCesChassisFanTrayStatusFaultedNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisFanTrayNotifIndex,
-                        cienaCesChassisFanTrayStatus,
-                        cienaCesChassisFanTrayName,
-                        cienaCesChassisFanTrayChassisIndx,
-                        cienaCesChassisFanTrayShelfIndx,
-                        cienaCesChassisFanTraySlotIndx,
-                        cienaCesChassisFanTraySerialNumber
+        OBJECTS  {
+			cienaGlobalSeverity,
+			cienaCesChassisMacAddress,
+			cienaCesChassisFanTrayNotifIndex,
+			cienaCesChassisFanTrayStatus,
+			cienaCesChassisFanTrayName,
+			cienaCesChassisFanTrayChassisIndx,
+			cienaCesChassisFanTrayShelfIndx,
+			cienaCesChassisFanTraySlotIndx,
+			cienaCesChassisFanTraySerialNumber
                  }
         STATUS  current
         DESCRIPTION
@@ -4912,17 +5016,17 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 11 }
 
  cienaCesChassisFanTrayStatusOkNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisFanTrayNotifIndex,
-                        cienaCesChassisFanTrayStatus,
-                        cienaCesChassisFanTrayName,
-                        cienaCesChassisFanTrayChassisIndx,
-                        cienaCesChassisFanTrayShelfIndx,
-                        cienaCesChassisFanTraySlotIndx,
-                        cienaCesChassisFanTraySerialNumber
-                 }
+        OBJECTS {
+			cienaGlobalSeverity,
+			cienaCesChassisMacAddress,
+			cienaCesChassisFanTrayNotifIndex,
+			cienaCesChassisFanTrayStatus,
+			cienaCesChassisFanTrayName,
+			cienaCesChassisFanTrayChassisIndx,
+			cienaCesChassisFanTrayShelfIndx,
+			cienaCesChassisFanTraySlotIndx,
+			cienaCesChassisFanTraySerialNumber
+                }
         STATUS  current
         DESCRIPTION
                 "This notification is sent whenever the fan tray status changes to ok(1).
@@ -4933,14 +5037,14 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
 
 
  cienaCesChassisHealthStatusUnknownNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisHealthCategory,
-              cienaCesChassisHealthSubCategory,
-              cienaCesChassisHealthStatus,
-              cienaCesChassisHealthStatusLast
-            }
+        OBJECTS {
+			cienaGlobalSeverity,
+			cienaCesChassisMacAddress,
+			cienaCesChassisHealthCategory,
+			cienaCesChassisHealthSubCategory,
+			cienaCesChassisHealthStatus,
+			cienaCesChassisHealthStatusLast
+		}
         STATUS  current
         DESCRIPTION
                "This notification is sent whenever the health manager status changes to unknown for the specified cienaCesChassisHealthCategory and
@@ -4955,14 +5059,14 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 13 }
 
  cienaCesChassisHealthStatusWarningNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisHealthCategory,
-              cienaCesChassisHealthSubCategory,
-              cienaCesChassisHealthStatus,
-              cienaCesChassisHealthStatusLast
-            }
+        OBJECTS  {
+                       cienaGlobalSeverity,
+                       cienaCesChassisMacAddress,
+                       cienaCesChassisHealthCategory,
+                       cienaCesChassisHealthSubCategory,
+                       cienaCesChassisHealthStatus,
+                       cienaCesChassisHealthStatusLast
+                 }
         STATUS  current
         DESCRIPTION
                 "This notification is sent whenever the health manager status changes to warning for the specified cienaCesChassisHealthCategory and
@@ -4975,14 +5079,14 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 14 }
 
  cienaCesChassisHealthStatusFaultedNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisHealthCategory,
-              cienaCesChassisHealthSubCategory,
-              cienaCesChassisHealthStatus,
-              cienaCesChassisHealthStatusLast
-            }
+        OBJECTS  {
+                          cienaGlobalSeverity,
+                          cienaCesChassisMacAddress,
+                          cienaCesChassisHealthCategory,
+                          cienaCesChassisHealthSubCategory,
+                          cienaCesChassisHealthStatus,
+                          cienaCesChassisHealthStatusLast
+                 }
         STATUS  current
         DESCRIPTION
                 "This notification is sent whenever the health manager status changes to faulted for the specified cienaCesChassisHealthCategory and
@@ -4995,14 +5099,14 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 15 }
 
  cienaCesChassisHealthStatusDegradedNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisHealthCategory,
-              cienaCesChassisHealthSubCategory,
-              cienaCesChassisHealthStatus,
-              cienaCesChassisHealthStatusLast
-            }
+        OBJECTS  {
+                          cienaGlobalSeverity,
+                          cienaCesChassisMacAddress,
+                          cienaCesChassisHealthCategory,
+                          cienaCesChassisHealthSubCategory,
+                          cienaCesChassisHealthStatus,
+                          cienaCesChassisHealthStatusLast
+                 }
         STATUS  current
         DESCRIPTION
                 "This notification is sent whenever the health manager status changes to degraded for the specified cienaCesChassisHealthCategory and
@@ -5016,14 +5120,14 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 16 }
 
  cienaCesChassisHealthStatusGoodNotification NOTIFICATION-TYPE
-        OBJECTS         {
-                 cienaGlobalSeverity,
-                 cienaCesChassisMacAddress,
-                        cienaCesChassisHealthCategory,
-              cienaCesChassisHealthSubCategory,
-              cienaCesChassisHealthStatus,
-              cienaCesChassisHealthStatusLast
-            }
+        OBJECTS  {
+                          cienaGlobalSeverity,
+                          cienaCesChassisMacAddress,
+                          cienaCesChassisHealthCategory,
+                          cienaCesChassisHealthSubCategory,
+                          cienaCesChassisHealthStatus,
+                          cienaCesChassisHealthStatusLast
+                 }
         STATUS  current
         DESCRIPTION
                 "This notification is sent whenever the health manager status changes to normal for the specified cienaCesChassisHealthCategory and
@@ -5036,11 +5140,11 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
         ::= { cienaCesChassisMIBNotifications 17 }
 
   cienaCesChassisRebootNotification NOTIFICATION-TYPE
-        OBJECTS         {
+       OBJECTS  {
                          cienaGlobalSeverity,
                          cienaCesChassisMacAddress,
-                                cienaCesChassisRebootReasonErrorType
-            }
+                         cienaCesChassisRebootReasonErrorType
+                }
         STATUS  current
         DESCRIPTION
                 "A cienaCesChassisRebootNotification is sent when the device is rebooted.  The cienaCesChassisRebootNotification has no guarantee to be sent upon a reboot and will likely misbehave if informs are used.  If sent, the cienaCesChassisRebootReasonErrorType is set to indicate the reboot reason. "
@@ -5181,6 +5285,31 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
             "This notification is sent when the system losses power"
    ::= { cienaCesChassisMIBNotifications 28 }
   
+ cienaCesChassisExternalAlarmSetNotification NOTIFICATION-TYPE
+    OBJECTS {
+                cienaGlobalSeverity,
+                cienaGlobalMacAddress,
+                cienaCesChassisExternalAlarmInterfaceNumber,
+                cienaCesChassisExternalAlarmDescription,
+                cienaCesChassisExternalAlarmTimestamp
+            }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when an external alarm is raised"
+    ::= { cienaCesChassisMIBNotifications 29 }
+
+ cienaCesChassisExternalAlarmClearNotification NOTIFICATION-TYPE
+    OBJECTS {
+                cienaGlobalSeverity,
+                cienaGlobalMacAddress,
+                cienaCesChassisExternalAlarmInterfaceNumber,
+                cienaCesChassisExternalAlarmDescription,
+                cienaCesChassisExternalAlarmTimestamp
+            }
+    STATUS current
+    DESCRIPTION
+        "This notification is sent when an external alarm is cleared"
+    ::= { cienaCesChassisMIBNotifications 30 }
   --
   -- Groups
   --
@@ -5294,4 +5423,24 @@ cienaCesChassisProcessHealthTable OBJECT-TYPE
             " A collection of notifications that provide information about changes related to the IOM."
        ::= { cienaCesChassisMIBGroups 10 }
 
+ chassisExternalAlarmGroup    OBJECT-GROUP
+    OBJECTS {
+                cienaCesChassisExternalAlarmInterfaceNumber,
+                cienaCesChassisExternalAlarmDescription,
+                cienaCesChassisExternalAlarmTimestamp
+            }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about external alarms."
+    ::= { cienaCesChassisMIBGroups 11 }
+
+ chassisExternalAlarmNotifGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                      cienaCesChassisExternalAlarmSetNotification,
+                      cienaCesChassisExternalAlarmClearNotification
+                  }
+    STATUS  current
+    DESCRIPTION
+        " A collection of notifications that provide information about changes related to external alarms."
+    ::= { cienaCesChassisMIBGroups 12 }
  END

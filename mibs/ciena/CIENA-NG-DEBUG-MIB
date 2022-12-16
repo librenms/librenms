@@ -1,0 +1,108 @@
+--
+-- Ciena NG-SAOS DEBUG MIB
+--
+
+CIENA-NG-DEBUG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  Unsigned32, TimeTicks, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 
+    FROM SNMPv2-SMI
+  DisplayString, MacAddress, RowStatus, DateAndTime 
+    FROM SNMPv2-TC
+  cienaGlobalSeverity
+    FROM CIENA-GLOBAL-MIB
+  cienaCesNotifications, cienaCesConfig
+    FROM CIENA-SMI;
+
+cienaNgSaosDebugMIB MODULE-IDENTITY
+  LAST-UPDATED "201805010000Z"
+  ORGANIZATION "Ciena Corp."
+  CONTACT-INFO
+    "Mib Meister
+     7035 Ridge Road
+     Hanover, Maryland 21076
+     USA
+     Phone:  +1 800 921 1144
+     Email:  support@ciena.com"
+  DESCRIPTION
+    "The MIB module defines the managed objects for debugging the SNMP agent on the NG SAOS platform product family."
+  REVISION "201805010000Z"
+  DESCRIPTION
+    "Initial implementation."
+  ::= { cienaCesConfig 1000 }
+
+--
+-- cienaNgSaosDebugMIB Objects
+-- 
+
+-- Node
+cienaNgSaosDebugMIBObjects OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIB 1 }
+
+-- Config groups
+cienaNgSaosDebug OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIBObjects 1 }
+
+-- Notification groups
+cienaNgSaosDebugMIBNotifPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 1000 }
+cienaNgSaosDebugMIBNotifs OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIBNotifPrefix 1 }
+
+-- Conformance/Compliance groups
+cienaNgSaosDebugMIBConformance OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIB 2 }
+cienaNgSaosDebugMIBCompliances OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIBConformance 1 }
+cienaNgSaosDebugMIBGroups OBJECT IDENTIFIER ::= { cienaNgSaosDebugMIBConformance 2 }
+
+--
+-- Leafs
+--
+
+cienaNgSaosDebugInteger OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "Integer debug type."
+  ::= { cienaNgSaosDebug 1 }
+
+cienaNgSaosDebugString OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "String degug type."
+  ::= { cienaNgSaosDebug 2 }
+
+cienaNgSaosDebugErrorMessage OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS accessible-for-notify
+  STATUS current
+  DESCRIPTION
+    "Debug failure message."
+  ::= { cienaNgSaosDebug 3 }
+
+--
+-- Notifications
+--
+
+cienaNgSaosDebugTestNotif NOTIFICATION-TYPE
+  OBJECTS {
+    cienaGlobalSeverity,
+    cienaNgSaosDebugInteger,
+    cienaNgSaosDebugString
+  }
+  STATUS current
+  DESCRIPTION
+    "Debug test message"
+  ::= { cienaNgSaosDebugMIBNotifs 1 }
+
+cienaNgSaosDebugFailedNotif NOTIFICATION-TYPE
+  OBJECTS {
+    cienaGlobalSeverity,
+    cienaNgSaosDebugInteger,
+    cienaNgSaosDebugString,
+    cienaNgSaosDebugErrorMessage
+  }
+  STATUS current
+  DESCRIPTION
+    "Debug failed message with a different severity."
+  ::= { cienaNgSaosDebugMIBNotifs 2 }
+
+END

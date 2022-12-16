@@ -1,0 +1,484 @@
+--
+
+-- Accedian Enterprise Specific MIB
+
+--
+
+-- Copyright (c) 2005-2010, Accedian Networks, Inc.
+
+-- All rights reserved.
+
+--
+
+-- The contents of this document are subject to change without notice.
+
+--
+
+
+
+
+
+ACD-VSET-MIB DEFINITIONS ::= BEGIN
+
+
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE,
+
+    Unsigned32
+
+        FROM SNMPv2-SMI
+
+    DisplayString, TEXTUAL-CONVENTION, RowStatus
+
+        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+
+        FROM SNMPv2-CONF
+
+
+
+    acdMibs
+
+        FROM ACCEDIAN-SMI;
+
+
+
+acdVSet MODULE-IDENTITY
+
+
+
+    LAST-UPDATED "201201110100Z"
+
+    ORGANIZATION "Accedian Networks, Inc."
+
+    CONTACT-INFO
+
+            "Accedian Technical Assistance Center
+
+             Accedian Networks, Inc.
+
+             2351 Alfred-Nobel blvd., Suite N-410
+
+             Saint-Laurent, Quebec Canada H4S 2A9
+
+             E-mail: support@accedian.com"
+
+    DESCRIPTION
+
+            "The VLAN sets database for this Accedian Networks device."
+
+
+
+    REVISION "201201110100Z"        -- 11 JAN 2012
+
+    DESCRIPTION
+
+            "Initial version of MIB module ACD-VSET-MIB."
+
+
+
+    ::= { acdMibs 13 }
+
+
+
+acdVSetNotifications    OBJECT IDENTIFIER ::= { acdVSet 0 }
+
+acdVSetMIBObjects       OBJECT IDENTIFIER ::= { acdVSet 1 }
+
+acdVSetConformance      OBJECT IDENTIFIER ::= { acdVSet 2 }
+
+
+
+acdVSetConfig           OBJECT IDENTIFIER ::= { acdVSetMIBObjects 1 }
+
+
+
+---------------------------------------------------------------------------
+
+
+-- Textual conventions
+
+
+---------------------------------------------------------------------------
+
+
+
+
+AcdVsetVlanType ::= TEXTUAL-CONVENTION
+
+
+    STATUS      current
+
+
+    DESCRIPTION
+
+
+       "The type of VLAN to be used."
+
+
+    SYNTAX      INTEGER {
+
+
+                    cvlan(1),
+
+
+                    svlan(2)
+
+
+    }
+
+
+
+
+---------------------------------------------------------------------------
+
+ -- The VLAN set configuration table
+
+ -- This table contains all VLAN set entry configurations.
+
+---------------------------------------------------------------------------
+
+
+
+acdVSetConfigTable OBJECT-TYPE
+
+    SYNTAX      SEQUENCE OF AcdVSetConfigEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Table of all VID set."
+
+    ::= { acdVSetConfig 1 }
+
+
+
+acdVSetConfigEntry OBJECT-TYPE
+
+    SYNTAX      AcdVSetConfigEntry
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "An entry consisting of all settings to a VLAN set."
+
+    INDEX   { acdVSetConfigPolicyListID, acdVSetConfigID }
+
+    ::=  { acdVSetConfigTable 1 }
+
+
+
+AcdVSetConfigEntry ::= SEQUENCE {
+
+    acdVSetConfigPolicyListID          Unsigned32,    
+
+    acdVSetConfigID                    Unsigned32,
+
+    acdVSetConfigRowStatus             RowStatus,
+
+    acdVSetConfigName                  DisplayString,
+
+    acdVSetConfigVlanType              AcdVsetVlanType,
+
+    acdVSetConfigVlanIDs0to1023        OCTET STRING,
+
+    acdVSetConfigVlanIDs1024to2047     OCTET STRING,
+
+    acdVSetConfigVlanIDs2048to3071     OCTET STRING,
+
+    acdVSetConfigVlanIDs3072to4095     OCTET STRING
+
+}
+
+
+
+acdVSetConfigPolicyListID OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This object identifies for which Policy list of this VLAN set."
+
+   ::= { acdVSetConfigEntry 1 }
+
+
+
+acdVSetConfigID  OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  not-accessible
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "Unique value for each VLAN set instance."
+
+    ::= { acdVSetConfigEntry 2 }
+
+
+
+acdVSetConfigRowStatus OBJECT-TYPE
+
+    SYNTAX      RowStatus
+
+    MAX-ACCESS  read-create
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "All columns must have a valid value before a row can be activated. To
+
+        create a new VLAN set you shall provide the a unique name, the type
+
+        and policy list id for an empty row with the RowStatus set to Create
+
+        and Go.  To delete the VLAN set you need to set the RowStatus to
+
+        destroy."
+
+    ::= { acdVSetConfigEntry 3 }
+
+
+
+acdVSetConfigName  OBJECT-TYPE
+
+    SYNTAX      DisplayString (SIZE (1..32))
+
+    MAX-ACCESS  read-create
+
+    STATUS      current
+
+    DESCRIPTION
+
+        "This is a string to uniquely identify the VLAN set."
+
+    ::= { acdVSetConfigEntry 4 }
+
+
+
+acdVSetConfigVlanType OBJECT-TYPE
+
+
+    SYNTAX      AcdVsetVlanType
+
+
+    MAX-ACCESS  read-create
+
+
+    STATUS      current
+
+
+    DESCRIPTION
+
+
+            "VLAN Ethernet type."
+
+
+    DEFVAL      { cvlan }
+
+
+    ::= { acdVSetConfigEntry 5 }
+
+
+
+
+acdVSetConfigVlanIDs0to1023 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-create
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 0 through 7, and so on. Within each octet, the most significant
+
+         bit represents the lowest numbered VLAN ID. If that bit has a value of
+
+         '1' then that VLAN is included in the set of VLANs; the VLAN is not 
+
+         included otherwise." 
+
+    ::= { acdVSetConfigEntry 6 }
+
+
+
+acdVSetConfigVlanIDs1024to2047 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-create
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 1024 through 1031, and so on. Within each octet, the most
+
+         significant bit represents the lowest numbered VLAN ID. If that bit
+
+         has a value of '1' then that VLAN is included in the set of VLANs; 
+
+         the VLAN is not included otherwise." 
+
+    ::= { acdVSetConfigEntry 7 }
+
+
+
+acdVSetConfigVlanIDs2048to3071 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-create
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 2048 through 2055, and so on. Within each octet, the most
+
+         significant bit represents the lowest numbered VLAN ID. If that bit
+
+         has a value of '1' then that VLAN is included in the set of VLANs; 
+
+         the VLAN is not included otherwise." 
+
+    ::= { acdVSetConfigEntry 8 }
+
+
+
+acdVSetConfigVlanIDs3072to4095 OBJECT-TYPE
+
+    SYNTAX          OCTET STRING (SIZE (0..128))
+
+    MAX-ACCESS      read-create
+
+    STATUS          current
+
+    DESCRIPTION
+
+        "Each octet specifies a set of eight VLANs, the first octet specifying
+
+         VLAN ID 3072 through 3079, and so on. Within each octet, the most
+
+         significant bit represents the lowest numbered VLAN ID. If that bit
+
+         has a value of '1' then that VLAN is included in the set of VLANs; 
+
+         the VLAN is not included otherwise." 
+
+    ::= { acdVSetConfigEntry 9 }
+
+
+
+
+
+---------------------------------------------------------------------------
+
+ -- ACD-SMAP-MIB Module - Conformance Information
+
+---------------------------------------------------------------------------
+
+
+
+acdVSetCompliances  OBJECT IDENTIFIER ::= { acdVSetConformance 1 }
+
+acdVSetGroups       OBJECT IDENTIFIER ::= { acdVSetConformance 2 }
+
+
+
+---------------------------------------------------------------------------
+
+ -- Units of conformance
+
+---------------------------------------------------------------------------
+
+
+
+acdVSetConfigGroup OBJECT-GROUP
+
+    OBJECTS {
+
+        acdVSetConfigRowStatus,
+
+        acdVSetConfigName,
+
+        acdVSetConfigVlanType,
+
+        acdVSetConfigVlanIDs0to1023,
+
+        acdVSetConfigVlanIDs1024to2047,
+
+        acdVSetConfigVlanIDs2048to3071,
+
+        acdVSetConfigVlanIDs3072to4095
+
+    }
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "Objects for the VLAN set configuration Group."
+
+    ::= { acdVSetGroups 1 }
+
+
+
+acdVSetCompliance MODULE-COMPLIANCE
+
+    STATUS      current
+
+    DESCRIPTION
+
+       "The compliance statement for support of the ACD-VSET-MIB module."
+
+    MODULE
+
+        MANDATORY-GROUPS {
+
+            acdVSetConfigGroup
+
+         }
+
+
+
+    OBJECT  acdVSetConfigRowStatus
+
+      SYNTAX       RowStatus { active(1) }
+
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+
+      DESCRIPTION "Support for createAndWait is not required."
+
+
+
+    ::= { acdVSetCompliances 1 }
+
+
+
+END

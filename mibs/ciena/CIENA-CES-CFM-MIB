@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
  --
 
  -- CIENA-CES-CFM-MIB.my
@@ -37,7 +36,7 @@
 
  cienaCesCfmMIB MODULE-IDENTITY
 
-                LAST-UPDATED "201706070000Z"
+                LAST-UPDATED "201906270000Z"
                 ORGANIZATION "Ciena Corp."
                 CONTACT-INFO
                 "   Mib Meister
@@ -50,6 +49,52 @@
                 DESCRIPTION
 
 	             "This module defines the CFM configuration and notification objects."
+
+                REVISION    "201906270000Z"
+                DESCRIPTION
+
+                "Added cienaCesCfmServiceYProtectionMonitoringState object to cienaCesCfmServiceTable."
+
+                REVISION   "201905150000Z"
+                DESCRIPTION
+
+                "Added cienaCesCfmGlobalLmmDefaultMode to cienaCesCfmGlobal to add support for
+                 lmm-default-mode configuration globally.
+                 Added cienaCesCfmServiceLmmMode, cienaCesCfmServiceLmmCounterProfile to
+                 cienaCesCfmServiceEntry to add support for ETH-LM."
+
+                REVISION   "201810030000Z"
+                DESCRIPTION
+
+                "Modified value range and description of mib objects cienaCesCfmSyntheticLossSessionSdSetThreshold 
+                 and cienaCesCfmSyntheticLossSessionSdClearThreshold."
+
+                REVISION   "201805170000Z"
+                DESCRIPTION
+
+                "Added cienaCesCfmGlobalDMMDefaultInterval to cienaCesCfmGlobal to add support for 
+                 dmm-default-interval configuration globally.
+                 Added cienaCesCfmServiceDMMVersion, cienaCesCfmServiceLMMVersion to cienaCesCfmServiceEntry to
+                 add support for sending frame-loss and delay measurement packets with version 0/1. 
+                 Added cienaCesCfmDelayTestTable table to support simultaneous Y1731 DM sessions."
+
+                REVISION   "201805080000Z"
+                DESCRIPTION
+	             "Following changes are made to support read-only access to configuration,
+                      status parameters and notifications for proprietary and standard frame
+                      loss test sessions.
+                         1. Added three new read-only objects under 'cienaCesCfmGlobal'.
+                               - cienaCesCfmGlobalLMMDefaultCount
+                               - cienaCesCfmGlobalLMMDefaultInterval
+                               - cienaCesCfmGlobalLMMDefaultTimeout
+                         2. Added separate table 'cienaCesCfmFrameLossTestTable' under
+                            parent node 'cienaCesCfmFrameLoss'.
+                         3. Added following notifications under 'cienaCesCfmNotifMIBNotification'.
+                               - cienaCesCfmFrameLossTestNearTrapSet
+                               - cienaCesCfmFrameLossTestNearTrapClear
+                               - cienaCesCfmFrameLossTestFarTrapSet
+                               - cienaCesCfmFrameLossTestFarTrapClear
+                     "
 
                 REVISION   "201706070000Z"
                 DESCRIPTION
@@ -369,6 +414,26 @@
          So a value of 1000 here would mean 0.1% loss."
     SYNTAX      Unsigned32 (0..1000000)
 
+ CfmTestMsgInterval ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the Y.1731 test messages' interval."
+    SYNTAX      INTEGER {
+                          i100msec(3),
+                          i1sec(4),
+                          i10sec(5),
+                          i1min(6),
+                          i10min(7)
+                        }
+
+ CfmLmmMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION  "Specifies the nature of loss measurement session."
+    SYNTAX      INTEGER {
+                          proprietary(1),
+
+                          standard(2)
+                        }
 --
 
 --Global Attributes
@@ -472,6 +537,62 @@
         "The global default timeout for synthetic loss measurement tests."
     ::= { cienaCesCfmGlobal 7 }    
  
+  cienaCesCfmGlobalLMMDefaultCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default count for frame loss measurement tests."
+    ::= { cienaCesCfmGlobal 8 }  
+   
+  cienaCesCfmGlobalLMMDefaultInterval OBJECT-TYPE
+    SYNTAX      CfmTestMsgInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default interval for frame loss measurement tests.
+         The value ranges from 3 to 7."
+    ::= { cienaCesCfmGlobal 9 } 
+    
+  cienaCesCfmGlobalLMMDefaultTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default timeout for frame loss measurement tests."
+    ::= { cienaCesCfmGlobal 10 }    
+
+  cienaCesCfmGlobalDMMDefaultInterval OBJECT-TYPE
+    SYNTAX      CfmTestMsgInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default interval for frame delay measurement tests.
+
+         The value ranges from 3 to 7.
+
+         The values 3-7 represent indices to CFM intervals as follows:
+         3 --> 100ms,
+         4 --> 1sec,
+         5 --> 10sec,
+         6 --> 1min,
+         7 --> 10min."
+
+    DEFVAL      {i100msec}
+
+    ::= { cienaCesCfmGlobal 11 }
+
+  cienaCesCfmGlobalLmmDefaultMode OBJECT-TYPE
+    SYNTAX      CfmLmmMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The global default lmm mode for cfm services."
+
+    DEFVAL      {proprietary}
+
+    ::= { cienaCesCfmGlobal 12 }
+
 
  --
 
@@ -591,7 +712,17 @@
 
      cienaCesCfmServiceMulticastDa                       TruthValue,
 
-     cienaCesCfmServiceCCMRxStats                       TruthValue
+     cienaCesCfmServiceCCMRxStats                        TruthValue,
+
+     cienaCesCfmServiceDMMVersion                        Unsigned32,
+
+     cienaCesCfmServiceLMMVersion                        Unsigned32,
+
+     cienaCesCfmServiceLmmMode                           CfmLmmMode,
+
+     cienaCesCfmServiceLmmCounterProfile                 INTEGER,
+    
+     cienaCesCfmServiceYProtectionMonitoringState        TruthValue
  }
 
 
@@ -1337,10 +1468,105 @@
 
              "Controls cfm rx debug stats for the service."
 
-     ::= { cienaCesCfmServiceEntry 38 }  
+     ::= { cienaCesCfmServiceEntry 38 }
 
- 
 
+    cienaCesCfmServiceDMMVersion OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..1)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates which version will be used for delay measurement packets transmitted from
+
+             a MEP of this service. Default version is set to 0."
+
+     DEFVAL       {0}
+
+     ::= { cienaCesCfmServiceEntry 39 }
+
+
+    cienaCesCfmServiceLMMVersion OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..1)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates which version will be used for loss measurement packets transmitted from
+
+             a MEP of this service. Default version is set to 0."
+
+     DEFVAL       {0}
+
+     ::= { cienaCesCfmServiceEntry 40 } 
+
+
+    cienaCesCfmServiceLmmMode OBJECT-TYPE
+     SYNTAX      CfmLmmMode
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the nature of loss measurement session of this service."
+
+     DEFVAL    {proprietary}
+
+     ::= { cienaCesCfmServiceEntry 41 }
+
+    cienaCesCfmServiceLmmCounterProfile OBJECT-TYPE
+
+     SYNTAX      INTEGER {
+
+                    none(1),
+
+                    subPort(2),
+
+                    subPortAndPcp(3)
+
+                 }
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This MIB object indicates the counting method of loss measurement
+              session initiated on standard mode service."
+
+     DEFVAL    {subPort}
+
+     ::= { cienaCesCfmServiceEntry 42 }
+
+
+   cienaCesCfmServiceYProtectionMonitoringState OBJECT-TYPE
+
+     SYNTAX       TruthValue
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "Specifies if Y-Protection is enabled for the service. Y-Protection montoring cannot be enabled on 
+              a service which has an existing down MEP. Same restriction is applied if service has an up-MEP 
+              created on Y-protection disabled physical port."  
+
+     DEFVAL       {false}
+
+     ::= { cienaCesCfmServiceEntry 43 }
       
 
   --
@@ -2615,6 +2841,502 @@
              "This object specifies the duration of time the test took in seconds to complete one iteration."
      ::= { cienaCesCfmDelayMsgEntry 23 }      
 
+
+
+
+  --
+
+  -- Delay Measurement Test table
+
+  --
+
+  cienaCesCfmDelayTestTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmDelayTestEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration
+
+            parameters for the DelayMeasurementMsg."
+
+     ::= { cienaCesCfmDelay 2 }
+
+
+ cienaCesCfmDelayTestEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmDelayTestEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmDelayTestTable."
+
+     INDEX {cienaCesCfmDelayTestServiceIndex,
+            cienaCesCfmDelayTestLocalMEPId,
+            cienaCesCfmDelayTestRemoteMEPId,
+            cienaCesCfmDelayTestId
+           }
+
+     ::= { cienaCesCfmDelayTestTable 1 }
+
+
+ CienaCesCfmDelayTestEntry ::=  SEQUENCE {
+
+     cienaCesCfmDelayTestServiceIndex                   Unsigned32,
+
+     cienaCesCfmDelayTestLocalMEPId                     Unsigned32,
+
+     cienaCesCfmDelayTestRemoteMEPId                    Unsigned32,
+     
+     cienaCesCfmDelayTestId                             Unsigned32,
+
+     cienaCesCfmDelayTestServiceName                    DisplayString,
+
+     cienaCesCfmDelayTestAverageDelayThreshold          Integer32,
+
+     cienaCesCfmDelayTestAverageDelayVariationThreshold Integer32,
+
+     cienaCesCfmDelayTestMaximumDelayThreshold          Integer32,
+
+     cienaCesCfmDelayTestMaximumDelayVariationThreshold Integer32,
+
+     cienaCesCfmDelayTestAverageDelay                   Unsigned32,
+
+     cienaCesCfmDelayTestAverageDelayVariation          Unsigned32,
+
+     cienaCesCfmDelayTestMaximumDelay                   Unsigned32,
+
+     cienaCesCfmDelayTestMaximumDelayVariation          Unsigned32,
+
+     cienaCesCfmDelayTestMinimumDelay                   Unsigned32,
+
+     cienaCesCfmDelayTestMinimumDelayVariation          Unsigned32,
+
+     cienaCesCfmDelayTestPriority                       Unsigned32,
+
+     cienaCesCfmDelayTestCount                          Unsigned32,
+
+     cienaCesCfmDelayTestDMMInterval                    CfmTestMsgInterval,
+
+     cienaCesCfmDelayTestIterations                     Unsigned32,
+
+     cienaCesCfmDelayTestRepeatDelay                    Unsigned32,
+
+     cienaCesCfmDelayTestTimeout                        Unsigned32,
+
+     cienaCesCfmDelayTestDuration                       Unsigned32,
+
+     cienaCesCfmDelayTestPduVersion                     Unsigned32
+
+ }
+
+
+ cienaCesCfmDelayTestServiceIndex OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+             "This object specifies the service index of the frame delay message."
+
+     ::= { cienaCesCfmDelayTestEntry 1 }
+
+
+
+ cienaCesCfmDelayTestLocalMEPId OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (1..8191)
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the local MEP ID."
+
+     ::= { cienaCesCfmDelayTestEntry 2 }
+
+ 
+
+ cienaCesCfmDelayTestRemoteMEPId OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (1..8191)
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object is used to specify the MEP ID."
+
+     ::= { cienaCesCfmDelayTestEntry 3 }
+
+
+
+ cienaCesCfmDelayTestId OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..4294967295)
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the test ID of the frame delay message."
+
+     ::= { cienaCesCfmDelayTestEntry 4 }
+
+
+
+ cienaCesCfmDelayTestServiceName OBJECT-TYPE
+
+     SYNTAX       DisplayString (SIZE(1..31))
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the service associated with the 
+
+             delay message."
+
+     ::= { cienaCesCfmDelayTestEntry 5 } 
+
+     
+
+ cienaCesCfmDelayTestAverageDelayThreshold OBJECT-TYPE
+
+     SYNTAX       Integer32 (-1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold for the average delay in microseconds."
+
+     ::= {cienaCesCfmDelayTestEntry 6 }
+
+ 
+
+ cienaCesCfmDelayTestAverageDelayVariationThreshold  OBJECT-TYPE
+
+     SYNTAX       Integer32  (-1..65535)
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold value for average Inter Frame Delay Variation.
+              A value of -1 disables the generation of faults. A value of 0 or greater
+              is compared to the Average Delay Variation measured in the test and a fault is generated
+              if the threshold is exceeded."
+
+     ::= { cienaCesCfmDelayTestEntry 7 }
+
+
+
+   cienaCesCfmDelayTestMaximumDelayThreshold OBJECT-TYPE
+
+     SYNTAX       Integer32 (-1..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold for the maximum delay."
+
+     ::= {cienaCesCfmDelayTestEntry 8 }
+
+
+
+ cienaCesCfmDelayTestMaximumDelayVariationThreshold  OBJECT-TYPE
+
+     SYNTAX       Integer32 (-1..65535)
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the threshold value for maximum Inter Frame Delay Variation.
+              A value of -1 disables the generation of faults. A value of 0 or greater
+              is compared to the Maximum Delay Variation measured in the test and a fault is generated
+              if the threshold is exceeded."
+
+     ::= { cienaCesCfmDelayTestEntry 9 }
+
+
+
+  cienaCesCfmDelayTestAverageDelay OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the average delay."
+
+     ::= { cienaCesCfmDelayTestEntry 10 }
+
+
+
+  cienaCesCfmDelayTestAverageDelayVariation OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the average delay variation."
+
+     ::= { cienaCesCfmDelayTestEntry 11 }
+
+
+
+  cienaCesCfmDelayTestMaximumDelay OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the maximum delay."
+
+     ::= { cienaCesCfmDelayTestEntry 12 }
+
+
+
+ cienaCesCfmDelayTestMaximumDelayVariation OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the maximum delay variation."
+
+     ::= { cienaCesCfmDelayTestEntry 13 }
+
+
+
+  cienaCesCfmDelayTestMinimumDelay  OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates the minimum delay."
+
+     ::= { cienaCesCfmDelayTestEntry 14 }
+
+
+
+  cienaCesCfmDelayTestMinimumDelayVariation  OBJECT-TYPE
+
+     SYNTAX       Unsigned32
+
+     UNITS        "microseconds"
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object indicates minimum frame Delay Variation."
+
+     ::= { cienaCesCfmDelayTestEntry 15 }
+
+
+
+  cienaCesCfmDelayTestPriority  OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..7)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the priority that will be encoded in the DMM message."
+
+     ::= { cienaCesCfmDelayTestEntry 16 }
+
+
+
+  cienaCesCfmDelayTestCount  OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (2..65535)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the number of DMM messages that will be transmitted for one Iteration."
+
+    ::= { cienaCesCfmDelayTestEntry 17 }
+
+
+
+ cienaCesCfmDelayTestDMMInterval  OBJECT-TYPE
+
+     SYNTAX       CfmTestMsgInterval 
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+             "This object specifies the message interval at which DMMs will be transmitted.
+              The values 3-7 represent indices to CFM intervals as follows:
+              3 --> 100ms,
+              4 --> 1sec,
+              5 --> 10sec,
+              6 --> 1min,
+              7 --> 10min."
+
+     ::= { cienaCesCfmDelayTestEntry 18 }
+
+
+
+  cienaCesCfmDelayTestIterations  OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..60)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the number of iterations the test has to be conducted.
+              A zero value means that test is continuous, and iterations are infinite. "
+
+     ::= { cienaCesCfmDelayTestEntry 19 }
+
+
+
+  cienaCesCfmDelayTestRepeatDelay  OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..1440)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the delay in minutes between consecutive test iterations."
+
+     ::= { cienaCesCfmDelayTestEntry 20 }
+
+
+
+ cienaCesCfmDelayTestTimeout OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0 | 2000..10000)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the timeout interval in milliseconds within which the source 
+
+              should receive DMR frame."
+
+     ::= { cienaCesCfmDelayTestEntry 21 }
+
+
+
+  cienaCesCfmDelayTestDuration OBJECT-TYPE
+
+     SYNTAX      Unsigned32 (0..65535)
+
+     MAX-ACCESS  read-only
+
+     STATUS      current
+
+     DESCRIPTION
+
+             "This object specifies the duration of time the test took in seconds to complete one iteration."
+
+     ::= { cienaCesCfmDelayTestEntry 22 }
+
+
+
+  cienaCesCfmDelayTestPduVersion OBJECT-TYPE
+
+     SYNTAX       Unsigned32 (0..1)
+
+     MAX-ACCESS   read-only
+
+     STATUS       current
+
+     DESCRIPTION
+
+             "This object specifies the version value which will be filled in frame delay messages."
+
+     ::= { cienaCesCfmDelayTestEntry 23 }
+
+
+
+
   --
 
   -- Frame Loss Measurement Msg table
@@ -2798,8 +3520,348 @@ cienaCesCfmFrameLossMsgFrameLossFar OBJECT-TYPE
      ::= { cienaCesCfmFrameLossMsgEntry 7 }
 
 
+  --
 
+  -- Frame Loss Measurement Test table
+
+  -- 
+
+  cienaCesCfmFrameLossTestTable OBJECT-TYPE
+
+     SYNTAX     SEQUENCE OF CienaCesCfmFrameLossTestEntry
+
+     MAX-ACCESS not-accessible
+
+     STATUS     current
+
+     DESCRIPTION
+
+            "The (conceptual) table listing the configuration 
+
+            parameters for the FrameLossMeasurementTest."  
+
+     ::= { cienaCesCfmFrameLoss 2 }
+
+               
+ cienaCesCfmFrameLossTestEntry OBJECT-TYPE
+
+     SYNTAX      CienaCesCfmFrameLossTestEntry
+
+     MAX-ACCESS  not-accessible
+
+     STATUS      current
+
+     DESCRIPTION
+
+           "An entry (conceptual row) in the cienaCesCfmFrameLossTestTable."
+
+     INDEX {
+            cienaCesCfmFrameLossTestServiceIndex,
+            cienaCesCfmFrameLossTestLocalMEPId,
+            cienaCesCfmFrameLossTestRemoteMEPId,
+            cienaCesCfmFrameLossTestId
+           }
+
+     ::= { cienaCesCfmFrameLossTestTable 1 }
+                
+
+ CienaCesCfmFrameLossTestEntry ::=  SEQUENCE {
+     cienaCesCfmFrameLossTestServiceIndex         Unsigned32,
+     cienaCesCfmFrameLossTestLocalMEPId           Unsigned32,
+     cienaCesCfmFrameLossTestRemoteMEPId          Unsigned32,
+     cienaCesCfmFrameLossTestId                   Unsigned32,
+     cienaCesCfmFrameLossTestServiceName          DisplayString,
+     cienaCesCfmFrameLossTestPriority             Unsigned32,
+     cienaCesCfmFrameLossTestDataPriority         INTEGER,
+     cienaCesCfmFrameLossTestCount                Unsigned32,
+     cienaCesCfmFrameLossTestLMMInterval          CfmTestMsgInterval,
+     cienaCesCfmFrameLossTestIterations           Unsigned32,
+     cienaCesCfmFrameLossTestRepeatDelay          Unsigned32,
+     cienaCesCfmFrameLossTestTimeout              Unsigned32,
+     cienaCesCfmFrameLossTestDuration             Unsigned32,
+     cienaCesCfmFrameLossTestAccelerate           TruthValue,
+     cienaCesCfmFrameLossTestNearLossThreshold    Integer32,
+     cienaCesCfmFrameLossTestFarLossThreshold     Integer32,
+     cienaCesCfmFrameLossTestNearLoss             Unsigned32,
+     cienaCesCfmFrameLossTestFarLoss              Unsigned32,
+     cienaCesCfmFrameLossTestNumLMMSent           Unsigned32,
+     cienaCesCfmFrameLossTestNumLMRReceived       Unsigned32,
+     cienaCesCfmFrameLossTestMinNearLoss          Integer32,
+     cienaCesCfmFrameLossTestAvgNearLoss          Integer32,
+     cienaCesCfmFrameLossTestMaxNearLoss          Integer32,
+     cienaCesCfmFrameLossTestMinFarLoss           Integer32,
+     cienaCesCfmFrameLossTestAvgFarLoss           Integer32,
+     cienaCesCfmFrameLossTestMaxFarLoss           Integer32,
+     cienaCesCfmFrameLossTestNearLossRatio        CfmFrameLossRatio,
+     cienaCesCfmFrameLossTestFarLossRatio         CfmFrameLossRatio,
+     cienaCesCfmFrameLossTestPduVersion           Unsigned32
+ }
+
+  cienaCesCfmFrameLossTestServiceIndex OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the service index of the frame loss message."
+     ::= { cienaCesCfmFrameLossTestEntry 1 }
+
+  cienaCesCfmFrameLossTestLocalMEPId OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..65535)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the local MEP ID at the source."
+     ::= { cienaCesCfmFrameLossTestEntry 2 }
+
+  cienaCesCfmFrameLossTestRemoteMEPId OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..8191)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This object is used to specify the MEP ID."
+     ::= { cienaCesCfmFrameLossTestEntry 3 }
+     
+  cienaCesCfmFrameLossTestId OBJECT-TYPE
+     SYNTAX       Unsigned32 (0..4294967295)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the test ID of the frame loss message."
+     ::= { cienaCesCfmFrameLossTestEntry 4 }
+
+  cienaCesCfmFrameLossTestServiceName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE(1..31))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the name of service associated with
+              the frame loss measurement message (LMM)."
+     ::= { cienaCesCfmFrameLossTestEntry 5 }
+
+  cienaCesCfmFrameLossTestPriority  OBJECT-TYPE
+     SYNTAX       Unsigned32 (0..7)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the priority that will be encoded in the LMM message."
+     DEFVAL       {7}
+     ::= { cienaCesCfmFrameLossTestEntry 6 }
+
+  cienaCesCfmFrameLossTestDataPriority  OBJECT-TYPE
+     SYNTAX       INTEGER {
+                     p0(0),
+                     p1(1),
+                     p2(2),
+                     p3(3),
+                     p4(4),
+                     p5(5),
+                     p6(6),
+                     p7(7),
+                     all(8)
+                  }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies which data traffic queques' counters to be encoded in the LMM/LMR messages."
+     DEFVAL       {7}
+     ::= { cienaCesCfmFrameLossTestEntry 7 }
+
+  cienaCesCfmFrameLossTestCount  OBJECT-TYPE
+     SYNTAX       Unsigned32 (0 | 2..65535) 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the number of LMM messages that will be transmitted during this session."
+     DEFVAL       {100}
+     ::= { cienaCesCfmFrameLossTestEntry 8 }
+
+  cienaCesCfmFrameLossTestLMMInterval  OBJECT-TYPE
+     SYNTAX       CfmTestMsgInterval
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the message interval at which LMMs will be transmitted."
+     DEFVAL       {3}
+     ::= { cienaCesCfmFrameLossTestEntry 9 }      
+    
+  cienaCesCfmFrameLossTestIterations  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0..60)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the number of iterations the test
+              has to be conducted. Each test iteration is defined by <cienaCesCfmFrameLossTestLMMInterval,
+              cienaCesCfmFrameLossTestCount>. If this object specifies zero, it means that test is continuous,
+              and iterations are infinite."
+     DEFVAL       {1}
+     ::= { cienaCesCfmFrameLossTestEntry 10 }
+          
+  cienaCesCfmFrameLossTestRepeatDelay  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0..1440)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the delay in minutes between consecutive test iterations."
+     DEFVAL       {0}
+     ::= { cienaCesCfmFrameLossTestEntry 11 }  
+       
+  cienaCesCfmFrameLossTestTimeout  OBJECT-TYPE  
+     SYNTAX       Unsigned32 (0 | 2000..10000)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the timeout interval in milliseconds within which
+              the source should receive a LMR for a corresponding LMM Test."
+     ::= { cienaCesCfmFrameLossTestEntry 12 }
+       
+  cienaCesCfmFrameLossTestDuration OBJECT-TYPE
+	  SYNTAX	      Unsigned32 (0..65535)
+	  MAX-ACCESS   read-only
+	  STATUS	      current                                   
+	  DESCRIPTION
+	   "This object specifies the duration of time the test took in milliseconds to complete one iteration."
+	  ::= { cienaCesCfmFrameLossTestEntry 13 }
+
+  cienaCesCfmFrameLossTestAccelerate OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS       current
+      DESCRIPTION
+       "This object specifies whether it is proprietary frame loss (i.e. value is false) or standard frame loss test."
+      DEFVAL      {false}
+      ::= { cienaCesCfmFrameLossTestEntry 14 }
+   
+  cienaCesCfmFrameLossTestNearLossThreshold OBJECT-TYPE
+     SYNTAX       Integer32 (-1|0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Indicates the threshold value for the near-end frame loss. -1 indicates that threshold check is disabled."
+     DEFVAL       {-1}
+     ::= { cienaCesCfmFrameLossTestEntry 15 }
+
+  cienaCesCfmFrameLossTestFarLossThreshold OBJECT-TYPE
+     SYNTAX       Integer32 (-1|0..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the threshold value for the far-end frame loss. -1 indicates that threshold check is disabled."
+     DEFVAL       {-1}
+     ::= { cienaCesCfmFrameLossTestEntry 16 }
+
+  cienaCesCfmFrameLossTestNearLoss OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the near-end frame loss. For a MEP,
+             near-end frame loss refers to frame loss associated with the 
+             ingress data frames."
+     ::= { cienaCesCfmFrameLossTestEntry 17 }
+
+  cienaCesCfmFrameLossTestFarLoss OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the far-end frame loss. For a MEP,
+             far-end frame loss refers to frame loss associated with the 
+             egress data frames."
+     ::= { cienaCesCfmFrameLossTestEntry 18 }
+
+  cienaCesCfmFrameLossTestNumLMMSent OBJECT-TYPE
+     SYNTAX	      Unsigned32 (1..65535)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+       "This object specifies the number of LMM messages sent in the latest test iteration."
+     ::= { cienaCesCfmFrameLossTestEntry 19 }
+
+  cienaCesCfmFrameLossTestNumLMRReceived OBJECT-TYPE
+     SYNTAX       Unsigned32 (1..65535)
+     MAX-ACCESS   read-only
+     STATUS	      current
+ 	  DESCRIPTION
+ 	      "This object specifies the number of LMR messages received in the latest test iteration."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 20 }
+ 	  
+  cienaCesCfmFrameLossTestMinNearLoss OBJECT-TYPE
+     SYNTAX    	Integer32 
+     MAX-ACCESS   read-only
+     STATUS	      current
+     DESCRIPTION
+       "This object specifies the average Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 21 }
+ 	  
+  cienaCesCfmFrameLossTestAvgNearLoss OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS   read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 		 "This object specifies the minimum Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 22 }
+ 	  
+  cienaCesCfmFrameLossTestMaxNearLoss OBJECT-TYPE
+ 	  SYNTAX			Integer32 
+ 	  MAX-ACCESS   read-only
+ 	  STATUS			current
+ 	  DESCRIPTION
+ 		"This object specifies the maximum Near Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 23 }
+ 	  
+  cienaCesCfmFrameLossTestMinFarLoss OBJECT-TYPE
+     SYNTAX	      Integer32 
+     MAX-ACCESS   read-only
+     STATUS	      current
+     DESCRIPTION
+        "This object specifies the minimum Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 24 }
+ 	  
+  cienaCesCfmFrameLossTestAvgFarLoss OBJECT-TYPE
+     SYNTAX    	Integer32 
+     MAX-ACCESS   read-only
+     STATUS	      current
+     DESCRIPTION
+ 	     "This object specifies the average Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 25 }
+ 	  
+  cienaCesCfmFrameLossTestMaxFarLoss OBJECT-TYPE
+ 	  SYNTAX       Integer32 
+ 	  MAX-ACCESS   read-only
+ 	  STATUS	      current
+ 	  DESCRIPTION
+ 	     "This object specifies the maximum Far Loss Threshold of the test session."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 26 } 
  
+  cienaCesCfmFrameLossTestNearLossRatio OBJECT-TYPE
+ 	  SYNTAX			CfmFrameLossRatio 
+     MAX-ACCESS   read-only
+ 	  STATUS       current
+ 	  DESCRIPTION
+ 	     "This object specifies the Frame Loss Ratio in percentile of loss at Nearend in the last
+         iteration of the completed test.
+         This object is applicable only when cienaCesCfmServiceLmmMode is set to proprietary,
+         in all other cases this object returns value 0."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 27 } 
+ 
+  cienaCesCfmFrameLossTestFarLossRatio OBJECT-TYPE
+     SYNTAX        CfmFrameLossRatio 
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+ 	     "This object specifies the Frame Loss Ratio in percentile of loss at Farend in the last
+         iteration of the completed test.
+         This object is applicable only when cienaCesCfmServiceLmmMode is set to proprietary,
+         in all other cases this object returns value 0."
+ 	  ::= { cienaCesCfmFrameLossTestEntry 28 } 
+
+  cienaCesCfmFrameLossTestPduVersion   OBJECT-TYPE
+     SYNTAX       Unsigned32 (0..1)
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "This object specifies the CFM PDU version encoded in the test frames being exchanged within an active frame loss test session."
+     ::= { cienaCesCfmFrameLossTestEntry 29 }
 
  --
 
@@ -6469,12 +7531,12 @@ cienaCesCfmGlobalCCMStatsRxTotalMIPCCM OBJECT-TYPE
  	  ::= { cienaCesCfmSyntheticLossSessionEntry 27 } 
 
   cienaCesCfmSyntheticLossSessionSdSetThreshold OBJECT-TYPE
- 	  SYNTAX			Integer32 (-1..65535) 
+ 	  SYNTAX			Integer32 (-1 | 1..65535) 
  	  MAX-ACCESS		read-only
  	  STATUS			current
  	  DESCRIPTION
              "This object represents the signal degrade set threshold value for the synthetic loss measurement test. 
-              A value of 0 or greater is compared to the frame loss result and fault is set, if the loss exceeds 
+              A value of 1 or greater is compared to the frame loss result and fault is set, if the loss exceeds 
               this threshold. A value of -1 disables the generation of signal degrade fault notification. 
               This object works in conjunction with cienaCesCfmSyntheticLossSessionSdClearThreshold. If one object is given  
               non-default value, other should be also set to non-default value." 
@@ -6483,7 +7545,7 @@ cienaCesCfmGlobalCCMStatsRxTotalMIPCCM OBJECT-TYPE
  	  ::= { cienaCesCfmSyntheticLossSessionEntry 28 } 
 
   cienaCesCfmSyntheticLossSessionSdClearThreshold OBJECT-TYPE
- 	  SYNTAX			Integer32 (-1..65535) 
+ 	  SYNTAX			Integer32 (-1..65534) 
  	  MAX-ACCESS		read-only
  	  STATUS			current
  	  DESCRIPTION
@@ -7291,6 +8353,77 @@ cienaCesCfmGlobalCCMStatsRxTotalMIPCCM OBJECT-TYPE
         DESCRIPTION 
              "A notification is sent whenever the signal degrade fault is cleared during 
               a Synthetic Loss Measurement test." 
-        ::= { cienaCesCfmNotifMIBNotification 24} 
+        ::= { cienaCesCfmNotifMIBNotification 24}
+
+
+  cienaCesCfmFrameLossTestNearTrapSet  NOTIFICATION-TYPE
+        OBJECTS {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesCfmFrameLossTestServiceName,                                      
+                 cienaCesCfmFrameLossTestNearLoss,
+                 cienaCesCfmFrameLossTestNearLossThreshold
+                }
+        STATUS      current
+        DESCRIPTION
+           "A notification is sent whenever frame-loss-near goes above frame-loss-near threshold during a 
+            frame loss measurement test. Setting the cienaCesCfmFrameLossTestNearTrapSetState object to 
+            'disabled' causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+            cienaGlobalMacAddress, cienaCesCfmFrameLossTestServiceName, cienaCesCfmFrameLossTestNearLoss,
+            and cienaCesCfmFrameLossTestNearLossThreshold." 
+        ::= { cienaCesCfmNotifMIBNotification 25 }
+
+
+  cienaCesCfmFrameLossTestNearTrapClear  NOTIFICATION-TYPE
+        OBJECTS {
+                  cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+                  cienaCesCfmFrameLossTestServiceName,                                      
+                  cienaCesCfmFrameLossTestNearLoss,
+                  cienaCesCfmFrameLossTestNearLossThreshold
+                }
+        STATUS      current
+        DESCRIPTION
+           "A notification is sent whenever frame-loss-near returns to normal during a 
+            frame loss measurement test. Setting the cienaCesCfmFrameLossTestNearTrapClearState 
+            object to 'disabled' causes this trap to be suppressed. Variable bindings include: 
+            cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmFrameLossTestServiceName,
+            cienaCesCfmFrameLossTestNearLoss and cienaCesCfmFrameLossTestNearLossThreshold." 
+        ::= { cienaCesCfmNotifMIBNotification 26 }
+
+
+  cienaCesCfmFrameLossTestFarTrapSet  NOTIFICATION-TYPE
+        OBJECTS {
+                  cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+                  cienaCesCfmFrameLossTestServiceName,                                      
+                  cienaCesCfmFrameLossTestFarLoss,
+                  cienaCesCfmFrameLossTestFarLossThreshold
+                }
+        STATUS      current
+        DESCRIPTION
+           "A notification is sent whenever frame-loss-far goes above frame-loss-far threshold during a 
+            frame loss measurement test. Setting the cienaCesCfmFrameLossTestFarTrapSetState object to 
+            'disabled' causes this trap to be suppressed. Variable bindings include: cienaGlobalSeverity,
+            cienaGlobalMacAddress, cienaCesCfmFrameLossTestServiceName, cienaCesCfmFrameLossTestFarLoss,
+            and cienaCesCfmFrameLossTestFarLossThreshold." 
+        ::= { cienaCesCfmNotifMIBNotification 27 }
+
+  cienaCesCfmFrameLossTestFarTrapClear  NOTIFICATION-TYPE
+        OBJECTS {
+                  cienaGlobalSeverity,
+                  cienaGlobalMacAddress,
+                  cienaCesCfmFrameLossTestServiceName,                                      
+                  cienaCesCfmFrameLossTestFarLoss,
+                  cienaCesCfmFrameLossTestFarLossThreshold
+                }
+        STATUS      current
+        DESCRIPTION
+           "A notification is sent whenever frame-loss-far returns to normal during a 
+            frame loss measurement test. Setting the cienaCesCfmFrameLossTestFarTrapClearState 
+            object to 'disabled' causes this trap to be suppressed. Variable bindings 
+            include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesCfmFrameLossTestServiceName,
+            cienaCesCfmFrameLossTestFarLoss and cienaCesCfmFrameLossTestFarLossThreshold." 
+        ::= { cienaCesCfmNotifMIBNotification 28 }
 
  END

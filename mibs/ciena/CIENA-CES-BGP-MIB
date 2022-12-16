@@ -1,0 +1,172 @@
+--
+-- CIENA-CES-BGP-MIB.my
+--
+
+CIENA-CES-BGP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY,
+    IpAddress, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI
+    cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM CIENA-GLOBAL-MIB;
+
+cienaCesBgpMIB MODULE-IDENTITY
+    LAST-UPDATED "202203240000Z"
+    ORGANIZATION "Ciena Corp."
+    CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+    DESCRIPTION
+              "This module defines the BGP related configuration information and associated notifications."
+                        
+    REVISION
+              "202203240000Z"
+    DESCRIPTION
+              "Initial Creation."
+    ::= { cienaCesConfig 61 }
+
+--
+-- Node definitions
+--
+
+cienaCesBgpMaxPrefixLimitMIBObjects OBJECT IDENTIFIER ::= { cienaCesBgpMIB 1 }
+
+
+-- Notifications
+
+cienaCesBgpMaxPrefixLimitMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 114 }
+cienaCesBgpMaxPrefixLimitMIBNotifications       OBJECT IDENTIFIER ::=
+                      { cienaCesBgpMaxPrefixLimitMIBNotificationPrefix 0 }
+
+CienaCesMaxPrefixLimitAfi ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION     "BGP Prefix-limit parameters."
+     SYNTAX          INTEGER  {
+                         ip(1),
+                         ip6(2),
+                         max(3),
+                         l2vpn(4),
+                         bgpls(5)
+                     }
+
+CienaCesMaxPrefixLimitSafi ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION     "BGP Prefix-limit parameters."
+     SYNTAX          INTEGER  {
+                         unicast(1),
+                         multicast(2),
+                         unicastmulticast(3),
+                         labeledunicast(4),
+                         vpls(5),
+                         max(6),
+                         bgpvpls(7),
+                         bgpevpn(8),
+                         bgpls(9),
+                         bgpsr(10),
+                         bgpmplsvpn(11),
+                         bgpvrlabeled(12),
+                         bgprtfilterunicast(13),
+                         bgpvrunlabeled(14)
+                     }
+
+CienaCesBgpPercentageValueString ::= TEXTUAL-CONVENTION
+    STATUS            current
+    DESCRIPTION       "A data type to represent percentage value 
+                       with two decimal precision for BGP Objects" 
+    SYNTAX            OCTET STRING  (SIZE (6))
+
+-- External BGP PREFIX LIMIT  notitifications Object Definitions
+cienaCesBgpMaxPrefixLimit OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          accessible-for-notify
+    STATUS              current
+    DESCRIPTION
+        "This depicts the maximum value configured for prefixes"
+    ::= { cienaCesBgpMaxPrefixLimitMIBObjects 1 }
+
+cienaCesBgpMaxPrefixLimitAfi OBJECT-TYPE
+    SYNTAX              CienaCesMaxPrefixLimitAfi
+    MAX-ACCESS          accessible-for-notify
+    STATUS              current
+    DESCRIPTION
+        "This depicts the combination of address family indicators."
+    ::= { cienaCesBgpMaxPrefixLimitMIBObjects 2 }
+
+cienaCesBgpMaxPrefixLimitSafi OBJECT-TYPE
+    SYNTAX              CienaCesMaxPrefixLimitSafi
+    MAX-ACCESS          accessible-for-notify
+    STATUS              current
+    DESCRIPTION
+        "This depicts the combination of subsequent family indicators."
+    ::= { cienaCesBgpMaxPrefixLimitMIBObjects 3 }
+
+cienaCesBgpMaxPrefixLimitDropPercentage OBJECT-TYPE
+    SYNTAX              CienaCesBgpPercentageValueString
+    MAX-ACCESS          accessible-for-notify
+    STATUS              current
+    DESCRIPTION
+       "This depicts the percentage value configured for the drop-excess"
+    ::= { cienaCesBgpMaxPrefixLimitMIBObjects 4 }
+
+cienaCesBgpMaxPrefixLimitIpAddress OBJECT-TYPE
+    SYNTAX              IpAddress 
+    MAX-ACCESS          accessible-for-notify
+    STATUS              current
+    DESCRIPTION
+       "This depicts the peer ip address."
+    ::= { cienaCesBgpMaxPrefixLimitMIBObjects 5 }
+
+cienaCesBgpMaxPrefixLimitExceededNotification  NOTIFICATION-TYPE
+ OBJECTS {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesBgpMaxPrefixLimit,
+          cienaCesBgpMaxPrefixLimitAfi,
+          cienaCesBgpMaxPrefixLimitSafi,
+          cienaCesBgpMaxPrefixLimitDropPercentage,
+          cienaCesBgpMaxPrefixLimitIpAddress
+         }
+STATUS     current
+DESCRIPTION
+        "This is generated when the number of prefixes recieved 
+         from the peer exceeds the maximum configured prefix-limit."
+ ::= { cienaCesBgpMaxPrefixLimitMIBNotifications 1 }
+
+cienaCesBgpMaxPrefixLimitDropExcessNotification  NOTIFICATION-TYPE
+ OBJECTS {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesBgpMaxPrefixLimit,
+          cienaCesBgpMaxPrefixLimitAfi,
+          cienaCesBgpMaxPrefixLimitSafi,
+          cienaCesBgpMaxPrefixLimitDropPercentage,
+          cienaCesBgpMaxPrefixLimitIpAddress
+         }
+STATUS     current
+DESCRIPTION
+        "This is generated when the number of prefixes recieved 
+         from the peer exceeds the configured drop-excess percentage."
+ ::= { cienaCesBgpMaxPrefixLimitMIBNotifications 2 }
+
+cienaCesBgpMaxPrefixLimitClearedNotification  NOTIFICATION-TYPE
+ OBJECTS {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesBgpMaxPrefixLimitIpAddress
+         }
+STATUS     current
+DESCRIPTION
+        "This is generated when the configured idle-timeout 
+         is expired."
+ ::= { cienaCesBgpMaxPrefixLimitMIBNotifications 3 }
+
+END

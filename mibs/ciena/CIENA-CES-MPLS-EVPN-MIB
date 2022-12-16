@@ -1,0 +1,175 @@
+--
+-- CIENA-CES-MPLS-EVPN-MIB.my
+CIENA-CES-MPLS-EVPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+      FROM SNMPv2-SMI
+  DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC
+  cienaCesNotifications, cienaCesConfig
+      FROM CIENA-SMI
+  cienaGlobalSeverity, cienaGlobalMacAddress
+      FROM CIENA-GLOBAL-MIB
+  CienaGlobalState
+       FROM CIENA-TC;
+
+cienaCesEvpnMIBModule MODULE-IDENTITY
+    LAST-UPDATED "202107200000Z"
+    ORGANIZATION "Ciena Corp."
+    CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+    DESCRIPTION
+              "This module defines the  EVPN related configuration information and associated notifications."
+    REVISION
+              "202107200000Z"
+    DESCRIPTION
+              "Initial Creation."
+    ::= { cienaCesConfig 59 }
+
+--
+-- Node definitions
+--
+
+cienaCesEvpnMIBObjects OBJECT IDENTIFIER ::= { cienaCesEvpnMIBModule 1 }
+
+
+-- Notifications
+
+cienaCesEvpnMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 112 }
+cienaCesEvpnMIBNotifications       OBJECT IDENTIFIER ::=
+                      { cienaCesEvpnMIBNotificationPrefix 0 }
+
+EvpnEthernetSegmentFailureType ::= TEXTUAL-CONVENTION
+     STATUS          current
+     DESCRIPTION     "Type of failure for ethernet segment."
+     SYNTAX          INTEGER  {
+                         config(1),
+                         routeupdate(2)
+                     }
+
+EvpnEthernetSegmentMode ::= TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "Type of mode for ethernet segment."
+    SYNTAX              INTEGER {
+                           allactive(1),
+                           singleactive(2)
+                        }
+
+EvpnEthernetSegmentDfMode ::= TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "Type of mode for ethernet segment desginated forwader."
+    SYNTAX              INTEGER {
+                           primary(1),
+                           backup(2),
+                           nondf(3)
+                         }
+
+EvpnEthernetSegmentIdentfier ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT        "1d:1d:1d:1d:1d:1d:1d:1d:1d:1d"
+    STATUS              current
+    DESCRIPTION         "This depicts ethernet segment idenfier of 10 bytes."
+    REFERENCE           "rfc7432"
+    SYNTAX              OCTET STRING (SIZE (10))
+
+
+-- External MPLS EVPN EVLAG notitifications Object Definitions
+cienaCesEvpnEthernetSegmentIdentifier OBJECT-TYPE
+   SYNTAX              EvpnEthernetSegmentIdentfier
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "This depicts 10 byte of octet for particular ethernet segment."
+   ::= { cienaCesEvpnMIBObjects 1 }
+
+cienaCesEvpnEthernetSegmentLogicalPortName OBJECT-TYPE
+   SYNTAX              DisplayString
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "This depicts logical port name for particular ethernet segment."
+   ::= { cienaCesEvpnMIBObjects 2 }
+
+cienaCesEvpnEthernetSegmentOperState OBJECT-TYPE
+   SYNTAX              CienaGlobalState
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "This depicts logical port state for a particular ethernet segment."
+   ::= { cienaCesEvpnMIBObjects 3 }
+
+cienaCesEvpnInstanceName OBJECT-TYPE
+   SYNTAX              DisplayString
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "This depicts ethernet instance name."
+   ::= { cienaCesEvpnMIBObjects 4 }
+
+cienaCesEvpnEthernetSegmentFailureType OBJECT-TYPE
+   SYNTAX              EvpnEthernetSegmentFailureType
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "This depicts ethernet segment evlag failure type for particular
+        ethernet segment."
+   ::= { cienaCesEvpnMIBObjects 5 }
+
+cienaCesEvpnEthernetSegmentActiveMode OBJECT-TYPE
+   SYNTAX              EvpnEthernetSegmentMode
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+      "This depicts designated forwarding mode for particular ethernet segment."
+   ::= { cienaCesEvpnMIBObjects 6 }
+
+cienaCesEvpnEthernetSegmentDfMode OBJECT-TYPE
+   SYNTAX              EvpnEthernetSegmentDfMode
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+         "This depicts designated forwarding mode for particular ethernet
+          segment evlag."
+   ::= { cienaCesEvpnMIBObjects 7 }
+
+cienaCesEvpnEvlagEthernetSegmentFailureNotification  NOTIFICATION-TYPE
+ OBJECTS {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesEvpnEthernetSegmentIdentifier,
+          cienaCesEvpnEthernetSegmentLogicalPortName,
+          cienaCesEvpnEthernetSegmentOperState,
+          cienaCesEvpnEthernetSegmentFailureType,
+          cienaCesEvpnInstanceName,
+          cienaCesEvpnEthernetSegmentActiveMode
+         }
+STATUS     current
+DESCRIPTION
+        "This is sent when any LAG failure event is triggered  for particular
+         ethernet segment."
+ ::= { cienaCesEvpnMIBNotifications 1 }
+
+
+cienaCesEvpnEvlagEthernetSegmentProtectionNotification NOTIFICATION-TYPE
+ OBJECTS {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesEvpnEthernetSegmentIdentifier,
+          cienaCesEvpnEthernetSegmentLogicalPortName,
+          cienaCesEvpnEthernetSegmentOperState,
+          cienaCesEvpnInstanceName,
+          cienaCesEvpnEthernetSegmentDfMode,
+          cienaCesEvpnEthernetSegmentActiveMode
+         }
+STATUS     current
+DESCRIPTION
+        "This occurs when after lag switchover elected DF sends it for
+         particular ethernet segment."
+ ::= { cienaCesEvpnMIBNotifications 2 }
+
+END

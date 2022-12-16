@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
  --
  -- CIENA-PRODUCTS-MIB.my
  --
@@ -14,7 +13,7 @@
 	
 	
  cienaProductsMIB MODULE-IDENTITY
-		LAST-UPDATED "201706070000Z"
+		LAST-UPDATED "202206300000Z"
 		ORGANIZATION "Ciena Corp."
 		CONTACT-INFO
 		"   Mib Meister
@@ -27,6 +26,30 @@
 		       "Initial creation. This module defines the object identifiers that are
 		       assigned to Ciena products and platforms.  It is these
 		       OID values that are returned in sysObjectID."
+
+		REVISION "202206300000Z"
+		DESCRIPTION
+		"Added Object Identifiers for the new 10x product line."
+
+		REVISION "202111050000Z"
+		DESCRIPTION
+		"Added new Object Identifier for 10x product line."
+
+		REVISION "202106250000Z"
+		DESCRIPTION
+		"Added new Object Identifier for the Els (Coherent ELS, edge line system) product line."
+
+		REVISION "202012010000Z"
+		DESCRIPTION
+		"Added new Object Identifier for the Rls (Reconfigurable line system) 6500 product line."
+
+		REVISION "201906070000Z"
+		DESCRIPTION
+		"Added new Object Identifier for the PN 5171 series product line."
+
+		REVISION "201709110000Z"
+		DESCRIPTION
+		"Added new Object Identifier for the PN 5170 series product line."
 
 		REVISION "201706070000Z"
 		DESCRIPTION
@@ -67,6 +90,74 @@
  pn8700-10 OBJECT IDENTIFIER  ::= { cienaProducts 8 }
 
  pn8700-20 OBJECT IDENTIFIER  ::= { cienaProducts 9 }
+
+ pn5170 OBJECT IDENTIFIER  ::= { cienaProducts 10 }
+
+ pn5171 OBJECT IDENTIFIER  ::= { cienaProducts 11 }
+
+ rls6500 OBJECT IDENTIFIER  ::= { cienaProducts 12 }
+ 
+ els  OBJECT IDENTIFIER     ::= { cienaProducts 13 }
+ 
+ cn3924 OBJECT IDENTIFIER  ::= { cienaProducts 14 }
+
+ cn3926 OBJECT IDENTIFIER  ::= { cienaProducts 15 }
+
+ cn3928 OBJECT IDENTIFIER  ::= { cienaProducts 16 }
+
+ cn3948 OBJECT IDENTIFIER  ::= { cienaProducts 17 }
+
+ cn5144 OBJECT IDENTIFIER  ::= { cienaProducts 18 }
+
+ cn5130 OBJECT IDENTIFIER  ::= { cienaProducts 19 }
+
+ cn5131 OBJECT IDENTIFIER  ::= { cienaProducts 20 }
+
+ cn5132 OBJECT IDENTIFIER  ::= { cienaProducts 21 }
+
+ cn5164 OBJECT IDENTIFIER  ::= { cienaProducts 22 }
+
+ cn5166 OBJECT IDENTIFIER  ::= { cienaProducts 23 }
+
+ cn5168 OBJECT IDENTIFIER  ::= { cienaProducts 24 }
+
+ cn5170 OBJECT IDENTIFIER  ::= { cienaProducts 25 }
+
+ cn5171 OBJECT IDENTIFIER  ::= { cienaProducts 26 }
+
+ cn5162 OBJECT IDENTIFIER  ::= { cienaProducts 27 }
+
+ cn8180 OBJECT IDENTIFIER  ::= { cienaProducts 28 }
+
+ cn8110 OBJECT IDENTIFIER  ::= { cienaProducts 29 }
+
+ cn8112 OBJECT IDENTIFIER  ::= { cienaProducts 30 }
+
+ as5916-54xl OBJECT IDENTIFIER  ::= { cienaProducts 31 }
+ 
+ sm-fru-large OBJECT IDENTIFIER  ::= { cienaProducts 32 }
+
+ sm-fru-medium OBJECT IDENTIFIER  ::= { cienaProducts 33 }
+
+ sm-fru-small OBJECT IDENTIFIER  ::= { cienaProducts 34 }
+
+ x10sdv-tp8f OBJECT IDENTIFIER  ::= { cienaProducts 35 }
+
+ r640 OBJECT IDENTIFIER  ::= { cienaProducts 36 }
+
+ nca-1515a OBJECT IDENTIFIER  ::= { cienaProducts 37 }
+
+ cn3922 OBJECT IDENTIFIER  ::= { cienaProducts 38 }
+
+ cn3984 OBJECT IDENTIFIER  ::= { cienaProducts 39 }
+
+ cn3985 OBJECT IDENTIFIER  ::= { cienaProducts 40 }
+
+ cn8114 OBJECT IDENTIFIER  ::= { cienaProducts 41 }
+
+ cn8140 OBJECT IDENTIFIER  ::= { cienaProducts 42 }
+
+ cn8190 OBJECT IDENTIFIER  ::= { cienaProducts 43 }
 
 END
 

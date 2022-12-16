@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
 --
 -- CIENA-CES-8021X-MIB.my
 --
@@ -7,21 +6,21 @@
     CIENA-CES-8021X-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
-            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE 
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
                 FROM SNMPv2-SMI
             DisplayString, TruthValue
                 FROM SNMPv2-TC
             cienaCesNotifications, cienaCesConfig
                 FROM CIENA-SMI
-            cienaGlobalSeverity, cienaGlobalMacAddress 
+            cienaGlobalSeverity, cienaGlobalMacAddress
                 FROM CIENA-GLOBAL-MIB
             dot1xPaeSystemAuthControl
                 FROM IEEE8021-PAE-MIB;
 
         -- 1.3.6.1.4.1.1271.2.1.42
-        cienaCes8021xMIB MODULE-IDENTITY 
-           LAST-UPDATED "201708220000Z"
-           ORGANIZATION 
+        cienaCes8021xMIB MODULE-IDENTITY
+           LAST-UPDATED "202110130000Z"
+           ORGANIZATION
                 "Ciena Corp."
            CONTACT-INFO
            "   Mib Meister
@@ -30,9 +29,14 @@
            USA
            Phone:  +1 800 921 1144
            Email:  support@ciena.com"
-            DESCRIPTION 
+            DESCRIPTION
                 "The MIB module is for 802.1x supplicant and authenticator
-                 information."            
+                 information."
+            REVISION
+                "202110130000Z"
+            DESCRIPTION
+                "Added cienaCes8021xPortName as a DisplayString object to CienaCes8021xPortEntry,
+                 cienaCes8021xSuppAuthenticationEvent and cienaCes8021xAuthAuthenticationEvent"
             REVISION
                 "201708220000Z"
             DESCRIPTION
@@ -75,11 +79,12 @@
             ::= { cienaCes8021xPortTable 1 }
 
         CienaCes8021xPortEntry ::=
-            SEQUENCE { 
-                cienaCes8021xPort                    Unsigned32,
-                cienaCes8021xRole                    INTEGER,
-                cienaCes8021xAuthPortStatsClear      INTEGER,
-                cienaCes8021xNotificationAuthenticationEvent INTEGER
+            SEQUENCE {
+                cienaCes8021xPort                            Unsigned32,
+                cienaCes8021xRole                            INTEGER,
+                cienaCes8021xAuthPortStatsClear              INTEGER,
+                cienaCes8021xNotificationAuthenticationEvent INTEGER,
+                cienaCes8021xPortName                        DisplayString
              }
 
         -- 1.3.6.1.4.1.1271.2.1.42.2.1.1.1
@@ -105,7 +110,7 @@
             DESCRIPTION
                 "802.1x role of the Port."
             ::= { cienaCes8021xPortEntry 2 }
-        
+
         -- 1.3.6.1.4.1.1271.2.1.42.2.1.1.3
         cienaCes8021xAuthPortStatsClear OBJECT-TYPE
             SYNTAX          TruthValue
@@ -128,9 +133,18 @@
             DESCRIPTION
                  "This object identifies the type of authentication event being communicated
                  in the notification in which this object is located."
-            ::= { cienaCes8021xPortEntry 4 }  
+            ::= { cienaCes8021xPortEntry 4 }
 
-                    
+        -- 1.3.6.1.4.1.1271.2.1.42.2.1.1.5
+        cienaCes8021xPortName OBJECT-TYPE
+            SYNTAX       DisplayString
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Indicates the port name for the corresponding PGID used for trap definition."
+            ::= { cienaCes8021xPortEntry 5 }
+
+
         -- 1.3.6.1.4.1.1271.2.1.42.3
         cienaCes8021xEvents OBJECT IDENTIFIER ::= { cienaCes8021xMIB 3 }
 
@@ -152,7 +166,7 @@
                  An entry appears in this table for each port that may
                  authenticate itself when challenged by a remote system."
             ::= { cienaCes8021xObjs 2 }
-        
+
         -- 1.3.6.1.4.1.1271.2.1.42.2.2.1
         cienaCes8021xSuppEntry OBJECT-TYPE
             SYNTAX CienaCes8021xSuppEntry
@@ -162,9 +176,9 @@
                 "The configuration information for a Supplicant PAE."
             INDEX { cienaCes8021xSuppPort }
             ::= { cienaCes8021xSuppTable 1 }
-        
+
         CienaCes8021xSuppEntry ::=
-            SEQUENCE { 
+            SEQUENCE {
                 cienaCes8021xSuppPort                    	Unsigned32,
                 cienaCes8021xSuppUserName                	DisplayString,
                 cienaCes8021xSuppPassword                	DisplayString,
@@ -213,7 +227,7 @@
             DESCRIPTION
                 "The password used with cienaCes8021xSuppUserName for EAP-MD5 authentication.
                  Doing a get on this object always returns a zero length string for security reasons."
-            ::= { cienaCes8021xSuppEntry 3 } 
+            ::= { cienaCes8021xSuppEntry 3 }
 
         -- 1.3.6.1.4.1.1271.2.1.42.2.2.1.5
         cienaCes8021xSuppPortStatsClear OBJECT-TYPE
@@ -228,7 +242,7 @@
         cienaCes8021xSuppEAPMethod OBJECT-TYPE
             SYNTAX          INTEGER {
                                     eapMd5(1)
-            }               
+            }
             MAX-ACCESS      read-write
             STATUS          obsolete
             DESCRIPTION
@@ -240,7 +254,7 @@
             SYNTAX      BITS {
                                 eapMd5(0),
                                 eapTls(1)
-                        }              
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
@@ -252,7 +266,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-only
             STATUS          current
             DESCRIPTION
@@ -264,7 +278,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
@@ -277,7 +291,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
@@ -291,11 +305,11 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-only
             STATUS          current
             DESCRIPTION
-                "Returns the operative state of mutual authentication checking. 
+                "Returns the operative state of mutual authentication checking.
                  Applies to EAP-TLS."
             ::= { cienaCes8021xSuppEntry 15 }
 
@@ -304,7 +318,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-only
             STATUS          current
             DESCRIPTION
@@ -333,7 +347,7 @@
             STATUS          current
             DESCRIPTION
                  "Sets the pre-encrypted secret that shall be used along with the
-                  username specified by cienaCes8021xSuppUserName to gain access 
+                  username specified by cienaCes8021xSuppUserName to gain access
                   on a port. A get returns the encrypted secret for the supplicant."
             ::= { cienaCes8021xSuppEntry 18}
 
@@ -365,7 +379,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
@@ -390,11 +404,11 @@
                                 version1dot0(1),
                                 version1dot1(2),
                                 version1dot2(3)
-                        }    
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
-                "This object is used to specify the minimum TLS version that can be 
+                "This object is used to specify the minimum TLS version that can be
                  used by the supplicant port.
                  Applies to EAP-TLS."
             ::= { cienaCes8021xSuppEntry 23 }
@@ -404,7 +418,7 @@
             SYNTAX      INTEGER {
                                 disabled(1),
                                 enabled(2)
-                        }    
+                        }
             MAX-ACCESS      read-write
             STATUS          current
             DESCRIPTION
@@ -415,7 +429,7 @@
 
         -- 1.3.6.1.4.1.1271.2.1.42.2.3
         cienaCes8021xGlobalAttrs OBJECT IDENTIFIER ::= { cienaCes8021xObjs 3 }
-        
+
         -- 1.3.6.1.4.1.1271.2.1.42.2.3.1
         cienaCes8021xAuthStatsClear OBJECT-TYPE
             SYNTAX          TruthValue
@@ -423,7 +437,7 @@
             STATUS          current
             DESCRIPTION
                 "Setting this MIB object to 'true' clears the authenticator global statistics."
-            ::= { cienaCes8021xGlobalAttrs 1 }   
+            ::= { cienaCes8021xGlobalAttrs 1 }
 
         -- 1.3.6.1.4.1.1271.2.1.42.2.3.2
         cienaCes8021xSuppStatsClear OBJECT-TYPE
@@ -432,7 +446,7 @@
             STATUS          current
             DESCRIPTION
                 "Setting this MIB object to 'true' clears the supplicant global statistics."
-            ::= { cienaCes8021xGlobalAttrs 2 }     
+            ::= { cienaCes8021xGlobalAttrs 2 }
 
 --
 -- Notifications
@@ -446,25 +460,27 @@
 
         -- 1.3.6.1.4.1.1271.2.2.101.0.1
         cienaCes8021xSuppAuthenticationEvent NOTIFICATION-TYPE
-            OBJECTS {   
-                      cienaGlobalSeverity, 
+            OBJECTS {
+                      cienaGlobalSeverity,
                       cienaGlobalMacAddress,
                       cienaCes8021xPort,
-                      cienaCes8021xNotificationAuthenticationEvent
+                      cienaCes8021xNotificationAuthenticationEvent,
+                      cienaCes8021xPortName
                     }
             STATUS     current
             DESCRIPTION     "This notification is generated when a supplicant authentication event,
                              as identified by the value of cienaCes8021xNotificationAuthenticationEvent
                              has occurred on the port identified by cienaCes8021xPort."
             ::= { cienaCes8021xMIBNotification 1 }
-        
+
         -- 1.3.6.1.4.1.1271.2.2.101.0.2
         cienaCes8021xAuthAuthenticationEvent NOTIFICATION-TYPE
             OBJECTS {
-                      cienaGlobalSeverity, 
+                      cienaGlobalSeverity,
                       cienaGlobalMacAddress,
                       cienaCes8021xPort,
-                      cienaCes8021xNotificationAuthenticationEvent
+                      cienaCes8021xNotificationAuthenticationEvent,
+                      cienaCes8021xPortName
                      }
             STATUS     current
             DESCRIPTION     "This notification is generated when a authenticator authentication event,
@@ -475,7 +491,7 @@
         -- 1.3.6.1.4.1.1271.2.2.101.0.3
         cienaCes8021xGlobalStateChangeEvent NOTIFICATION-TYPE
             OBJECTS {
-                     cienaGlobalSeverity, 
+                     cienaGlobalSeverity,
                      cienaGlobalMacAddress,
                      dot1xPaeSystemAuthControl
                     }
@@ -487,7 +503,7 @@
         -- 1.3.6.1.4.1.1271.2.2.101.0.4
         cienaCes8021xAuthConfigChangeEvent NOTIFICATION-TYPE
             OBJECTS {
-                      cienaGlobalSeverity, 
+                      cienaGlobalSeverity,
                       cienaGlobalMacAddress,
                       cienaCes8021xPort
                     }
@@ -499,7 +515,7 @@
         -- 1.3.6.1.4.1.1271.2.2.101.0.5
         cienaCes8021xSuppConfigChangeEvent NOTIFICATION-TYPE
             OBJECTS {
-                      cienaGlobalSeverity, 
+                      cienaGlobalSeverity,
                       cienaGlobalMacAddress,
                       cienaCes8021xPort
                     }

@@ -1,0 +1,18 @@
+mib: ACD-DESC-MIB
+
+modules:
+   sensors:
+
+       state:
+            data:
+                -
+                    oid: acdDescPwrTable
+                    value: acdDescPwrPresent
+                    num_oid: '.1.3.6.1.4.1.22420.1.1.11.1.4.{{ $index }}'
+                    descr: acdDescPwrName
+                    index: 'acdDescPwrPresent.{{ $index }}'
+                    states:
+                        - { value: 1, descr: on, graph: 1, generic: 2 }
+                        - { value: 2, descr: off, graph: 1, generic: 0 }
+                        - { value: 2, descr: absent, graph: 1, generic: 1 }
+

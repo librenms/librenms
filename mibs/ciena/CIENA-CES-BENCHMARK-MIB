@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-BENCHMARK-MIB.my
  --
@@ -21,57 +20,105 @@
             FROM CIENA-GLOBAL-MIB;
 
  cienaCesBenchmarkMIB MODULE-IDENTITY
-            LAST-UPDATED "201610140000Z"
-            ORGANIZATION "Ciena, Inc"
+            LAST-UPDATED "201905230000Z"
+            ORGANIZATION "Ciena Corp."
             CONTACT-INFO
-               "   Mib Meister
-               115 North Sullivan Road
-               Spokane Valley, WA 99037
-               USA
-               Phone:  +1 509 242 9000
-               Email:  support@ciena.com"
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"
             DESCRIPTION  "The MIB module for managing RFC2544/Y1564 service benchmark testing."
+
+            REVISION     "201905230000Z"
+            DESCRIPTION  "Introduced new attributes in CienaCesBenchmarkTestInstanceEntry, 
+                          CienaCesBenchmarkGenTestSessionThroughputResultsEntry, 
+                          CienaCesBenchmarkGenTestSessionFramelossResultsEntry,
+                          CienaCesBenchmarkGenTestSessionLatencyResultsEntry,
+                          CienaCesBenchmarkGenTestSessionPdvResultsEntry,
+                          CienaCesBenchmarkGenTestSessionOutageResultsEntry,
+                          and a TRAP cienaCesBenchmarkEntityPortProtectionSwitchEvent for benchmark support with 
+                          1:1 LAG, MC-LAG and Y-protection configuration"
+
+            REVISION     "201903060000Z"
+            DESCRIPTION  "Added new duration enum value 'custom' in cienaCesBenchmarkProfileEntryDuration and a new test profile attribute cienaCesBenchmarkProfileEntryCustomDuration."
+            
+            REVISION     "201808170000Z"
+            DESCRIPTION  "Remove DISPLAY-HINT for CienaCesBenchmarkPcpBitmap and DEFVAL for cienaCesBenchmarkProfileEntrySPcp
+                          and cienaCesBenchmarkProfileEntryCPcp."
+
+            REVISION     "201804100000Z"
+            DESCRIPTION  "Introduced new CienaCesBenchmarkOutageTestState value waitingForResidualPackets(5)."
+
+            REVISION     "201712140000Z"
+            DESCRIPTION  "Adding support for the outage test along with 3 new KPIs and associated
+                          notifications.
+                          Adding support for KPIs for untagged session."
+
+            REVISION     "201706070000Z"
+            DESCRIPTION  "Updated contact info."
+
+            REVISION     "201702280000Z"
+            DESCRIPTION  "Introduced cienaCesBenchmarkTestInstanceEntryConnectivityTest and 
+                          cienaCesBenchmarkTestInstanceEntryOperState attributes."
+
+            REVISION     "201702160000Z"
+            DESCRIPTION  "Increase the range of cienaCesBenchmarkBwRatio to 0..1,000,000."
 
             REVISION     "201611110000Z"
             DESCRIPTION  "The maximumLineRate(3) value for cienaCesBenchmarkProfileEntryFrameLossStartBw is not supported."
+
             REVISION     "201610140000Z"
             DESCRIPTION  "Add new entity attribute cienaCesBenchmarkEntityEntryReflectorMacValidation
                           to support MAC-agnostic reflector."
+
             REVISION     "201610070000Z"
             DESCRIPTION  "Updated the description of cienaCesBenchmarkProfileEntryTpid and made
                           cienaCesBenchmarkEntityStatsEntryClear obsolete. Entity statistics shall
                           now be cleared using new attribute cienaCesBenchmarkEntityEntryClearStats"
+
             REVISION     "201610040000Z"
             DESCRIPTION  "Fix VID range to allow up to maximum value of 4094"
+
             REVISION     "201609070000Z"
             DESCRIPTION  "Updated default values for various objects to help with 'createAndGo' operations"
+
             REVISION     "201606010000Z"
             DESCRIPTION  "Added Trap cienaCesBenchmarkTestIterationCompleted."
+
             REVISION     "201605130000Z"
             DESCRIPTION  "Updated cienaCesBenchmarkTestStarted, cienaCesBenchmarkTestStopped,
                           cienaCesBenchmarkTestCompleted, cienaCesBenchmarkTestFailedThroughputKpi,
                           cienaCesBenchmarkTestFailedFramelossKpi, cienaCesBenchmarkTestFailedLatencyKpi
                           and cienaCesBenchmarkTestFailedPdvKpi traps to include cienaGlobalSeverity and 
                           cienaGlobalMacAddress."
+
             REVISION     "201604260000Z"
             DESCRIPTION  "Add new throughput test state, txMaxThroughputForYellowTest, to 
                           CienaCesBenchmarkThroughputTestState's definition. Used on green
                           session when the associated yellow session is running its throughput
                           test."
+
             REVISION     "201603300000Z"
             DESCRIPTION  "Add cienaCesBenchmarkEmixCharSetTable"
+
             REVISION     "201603140000Z"
             DESCRIPTION  "Add attribute cienaCesBenchmarkTestInstanceEntryAssocEntityId which 
                           points back to the entity ID associated with the test instance."
+
             REVISION     "201603100000Z"
             DESCRIPTION  "Add a special note to the description of 
                           cienaCesBenchmarkGenTestSessionAllocationEntry
                           for the case when test traffic is untagged."
+
             REVISION     "201603030000Z"
             DESCRIPTION  "Fix description for cienaCesBenchmarkEntityStatsEntryClear
                           and cienaCesBenchmarkTestInstanceEntryTotalIntervals attributes"
+
             REVISION     "201602240000Z"
             DESCRIPTION  "Added evcOutOfService to the Entity Mode enum"
+
             REVISION     "201602090000Z"
             DESCRIPTION  "Initial creation. Based on WWP-LEOS-BENCHMARK-MIB update 201412180000Z"
             ::= { cienaCesConfig 39 }
@@ -150,6 +197,20 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                       done(6)
                   }
 
+ CienaCesBenchmarkOutageTestState ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Outage test state."
+     SYNTAX       INTEGER {
+                      idle(1),
+                      aboutToStart(2),
+                      running(3),
+                      processingOutageRecords(4),
+                      waitingForResidualPackets(5),
+                      stoppedByDurationTimer(6),
+                      stoppedByUser(7),
+                      done(8)
+                  }
+
  CienaCesBenchmarkColorTest ::= TEXTUAL-CONVENTION
      STATUS       current
      DESCRIPTION  "Defines which traffic color needs to be tested. Green 
@@ -225,7 +286,6 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      SYNTAX        Unsigned32
 
  CienaCesBenchmarkPcpBitmap ::= TEXTUAL-CONVENTION
-     DISPLAY-HINT "x"
      STATUS       current
      DESCRIPTION  "Bitmap of the VLAN PCP (Priority Code ) value to test
                    with. When The RFC2544 test is selected in the profile,
@@ -1516,28 +1576,35 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkKpiThroughput    CienaCesBenchmarkThroughputKpiPercent,
      cienaCesBenchmarkKpiFrameloss     CienaCesBenchmarkFramelossKpiPercent,
      cienaCesBenchmarkKpiLatency       Integer32,
-     cienaCesBenchmarkKpiPdv           Integer32
+     cienaCesBenchmarkKpiPdv           Integer32,
+     cienaCesBenchmarkKpiOutageMaxNum  Integer32,
+     cienaCesBenchmarkKpiOutageMaxDurationSingle  Integer32,
+     cienaCesBenchmarkKpiOutageMaxDurationSum     Integer32,
+     cienaCesBenchmarkKpiUntagged      TruthValue
  }
 
  cienaCesBenchmarkKpiPcpIndex        OBJECT-TYPE
-     SYNTAX       Integer32  (1..8)
+     SYNTAX       Integer32  (1..9)
      MAX-ACCESS   not-accessible
      STATUS       current
-     DESCRIPTION "Index for the PCP"
+     DESCRIPTION "Index for the PCP. Index 9 is used for untagged."
      ::= { cienaCesBenchmarkKpiPcpColorEntry 1 }
 
  cienaCesBenchmarkKpiColorIndex      OBJECT-TYPE
      SYNTAX       Integer32  (1..2)
      MAX-ACCESS   not-accessible
      STATUS       current
-     DESCRIPTION "Index for the PCP"
+     DESCRIPTION "Index for the color; 1 green, 2 yellow. 
+                  Index 1 is used for untagged"
      ::= { cienaCesBenchmarkKpiPcpColorEntry 2 }
 
  cienaCesBenchmarkKpiPcp             OBJECT-TYPE
      SYNTAX       Integer32  (0..7)
      MAX-ACCESS   read-only
      STATUS       current
-     DESCRIPTION "PCP value associated with this entry"
+     DESCRIPTION "PCP value associated with this entry. Set only 
+                  if the KPI is associated with a tagged session 
+                  meaning cienaCesBenchmarkKpiUntagged flag is set to false."
      ::= { cienaCesBenchmarkKpiPcpColorEntry 3 }
 
  cienaCesBenchmarkKpiColor           OBJECT-TYPE
@@ -1545,7 +1612,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      MAX-ACCESS   read-only
      STATUS       current
      DESCRIPTION "Traffic color, green or yellow, associated with these
-                  KPIs."
+                  KPIs. Set only if the KPI is associated with a tagged session 
+                  meaning cienaCesBenchmarkKpiUntagged flag is set to false."
      ::= { cienaCesBenchmarkKpiPcpColorEntry 4 }
 
  cienaCesBenchmarkKpiThroughput      OBJECT-TYPE
@@ -1585,6 +1653,52 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                   should not exceed in order for the test to be 
                   considered a pass."
      ::= { cienaCesBenchmarkKpiPcpColorEntry 8 }
+
+ cienaCesBenchmarkKpiOutageMaxNum    OBJECT-TYPE
+     SYNTAX       Integer32  (-1..128)
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Maximum number of outages that can be recorded during the 
+                  outage test for the test to be declared a success. If there
+                  are more than the specified number of outages detected, the
+                  test is failed."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 9 }
+
+ cienaCesBenchmarkKpiOutageMaxDurationSingle   OBJECT-TYPE
+     SYNTAX       Integer32  (0..10000)
+     UNITS       "milliseconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Maximum number of milliseconds a single recorded outage can 
+                  last for the outage test to be a success. If a single detected
+                  outage exceeds that threshold, the outage test is failed."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 10 }
+
+ cienaCesBenchmarkKpiOutageMaxDurationSum      OBJECT-TYPE
+     SYNTAX       Integer32  (0..30000)
+     UNITS       "milliseconds"
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION "Maximum number of milliseconds the sum of the duration of all 
+                  recorded outages cannot exceed for the outage test to be declared
+                  a success. If the sum exceeds the configured threshold, the
+                  outage test fails the KPI. The outage test can detect more than 128 
+                  outages during the test, but will only record details for the first
+                  128 outages detected. This KPI is the sum of the duration of the 
+                  first 128 outages only; it doesn't include the duration of the
+                  outages detected beyond 128."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 11 }
+
+ cienaCesBenchmarkKpiUntagged          OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Flag indicating if this group of KPIs is for untagged traffic
+                  or not. When set to True, cienaCesBenchmarkKpiPcp and
+                  cienaCesBenchmarkKpiColor are ignored. The value of 
+                  cienaCesBenchmarkKpiPcpIndex and cienaCesBenchmarkKpiColorIndex
+                  are 9 and 1 respectively for untagged KPIs."
+     ::= { cienaCesBenchmarkKpiPcpColorEntry 12 }
 
  ---
  --- Bandwidth Allocation Profile Table
@@ -1697,7 +1811,7 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      ::= { cienaCesBenchmarkBwRatioEntry 2 }
 
  cienaCesBenchmarkBwRatio         OBJECT-TYPE
-     SYNTAX       Integer32 (0..100)
+     SYNTAX       Integer32 (0..1000000)
      MAX-ACCESS   read-write
      STATUS       current
      DESCRIPTION "Ratio of test bandwidth to allocate to the
@@ -1771,7 +1885,10 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      -- Operational status
      cienaCesBenchmarkProfileEntryHwSessionsRequired  Integer32,
      cienaCesBenchmarkProfileEntryNumOfRef            Integer32,
-     cienaCesBenchmarkProfileEntryRowStatus           RowStatus
+     cienaCesBenchmarkProfileEntryRowStatus           RowStatus,
+     cienaCesBenchmarkProfileEntryOutageTest          TruthValue,
+     -- Configuration Parameters
+     cienaCesBenchmarkProfileEntryCustomDuration      Unsigned32
  } 
 
  cienaCesBenchmarkProfileEntryId                  OBJECT-TYPE
@@ -1832,7 +1949,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                             t6hr(3),
                             t24hr(4),
                             tIndefinite(5),
-                            tOnce(6)
+                            tOnce(6),
+                            tCustom(7)
                         }
      MAX-ACCESS         read-create
      STATUS             current
@@ -2019,7 +2137,6 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  PCP can be set in the mask. Otherwise, a test session
                  will be run for each PCP bit set. Used when the encapType
                  set to QinQ"
-     DEFVAL      { pcp0 }
      ::= { cienaCesBenchmarkProfileEntry 22 }
 
  cienaCesBenchmarkProfileEntrySColor    OBJECT-TYPE
@@ -2060,7 +2177,6 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  encapType is set to dot1q. In the QinQ type, the c-pcp 
                  of the test packet takes the same value as the s-pcp to
                  simplify software."
-     DEFVAL      { pcp0 }
      ::= { cienaCesBenchmarkProfileEntry 25 }
 
  cienaCesBenchmarkProfileEntryCColor    OBJECT-TYPE
@@ -2269,7 +2385,26 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                         'destroy'.  If the entry exists, it is displayed 
                         as 'active'."
      ::= { cienaCesBenchmarkProfileEntry 43 }
- 
+
+ cienaCesBenchmarkProfileEntryOutageTest OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION       "When set to true, the outage test will be executed follwoing one
+                        iteration of the other enabled tests for the reminder of the duration.
+                        The outage test records details for up to the first 128 outages detected."
+     ::= { cienaCesBenchmarkProfileEntry 44 }
+  
+ cienaCesBenchmarkProfileEntryCustomDuration OBJECT-TYPE
+     SYNTAX             Unsigned32 (15..65535)
+     MAX-ACCESS         read-create
+     STATUS             current
+     DESCRIPTION        
+                        "Custom duration for testing in mins. Custom duration is only used if 
+                         cienaCesBenchmarkProfileEntryDuration is set to tCustom."
+     DEFVAL             { 15 }
+     ::= { cienaCesBenchmarkProfileEntry 45 }
+     
  --
  -- Test Instance Table
  --
@@ -2306,7 +2441,12 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkTestInstanceEntryLastIterStart        DateAndTime,
      cienaCesBenchmarkTestInstanceEntryClearStats           TruthValue,
      cienaCesBenchmarkTestInstanceEntryRowStatus            RowStatus,
-     cienaCesBenchmarkTestInstanceEntryAssocEntityId        Integer32
+     cienaCesBenchmarkTestInstanceEntryAssocEntityId        Integer32,
+     cienaCesBenchmarkTestInstanceEntryOperState            TruthValue,
+     cienaCesBenchmarkTestInstanceEntryConnectivityTest     TruthValue,
+     cienaCesBenchmarkTestInstanceEntrySuspectFlag          TruthValue,
+     cienaCesBenchmarkTestInstanceEntryPortProtectionSwitchCount Integer32,
+     cienaCesBenchmarkTestInstanceEntryPortLastProtectionSwitchTime  DateAndTime
  }
 
  cienaCesBenchmarkTestInstanceEntryId          OBJECT-TYPE
@@ -2480,6 +2620,61 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
               (cienaCesBenchmarkEntityEntryId)"
      ::= { cienaCesBenchmarkTestInstanceEntry 16 }
 
+ cienaCesBenchmarkTestInstanceEntryOperState OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Indicates the operational state of the test instance. When a generator 
+             test instance is operationally enabled it means the test is running and 
+             traffic is being generated. When a reflector test instance is operationally 
+             enabled it means that reflection is active on the specified svid:cvid combination. 
+             Use the cienaCesBenchmarkTestInstanceEntryAdminState to enable/disable a test 
+             instance since this field is read-only and meant to capture operational state."
+     ::= { cienaCesBenchmarkTestInstanceEntry 17 }
+
+ cienaCesBenchmarkTestInstanceEntryConnectivityTest    OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Applicable to generator test instances, this field is used to trigger 
+             a connectivity test on the test instance. Setting the value to true will 
+             trigger the test by transmitting 10 packets. If no error is returned 
+             then the test has passed. If a commit error is received then the test has failed."
+     ::= { cienaCesBenchmarkTestInstanceEntry 18 }
+
+ cienaCesBenchmarkTestInstanceEntrySuspectFlag OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "When a port under test is having 1:1 LAG,MC-LAG/Y-protection as configuration and while a test is running
+              and port under test protection switch event is detected, this flag shall be set to true.
+              This flag set to true indicates result might not be valid since one or more protection 
+              switch events were detected while the test was running."
+     ::= { cienaCesBenchmarkTestInstanceEntry 19 }
+
+ cienaCesBenchmarkTestInstanceEntryPortProtectionSwitchCount OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Port under test configuration as 1:1 LAG/MC-LAG/Y-protection.
+              This Indicates the number protection switch event detected while reflector 
+              operational state was reflecting"
+     ::= { cienaCesBenchmarkTestInstanceEntry 20 }
+
+ cienaCesBenchmarkTestInstanceEntryPortLastProtectionSwitchTime OBJECT-TYPE
+     SYNTAX       DateAndTime
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "With port under test configuration as 1:1 LAG/MC-LAG/Y-cable.
+              Indicates the date and time of last dtected protection switch event of port under test"
+     ::= { cienaCesBenchmarkTestInstanceEntry 21 }
+
+
  ---
  --- Generator Test Session Allocation and Status Table
  --- 
@@ -2527,7 +2722,10 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkGenTestSessionRfc2544TestState    CienaCesBenchmarkRfc2544TestState,
      cienaCesBenchmarkGenTestSessionY1564TestState      CienaCesBenchmarkY1564TestState,
      cienaCesBenchmarkGenTestSessionCurrentRate         Integer32,
-     cienaCesBenchmarkGenTestSessionSamplesCompleted    Integer32
+     cienaCesBenchmarkGenTestSessionSamplesCompleted    Integer32,
+     cienaCesBenchmarkGenTestSessionOutageTestState     CienaCesBenchmarkOutageTestState,
+     cienaCesBenchmarkGenTestSessionNumOutagesDetected  Integer32,
+     cienaCesBenchmarkGenTestSessionOutageProgress      Integer32
  }
 
  cienaCesBenchmarkGenTestSessionPcpIndex          OBJECT-TYPE
@@ -2647,6 +2845,34 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      DESCRIPTION "When latency and/or pdv is running, this indicates how 
                   many samples have been gathered so far."
      ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 15 }
+
+ cienaCesBenchmarkGenTestSessionOutageTestState     OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkOutageTestState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "State of the outage test for this hardware session."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 16 }
+
+ cienaCesBenchmarkGenTestSessionNumOutagesDetected  OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Number of outages detected so far."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 17 }
+
+ cienaCesBenchmarkGenTestSessionOutageProgress      OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Percentage of the outage test completed. This is based
+                  on how much time has passed since the outage test
+                  started and the total duration of the test.
+                  If the test is not in the running or processing
+                  records state the value is 0.
+                  If the duration is indefinite, then a percentage
+                  progress is impossible to maintain, and this value
+                  will be 0."
+     ::= { cienaCesBenchmarkGenTestSessionAllocationEntry 18 }
 
  --
  -- Test Instance Stats Table
@@ -2864,7 +3090,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkGenTestSessionThroughputResultsMax             CienaCesBenchmarkThroughputResult,
      cienaCesBenchmarkGenTestSessionThroughputResultsAvg             CienaCesBenchmarkThroughputResult,
      cienaCesBenchmarkGenTestSessionThroughputResultsIterations      Integer32,
-     cienaCesBenchmarkGenTestSessionThroughputResultsKpiResult       CienaCesBenchmarkKpiResult
+     cienaCesBenchmarkGenTestSessionThroughputResultsKpiResult       CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionThroughputResultsSuspect         TruthValue
  } 
 
  cienaCesBenchmarkGenTestSessionThroughputResultsPcpIndex   OBJECT-TYPE
@@ -2989,6 +3216,17 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  be 'notApplicable'."
      ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 12 }
 
+ cienaCesBenchmarkGenTestSessionThroughputResultsSuspect  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                 "In case port under test with 1:1 LAG/MC-LAG/Y-protection configuration 
+                  Suspect result indicates test result might not be valid since one or more 
+                  protection switch events were detected while the test was in progress."
+     ::= { cienaCesBenchmarkGenTestSessionThroughputResultsEntry 13 }
+
+
  --
  -- Benchmark Generator Test Session Frameloss Results
  --
@@ -3027,7 +3265,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkGenTestSessionFramelossResultsFirst            CienaCesBenchmarkFramelossResult,
      cienaCesBenchmarkGenTestSessionFramelossResultsSecond           CienaCesBenchmarkFramelossResult,
      cienaCesBenchmarkGenTestSessionFramelossResultsKpiResult        CienaCesBenchmarkKpiResult,
-     cienaCesBenchmarkGenTestSessionFramelossResultsResult           CienaCesBenchmarkFramelossResult
+     cienaCesBenchmarkGenTestSessionFramelossResultsResult           CienaCesBenchmarkFramelossResult,
+     cienaCesBenchmarkGenTestSessionFramelossResultsSuspect          TruthValue
  } 
 
  cienaCesBenchmarkGenTestSessionFramelossResultsPcpIndex   OBJECT-TYPE
@@ -3144,6 +3383,17 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      DESCRIPTION
                 "Percentage of frames lost on the largest test sequence results."
      ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 13 }
+
+ cienaCesBenchmarkGenTestSessionFramelossResultsSuspect  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                 "In case port under test with 1:1 LAG/MC-LAG/Y-protection configuration 
+                  Suspect result indicates test result might not be valid since one or more 
+                  protection switch events were detected while the test was in progress."
+     ::= { cienaCesBenchmarkGenTestSessionFramelossResultsEntry 14 }
+
      
  --
  -- Benchmark Generator Test Session Latency Results
@@ -3181,7 +3431,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkGenTestSessionLatencyResultsMax             Unsigned32,
      cienaCesBenchmarkGenTestSessionLatencyResultsAvg             Unsigned32,
      cienaCesBenchmarkGenTestSessionLatencyResultsSamples         Integer32,
-     cienaCesBenchmarkGenTestSessionLatencyResultsKpiResult       CienaCesBenchmarkKpiResult 
+     cienaCesBenchmarkGenTestSessionLatencyResultsKpiResult       CienaCesBenchmarkKpiResult, 
+     cienaCesBenchmarkGenTestSessionLatencyResultsSuspect         TruthValue
  } 
 
  cienaCesBenchmarkGenTestSessionLatencyResultsPcpIndex   OBJECT-TYPE
@@ -3289,6 +3540,17 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  be 'notApplicable'."
      ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 12 }
 
+ cienaCesBenchmarkGenTestSessionLatencyResultsSuspect  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                 "In case port under test with 1:1 LAG/MC-LAG/Y-protection configuration 
+                  Suspect result indicates test result might not be valid since one or more 
+                  protection switch events were detected while the test was in progress."
+     ::= { cienaCesBenchmarkGenTestSessionLatencyResultsEntry 13 }
+
+
  --
  -- Benchmark Test Session Packet Delay Variation Results
  --
@@ -3324,7 +3586,8 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkGenTestSessionPdvResultsEmixSequenceId  Integer32,
      cienaCesBenchmarkGenTestSessionPdvResultsAvg             Unsigned32,
      cienaCesBenchmarkGenTestSessionPdvResultsSamples         Integer32,
-     cienaCesBenchmarkGenTestSessionPdvResultsKpiResult       CienaCesBenchmarkKpiResult
+     cienaCesBenchmarkGenTestSessionPdvResultsKpiResult       CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionPdvResultsSuspect         TruthValue
  } 
 
  cienaCesBenchmarkGenTestSessionPdvResultsPcpIndex   OBJECT-TYPE
@@ -3416,6 +3679,17 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  be 'notApplicable'."
      ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 10 }
 
+ cienaCesBenchmarkGenTestSessionPdvResultsSuspect  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                 "In case port under test with 1:1 LAG/MC-LAG/Y-protection configuration 
+                  Suspect result indicates test result might not be valid since one or more 
+                  protection switch events were detected while the test was in progress."
+     ::= { cienaCesBenchmarkGenTestSessionPdvResultsEntry 11 }
+
+
  --
  -- Benchmark EMIX character set table
  --
@@ -3475,6 +3749,303 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      ::= { cienaCesBenchmarkEmixCharacterSetEntry 3 }
 
  --
+ -- Benchmark Test Session Outage Results
+ --
+ cienaCesBenchmarkGenTestSessionOutageResultsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkGenTestSessionOutageResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of BENCHMARK generator test session outage test
+              results."
+     ::= { cienaCesBenchmarkModule 20 }
+                
+ cienaCesBenchmarkGenTestSessionOutageResultsEntry OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkGenTestSessionOutageResultsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "BENCHMARK generator test session outage test results."
+     INDEX { cienaCesBenchmarkEntityEntryId,
+             cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkGenTestSessionOutageResultsPcpIndex,
+             cienaCesBenchmarkGenTestSessionOutageResultsColorIndex }
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsTable 1 } 
+
+ CienaCesBenchmarkGenTestSessionOutageResultsEntry ::= SEQUENCE { 
+     cienaCesBenchmarkGenTestSessionOutageResultsPcpIndex        Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsColorIndex      Integer32,
+     cienaCesBenchmarkGenTestSessionOutageUntagged               TruthValue,
+     cienaCesBenchmarkGenTestSessionOutageResultsPcp             Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsColor           CienaCesBenchmarkColorTest,
+     cienaCesBenchmarkGenTestSessionOutageResultsFrameSize       Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsEmixSequenceId  Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsNumDetected     Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsSumDurationRecorded Unsigned32,
+     cienaCesBenchmarkGenTestSessionOutageResultsStartTime       DateAndTime,
+     cienaCesBenchmarkGenTestSessionOutageResultsEndTime         DateAndTime,
+     cienaCesBenchmarkGenTestSessionOutageResultsMaxNumKpiResult         CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionOutageResultsSumDurationKpiResult    CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionOutageResultsOverallKpiResult        CienaCesBenchmarkKpiResult,
+     cienaCesBenchmarkGenTestSessionOutageResultsNumRecorded     Integer32,
+     cienaCesBenchmarkGenTestSessionOutageResultsThroughput      CienaCesBenchmarkThroughputResult,
+     cienaCesBenchmarkGenTestSessionOutageResultsSuspect         TruthValue
+ } 
+
+ cienaCesBenchmarkGenTestSessionOutageResultsPcpIndex   OBJECT-TYPE
+     SYNTAX             Integer32 (1..8)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "PCP index."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 1 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsColorIndex OBJECT-TYPE
+     SYNTAX             Integer32 (1..2)
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+                "Color index."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 2 }
+
+ cienaCesBenchmarkGenTestSessionOutageUntagged          OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Flag indicating whether the results are associated with an untagged
+                 session or not."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 3 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsPcp        OBJECT-TYPE
+     SYNTAX             Integer32 (0..7)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "PCP value of the test packets associated with those
+                 results. Not valid if cienaCesBenchmarkGenTestSessionOutageUntagged
+                 is True."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 4 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsColor      OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkColorTest
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Color of the test packets associated with those
+                 results. Not valid if cienaCesBenchmarkGenTestSessionOutageUntagged
+                 is True."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 5 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsFrameSize  OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Packet size in bytes."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 6 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsEmixSequenceId OBJECT-TYPE
+     SYNTAX             Integer32 (1..32)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "ID of the EMIX sequence that was used for running the
+                 test which produced these results. When 0,
+                 frame size indicates the size of the test frame
+                 associated with these results."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 7 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsNumDetected     OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of outages detected during the outage test."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 8 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsSumDurationRecorded OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Sum of the duration of the first 128 outages detected. Only the 
+                 first 128 outages have recorded details."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 9 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsStartTime       OBJECT-TYPE
+     SYNTAX             DateAndTime
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Date and time of the start of the outage test."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 10 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsEndTime       OBJECT-TYPE
+     SYNTAX             DateAndTime
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Date and time of the end of the outage test."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 11 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsMaxNumKpiResult  OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Results for the maximum number of outagses KPI. The result is fail if 
+                 there is a KPI configured for the used profile and session and if 
+                 cienaCesBenchmarkGenTestSessionOutageResultsNumDetected exceeds the
+                 configured KPI for the session; it is pass otherwise. When there is 
+                 no KPI configured for the session, the results is not applicable."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 12 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsSumDurationKpiResult OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Results for the sum of the duration of the recorded outage KPI. 
+                 The result is fail if there is a KPI configured for the used profile 
+                 and session and if cienaCesBenchmarkGenTestSessionOutageResultsSumDurationRecorded
+                 exceeds the configured KPI for the session; it is pass otherwise. When there is 
+                 no KPI configured for the session, the results is not applicable."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 13 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsOverallKpiResult    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkKpiResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Overall KPI results for the outage test is an OR of all 3 outage KPIs:
+                 maximum number of outages detected KPI result, sum of duration of all
+                 recorded outages KPI result and the result of the duration of a single outage KPI
+                 for all recorded outage. If any one of those is fail, the over KPI is fail.
+                 If ALL of the KPIs are pass, the overall KPI results is pass."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 14 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsNumRecorded     OBJECT-TYPE
+     SYNTAX             Integer32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of outages recorded during the outage test."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 15 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsThroughput    OBJECT-TYPE
+     SYNTAX             CienaCesBenchmarkThroughputResult
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Average throughput during outage test in Mbps * 100.
+                 The value is multiplied by 100 to be able
+                 to send the results as an integer but should be divided
+                 by 100 when displayed to provide a 2 decimal point accuracy.
+                 A result of 123.45 is sent as 12345."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 16 }
+
+ cienaCesBenchmarkGenTestSessionOutageResultsSuspect  OBJECT-TYPE
+     SYNTAX             TruthValue
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                 "In case port under test with 1:1 LAG/MC-LAG/Y-protection configuration 
+                  Suspect Result indicates test result might not be valid since one or more 
+                  protection switch events were detected while the test was in progress."
+     ::= { cienaCesBenchmarkGenTestSessionOutageResultsEntry 17 }
+
+
+
+ ---
+ --- Outage record table
+ ---
+ cienaCesBenchmarkOutageRecordTable        OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesBenchmarkOutageRecordEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table providing the detailed inforamtion on
+              each outage that was recorded during the outage
+              test. The first 128 outages have their 
+              details recorde."
+     ::= { cienaCesBenchmarkModule 21 }
+
+ cienaCesBenchmarkOutageRecordEntry     OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkOutageRecordEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Entry for storing details on one outage."
+     INDEX { cienaCesBenchmarkTestInstanceEntryId,
+             cienaCesBenchmarkOutageRecordIndex }
+     ::= { cienaCesBenchmarkOutageRecordTable 1 }
+
+ CienaCesBenchmarkOutageRecordEntry ::= SEQUENCE {
+     cienaCesBenchmarkOutageRecordIndex                   Integer32,
+     cienaCesBenchmarkOutageRecordStartTime               DateAndTime,
+     cienaCesBenchmarkOutageRecordEndTime                 DateAndTime,
+     cienaCesBenchmarkOutageRecordDuration                Unsigned32,
+     cienaCesBenchmarkOutageRecordDroppedFrames           Unsigned32,
+     cienaCesBenchmarkOutageRecordSingleDurationKpiResult CienaCesBenchmarkKpiResult, 
+     cienaCesBenchmarkOutageRecordId                      Unsigned32
+ }
+
+ cienaCesBenchmarkOutageRecordIndex  OBJECT-TYPE
+     SYNTAX       Integer32  (1..128)
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION "Index of the outage record. Software records the first 128 outages
+                  detected during the outage test."
+     ::= { cienaCesBenchmarkOutageRecordEntry 1 }
+
+ cienaCesBenchmarkOutageRecordStartTime OBJECT-TYPE
+     SYNTAX       DateAndTime
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Date and time for the start of this outage."
+     ::= { cienaCesBenchmarkOutageRecordEntry 2 }
+
+ cienaCesBenchmarkOutageRecordEndTime  OBJECT-TYPE
+     SYNTAX       DateAndTime
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Date and time of the end of this outage."
+     ::= { cienaCesBenchmarkOutageRecordEntry 3 }
+
+ cienaCesBenchmarkOutageRecordDuration  OBJECT-TYPE
+     SYNTAX       Unsigned32
+     UNITS       "microseconds"
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Duration of this outage in micro-seconds."
+     ::= { cienaCesBenchmarkOutageRecordEntry 4 }
+
+ cienaCesBenchmarkOutageRecordDroppedFrames  OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Number of frames that were dropped during this outage."
+     ::= { cienaCesBenchmarkOutageRecordEntry 5 }
+
+ cienaCesBenchmarkOutageRecordSingleDurationKpiResult  OBJECT-TYPE
+     SYNTAX       CienaCesBenchmarkKpiResult
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION "Result for the maximum duration of single outage KPI for
+                  this outage. If there is no KPI set, the result will be
+                  'not available'."
+     ::= { cienaCesBenchmarkOutageRecordEntry 6 }
+
+ cienaCesBenchmarkOutageRecordId  OBJECT-TYPE
+     SYNTAX       Unsigned32  (1..128)
+     MAX-ACCESS   read-only     
+     STATUS       current
+     DESCRIPTION "Id of the outage record. 
+                  (One less than the record index)."
+     ::= { cienaCesBenchmarkOutageRecordEntry 7 }
+
+
+ --
  -- Trap definitions
  --
  cienaCesBenchmarkTestStarted   NOTIFICATION-TYPE
@@ -3531,13 +4102,16 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  cienaCesBenchmarkKpiColor,
                  cienaCesBenchmarkGenTestSessionCurrentPktSize,
                  cienaCesBenchmarkEmixSequenceId,
-                cienaCesBenchmarkGenTestSessionThroughputResultsMax 
+                 cienaCesBenchmarkGenTestSessionThroughputResultsMax,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkEmixSequenceName
                }
      STATUS    current
      DESCRIPTION
               "The throughput test result for the specified generator test
                instance is below the specified throughput KPI value for
-               the given PCP and color traffic."
+               either the untagged session the given PCP and color traffic."
      ::= { cienaCesBenchmarkNotifications 4 }
 
  cienaCesBenchmarkTestFailedFramelossKpi NOTIFICATION-TYPE
@@ -3550,13 +4124,16 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  cienaCesBenchmarkKpiColor,
                  cienaCesBenchmarkGenTestSessionCurrentPktSize,
                  cienaCesBenchmarkEmixSequenceId,
-                 cienaCesBenchmarkGenTestSessionFramelossResultsResult
+                 cienaCesBenchmarkGenTestSessionFramelossResultsResult,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkEmixSequenceName
                }
      STATUS    current
      DESCRIPTION
               "The frameloss test result for the specified generator test 
                instance exceeds the specified throughput KPI value for
-               the given PCP and color traffic."
+               either the untagged session the given PCP and color traffic."
      ::= { cienaCesBenchmarkNotifications 5 }
 
  cienaCesBenchmarkTestFailedLatencyKpi NOTIFICATION-TYPE
@@ -3569,13 +4146,16 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  cienaCesBenchmarkKpiColor,
                  cienaCesBenchmarkGenTestSessionCurrentPktSize,
                  cienaCesBenchmarkEmixSequenceId,
-                 cienaCesBenchmarkGenTestSessionLatencyResultsMax 
+                 cienaCesBenchmarkGenTestSessionLatencyResultsMax,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkEmixSequenceName
                }
      STATUS    current
      DESCRIPTION
               "The latency test result for the specified generator test
                instance exceeds the specified throughput KPI value for
-               the given PCP and color traffic."
+               either the untagged session the given PCP and color traffic."
      ::= { cienaCesBenchmarkNotifications 6 }
 
  cienaCesBenchmarkTestFailedPdvKpi NOTIFICATION-TYPE
@@ -3588,13 +4168,16 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
                  cienaCesBenchmarkKpiColor,
                  cienaCesBenchmarkGenTestSessionCurrentPktSize,
                  cienaCesBenchmarkEmixSequenceId,
-                 cienaCesBenchmarkGenTestSessionPdvResultsAvg
+                 cienaCesBenchmarkGenTestSessionPdvResultsAvg,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkEmixSequenceName
                }
      STATUS    current
      DESCRIPTION
-              "The throughput test result for the specified generator test
-               instance is below the specified throughput KPI value for
-               the given PCP and color traffic."
+              "The PDV test result for the specified generator test
+               instance is above the specified PDV KPI value for
+               either the untagged session the given PCP and color traffic."
      ::= { cienaCesBenchmarkNotifications 7 }
 
  cienaCesBenchmarkTestIterationCompleted NOTIFICATION-TYPE
@@ -3608,5 +4191,75 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      DESCRIPTION
               "An iteration of tests for the given test instance has just completed."
      ::= { cienaCesBenchmarkNotifications  8 }
+
+ cienaCesBenchmarkTestFailedMaxNumOutagesKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceName,
+                 cienaCesBenchmarkGenTestSessionOutageResultsNumRecorded
+               }
+     STATUS    current
+     DESCRIPTION
+              "The number of recorded outages for the specified generator test
+               instance is above the specified maximum number of outages KPI value for
+               either the untagged session the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 9 }
+
+ cienaCesBenchmarkTestFailedMaxDurationSingleOutageKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceName,
+                 cienaCesBenchmarkOutageRecordId,
+                 cienaCesBenchmarkOutageRecordDuration
+               }
+     STATUS    current
+     DESCRIPTION
+              "The duration of a single recorded outage for the specified 
+               generator test instance is above the specified max single outage duration
+               KPI value for either the untagged session the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 10 }
+
+ cienaCesBenchmarkTestFailedMaxDurationSumOutagesKpi NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkTestInstanceEntryName,
+                 cienaCesBenchmarkKpiProfileName,
+                 cienaCesBenchmarkKpiUntagged,
+                 cienaCesBenchmarkKpiPcp,
+                 cienaCesBenchmarkKpiColor,
+                 cienaCesBenchmarkGenTestSessionCurrentPktSize,
+                 cienaCesBenchmarkEmixSequenceName,
+                 cienaCesBenchmarkGenTestSessionOutageResultsSumDurationRecorded
+               }
+     STATUS    current
+     DESCRIPTION
+              "The sum of the duration of the recorded outages for the outage test for 
+               the specified generator test instance is above the specified sum of outages duration
+               KPI value for either the untagged session or the given PCP and color traffic."
+     ::= { cienaCesBenchmarkNotifications 11 }
+
+ cienaCesBenchmarkEntityPortProtectionSwitchEvent NOTIFICATION-TYPE
+     OBJECTS   { cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 cienaCesBenchmarkEntityEntryName,
+                 cienaCesBenchmarkEntityEntryPortId
+               }
+     STATUS    current
+     DESCRIPTION
+               "Entity port protection switch event detected  with port under test having
+                1:1 LAG, MC-LAG or Y-protection configuration"
+     ::= { cienaCesBenchmarkNotifications 12 }
 
  END

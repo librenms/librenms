@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
  --
  -- CIENA-CES-PORT-MIB.my
  --
@@ -25,7 +24,7 @@
 
 
  cienaCesPortConfigMIB MODULE-IDENTITY
-          LAST-UPDATED "201812180000Z"
+          LAST-UPDATED "202002070000Z"
           ORGANIZATION "Ciena Corp."
           CONTACT-INFO
           "   Mib Meister
@@ -38,24 +37,51 @@
                "This module defines the port configuration objects and also the objects required for
                 port related notifications."
           REVISION
+               "202002070000Z"
+          DESCRIPTION
+               "Added cienaCesPortConfigHoldOffTimeMsec, cienaCesPortConfigLinkFlapHoldTimeSec to 
+                cienaCesLogicalPortConfigEntry"
+
+          REVISION
+               "202001230000Z"
+          DESCRIPTION
+               "Added cienaCesLogicalPortConfigMplsSpeculativeHash to
+                cienaCesLogicalPortConfigEntry."
+
+          REVISION
+               "201904240000Z"
+          DESCRIPTION
+               "Added cienaCesPortConfigYProtection to cienaCesLogicalPortConfigTable."
+
+          REVISION
                "201812180000Z"
           DESCRIPTION
                "Added cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects and
-                changed the name of cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to cienaCesPortHoldOffState and cienaCesPortHoldOffTime respectively 
-                to align with ../dev/5170-main branch.
-                Currenty cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects are not supported in 8.7"  
-          REVISION
-               "201811120000Z"
-          DESCRIPTION
-               "Modified the SIZE range of cienaCesPortMaxFrameSize from (1522..9216) to (1200..10222) to accommodate wider range available in some devices."
-          REVISION
+                changed the name of cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to
+                cienaCesPortHoldOffState and cienaCesPortHoldOffTime respectively to align with ../dev/5170-main branch.
+                Currenty cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects are not supported in 8.7"
+                
+          REVISION     
                "201810090000Z"
           DESCRIPTION
                "Added cienaCesPortOperFecState to CienaCesLogicalPortConfigEntry MIB objects."
+       
+          REVISION
+               "201809210000Z"
+          DESCRIPTION
+               "Modified the SIZE range of cienaCesPortMaxFrameSize from (1522..9216) to (1200..10222) to accommodate wider range available in some devices."
+          REVISION
+               "201805310000Z"
+          DESCRIPTION
+               "Added cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to CienaCesLogicalPortConfigEntry MIB object."
           REVISION
                "201806120000Z"
           DESCRIPTION
                "Added cienaCesLogicalPortHoldOffState and cienaCesLogicalPortHoldOffTime to CienaCesLogicalPortConfigEntry MIB objects."
+          REVISION
+               "201805220000Z"
+          DESCRIPTION
+               "Added cienaCesPortL2CftProfileId and cienaCesPortL2CftStatus objects."          
           REVISION
                "201706070000Z"
           DESCRIPTION
@@ -304,7 +330,11 @@
      cienaCesPortL2CftProfileId                            Unsigned32,
      cienaCesPortConfigHoldOffState                        TruthValue,
      cienaCesPortConfigHoldOffTime                         Unsigned32,
-     cienaCesPortOperFecState  	                           INTEGER
+     cienaCesPortOperFecState                              INTEGER,
+     cienaCesPortConfigYProtection                         INTEGER,
+     cienaCesLogicalPortConfigMplsSpeculativeHash          INTEGER,
+     cienaCesPortConfigHoldOffTimeMsec                     Unsigned32,
+     cienaCesPortConfigLinkFlapHoldTimeSec                 Unsigned32
     }  
 
   cienaCesLogicalPortConfigPgId   OBJECT-TYPE
@@ -758,25 +788,25 @@ cienaCesPortL2CftProfileId OBJECT-TYPE
      DEFVAL        { 0 }
      ::=           { cienaCesLogicalPortConfigEntry 40 }   
 
- cienaCesPortConfigHoldOffState OBJECT-TYPE
-      SYNTAX        TruthValue
-      MAX-ACCESS    read-only
-      STATUS        current
-      DESCRIPTION
-              "The object specifies the hold-off state of the port."
-      DEFVAL        { false }
-      ::= { cienaCesLogicalPortConfigEntry 41 }
+cienaCesPortConfigHoldOffState OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "The object specifies the hold-off state of the port."
+     DEFVAL        { false }
+     ::= { cienaCesLogicalPortConfigEntry 41 }
 
- cienaCesPortConfigHoldOffTime OBJECT-TYPE
-      SYNTAX        Unsigned32 (3..20)
-      MAX-ACCESS    read-only
-      STATUS        current
-      DESCRIPTION
-              "This object specifies the time (in deciseconds, 1ds=100ms) for which port
-               remains in hold-off state. During the hold-off time, all physical link
-               transitions are ignored."
-      DEFVAL        { 10 }
-      ::= { cienaCesLogicalPortConfigEntry 42 }
+cienaCesPortConfigHoldOffTime OBJECT-TYPE
+     SYNTAX        Unsigned32 (3..20)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the time (in deciseconds, 1ds=100ms) for which port
+              remains in hold-off state. During the hold-off time, all physical link
+              transitions are ignored."
+     DEFVAL        { 10 }
+     ::= { cienaCesLogicalPortConfigEntry 42 }
 
  cienaCesPortOperFecState OBJECT-TYPE
     SYNTAX        INTEGER {
@@ -789,9 +819,57 @@ cienaCesPortL2CftProfileId OBJECT-TYPE
         "The current operational Forward Error Correction (FEC) state of the port."
     ::= { cienaCesLogicalPortConfigEntry 43 }
 
+     cienaCesPortConfigYProtection OBJECT-TYPE
+     SYNTAX        INTEGER {
+                       none(1),
+                       primary(2),
+                       secondary(3)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              "This object specifies the YProtection state of a port. If the value
+               is other than 'none', means the port is operationally controlled by VLLI
+               in a yProtection configuration."
+      DEFVAL        { none }
+      ::= { cienaCesLogicalPortConfigEntry 44 }
+
+      cienaCesLogicalPortConfigMplsSpeculativeHash OBJECT-TYPE
+      SYNTAX        INTEGER {
+                       off(1),
+                       on(2)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+              "The MPLS speculative hash state of the port."
+      ::= { cienaCesLogicalPortConfigEntry 45 }
+
+cienaCesPortConfigHoldOffTimeMsec OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..10000)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the time (in milliseconds) for which port
+              remains in hold-off state. During the hold-off time, all physical link
+              transitions are ignored."
+     DEFVAL   {0}
+     ::= { cienaCesLogicalPortConfigEntry 46 }
+ 
+cienaCesPortConfigLinkFlapHoldTimeSec OBJECT-TYPE
+     SYNTAX        Unsigned32 (0..10)
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+             "This object specifies the time (in seconds) for which port
+              remains in hold-on state. During the hold-on time, all physical link
+              transitions are ignored."
+     DEFVAL   {1}
+     ::= { cienaCesLogicalPortConfigEntry 47 }
+
 --
- --cienaCesPortPgIdMappingTable
- --
+--cienaCesPortPgIdMappingTable
+--
 cienaCesPortPgIdMappingTable  OBJECT-TYPE
      SYNTAX       SEQUENCE OF CienaCesPortPgIdMappingEntry
      MAX-ACCESS   not-accessible

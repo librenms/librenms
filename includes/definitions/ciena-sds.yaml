@@ -4,8 +4,9 @@ icon: ciena
 bad_hrSystemUptime: true
 bad_snmpEngineTime: true
 ifname: true
-bad_ifname_regexp: # ifName (regex, case insensitive) - ignore interfaces with empty name
-    - "/^$/"
+empty_ifdescr: true
+#bad_ifname_regexp: # ifName (regex, case insensitive) - ignore interfaces with empty name
+#    - "/^$/"
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

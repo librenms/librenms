@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-LDP-MIB.my
  --
@@ -6,31 +5,94 @@
  CIENA-CES-LDP-MIB DEFINITIONS ::= BEGIN
 
  IMPORTS 		
-   	TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, IpAddress    		
-	FROM SNMPv2-SMI			
-   	DisplayString, MacAddress, RowStatus, TruthValue			
-	FROM SNMPv2-TC							
-   	MplsLdpIdentifier  
-	FROM MPLS-TC-STD-MIB
-	CienaGlobalState
-	FROM CIENA-TC							
-   	cienaCesConfig,cienaCesNotifications 
-	FROM CIENA-SMI;
+   	TimeTicks, 
+      Integer32, 
+      Unsigned32, 
+      OBJECT-TYPE, 
+      MODULE-IDENTITY, 
+      IpAddress,
+      zeroDotZero    		
+	      FROM SNMPv2-SMI
 
-	
+   	DisplayString, 
+      MacAddress, 
+      RowStatus, 
+      TruthValue, 
+      StorageType, 
+      TEXTUAL-CONVENTION, 
+      TimeStamp			
+	      FROM SNMPv2-TC
+
+      MplsLdpIdentifier, 
+      MplsLSPID, 
+      MplsLabel, 
+      MplsLdpLabelType, 
+      MplsLspType, 
+      MplsLabelDistributionMethod, 
+      MplsRetentionMode  
+	      FROM MPLS-TC-STD-MIB
+
+      MplsIndexType
+         FROM MPLS-LSR-STD-MIB
+      
+      InterfaceIndexOrZero
+         FROM IF-MIB
+
+      AddressFamilyNumbers
+         FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+
+      InetAddress, 
+      InetAddressType, 
+      InetAddressType, 
+      InetPortNumber,
+      InetAddressPrefixLength
+         FROM INET-ADDRESS-MIB
+	   
+      CienaGlobalState
+	      FROM CIENA-TC							
+
+   	cienaCesConfig,
+      cienaCesNotifications 
+	      FROM CIENA-SMI
+      mplsLdpSessionState,  mplsLdpSessionDiscontinuityTime,  mplsLdpSessionStatsUnknownMesTypeErrors,  mplsLdpSessionStatsUnknownTlvErrors
+         FROM MPLS-LDP-STD-MIB;
+
  cienaCesLdpMIB MODULE-IDENTITY
-	    LAST-UPDATED "201607150000Z"
-	    ORGANIZATION "Ciena, Inc"
+	    LAST-UPDATED "202105210000Z"
+	    ORGANIZATION "Ciena Corp."
 	    CONTACT-INFO
-		    "   Mib Meister
-		  	115 North Sullivan Road
-			Spokane Valley, WA 99037
-		        USA		 		
-		        Phone:  +1 509 242 9000
-			Email:  support@ciena.com"
+	    "   Mib Meister
+	        7035 Ridge Road
+	        Hanover, Maryland 21076
+	        USA
+	        Phone:  +1 800 921 1144
+	        Email:  support@ciena.com"
 
 	    DESCRIPTION
 		"This MIB module is for the Extension of the LDP MIB for CIENA Products"
+
+      REVISION
+         "202105210000Z"
+      DESCRIPTION
+      "Added cienaCesLdpPeerType to CienaCesLdpSessionEntry and cienaCesMplsLdpSessionUp
+      and cienaCesMplsLdpSessionDown Notifications."
+
+      REVISION
+         "201912130000Z"
+      DESCRIPTION
+      "Added following table cienaCesMplsInSegmentEntry, cienaCesMplsOutSegmentEntry, 
+      cienaCesMplsXCEntry, cienaCesMplsInSegmentLdpLspEntry, cienaCesMplsOutSegmentLdpLspEntry, 
+      cienaCesMplsFecEntry, cienaCesMplsLdpLspFecEntry."
+
+      REVISION
+         "201811220000Z"
+      DESCRIPTION
+      "Addition of new attribute cienaCesLdpIfIpAddr to differentiate LDP adjacency."
+
+        REVISION 
+	        "201706070000Z"
+	    DESCRIPTION
+		"Updated contact info."
 
 	    REVISION
 	    	"201607150000Z"
@@ -39,7 +101,7 @@
 		under cienaCesLdpObjects."
 
 	    REVISION
-	    	"201607110000Z"
+	    	"201607130000Z"
 	    DESCRIPTION
 		"Added support for LDP Graceful Restart functionality."
 
@@ -63,6 +125,13 @@
  cienaCesLdpMIBObjects   OBJECT IDENTIFIER ::= { cienaCesLdpMIB 1 }
  cienaCesLdpObjects      OBJECT IDENTIFIER ::= { cienaCesLdpMIBObjects 1 }
  cienaCesLdp             OBJECT IDENTIFIER ::= { cienaCesLdpMIBObjects 2 }
+
+--
+-- Notification Objects
+--
+
+cienaCesMplsLdpMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 110 }
+cienaCesMplsLdpMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesMplsLdpMIBNotificationPrefix 0 }
  
 
 --
@@ -267,7 +336,8 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
         cienaCesLdpPeerLdpId                     MplsLdpIdentifier,
         cienaCesLdpSessionConfiguredHoldTime     Unsigned32,
         cienaCesLdpSessionPeerHoldTime           Unsigned32,
-        cienaCesLdpSessionHoldTimeInUse          Unsigned32
+        cienaCesLdpSessionHoldTimeInUse          Unsigned32,
+        cienaCesLdpPeerType                      Unsigned32
         }
 
 
@@ -344,6 +414,14 @@ CienaCesLdpSessionEntry ::= SEQUENCE {
         session, in seconds."
     ::= { cienaCesLdpSessionEntry 6 }
 
+  cienaCesLdpPeerType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The peer type value is an integer."
+    ::= { cienaCesLdpSessionEntry 7 }
+
 
 cienaCesLdpHelloAdjacencyTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CienaCesLdpHelloAdjacencyEntry
@@ -370,7 +448,8 @@ cienaCesLdpHelloAdjacencyEntry OBJECT-TYPE
 CienaCesLdpHelloAdjacencyEntry ::= SEQUENCE {
     cienaCesLdpHelloAdjacencyIndex               Unsigned32,
     cienaCesLdpHelloAdjacencyConfiguredHoldTime  Unsigned32,
-    cienaCesLdpHelloAdjacencyPeerHoldTime        Unsigned32
+    cienaCesLdpHelloAdjacencyPeerHoldTime        Unsigned32,
+    cienaCesLdpIfIpAddr                          IpAddress
 }
 
 cienaCesLdpHelloAdjacencyIndex OBJECT-TYPE
@@ -399,11 +478,1003 @@ cienaCesLdpHelloAdjacencyPeerHoldTime OBJECT-TYPE
         in seconds."
     ::= { cienaCesLdpHelloAdjacencyEntry 3 }
 
+cienaCesLdpIfIpAddr OBJECT-TYPE
+      SYNTAX      IpAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Interface IP address."
+      ::= { cienaCesLdpHelloAdjacencyEntry 4 }
+
+--insegment table.
+
+cienaCesMplsInSegmentTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CienaCesMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a description of the incoming MPLS
+        segments (labels) to an LSR and their associated parameters.
+        The index for this table is mplsInSegmentIndex.
+        The index structure of this table is specifically designed
+        to handle many different MPLS implementations that manage
+        their labels both in a distributed and centralized manner.
+        The table is also designed to handle existing MPLS labels
+        as defined in RFC3031 as well as longer ones that may
+        be necessary in the future.
+
+        In cases where the label cannot fit into the
+        mplsInSegmentLabel object, the mplsInSegmentLabelPtr
+        will indicate this by being set to the first accessible
+        column in the appropriate extension table's row.
+        In this case an additional table MUST
+        be provided and MUST be indexed by at least the indexes
+        used by this table. In all other cases when the label is
+        represented within the mplsInSegmentLabel object, the
+        mplsInSegmentLabelPtr MUST be set to 0.0. Due to the
+        fact that MPLS labels may not exceed 24 bits, the
+        mplsInSegmentLabelPtr object is only a provision for
+        future-proofing the MIB module. Thus, the definition
+        of any extension tables is beyond the scope of this
+        MIB module."
+      ::= { cienaCesLdp 3 }
+
+cienaCesMplsInSegmentEntry  OBJECT-TYPE
+   SYNTAX        CienaCesMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one incoming
+        segment as is represented in an LSR's LFIB.
+        An entry can be created by a network
+        administrator or an SNMP agent, or an MPLS signaling
+        protocol.
+
+        The value of mplsInSegmentRowStatus cannot be active(1)
+        unless the ifTable entry corresponding to
+        mplsInSegmentInterface exists.  An entry in this table
+        must match any incoming packets, and indicates an
+        instance of mplsXCEntry based on which forwarding
+        and/or switching actions are taken."
+   INDEX { cienaCesMplsInSegmentIndex }
+   ::= { cienaCesMplsInSegmentTable 1 }
+
+CienaCesMplsInSegmentEntry ::= SEQUENCE {
+  cienaCesMplsInSegmentIndex                MplsIndexType,
+  cienaCesMplsInSegmentLabel                MplsLabel,
+  cienaCesMplsInSegmentNPop                 Integer32,
+  cienaCesMplsInSegmentInterface            InterfaceIndexOrZero,
+  cienaCesMplsInSegmentAddrFamily           AddressFamilyNumbers,
+  cienaCesMplsInSegmentXCIndex              MplsIndexType,
+  cienaCesMplsInSegmentRowStatus            RowStatus,
+  cienaCesMplsInSegmentStorageType          StorageType
+}
+
+cienaCesMplsInSegmentIndex  OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The index for this in-segment. The
+        string containing the single octet 0x00
+        MUST not be used as an index."
+   ::= { cienaCesMplsInSegmentEntry 1 }
+
+cienaCesMplsInSegmentLabel OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+     "If the corresponding instance of mplsInSegmentLabelPtr is
+      zeroDotZero then this object MUST contain the incoming label
+      associated with this in-segment. If not this object SHOULD
+      be zero and MUST be ignored."
+   ::= { cienaCesMplsInSegmentEntry 2 }
+
+cienaCesMplsInSegmentNPop OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of labels to pop from the incoming
+        packet.  Normally only the top label is popped from
+        the packet and used for all switching decisions for
+        that packet.  This is indicated by setting this
+        object to the default value of 1. If an LSR supports
+        popping of more than one label, this object MUST
+        be set to that number. This object cannot be modified
+        if mplsInSegmentRowStatus is active(1)."
+   DEFVAL        { 1 }
+   ::= { cienaCesMplsInSegmentEntry 3 }
+
+cienaCesMplsInSegmentInterface OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object represents the
+        interface index for the incoming MPLS interface.  A
+        value of zero represents all interfaces participating in
+        the per-platform label space.  This may only be used
+        in cases where the incoming interface and label
+        are associated with the same mplsXCEntry. Specifically,
+        given a label and any incoming interface pair from the
+        per-platform label space, the outgoing label/interface
+        mapping remains the same. If this is not the case,
+        then individual entries MUST exist that
+
+        can then be mapped to unique mplsXCEntries."
+   ::= { cienaCesMplsInSegmentEntry 4 }
+
+cienaCesMplsInSegmentAddrFamily OBJECT-TYPE
+   SYNTAX        AddressFamilyNumbers
+   MAX-ACCESS    read-only
+
+   STATUS        current
+   DESCRIPTION
+       "The IANA address family [IANAFamily] of packets
+        received on this segment, which is used at an egress
+        LSR to deliver them to the appropriate layer 3 entity.
+        A value of other(0) indicates that the family type is
+        either unknown or undefined; this SHOULD NOT be used
+        at an egress LSR. This object cannot be
+        modified if mplsInSegmentRowStatus is active(1)."
+   DEFVAL        { other }
+   ::= { cienaCesMplsInSegmentEntry 5 }
+
+cienaCesMplsInSegmentXCIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into mplsXCTable which identifies which cross-
+        connect entry this segment is part of.  The string
+        containing the single octet 0x00 indicates that this
+        entry is not referred to by any cross-connect entry.
+        When a cross-connect entry is created which this
+        in-segment is a part of, this object is automatically
+        updated to reflect the value of mplsXCIndex of that
+        cross-connect entry."
+   ::= { cienaCesMplsInSegmentEntry 6 }
+
+cienaCesMplsInSegmentRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table. When a row in this
+        table has a row in the active(1) state, no
+        objects in this row can be modified except the
+        mplsInSegmentRowStatus and mplsInSegmentStorageType."
+   ::= { cienaCesMplsInSegmentEntry 7 }
+
+cienaCesMplsInSegmentStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the storage type for this
+        object. The agent MUST ensure that this object's
+        value remains consistent with the associated
+        mplsXCEntry. Conceptual rows having the value
+        'permanent' need not allow write-access to any
+        columnar objects in the row."
+   DEFVAL { volatile }
+
+   ::= { cienaCesMplsInSegmentEntry 8 }
+
+-- End of cienaCesmplsInSegmentTable.
 
 
-  END
+-- out-segment table.
+
+cienaCesMplsOutSegmentTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CienaCesMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a representation of the outgoing
+        segments from an LSR."
+   ::= { cienaCesLdp 4 }
+
+cienaCesMplsOutSegmentEntry  OBJECT-TYPE
+   SYNTAX        CienaCesMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one outgoing
+
+        segment.  An entry can be created by a network
+        administrator, an SNMP agent, or an MPLS signaling
+        protocol.  The object mplsOutSegmentOwner indicates
+        the creator of this entry. The value of
+        mplsOutSegmentRowStatus cannot be active(1) unless
+        the ifTable entry corresponding to
+        mplsOutSegmentInterface exists.
+
+        Note that the indexing of this table uses a single,
+        arbitrary index (mplsOutSegmentIndex) to indicate
+        which out-segment (i.e.: label) is being switched to
+        from which in-segment (i.e: label) or in-segments.
+        This is necessary because it is possible to have an
+        equal-cost multi-path situation where two identical
+        out-going labels are assigned to the same
+        cross-connect (i.e.: they go to two different neighboring
+        LSRs); thus, requiring two out-segments. In order to
+        preserve the uniqueness of the references
+        by the mplsXCEntry, an arbitrary integer must be used as
+        the index for this table."
+   INDEX { cienaCesMplsOutSegmentIndex }
+   ::= { cienaCesMplsOutSegmentTable 1 }
+
+CienaCesMplsOutSegmentEntry ::= SEQUENCE {
+  cienaCesMplsOutSegmentIndex                MplsIndexType,
+  cienaCesMplsOutSegmentInterface            InterfaceIndexOrZero,
+  cienaCesMplsOutSegmentPushTopLabel         TruthValue,
+  cienaCesMplsOutSegmentTopLabel             MplsLabel,
+  cienaCesMplsOutSegmentNextHopAddrType      InetAddressType,
+  cienaCesMplsOutSegmentNextHopAddr          InetAddress,
+  cienaCesMplsOutSegmentXCIndex              MplsIndexType,
+  cienaCesMplsOutSegmentRowStatus            RowStatus,
+  cienaCesMplsOutSegmentStorageType          StorageType,
+  cienaCesMplsOutSegmentType                 INTEGER -- 1: Primary, 2: LFA, 3: RLFA
+}
+
+cienaCesMplsOutSegmentIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This value contains a unique index for this row.
+        While a value of a string containing the single
+        octet 0x00 is not valid as an index for entries
+        in this table, it can be supplied as a valid value
+        to index the mplsXCTable to represent entries for
+
+        which no out-segment has been configured or
+        exists."
+   ::= { cienaCesMplsOutSegmentEntry 1 }
+
+cienaCesMplsOutSegmentInterface OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value must contain the interface index of the
+        outgoing interface. This object cannot be modified
+        if mplsOutSegmentRowStatus is active(1). The
+        mplsOutSegmentRowStatus cannot be set to active(1)
+        until this object is set to a value corresponding to
+        a valid ifEntry."
+   ::= { cienaCesMplsOutSegmentEntry 2 }
+
+cienaCesMplsOutSegmentPushTopLabel OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value indicates whether or not a top label
+        should be pushed onto the outgoing packet's label
+        stack.  The value of this variable MUST be set to
+        true(1) if the outgoing interface does not support
+        pop-and-go (and no label stack remains). For example,
+        on ATM interface, or if the segment represents a
+        tunnel origination.  Note that it is considered
+        an error in the case that mplsOutSegmentPushTopLabel
+        is set to false, but the cross-connect entry which
+        refers to this out-segment has a non-zero
+        mplsLabelStackIndex.  The LSR MUST ensure that this
+        situation does not happen. This object cannot be
+        modified if mplsOutSegmentRowStatus is active(1)."
+   DEFVAL { true }
+   ::= { cienaCesMplsOutSegmentEntry 3 }
+
+
+cienaCesMplsOutSegmentTopLabel OBJECT-TYPE
+   SYNTAX        MplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "If mplsOutSegmentPushTopLabel is true then this
+        represents the label that should be pushed onto the
+        top of the outgoing packet's label stack. Otherwise
+        this value SHOULD be set to 0 by the management
+        station and MUST be ignored by the agent. This
+
+        object cannot be modified if mplsOutSegmentRowStatus
+        is active(1)."
+   DEFVAL { 0 }
+   ::= { cienaCesMplsOutSegmentEntry 4 }
+
+cienaCesMplsOutSegmentNextHopAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the next hop Internet address type.
+        Only values unknown(0), ipv4(1) or ipv6(2)
+        have to be supported.
+
+        A value of unknown(0) is allowed only when
+        the outgoing interface is of type point-to-point.
+        If any other unsupported values are attempted in a set
+        operation, the agent MUST return an inconsistentValue
+        error."
+   ::= { cienaCesMplsOutSegmentEntry 5 }
+
+cienaCesMplsOutSegmentNextHopAddr OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The internet address of the next hop. The type of
+        this address is determined by the value of the
+        mplslOutSegmentNextHopAddrType object.
+
+        This object cannot be modified if
+
+        mplsOutSegmentRowStatus is active(1)."
+   ::= { cienaCesMplsOutSegmentEntry 6 }
+
+cienaCesMplsOutSegmentXCIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into mplsXCTable which identifies which cross-
+        connect entry this segment is part of.  A value of
+        the string containing the single octet 0x00
+        indicates that this entry is not referred
+        to by any cross-connect entry.  When a cross-connect
+        entry is created which this out-segment is a part of,
+        this object MUST be updated by the agent to reflect
+        the value of mplsXCIndex of that cross-connect
+        entry."
+   ::= { cienaCesMplsOutSegmentEntry 7 }
+
+cienaCesMplsOutSegmentRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row.
+        When a row in this table has a row in the active(1)
+        state, no objects in this row can be modified
+        except the mplsOutSegmentRowStatus or
+        mplsOutSegmentStorageType."
+   ::= { cienaCesMplsOutSegmentEntry 8 }
+
+cienaCesMplsOutSegmentStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the storage type for this
+        object. The agent MUST ensure that this object's value
+        remains consistent with the associated mplsXCEntry.
+        Conceptual rows having the value 'permanent'
+        need not allow write-access to any columnar
+        objects in the row."
+   DEFVAL { volatile }
+   ::= { cienaCesMplsOutSegmentEntry 9 }
+
+cienaCesMplsOutSegmentType  OBJECT-TYPE
+   SYNTAX        INTEGER {
+                    primary(1),
+                    lfa(2),
+                    rlfa(3)
+                 }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the type of out segment
+        which can be any of the following type
+        primary(1), LFA(2), RLFA(3)." 
+   ::= { cienaCesMplsOutSegmentEntry 10 }
+
+-- End of cienaCesmplsOutSegmentTable
+
+
+-- cross-connect table
+
+cienaCesMplsXCTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CienaCesMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies information for switching
+        between LSP segments.  It supports point-to-point,
+        point-to-multipoint and multipoint-to-point
+        connections.  mplsLabelStackTable specifies the
+        label stack information for a cross-connect LSR and
+        is referred to from mplsXCTable."
+   ::= { cienaCesLdp 5 }
+
+cienaCesMplsXCEntry  OBJECT-TYPE
+   SYNTAX        CienaCesMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "A row in this table represents one cross-connect
+        entry.  It is indexed by the following objects:
+
+        - cross-connect index mplsXCIndex that uniquely
+          identifies a group of cross-connect entries
+
+        - in-segment index, mplsXCInSegmentIndex
+
+        - out-segment index, mplsXCOutSegmentIndex"
+
+   INDEX { cienaCesMplsXCIndex, cienaCesMplsXCInSegmentIndex,
+           cienaCesMplsXCOutSegmentIndex }
+   ::= { cienaCesMplsXCTable 1 }
+
+ CienaCesMplsXCEntry ::= SEQUENCE {
+    cienaCesMplsXCIndex                  MplsIndexType,
+    cienaCesMplsXCInSegmentIndex         MplsIndexType,
+    cienaCesMplsXCOutSegmentIndex        MplsIndexType,
+    cienaCesMplsXCLabelStackIndex        MplsIndexType,
+    cienaCesMplsXCRowStatus              RowStatus,
+    cienaCesMplsXCStorageType            StorageType,
+    cienaCesMplsXCAdminStatus            INTEGER,
+    cienaCesMplsXCOperStatus             INTEGER,
+    cienaCesMplsXcEntryState             INTEGER -- Active or standby
+}
+
+cienaCesMplsXCIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+
+   DESCRIPTION
+       "Primary index for the conceptual row identifying a
+        group of cross-connect segments. The string
+        containing a single octet 0x00 is an invalid index."
+   ::= { cienaCesMplsXCEntry 1 }
+
+cienaCesMplsXCInSegmentIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Incoming label index.
+        If this object is set to the string containing
+        a single octet 0x00, this indicates a special
+        case outlined in the table's description above.
+        In this case no corresponding mplsInSegmentEntry
+        shall exist."
+   ::= { cienaCesMplsXCEntry 2 }
+
+cienaCesMplsXCOutSegmentIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Index of out-segment for LSPs not terminating on
+        this LSR if not set to the string containing the
+        single octet 0x00. If the segment identified by this
+        entry is terminating, then this object MUST be set to
+        the string containing a single octet 0x00 to indicate
+        that no corresponding mplsOutSegmentEntry shall
+        exist."
+   ::= { cienaCesMplsXCEntry 3 }
+
+cienaCesMplsXCLabelStackIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    read-only
+   STATUS        current
+
+   DESCRIPTION
+       "Primary index into mplsLabelStackTable identifying a
+        stack of labels to be pushed beneath the top label.
+        Note that the top label identified by the out-
+        segment ensures that all the components of a
+        multipoint-to-point connection have the same
+        outgoing label. A value of the string containing the
+        single octet 0x00 indicates that no labels are to
+        be stacked beneath the top label.
+        This object cannot be modified if mplsXCRowStatus is
+        active(1)."
+   ::= { cienaCesMplsXCEntry 4 }
+
+cienaCesMplsXCRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row.
+        When a row in this table has a row in the active(1)
+        state, no objects in this row except this object
+        and the mplsXCStorageType can be modified. "
+   ::= { cienaCesMplsXCEntry 5 }
+
+cienaCesMplsXCStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the storage type for this
+        object. The agent MUST ensure that the associated in
+        and out segments also have the same StorageType value
+        and are restored consistently upon system restart.
+        This value SHOULD be set to permanent(4) if created
+        as a result of a static LSP configuration.
+
+        Conceptual rows having the value 'permanent'
+        need not allow write-access to any columnar
+        objects in the row."
+
+   DEFVAL { volatile }
+   ::= { cienaCesMplsXCEntry 6 }
+
+cienaCesMplsXCAdminStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+              up(1),     -- ready to pass packets
+              down(2),
+              testing(3) -- in some test mode
+      }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The desired operational status of this segment."
+   DEFVAL { up }
+   ::= { cienaCesMplsXCEntry 7 }
+
+cienaCesMplsXCOperStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+             up(1),            -- ready to pass packets
+             down(2),
+             testing(3),       -- in some test mode
+             unknown(4),       -- status cannot be determined
+                               -- for some reason.
+             dormant(5),
+             notPresent(6),    -- some component is missing
+             lowerLayerDown(7) -- down due to the state of
+                               -- lower layer interfaces
+      }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The actual operational status of this cross-
+        connect."
+   ::= { cienaCesMplsXCEntry 8 }
+
+cienaCesMplsXcEntryState OBJECT-TYPE
+   SYNTAX    INTEGER {
+               active(1),
+               standby(2)
+             }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object represent that the current LSP is 
+        active or in Standby"
+   ::= { cienaCesMplsXCEntry 9 }
+
+ -- End of cienaCesmplsXCTable
  
- --
- -- CIENA-CES-LDP-MIB
- --
+ -- Start of insegment ldp lsp table 
+cienaCesMplsInSegmentLdpLspTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF CienaCesMplsInSegmentLdpLspEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of LDP LSP's which
+        map to the mplsInSegmentTable in the
+        MPLS-LSR-STD-MIB module."
+   ::= { cienaCesLdp 6 }
+
+cienaCesMplsInSegmentLdpLspEntry OBJECT-TYPE
+   SYNTAX      CienaCesMplsInSegmentLdpLspEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry in this table represents information
+        on a single LDP LSP which is represented by
+        a session's index triple (mplsLdpEntityLdpId,
+        mplsLdpEntityIndex, mplsLdpPeerLdpId) AND the
+        index for the mplsInSegmentTable
+        (mplsInSegmentLdpLspLabelIndex) from the
+        MPLS-LSR-STD-MIB.
+
+        The information contained in a row is read-only."
+   INDEX { cienaCesLdpEntityLdpId,
+           cienaCesLdpEntityIndex,
+           cienaCesLdpPeerLdpId,
+           cienaCesMplsInSegmentLdpLspIndex
+         }
+   ::= { cienaCesMplsInSegmentLdpLspTable 1 }
+
+CienaCesMplsInSegmentLdpLspEntry ::= SEQUENCE {
+    cienaCesMplsInSegmentLdpLspIndex                 MplsIndexType,
+    cienaCesMplsInSegmentLdpLspLabelType             MplsLdpLabelType,
+    cienaCesMplsInSegmentLdpLspType                  MplsLspType
+}
+
+cienaCesMplsInSegmentLdpLspIndex OBJECT-TYPE
+   SYNTAX        MplsIndexType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This contains the same value as the
+        mplsInSegmentIndex in the
+        MPLS-LSR-STD-MIB's mplsInSegmentTable."
+   ::= { cienaCesMplsInSegmentLdpLspEntry 1 }
+
+cienaCesMplsInSegmentLdpLspLabelType  OBJECT-TYPE
+   SYNTAX        MplsLdpLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Layer 2 Label Type."
+   ::= { cienaCesMplsInSegmentLdpLspEntry 2 }
+
+cienaCesMplsInSegmentLdpLspType OBJECT-TYPE
+   SYNTAX        MplsLspType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "The type of LSP connection."
+   ::= { cienaCesMplsInSegmentLdpLspEntry 3 }
+
+ -- End of cienaCesMplsInSegmentLdpLspTable
+
+ -- Start of out segment ldp lsp table 
+cienaCesmplsOutSegmentLdpLspTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF CienaCesMplsOutSegmentLdpLspEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table of LDP LSP's which
+        map to the mplsOutSegmentTable in the
+        MPLS-LSR-STD-MIB."
+   ::= { cienaCesLdp 7 }
+
+cienaCesMplsOutSegmentLdpLspEntry OBJECT-TYPE
+   SYNTAX      CienaCesMplsOutSegmentLdpLspEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "An entry in this table represents information
+        on a single LDP LSP which is represented by
+        a session's index triple (mplsLdpEntityLdpId,
+        mplsLdpEntityIndex, mplsLdpPeerLdpId) AND the
+        index (mplsOutSegmentLdpLspIndex)
+        for the mplsOutSegmentTable.
+
+       The information contained in a row is read-only."
+   INDEX { cienaCesLdpEntityLdpId,
+           cienaCesLdpEntityIndex,
+           cienaCesLdpPeerLdpId,
+           cienaCesMplsOutSegmentLdpLspIndex
+         }
+   ::= { cienaCesmplsOutSegmentLdpLspTable 1 }
+
+CienaCesMplsOutSegmentLdpLspEntry ::= SEQUENCE {
+         cienaCesMplsOutSegmentLdpLspIndex                 MplsIndexType,
+         cienaCesMplsOutSegmentLdpLspLabelType             MplsLdpLabelType,
+         cienaCesMplsOutSegmentLdpLspType                  MplsLspType
+     }
+
+cienaCesMplsOutSegmentLdpLspIndex OBJECT-TYPE
+   SYNTAX       MplsIndexType
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       "This contains the same value as the
+        mplsOutSegmentIndex in the
+        MPLS-LSR-STD-MIB's mplsOutSegmentTable."
+   ::= { cienaCesMplsOutSegmentLdpLspEntry 1 }
+
+cienaCesMplsOutSegmentLdpLspLabelType  OBJECT-TYPE
+   SYNTAX        MplsLdpLabelType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Layer 2 Label Type."
+   ::= { cienaCesMplsOutSegmentLdpLspEntry 2 }
+
+cienaCesMplsOutSegmentLdpLspType OBJECT-TYPE
+   SYNTAX        MplsLspType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The type of LSP connection."
+   ::= { cienaCesMplsOutSegmentLdpLspEntry 3 }
+
+-- end of cienaCesMplsOutSegmentLdpLspTable
+
+-- start of Fec Table
+cienaCesmplsFecTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF CienaCesMplsFecEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This table represents the FEC
+        (Forwarding Equivalence Class)
+        Information associated with an LSP."
+   ::= { cienaCesLdp 8 }
+
+cienaCesMplsFecEntry OBJECT-TYPE
+   SYNTAX      CienaCesMplsFecEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "Each row represents a single FEC Element."
+   INDEX       { cienaCesMplsFecIndex }
+   ::= { cienaCesmplsFecTable 1 }
+
+CienaCesMplsFecEntry ::= SEQUENCE {
+    cienaCesMplsFecIndex               Unsigned32,
+    cienaCesMplsFecType                INTEGER,
+    cienaCesMplsFecAddrType            InetAddressType,
+    cienaCesMplsFecAddr                InetAddress,
+    cienaCesMplsFecAddrPrefixLength    InetAddressPrefixLength,
+    cienaCesMplsFecStorageType         StorageType,
+    cienaCesMplsFecRowStatus           RowStatus
+}
+
+cienaCesMplsFecIndex OBJECT-TYPE
+   SYNTAX      Unsigned32(1..4294967295)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index which uniquely identifies this entry."
+   ::= { cienaCesMplsFecEntry 1 }
+
+cienaCesMplsFecType  OBJECT-TYPE
+   SYNTAX      INTEGER {
+                         prefix(1),
+                         hostAddress(2)
+                       }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The type of the FEC.  If the value of this object
+        is 'prefix(1)' then the FEC type described by this
+        row is an address prefix.
+
+        If the value of this object is 'hostAddress(2)' then
+        the FEC type described by this row is a host address."
+   DEFVAL { 2 }
+   ::= { cienaCesMplsFecEntry 2 }
+
+cienaCesMplsFecAddrType  OBJECT-TYPE
+   SYNTAX      InetAddressType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value of this object is the type of the
+        Internet address.  The value of this object,
+        decides how the value of the mplsFecAddr object
+        is interpreted."
+   DEFVAL { 3 }
+   ::= { cienaCesMplsFecEntry 3 }
+
+cienaCesMplsFecAddr     OBJECT-TYPE
+   SYNTAX      InetAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The value of this object is interpreted based
+        on the value of the 'mplsFecAddrType' object.
+        This address is then further interpretted as
+        an being used with the address prefix,
+        or as the host address.  This further interpretation
+        is indicated by the 'mplsFecType' object.
+        In other words, the FEC element is populated
+        according to the Prefix FEC Element value encoding, or
+        the Host Address FEC Element encoding."
+   ::= { cienaCesMplsFecEntry 4 }
+
+cienaCesMplsFecAddrPrefixLength  OBJECT-TYPE
+   SYNTAX      InetAddressPrefixLength
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "If the value of the 'mplsFecType' is 'hostAddress(2)'
+        then this object is undefined.
+        If the value of 'mplsFecType' is 'prefix(1)'
+        then the value of this object is the length in
+        bits of the address prefix represented by
+        'mplsFecAddr', or zero.  If the value of this
+        object is zero, this indicates that the
+        prefix matches all addresses.  In this case the
+        address prefix MUST also be zero (i.e., 'mplsFecAddr'
+        should have the value of zero.)"
+   DEFVAL { 0 }
+
+   ::= { cienaCesMplsFecEntry 5 }
+
+cienaCesMplsFecStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent(4)'
+        need not allow write-access to any columnar
+        objects in the row."
+   DEFVAL { nonVolatile }
+   ::= { cienaCesMplsFecEntry 6 }
+
+cienaCesMplsFecRowStatus OBJECT-TYPE
+   SYNTAX      RowStatus
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The status of this conceptual row.  If the value of this
+        object is 'active(1)', then none of the writable objects
+        of this entry can be modified, except to set this object
+        to 'destroy(6)'.
+
+        NOTE: if this row is being referenced by any entry in
+        the mplsLdpLspFecTable, then a request to destroy
+        this row, will result in an inconsistentValue error."
+   ::= { cienaCesMplsFecEntry 7 }
+
+cienaCesmplsLdpLspFecTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF CienaCesMplsLdpLspFecEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "A table which shows the relationship between
+        LDP LSPs and FECs.  Each row represents
+        a single LDP LSP to FEC association."
+   ::= { cienaCesLdp 9 }
+
+cienaCesMplsLdpLspFecEntry OBJECT-TYPE
+   SYNTAX     CienaCesMplsLdpLspFecEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       "An entry represents a LDP LSP
+        to FEC association."
+   INDEX       { cienaCesLdpEntityLdpId,
+                 cienaCesLdpEntityIndex,
+                 cienaCesLdpPeerLdpId,
+                 cienaCesMplsLdpLspFecSegment,
+                 cienaCesMplsLdpLspFecSegmentIndex,
+                 cienaCesMplsLdpLspFecIndex
+               }
+   ::= { cienaCesmplsLdpLspFecTable 1 }
+
+CienaCesMplsLdpLspFecEntry ::= SEQUENCE {
+   cienaCesMplsLdpLspFecSegment       INTEGER,
+   cienaCesMplsLdpLspFecSegmentIndex  MplsIndexType,
+   cienaCesMplsLdpLspFecIndex         Unsigned32,
+   cienaCesMplsLdpLspFecStorageType   StorageType,
+   cienaCesMplsLdpLspFecRowStatus     RowStatus
+}
+
+
+cienaCesMplsLdpLspFecSegment OBJECT-TYPE
+   SYNTAX      INTEGER {
+                         inSegment(1),
+                         outSegment(2)
+                       }
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "If the value is inSegment(1), then this
+        indicates that the following index,
+        mplsLdpLspFecSegmentIndex, contains the same
+        value as the mplsInSegmentLdpLspIndex.
+        Otherwise, if the value of this object is
+        outSegment(2),  then this
+        indicates that following index,
+        mplsLdpLspFecSegmentIndex, contains the same
+        value as the mplsOutSegmentLdpLspIndex."
+   ::= { cienaCesMplsLdpLspFecEntry 1 }
+
+cienaCesMplsLdpLspFecSegmentIndex OBJECT-TYPE
+   SYNTAX      MplsIndexType
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This index is interpretted by using the value
+        of the mplsLdpLspFecSegment.
+        If the mplsLdpLspFecSegment is inSegment(1),
+        then this index has the same value as
+        mplsInSegmentLdpLspIndex.
+        If the mplsLdpLspFecSegment is outSegment(2),
+        then this index has the same value as
+        mplsOutSegmentLdpLspIndex."
+   ::= { cienaCesMplsLdpLspFecEntry 2 }
+
+cienaCesMplsLdpLspFecIndex   OBJECT-TYPE
+   SYNTAX      Unsigned32 (1..4294967295)
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "This index identifies the FEC entry in the
+        mplsFecTable associated with this session.
+        In other words, the value of this index
+        is the same as the value of the mplsFecIndex
+        that denotes the FEC associated with this
+        Session."
+   ::= { cienaCesMplsLdpLspFecEntry 3 }
+
+cienaCesMplsLdpLspFecStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent(4)'
+        need not allow write-access to any columnar
+        objects in the row."
+   DEFVAL { nonVolatile }
+   ::= { cienaCesMplsLdpLspFecEntry 4 }
+
+cienaCesMplsLdpLspFecRowStatus  OBJECT-TYPE
+   SYNTAX     RowStatus
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "The status of this conceptual row.  If the
+        value of this object is 'active(1)', then
+        none of the writable objects of this entry
+        can be modified.
+        The Agent should delete this row when
+        the session ceases to exist.  If an
+        operator wants to associate the session with
+        a different FEC, the recommended
+        procedure is (as described in detail in the section
+        entitled, 'Changing Values After Session
+        Establishment', and again described in the
+        DESCRIPTION clause of the
+        mplsLdpEntityAdminStatus object)
+        is to set the mplsLdpEntityAdminStatus to
+        down, thereby explicitly causing a session
+        to be torn down. This will also
+        cause this entry to be deleted.
+
+        Then, set the mplsLdpEntityAdminStatus
+        to enable which enables a new session to be initiated.
+        Once the session is initiated, an entry may be
+        added to this table to associate the new session
+        with a FEC."
+   ::= { cienaCesMplsLdpLspFecEntry 5 }
+
+--Notifications
+cienaCesMplsLdpSessionUp NOTIFICATION-TYPE
+  OBJECTS  {  cienaGlobalSeverity,
+              cienaGlobalMacAddress,
+              cienaCesLdpPeerLdpId,
+              cienaCesLdpPeerType,
+              mplsLdpSessionState,
+              mplsLdpSessionDiscontinuityTime,
+              mplsLdpSessionStatsUnknownMesTypeErrors,
+              mplsLdpSessionStatsUnknownTlvErrors
+              }
+  STATUS   current
+  DESCRIPTION
+        "If this notification is sent when the
+        value of 'mplsLdpSessionState' enters
+        the 'operational(5)' state."
+        ::= { cienaCesMplsLdpMIBNotifications 1 }
+
+cienaCesMplsLdpSessionDown NOTIFICATION-TYPE
+  OBJECTS  {  cienaGlobalSeverity,
+              cienaGlobalMacAddress,
+              cienaCesLdpPeerLdpId,
+              cienaCesLdpPeerType,
+              mplsLdpSessionState,
+              mplsLdpSessionDiscontinuityTime,
+              mplsLdpSessionStatsUnknownMesTypeErrors,
+              mplsLdpSessionStatsUnknownTlvErrors
+              }
+  STATUS   current
+  DESCRIPTION
+        "If this notification is sent when the
+        value of 'mplsLdpSessionState' leaves
+        the 'operational(5)' state."
+        ::= { cienaCesMplsLdpMIBNotifications 2 }
+
+END
+--
+-- CIENA-CES-LDP-MIB
+--
  

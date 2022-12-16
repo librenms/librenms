@@ -1,0 +1,266 @@
+--
+-- CIENA-CES-EGRESS-QOS-MIB.my
+--
+--
+
+CIENA-CES-EGRESS-QOS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    cienaCesConfig
+        FROM CIENA-SMI;
+
+
+cienaCesEgressQosMIB MODULE-IDENTITY
+    LAST-UPDATED "202202010000Z"
+    ORGANIZATION "Ciena Corp."
+    CONTACT-INFO
+        "   Mib Meister
+               7035 Ridge Road
+               Hanover, Maryland 21076
+               USA
+               Phone:  +1 800 921 1144
+               Email:  support@ciena.com"
+    DESCRIPTION
+        "This module defines the Egress-QOS related configurations."
+    REVISION
+        "202203010000Z"
+    DESCRIPTION
+        "Initial creation."
+    ::= { cienaCesConfig 62 }
+
+--
+-- Node definitions
+--
+
+cienaCesEgressQosInterfaceBindingMIBObjects OBJECT IDENTIFIER ::= { cienaCesEgressQosMIB 1 }
+
+--
+-- Node definitions
+--
+
+cienaCesEgressQosSchedulerInstanceMIBObjects OBJECT IDENTIFIER ::= { cienaCesEgressQosMIB 2 }
+
+--
+-- Node definitions
+--
+
+cienaCesEgressQosSchedulerProfileMIBObjects OBJECT IDENTIFIER ::= { cienaCesEgressQosMIB 3 } 
+
+--
+-- EgressQos Binding Node
+--
+
+cienaCesEgressQosInterfaceBinding OBJECT IDENTIFIER ::= { cienaCesEgressQosInterfaceBindingMIBObjects 1 }
+
+--
+-- EgressQos Scheduler Node
+--
+
+cienaCesEgressQosSchedulerInstance OBJECT IDENTIFIER ::= { cienaCesEgressQosSchedulerInstanceMIBObjects 1 }
+
+--
+-- EgressQos Scheduler Profile Node
+--
+
+cienaCesEgressQosSchedulerProfile OBJECT IDENTIFIER ::= { cienaCesEgressQosSchedulerProfileMIBObjects 1 }
+
+
+--
+-- EgressQos Binding MIB definitions
+--
+
+--
+-- Interface-Qos-Binding Table
+--
+
+cienaCesEgressQosInterfaceBindingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF   CienaCesEgressQosInterfaceBindingEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "Table of interface-qos-binding contains references to the logical-port and queue-group-instance."
+    ::= { cienaCesEgressQosInterfaceBinding 1 }
+
+cienaCesEgressQosInterfaceBindingEntry OBJECT-TYPE
+    SYNTAX               CienaCesEgressQosInterfaceBindingEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "Each entry represents an interface-qos-binding."
+    INDEX { cienaCesEgressQosInterfaceBindingIndex }
+    ::= { cienaCesEgressQosInterfaceBindingTable 1 }
+
+CienaCesEgressQosInterfaceBindingEntry ::=  SEQUENCE {
+    cienaCesEgressQosInterfaceBindingIndex  DisplayString,
+    cienaCesEgressQosInterfaceBindingName   DisplayString,
+    cienaCesEgressQosQueueGroupName         DisplayString,
+    cienaCesEgressQosInterfaceName          DisplayString 
+}
+
+cienaCesEgressQosInterfaceBindingIndex OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Unique index of the interface-qos-binding."
+    ::= { cienaCesEgressQosInterfaceBindingEntry 1 }
+
+cienaCesEgressQosInterfaceBindingName OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Unique identifier of the interface-qos-binding."
+    ::= { cienaCesEgressQosInterfaceBindingEntry 2 }
+
+cienaCesEgressQosQueueGroupName OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "A reference to a queue group instance specific to the interface."
+    ::= { cienaCesEgressQosInterfaceBindingEntry 3 }
+
+cienaCesEgressQosInterfaceName OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "A reference to an interface specific to the queue group instance."
+    ::= { cienaCesEgressQosInterfaceBindingEntry 4 }
+
+
+--
+-- EgressQos Scheduler MIB definitions
+--
+
+--
+-- Scheduler Instance Table
+--
+
+cienaCesEgressQosSchedulerInstanceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF         CienaCesEgressQosSchedulerInstanceEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "Table of scheduler instance contains references to the logical-port and scheduler profile."
+    ::= { cienaCesEgressQosSchedulerInstance 1 }
+
+cienaCesEgressQosSchedulerInstanceEntry OBJECT-TYPE
+    SYNTAX                     CienaCesEgressQosSchedulerInstanceEntry
+    MAX-ACCESS                 not-accessible
+    STATUS                     current
+    DESCRIPTION
+        "Each entry represents an scheduler instance."
+    INDEX { cienaCesEgressQosSchedulerInstanceIndex }
+    ::= { cienaCesEgressQosSchedulerInstanceTable 1 }
+
+CienaCesEgressQosSchedulerInstanceEntry ::=  SEQUENCE {
+    cienaCesEgressQosSchedulerInstanceIndex       DisplayString,
+    cienaCesEgressQosSchedulerInstanceName        DisplayString,
+    cienaCesEgressQosSchedulerProfileName         DisplayString,
+    cienaCesEgressQosSchedulerInterfaceName       DisplayString
+}
+
+cienaCesEgressQosSchedulerInstanceIndex OBJECT-TYPE
+    SYNTAX            DisplayString
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION
+        "Unique index of the scheduler instance."
+    ::= { cienaCesEgressQosSchedulerInstanceEntry 1 }
+
+cienaCesEgressQosSchedulerInstanceName OBJECT-TYPE
+    SYNTAX            DisplayString
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+       "Unique name of the scheduler instance."
+    ::= { cienaCesEgressQosSchedulerInstanceEntry 2 }
+
+cienaCesEgressQosSchedulerProfileName OBJECT-TYPE
+    SYNTAX            DisplayString
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "A reference to a scheduler profile specific to the scheduler instance."
+    ::= { cienaCesEgressQosSchedulerInstanceEntry 3 }
+
+
+cienaCesEgressQosSchedulerInterfaceName OBJECT-TYPE
+    SYNTAX            DisplayString
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "A reference to an interface specific to the scheduler instance."
+    ::= { cienaCesEgressQosSchedulerInstanceEntry 4 }
+
+
+--
+-- EgressQos Scheduler Profile MIB definitions
+--
+
+--
+-- Scheduler Profile Table
+--
+
+cienaCesEgressQosSchedulerProfileTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF      CienaCesEgressQosSchedulerProfileEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Table of scheduler profile contains profile name , CIR and EIR values."
+    ::= { cienaCesEgressQosSchedulerProfile 1 }
+
+cienaCesEgressQosSchedulerProfileEntry OBJECT-TYPE
+    SYNTAX                  CienaCesEgressQosSchedulerProfileEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Each entry represents an scheduler profile."
+    INDEX { cienaCesEgressQosSchedulerProfileEntryIndex }
+    ::= { cienaCesEgressQosSchedulerProfileTable 1 }
+
+CienaCesEgressQosSchedulerProfileEntry ::=  SEQUENCE {
+    cienaCesEgressQosSchedulerProfileEntryIndex           DisplayString,
+    cienaCesEgressQosSchedulerProfileEntryName            DisplayString,
+    cienaCesEgressQosSchedulerProfileEntryCIR             Unsigned32,
+    cienaCesEgressQosSchedulerProfileEntryEIR             Unsigned32
+}
+
+cienaCesEgressQosSchedulerProfileEntryIndex OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Unique index of the scheduler profile."
+    ::= { cienaCesEgressQosSchedulerProfileEntry 1 }
+
+cienaCesEgressQosSchedulerProfileEntryName OBJECT-TYPE
+    SYNTAX           DisplayString
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Unique name of this scheduler profile."
+    ::= { cienaCesEgressQosSchedulerProfileEntry 2 }
+
+cienaCesEgressQosSchedulerProfileEntryCIR OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "CIR value of this scheduler profile."
+    ::= { cienaCesEgressQosSchedulerProfileEntry 3 }
+
+cienaCesEgressQosSchedulerProfileEntryEIR OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "EIR value of this scheduler profile."
+    ::= { cienaCesEgressQosSchedulerProfileEntry 4 }
+
+END

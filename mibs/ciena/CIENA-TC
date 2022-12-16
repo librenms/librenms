@@ -5,8 +5,10 @@ CIENA-TC DEFINITIONS ::= BEGIN
 
              
 	IMPORTS                
-   MacAddress
-   		FROM SNMPv2-TC;               
+        MacAddress
+   		    FROM SNMPv2-TC
+		Counter64
+			FROM SNMPv2-SMI;
 
 -- definition of textual conventions
 
@@ -96,5 +98,11 @@ CienaGlobalState  ::=  TEXTUAL-CONVENTION
  	DESCRIPTION
  		"This textual convention denotes a MAC address."
  	SYNTAX MacAddress 
- 	
+ 
+ CienaTimeTicks64 ::= TEXTUAL-CONVENTION
+ 	STATUS    current
+ 	DESCRIPTION
+		"This textual convention denotes a data type of 64 bit non-negative integer
+		to hold a time value, more than a typical 32 bit TimeTicks object."
+ 	SYNTAX    Counter64
 END

@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
  --
  -- CIENA-CES-PORT-XCVR-MIB.my
  --
@@ -17,7 +16,7 @@
 	
 	
  cienaCesPortXcvrMIB MODULE-IDENTITY
-          LAST-UPDATED "201901030000Z"
+          LAST-UPDATED "202103240000Z"
           ORGANIZATION "Ciena Corp."
           CONTACT-INFO
           "   Mib Meister
@@ -28,6 +27,14 @@
               Email:  support@ciena.com" 
           DESCRIPTION
                    "This module defines the port XCVR related notifications."
+          REVISION
+                   "202103240000Z"
+          DESCRIPTION
+                   "Added a new object cienaCesPortXcvrNotifPortName."
+          REVISION
+                   "201907250000Z"
+          DESCRIPTION
+                   "Added cfp2Dco(17) in cienaCesPortXcvrIdentiferType."
           REVISION
                    "201901030000Z"
           DESCRIPTION
@@ -41,7 +48,15 @@
                    "201806150000Z"
           DESCRIPTION
                    "Added a new object cienaCesPortXcvrFecMode."
-             REVISION
+          REVISION
+                   "201805150000Z"
+          DESCRIPTION
+                   "Add TxHigh/LowWarning Notifications"
+          REVISION
+                   "201804200000Z"
+          DESCRIPTION
+                   "Add RxHigh/LowWarning Notifications" 
+          REVISION
                    "201706070000Z"
           DESCRIPTION
                    "Updated contact info."
@@ -135,7 +150,8 @@
     cienaCesPortXcvrTxState		                            INTEGER,
     cienaCesPortXcvrTxFaultStatus                           INTEGER,
     cienaCesPortXcvrTxOutputPower	                 		INTEGER,
-    cienaCesPortXcvrFecMode                                 INTEGER
+    cienaCesPortXcvrFecMode                                 INTEGER,
+    cienaCesPortXcvrNotifPortName                           DisplayString
  }
 
  cienaCesPortXcvrId OBJECT-TYPE
@@ -350,7 +366,8 @@
 		               vendorSpecific(13),
                        cfp(14),
                        qsfpPlus(15),  
-                       qsfp28(16)
+                       qsfp28(16),
+                       cfp2Dco(17)
                      }
     MAX-ACCESS       read-only
     STATUS           current
@@ -514,6 +531,14 @@
          efec means enhanced forward error correction."
    ::= { cienaCesPortXcvrEntry 36 }
 
+ cienaCesPortXcvrNotifPortName		OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		accessible-for-notify
+	STATUS			current
+	DESCRIPTION
+		"Indicates the port name for the corresponding PGID
+		used for trap definition."
+	::= { cienaCesPortXcvrEntry 37 }
 
  --
  -- notification
@@ -550,7 +575,8 @@
      			cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -559,8 +585,8 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to 
 		enabled. These objects are set to enabled by default. Variable bindings include: 
 		cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, 
-		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
-		cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber
+		and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 1 }
 
  cienaCesPortXcvrInsertedNotification NOTIFICATION-TYPE
@@ -569,7 +595,8 @@
      			cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -578,8 +605,8 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to 
 		enabled. These objects are set to enabled by default. Variable bindings include: 
 		cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, 
-		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
-		cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber
+		and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 2 }
 
  cienaCesPortXcvrErrorTypeNotification NOTIFICATION-TYPE
@@ -588,8 +615,9 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber,
-				cienaCesPortXcvrErrorType        
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrErrorType,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -599,7 +627,7 @@
 		and cienaCesPortAllTrapState need to be set to enabled. These objects are enabled by default. 
 		Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
 		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
-		cienaCesPortXcvrNotifPortNumber, and cienaCesPortXcvrErrorType."
+		cienaCesPortXcvrNotifPortNumber, cienaCesPortXcvrErrorType and cienaCesPortXcvrNotifPortName."
 ::= { cienaCesPortXcvrMIBNotifications 5 }
 
  cienaCesPortXcvrTempHighNotification NOTIFICATION-TYPE
@@ -608,7 +636,8 @@
    			    cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -617,7 +646,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 6 }
  
  cienaCesPortXcvrTempLowNotification NOTIFICATION-TYPE
@@ -626,7 +655,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -635,7 +665,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 7 }
 
  cienaCesPortXcvrTempNormalNotification NOTIFICATION-TYPE
@@ -644,7 +674,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -653,7 +684,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 8 }
  
  cienaCesPortXcvrVoltageHighNotification NOTIFICATION-TYPE
@@ -662,7 +693,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -671,8 +703,8 @@
 		cienaCesLogicalPortConfigPortAllTrapState, cienaCesPortAllTrapState needs to be set to enabled
        These objects are set to enabled by default. Variable bindings include: 
        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex,
-       cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, and 
-       cienaCesPortXcvrNotifPortNumber."
+       cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and
+       cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 9 }
  
  cienaCesPortXcvrVoltageLowNotification NOTIFICATION-TYPE
@@ -681,7 +713,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -690,7 +723,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 10 }
 
  cienaCesPortXcvrVoltageNormalNotification NOTIFICATION-TYPE
@@ -699,7 +732,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -708,7 +742,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 11 }
  
  cienaCesPortXcvrBiasHighNotification NOTIFICATION-TYPE
@@ -717,7 +751,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -726,7 +761,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 12 }
  
  cienaCesPortXcvrBiasLowNotification NOTIFICATION-TYPE
@@ -735,7 +770,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         	    cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -744,7 +780,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 13 }
 
  cienaCesPortXcvrBiasNormalNotification NOTIFICATION-TYPE
@@ -753,7 +789,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         	    cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -762,7 +799,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 14 }
  
  cienaCesPortXcvrTxPowerHighNotification NOTIFICATION-TYPE
@@ -771,7 +808,8 @@
         		 cienaCesPortXcvrNotifChassisIndex,
         		 cienaCesPortXcvrNotifShelfIndex,
         		 cienaCesPortXcvrNotifSlotIndex,
-        		 cienaCesPortXcvrNotifPortNumber
+				 cienaCesPortXcvrNotifPortNumber,
+				 cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -780,7 +818,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 15 }
  
  cienaCesPortXcvrTxPowerLowNotification NOTIFICATION-TYPE
@@ -789,7 +827,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -798,7 +837,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled.
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 16 }
 
  cienaCesPortXcvrTxPowerNormalNotification NOTIFICATION-TYPE
@@ -807,7 +846,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -816,7 +856,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
 		These above values are set to enabled by default. Variable bindings include: cienaGlobalSeverity,
        cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-       cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+       cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 17 }
  
  cienaCesPortXcvrRxPowerHighNotification NOTIFICATION-TYPE
@@ -825,7 +865,8 @@
         	    cienaCesPortXcvrNotifChassisIndex,
         	    cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -834,7 +875,7 @@
 		cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
 		These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
 		cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 18 }
  
  cienaCesPortXcvrRxPowerLowNotification NOTIFICATION-TYPE
@@ -843,7 +884,8 @@
         		cienaCesPortXcvrNotifChassisIndex,
         		cienaCesPortXcvrNotifShelfIndex,
         		cienaCesPortXcvrNotifSlotIndex,
-        		cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -853,7 +895,7 @@
 		cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
 		by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
 		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
-		and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 19 }
 
  cienaCesPortXcvrRxPowerNormalNotification NOTIFICATION-TYPE
@@ -862,7 +904,8 @@
         	    cienaCesPortXcvrNotifChassisIndex,
         	    cienaCesPortXcvrNotifShelfIndex,
         	    cienaCesPortXcvrNotifSlotIndex,
-        	    cienaCesPortXcvrNotifPortNumber
+				cienaCesPortXcvrNotifPortNumber,
+				cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -872,7 +915,7 @@
 		cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled by 
 		default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
 		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
-		and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 20 }
    
   cienaCesPortXcvrSpeedInfoMissingNotification NOTIFICATION-TYPE
@@ -881,7 +924,8 @@
         			  cienaCesPortXcvrNotifChassisIndex,
         			  cienaCesPortXcvrNotifShelfIndex,
         			  cienaCesPortXcvrNotifSlotIndex,
-        			  cienaCesPortXcvrNotifPortNumber
+					  cienaCesPortXcvrNotifPortNumber,
+					  cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -891,7 +935,7 @@
 		cienaCesPortAllTrapState need to be set to enabled. These objects are set to enabled 
 		by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
 		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 21 }
   
   cienaCesPortXcvrUncertifiedNotification NOTIFICATION-TYPE
@@ -900,7 +944,8 @@
         			  cienaCesPortXcvrNotifChassisIndex,
         			  cienaCesPortXcvrNotifShelfIndex,
         			  cienaCesPortXcvrNotifSlotIndex,
-        			  cienaCesPortXcvrNotifPortNumber
+					  cienaCesPortXcvrNotifPortNumber,
+					  cienaCesPortXcvrNotifPortName
 		}
 	STATUS	current
 	DESCRIPTION
@@ -910,7 +955,7 @@
 		and cesPortAllTrapState need to be set to enabled. cienaCesPortXcvrUncertifiedTrapState 
 		is set to disabled by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
 		cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, 
-		cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+		cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
 	::= { cienaCesPortXcvrMIBNotifications 22 }
 
  cienaCesPortXcvrRxPowerHighWarningNotification NOTIFICATION-TYPE
@@ -919,7 +964,8 @@
                 cienaCesPortXcvrNotifChassisIndex,
                 cienaCesPortXcvrNotifShelfIndex,
                 cienaCesPortXcvrNotifSlotIndex,
-                cienaCesPortXcvrNotifPortNumber
+                cienaCesPortXcvrNotifPortNumber,
+                cienaCesPortXcvrNotifPortName
       }
    STATUS   current
    DESCRIPTION
@@ -928,7 +974,7 @@
       cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
       These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
       cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-      cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+      cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
    ::= { cienaCesPortXcvrMIBNotifications 23 }
  
  cienaCesPortXcvrRxPowerLowWarningNotification NOTIFICATION-TYPE
@@ -937,7 +983,8 @@
                 cienaCesPortXcvrNotifChassisIndex,
                 cienaCesPortXcvrNotifShelfIndex,
                 cienaCesPortXcvrNotifSlotIndex,
-                cienaCesPortXcvrNotifPortNumber
+                cienaCesPortXcvrNotifPortNumber,
+                cienaCesPortXcvrNotifPortName
       }
    STATUS   current
    DESCRIPTION
@@ -947,7 +994,7 @@
       cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
       by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
       cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
-      and cienaCesPortXcvrNotifPortNumber."
+      cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
    ::= { cienaCesPortXcvrMIBNotifications 24 }
 
  cienaCesPortXcvrTxPowerHighWarningNotification NOTIFICATION-TYPE
@@ -956,7 +1003,8 @@
                 cienaCesPortXcvrNotifChassisIndex,
                 cienaCesPortXcvrNotifShelfIndex,
                 cienaCesPortXcvrNotifSlotIndex,
-                cienaCesPortXcvrNotifPortNumber
+                cienaCesPortXcvrNotifPortNumber,
+                cienaCesPortXcvrNotifPortName
       }
    STATUS   current
    DESCRIPTION
@@ -965,7 +1013,7 @@
       cienaCesLogicalPortConfigPortAllTrapState, and cienaCesPortAllTrapState need to be set to enabled. 
       These objects are set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
       cienaGlobalMacAddress, cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex,
-      cienaCesPortXcvrNotifSlotIndex, and cienaCesPortXcvrNotifPortNumber."
+      cienaCesPortXcvrNotifSlotIndex, cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
    ::= { cienaCesPortXcvrMIBNotifications 25 }
  
  cienaCesPortXcvrTxPowerLowWarningNotification NOTIFICATION-TYPE
@@ -974,7 +1022,8 @@
                 cienaCesPortXcvrNotifChassisIndex,
                 cienaCesPortXcvrNotifShelfIndex,
                 cienaCesPortXcvrNotifSlotIndex,
-                cienaCesPortXcvrNotifPortNumber
+                cienaCesPortXcvrNotifPortNumber,
+                cienaCesPortXcvrNotifPortName
       }
    STATUS   current
    DESCRIPTION
@@ -984,7 +1033,7 @@
       cienaCesPortAllTrapState needs to be set to enabled. These objects are set to enabled 
       by default. Variable bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
       cienaCesPortXcvrNotifChassisIndex, cienaCesPortXcvrNotifShelfIndex, cienaCesPortXcvrNotifSlotIndex, 
-      and cienaCesPortXcvrNotifPortNumber."
+      cienaCesPortXcvrNotifPortNumber and cienaCesPortXcvrNotifPortName."
    ::= { cienaCesPortXcvrMIBNotifications 26 }
 
  END

@@ -1,0 +1,362 @@
+--
+-- Ciena CES PLATFORM MIB
+--
+
+CIENA-CES-PLATFORM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, Unsigned32
+
+    FROM SNMPv2-SMI
+  DisplayString
+    FROM SNMPv2-TC
+  cienaCesNotifications, cienaCesConfig
+    FROM CIENA-SMI
+  cienaGlobalSeverity, cienaGlobalMacAddress
+    FROM CIENA-GLOBAL-MIB;
+
+cienaCesPlatformMIB MODULE-IDENTITY
+  LAST-UPDATED "202112070000Z"
+  ORGANIZATION "Ciena Corp."
+  CONTACT-INFO
+    "Mib Meister
+     7035 Ridge Road
+     Hanover, Maryland 21076
+     USA
+     Phone:  +1 800 921 1144
+     Email:  support@ciena.com"
+  DESCRIPTION
+    "The MIB module defines the traps triggered from hardware events"
+  REVISION "202112070000Z"
+  DESCRIPTION
+    "Added higherThanWarningThreshold, and higherThanMajorThreshold attributes
+     to cienaCesPlatformTempSensorState object."
+
+  REVISION "202102220000Z"
+  DESCRIPTION
+    "Added cienaCesPlatformTempSensorName to cienaCesPlatformTempNotification."
+  REVISION "202010120000Z"
+  DESCRIPTION
+    "Added cienaCesPlatformFanModuleEntry table." 
+  REVISION "202009250000Z"
+  DESCRIPTION
+    "Added cienaGlobalSeverity and cienaGlobalMacAddress for EM event traps"
+  REVISION "202005150000Z"
+  DESCRIPTION
+    "Adjusted cienaCesPlatformMIB and cienaCesPlatformMIBNotificationPrefix OID 
+     assignments to prevent conflict with previously published MIB modules."
+  REVISION "202001140000Z"
+  DESCRIPTION
+    "Added cienaCesRtucState, cienaCesRtucFileName and 
+     cienaCesRtucNotification for reset to user config Trap"
+  REVISION "201806070000Z"
+  DESCRIPTION
+    "Initial implementation."
+  ::= { cienaCesConfig 55 }
+
+--
+-- cienaCesPlatformMIB Objects
+-- 
+
+-- Node
+cienaCesPlatformMIBObjects OBJECT IDENTIFIER ::= { cienaCesPlatformMIB 1 }
+
+-- Config groups
+cienaCesPlatformObjects OBJECT IDENTIFIER ::= { cienaCesPlatformMIBObjects 1 }
+
+-- Notification groups
+cienaCesPlatformMIBNotificationPrefix OBJECT IDENTIFIER ::= { cienaCesNotifications 105 }
+cienaCesPlatformMIBNotifications OBJECT IDENTIFIER ::= { cienaCesPlatformMIBNotificationPrefix 1 }
+
+-- Conformance/Compliance groups
+cienaCesPlatformMIBConformance OBJECT IDENTIFIER ::= { cienaCesPlatformMIB 2 }
+cienaCesPlatformMIBCompliances OBJECT IDENTIFIER ::= { cienaCesPlatformMIBConformance 1 }
+cienaCesPlatformMIBGroups OBJECT IDENTIFIER ::= { cienaCesPlatformMIBConformance 2 }
+
+--
+-- Leafs
+--
+
+cienaCesPlatformPostErrorCategory OBJECT-TYPE
+  SYNTAX       INTEGER 
+               {
+                 chassis(1),
+                 blade(2),
+                 port(3)
+               }
+  MAX-ACCESS   accessible-for-notify
+  STATUS       current
+  DESCRIPTION
+    "This variable indicates the category of post errors. This
+     object is sent out as one of the binding in the Post Error
+     Notification."    
+  ::= { cienaCesPlatformObjects 1 }
+    
+cienaCesPlatformPostErrorMsg OBJECT-TYPE      
+  SYNTAX       DisplayString
+  MAX-ACCESS   accessible-for-notify
+  STATUS       current
+  DESCRIPTION
+    "This variable indicates the post error message
+     associated with category cienaCesPlatformPostErrorCategory."    
+  ::= { cienaCesPlatformObjects 2 }
+
+cienaCesPlatformFanModuleNum OBJECT-TYPE
+  SYNTAX       Integer32 (1..2147483647)
+  MAX-ACCESS   read-only 
+  STATUS       current
+  DESCRIPTION
+    "Denotes the Fan module."
+  ::= { cienaCesPlatformObjects 3 }
+
+cienaCesPlatformFanModuleStatus OBJECT-TYPE
+  SYNTAX       INTEGER 
+               {
+                 ok(1),
+                 failure(2)             
+               }
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "Denotes the fan modules status.
+     'ok' means fan is operational,
+     'failure' means fan is not working."
+  ::= { cienaCesPlatformObjects 4 }
+
+cienaCesPlatformPowerSupplyNum  OBJECT-TYPE
+  SYNTAX       DisplayString 
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "Denotes the power supply."
+  ::= { cienaCesPlatformObjects 5 }
+
+cienaCesPlatformPowerSupplyState  OBJECT-TYPE
+  SYNTAX       INTEGER 
+               {
+                 online(1),
+                 offline(2),
+                 faulted(3)                  
+               }
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "Specifies the power supply's state."
+  ::= { cienaCesPlatformObjects 6 }
+
+cienaCesPlatformTempSensorState   OBJECT-TYPE
+  SYNTAX       INTEGER 
+               {
+                 higherThanThreshold(1),
+                 normal(2),
+                 lowerThanThreshold(3),
+                 higherThanWarningThreshold(4),
+                 higherThanMajorThreshold(5)
+               }
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "The state indicates whether the current temp is greater than,
+     equal to or less than a specific threshold."
+  ::= { cienaCesPlatformObjects 7 }
+
+cienaCesPlatformTempSensorValue OBJECT-TYPE
+  SYNTAX       Integer32
+  UNITS        "degrees Celsius"
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "The value of temperature measured by the sensor 
+     inside the device in degrees C."
+  ::= { cienaCesPlatformObjects 8 }
+
+cienaCesRtucState  OBJECT-TYPE
+  SYNTAX       DisplayString 
+  MAX-ACCESS   accessible-for-notify
+  STATUS       current
+  DESCRIPTION
+    "Denotes the reset to user config  status."
+  ::= { cienaCesPlatformObjects 9 }
+
+cienaCesRtucFileName  OBJECT-TYPE
+  SYNTAX       DisplayString 
+  MAX-ACCESS   accessible-for-notify
+  STATUS       current
+  DESCRIPTION
+    "Denotes the reset to user config backup file name."
+  ::= { cienaCesPlatformObjects 10 }
+
+--
+--  The Module Table
+--
+
+cienaCesPlatformFanModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesPlatformFanModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A Table list fan modules configured and detected"
+    ::= { cienaCesPlatformObjects 11 }
+
+cienaCesPlatformTempSensorName OBJECT-TYPE
+  SYNTAX       DisplayString 
+  MAX-ACCESS   read-only
+  STATUS       current
+  DESCRIPTION
+    "The name of temperature sensor."
+  ::= { cienaCesPlatformObjects 12 }
+
+cienaCesPlatformFanModuleEntry OBJECT-TYPE
+    SYNTAX      CienaCesPlatformFanModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in cienaCesPlatformFanModuleTable"
+    INDEX   { cienaCesPlatformFanModuleIndex }
+    ::= { cienaCesPlatformFanModuleTable 1 }
+
+CienaCesPlatformFanModuleEntry ::=
+    SEQUENCE {
+        cienaCesPlatformFanModuleIndex                Unsigned32,
+        cienaCesPlatformFanModuleName                 DisplayString,
+        cienaCesPlatformFanModuleType                 DisplayString,
+        cienaCesPlatformFanModuleCurrentSpeed         Unsigned32,
+        cienaCesPlatformFanModuleMaxSpeed             Unsigned32,
+        cienaCesPlatformFanModuleMinSpeed             Unsigned32,
+        cienaCesPlatformFanModuleAvgSpeed             Unsigned32,
+        cienaCesPlatformFanModuleFanTray              Unsigned32
+    }
+
+cienaCesPlatformFanModuleIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module index."
+    ::= { cienaCesPlatformFanModuleEntry 1 }
+
+cienaCesPlatformFanModuleName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module name."
+    ::= { cienaCesPlatformFanModuleEntry 2 }
+
+cienaCesPlatformFanModuleType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module type."
+    ::= { cienaCesPlatformFanModuleEntry 3 }
+
+cienaCesPlatformFanModuleCurrentSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module current speed."
+    ::= { cienaCesPlatformFanModuleEntry 4 }
+
+cienaCesPlatformFanModuleMaxSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module maximum speed."
+    ::= { cienaCesPlatformFanModuleEntry 5 }
+
+cienaCesPlatformFanModuleMinSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module minimum speed."
+    ::= { cienaCesPlatformFanModuleEntry 6 }
+
+cienaCesPlatformFanModuleAvgSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module average speed."
+    ::= { cienaCesPlatformFanModuleEntry 7 }
+
+cienaCesPlatformFanModuleFanTray OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The object indicates fan-module fan tray."
+    ::= { cienaCesPlatformFanModuleEntry 8 }
+
+--
+-- Notifications
+--
+  
+cienaCesPlatformPostErrorNotification NOTIFICATION-TYPE
+  OBJECTS  {           
+    cienaCesPlatformPostErrorCategory,
+    cienaCesPlatformPostErrorMsg,
+    cienaGlobalSeverity,
+    cienaGlobalMacAddress
+  }
+  STATUS       current
+  DESCRIPTION
+    "A cienaCesPlatformPostErrorNotification is sent after cold start trap
+     if the device detects post errors." 
+  ::= { cienaCesPlatformMIBNotifications 1 }
+  
+cienaCesPlatformFanModuleNotification NOTIFICATION-TYPE
+  OBJECTS  {
+    cienaCesPlatformFanModuleNum,
+    cienaCesPlatformFanModuleStatus,
+    cienaGlobalSeverity,
+    cienaGlobalMacAddress
+  }
+  STATUS       current
+  DESCRIPTION
+    "A cienaCesPlatformFanModuleNotification is sent if the 
+     fan state changes."
+  ::= { cienaCesPlatformMIBNotifications 2 }
+   
+cienaCesPlatformPowerSupplyStatusNotification NOTIFICATION-TYPE
+  OBJECTS  {
+    cienaCesPlatformPowerSupplyNum,
+    cienaCesPlatformPowerSupplyState,
+    cienaGlobalSeverity,
+    cienaGlobalMacAddress
+  }
+  STATUS       current
+  DESCRIPTION
+    "A cienaCesPlatformPowerSupplyStatusNotification is sent if a 
+     power supply state is changed."
+  ::= { cienaCesPlatformMIBNotifications 3 }
+   
+cienaCesPlatformTempNotification NOTIFICATION-TYPE
+  OBJECTS  {
+    cienaCesPlatformTempSensorState,
+    cienaCesPlatformTempSensorValue,
+    cienaGlobalSeverity,
+    cienaGlobalMacAddress,
+    cienaCesPlatformTempSensorName
+  }
+  STATUS       current
+  DESCRIPTION
+    "A cienaCesPlatformTempNotification is sent if the 
+     cienaCesPlatformTempSensorState is changed."
+  ::= { cienaCesPlatformMIBNotifications 4 }
+
+cienaCesRtucNotification NOTIFICATION-TYPE
+  OBJECTS  {
+    cienaCesRtucState,
+    cienaCesRtucFileName
+ }
+  STATUS       current
+  DESCRIPTION
+    "A cienaCesRtucNotification is sent if the
+     reset to user config is completed or failed."
+  ::= { cienaCesPlatformMIBNotifications 5 }
+
+END

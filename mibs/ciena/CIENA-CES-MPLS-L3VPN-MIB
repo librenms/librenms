@@ -1,0 +1,213 @@
+--
+-- CIENA-CES-MPLS-L3VPN-MIB.my
+--
+--
+
+CIENA-CES-MPLS-L3VPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  Integer32, IpAddress, Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+      FROM SNMPv2-SMI
+  DisplayString, TruthValue, MacAddress
+      FROM SNMPv2-TC
+  InetAddress, InetAddressPrefixLength, InetAddressType
+      FROM INET-ADDRESS-MIB
+  cienaGlobalSeverity, cienaGlobalMacAddress
+      FROM CIENA-GLOBAL-MIB
+  cienaCesNotifications, cienaCesConfig
+      FROM CIENA-SMI
+  CienaGlobalState
+      FROM CIENA-TC
+  mplsL3VpnVrfName, mplsL3VpnIfConfRowStatus, mplsL3VpnVrfOperStatus, mplsL3VpnVrfDescription,
+  mplsL3VpnVrfPerfCurrNumRoutes, mplsL3VpnVrfConfMidRteThresh, mplsL3VpnVrfConfHighRteThresh
+      FROM MPLS-L3VPN-STD-MIB;
+
+
+cienaCesMplsL3VpnMIB MODULE-IDENTITY
+             LAST-UPDATED "202105120000Z"
+             ORGANIZATION "Ciena Corp."
+             CONTACT-INFO
+             "   Mib Meister
+                 7035 Ridge Road
+                 Hanover, Maryland 21076
+                 USA
+                 Phone:  +1 800 921 1144
+                 Email:  support@ciena.com"
+             DESCRIPTION
+                      "This module defines the  L3VPN related notifications."
+             REVISION
+                      "202105120000Z"
+             DESCRIPTION
+                      "Initial creation."
+      ::= { cienaCesConfig 58 }
+
+--
+-- Node definitions
+--
+
+cienaCesMplsL3VpnMIBObjects OBJECT IDENTIFIER ::= { cienaCesMplsL3VpnMIB 1 }
+cienaCesMplsL3VpnVrfNotif   OBJECT IDENTIFIER ::= { cienaCesMplsL3VpnMIBObjects 1 }
+
+
+-- Notifications
+
+cienaCesMplsL3VpnMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 108 }
+cienaCesMplsL3VpnMIBNotifications       OBJECT IDENTIFIER ::=
+                      { cienaCesMplsL3VpnMIBNotificationPrefix 0 }
+
+
+-- External MPLS L3VPN VRF Notifications Object Definitions
+cienaCesMplsL3VpnVrfAfiType OBJECT-TYPE
+   SYNTAX              InetAddressType
+   MAX-ACCESS          accessible-for-notify
+   STATUS              current
+   DESCRIPTION
+       "The address family of the specified VRF."
+   ::= { cienaCesMplsL3VpnVrfNotif 1 }
+
+cienaCesMplsL3VpnVrfUpNotification NOTIFICATION-TYPE
+  OBJECTS  {  cienaGlobalSeverity,
+              cienaGlobalMacAddress,
+              mplsL3VpnIfConfRowStatus,
+              mplsL3VpnVrfOperStatus,
+              mplsL3VpnVrfName,
+              mplsL3VpnVrfDescription
+              }
+  STATUS   current
+  DESCRIPTION
+     "This notification is generated when:
+        a. No interface is associated with this VRF, and the first
+           (and only first) interface associated with it has its
+           ifOperStatus change to up(1).
+
+        b. One interface is associated with this VRF, and
+           the ifOperStatus of this interface changes to up(1).
+
+        c. Multiple interfaces are associated with this VRF, and the
+           ifOperStatus of all interfaces is down(2), and the first
+           of those interfaces has its ifOperStatus change to up(1)."
+  ::= { cienaCesMplsL3VpnMIBNotifications 1 }
+
+cienaCesMplsL3VpnVrfDownNotification NOTIFICATION-TYPE
+  OBJECTS  {  cienaGlobalSeverity,
+              cienaGlobalMacAddress,
+              mplsL3VpnIfConfRowStatus,
+              mplsL3VpnVrfOperStatus,
+              mplsL3VpnVrfName,
+              mplsL3VpnVrfDescription
+              }
+  STATUS   current
+  DESCRIPTION
+     "This notification is generated when:
+        a. One interface is associated with this VRF, and
+           the ifOperStatus of this interface changes from up(1)
+           to down(2).
+
+        b. Multiple interfaces are associated with this VRF, and
+           the ifOperStatus of all except one of these interfaces is
+           equal to up(1), and the ifOperStatus of that interface
+           changes from up(1) to down(2).
+
+        c. The last interface with ifOperStatus equal to up(1)
+           is disassociated from a VRF."
+  ::= { cienaCesMplsL3VpnMIBNotifications 2 }
+
+cienaCesMplsL3VpnVrfRouteMidThreshExceeded NOTIFICATION-TYPE
+   OBJECTS     {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 mplsL3VpnVrfName,
+                 mplsL3VpnVrfDescription,
+                 cienaCesMplsL3VpnVrfAfiType,
+                 mplsL3VpnVrfPerfCurrNumRoutes,
+                 mplsL3VpnVrfConfMidRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when the number of routes
+        contained by the specified VRF exceeds the value indicated by
+        mplsL3VpnVrfMidRouteThreshold.  A single notification MUST be
+        generated when this threshold is exceeded, and no other
+        notifications of this type should be issued until the value
+        of mplsL3VpnVrfPerfCurrNumRoutes has fallen below that of
+        mplsL3VpnVrfConfMidRteThresh."
+   ::= { cienaCesMplsL3VpnMIBNotifications 3 }
+
+cienaCesMplsL3VpnNumVrfRouteMaxThreshCleared  NOTIFICATION-TYPE
+   OBJECTS     {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 mplsL3VpnVrfName,
+                 mplsL3VpnVrfDescription,
+                 cienaCesMplsL3VpnVrfAfiType,
+                 mplsL3VpnVrfPerfCurrNumRoutes,
+                 mplsL3VpnVrfConfHighRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated only after the number of routes
+        contained by the specified VRF exceeds or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsVrfMaxRouteThreshold, and then falls below this value.  The
+        emission of this notification informs the operator that the
+        error condition has been cleared without the operator having to
+        query the device.
+        Note that mplsL3VpnVrfConfRteMxThrshTime denotes the interval at
+        which the mplsNumVrfRouteMaxThreshExceeded notification will
+        be reissued after the maximum value has been exceeded (or
+        reached if mplsL3VpnVrfConfMaxRoutes and
+        mplsL3VpnVrfConfHighRteThresh are equal) and the initial
+        notification has been issued.  Therefore,
+        the generation of this notification should also be emitted with
+        this same frequency (assuming that the error condition is
+        cleared).  Specifically, if the error condition is reached and
+        cleared several times during the period of time specified in
+        mplsL3VpnVrfConfRteMxThrshTime, only a single notification will
+        be issued to indicate the first instance of the error condition
+        as well as the first time the error condition is cleared.
+
+        This behavior is intended to prevent continuous generation of
+        notifications by an agent in the event that routes are
+        continually added and removed to/from a VRF after it has
+        reached its maximum value.  The default value is 0.  If this
+        value is set to 0, the agent should issue a notification
+        whenever the maximum threshold has been cleared."
+   ::= { cienaCesMplsL3VpnMIBNotifications 4 }
+
+cienaCesMplsL3VpnVrfNumVrfRouteMaxThreshExceeded NOTIFICATION-TYPE
+   OBJECTS     {
+                 cienaGlobalSeverity,
+                 cienaGlobalMacAddress,
+                 mplsL3VpnVrfName,
+                 mplsL3VpnVrfDescription,
+                 cienaCesMplsL3VpnVrfAfiType,
+                 mplsL3VpnVrfPerfCurrNumRoutes,
+                 mplsL3VpnVrfConfHighRteThresh
+               }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when the number of routes
+        contained by the specified VRF exceeds or attempts to exceed
+        the maximum allowed value as indicated by
+        mplsL3VpnVrfMaxRouteThreshold.  In cases where
+        mplsL3VpnVrfConfHighRteThresh is set to the same value
+        as mplsL3VpnVrfConfMaxRoutes, mplsL3VpnVrfConfHighRteThresh
+        need not be exceeded; rather, just reached for this notification
+        to be issued.
+
+        Note that mplsL3VpnVrfConfRteMxThrshTime denotes the interval
+        at which the this notification will be reissued after the
+        maximum value has been exceeded (or reached if
+        mplsL3VpnVrfConfMaxRoutes and mplsL3VpnVrfConfHighRteThresh are
+        equal) and the initial notification has been issued.  This value
+        is intended to prevent continuous generation of notifications by
+        an agent in the event that routes are continually added to a VRF
+        after it has reached its maximum value.  The default value is 0
+        minutes.  If this value is set to 0, the agent should only issue
+        a single notification at the time that the maximum threshold has
+        been reached, and should not issue any more notifications until
+        the value of routes has fallen below the configured threshold
+        value."
+   ::= { cienaCesMplsL3VpnMIBNotifications 5 }
+
+END

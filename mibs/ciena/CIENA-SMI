@@ -1,4 +1,3 @@
--- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
 --
 -- CIENA-SMI.my
 --
@@ -11,7 +10,7 @@
 				FROM SNMPv2-SMI;
 	
 		ciena MODULE-IDENTITY
-			LAST-UPDATED "201903010756Z"
+			LAST-UPDATED "201706070000Z"
 			ORGANIZATION "Ciena Corp."
 			CONTACT-INFO
 			"   Mib Meister
@@ -21,25 +20,25 @@
 			    Phone:  +1 800 921 1144
 			    Email:  support@ciena.com"
 			DESCRIPTION
-				"MIB Version: 08-07-00-024."
+				"MIB Version: MIBS-CIENA-CES-XX-XX-XX-XXX."
 
-			REVISION "201903010756Z"
+			REVISION "201706070000Z"
 			DESCRIPTION
 				"Updated contact info."
 
-			REVISION "201903010756Z"
+			REVISION "201507150000Z"
 			DESCRIPTION
 				"Updated for cienaGenericMIBs and cienaOpterametro."
 
-			REVISION "201903010756Z"
+			REVISION "201304220000Z"
 			DESCRIPTION
 				"Fixed miscellaneous spelling and description errors."
 
-			REVISION "201903010756Z"
+			REVISION "201212260000Z"
 			DESCRIPTION
 				"Fixed the revision and description minor errors."
 
-			REVISION "201903010756Z"
+			REVISION "201009272317Z"
 			DESCRIPTION
 				"Initial creation of MIB file structure for Ciena Packet Networking Products."
 			::= { enterprises 1271 }
@@ -106,10 +105,13 @@
 			STATUS	current
 			DESCRIPTION
 				"This module represents the top-level MIB branch for Optical MIBs."
-			::= { ciena 68 }			                                    
+			::= { ciena 68 }	
+
+                		                                    
 
 END
 			
 --
 -- CIENA-SMI.my
 --
+

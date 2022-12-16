@@ -1,4 +1,3 @@
--- This file was included in WWP MIB release 04-16-00-0047
  --
  -- CIENA-CES-BFD-MIB.my
  --    
@@ -11,25 +10,40 @@
    DisplayString, MacAddress, TruthValue                
         FROM SNMPv2-TC                                                  
     cienaGlobalSeverity, cienaGlobalMacAddress
-   		FROM  CIENA-GLOBAL-MIB
+         FROM  CIENA-GLOBAL-MIB
    CienaGlobalState, CienaStatsClear,CienaMacAddress
-   		FROM CIENA-TC
+         FROM CIENA-TC
    cienaCesConfig,cienaCesStatistics, cienaCesNotifications         
         FROM CIENA-SMI;
         
  cienaCesBfdMIB MODULE-IDENTITY
-	LAST-UPDATED "201404040000Z"
-	ORGANIZATION "Ciena, Inc"
-	CONTACT-INFO
-                       "Mib Meister
-                        115 North Sullivan Road
-                        Spokane Valley, WA 99037
-                        USA            
-                        Phone:  +1 509 242 9000
-			Email:  support@ciena.com"
-	DESCRIPTION
-	                    "This module defines the BFD SNMP objects."
+        LAST-UPDATED "202002040000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+        DESCRIPTION     "This module defines the BFD SNMP objects."
 
+        REVISION        "202002040000Z"
+        DESCRIPTION     "Added cienaCesBfdNegotiatedTxInterval, cienaCesBfdNegotiatedRxInterval and
+                         cienaCesBfdDetectionTime objects to CienaCesBfdSessionEntry table."
+
+        REVISION        "201903120000Z"
+        DESCRIPTION     "Added cienaCesBfdDampProfileTable, cienaCesBfdDampSessionTable, cienaCesBfdDampSessionStatsTable 
+                         and a trap cienaCesBfdDampSessionSuppressStateChangeTrap. Added objects cienaCesBfdDampSessionAdminState,
+                         cienaCesBfdDampSessionOperState and cienaCesBfdDampSessionProfileIndex to CienaCesBfdSessionEntry table."
+
+        REVISION        "201802190000Z"
+        DESCRIPTION     "Added objects cienaCesBfdDesiredMinTxInterval and cienaCesBfdReqMinRxInterval to
+                         CienaCesBfdProfileEntry table. Deprecated objects cienaCesBfdTransmitInterval
+                         and cienaCesBfdReceiveInterval from CienaCesBfdProfileEntry table"
+
+        REVISION        "201706070000Z"
+        DESCRIPTION     "Updated contact info."
 
         REVISION        "201404040000Z"
         DESCRIPTION     "Added Profile Index for BFD Session MIB object"  
@@ -37,10 +51,8 @@
         REVISION        "201403190000Z"
         DESCRIPTION     "Added BFD Profile MIB object"
 
-                    REVISION
-                        "201107260000Z"
-                    DESCRIPTION
-                        "Initial creation."
+        REVISION        "201107260000Z"
+        DESCRIPTION     "Initial creation."
 
                         ::= { cienaCesConfig 22 }
 --
@@ -54,21 +66,35 @@
                     active(2)
                    }
 
+ BfdInterval ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Indicates the BFD Timer Interval in microseconds."
+     SYNTAX       Unsigned32 (0..4294967295)
+
+ BfdDampMode ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "BFD Dampening Mode"
+     SYNTAX       INTEGER {
+                    test(1),
+                    full(2)
+                   }
 --
 -- Node Definitions
 -- 
 
- cienaCesBfdMIBObjects 			OBJECT IDENTIFIER ::= { cienaCesBfdMIB 1 } 
- cienaCesBfdSession 			        OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 2 }
- cienaCesBfdProfile 			        OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 3 }
+ cienaCesBfdMIBObjects        OBJECT IDENTIFIER ::= { cienaCesBfdMIB 1 } 
+ cienaCesBfdSession                OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 2 }
+ cienaCesBfdProfile                OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 3 }
+ cienaCesBfdDampProfile            OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 4 }
+ cienaCesBfdDampSession            OBJECT IDENTIFIER ::= { cienaCesBfdMIBObjects 5 } 
 
 -- Statistics
 
-   cienaCesBfdSessionStats			OBJECT IDENTIFIER ::= { cienaCesStatistics 7 } 
+   cienaCesBfdSessionStats       OBJECT IDENTIFIER ::= { cienaCesStatistics 7 } 
 
 -- Notifications 
   
- cienaCesBfdSessionMIBNotificationPrefix  	OBJECT IDENTIFIER ::= { cienaCesNotifications 19 } 
+ cienaCesBfdSessionMIBNotificationPrefix     OBJECT IDENTIFIER ::= { cienaCesNotifications 19 } 
  
  cienaCesBfdSessionMIBNotification              OBJECT IDENTIFIER ::=  { cienaCesBfdSessionMIBNotificationPrefix 0 }
 
@@ -99,7 +125,13 @@
      cienaCesBfdSessionName                              DisplayString,
      cienaCesBfdSessionAdminState                        CienaGlobalState,     
      cienaCesBfdSessionOperState                         CienaGlobalState,
-     cienaCesBfdSessionProfileIndex                      Unsigned32
+     cienaCesBfdSessionProfileIndex                      Unsigned32,
+     cienaCesBfdDampSessionAdminState                    CienaGlobalState,     
+     cienaCesBfdDampSessionOperState                     CienaGlobalState,
+     cienaCesBfdDampSessionProfileIndex                  Unsigned32,
+     cienaCesBfdNegotiatedTxInterval                     BfdInterval,
+     cienaCesBfdNegotiatedRxInterval                     BfdInterval,
+     cienaCesBfdDetectionTime                            BfdInterval
 }
 
 
@@ -145,6 +177,56 @@ cienaCesBfdSessionIndex OBJECT-TYPE
              "This mib object specifies the BFD Profile Index for the Session."
      ::= { cienaCesBfdSessionEntry 5 }         
 
+ cienaCesBfdDampSessionAdminState OBJECT-TYPE
+     SYNTAX       CienaGlobalState 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening admin state for the session."
+     ::= { cienaCesBfdSessionEntry 6 } 
+        
+ cienaCesBfdDampSessionOperState OBJECT-TYPE
+     SYNTAX       CienaGlobalState 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening operational state for the session."
+     ::= { cienaCesBfdSessionEntry 7 }    
+     
+ cienaCesBfdDampSessionProfileIndex OBJECT-TYPE
+     SYNTAX       Unsigned32 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening profile index for the session.
+              This object corresponds to the table row in cienaCesBfdDampProfileTable 
+              with cienaCesBfdDampProfileIndex "
+     ::= { cienaCesBfdSessionEntry 8 }         
+
+ cienaCesBfdNegotiatedTxInterval OBJECT-TYPE
+     SYNTAX       BfdInterval 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD negotiated transmit time interval for the session."
+     ::= { cienaCesBfdSessionEntry 9 }
+
+ cienaCesBfdNegotiatedRxInterval OBJECT-TYPE
+     SYNTAX       BfdInterval 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD negotiated receive time interval for the session."
+     ::= { cienaCesBfdSessionEntry 10 }
+
+ cienaCesBfdDetectionTime OBJECT-TYPE
+     SYNTAX       BfdInterval 
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD detection time for the session."
+     ::= { cienaCesBfdSessionEntry 11 }
+
 --
 -- BFD Session Statistics
 --
@@ -171,11 +253,11 @@ cienaCesBfdSessionIndex OBJECT-TYPE
 
  CienaCesBfdSessionStatsEntry ::=  SEQUENCE { 
     cienaCesBfdSessionIndex             Unsigned32,
-	cienaCesBfdSessionStatsTotalTx		Unsigned32,
- 	cienaCesBfdSessionStatsTotalRx 		Unsigned32,
+   cienaCesBfdSessionStatsTotalTx      Unsigned32,
+   cienaCesBfdSessionStatsTotalRx      Unsigned32,
     cienaCesBfdSessionUpTime            Unsigned32,
-    cienaCesBfdSessionDownTimeCount     Unsigned32 	
-	}
+    cienaCesBfdSessionDownTimeCount     Unsigned32    
+   }
 
  cienaCesBfdSessionStatsTotalTx OBJECT-TYPE
      SYNTAX       Unsigned32
@@ -214,6 +296,81 @@ cienaCesBfdSessionIndex OBJECT-TYPE
     
 
 --
+-- BFD Dampening Session Statistics
+--
+
+ cienaCesBfdDampSessionStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CienaCesBfdDampSessionStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The table listing the statistics
+             for a given BFD dampening enabled session."
+    ::= { cienaCesBfdSessionStats 2 }
+
+ cienaCesBfdDampSessionStatsEntry OBJECT-TYPE
+     SYNTAX      CienaCesBfdDampSessionStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "An entry in the BFD dampening enabled session statistics table."
+     INDEX {cienaCesBfdSessionIndex}
+     ::= { cienaCesBfdDampSessionStatsTable 1 }
+
+ CienaCesBfdDampSessionStatsEntry ::=  SEQUENCE {
+    cienaCesBfdDampSessionCurrentPenalty         Unsigned32,
+    cienaCesBfdDampSessionLastSupressTime        DisplayString,
+    cienaCesBfdDampSessionSuppressRecoveryTime   DisplayString,
+    cienaCesBfdDampSessionSuppressCount          Unsigned32,
+    cienaCesBfdDampSessionDampTrapCount          Unsigned32
+    
+   }
+
+ cienaCesBfdDampSessionCurrentPenalty OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the current penalty of BFD dampening 
+              enabled BFD session."
+     ::= { cienaCesBfdDampSessionStatsEntry 1 }   
+     
+ cienaCesBfdDampSessionLastSupressTime OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the last suppress time of BFD dampening
+              enabled BFD session."
+     ::= { cienaCesBfdDampSessionStatsEntry 2 }
+
+ cienaCesBfdDampSessionSuppressRecoveryTime OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies the time left to recover suppressed client
+              notification of BFD dampening enabled BFD session."
+     ::= { cienaCesBfdDampSessionStatsEntry 3 }
+
+ cienaCesBfdDampSessionSuppressCount OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies total number of time suppression occured  
+              on BFD dampening enabled BFD session."
+     ::= { cienaCesBfdDampSessionStatsEntry 4 }
+
+ cienaCesBfdDampSessionDampTrapCount OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object specifies total number of times trap sent when 
+              suppression occured on  BFD dampening enabled BFD session."
+     ::= { cienaCesBfdDampSessionStatsEntry 5 }
+--
 -- Notifications
 --  
  cienaCesBfdSessionOperStateChangeTrap  NOTIFICATION-TYPE
@@ -234,6 +391,29 @@ cienaCesBfdSessionIndex OBJECT-TYPE
        cienaCesBfdSessionAdminState, and cienaCesBfdSessionOperState."
 
    ::= { cienaCesBfdSessionMIBNotification 1 }
+
+ cienaCesBfdDampSessionSuppressStateChangeTrap  NOTIFICATION-TYPE
+        OBJECTS      {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesBfdSessionName,
+          cienaCesBfdSessionIndex,
+          cienaCesBfdDampSessionType,
+          cienaCesBfdDampSessionServiceName,
+          cienaCesBfdSessionAdminState,
+          cienaCesBfdSessionOperState,
+          cienaCesBfdDampSessionSuppressState,
+          cienaCesBfdDampSessionSuppressReason,
+          cienaCesBfdDampSessionCurrentPenalty,
+          cienaCesBfdDampSessionLastSupressTime
+       }
+   STATUS      current
+   DESCRIPTION
+      "A notification is sent whenever the BFD session client notification suppression state changes. To enable this 
+       notification, the cienaCesBfdDampSessionOperTrapState object must be enabled (which is enabled by default)."
+
+   ::= { cienaCesBfdSessionMIBNotification 2 }
+
 
 --
 -- BFD Profile Table
@@ -263,7 +443,9 @@ cienaCesBfdSessionIndex OBJECT-TYPE
      cienaCesBfdRole                                     BfdRole,
      cienaCesBfdLspGachType                              Unsigned32,
      cienaCesBfdDetectMultiplier                         Unsigned32,
-     cienaCesBfdUseCount                                 Unsigned32
+     cienaCesBfdUseCount                                 Unsigned32,
+     cienaCesBfdDesiredMinTxInterval                     BfdInterval,
+     cienaCesBfdReqMinRxInterval                         BfdInterval
 }
 
 
@@ -287,17 +469,21 @@ cienaCesBfdProfileName OBJECT-TYPE
 cienaCesBfdTransmitInterval OBJECT-TYPE
      SYNTAX       Unsigned32
      MAX-ACCESS   read-only
-     STATUS       current
+     STATUS       deprecated
      DESCRIPTION
-             "This mib object specifies the BFD Transmit Interval in msec."
+             "This mib object specifies the BFD Transmit Interval in msec.
+              Marking this object deprecated as new object cienaCesBfdDesiredMinTxInterval
+              has been added that provides the transmit interval in microseconds."
      ::= { cienaCesBfdProfileEntry 3 }
 
 cienaCesBfdReceiveInterval OBJECT-TYPE
      SYNTAX       Unsigned32
      MAX-ACCESS   read-only
-     STATUS       current
+     STATUS       deprecated
      DESCRIPTION
-             "This mib object specifies the BFD Receive Interval in msec."
+             "This mib object specifies the BFD Receive Interval in msec.
+              Marking this object deprecated as new object cienaCesBfdReqMinRxInterval
+              has been added that provides the receive interval in microseconds."
      ::= { cienaCesBfdProfileEntry 4 }
 
 cienaCesBfdRole OBJECT-TYPE
@@ -333,6 +519,199 @@ cienaCesBfdUseCount OBJECT-TYPE
              "Number of sessions using BFD Profile."
      ::= { cienaCesBfdProfileEntry 8 }
 
+cienaCesBfdDesiredMinTxInterval OBJECT-TYPE
+     SYNTAX       BfdInterval
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Transmit Interval in microseconds."
+     ::= { cienaCesBfdProfileEntry 9 }
+
+cienaCesBfdReqMinRxInterval OBJECT-TYPE
+     SYNTAX       BfdInterval
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD Receive Interval in microseconds."
+     ::= { cienaCesBfdProfileEntry 10 }
+
+
+--
+-- BFD Dampening Profile Table
+--
+ cienaCesBfdDampProfileTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesBfdDampProfileEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+             "The BFD dampening Profile Table."
+     ::= { cienaCesBfdDampProfile 1 }
+
+ cienaCesBfdDampProfileEntry OBJECT-TYPE
+     SYNTAX      CienaCesBfdDampProfileEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "An entry in the cienaCesBfdDampProfileTable."
+     INDEX {cienaCesBfdDampProfileIndex}
+     ::= { cienaCesBfdDampProfileTable 1 }
+
+ CienaCesBfdDampProfileEntry ::=  SEQUENCE {
+     cienaCesBfdDampProfileIndex                        Unsigned32,
+     cienaCesBfdDampProfileName                         DisplayString,
+     cienaCesBfdDampSuppressThreshold                   Unsigned32,
+     cienaCesBfdDampReuseThreshold                      Unsigned32,
+     cienaCesBfdDampMaxSupressDuration                  Unsigned32,
+     cienaCesBfdDampDecayHalfLife                       Unsigned32,
+     cienaCesBfdDampMode                                BfdDampMode,
+     cienaCesBfdDampUseCount                            Unsigned32
+}
+
+cienaCesBfdDampProfileIndex OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "A unique identifier for BFD dampening profile entry."
+     ::= { cienaCesBfdDampProfileEntry 1 }
+
+cienaCesBfdDampProfileName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening profile name."
+     ::= { cienaCesBfdDampProfileEntry 2 }
+
+cienaCesBfdDampSuppressThreshold OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening suppress threshold
+              above which bfd client notification will be suppressed."
+     ::= { cienaCesBfdDampProfileEntry 3 }
+
+cienaCesBfdDampReuseThreshold OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening reuse threshold
+              below which bfd client notification will be re-enabled."
+     ::= { cienaCesBfdDampProfileEntry 4 }
+
+cienaCesBfdDampMaxSupressDuration OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening max suppress time
+              in miliseconds. Penalty will reset after max suppress time expires."
+     ::= { cienaCesBfdDampProfileEntry 5 }
+
+cienaCesBfdDampDecayHalfLife OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening decay half life in
+              miliseconds. Penalty will be half after decay half life expires."
+     ::= { cienaCesBfdDampProfileEntry 6 }
+
+cienaCesBfdDampMode OBJECT-TYPE
+     SYNTAX       BfdDampMode
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This mib object specifies the BFD dampening mode."
+     ::= { cienaCesBfdDampProfileEntry 7 }
+
+cienaCesBfdDampUseCount OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "Number of sessions using BFD dampening profile."
+     ::= { cienaCesBfdDampProfileEntry 8 }
+
+--
+-- BFD Dampening Sessions
+--
+ cienaCesBfdDampSessionTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF CienaCesBfdDampSessionEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+             "The table listing the dampening information
+              for a given BFD dampening enabled session."
+     ::= { cienaCesBfdDampSession 1 }
+
+ cienaCesBfdDampSessionEntry OBJECT-TYPE
+     SYNTAX      CienaCesBfdDampSessionEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "An entry in the BFD dampening session table."
+     INDEX {cienaCesBfdSessionIndex}
+     ::= { cienaCesBfdDampSessionTable 1 }
+
+ CienaCesBfdDampSessionEntry ::=  SEQUENCE {
+    cienaCesBfdDampSessionName               DisplayString,
+    cienaCesBfdDampSessionType               DisplayString,
+    cienaCesBfdDampSessionServiceName        DisplayString,
+    cienaCesBfdDampSessionState              CienaGlobalState,
+    cienaCesBfdDampSessionSuppressState      CienaGlobalState,
+    cienaCesBfdDampSessionSuppressReason     DisplayString
+   }
+
+ cienaCesBfdDampSessionName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates BFD session name."
+     ::= { cienaCesBfdDampSessionEntry 1 }
+
+ cienaCesBfdDampSessionType OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates BFD session type."
+     ::= { cienaCesBfdDampSessionEntry 2 }
+
+ cienaCesBfdDampSessionServiceName OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates BFD session service."
+     ::= { cienaCesBfdDampSessionEntry 3 }
+
+ cienaCesBfdDampSessionState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the dampening state of a BFD session."
+     ::= { cienaCesBfdDampSessionEntry 4 }
+
+ cienaCesBfdDampSessionSuppressState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the suppress state of a BFD session."
+     ::= { cienaCesBfdDampSessionEntry 5 }
+
+ cienaCesBfdDampSessionSuppressReason OBJECT-TYPE
+     SYNTAX       DisplayString
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "This object indicates the Last suppress reason of a BFD session."
+     ::= { cienaCesBfdDampSessionEntry 6 }
  END
 
 
