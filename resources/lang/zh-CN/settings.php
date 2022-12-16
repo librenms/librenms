@@ -752,8 +752,8 @@ return [
         'update_channel' => [
             'description' => '设定更新频道',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'virsh' => [
