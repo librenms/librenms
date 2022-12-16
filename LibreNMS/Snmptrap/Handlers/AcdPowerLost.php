@@ -26,7 +26,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class AcdPowerLost implements SnmptrapHandler
 {
@@ -40,6 +39,6 @@ class AcdPowerLost implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        Log::event('SNMP Trap: Device ' . $device->displayName() . ' lost power', $device->device_id, 'trap', 5);
+        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' lost power', $device->device_id, 'trap', 5);
     }
 }
