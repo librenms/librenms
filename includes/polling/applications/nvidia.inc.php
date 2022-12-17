@@ -33,7 +33,7 @@ $metrics = [];
 foreach ($gpuArray as $index => $gpu) {
     $stats = explode(',', $gpu);
 
-    if (count($stats) == 19) {
+    if (count($stats) == 19 || count($stats) == 20) {
         [$gpu, $pwr, $temp, $memtemp, $sm, $mem, $enc, $dec, $mclk, $pclk, $pviol, $tviol,
         $fb, $bar1, $sbecc, $dbecc, $pci, $rxpci, $txpci] = $stats;
     } else {
