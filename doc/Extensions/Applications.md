@@ -2759,6 +2759,11 @@ b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publick
 
 5. Restart snmpd.
 
+On Ubuntu, snmpd runs as Debian-snmp, and as a result cannot "directly" access or run wg. BUT - if you add this user (Debian-snmp) to visudo, and allow `bash` to be run, then you can update the entry in snmpd.conf to be,
+```
+extend wireguard /usr/bin/bash -c "sudo -i /etc/snmp/wireguard.py"
+```
+
 ## ZFS
 
 ### SNMP Extend
