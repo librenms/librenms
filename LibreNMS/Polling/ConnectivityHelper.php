@@ -151,7 +151,7 @@ class ConnectivityHelper
 
         return [
             'traceroute' => $process->getOutput(),
-            'output' => $process->getErrorOutput(),
+            'traceroute_output' => $process->getErrorOutput(),
         ];
     }
 
@@ -201,8 +201,9 @@ class ConnectivityHelper
     private function savePingStats(FpingResponse $ping_response): void
     {
         $perf = $ping_response->toModel();
+        $perf->debug = ['poller_name'=>Config::get('distributed_poller_name')];
         if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
-            $perf->debug = $this->traceroute();
+            $perf->debug = array_merge($perf->debug, $this->traceroute());
         }
         $this->device->perf()->save($perf);
         $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;

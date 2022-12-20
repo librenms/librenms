@@ -81,7 +81,6 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
 -- Type definitions
 
     OSINSAddress ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
           "OSI Network Service Address, e.g. NSAP, Network Entity Title"
@@ -89,14 +88,12 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
 
 
     SNPAAddress ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
           "A MAC Address or DTE Address or other SNPA Address."
        SYNTAX     OCTET STRING (SIZE(0..20))
 
     NSAPPrefix ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
           "NSAP Prefix. The first octet of the string is used to
@@ -110,7 +107,6 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
 
 
     SNPAPrefix ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
           "SNPA Prefix. The first octet of the string is used to
@@ -122,7 +118,6 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
        SYNTAX         OCTET STRING (SIZE(1..21))
 
     SystemID ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
           "A system ID."
@@ -175,8 +170,8 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
        SYNTAX        INTEGER
                         {
                          iso8473(129),
-                         ip(204),
-                         ipV6(205)
+                         ipV6(142),
+                         ip(204)
                         }
 
     DefaultMetric ::= TEXTUAL-CONVENTION
@@ -196,7 +191,6 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
                            }
 
     CircuitID ::= TEXTUAL-CONVENTION
-       DISPLAY-HINT "255a"
        STATUS       current
        DESCRIPTION
              "ID for a circuit."
@@ -336,7 +330,11 @@ isisConformance         OBJECT IDENTIFIER ::= { isisMIB 3 }
          }
 
      isisSysInstance OBJECT-TYPE
-         SYNTAX Integer32 (1..10000)
+-- TIMOS_EXTENSIONS Edited to accept 0 for M-ISIS instances (0..127)
+-- Edited to extend range to support indices used for Shortest Path Bridging
+--         SYNTAX Integer32 (1..10000)
+         SYNTAX Integer32 (0..127|1024..2047)
+-- End TIMOS_EXTENSIONS
          MAX-ACCESS not-accessible
          STATUS current
          DESCRIPTION

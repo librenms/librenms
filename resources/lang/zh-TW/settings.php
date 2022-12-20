@@ -925,8 +925,8 @@ return [
         'update_channel' => [
             'description' => '設定更新頻道',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

@@ -42,6 +42,11 @@ if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
 }
 
+//Moxa Etherdevice portName mapping
+if ($device['os'] == 'moxa-etherdevice') {
+    require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 
