@@ -350,6 +350,9 @@ function list_devices(Illuminate\Http\Request $request)
     } elseif ($type == 'type') {
         $sql = '`d`.`type`=?';
         $param[] = $query;
+    } elseif ($type == 'display') {
+        $sql = '`d`.`display`=?';
+        $param[] = $query;
     } else {
         $sql = '1';
     }
