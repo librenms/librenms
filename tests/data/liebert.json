@@ -1,24 +1,23 @@
 {
     "os": {
-        "discovery": {
+        "poller": {
             "devices": [
                 {
-                    "sysName": "<private>",
+                    "sysName": "127.1.6.1",
                     "sysObjectID": ".1.3.6.1.4.1.476.1.42",
                     "sysDescr": "Liebert GXT2-3000RT120",
-                    "sysContact": "<private>",
-                    "version": null,
+                    "sysContact": null,
+                    "version": "v2c",
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
-                    "os": "liebert",
-                    "type": "power",
+                    "location": null,
+                    "os": "generic",
+                    "type": "",
                     "serial": null,
-                    "icon": "vertiv.png"
+                    "icon": "generic.svg"
                 }
             ]
-        },
-        "poller": "matches discovery"
+        }
     },
     "sensors": {
         "discovery": {
