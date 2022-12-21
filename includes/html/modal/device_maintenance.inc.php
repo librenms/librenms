@@ -22,6 +22,8 @@
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
+use App\Facades\DeviceCache;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
