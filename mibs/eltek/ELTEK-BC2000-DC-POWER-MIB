@@ -473,12 +473,12 @@ BDTResultTC ::= TEXTUAL-CONVENTION
        DESCRIPTION
                "An entry containing information applicable to a
                particular alarm."
-       INDEX { vpwrShelfIndex, vpwrModuleIndex }
+       INDEX { vpwrBayIndex, vpwrModuleIndex }
        ::= { vpwrSystemIdentTable 1 }
 
 
     VpwrSystemIdentEntry ::= SEQUENCE {
-       vpwrShelfIndex       PositiveInteger,
+       vpwrBayIndex       PositiveInteger,
        vpwrModuleIndex      PositiveInteger,
        vpwrModuleOID        OBJECT IDENTIFIER  ,
        vpwrModuleCurrent    INTEGER ,
@@ -496,10 +496,10 @@ BDTResultTC ::= TEXTUAL-CONVENTION
     --       DESCRIPTION
     --         "An entry containing information applicable to a
     --          particular module making up the system."
-    --       INDEX { vpwrShelfIndex, vpwrModuleIndex }
+    --       INDEX { vpwrBayIndex, vpwrModuleIndex }
     --       ::= { vpwrSystemIdentTable 1 }
     --
-       vpwrShelfIndex OBJECT-TYPE
+       vpwrBayIndex OBJECT-TYPE
                SYNTAX     PositiveInteger
                MAX-ACCESS read-only
                STATUS     current
@@ -768,12 +768,12 @@ BDTResultTC ::= TEXTUAL-CONVENTION
        DESCRIPTION
                "An entry containing information applicable to a
                power module."
-       INDEX { vpwrShelfIndex1, vpwrDCModuleIndex }       
+       INDEX { vpwrBayIndex1, vpwrDCModuleIndex }       
        ::= { vpwrDcPowerModuleIdentTable 1 }
 
 
     DCPowerModuleIdentEntrySEQ ::= SEQUENCE {
-       vpwrShelfIndex1          PositiveInteger,
+       vpwrBayIndex1          PositiveInteger,
        vpwrDCModuleIndex       PositiveInteger,
        vpwrModuleSerialNumber  DisplayString  ,
        vpwrModuleModelNumber   DisplayString ,
@@ -782,7 +782,7 @@ BDTResultTC ::= TEXTUAL-CONVENTION
        vpwrModuleOperHours     Counter32
     }
 
-    vpwrShelfIndex1 OBJECT-TYPE
+    vpwrBayIndex1 OBJECT-TYPE
                SYNTAX     PositiveInteger
                MAX-ACCESS read-only
                STATUS     current
@@ -1678,7 +1678,7 @@ BDTResultTC ::= TEXTUAL-CONVENTION
        DESCRIPTION
                "An entry containing information applicable to a
                particular alarm."
-       INDEX { vpwrShelfIndex, vpwrModuleIndex, vpwrAlarmIndex }
+       INDEX { vpwrBayIndex, vpwrModuleIndex, vpwrAlarmIndex }
        ::= { vpwrAlarmTable 1 }
 
     VpwrAlarmEntrySEQ ::= SEQUENCE {
@@ -3415,13 +3415,13 @@ vpwrTrapPowerMajorAlarm NOTIFICATION-TYPE
                         ::= {vpwrDcPowerTraps 17}
 
     vpwrTrapModuleInserted NOTIFICATION-TYPE
-                        OBJECTS { vpwrTrapsMsgString, vpwrShelfIndex, vpwrModuleIndex }
+                        OBJECTS { vpwrTrapsMsgString, vpwrBayIndex, vpwrModuleIndex }
                            STATUS          current
                            DESCRIPTION "A new module has been inserted into the system"
                         ::= {vpwrDcPowerTraps 18}
 
     vpwrTrapModuleRemoved NOTIFICATION-TYPE
-                        OBJECTS { vpwrTrapsMsgString,vpwrShelfIndex, vpwrModuleIndex }
+                        OBJECTS { vpwrTrapsMsgString,vpwrBayIndex, vpwrModuleIndex }
                            STATUS          current
                            DESCRIPTION "A module has been removed from the system"
                         ::= {vpwrDcPowerTraps 19}
@@ -3730,7 +3730,7 @@ vpwrTrapPowerMajorAlarm NOTIFICATION-TYPE
                      ::= {vpwrDcPowerTraps 64}
 
  vpwrTrapRectifierUVAlarm    NOTIFICATION-TYPE
-            OBJECTS {    vpwrTrapsMsgString, vpwrShelfIndex, vpwrModuleIndex }
+            OBJECTS {    vpwrTrapsMsgString, vpwrBayIndex, vpwrModuleIndex }
             STATUS       current
             DESCRIPTION  "Rectifier Under Voltage Alarm"
             ::= {vpwrDcPowerTraps 65}
@@ -3767,7 +3767,7 @@ vpwrTrapPowerMajorAlarm NOTIFICATION-TYPE
             ::= {vpwrDcPowerTraps 69}
 
 vpwrTrapRectifierIlimitAlarm    NOTIFICATION-TYPE
-            OBJECTS {   vpwrTrapsMsgString, vpwrShelfIndex, vpwrModuleIndex }
+            OBJECTS {   vpwrTrapsMsgString, vpwrBayIndex, vpwrModuleIndex }
             STATUS      current
             DESCRIPTION "Rectifier Current Limit Alarm"
             ::= {vpwrDcPowerTraps 70}
