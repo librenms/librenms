@@ -69,7 +69,7 @@ class RipeApi extends BaseApi
     private function makeApiCall(string $uri, array $options): mixed
     {
         try {
-            $response_data = $this->getClient()->get($uri, $options)->json();
+            $response_data = $this->getClient()->get($uri, $options['query'])->json();
             if (isset($response_data['status']) && $response_data['status'] == 'ok') {
                 return $response_data;
             } else {
