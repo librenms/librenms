@@ -18,10 +18,10 @@ $no_refresh = true;
 <form class="form-horizontal" action="" method="post">
     <?php echo csrf_field() ?>
     <div class="radio">
-        <label><input type="radio" name="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
+        <label><input type="radio" name="data_radio" value="whois" checked>Whois</label>
     </div>
     <div class="radio">
-        <label><input type="radio" name="data_radio" value="whois">Whois</label>
+        <label><input type="radio" name="data_radio" value="abuse-contact-finder">Abuse Contact Finder</label>
     </div>
     <br />
     <div class="input-group">
@@ -58,9 +58,9 @@ $no_refresh = true;
                     $.each(data.output.data.records[0], function(row, value) {
                         $('#ripe-output').append(value['key'] + ' = ' + value['value'] + '<br />');
                     });
-                else if (data.output.data.anti_abuse_contacts.abuse_c)
-                    $.each(data.output.data.anti_abuse_contacts.abuse_c, function(row, value) {
-                        $('#ripe-output').append(value['description'] + ' = ' + value['email'] + '<br />');
+                else if (data.output.data.abuse_contacts)
+                    $.each(data.output.data.abuse_contacts, function(row, value) {
+                        $('#ripe-output').append("email" + ' = ' + value + '<br />');
                     });
             },
             error: function(data) {
