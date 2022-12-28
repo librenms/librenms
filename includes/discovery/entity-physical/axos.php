@@ -1,15 +1,14 @@
 <?php
 
-
 $physical_name = snmpwalk_cache_oid($device, 'sysObjectID.0', $physical_name, 'SNMPv2-MIB:CALIX-PRODUCT-MIB');
 $serial_number = snmpwalk_cache_oid($device, 'axosSystemChassisSerialNumber', $serial_number, 'Axos-System-MIB');
 $entity_array[] = [
-  'entPhysicalIndex' => 0,
-  'entPhysicalName' => $physical_name['sysObjectID.0'],
-  'entPhysicalSerialNum' => $serial_number['axosSystemChassisSerialNumber.0'],
-  'entPhysicalMfgName' => 'Calix',
-  'entPhysicalVendorType' => 'Calix',
-  'entPhysicalParentRelPos' => 0,
+    'entPhysicalIndex' => 0,
+    'entPhysicalName' => $physical_name['sysObjectID.0'],
+    'entPhysicalSerialNum' => $serial_number['axosSystemChassisSerialNumber.0'],
+    'entPhysicalMfgName' => 'Calix',
+    'entPhysicalVendorType' => 'Calix',
+    'entPhysicalParentRelPos' => 0,
 ];
 
 $card_array = snmpwalk_cache_multi_oid($device, 'axosCardTable', $card_array, 'Axos-Card-MIB');
