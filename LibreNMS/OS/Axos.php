@@ -33,9 +33,7 @@ class Axos extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $device->serial = snmp_get($this->getDeviceArray(), 'axosSystemChassisSerialNumber.0', '-Ovq', 'Axos-System-MIB');
-        $device->hardware = $device->sysDescr;
-
+        parent::discoverOS(Device $device);
         $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'axosCardActualType', '-OQv', 'Axos-Card-MIB'));
         $card_count = [];
         foreach ($cards as $card) {
