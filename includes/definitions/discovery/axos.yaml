@@ -1,5 +1,7 @@
 mib: CALIX-PRODUCT-MIB:AXOS-ALARM-MIB:Axos-Card-MIB:Axos-Ont-MIB:Axos-System-MIB:Axos-Trap-MIB
 modules:
+    os:
+        serial: Axos-System-MIB::axosSystemChassisSerialNumber.0
     sensors:
         temperature:
             data:
