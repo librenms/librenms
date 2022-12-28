@@ -3,6 +3,7 @@ text: Calix AXOS
 type: network
 ifname: true
 empty_ifdescr: true
+mib_dir: calix
 icon: calix
 over:
     - { graph: device_bits, text: 'Device Traffic' }
