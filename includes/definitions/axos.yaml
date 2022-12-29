@@ -3,7 +3,8 @@ text: Calix AXOS
 type: network
 ifname: true
 empty_ifdescr: true
-bad_ifname_regexp: '/^(\d{1,6}\/g[1-8])$/'
+bad_ifname_regexp:
+    - '/^(\d{1,6}\/g[1-8])$/'
 mib_dir: calix
 icon: calix
 over:
