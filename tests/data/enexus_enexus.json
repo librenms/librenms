@@ -8,7 +8,7 @@
                     "sysDescr": "ELTEK Power System",
                     "sysContact": "<private>",
                     "version": "2.8.1",
-                    "hardware": "AM3_RECT_01",
+                    "hardware": "SmartPack2",
                     "features": null,
                     "location": "AM3 [52.21183,4.57424]",
                     "os": "enexus",
