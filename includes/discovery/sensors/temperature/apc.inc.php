@@ -52,8 +52,7 @@ if ($apc_env_data) {
             discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
         }
     }
-}
-else {
+} else {
     // NMC1 Integrated Environmental Monitor (legacy)
     $apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', [], 'PowerNet-MIB', null, '-OQUse');
     $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB', null, '-OQUse');

@@ -195,8 +195,7 @@ if ($apcContactData) {
             create_sensor_to_state_index($device, $state_name, $state_name . '.' . $index);
         }
     }
-}
-else {
+} else {
     // NMC1 Integrated Environmental Monitor (legacy)
     $apcContactData = snmpwalk_cache_oid($device, 'iemConfigContactsTable', [], 'PowerNet-MIB', null, '-OQUse');
     $apcContactData = snmpwalk_cache_oid($device, 'iemStatusContactsTable', $apcContactData, 'PowerNet-MIB', null, '-OQUse');
