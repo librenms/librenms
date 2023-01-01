@@ -31,7 +31,7 @@ if ($apc_env_data) {
         }
     }
 } else {
-     // NMC1 Integrated Environmental Monitor (legacy)
+    // NMC1 Integrated Environmental Monitor (legacy)
     $apc_env_data = snmpwalk_cache_oid($device, 'iemConfigProbesTable', [], 'PowerNet-MIB');
     $apc_env_data = snmpwalk_cache_oid($device, 'iemStatusProbesTable', $apc_env_data, 'PowerNet-MIB');
 
