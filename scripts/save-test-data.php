@@ -130,8 +130,8 @@ if (! $snmpsim->isRunning()) {
     exit(1);
 }
 
-echo "Pausing 3 seconds to allow snmpsim to initialize...\n";
-sleep(3);
+echo "Pausing 10 seconds to allow snmpsim to initialize...\n";
+sleep(10);
 echo "\n";
 
 try {
