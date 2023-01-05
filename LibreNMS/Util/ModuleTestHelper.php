@@ -357,7 +357,7 @@ class ModuleTestHelper
     private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->raw) as $line) {
             if (empty($line)) {
                 continue;
             }

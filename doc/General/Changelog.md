@@ -1,3 +1,336 @@
+## 22.12.0
+*(2022-12-28)*
+
+A big thank you to the following 21 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (10)
+  - [electrocret](https://github.com/electrocret) (4)
+  - [bnerickson](https://github.com/bnerickson) (4)
+  - [peelman](https://github.com/peelman) (2)
+  - [bonzo81](https://github.com/bonzo81) (2)
+  - [gdepeyrot](https://github.com/gdepeyrot) (2)
+  - [bogdanrotariu](https://github.com/bogdanrotariu) (2)
+  - [TheMysteriousX](https://github.com/TheMysteriousX) (2)
+  - [LoveSkylark](https://github.com/LoveSkylark) (1)
+  - [fcqpl](https://github.com/fcqpl) (1)
+  - [angeletdemon](https://github.com/angeletdemon) (1)
+  - [alchemyx](https://github.com/alchemyx) (1)
+  - [rinsekloek](https://github.com/rinsekloek) (1)
+  - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [gewuerfelt](https://github.com/gewuerfelt) (1)
+  - [tuxgasy](https://github.com/tuxgasy) (1)
+  - [hugalafutro](https://github.com/hugalafutro) (1)
+  - [nightcore500](https://github.com/nightcore500) (1)
+  - [mrwold](https://github.com/mrwold) (1)
+  - [rhinoau](https://github.com/rhinoau) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (15)
+  - [murrant](https://github.com/murrant) (14)
+  - [PipoCanaja](https://github.com/PipoCanaja) (3)
+  - [ottorei](https://github.com/ottorei) (3)
+  - [SeeMyPing](https://github.com/SeeMyPing) (1)
+
+#### Feature
+* Pre-Install settings ([#13906](https://github.com/librenms/librenms/pull/13906)) - [murrant](https://github.com/murrant)
+
+#### Device
+* Additional sensors ([#14756](https://github.com/librenms/librenms/pull/14756)) - [peelman](https://github.com/peelman)
+* Update fs-nmu.inc.php ([#14702](https://github.com/librenms/librenms/pull/14702)) - [gewuerfelt](https://github.com/gewuerfelt)
+* Support Huawei SMU02B ([#14673](https://github.com/librenms/librenms/pull/14673)) - [nightcore500](https://github.com/nightcore500)
+* Use 'counter' RRD type for some TrueNAS sensors ([#14670](https://github.com/librenms/librenms/pull/14670)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+* Device - Add support for "Smartpack R" ([#14665](https://github.com/librenms/librenms/pull/14665)) - [mrwold](https://github.com/mrwold)
+* Added Moxa switching ifAlias/portName mapping ([#14633](https://github.com/librenms/librenms/pull/14633)) - [rhinoau](https://github.com/rhinoau)
+
+#### Webui
+* Fix port speed setting feedback ([#14743](https://github.com/librenms/librenms/pull/14743)) - [murrant](https://github.com/murrant)
+* Fix Cimc on Overview ([#14727](https://github.com/librenms/librenms/pull/14727)) - [electrocret](https://github.com/electrocret)
+* Search devices also in display ([#14714](https://github.com/librenms/librenms/pull/14714)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Fix check rrd file exists with remote rrdcached ([#14690](https://github.com/librenms/librenms/pull/14690)) - [tuxgasy](https://github.com/tuxgasy)
+
+#### Alerting
+* Adding sample alert for systemd application ([#14711](https://github.com/librenms/librenms/pull/14711)) - [bnerickson](https://github.com/bnerickson)
+* Polling poller debug ([#14691](https://github.com/librenms/librenms/pull/14691)) - [electrocret](https://github.com/electrocret)
+* Add -I flag to Traceroute cmd ([#14667](https://github.com/librenms/librenms/pull/14667)) - [electrocret](https://github.com/electrocret)
+
+#### Graphs
+* Fix graph output base64 ([#14701](https://github.com/librenms/librenms/pull/14701)) - [murrant](https://github.com/murrant)
+* Fix some graphs not respecting device display name ([#14684](https://github.com/librenms/librenms/pull/14684)) - [murrant](https://github.com/murrant)
+* Adding Average into graphs ([#14679](https://github.com/librenms/librenms/pull/14679)) - [bogdanrotariu](https://github.com/bogdanrotariu)
+
+#### Applications
+* Update Nvidia application - values in wrong charts ([#14736](https://github.com/librenms/librenms/pull/14736)) - [fcqpl](https://github.com/fcqpl)
+* Removing max polling restriction for wireguard traffic RRD data ([#14710](https://github.com/librenms/librenms/pull/14710)) - [bnerickson](https://github.com/bnerickson)
+
+#### Api
+* Fix for RIPE NCC API Tools ([#14757](https://github.com/librenms/librenms/pull/14757)) - [LoveSkylark](https://github.com/LoveSkylark)
+* API list_devices update with sysName, location_id and type ([#14731](https://github.com/librenms/librenms/pull/14731)) - [bonzo81](https://github.com/bonzo81)
+
+#### Discovery
+* Prevent spurious MAC changes on multi-interface devices ([#14671](https://github.com/librenms/librenms/pull/14671)) - [TheMysteriousX](https://github.com/TheMysteriousX)
+
+#### Polling
+* Fix ArubaInstance channel decode issue ([#14732](https://github.com/librenms/librenms/pull/14732)) - [murrant](https://github.com/murrant)
+
+#### Refactor
+* Unify time interval formatting ([#14733](https://github.com/librenms/librenms/pull/14733)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Install updates for Rocky8 ([#14722](https://github.com/librenms/librenms/pull/14722)) - [angeletdemon](https://github.com/angeletdemon)
+* Updating certificate script documentation ([#14721](https://github.com/librenms/librenms/pull/14721)) - [bnerickson](https://github.com/bnerickson)
+* Update Docker.md with proper path to unzipped files ([#14717](https://github.com/librenms/librenms/pull/14717)) - [alchemyx](https://github.com/alchemyx)
+* Fix typo: purge-port.php file name ([#14712](https://github.com/librenms/librenms/pull/14712)) - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ)
+* Alert template example uses incorrect variable ([#14683](https://github.com/librenms/librenms/pull/14683)) - [electrocret](https://github.com/electrocret)
+* Correct squid snmpd.conf proxy host syntax ([#14678](https://github.com/librenms/librenms/pull/14678)) - [hugalafutro](https://github.com/hugalafutro)
+
+#### Tests
+* Adding certificate application tests ([#14708](https://github.com/librenms/librenms/pull/14708)) - [bnerickson](https://github.com/bnerickson)
+
+#### Misc
+* Add MAC OUI caching when code updates are disabled ([#14713](https://github.com/librenms/librenms/pull/14713)) - [gdepeyrot](https://github.com/gdepeyrot)
+
+#### Internal Features
+* Number Casting allow preceding space ([#14699](https://github.com/librenms/librenms/pull/14699)) - [murrant](https://github.com/murrant)
+* Improve SnmpResponse value() ([#14605](https://github.com/librenms/librenms/pull/14605)) - [murrant](https://github.com/murrant)
+
+#### Mibs
+* Add CISCO-ENTITY-ALARM-MIB file ([#14754](https://github.com/librenms/librenms/pull/14754)) - [bonzo81](https://github.com/bonzo81)
+* Update Nokia MIBs to release R22.2 ([#14734](https://github.com/librenms/librenms/pull/14734)) - [peelman](https://github.com/peelman)
+
+#### Dependencies
+* Update PHP dependencies (fix dependencies on PHP 8.2) ([#14759](https://github.com/librenms/librenms/pull/14759)) - [murrant](https://github.com/murrant)
+* Bump qs and express ([#14705](https://github.com/librenms/librenms/pull/14705)) - [dependabot](https://github.com/apps/dependabot)
+
+
+## 22.11.0
+*(2022-11-24)*
+
+A big thank you to the following 40 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (52)
+  - [Jellyfrog](https://github.com/Jellyfrog) (23)
+  - [PipoCanaja](https://github.com/PipoCanaja) (9)
+  - [bnerickson](https://github.com/bnerickson) (5)
+  - [electrocret](https://github.com/electrocret) (4)
+  - [SourceDoctor](https://github.com/SourceDoctor) (4)
+  - [noaheroufus](https://github.com/noaheroufus) (3)
+  - [rhinoau](https://github.com/rhinoau) (3)
+  - [mabra94](https://github.com/mabra94) (2)
+  - [fcqpl](https://github.com/fcqpl) (2)
+  - [kimhaak](https://github.com/kimhaak) (2)
+  - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ) (2)
+  - [fbouynot](https://github.com/fbouynot) (2)
+  - [opalivan](https://github.com/opalivan) (2)
+  - [mprins-RAM](https://github.com/mprins-RAM) (2)
+  - [VVelox](https://github.com/VVelox) (2)
+  - [koocotte](https://github.com/koocotte) (1)
+  - [VoipTelCH](https://github.com/VoipTelCH) (1)
+  - [cfitzw](https://github.com/cfitzw) (1)
+  - [systeembeheerder](https://github.com/systeembeheerder) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [jaaruizgu](https://github.com/jaaruizgu) (1)
+  - [pertruccio](https://github.com/pertruccio) (1)
+  - [josh-silvas](https://github.com/josh-silvas) (1)
+  - [ianhodgson](https://github.com/ianhodgson) (1)
+  - [LoveSkylark](https://github.com/LoveSkylark) (1)
+  - [talkstraightuk](https://github.com/talkstraightuk) (1)
+  - [fufroma](https://github.com/fufroma) (1)
+  - [fuzzbawl](https://github.com/fuzzbawl) (1)
+  - [otkd](https://github.com/otkd) (1)
+  - [kiwibrew](https://github.com/kiwibrew) (1)
+  - [luc-ass](https://github.com/luc-ass) (1)
+  - [andrekeller](https://github.com/andrekeller) (1)
+  - [geg347](https://github.com/geg347) (1)
+  - [Olen](https://github.com/Olen) (1)
+  - [Frazew](https://github.com/Frazew) (1)
+  - [SirMaple](https://github.com/SirMaple) (1)
+  - [westerterp](https://github.com/westerterp) (1)
+  - [squidly](https://github.com/squidly) (1)
+  - [Bierchermuesli](https://github.com/Bierchermuesli) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (53)
+  - [murrant](https://github.com/murrant) (44)
+  - [PipoCanaja](https://github.com/PipoCanaja) (15)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [VVelox](https://github.com/VVelox) (1)
+  - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ) (1)
+  - [fbouynot](https://github.com/fbouynot) (1)
+
+#### Feature
+* Split out lnms snmp convenience commands ([#14603](https://github.com/librenms/librenms/pull/14603)) - [murrant](https://github.com/murrant)
+* Add --forgot-key to key:rotate command ([#14495](https://github.com/librenms/librenms/pull/14495)) - [murrant](https://github.com/murrant)
+
+#### Security
+* Fix Service Template XSS ([#14659](https://github.com/librenms/librenms/pull/14659)) - [murrant](https://github.com/murrant)
+* Fix neighbours XSS ([#14658](https://github.com/librenms/librenms/pull/14658)) - [murrant](https://github.com/murrant)
+* Fix SNMP trap -\> Eventlog XSS ([#14657](https://github.com/librenms/librenms/pull/14657)) - [murrant](https://github.com/murrant)
+* Fix XSS in api access ([#14551](https://github.com/librenms/librenms/pull/14551)) - [murrant](https://github.com/murrant)
+* XSS sanitize pwrstatd application script inputs ([#14545](https://github.com/librenms/librenms/pull/14545)) - [bnerickson](https://github.com/bnerickson)
+
+#### Device
+* Added divisor to SAF Integra-X temp sensors ([#14655](https://github.com/librenms/librenms/pull/14655)) - [noaheroufus](https://github.com/noaheroufus)
+* Corrected ICT MPS hardware detection ([#14654](https://github.com/librenms/librenms/pull/14654)) - [noaheroufus](https://github.com/noaheroufus)
+* Adjusted PMP to accomodate various other 450 models. ([#14652](https://github.com/librenms/librenms/pull/14652)) - [noaheroufus](https://github.com/noaheroufus)
+* Added support for Eltek Micropack 1U ([#14645](https://github.com/librenms/librenms/pull/14645)) - [fcqpl](https://github.com/fcqpl)
+* Added support for Eltek Flatpack S ([#14643](https://github.com/librenms/librenms/pull/14643)) - [fcqpl](https://github.com/fcqpl)
+* Improve VRP power display ([#14624](https://github.com/librenms/librenms/pull/14624)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Edgeos picked up as generic device ([#14612](https://github.com/librenms/librenms/pull/14612)) - [ianhodgson](https://github.com/ianhodgson)
+* Added Moxa EDS-G516E optical sensors ([#14610](https://github.com/librenms/librenms/pull/14610)) - [rhinoau](https://github.com/rhinoau)
+* Fix eNexus total current for Smartpack S ([#14606](https://github.com/librenms/librenms/pull/14606)) - [murrant](https://github.com/murrant)
+* Disable SNMP Bulk for Delta UPS devices ([#14599](https://github.com/librenms/librenms/pull/14599)) - [fufroma](https://github.com/fufroma)
+* Improved AIX os information collection ([#14595](https://github.com/librenms/librenms/pull/14595)) - [murrant](https://github.com/murrant)
+* More inclusive Cisco SB os detection ([#14594](https://github.com/librenms/librenms/pull/14594)) - [murrant](https://github.com/murrant)
+* IP Infusion OcNOS basic detection ([#14588](https://github.com/librenms/librenms/pull/14588)) - [murrant](https://github.com/murrant)
+* Fix APC current divide by zero ([#14578](https://github.com/librenms/librenms/pull/14578)) - [murrant](https://github.com/murrant)
+* Extend EfficientIP SolidServer support ([#14549](https://github.com/librenms/librenms/pull/14549)) - [PipoCanaja](https://github.com/PipoCanaja)
+* TAIT-Infra93 - Fix state + skip_values for Battery ([#14541](https://github.com/librenms/librenms/pull/14541)) - [opalivan](https://github.com/opalivan)
+* Timos - Improve SAP stats graphing ([#14534](https://github.com/librenms/librenms/pull/14534)) - [mabra94](https://github.com/mabra94)
+* McAfee Web Proxy with COUNTER rrd_type on sensors ([#14529](https://github.com/librenms/librenms/pull/14529)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix 'bke.yaml' discovery file ([#14524](https://github.com/librenms/librenms/pull/14524)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Added support for additional Moxa EDS-P model ([#14523](https://github.com/librenms/librenms/pull/14523)) - [rhinoau](https://github.com/rhinoau)
+* Fix awplus ntp polling bug ([#14521](https://github.com/librenms/librenms/pull/14521)) - [murrant](https://github.com/murrant)
+* Add discovery support for Riedo Networks UPDU ([#14496](https://github.com/librenms/librenms/pull/14496)) - [andrekeller](https://github.com/andrekeller)
+* Use correct description oid ([#14489](https://github.com/librenms/librenms/pull/14489)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Correct upsBypassVoltage oid ([#14488](https://github.com/librenms/librenms/pull/14488)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Correct variable typo ([#14486](https://github.com/librenms/librenms/pull/14486)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Hpe ilo: fix filesystem type regex ([#14485](https://github.com/librenms/librenms/pull/14485)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Added Fortigate SD-WAN Health checks ([#14456](https://github.com/librenms/librenms/pull/14456)) - [mprins-RAM](https://github.com/mprins-RAM)
+* Dont include empty storage sensor ([#14453](https://github.com/librenms/librenms/pull/14453)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Remove undefined sensors ([#14449](https://github.com/librenms/librenms/pull/14449)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Use correct low warn limit variable ([#14447](https://github.com/librenms/librenms/pull/14447)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fortinet FortiADC detection and basic statistics ([#14434](https://github.com/librenms/librenms/pull/14434)) - [westerterp](https://github.com/westerterp)
+* Device - Add support for Vultan Environmental Monitoring units ([#14401](https://github.com/librenms/librenms/pull/14401)) - [squidly](https://github.com/squidly)
+* Device - Basic hatteras dslam integration ([#14115](https://github.com/librenms/librenms/pull/14115)) - [Bierchermuesli](https://github.com/Bierchermuesli)
+
+#### Webui
+* Remove ungrouped devices panel ([#14664](https://github.com/librenms/librenms/pull/14664)) - [murrant](https://github.com/murrant)
+* Custom port view fix ([#14637](https://github.com/librenms/librenms/pull/14637)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix billing graph divide by zero when the period is zero or doesn't exist ([#14623](https://github.com/librenms/librenms/pull/14623)) - [jaaruizgu](https://github.com/jaaruizgu)
+* Fix port neighbors missing ([#14586](https://github.com/librenms/librenms/pull/14586)) - [murrant](https://github.com/murrant)
+* Fix some icons ([#14584](https://github.com/librenms/librenms/pull/14584)) - [murrant](https://github.com/murrant)
+* [About] Open Laravel and RRDtool link in new tab ([#14568](https://github.com/librenms/librenms/pull/14568)) - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ)
+* [About] Open the contributor list link in a new tab ([#14553](https://github.com/librenms/librenms/pull/14553)) - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ)
+* Fix v2 plugins ([#14506](https://github.com/librenms/librenms/pull/14506)) - [murrant](https://github.com/murrant)
+* Check if service_name is empty or equal to service_type ([#14499](https://github.com/librenms/librenms/pull/14499)) - [luc-ass](https://github.com/luc-ass)
+* Show id on device dependencies ([#14497](https://github.com/librenms/librenms/pull/14497)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Userlist description fix ([#14482](https://github.com/librenms/librenms/pull/14482)) - [mprins-RAM](https://github.com/mprins-RAM)
+* Sort alert transport by name ([#14464](https://github.com/librenms/librenms/pull/14464)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Graphs
+* Fix device poller modules graph ([#14640](https://github.com/librenms/librenms/pull/14640)) - [murrant](https://github.com/murrant)
+* Bug - XDSL module - rrd_def and rrd file definition issue for Actual rate ([#14597](https://github.com/librenms/librenms/pull/14597)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix graph errors wrong content type ([#14574](https://github.com/librenms/librenms/pull/14574)) - [murrant](https://github.com/murrant)
+* Improve graph embedded title handling ([#14544](https://github.com/librenms/librenms/pull/14544)) - [murrant](https://github.com/murrant)
+* Graphing cleanup ([#14492](https://github.com/librenms/librenms/pull/14492)) - [murrant](https://github.com/murrant)
+
+#### Snmp Traps
+* Adds Cisco DHCP Server SNMP MIB and Trap Handlers. ([#14618](https://github.com/librenms/librenms/pull/14618)) - [josh-silvas](https://github.com/josh-silvas)
+
+#### Applications
+* Alarm Flag on UPS-Nut Application ([#14635](https://github.com/librenms/librenms/pull/14635)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Adding wireguard app to the apps overview page ([#14629](https://github.com/librenms/librenms/pull/14629)) - [bnerickson](https://github.com/bnerickson)
+* Adding wireguard application support ([#14625](https://github.com/librenms/librenms/pull/14625)) - [bnerickson](https://github.com/bnerickson)
+* Adding systemd service status application ([#14540](https://github.com/librenms/librenms/pull/14540)) - [bnerickson](https://github.com/bnerickson)
+* Memcached application: improve error visibility ([#14536](https://github.com/librenms/librenms/pull/14536)) - [murrant](https://github.com/murrant)
+* Fix memcached polling bug ([#14501](https://github.com/librenms/librenms/pull/14501)) - [murrant](https://github.com/murrant)
+* Add HV Monitor, a generic means for monitoring hypvervisors ([#14218](https://github.com/librenms/librenms/pull/14218)) - [VVelox](https://github.com/VVelox)
+* Base64 gzip compression support for json_app_get ([#14169](https://github.com/librenms/librenms/pull/14169)) - [VVelox](https://github.com/VVelox)
+
+#### Api
+* Port search API search more than one fields ([#14646](https://github.com/librenms/librenms/pull/14646)) - [murrant](https://github.com/murrant)
+* Added disable_notify and location_id ([#14619](https://github.com/librenms/librenms/pull/14619)) - [pertruccio](https://github.com/pertruccio)
+* Add sortorder parameter to list_logs ([#14600](https://github.com/librenms/librenms/pull/14600)) - [talkstraightuk](https://github.com/talkstraightuk)
+* API restore ability to update purpose and override_sysLocation ([#14596](https://github.com/librenms/librenms/pull/14596)) - [murrant](https://github.com/murrant)
+* API graphs, variable whitelist ([#14552](https://github.com/librenms/librenms/pull/14552)) - [murrant](https://github.com/murrant)
+* Graph API use new code path ([#14493](https://github.com/librenms/librenms/pull/14493)) - [murrant](https://github.com/murrant)
+* Adding device's field in get_alert_rule and list-alert-rules API function (new) ([#14481](https://github.com/librenms/librenms/pull/14481)) - [geg347](https://github.com/geg347)
+* Fix update_device hostname handling #14435 ([#14448](https://github.com/librenms/librenms/pull/14448)) - [rhinoau](https://github.com/rhinoau)
+* Add Columns to search_ports API function ([#14348](https://github.com/librenms/librenms/pull/14348)) - [electrocret](https://github.com/electrocret)
+
+#### Discovery
+* Fix discovery ignores custom ipmi port ([#14660](https://github.com/librenms/librenms/pull/14660)) - [VoipTelCH](https://github.com/VoipTelCH)
+* Sensors - Allow changing RRD type in YAML and PHP sensor discovery ([#14208](https://github.com/librenms/librenms/pull/14208)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Polling
+* Don't poll sysDescr, sysObjectID, and sysName so frequently ([#14562](https://github.com/librenms/librenms/pull/14562)) - [murrant](https://github.com/murrant)
+* Add connection exception handling to all redis calls ([#14467](https://github.com/librenms/librenms/pull/14467)) - [Frazew](https://github.com/Frazew)
+
+#### Authentication
+* Update Radius auth to accept permissions attributes ([#14531](https://github.com/librenms/librenms/pull/14531)) - [kimhaak](https://github.com/kimhaak)
+
+#### Bug
+* Handle Division by 0 error for SvcFdbTableSize ([#14672](https://github.com/librenms/librenms/pull/14672)) - [mabra94](https://github.com/mabra94)
+* Fix sqlite test ([#14642](https://github.com/librenms/librenms/pull/14642)) - [murrant](https://github.com/murrant)
+* Remove extends and hardware detection support ([#14626](https://github.com/librenms/librenms/pull/14626)) - [murrant](https://github.com/murrant)
+* Set 0 as integer in loading of graylog. ([#14621](https://github.com/librenms/librenms/pull/14621)) - [kimhaak](https://github.com/kimhaak)
+* Fix GeocodingHelper type-hinting ([#14604](https://github.com/librenms/librenms/pull/14604)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Bug in Ciscowlc AP graphs definition ([#14585](https://github.com/librenms/librenms/pull/14585)) - [PipoCanaja](https://github.com/PipoCanaja)
+* SnmpQuery fix mib directory order ([#14580](https://github.com/librenms/librenms/pull/14580)) - [murrant](https://github.com/murrant)
+* SnmpQuery Handle empty oids in get more gracefully ([#14577](https://github.com/librenms/librenms/pull/14577)) - [murrant](https://github.com/murrant)
+* Fix PTOPO mib in module discovery-protocols ([#14564](https://github.com/librenms/librenms/pull/14564)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix Type error ([#14555](https://github.com/librenms/librenms/pull/14555)) - [fbouynot](https://github.com/fbouynot)
+* Correct variable use in billing ([#14533](https://github.com/librenms/librenms/pull/14533)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix sensor limit linked port rules in collection ([#14520](https://github.com/librenms/librenms/pull/14520)) - [electrocret](https://github.com/electrocret)
+* EES Rectifier various fixes from MIB + added tests ([#14519](https://github.com/librenms/librenms/pull/14519)) - [opalivan](https://github.com/opalivan)
+* Fix fetch ifEntry logic ([#14483](https://github.com/librenms/librenms/pull/14483)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Add a few breaks to avoid connection flooding for the irc-bot ([#14479](https://github.com/librenms/librenms/pull/14479)) - [Olen](https://github.com/Olen)
+
+#### Refactor
+* Remove Log::event ([#14526](https://github.com/librenms/librenms/pull/14526)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Cleanup
+* Fix snmp_disable type ([#14650](https://github.com/librenms/librenms/pull/14650)) - [murrant](https://github.com/murrant)
+* Consolidate and improve snmptranslate usage ([#14567](https://github.com/librenms/librenms/pull/14567)) - [murrant](https://github.com/murrant)
+* Remove graph_min ([#14561](https://github.com/librenms/librenms/pull/14561)) - [murrant](https://github.com/murrant)
+* Remove $_GET from graphs ([#14554](https://github.com/librenms/librenms/pull/14554)) - [murrant](https://github.com/murrant)
+* Undefined array key fixes ([#14532](https://github.com/librenms/librenms/pull/14532)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Use Collection instead of collect() ([#14527](https://github.com/librenms/librenms/pull/14527)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Convert string references to `::class` ([#14508](https://github.com/librenms/librenms/pull/14508)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Miscellaneous cleanup - part 5 ([#14502](https://github.com/librenms/librenms/pull/14502)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Type API methods and properties ([#14476](https://github.com/librenms/librenms/pull/14476)) - [fbouynot](https://github.com/fbouynot)
+* Miscellaneous cleanup - part 4 ([#14452](https://github.com/librenms/librenms/pull/14452)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Miscellaneous cleanup - part 3 ([#14450](https://github.com/librenms/librenms/pull/14450)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Miscellaneous cleanup, mostly undefined variables - part2 ([#14445](https://github.com/librenms/librenms/pull/14445)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Documentation
+* Fix Traceroute debug alert template snippet ([#14668](https://github.com/librenms/librenms/pull/14668)) - [electrocret](https://github.com/electrocret)
+* Update Dispatcher docs for Debian and for non /opt/librenms installation ([#14663](https://github.com/librenms/librenms/pull/14663)) - [koocotte](https://github.com/koocotte)
+* Fix Location mapping docs ([#14644](https://github.com/librenms/librenms/pull/14644)) - [electrocret](https://github.com/electrocret)
+* Update config name for the default device display ([#14641](https://github.com/librenms/librenms/pull/14641)) - [cfitzw](https://github.com/cfitzw)
+* Update Dispatcher-Service.md ([#14632](https://github.com/librenms/librenms/pull/14632)) - [systeembeheerder](https://github.com/systeembeheerder)
+* Updating postgres application documentation ([#14627](https://github.com/librenms/librenms/pull/14627)) - [bnerickson](https://github.com/bnerickson)
+* Documentation for Observium Migration ([#14601](https://github.com/librenms/librenms/pull/14601)) - [LoveSkylark](https://github.com/LoveSkylark)
+* Add snmp_flags and tips on string oids to the docs ([#14579](https://github.com/librenms/librenms/pull/14579)) - [murrant](https://github.com/murrant)
+* Clarify Dispatcher-Service.md for systemd ([#14575](https://github.com/librenms/librenms/pull/14575)) - [fuzzbawl](https://github.com/fuzzbawl)
+* Update license section of readme ([#14571](https://github.com/librenms/librenms/pull/14571)) - [otkd](https://github.com/otkd)
+* Remove outdated rules videos ([#14505](https://github.com/librenms/librenms/pull/14505)) - [kiwibrew](https://github.com/kiwibrew)
+* Docker quick install ([#14475](https://github.com/librenms/librenms/pull/14475)) - [murrant](https://github.com/murrant)
+
+#### Tests
+* Mock astext ([#14581](https://github.com/librenms/librenms/pull/14581)) - [murrant](https://github.com/murrant)
+* Github tests log improvement ([#14559](https://github.com/librenms/librenms/pull/14559)) - [murrant](https://github.com/murrant)
+* Improve trap testing ([#14546](https://github.com/librenms/librenms/pull/14546)) - [murrant](https://github.com/murrant)
+* Remove unused phpstan tests ([#14503](https://github.com/librenms/librenms/pull/14503)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Misc
+* New schema dump ([#14630](https://github.com/librenms/librenms/pull/14630)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Add check_hetzner_storagebox to includes/services ([#14463](https://github.com/librenms/librenms/pull/14463)) - [SirMaple](https://github.com/SirMaple)
+* Add instance id to error reports ([#14444](https://github.com/librenms/librenms/pull/14444)) - [murrant](https://github.com/murrant)
+
+#### Internal Features
+* DeviceCache::get() allow hostname ([#14649](https://github.com/librenms/librenms/pull/14649)) - [murrant](https://github.com/murrant)
+* SnmpQuery numeric accept a boolean ([#14565](https://github.com/librenms/librenms/pull/14565)) - [murrant](https://github.com/murrant)
+* Support regex in os field replace ([#14563](https://github.com/librenms/librenms/pull/14563)) - [murrant](https://github.com/murrant)
+* More Replacement Capabilities for sensor index computation ([#14522](https://github.com/librenms/librenms/pull/14522)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Dependencies
+* Bump loader-utils from 1.4.0 to 1.4.2 ([#14628](https://github.com/librenms/librenms/pull/14628)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 22.10.0
 *(2022-10-17)*
 

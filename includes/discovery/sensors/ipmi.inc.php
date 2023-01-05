@@ -6,7 +6,7 @@ use LibreNMS\Config;
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     echo 'IPMI : ';
-
+    $ipmi['port'] = filter_var(get_dev_attrib($device, 'ipmi_port'), FILTER_VALIDATE_INT) ?: '623';
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
@@ -14,9 +14,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $cmd = [Config::get('ipmitool', 'ipmitool')];
     if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
         if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
-            array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
+            array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         } else {
-            array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-y', $ipmi['kg_key'], '-L', 'USER');
+            array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-y', $ipmi['kg_key'], '-L', 'USER');
         }
     }
 

@@ -38,7 +38,6 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
-use Log;
 
 class RunAlerts
 {
@@ -104,7 +103,7 @@ class RunAlerts
         $obj['features'] = $device->features;
         $obj['location'] = (string) $device->location;
         $obj['uptime'] = $device->uptime;
-        $obj['uptime_short'] = Time::formatInterval($device->uptime, 'short');
+        $obj['uptime_short'] = Time::formatInterval($device->uptime, true);
         $obj['uptime_long'] = Time::formatInterval($device->uptime);
         $obj['description'] = $device->purpose;
         $obj['notes'] = $device->notes;
@@ -149,7 +148,7 @@ class RunAlerts
                     }
                 }
             }
-            $obj['elapsed'] = $this->timeFormat(time() - strtotime($alert['time_logged']));
+            $obj['elapsed'] = Time::formatInterval(time() - strtotime($alert['time_logged']), true) ?: 'none';
             if (! empty($extra['diff'])) {
                 $obj['diff'] = $extra['diff'];
             }
@@ -170,7 +169,7 @@ class RunAlerts
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
-            $obj['elapsed'] = $this->timeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
+            $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id['time_logged']), true) ?: 'none';
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {
                 $i++;
@@ -198,36 +197,6 @@ class RunAlerts
         $obj['template'] = $template;
 
         return $obj;
-    }
-
-    /**
-     * Format Elapsed Time
-     *
-     * @param  int  $secs  Seconds elapsed
-     * @return string
-     */
-    public function timeFormat($secs)
-    {
-        $bit = [
-            'y' => round($secs / 31556926) % 12,
-            'w' => round($secs / 604800) % 52,
-            'd' => round($secs / 86400) % 7,
-            'h' => round($secs / 3600) % 24,
-            'm' => round($secs / 60) % 60,
-            's' => $secs % 60,
-        ];
-        $ret = [];
-        foreach ($bit as $k => $v) {
-            if ($v > 0) {
-                $ret[] = $v . $k;
-            }
-        }
-
-        if (empty($ret)) {
-            return 'none';
-        }
-
-        return join(' ', $ret);
     }
 
     public function clearStaleAlerts()

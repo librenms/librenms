@@ -27,6 +27,11 @@ if ($device['os'] == 'edgeosolt') {
     require base_path('includes/discovery/ports/edgeosolt.inc.php');
 }
 
+//Get loop-telecom line card interfaces
+if ($device['os'] == 'loop-telecom') {
+    require base_path('includes/discovery/ports/loop-telecom.inc.php');
+}
+
 //Change Zynos ports from swp to 1/1
 if ($device['os'] == 'zynos') {
     require base_path('includes/discovery/ports/zynos.inc.php');
@@ -40,6 +45,11 @@ if ($device['os'] == 'airos-af-ltu') {
 //Teleste Luminato ifOperStatus
 if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
+}
+
+//Moxa Etherdevice portName mapping
+if ($device['os'] == 'moxa-etherdevice') {
+    require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
 }
 
 // End Building SNMP Cache Array

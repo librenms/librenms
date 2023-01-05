@@ -4866,6 +4866,16 @@
             "type": "boolean"
         },
         "reporting.dump_errors": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.usage": {
+            "group": "system",
+            "section": "reporting",
+            "order": 0,
             "default": false,
             "type": "boolean"
         },

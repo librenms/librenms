@@ -160,7 +160,7 @@ class ValidateDeviceAndCreate
         }
 
         if ($this->ping_fallback) {
-            $this->device->snmp_disable = 1;
+            $this->device->snmp_disable = true;
             $this->device->os = 'ping';
 
             return;

@@ -166,8 +166,9 @@ Once the LibreNMS service is installed, the cron scripts used by LibreNMS to sta
 
 ## Service Installation
 
-A systemd unit file is provided - the sysv and upstart init scripts
-could also be used with a little modification.
+A systemd unit file is provided - You must adapt `ExecStart` and `WorkingDirectory` if you did not install librenms in `/opt/librenms`
+
+The sysv and upstart init scripts could also be used with a little modification.
 
 ### systemd service
 
@@ -176,6 +177,8 @@ install run:
 ```bash
 cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
 ```
+
+
 
 ### systemd service with watchdog
 
@@ -234,16 +237,17 @@ replacement scl.
 
 #### Debian/Ubuntu
 
-##### Debian 9 (stretch)
+##### Debian 11 (Bullseye)
 
-install python3 and python-mysqldb. python-dotenv is not yet
-available, but the testing package is working fine, you can grab it on
-<https://packages.debian.org/fr/buster/all/python3-dotenv/download> (the
-package may be updated and have a new version number).
+Warning: Bullseye provide PHP 7.4 that is too old to run LibreNMS.
 
-```bash
-apt install python3 python-mysqldb
-cd /tmp
-wget http://ftp.fr.debian.org/debian/pool/main/p/python-dotenv/python3-dotenv_0.9.1-1_all.deb
-dpkg -i python3-dotenv_0.9.1-1_all.deb
+##### Debian 12 (Bookworm)
+
+Warning: Bookworm is not available as stable yet (as 2022 november).
+
+Install dependancies
 ```
+apt install python3 python3-mysqldb python3-dotenv
+```
+
+Add the `python3-systemd` package for service with watchdog.

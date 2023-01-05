@@ -2328,7 +2328,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2376,7 +2376,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -2393,7 +2393,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2426,7 +2426,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -2443,7 +2443,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2478,7 +2478,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2526,7 +2526,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -2543,7 +2543,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2551,7 +2551,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -2568,7 +2568,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2576,7 +2576,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -2593,7 +2593,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2626,7 +2626,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -2643,7 +2643,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -2976,7 +2976,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.6.0",
                     "sensor_index": "zfsArcC.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC C",
+                    "sensor_descr": "ARC Target Size (C)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3024,7 +3024,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.4.0",
-                    "sensor_index": "zfsArcHits.0",
+                    "sensor_index": "zfsArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Hits",
                     "group": null,
@@ -3041,7 +3041,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3074,7 +3074,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.5.0",
-                    "sensor_index": "zfsArcMisses.0",
+                    "sensor_index": "zfsArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "ARC Misses",
                     "group": null,
@@ -3091,7 +3091,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3126,7 +3126,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.4.7.0",
                     "sensor_index": "zfsArcP.0",
                     "sensor_type": "truenas",
-                    "sensor_descr": "ARC P",
+                    "sensor_descr": "ARC MRU Target Size (P)",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3174,7 +3174,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.1.0",
-                    "sensor_index": "zfsL2ArcHits.0",
+                    "sensor_index": "zfsL2ArcHits_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Hits",
                     "group": null,
@@ -3191,7 +3191,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3199,7 +3199,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.2.0",
-                    "sensor_index": "zfsL2ArcMisses.0",
+                    "sensor_index": "zfsL2ArcMisses_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Misses",
                     "group": null,
@@ -3216,7 +3216,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3224,7 +3224,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.3.0",
-                    "sensor_index": "zfsL2ArcRead.0",
+                    "sensor_index": "zfsL2ArcRead_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Reads",
                     "group": null,
@@ -3241,7 +3241,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {
@@ -3274,7 +3274,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.50536.1.5.4.0",
-                    "sensor_index": "zfsL2ArcWrite.0",
+                    "sensor_index": "zfsL2ArcWrite_rate.0",
                     "sensor_type": "truenas",
                     "sensor_descr": "L2ARC Writes",
                     "group": null,
@@ -3291,7 +3291,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "rrd_type": "GAUGE",
+                    "rrd_type": "COUNTER",
                     "state_name": null
                 },
                 {

@@ -1077,8 +1077,8 @@ return [
         'update_channel' => [
             'description' => 'Choisir le canal des mises à jour',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [
