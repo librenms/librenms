@@ -130,6 +130,10 @@ if (! $snmpsim->isRunning()) {
     exit(1);
 }
 
+echo "Pausing 3 seconds to allow snmpsim to initialize...\n";
+sleep(3);
+echo "\n";
+
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
     foreach ($os_list as $full_os_name => $parts) {
