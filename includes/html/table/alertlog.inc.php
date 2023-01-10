@@ -85,11 +85,14 @@ if ($rowCount != -1) {
 $sql = "SELECT R.severity, D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 
 $rulei = 0;
+$alert_offsets=[];
 foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
     logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
+    $offset_id= $alertlog['rule_id'] . "_" . $alertlog['device_id'];
+    $alert_offsets[$offset_id] = array_key_exists($offset_id,$alert_offsets) ? $alert_offsets[$offset_id]++:0;
+    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1 OFFSET ?', [$alertlog['rule_id'], $alertlog['device_id'],$alert_offsets[$offset_id]]);
     [$fault_detail, $max_row_length] = alert_details($log);
 
     if (empty($fault_detail)) {
