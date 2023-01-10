@@ -112,3 +112,30 @@ Output:
     "message": "Location updated successfully"
 }
 ```
+
+###`get_location`
+
+Gets a specific location
+
+Route: `/api/v0/location/:location`
+
+- location: name or id of the location to get
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "get_location": [
+        {
+            "id": 1,
+            "location": "TEST",
+            "lat": 00.000000,
+            "lng": 00.000000,
+            "timestamp": "2023-01-01 00:00:00",
+            "fixed_coordinates": 1
+        }
+    ],
+    "count": 1
+}
+```
