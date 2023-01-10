@@ -2837,6 +2837,7 @@ function edit_location(Illuminate\Http\Request $request)
 
     return api_error(500, 'Failed to update location');
 }
+
 function get_location(Illuminate\Http\Request $request)
 {
     $location = $request->route('location_id_or_name');
