@@ -4295,6 +4295,7 @@
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
+                        {"match": "fortiswitch", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
