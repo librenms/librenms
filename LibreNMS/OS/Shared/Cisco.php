@@ -320,7 +320,7 @@ class Cisco extends OS implements
     {
         $slas = new Collection();
 
-        $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB');
+        $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonCtrl', [], 'CISCO-RTTMON-MIB', null, '-OQUsx');
 
         if (! empty($sla_data)) {
             $sla_data = snmpwalk_cache_oid($this->getDeviceArray(), 'rttMonLatestRttOperCompletionTime', $sla_data, 'CISCO-RTTMON-MIB');
