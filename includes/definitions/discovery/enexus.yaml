@@ -1,7 +1,9 @@
 mib: SP2-MIB
 modules:
     os:
-        hardware: SP2-MIB::powerSystemModel.0
+        hardware:
+            - SP2-MIB::controlUnitDescription.1
+            - SP2-MIB::controlUnitDescription.2
         version:
             - SP2-MIB::controlUnitSwVersion.1
             - SP2-MIB::controlUnitSwVersion.2
@@ -319,8 +321,8 @@ modules:
                     skip_values:
                         -
                             device: hardware
-                            op: '='
-                            value: Smartpack S
+                            op: 'regex'
+                            value: '/^Smart[Pp]ack S.*/'
                 -  # Smartpack S returns 10ths of an amp
                     oid: rectifiersCurrent
                     value: rectifiersCurrentValue
@@ -333,8 +335,8 @@ modules:
                     high_limit: rectifiersCurrentMajorAlarmLevel
                     skip_values:
                         - device: hardware
-                          op: '!='
-                          value: Smartpack S
+                          op: 'not_regex'
+                          value: '/^Smart[Pp]ack S.*/'
                 -
                     oid: rectifierTable
                     value: rectifierOutputCurrentValue
