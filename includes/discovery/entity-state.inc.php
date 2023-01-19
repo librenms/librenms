@@ -56,7 +56,7 @@ if (! empty($entPhysical)) {
 
             if (isset($db_states[$id])) { // update the db
                 $db_state = $db_states[$id];
-                $update = array_diff($state, $db_state);
+                $update = array_diff_assoc($state, $db_state);
 
                 if (! empty($update)) {
                     if (array_key_exists('entStateLastChanged', $update) && is_null($update['entStateLastChanged'])) {
