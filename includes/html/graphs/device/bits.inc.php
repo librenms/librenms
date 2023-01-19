@@ -18,8 +18,8 @@ foreach ($ports as $port) {
             if (in_array($iftype, ['/virtual/', '/l2vlan/']) && $device['os'] == 'asa') {
                 // ASA (at least in multicontext) reports interfaces as l2vlan even if they are l3
                 // or propVirtual in 9.16 (like etherchannels) but without the physical ones.
-                // Removing thos types results in empty device_bits graphs in ASAs. 
-                // This patch will ignore l2vlan and propVirtual for ASA.
+                // Filtering those types results in empty device_bits graphs in ASAs.
+                // This patch will avoid filtering l2vlan and propVirtual on ASA devices.
                 continue;
             }
             if (preg_match($iftype . 'i', $port['ifType'])) {
