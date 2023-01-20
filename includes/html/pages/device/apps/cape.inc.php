@@ -146,7 +146,8 @@ if (isset($vars['package'])) {
             'cape_pending' => 'Pending',
             'cape_lines' => 'Log Lines',
             'cape_run_stats' => 'Run Stats',
-            'cape_malscore_stats' => 'Malscore Averages'
+            'cape_malscore_stats' => 'Malscore Averages',
+            'cape_pkg_tasks_all' => 'Package Tasks',
         ];
 
         if ($vars['bypkg'] == 'on') {
