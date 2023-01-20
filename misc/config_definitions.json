@@ -1988,6 +1988,10 @@
             "default": false,
             "type": "boolean"
         },
+        "enable_proxmox": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
