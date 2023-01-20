@@ -9,6 +9,7 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+use App\Facades\DeviceCache;
 $pagetitle[] = 'Oxidized';
 ?>
 <div class="col-xs-12">
@@ -121,7 +122,7 @@ $pagetitle[] = 'Oxidized';
                     $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
                         if (value['dev_id']) {
-                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + value['full_name'] + '</p>');
+                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + DeviceCache::get(value['dev_id'])->displayName() + '</p>');
                         } else {
                             $('#search-output').append('<p>' + value['full_name'] + '</p>');
                         }
