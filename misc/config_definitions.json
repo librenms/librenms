@@ -5155,6 +5155,10 @@
                 "value": "url"
             }
         },
+        "rrd.enable": {
+            "default": true,
+            "type": "boolean"
+        },
         "snmptraps.eventlog": {
             "default": "unhandled",
             "group": "external",
