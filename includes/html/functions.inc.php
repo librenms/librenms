@@ -14,6 +14,7 @@ use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
+use App\Facades\DeviceCache;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
@@ -923,6 +924,7 @@ function search_oxidized_config($search_in_conf_textbox)
     foreach ($nodes as &$n) {
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
+        $n['full_name']=DeviceCache::get($n['dev_id'])->displayName()?$dev['device_id']:$n['full_name']
     }
 
     /*
