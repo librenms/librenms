@@ -2075,6 +2075,10 @@
             "default": true,
             "type": "boolean"
         },
+        "error_font": {
+            "default": null,
+            "type": "text"
+        },
         "eventlog_purge": {
             "default": 30,
             "units": "days",
