@@ -37,7 +37,7 @@ use File::Slurp;
 if ( -f 'find_missing_config_defs' && -d '../LibreNMS' && -f '../misc/config_definitions.json' ) {
 	chdir('..');
 }
-elsif ( -d './LibreNMS' && -f './misc/config_definitions.json' ) {
+elsif ( ! -d './LibreNMS' && ! -f './misc/config_definitions.json' ) {
 	die('Does not appear to be the LibreNMS base directory. Please CD to there and rerun this script');
 }
 
