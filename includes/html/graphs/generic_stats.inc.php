@@ -119,9 +119,14 @@ $rrd_optionsb .= ' LINE1.25:' . $id . '1w#' . $colour1w . ":'$descr_1w'";
 $rrd_optionsb .= ' GPRINT:' . $id . '1w:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1w:MIN:%5.' . $float_precision . 'lf%s' . $units;
 $rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
-$rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile\\n';
-$rrd_optionsb .= ' HRULE:' . $id . '50th#' . $colour50th . ':50th_Percentile\\n';
-$rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile\\n';
+$rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
+$rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
+
+$rrd_optionsb .= ' HRULE:' . $id . '50th#' . $colour50th . ':50th_Percentile';
+$rrd_optionsb .= ' GPRINT:' . $id . '50th:%' . $float_precision . 'lf%s\n';
+
+$rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
+$rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
 
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';
