@@ -4963,6 +4963,10 @@
             "order": 2,
             "type": "text"
         },
+        "norrd": {
+            "default": false,
+            "type": "boolean"
+        },
         "notifications.LibreNMS": {
             "default": "https://www.librenms.org/notifications.rss",
             "type": "text"
