@@ -4257,6 +4257,22 @@
             "default": true,
             "type": "boolean"
         },
+        "ignore_bsd_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 6,
+            "default": [
+            ],
+            "type": "array"
+        },
+        "ignore_junos_os_drives": {
+            "group": "discovery",
+            "section": "storage",
+            "order": 7,
+            "default": [
+            ],
+            "type": "array"
+        },
         "ignore_mount": {
             "group": "discovery",
             "section": "storage",
