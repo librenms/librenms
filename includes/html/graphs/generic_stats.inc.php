@@ -98,10 +98,15 @@ $id = 'ds' . $i;
 $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
 $rrd_options .= ' DEF:' . $id . "1h=$filename:$ds:AVERAGE:step=3600";
 $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
-$rrd_options .= ' DEF:' . $id . "1w=$filename:$ds:AVERAGE:step=604800";
 $rrd_options .= ' VDEF:' . $id . "50th=". $id .",50,PERCENTNAN";
 $rrd_options .= ' VDEF:' . $id . "25th=". $id .",25,PERCENTNAN";
 $rrd_options .= ' VDEF:' . $id . "75th=". $id .",75,PERCENTNAN";
+
+// weekly breaks and causes issues if it is less than 8 days
+$time_diff=$vars['to'] - $vars['from'];
+if ( $time_diff >= 691200 ){
+    $rrd_options .= ' DEF:' . $id . "1w=$filename:$ds:AVERAGE:step=604800";
+}
 
 $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ':MIN:%5.' . $float_precision . 'lf%s' . $units;
@@ -115,9 +120,11 @@ $rrd_optionsb .= ' LINE1.25:' . $id . '1d#' . $colour1d . ":'$descr_1d'";
 $rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
 $rrd_optionsb .= ' GPRINT:' . $id . '1d:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1d:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
-$rrd_optionsb .= ' LINE1.25:' . $id . '1w#' . $colour1w . ":'$descr_1w'";
-$rrd_optionsb .= ' GPRINT:' . $id . '1w:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1w:MIN:%5.' . $float_precision . 'lf%s' . $units;
-$rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+if ( $time_diff >= 691200 ){
+    $rrd_optionsb .= ' LINE1.25:' . $id . '1w#' . $colour1w . ":'$descr_1w'";
+    $rrd_optionsb .= ' GPRINT:' . $id . '1w:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1w:MIN:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb .= ' GPRINT:' . $id . '1w:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1w:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+}
 
 $rrd_optionsb .= ' HRULE:' . $id . '25th#' . $colour25th . ':25th_Percentile';
 $rrd_optionsb .= ' GPRINT:' . $id . '25th:%' . $float_precision . 'lf%s\n';
