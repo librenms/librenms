@@ -2108,6 +2108,14 @@
             "default": 10,
             "type": "integer"
         },
+        "gateone.server": {
+            "default": null,
+            "type": "text"
+        },
+        "gateone.use_librenms_user": {
+            "default": false,
+            "type": "boolean"
+        },
         "geoloc.api_key": {
             "default": "",
             "group": "external",
