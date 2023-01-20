@@ -10,11 +10,11 @@
  * @copyright  (C) 2013 LibreNMS Group
  */
 
+use App\Facades\DeviceCache;
 use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use App\Facades\DeviceCache;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
