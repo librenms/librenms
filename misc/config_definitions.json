@@ -409,6 +409,41 @@
             "type": "boolean",
             "default": false
         },
+        "auth_ad_debug": {
+            "group": "auth",
+            "section": "ad",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_global_read": {
+            "group": "auth",
+            "section": "ad",
+            "order": 3,
+            "type": "boolean",
+            "default": false
+        },
+        "auth_ad_group": {
+            "group": "auth",
+            "section": "ad",
+            "order": 4,
+            "type": "text",
+            "default": null
+        },
+        "auth_ad_require_groupmembership": {
+            "group": "auth",
+            "section": "ad",
+            "order": 5,
+            "type": "boolean",
+            "default": true
+        },
+        "auth_ad_timeout": {
+            "group": "auth",
+            "section": "ad",
+            "order": 6,
+            "type": "integer",
+            "default": 5
+        },
         "auth.socialite.redirect": {
             "group": "auth",
             "section": "socialite",
@@ -5161,6 +5196,30 @@
             "validate": {
                 "value": "url"
             }
+        },
+        "radius.default_level": {
+            "default": 1,
+            "type": "integer"
+        },
+        "radius.hostname": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.port": {
+            "default": null,
+            "type": "integer"
+        },
+        "radius.users_purge": {
+            "default": null,
+            "type": "boolean"
+        },
+        "radius.secret": {
+            "default": null,
+            "type": "text"
+        },
+        "radius.suffix": {
+            "default": null,
+            "type": "text"
         },
         "rrd.enable": {
             "default": true,
