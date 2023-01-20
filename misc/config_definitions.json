@@ -4979,6 +4979,13 @@
             "default": true,
             "type": "boolean"
         },
+        "opentsdb.co": {
+            "default": null,
+            "type": "boolean",
+            "group": "poller",
+            "section": "opentsdb",
+            "order": 3
+        },
         "opentsdb.enable": {
             "default": false,
             "type": "boolean",
