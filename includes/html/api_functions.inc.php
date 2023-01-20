@@ -2849,7 +2849,7 @@ function get_location(Illuminate\Http\Request $request)
     if (count($data) == 0) {
         return api_error(404, 'Location does not exist');
     }
-    
+
     return api_success($data, 'get_location');
 }
 
