@@ -8,6 +8,7 @@ $dostack = 0;
 $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
+$float_precision = 3;
 
 $packages = Rrd::getRrdApplicationArrays($device, $app['app_id'], 'cape', 'pkg-files_written___-___');
 

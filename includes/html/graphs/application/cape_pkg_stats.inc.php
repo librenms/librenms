@@ -8,6 +8,7 @@ $dostack = 0;
 $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
+$float_precision = 3;
 
 $rrd_filename_anti_issues = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-anti_issues___-___',$vars['package']]);
 $rrd_filename_api_calls = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-api_calls___-___',$vars['package']]);

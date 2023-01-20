@@ -8,6 +8,7 @@ $dostack = 0;
 $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
+$float_precision = 3;
 
 if (isset($vars['stddev'])) {
     if ($vars['stddev'] != 'on' and $vars['stddev'] != 'off') {

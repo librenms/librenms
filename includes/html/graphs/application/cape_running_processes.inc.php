@@ -8,6 +8,7 @@ $dostack = 0;
 $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
+$float_precision = 3;
 
 if (isset($vars['package'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-running_processes___-___',$vars['package']]);
