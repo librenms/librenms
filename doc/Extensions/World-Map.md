@@ -30,7 +30,7 @@ or
 ```
 1100 Congress Ave, Austin, TX 78701 (3rd floor cabinet)
 ```
-*Informatioinside parentheses is ignored during GEO lookup*
+*Information inside parentheses is ignored during GEO lookup*
 
 We have two current mapping engines available:
 
