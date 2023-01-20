@@ -2011,6 +2011,10 @@
             "order": 1,
             "type": "text"
         },
+        "empty_ifdescr": {
+            "default": false,
+            "type": "boolean"
+        },
         "enable_billing": {
             "default": false,
             "type": "boolean"
