@@ -108,6 +108,11 @@ if ( $time_diff >= 691200 ){
     $rrd_options .= ' DEF:' . $id . "1w=$filename:$ds:AVERAGE:step=604800";
 }
 
+// displays nan if less than 17 hours
+if ( $time_diff >= 61200 ){
+    $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
+}
+
 $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ':MIN:%5.' . $float_precision . 'lf%s' . $units;
 $rrd_optionsb .= ' GPRINT:' . $id . ':MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
@@ -116,9 +121,11 @@ $rrd_optionsb .= ' LINE1.25:' . $id . '1h#' . $colour1h . ":'$descr_1h'";
 $rrd_optionsb .= ' GPRINT:' . $id . '1h:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1h:MIN:%5.' . $float_precision . 'lf%s' . $units;
 $rrd_optionsb .= ' GPRINT:' . $id . '1h:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1h:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
-$rrd_optionsb .= ' LINE1.25:' . $id . '1d#' . $colour1d . ":'$descr_1d'";
-$rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
-$rrd_optionsb .= ' GPRINT:' . $id . '1d:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1d:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+if ( $time_diff >= 61200 ){
+    $rrd_optionsb .= ' LINE1.25:' . $id . '1d#' . $colour1d . ":'$descr_1d'";
+    $rrd_optionsb .= ' GPRINT:' . $id . '1d:LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . '1d:MIN:%5.' . $float_precision . 'lf%s' . $units;
+    $rrd_optionsb .= ' GPRINT:' . $id . '1d:MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . "1d:AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
+}
 
 if ( $time_diff >= 691200 ){
     $rrd_optionsb .= ' LINE1.25:' . $id . '1w#' . $colour1w . ":'$descr_1w'";
