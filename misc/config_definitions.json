@@ -966,6 +966,10 @@
             "default": null,
             "type": "directory"
         },
+        "collectd_sock": {
+            "default": null,
+            "type": "text"
+        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
