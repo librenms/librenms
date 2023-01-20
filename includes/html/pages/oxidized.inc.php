@@ -122,7 +122,7 @@ $pagetitle[] = 'Oxidized';
                     $('#search-output').append('<p>Config appears on the following device(s):</p>');
                     $.each(data.output, function (row, value) {
                         if (value['dev_id']) {
-                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + DeviceCache::get(value['dev_id'])->displayName() + '</p>');
+                            $('#search-output').append('<p><a href="<?= url('device') ?>/' + value['dev_id'] + '/tab=showconfig/">' + <?= DeviceCache::get(value['dev_id'])->displayName() ?> + '</p>');
                         } else {
                             $('#search-output').append('<p>' + value['full_name'] + '</p>');
                         }
