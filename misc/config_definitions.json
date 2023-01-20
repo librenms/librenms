@@ -4795,20 +4795,28 @@
             "order": 0,
             "type": "boolean"
         },
+
+        "nfsen_base": {
+            "default": "/var/nfsen/",
+            "group": "external",
+            "section": "nfsen",
+            "order": 1,
+            "type": "text"
+        },
         "nfsen_rrds": {
             "default": [
                 "/var/nfsen/profiles-stat/live"
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 1,
+            "order": 2,
             "type": "array"
         },
         "nfsen_subdirlayout": {
             "default": 1,
             "group": "external",
             "section": "nfsen",
-            "order": 2,
+            "order": 3,
             "type": "select",
             "options": {
                 "0": "0. flat layout",
@@ -4826,7 +4834,7 @@
             "default": 153600,
             "group": "external",
             "section": "nfsen",
-            "order": 3,
+            "order": 4,
             "type": "integer",
             "units": "seconds"
         },
@@ -4834,7 +4842,7 @@
             "default": 500,
             "group": "external",
             "section": "nfsen",
-            "order": 4,
+            "order": 5,
             "type": "integer"
         },
         "nfsen_top_N": {
@@ -4848,39 +4856,42 @@
             ],
             "group": "external",
             "section": "nfsen",
-            "order": 5,
+            "order": 6,
             "type": "array"
         },
         "nfsen_top_default": {
             "default": 20,
             "group": "external",
             "section": "nfsen",
-            "order": 6,
+            "order": 7,
             "type": "integer"
         },
         "nfsen_stat_default": {
             "default": "srcip",
             "group": "external",
             "section": "nfsen",
-            "order": 7,
+            "order": 8,
             "type": "text"
         },
         "nfsen_order_default": {
             "default": "packets",
             "group": "external",
             "section": "nfsen",
-            "order": 8,
+            "order": 9,
             "type": "text"
         },
         "nfsen_last_default": {
             "default": 900,
             "group": "external",
             "section": "nfsen",
-            "order": 9,
+            "order": 10,
             "type": "integer",
             "units": "seconds"
         },
         "nfsen_lasts": {
+            "group": "external",
+            "section": "nfsen",
+            "order": 11,
             "default": {
                 "300": "5 minutes",
                 "600": "10 minutes",
@@ -4905,13 +4916,13 @@
         "nfsen_split_char": {
             "group": "external",
             "section": "nfsen",
-            "order": 11,
+            "order": 12,
             "type": "text"
         },
         "nfsen_suffix": {
             "group": "external",
             "section": "nfsen",
-            "order": 12,
+            "order": 13,
             "type": "text"
         },
         "nmap": {
