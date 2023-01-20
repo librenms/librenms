@@ -16,6 +16,8 @@ try {
     return;
 }
 
+$current_packages=Rrd::getRrdApplicationArrays($device, $app['app_id'], 'cape', 'pkg-dropped_files___-___');
+
 # general RRD def for base stats
 $rrd_name = ['app', $name, $app_id];
 $rrd_def_general = RrdDefinition::make()
@@ -512,7 +514,10 @@ $rrd_def_pkg = RrdDefinition::make()
         ->addDataset('failed_analysis', 'GAUGE', 0)
         ->addDataset('failed_processing', 'GAUGE', 0);
 
+$found_packages=[];
 foreach ($returned['pkg_stats'] as $pkg => $stats) {
+    $found_packages['pkg-dropped_files___-___-' . $pkg]=$pkg;
+
     $rrd_name = ['app', $name, $app_id, 'pkg___-___', $pkg];
     $fields = [
         'tasks' => $returned['pkg_stats'][$pkg]['tasks'],
@@ -755,6 +760,254 @@ foreach ($returned['pkg_stats'] as $pkg => $stats) {
     ];
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_weight, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
+}
+
+// zero any rrds for existing packages
+foreach ($current_packages as $index => $current_package){
+    $pkg=str_replace('pkg-dropped_files___-___-', '', $current_package);
+
+    if (!isset($found_packages[$current_package])) {
+        echo $pkg. " not handled, zeroing states for this timeslot\n";
+
+        $rrd_name = ['app', $name, $app_id, 'pkg___-___', $pkg];
+        $fields = [
+            'tasks' => 0,
+            'pending' => null,
+            'banned' => 0,
+            'running' => 0,
+            'completed' => 0,
+            'distributed' => 0,
+            'reported' => 0,
+            'recovered' => 0,
+            'failed_analysis' => 0,
+            'failed_processing' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_pkg, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-dropped_files___-___', $pkg];
+        $fields = [
+            'dropped_files' => 0,
+            's0dropped_files' => 0,
+            's1dropped_files' => 0,
+            's2dropped_files' => 0,
+            's3dropped_files' => 0,
+            's4dropped_files' => 0,
+            's5dropped_files' => 0,
+            's6dropped_files' => 0,
+            's7dropped_files' => 0,
+            's8dropped_files' => 0,
+            's9dropped_files' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_dropped_files, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-running_processes___-___', $pkg];
+        $fields = [
+            'running_processes' => 0,
+            's0running_processes' => 0,
+            's1running_processes' => 0,
+            's2running_processes' => 0,
+            's3running_processes' => 0,
+            's4running_processes' => 0,
+            's5running_processes' => 0,
+            's6running_processes' => 0,
+            's7running_processes' => 0,
+            's8running_processes' => 0,
+            's9running_processes' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_running_processes, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-api_calls___-___', $pkg];
+        $fields = [
+            'api_calls' => 0,
+            's0api_calls' => 0,
+            's1api_calls' => 0,
+            's2api_calls' => 0,
+            's3api_calls' => 0,
+            's4api_calls' => 0,
+            's5api_calls' => 0,
+            's6api_calls' => 0,
+            's7api_calls' => 0,
+            's8api_calls' => 0,
+            's9api_calls' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_api_calls, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-domains___-___', $pkg];
+        $fields = [
+            'domains' => 0,
+            's0domains' => 0,
+            's1domains' => 0,
+            's2domains' => 0,
+            's3domains' => 0,
+            's4domains' => 0,
+            's5domains' => 0,
+            's6domains' => 0,
+            's7domains' => 0,
+            's8domains' => 0,
+            's9domains' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_domains, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-signatures_total___-___', $pkg];
+        $fields = [
+            'signatures_total' => 0,
+            's0signatures_total' => 0,
+            's1signatures_total' => 0,
+            's2signatures_total' => 0,
+            's3signatures_total' => 0,
+            's4signatures_total' => 0,
+            's5signatures_total' => 0,
+            's6signatures_total' => 0,
+            's7signatures_total' => 0,
+            's8signatures_total' => 0,
+            's9signatures_total' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_signatures_total, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-signatures_alert___-___', $pkg];
+        $fields = [
+            'signatures_alert' => 0,
+            's0signatures_alert' => 0,
+            's1signatures_alert' => 0,
+            's2signatures_alert' => 0,
+            's3signatures_alert' => 0,
+            's4signatures_alert' => 0,
+            's5signatures_alert' => 0,
+            's6signatures_alert' => 0,
+            's7signatures_alert' => 0,
+            's8signatures_alert' => 0,
+            's9signatures_alert' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_signatures_alert, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-reg_keys_mod___-___', $pkg];
+        $fields = [
+            'reg_keys_mod' => 0,
+            's0regkeysmod' => 0,
+            's1regkeysmod' => 0,
+            's2regkeysmod' => 0,
+            's3regkeysmod' => 0,
+            's4regkeysmod' => 0,
+            's5regkeysmod' => 0,
+            's6regkeysmod' => 0,
+            's7regkeysmod' => 0,
+            's8regkeysmod' => 0,
+            's9regkeysmod' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_reg_keys_mod, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-crash_issues___-___', $pkg];
+        $fields = [
+            'crash_issues' => 0,
+            's0crash_issues' => 0,
+            's1crash_issues' => 0,
+            's2crash_issues' => 0,
+            's3crash_issues' => 0,
+            's4crash_issues' => 0,
+            's5crash_issues' => 0,
+            's6crash_issues' => 0,
+            's7crash_issues' => 0,
+            's8crash_issues' => 0,
+            's9crash_issues' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_crash_issues, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-anti_issues___-___', $pkg];
+        $fields = [
+            'anti_issues' => 0,
+            's0anti_issues' => 0,
+            's1anti_issues' => 0,
+            's2anti_issues' => 0,
+            's3anti_issues' => 0,
+            's4anti_issues' => 0,
+            's5anti_issues' => 0,
+            's6anti_issues' => 0,
+            's7anti_issues' => 0,
+            's8anti_issues' => 0,
+            's9anti_issues' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_anti_issues, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-files_written___-___', $pkg];
+        $fields = [
+            'files_written' => 0,
+            's0files_written' => 0,
+            's1files_written' => 0,
+            's2files_written' => 0,
+            's3files_written' => 0,
+            's4files_written' => 0,
+            's5files_written' => 0,
+            's6files_written' => 0,
+            's7files_written' => 0,
+            's8files_written' => 0,
+            's9files_written' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_files_written, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-malscore___-___', $pkg];
+        $fields = [
+            'malscore' => 0,
+            's0malscore' => 0,
+            's1malscore' => 0,
+            's2malscore' => 0,
+            's3malscore' => 0,
+            's4malscore' => 0,
+            's5malscore' => 0,
+            's6malscore' => 0,
+            's7malscore' => 0,
+            's8malscore' => 0,
+            's9malscore' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_malscore, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-confidence___-___', $pkg];
+        $fields = [
+            'confidence' => 0,
+            's0confidence' => 0,
+            's1confidence' => 0,
+            's2confidence' => 0,
+            's3confidence' => 0,
+            's4confidence' => 0,
+            's5confidence' => 0,
+            's6confidence' => 0,
+            's7confidence' => 0,
+            's8confidence' => 0,
+            's9confidence' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_confidence, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+
+        $rrd_name = ['app', $name, $app_id, 'pkg-weight___-___', $pkg];
+        $fields = [
+            'weight' => 0,
+            's0weight' => 0,
+            's1weight' => 0,
+            's2weight' => 0,
+            's3weight' => 0,
+            's4weight' => 0,
+            's5weight' => 0,
+            's6weight' => 0,
+            's7weight' => 0,
+            's8weight' => 0,
+            's9weight' => 0,
+        ];
+        $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def_weight, 'rrd_name' => $rrd_name];
+        data_update($device, 'app', $tags, $fields);
+    }else{
+        echo $pkg. " handled, skipping zeroing this timeslot\n";
+    }
 }
 
 // log any warnings
