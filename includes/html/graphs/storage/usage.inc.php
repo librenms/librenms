@@ -5,6 +5,8 @@ $scale_max = '100';
 
 require 'includes/html/graphs/common.inc.php';
 
+$previous = $graph_params->visible('previous');
+
 $rrd_options .= ' -b 1024';
 
 $iter = '1';
@@ -32,7 +34,7 @@ $rrd_options .= ' GPRINT:size:LAST:%6.2lf%sB';
 $rrd_options .= ' GPRINT:free:LAST:%6.2lf%sB';
 $rrd_options .= ' GPRINT:perc:LAST:%5.2lf%%\\n';
 
-if ($_GET['previous']) {
+if ($previous) {
     $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Prev ' . $storage['storage_descr'], 16);
 
     $colour = '99999999';

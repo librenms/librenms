@@ -51,6 +51,84 @@ like that for proxmox:
 extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 ```
 
+### JSON Return Optimization Using librenms_return_optimizer
+
+While the json_app_get does allow for more complex and larger data
+to be easily returned by a extend and the data to then be worked
+with, this can also sometimes result in large returns that
+occasionally don't play nice with SNMP on some networks.
+
+`librenms_return_optimizer` fixes this via taking the extend output
+piped to it, gzipping it, and then converting it to base64. The
+later is needed as net-snmp does not play that nice with binary data,
+converting most of the non-printable characters to `.`. This does add
+a bit of additional overhead to the gzipped data, but still tends to
+be result in a return that is usually a third of the size for JSONs
+items.
+
+The change required is fairly simply. So for the portactivity example below...
+
+```
+extend portactivity /etc/snmp/extends/portactivity smtps,http,imap,imaps,postgresql,https,ldap,ldaps,nfsd,syslog-conn,ssh,matrix,gitea
+```
+
+Would become this...
+
+```
+extend portactivity /usr/local/bin/lnms_return_optimizer -- /etc/snmp/extends/portactivity smtps,http,imap,imaps,postgresql,https,ldap,ldaps,nfsd,syslog-conn,ssh,matrix,gitea
+```
+
+The requirements for this are Perl, MIME::Base64, and Gzip::Faster.
+
+Installing on FreeBSD...
+
+```
+pkg install p5-MIME-Base64 p5-Gzip-Faster wget
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/librenms_return_optimizer -O /usr/local/bin/librenms_return_optimizer
+chmod +x /usr/local/bin/librenms_return_optimizer
+```
+
+Installing on Debian...
+
+```
+apt-get install zlib1g-dev cpanminus wget
+cpanm Gzip::Faster
+cpanm MIME::Base64
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/utils/librenms_return_optimizer -O /usr/local/bin/librenms_return_optimizer
+chmod +x /usr/local/bin/librenms_return_optimizer
+```
+
+Currently supported applications as are below.
+
+- backupninja
+- certificate
+- chronyd
+- dhcp-stats
+- docker
+- fail2ban
+- fbsd-nfs-client
+- fbsd-nfs-server
+- gpsd
+- mailcow-postfix
+- mdadm
+- ntp-client
+- ntp-server
+- portactivity
+- powerdns
+- powermon
+- puppet-agent
+- pureftpd
+- redis
+- seafile
+- supervisord
+- ups-apcups
+- zfs
+
+The following apps have extends that have native support for this,
+if congiured to do so.
+
+- suricata
+
 ## Enable the application discovery module
 
 1. Edit the device for which you want to add this support
@@ -325,12 +403,15 @@ Content of an example /etc/snmp/certificate.json . Please edit with your own set
     {"fqdn": "www.mydomain.com"},
     {"fqdn": "some.otherdomain.org",
      "port": 8443},
-    {"fqdn": "personal.domain.net"}
+    {"fqdn": "personal.domain.net"},
+    {"fqdn": "selfsignedcert_host.domain.com",
+     "cert_location": "/etc/pki/tls/certs/localhost.pem"}
 ]
 }
 ```
-Key 'domains' contains a list of domains to check.
-Optional you can define a port. By default it checks on port 443.
+a. (Required): Key 'domains' contains a list of domains to check.
+b. (Optional): You can define a port. By default it checks on port 443.
+c. (Optional): You may define a certificate location for self-signed certificates.
 
 ### SNMP Extend
 1. Copy the shell script to the desired host.
@@ -766,6 +847,56 @@ You may need to configure `$server` or `$port`.
 
 Verify it is working by running `/usr/lib/check_mk_agent/local/gpsd`
 
+## HV Monitor
+
+HV Monitor provides a generic way to monitor hypervisors. Currently
+CBSD+bhyve on FreeBSD and Libvirt+QEMU on Linux are support.
+
+For more information see
+HV::Monitor on
+[Github](https://github.com/VVelox/HV-Monitor)
+or [MetaCPAN](https://metacpan.org/dist/HV-Monitor).
+
+### SNMP Extend
+
+1. Install the SNMP Extend.
+
+For Debian based systems this is as below.
+
+```
+apt-get install zlib1g-dev cpanminus libjson-perl
+cpanm HV::Monitor
+```
+
+And on FreeBSD as below.
+
+```
+pkg install p5-App-cpanminus p5-JSON p5-MIME-Base64 p5-Gzip-Faster
+cpanm HV::Monitor
+```
+
+2. Set it up to be be ran by cron by root. Yes, you can directly call
+   this script from SNMPD, but be aware, especially with Libvirt,
+   there is a very real possibility of the snmpget timing out,
+   especially if a VM is spinning up/down as virsh domstats can block
+   for a few seconds or so then.
+
+```
+*/5 * * * * /usr/local/bin/hv_monitor > /var/cache/hv_monitor.json -c 2> /dev/null
+```
+
+3. Setup snmpd.conf as below.
+
+```
+extend hv-monitor /bin/cat
+/var/cache/hv_monitor.json
+
+```
+
+4. Restart SNMPD.
+
+5. Either wait for it to be re-discovered or manually enable it.
+
 ## Icecast
 
 Shell script that reports load average/memory/open-files stats of Icecast
@@ -877,26 +1008,41 @@ Extend` heading top of page.
 
 ## Mdadm
 
-This shell script checks mdadm health and array data
+It allows you to checks mdadm health and array data
+
+This script require: jq
 
 ### SNMP Extend
 
-1. Download the script onto the desired host.
+1. Install jq
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/mdadm
+sudo apt install jq
 ```
 
-3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+2. Download the script onto the desired host.
+```
+sudo wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
+```
+
+3. Make the script executable
+```
+sudo chmod +x /etc/snmp/mdadm
+```
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 ```
 extend mdadm /etc/snmp/mdadm
 ```
 
-4. Restart snmpd on your host
+5. Verify it is working by running
+```
+sudo /etc/snmp/mdadm
+```
+
+6. Restart snmpd on your host
+```
+sudo service snmpd restart
+```
 
 The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
@@ -922,10 +1068,10 @@ pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
 ### SNMP Extend
 
 1. Copy the [memcached
-   script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached)
+   script](https://github.com/librenms/librenms-agent/blob/master/snmp/memcached)
    to `/etc/snmp/` on your remote server.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/memcached -O /etc/snmp/memcached
 ```
 
 2. Make the script executable:
@@ -1227,6 +1373,45 @@ sees them as being.
 For questions about what the various values are/mean, please see the
 nvidia-smi man file under the section covering dmon.
 
+## Opensearch\Elasticsearch
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensearch -O /etc/snmp/opensearch
+```
+
+2. Make it executable
+```
+chmod +x /etc/snmp/opensearch
+```
+
+3. Install the required Perl dependencies.
+```
+# FreeBSD
+pkg install p5-JSON p5-libwww
+# Debian/Ubuntu
+apt-get install libjson-perl libwww-perl
+# cpanm
+cpanm JSON Libwww
+```
+
+4. Update your snmpd.conf.
+```
+extend opensearch /bin/cat /var/cache/opensearch.json
+```
+
+5. Update root crontab with. This is required as it will this will
+likely time out otherwise. Use `*/1` if you want to have the most
+recent stats when polled or to `*/5` if you just want at exactly a 5
+minute interval.
+```
+*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+```
+
+6. Enable it or wait for the device to be re-disocvered.
+
 ## Open Grid Scheduler
 
 Shell script to track the OGS/GE jobs running on clusters.
@@ -1489,10 +1674,21 @@ extend postgres /etc/snmp/postgres
 6. Verify the path to check_postgres.pl in /etc/snmp/postgres is
 correct.
 
-7. If you wish it to ignore the database postgres for totalling up the
-stats, set ignorePG to 1(the default) in /etc/snmp/postgres. If you
-are using netdata or the like, you may wish to set this or otherwise
-that total will be very skewed on systems with light or moderate usage.
+7. (Optional) If you wish to change the DB username (default: pgsql), enable
+the postgres DB in totalling (e.g. set ignorePG to 0, default: 1), or set a
+hostname for check_postgres.pl to connect to (default: the Unix Socket postgresql
+is running on), then create the file /etc/snmp/postgres.config with the following
+contents (note that not all of them need be defined, just whichever you'd like to
+change):
+```
+DBuser=monitoring
+ignorePG=0
+DBhost=localhost
+```
+
+Note that if you are using netdata or the like, you may wish to set ignorePG
+to 1 or otherwise that total will be very skewed on systems with light or
+moderate usage.
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -1752,6 +1948,38 @@ systemctl reload snmpd
 7. You're now ready to enable the application in LibreNMS.
 
 
+## Pwrstatd
+
+Pwrstatd (commonly known as powerpanel) is an application/service available from CyberPower to monitor their PSUs over USB.  It is currently capable of reading the status of only one PSU connected via USB at a time.  The powerpanel software is available here:
+https://www.cyberpowersystems.com/products/software/power-panel-personal/
+
+### SNMP Extend
+
+1. Copy the python script, pwrstatd.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/pwrstatd.py -O /etc/snmp/pwrstatd.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/pwrstatd.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend pwrstatd /etc/snmp/pwrstatd.py
+```
+
+4. (Optional) Create a /etc/snmp/pwrstatd.json file and specify the path to the pwrstat executable [the default path is /sbin/pwrstat]:
+```
+{
+    "pwrstat_cmd": "/sbin/pwrstat"
+}
+```
+
+5. Restart snmpd.
+
+
 ## Proxmox
 
 1. For Proxmox 4.4+ install the libpve-apiclient-perl package
@@ -1939,7 +2167,7 @@ extend rpigpiomonitor /etc/snmp/rpigpiomonitor.php
 
 ## Redis
 
-SNMP extend script to monitor your Redis Server
+Script to monitor your Redis Server
 
 ### SNMP Extend
 
@@ -1957,6 +2185,11 @@ chmod +x /etc/snmp/redis.py
 ```
 extend redis /etc/snmp/redis.py
 ```
+
+### Agent
+
+[Install the agent](Agent-Setup.md) on this device if it isn't already
+and copy the `redis` script to `/usr/lib/check_mk_agent/local/`
 
 ## RRDCached
 
@@ -2175,7 +2408,7 @@ snmp_access deny all
 3. Edit your snmpd.conf file and add, making sure you have the same
 community, host, and port as above:
 ```
-proxy -v 2c -Cc -c public 127.0.0.1.3401 1.3.6.1.4.1.3495
+proxy -v 2c -Cc -c public 127.0.0.1:3401 1.3.6.1.4.1.3495
 ```
 
 For more advanced information on Squid and SNMP or setting up proxying
@@ -2211,6 +2444,74 @@ extend supervisord /etc/snmp/supervisord.py
 systemctl restart snmpd
 ```
 
+## Sagan
+
+For metrics the stats are migrated as below from the stats JSON.
+
+`f_drop_percent` and `drop_percent` are computed based on the found data.
+
+| Instance Key       | Stats JSON Key                     |
+|--------------------|------------------------------------|
+| uptime             | .stats.uptime                      |
+| total              | .stats.captured.total              |
+| drop               | .stats.captured.drop               |
+| ignore             | .stats.captured.ignore             |
+| threshold          | .stats.captured.theshold           |
+| after              | .stats.captured.after              |
+| match              | .stats.captured.match              |
+| bytes              | .stats.captured.bytes_total        |
+| bytes_ignored      | .stats.captured.bytes_ignored      |
+| max_bytes_log_line | .stats.captured.max_bytes_log_line |
+| eps                | .stats.captured.eps                |
+| f_total            | .stats.flow.total                  |
+| f_dropped          | .stats.flow.dropped                |
+
+Those keys are appended with the name of the instance running with `_`
+between the instance name and instance metric key. So `uptime` for
+`ids` would be `ids_uptime`.
+
+The default is named 'ids' unless otherwise specified via the extend.
+
+There is a special instance name of `.total` which is the total of all
+the instances. So if you want the total eps, the metric would be
+`.total_eps`. Also worth noting that the alert value is the highest
+one found among all the instances.
+
+### SNMP Extend
+
+1. Install the extend.
+```
+cpanm Sagan::Monitoring
+```
+
+2. Setup cron. Below is a example.
+```
+*/5 * * * * /usr/local/bin/sagan_stat_check > /dev/null
+```
+
+3. Configure snmpd.conf
+```
+extend sagan-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin sagan_stat_check -c
+```
+
+4. Restart snmpd on your system.
+
+You will want to make sure that sagan is setup to with the values set
+below for stats-json processor, for a single instance setup..
+
+```
+enabled: yes
+time: 300
+subtract_old_values: true
+filename: "$LOG_PATH/stats.json"
+```
+
+Any configuration of sagan_stat_check should be done in the cron
+setup. If the default does not work, check the docs for it at
+[MetaCPAN for
+sagan_stat_check](https://metacpan.org/dist/Sagan-Monitoring/view/bin/sagan_stat_check)
+
+
 ## Suricata
 
 ### SNMP Extend
@@ -2230,6 +2531,12 @@ cpanm Suricata::Monitoring
 extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c
 ```
 
+Or if you want to use try compressing the return via Base64+GZIP...
+
+```
+extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c -b
+```
+
 4. Restart snmpd on your system.
 
 You will want to make sure Suricata is set to output the stats
@@ -2241,6 +2548,41 @@ Any configuration of suricata_stat_check should be done in the cron
 setup. If the default does not work, check the docs for it at
 [MetaCPAN for
 suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
+
+
+## Systemd
+
+The systemd application polls systemd and scrapes systemd units' load, activation, and sub states.
+
+### SNMP Extend
+
+1. Copy the python script, systemd.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/systemd.py -O /etc/snmp/systemd.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/systemd.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend systemd /etc/snmp/systemd.py
+```
+
+4. (Optional) Create a /etc/snmp/systemd.json file and specify:
+    a.) "systemctl_cmd" - String path to the systemctl binary [Default: "/usr/bin/systemctl"]
+    b.) "include_inactive_units" - True/False string to include inactive units in results [Default: "False"]
+```
+{
+    "systemctl_cmd": "/bin/systemctl",
+    "include_inactive_units": "True"
+}
+```
+
+5. Restart snmpd.
+
 
 ## TinyDNS aka djbdns
 
@@ -2406,6 +2748,44 @@ chmod +x /etc/snmp/voipmon-stats.sh
 ```
 extend voipmon /etc/snmp/voipmon-stats.sh
 ```
+
+## Wireguard
+
+The wireguard application polls the Wireguard service and scrapes all client statistics for all interfaces configured as Wireguard interfaces.
+
+### SNMP Extend
+
+1. Copy the python script, wireguard.py, to the desired host
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/wireguard.py -O /etc/snmp/wireguard.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/wireguard.py
+```
+
+3. Edit your snmpd.conf file and add:
+```
+extend wireguard /etc/snmp/wireguard.py
+```
+
+4. Create a /etc/snmp/wireguard.json file and specify:
+a.) (optional) "wg_cmd" - String path to the wg binary ["/usr/bin/wg"]
+b.) "public_key_to_arbitrary_name" - A dictionary to convert between the publickey assigned to the client (specified in the wireguard interface conf file) to an arbitrary, friendly name.  The friendly names MUST be unique within each interface.  Also note that the interface name and friendly names are used in the RRD filename, so using special characters is highly discouraged.
+```
+{
+    "wg_cmd": "/bin/wg",
+    "public_key_to_arbitrary_name": {
+        "wg0": {
+            "z1iSIymFEFi/PS8rR19AFBle7O4tWowMWuFzHO7oRlE=": "client1",
+            "XqWJRE21Fw1ke47mH1yPg/lyWqCCfjkIXiS6JobuhTI=": "server.domain.com"
+        }
+    }
+}
+```
+
+5. Restart snmpd.
 
 ## ZFS
 

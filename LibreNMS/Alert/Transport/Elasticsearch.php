@@ -39,7 +39,7 @@ class Elasticsearch extends Transport
     {
         $es_host = '127.0.0.1';
         $es_port = 9200;
-        $index = strftime('librenms-%Y.%m.%d');
+        $index = date("\l\i\b\\r\\e\\n\m\s\-Y.m.d");
         $type = 'alert';
         $severity = $obj['severity'];
 
@@ -61,7 +61,7 @@ class Elasticsearch extends Transport
         }
 
         if (! empty($opts['es_index'])) {
-            $index = strftime($opts['es_index']);
+            $index = date($opts['es_index']);
         }
 
         $host = $es_host . ':' . $es_port . '/' . $index . '/' . $type;
@@ -222,7 +222,7 @@ class Elasticsearch extends Transport
                 [
                     'title' => 'Index Pattern',
                     'name' => 'es-pattern',
-                    'descr' => 'Elasticsearch Index Pattern',
+                    'descr' => 'Elasticsearch Index Pattern | Default: \l\i\b\\r\\e\\n\m\s\-Y.m.d | Format: https://www.php.net/manual/en/function.date.php',
                     'type' => 'text',
                 ],
                 [

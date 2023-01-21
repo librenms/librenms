@@ -41,6 +41,7 @@ use LibreNMS\Interfaces\Polling\Sensors\WirelessApCountPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 class ArubaInstant extends OS implements
@@ -262,8 +263,11 @@ class ArubaInstant extends OS implements
         return $sensors;
     }
 
-    protected function decodeChannel($channel)
+    protected function decodeChannel($channel): int
     {
+        // Trim off everything not a digit, like channel "116e"
+        $channel = Number::cast(preg_replace("/\D/", '', $channel));
+
         return $channel & 255; // mask off the channel width information
     }
 
@@ -303,7 +307,7 @@ class ArubaInstant extends OS implements
                 $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids);
 
                 foreach ($oids as $id => $oid) {
-                    $data[$id] = $snmp_data[$oid];
+                    $data[$id] = $snmp_data[$oid] ?? null;
                 }
             } else {
                 // version is lower than 8.4.0.0

@@ -10,11 +10,11 @@
                     "version": "S2800-24T4F V100R001B01D001P003SP9",
                     "hardware": "S2800-24T4F Switch Product",
                     "features": null,
+                    "location": "<private>",
                     "os": "fs-gbn",
                     "type": "network",
                     "serial": "T180321D200",
-                    "icon": "fs.svg",
-                    "location": "<private>"
+                    "icon": "fs.svg"
                 }
             ]
         },

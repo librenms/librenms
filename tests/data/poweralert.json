@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.850.1",
                     "sysDescr": "POWERALERT",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "poweralert",
                     "type": "power",
                     "serial": null,
-                    "icon": "tripplite.svg",
-                    "location": null
+                    "icon": "tripplite.svg"
                 }
             ]
         },

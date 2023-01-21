@@ -63,6 +63,7 @@ class GitHub
         'translation' => [],
         'tests' => [],
         'misc' => [],
+        'internal features' => [],
         'mibs' => [],
         'dependencies' => [],
     ];

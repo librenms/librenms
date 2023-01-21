@@ -10,11 +10,11 @@
                     "version": "1.0.5d (Bootloader x.x.x)",
                     "hardware": "INETPOE-4GP2GF",
                     "features": null,
+                    "location": "<private>",
                     "os": "ifotec",
                     "type": "network",
                     "serial": "0051",
-                    "icon": "ifotec.png",
-                    "location": "<private>"
+                    "icon": "ifotec.png"
                 }
             ]
         },
@@ -2155,6 +2155,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

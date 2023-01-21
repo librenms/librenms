@@ -485,8 +485,8 @@ return [
             'cisco-qfp' => [
                 'description' => 'Cisco QFP',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-pw' => [
                 'description' => 'Cisco PW',
@@ -1101,8 +1101,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-sla' => [
-                'description' => 'Cisco SLA',
+            'slas' => [
+                'description' => 'Service Level Agreement Tracking',
             ],
             'cisco-mac-accounting' => [
                 'description' => 'Cisco MAC Accounting',
@@ -1176,7 +1176,7 @@ return [
             'help' => 'Очистка виконується daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Записи портів старші за',
+            'description' => 'Порти очищення видалено',
             'help' => 'Очистка виконується daily.sh',
         ],
         'prometheus' => [
@@ -1482,8 +1482,8 @@ return [
         'update_channel' => [
             'description' => 'Визначити канал оновлень',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

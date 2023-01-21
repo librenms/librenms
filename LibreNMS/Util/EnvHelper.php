@@ -27,6 +27,7 @@ namespace LibreNMS\Util;
 
 use ErrorException;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\Artisan;
 use LibreNMS\Exceptions\FileWriteFailedException;
 
 class EnvHelper
@@ -119,7 +120,16 @@ class EnvHelper
             if (! file_exists($env_file)) {
                 copy(base_path('.env.example'), $env_file);
 
-                $key = trim(exec(PHP_BINARY . ' ' . base_path('artisan') . ' key:generate --show'));
+                $key = null;
+                if (php_sapi_name() == 'cli') {
+                    $key = trim(exec(PHP_BINARY . ' ' . base_path('artisan') . ' key:generate --show'));
+                } else {
+                    if (Artisan::call('key:generate', [
+                        '--show' => 'true',
+                    ]) == 0) {
+                        $key = trim(Artisan::output());
+                    }
+                }
 
                 self::writeEnv([
                     'APP_KEY' => $key,

@@ -10,11 +10,11 @@
                     "version": "11.10",
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "apc-epdu",
                     "type": "power",
                     "serial": null,
-                    "icon": "apc.svg",
-                    "location": null
+                    "icon": "apc.svg"
                 }
             ]
         },

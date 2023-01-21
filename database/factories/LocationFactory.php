@@ -25,7 +25,7 @@ class LocationFactory extends Factory
         return [
             'location' => $this->faker->randomElement([
                 $this->faker->sentence($this->faker->numberBetween(1, 10)),
-                str_replace("\n", ' ', $this->faker->address),
+                str_replace("\n", ' ', $this->faker->address()),
             ]),
         ];
     }
@@ -39,8 +39,8 @@ class LocationFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'lat' => $this->faker->latitude,
-                'lng' => $this->faker->longitude,
+                'lat' => $this->faker->latitude(),
+                'lng' => $this->faker->longitude(),
             ];
         });
     }

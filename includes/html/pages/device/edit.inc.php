@@ -58,7 +58,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
     print_optionbar_start();
 
-    unset($sep);
+    $sep = '';
     foreach ($panes as $type => $text) {
         if (! isset($vars['section'])) {
             $vars['section'] = $type;

@@ -15,7 +15,7 @@ if ($oids) {
             $descr_oid = "powerSupplyLocationName.1.$index";
             $limit_oid = "powerSupplyMaximumInputVoltage.1.$index";
             $descr = trim(snmp_get($device, $descr_oid, '-Oqv', 'IDRAC-MIB-SMIv2'), '"');
-            $descr = preg_replace('/(Status)/', '', $descr);
+            $descr = trim(preg_replace('/(Status)/', '', $descr));
             $current = snmp_get($device, $voltage_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
             $high_limit = snmp_get($device, $limit_oid, '-Oqv', 'IDRAC-MIB-SMIv2');
             $divisor = '1';

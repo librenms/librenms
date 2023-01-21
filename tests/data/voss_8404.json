@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.2272.208",
                     "sysDescr": "VSP-8404 (5.1.1.1)",
                     "sysContact": null,
                     "version": "5.1.1.1",
                     "hardware": "VSP-8404",
                     "features": null,
+                    "location": null,
                     "os": "voss",
                     "type": "network",
                     "serial": null,
-                    "icon": "extremevoss.svg",
-                    "location": null
+                    "icon": "extremevoss.svg"
                 }
             ]
         },

@@ -13,7 +13,7 @@ use LibreNMS\Util\Debug;
 $auth = false;
 $start = microtime(true);
 
-$init_modules = ['web', 'graphs', 'auth'];
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 if (! Auth::check()) {

@@ -2,28 +2,35 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-if (! isset($descr_len)) {
-    $descr_len = 12;
-}
+$unitlen = $unitlen ?? 0;
+$descr_len = $descr_len ?? 12;
+$multiplier = $multiplier ?? false;
+$previous = $graph_params->visible('previous');
+$stack = $stack ?? '';
+
+$seperatorX = '';
+$thingX = '';
+$plusX = '';
+$plusesX = '';
 
 if ($nototal) {
-    $descr_len += '2';
-    $unitlen += '2';
+    $descr_len += 2;
+    $unitlen += 2;
 }
 
 $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
-$unitlen = '10';
+$unitlen = 10;
 if ($nototal) {
-    $descr_len += '2';
-    $unitlen += '2';
+    $descr_len += 2;
+    $unitlen += 2;
 }
 
 $unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
 
 $colour_iter = 0;
 foreach ($rrd_list as $i => $rrd) {
-    if ($rrd['colour']) {
+    if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
         if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
@@ -38,7 +45,7 @@ foreach ($rrd_list as $i => $rrd) {
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
-    if ($simple_rrd) {
+    if (isset($simple_rrd)) {
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
     } else {
@@ -46,7 +53,7 @@ foreach ($rrd_list as $i => $rrd) {
         $rrd_options .= ' DEF:' . $rrd['ds'] . $i . 'max=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MAX ';
     }
 
-    if ($_GET['previous']) {
+    if ($previous) {
         $rrd_options .= ' DEF:' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $i . "X:$period";
         $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
@@ -100,7 +107,7 @@ foreach ($rrd_list as $i => $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($_GET['previous'] == 'yes') {
+if ($previous) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {

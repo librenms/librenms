@@ -32,9 +32,10 @@ $virtual_tables = [
     'ra32-wish-temp' => '/\.1\.3\.6\.1\.4\.1\.20916\.1\.8\.1\.4\.((\d+)\.4\.1\.2\.0)/',
 ];
 
-$data = snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn');
+$data = trim(snmp_walk($device, '.1.3.6.1.4.1.20916.1', '-OQn'));
 foreach (explode(PHP_EOL, $data) as $line) {
-    [$oid, $value] = explode(' = ', $line);
+    [$oid, $value] = explode(' =', $line);
+    $value = trim($value);
 
     $processed = false;
     foreach ($virtual_tables as $vt_name => $vt_regex) {

@@ -34,7 +34,7 @@ function string_to_oid($string)
 }//end string_to_oid()
 
 // Options!
-$short_opts = 'sktmlhj:a:S';
+$short_opts = 'S:sktmlhj:a:';
 $options = getopt($short_opts);
 
 // print the help

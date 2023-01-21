@@ -10,7 +10,7 @@ if (is_array($dsktable_array)) {
         if (isset($dsk['dskPath'])) {
             if (! in_array($dsk['dskPath'], $tmp_storage)) {
                 $dsk['dskTotal'] = $dsk['dskTotal'] * 1024;
-                $dsk['dskAvail'] = ($entry['dskAvail'] * 1024);
+                $dsk['dskAvail'] = ($dsk['dskAvail'] * 1024);
                 $dsk['dskUsed'] = $dsk['dskTotal'] - $dsk['dskAvail'];
 
                 discover_storage($valid_storage, $device, $dsk['dskIndex'], 'dsk', 'ucd-dsktable', $dsk['dskPath'], $dsk['dskTotal'], 1024, $dsk['dskUsed']);

@@ -10,11 +10,11 @@
                     "version": "5.5.1.4-464376",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "datadomain",
                     "type": "storage",
                     "serial": null,
-                    "icon": "emc.svg",
-                    "location": "<private>"
+                    "icon": "emc.svg"
                 }
             ]
         },

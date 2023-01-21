@@ -27,7 +27,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class SnTrapUserLogin implements SnmptrapHandler
 {
@@ -42,6 +41,6 @@ class SnTrapUserLogin implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $message = $trap->getOidData($trap->findOid('FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0'));
-        Log::event("$message", $device->device_id, 'trap', 2);
+        $trap->log("$message");
     }
 }

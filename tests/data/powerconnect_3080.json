@@ -28,11 +28,11 @@
                     "version": "6.6.0.21",
                     "hardware": "Dell EMC Networking N1124T-ON",
                     "features": "Dell EMC Networking Switch",
+                    "location": "<private>",
                     "os": "powerconnect",
                     "type": "network",
                     "serial": null,
-                    "icon": "dell.svg",
-                    "location": "<private>"
+                    "icon": "dell.svg"
                 }
             ]
         },

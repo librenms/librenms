@@ -10,11 +10,11 @@
                     "version": "18.1.8.2",
                     "hardware": "PL7810-INT-FWA3210",
                     "features": null,
+                    "location": "<private>",
                     "os": "procera",
                     "type": "network",
                     "serial": "000ABCD0123",
-                    "icon": "procera.png",
-                    "location": "<private>"
+                    "icon": "procera.png"
                 }
             ]
         },
@@ -667,8 +667,8 @@
                     "ifName": "bond0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -877,8 +877,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",

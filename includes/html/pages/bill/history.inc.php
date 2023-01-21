@@ -104,7 +104,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         echo '
             <tr>
                 <td></td>
-                <td><span style="font-weight: bold;" class="interface">' . strftime('%Y-%m-%d', strtotime($datefrom)) . ' to ' . strftime('%Y-%m-%d', strtotime($dateto)) . "</span></td>
+                <td><span style="font-weight: bold;" class="interface">' . date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto)) . "</span></td>
                 <td>$type</td>
                 <td>$allowed</td>
                 <td>$in</td>

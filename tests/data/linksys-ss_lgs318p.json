@@ -10,11 +10,11 @@
                     "version": "SW: 1.1.1.9, FW: 1.0.0.5",
                     "hardware": "LGS318P V02",
                     "features": null,
+                    "location": "<private>",
                     "os": "linksys-ss",
                     "type": "network",
                     "serial": "14A10C95808734",
-                    "icon": "linksys.png",
-                    "location": "<private>"
+                    "icon": "linksys.png"
                 }
             ]
         },

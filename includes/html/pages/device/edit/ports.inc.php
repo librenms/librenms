@@ -81,29 +81,29 @@
             success: function (data) {
                 if (data.status == 'ok') {
                     $this.closest('.form-group').addClass('has-success');
-                    $this.next().addClass('fa-check');
+                    $this.next().children().first().addClass('fa-check');
                     $this.val(speed);
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-success');
-                        $this.next().removeClass('fa-check');
+                        $this.next().children().first().removeClass('fa-check');
                     }, 2000);
                 } else if (data.status == 'na') {
 
                 } else {
                     $(this).closest('.form-group').addClass('has-error');
-                    $this.next().addClass('fa-times');
+                    $this.next().children().first().addClass('fa-times');
                     setTimeout(function(){
                         $this.closest('.form-group').removeClass('has-error');
-                        $this.next().removeClass('fa-times');
+                        $this.next().children().first().removeClass('fa-times');
                     }, 2000);
                 }
             },
             error: function () {
                 $(this).closest('.form-group').addClass('has-error');
-                $this.next().addClass('fa-times');
+                $this.next().children().first().addClass('fa-times');
                 setTimeout(function(){
                    $this.closest('.form-group').removeClass('has-error');
-                   $this.next().removeClass('fa-times');
+                   $this.next().children().first().removeClass('fa-times');
                 }, 2000);
             }
         });
@@ -228,12 +228,24 @@
         });
 
         init_select2('.port_group_select', 'port-group', {}, null, 'No Group');
+        var last_port_group_change;
         $('.port_group_select').on('change', function (e) {
-            var $target = $(e.target)
+            var $target = $(e.target);
+            var port_id = $target.data('port_id');
+            var groups = JSON.stringify({"groups": $target.val()});
+
+            console.log(last_port_group_change, (port_id + groups));
+            // don't send the same update multiple times... silly select2
+            if (last_port_group_change === (port_id + groups)) {
+                return;
+            }
+
+            last_port_group_change = port_id + groups;
+
             $.ajax({
                 type: "PUT",
-                url: "<?php echo url('port'); ?>/" + $target.data('port_id'),
-                data: {"groups": $target.val()},
+                url: "<?php echo url('port'); ?>/" + port_id,
+                data: groups,
                 success: function(data) {
                     toastr.success(data.message)
                 },

@@ -4,6 +4,7 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $rules = [
+    'array_indentation' => true,
     'array_syntax' => ['syntax' => 'short'],
     'binary_operator_spaces' => [
         'default' => 'single_space',
@@ -17,12 +18,22 @@ $rules = [
     'braces' => true,
     'cast_spaces' => true,
     'class_attributes_separation' => [
-        'elements' => ['method' => 'one'],
+        'elements' => [
+//            'const' => 'one',
+            'method' => 'one',
+//            'property' => 'one',
+            'trait_import' => 'none',
+        ],
     ],
-    'class_definition' => true,
+    'class_definition' => [
+        'multi_line_extends_each_single_line' => true,
+        'single_item_single_line' => true,
+//        'single_line' => true,
+    ],
     'concat_space' => [
-        'spacing' => 'one',
+        'spacing' => 'one', // upstream none
     ],
+    'constant_case' => ['case' => 'lower'],
     'declare_equal_normalize' => true,
     'elseif' => true,
     'encoding' => true,
@@ -38,20 +49,23 @@ $rules = [
     'linebreak_after_opening_tag' => true,
     'line_ending' => true,
     'lowercase_cast' => true,
-    'constant_case' => true,
     'lowercase_keywords' => true,
     'lowercase_static_reference' => true, // added from Symfony
     'magic_method_casing' => true, // added from Symfony
     'magic_constant_casing' => true,
-    'method_argument_space' => true,
+    'method_argument_space' => [
+        'on_multiline' => 'ignore',
+    ],
+    'multiline_whitespace_before_semicolons' => [
+        'strategy' => 'no_multi_line',
+    ],
     'native_function_casing' => true,
-    'no_alias_functions' => false, // TODO: Enable?
+    'no_alias_functions' => true,
     'no_extra_blank_lines' => [
         'tokens' => [
             'extra',
             'throw',
             'use',
-            'use_trait',
         ],
     ],
     'no_blank_lines_after_class_opening' => true,
@@ -65,20 +79,21 @@ $rules = [
         'use' => 'echo',
     ],
     'no_multiline_whitespace_around_double_arrow' => true,
-    'multiline_whitespace_before_semicolons' => [
-        'strategy' => 'no_multi_line',
-    ],
     'no_short_bool_cast' => true,
     'no_singleline_whitespace_before_semicolons' => true,
     'no_spaces_after_function_name' => true,
-    'no_spaces_around_offset' => true,
+    'no_spaces_around_offset' => [
+        'positions' => ['inside', 'outside'],
+    ],
     'no_spaces_inside_parenthesis' => true,
     'no_trailing_comma_in_list_call' => true,
     'no_trailing_comma_in_singleline_array' => true,
     'no_trailing_whitespace' => true,
     'no_trailing_whitespace_in_comment' => true,
-    'no_unneeded_control_parentheses' => true,
-    'no_unreachable_default_argument_value' => false, // TODO: Enable?
+    'no_unneeded_control_parentheses' => [
+        'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield'],
+    ],
+    'no_unreachable_default_argument_value' => true,
     'no_useless_return' => true,
     'no_whitespace_before_comma_in_array' => true,
     'no_whitespace_in_blank_line' => true,
@@ -86,6 +101,7 @@ $rules = [
     'not_operator_with_successor_space' => true,
     'object_operator_without_whitespace' => true,
     'ordered_imports' => ['sort_algorithm' => 'alpha'],
+    'psr_autoloading' => true,
     'phpdoc_indent' => true,
     'phpdoc_inline_tag_normalizer' => true,
     'phpdoc_no_access' => true,
@@ -94,18 +110,19 @@ $rules = [
     'phpdoc_scalar' => true,
     'phpdoc_single_line_var_spacing' => true,
     'phpdoc_summary' => false,
+    'phpdoc_to_comment' => false, // override to preserve user preference
     'phpdoc_tag_type' => true,
-    'phpdoc_to_comment' => false, // TODO: Enable?
     'phpdoc_trim' => true,
     'phpdoc_types' => true,
     'phpdoc_var_without_name' => true,
-    'psr_autoloading' => false, // TODO: Enable?
     'self_accessor' => false, // TODO: Enable?
     'short_scalar_cast' => true,
-    'simplified_null_return' => false, // disabled by Shift
+    'simplified_null_return' => false, // disabled as "risky"
     'single_blank_line_at_eof' => true,
     'single_blank_line_before_namespace' => true,
-    'single_class_element_per_statement' => true,
+    'single_class_element_per_statement' => [
+        'elements' => ['const', 'property'],
+    ],
     'single_import_per_statement' => true,
     'single_line_after_imports' => true,
     'single_line_comment_style' => [
@@ -117,26 +134,33 @@ $rules = [
     'switch_case_semicolon_to_colon' => true,
     'switch_case_space' => true,
     'ternary_operator_spaces' => true,
-    'trailing_comma_in_multiline' => true,
+    'trailing_comma_in_multiline' => ['elements' => ['arrays']],
     'trim_array_spaces' => true,
     'unary_operator_spaces' => true,
     'visibility_required' => [
-        'elements' => ['property', 'method', 'const'],
+        'elements' => ['method', 'property'],
     ],
     'whitespace_after_comma_in_array' => true,
 ];
 
+
 $finder = Finder::create()
-    ->in(__DIR__)
-    ->exclude('storage')
-    ->exclude('bootstrap/cache')
-    ->exclude('vendor')
+    ->in([
+        __DIR__ . '/app',
+        __DIR__ . '/config',
+        __DIR__ . '/database',
+        __DIR__ . '/resources',
+        __DIR__ . '/routes',
+        __DIR__ . '/tests',
+        __DIR__ . '/LibreNMS',
+    ])
     ->name('*.php')
     ->notName('*.blade.php')
     ->ignoreDotFiles(true)
     ->ignoreVCS(true);
 
 return (new Config)
-    //->setRiskyAllowed(true)
     ->setFinder($finder)
-    ->setRules($rules);
+    ->setRules($rules)
+    ->setRiskyAllowed(true)
+    ->setUsingCache(true);

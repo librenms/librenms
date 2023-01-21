@@ -46,8 +46,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('mem_limit', 'GAUGE', 0);
 
 $metrics = [];
+$containerNames = [];
 foreach ($docker_data as $data) {
-    $container = $data['container'];
+    $containerNames[] = $container = $data['container'];
 
     $rrd_name = ['app', $name, $app->app_id, $container];
 
@@ -63,5 +64,6 @@ foreach ($docker_data as $data) {
     $tags = ['name' => $container, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
 }
+$app->data = ['containers' => $containerNames];
 
 update_application($app, $output, $metrics);

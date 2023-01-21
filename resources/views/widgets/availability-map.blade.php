@@ -26,35 +26,21 @@
 <br style="clear:both;">
 
 @foreach($devices as $row)
-    <a href="@deviceUrl($row['device'])" title="{{$row['device']->displayName() }}@if($row['stateName'] == 'up' or $row['stateName'] == 'warn')@if($row['device']->formatDownUptime(true)) - @endif{{ $row['device']->formatDownUptime(true) }}@elseif($row['stateName'] == 'down')@if($row['device']->formatDownUptime(true)) - downtime @endif{{$row['device']->formatDownUptime(true)}}@endif">
+    <a href="{{ $row['link'] }}" title="{{$row['tooltip'] }}">
         @if($type == 0)
-            @if($color_only_select == 1)
-                <span class="label {{ $row['labelClass'] }} widget-availability-fixed widget-availability label-font-border"> </span>
-            @elseif($color_only_select == 2)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->hostname }}</span>
-            @elseif($color_only_select == 3)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->sysName }}</span>
-            @elseif($color_only_select == 4)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->shortDisplayName() }}</span>
-            @else
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['stateName']) }}</span>
-            @endif
+            <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['label'] }}</span>
         @else
-            <div class="availability-map-oldview-box-{{ $row['stateName'] }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>
+            <div class="{{ $row['labelClass'] }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>
         @endif
     </a>
 @endforeach
 
 @foreach($services as $row)
-    <a href="@deviceUrl($row['service']->device, ['tab' => 'services'])" title="{{ $row['service']->device->displayName() }} - {{ $row['service']->service_type }} - {{ $row['service']->service_desc }}">
+    <a href="{{ $row['link'] }}" title="{{$row['tooltip'] }}">
         @if($type == 0)
-            @if($color_only_select)
-                <span class="label {{ $row['labelClass'] }} widget-availability-fixed widget-availability label-font-border"> </span>
-            @else
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['service']->service_type }} - {{ $row['stateName'] }}</span>
-            @endif
+            <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['label'] }}</span>
         @else
-            <div class="availability-map-oldview-box-{{ $row['stateName'] }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>
+            <div class="{{ $row['labelClass'] }}" style="width:{{ $tile_size }}px;height:{{ $tile_size }}px;"></div>
         @endif
     </a>
 @endforeach

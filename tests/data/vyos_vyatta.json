@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.30803",
                     "sysDescr": "Vyatta VyOS 1.1.7",
                     "sysContact": null,
                     "version": "1.1.7",
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "vyos",
                     "type": "network",
                     "serial": null,
-                    "icon": "vyos.svg",
-                    "location": null
+                    "icon": "vyos.svg"
                 }
             ]
         },

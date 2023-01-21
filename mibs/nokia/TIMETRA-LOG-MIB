@@ -30,8 +30,8 @@ IMPORTS
                                                          FROM TIMETRA-GLOBAL-MIB
     THsmdaCounterIdOrZero,
     THsmdaCounterIdOrZeroOrAll,
-    TItemDescription, TNamedItem,
-    TNamedItemOrEmpty, TQueueId,
+    TItemDescription, TLNamedItemOrEmpty,
+    TNamedItem, TNamedItemOrEmpty, TQueueId,
     TQueueIdOrAll, TmnxAccPlcyAACounters,
     TmnxAccPlcyAASubAttributes,
     TmnxAccPlcyOECounters,
@@ -47,7 +47,7 @@ IMPORTS
     ;
 
 timetraLogMIBModule              MODULE-IDENTITY
-    LAST-UPDATED "201904010000Z"
+    LAST-UPDATED "202007140000Z"
     ORGANIZATION "Nokia"
     CONTACT-INFO
         "Nokia SROS Support
@@ -56,7 +56,7 @@ timetraLogMIBModule              MODULE-IDENTITY
         "This document is the SNMP MIB module to manage and provision the Nokia
          SROS Logging utility.
 
-         Copyright 2003-2018 Nokia.  All rights reserved.
+         Copyright 2003-2020 Nokia.  All rights reserved.
          Reproduction of this document is authorized on the condition that
          the foregoing copyright notice is included.
 
@@ -73,6 +73,11 @@ timetraLogMIBModule              MODULE-IDENTITY
          This Specification is supplied 'as is', and Nokia makes no warranty,
          either express or implied, as to the use, operation, condition, or
          performance of the Specification."
+
+    REVISION    "202007140000Z"
+    DESCRIPTION
+        "Rev 20               14 Jul 2020 00:00
+         Release 20 of the TIMETRA-LOG-MIB."
 
     REVISION    "201904010000Z"
     DESCRIPTION
@@ -527,7 +532,8 @@ TmnxLogFileIdEntry               ::= SEQUENCE
     tmnxLogFileIdLogId               Integer32,
     tmnxLogFileIdPathName            DisplayString,
     tmnxLogFileIdCreateTime          DateAndTime,
-    tmnxLogFileIdBackupLoc           TmnxCFlash
+    tmnxLogFileIdBackupLoc           TmnxCFlash,
+    tmnxLogFileIdName                TLNamedItemOrEmpty
 }
 
 tmnxLogFileId                    OBJECT-TYPE
@@ -693,6 +699,16 @@ tmnxLogFileIdBackupLoc           OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { tmnxLogFileIdEntry 13 }
 
+tmnxLogFileIdName                OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFileIdName specifies particular entry in the
+         tmnxLogFileIdTable."
+    DEFVAL      { "" }
+    ::= { tmnxLogFileIdEntry 14 }
+
 tmnxLogApTable                   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLogApEntry
     MAX-ACCESS  not-accessible
@@ -804,8 +820,13 @@ tmnxLogApInterval                OBJECT-TYPE
          minutes. For service and network types of record, default values are 5
          minutes and 15 minutes respectively.
 
-         For SAA and PM only, the minimum value of tmnxLogApInterval is 1
-         minute. Otherwise the minimum value is 5 minutes."
+         For an accounting policy with one of the following record type
+         (i.e. tmnxLogApRecord) values, the minimum interval is one minute:
+             completeOamPm(56),
+             completeSvcActivTestHead(76),
+             saa(32).
+
+         Otherwise the minimum interval is five minutes."
     DEFVAL      { 5 }
     ::= { tmnxLogApEntry 6 }
 
@@ -915,7 +936,9 @@ tmnxLogApRecord                  OBJECT-TYPE
         accessEgressOctets          (72),
         accessEgressPackets         (73),
         combinedAccessEgress        (74),
-        combinedNetworkEgress       (75)
+        combinedNetworkEgress       (75),
+        completeSvcActivTestHead    (76),
+        combinedMplsSrteEgress      (77)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -970,7 +993,9 @@ tmnxLogApPortType                OBJECT-TYPE
         ethernet      (13),
         oamPm         (14),
         networkIntf   (16),
-        accessPort    (17)
+        accessPort    (17),
+        svcActvTest   (18),
+        mplsSrteEgr   (19)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1108,7 +1133,8 @@ TmnxLogIdEntry                   ::= SEQUENCE
     tmnxLogIdTimeFormat              INTEGER,
     tmnxLogIdPythonPolicy            TNamedItemOrEmpty,
     tmnxLogIdOperDestination         INTEGER,
-    tmnxLogIdNetconfStream           TNamedItemOrEmpty
+    tmnxLogIdNetconfStream           TNamedItemOrEmpty,
+    tmnxLogIdName                    TLNamedItemOrEmpty
 }
 
 tmnxLogIdIndex                   OBJECT-TYPE
@@ -1294,7 +1320,10 @@ tmnxLogIdFileId                  OBJECT-TYPE
 
          tmnxLogIdOperStatus will not transition to 'inService' until a
          valid value has been set for tmnxLogIdFileId.  This object is
-         valid only if tmnxLogIdDestination is set to 'file'."
+         valid only if tmnxLogIdDestination is set to 'file'.
+
+         This object can be set only once together with tmnxLogIdDestination
+         value of 'file'. "
     ::= { tmnxLogIdEntry 10 }
 
 tmnxLogIdSyslogId                OBJECT-TYPE
@@ -1308,7 +1337,10 @@ tmnxLogIdSyslogId                OBJECT-TYPE
 
          This object is valid only when tmnxLogIdDestination has a value of
          'syslog'.  If this object has a value of zero (0), then no collector
-         is specified and no messages are sent."
+         is specified and no messages are sent.
+
+         This object can be set only once together with tmnxLogIdDestination
+         value of 'syslog'."
     DEFVAL      { 0 }
     ::= { tmnxLogIdEntry 11 }
 
@@ -1319,8 +1351,8 @@ tmnxLogIdMaxMemorySize           OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxLogIdMaxMemorySize specifies the amount of memory to
-         allocate for this log.  This object is valid only when
-         tmnxLogIdDestination has a value of 'memory', 'snmpTraps' or 'subscribedCli'.
+         allocate for this log.  This object can be set only once together with
+         tmnxLogIdDestination has a value of 'memory', 'netconf', 'snmpTraps' or 'subscribedCli'.
          For any other value of tmnxLogIdDestination, a read of this object will return zero (0).
 
          Once a memory size has been specified and the log created, any attempt
@@ -1457,6 +1489,15 @@ tmnxLogIdNetconfStream           OBJECT-TYPE
     DEFVAL      { "" }
     ::= { tmnxLogIdEntry 19 }
 
+tmnxLogIdName                    OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogIdName specifies an event stream log."
+    DEFVAL      { "" }
+    ::= { tmnxLogIdEntry 20 }
+
 tmnxLogFilterTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLogFilterEntry
     MAX-ACCESS  not-accessible
@@ -1486,7 +1527,8 @@ TmnxLogFilterEntry               ::= SEQUENCE
     tmnxLogFilterRowStatus           RowStatus,
     tmnxLogFilterDescription         TItemDescription,
     tmnxLogFilterDefaultAction       TFilterAction,
-    tmnxLogFilterInUse               TruthValue
+    tmnxLogFilterInUse               TruthValue,
+    tmnxLogFilterName                TLNamedItemOrEmpty
 }
 
 tmnxLogFilterId                  OBJECT-TYPE
@@ -1537,6 +1579,16 @@ tmnxLogFilterInUse               OBJECT-TYPE
          attached to a log file configuration.  The same tmnxLogFilterEntry
          can be attached to more than one log file."
     ::= { tmnxLogFilterEntry 5 }
+
+tmnxLogFilterName                OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterName specifies particular entry in the
+         tmnxLogFilterTable."
+    DEFVAL      { "" }
+    ::= { tmnxLogFilterEntry 6 }
 
 tmnxLogFilterParamsTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLogFilterParamsEntry
@@ -1601,7 +1653,8 @@ TmnxLogFilterParamsEntry         ::= SEQUENCE
     tmnxLogFilterParamsRouterRegexp  TruthValue,
     tmnxLogFilterParamsMsg           OCTET STRING,
     tmnxLogFilterParamsMsgOperator   TmnxLogFilterOperator,
-    tmnxLogFilterParamsMsgRegexp     TruthValue
+    tmnxLogFilterParamsMsgRegexp     TruthValue,
+    tmnxLogFilterParamsName          TLNamedItemOrEmpty
 }
 
 tmnxLogFilterParamsIndex         OBJECT-TYPE
@@ -1833,6 +1886,16 @@ tmnxLogFilterParamsMsgRegexp     OBJECT-TYPE
     DEFVAL      { false }
     ::= { tmnxLogFilterParamsEntry 19 }
 
+tmnxLogFilterParamsName          OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxLogFilterParamsName specifies particular entry in the
+         tmnxLogFilterParamsTable."
+    DEFVAL      { "" }
+    ::= { tmnxLogFilterParamsEntry 20 }
+
 tmnxSyslogTargetTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSyslogTargetEntry
     MAX-ACCESS  not-accessible
@@ -1868,7 +1931,9 @@ TmnxSyslogTargetEntry            ::= SEQUENCE
     tmnxSyslogTargetMessagePrefix    TNamedItemOrEmpty,
     tmnxSyslogTargetMessagesDropped  Counter32,
     tmnxSyslogTargetAddrType         InetAddressType,
-    tmnxSyslogTargetAddr             InetAddress
+    tmnxSyslogTargetAddr             InetAddress,
+    tmnxSyslogTargetName             TLNamedItemOrEmpty,
+    tmnxSyslogTlsClntProfileName     TNamedItemOrEmpty
 }
 
 tmnxSyslogTargetIndex            OBJECT-TYPE
@@ -2009,6 +2074,26 @@ tmnxSyslogTargetAddr             OBJECT-TYPE
          corresponding tmnxSyslogTargetAddrType object."
     DEFVAL      { ''H }
     ::= { tmnxSyslogTargetEntry 11 }
+
+tmnxSyslogTargetName             OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyslogTargetName specifies particular entry in the
+         tmnxSyslogTargetTable."
+    DEFVAL      { "" }
+    ::= { tmnxSyslogTargetEntry 12 }
+
+tmnxSyslogTlsClntProfileName     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSyslogTlsClntProfileName specifies the
+         name for a TLS client profile. If configured, syslog uses TLS."
+    DEFVAL      { "" }
+    ::= { tmnxSyslogTargetEntry 13 }
 
 tmnxEventAppTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxEventAppEntry
@@ -2729,7 +2814,10 @@ tmnxSnmpTrapLogEntry             OBJECT-TYPE
     ::= { tmnxSnmpTrapLogTable 1 }
 
 TmnxSnmpTrapLogEntry             ::= SEQUENCE
-{ tmnxSnmpTrapLogDescription       TItemDescription }
+{
+    tmnxSnmpTrapLogDescription       TItemDescription,
+    snmpNotifyId                     TmnxLogIdIndex
+}
 
 tmnxSnmpTrapLogDescription       OBJECT-TYPE
     SYNTAX      TItemDescription
@@ -2740,6 +2828,16 @@ tmnxSnmpTrapLogDescription       OBJECT-TYPE
          assigned textual description of this snmp trap log."
     DEFVAL      { ''H }
     ::= { tmnxSnmpTrapLogEntry 1 }
+
+snmpNotifyId                     OBJECT-TYPE
+    SYNTAX      TmnxLogIdIndex (1..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of snmpNotifyId creates association with log with the same
+         value of tmnxLogIdIndex. It is number representation of
+         snmpNotifyName. Usage of default Netconf log 101 not allowed."
+    ::= { tmnxSnmpTrapLogEntry 2 }
 
 tmnxSnmpTrapDestTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSnmpTrapDestEntry
@@ -2786,7 +2884,8 @@ TmnxSnmpTrapDestEntry            ::= SEQUENCE
     tmnxStdSecurityLevel             SnmpSecurityLevel,
     tmnxStdReplay                    TruthValue,
     tmnxStdReplayStart               Unsigned32,
-    tmnxStdReplayLastTime            TimeStamp
+    tmnxStdReplayLastTime            TimeStamp,
+    tmnxStdDyingGasp                 TruthValue
 }
 
 tmnxStdIndex                     OBJECT-TYPE
@@ -2990,6 +3089,20 @@ tmnxStdReplayLastTime            OBJECT-TYPE
          replayed to this SNMP notification target address."
     ::= { tmnxSnmpTrapDestEntry 14 }
 
+tmnxStdDyingGasp                 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxStdDyingGasp specifies whether the tmnxSysDyingGasp
+         trap message is to be sent using this SNMP notification target when
+         the system goes down due to power loss.
+
+         tmnxStdDyingGasp can only be set to 'true' on at most 3 SNMP
+         notification targets."
+    DEFVAL      { false }
+    ::= { tmnxSnmpTrapDestEntry 15 }
+
 tmnxStdMaxTargets                OBJECT-TYPE
     SYNTAX      Unsigned32 (10..100)
     UNITS       "trap-targets"
@@ -3076,7 +3189,7 @@ tmnxLogApCrSignChangeQueue       OBJECT-TYPE
 tmnxLogApCrSignChangeOCntr       OBJECT-TYPE
     SYNTAX      THsmdaCounterIdOrZeroOrAll
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrSignChangeOCntr specifies the counter-id that
          will be taken as reference to which the significant change defined in
@@ -3117,7 +3230,7 @@ tmnxLogApCrSignChangeQECounters  OBJECT-TYPE
 tmnxLogApCrSignChangeOICounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyOICounters
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrSignChangeOICounters specifies the ingress
          counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
@@ -3132,7 +3245,7 @@ tmnxLogApCrSignChangeOICounters  OBJECT-TYPE
 tmnxLogApCrSignChangeOECounters  OBJECT-TYPE
     SYNTAX      TmnxAccPlcyOECounters
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrSignChangeOECounters specifies the egress
          counter Ids in the counter-group defined by tmnxLogApCrSignChangeOCntr
@@ -3323,7 +3436,7 @@ tmnxLogApCrQueueECounters        OBJECT-TYPE
 tmnxLogApCrOverrideCntrTable     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxLogApCrOverrideCntrEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The Nokia SROS series tmnxLogApCrOverrideCntrTable allows to create
          custom record counter override information for a given accounting
@@ -3336,7 +3449,7 @@ tmnxLogApCrOverrideCntrTable     OBJECT-TYPE
 tmnxLogApCrOverrideCntrEntry     OBJECT-TYPE
     SYNTAX      TmnxLogApCrOverrideCntrEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Defines an entry in the tmnxLogApCrOverrideCntrTable. Entries in this
          table are created and destroyed via SNMP Set requests."
@@ -3369,7 +3482,7 @@ tmnxLogApCrOverrideCntrId        OBJECT-TYPE
 tmnxLogApCrOverrideCntrRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Row Status of the entry. This allows creation/deletion of rows in this
          table."
@@ -3378,7 +3491,7 @@ tmnxLogApCrOverrideCntrRowStatus OBJECT-TYPE
 tmnxLogApCrOverrideCntrLastChngd OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrOverrideCntrLastChngd indicates the sysUpTime
          when an object in this table was last modified. A Value 0 means that
@@ -3388,7 +3501,7 @@ tmnxLogApCrOverrideCntrLastChngd OBJECT-TYPE
 tmnxLogApCrOverrideCntrICounters OBJECT-TYPE
     SYNTAX      TmnxAccPlcyOICounters
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrOverrideCntrICounters specifies the list of
          ingress counters that need to be collected in this custom record.
@@ -3401,7 +3514,7 @@ tmnxLogApCrOverrideCntrICounters OBJECT-TYPE
 tmnxLogApCrOverrideCntrECounters OBJECT-TYPE
     SYNTAX      TmnxAccPlcyOECounters
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxLogApCrOverrideCntrECounters specifies the list of
          egress counters that need to be collected in this custom record.
@@ -5200,6 +5313,41 @@ tmnxLogV19v0Compliance           MODULE-COMPLIANCE
         }
     ::= { tmnxLogCompliances 17 }
 
+tmnxLogV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 20 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxLogNameGroup,
+            tmnxLogFilterNameGroup,
+            tmnxLogSnmpTrapGroupNameGroup,
+            tmnxLogFilterParamsNameGroup,
+            tmnxSyslogTargetNameGroup
+        }
+    ::= { tmnxLogCompliances 18 }
+
+tmnxLogV21v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 21 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSyslogTlsClntProfilNameGroup,
+            tmnxLogFileNameGroup
+        }
+    ::= { tmnxLogCompliances 19 }
+
+tmnxLogV22v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 22 of TIMETRA-LOG-MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSnmpTrapDestV22v0Group
+        }
+    ::= { tmnxLogCompliances 20 }
+
 tmnxLogGroups                    OBJECT IDENTIFIER ::= { tmnxLogConformance 2 }
 
 tmnxLogGlobalGroup               OBJECT-GROUP
@@ -5619,21 +5767,14 @@ tmnxLogAccountingPolicyCRV7v0Group OBJECT-GROUP
         tmnxLogApCrLastChanged,
         tmnxLogApCrSignChangeDelta,
         tmnxLogApCrSignChangeQueue,
-        tmnxLogApCrSignChangeOCntr,
         tmnxLogApCrSignChangeQICounters,
         tmnxLogApCrSignChangeQECounters,
-        tmnxLogApCrSignChangeOICounters,
-        tmnxLogApCrSignChangeOECounters,
         tmnxLogApCrSignChangeAACounters,
         tmnxLogApCrAACounters,
         tmnxLogApCrQueueRowStatus,
         tmnxLogApCrQueueLastChanged,
         tmnxLogApCrQueueICounters,
-        tmnxLogApCrQueueECounters,
-        tmnxLogApCrOverrideCntrRowStatus,
-        tmnxLogApCrOverrideCntrLastChngd,
-        tmnxLogApCrOverrideCntrICounters,
-        tmnxLogApCrOverrideCntrECounters
+        tmnxLogApCrQueueECounters
     }
     STATUS      current
     DESCRIPTION
@@ -5987,6 +6128,102 @@ tmnxLogApV19v0Group              OBJECT-GROUP
         "The group of additional objects supporting the Log Accounting Policy
          feature on Nokia SROS series systems in release 19.0."
     ::= { tmnxLogGroups 57 }
+
+tmnxLogNameGroup                 OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogIdName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the Log Id Vs Name feature
+         on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 58 }
+
+tmnxLogFilterNameGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFilterName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the Log Filter Id Vs Name
+         feature on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 59 }
+
+tmnxLogSnmpTrapGroupNameGroup    OBJECT-GROUP
+    OBJECTS     {
+        snmpNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additonal objects supporting the Log Snmp-trap-group Id
+         vs Name feature on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 60 }
+
+tmnxLogFilterParamsNameGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFilterParamsName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additonal objects supporting the Log Filter Entry Id vs
+         Name feature on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 61 }
+
+tmnxSyslogTargetNameGroup        OBJECT-GROUP
+    OBJECTS     {
+        tmnxSyslogTargetName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additonal objects supporting the Log Syslog Id vs Name
+         feature on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 63 }
+
+tmnxSyslogTlsClntProfilNameGroup OBJECT-GROUP
+    OBJECTS     {
+        tmnxSyslogTlsClntProfileName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additonal objects supporting the Log Syslog over TLS
+         feature on Nokia SROS series systems in release 20."
+    ::= { tmnxLogGroups 64 }
+
+tmnxLogApObsoleteObjsV21v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogApCrSignChangeOCntr,
+        tmnxLogApCrSignChangeOECounters,
+        tmnxLogApCrSignChangeOICounters,
+        tmnxLogApCrOverrideCntrRowStatus,
+        tmnxLogApCrOverrideCntrLastChngd,
+        tmnxLogApCrOverrideCntrICounters,
+        tmnxLogApCrOverrideCntrECounters
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting custom record counter override
+         information obsoleted on Nokia SROS series systems in release 21.0."
+    ::= { tmnxLogGroups 65 }
+
+tmnxLogFileNameGroup             OBJECT-GROUP
+    OBJECTS     {
+        tmnxLogFileIdName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting the Log File Id Vs Name
+         feature on Nokia SROS series systems in release 21."
+    ::= { tmnxLogGroups 66 }
+
+tmnxSnmpTrapDestV22v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tmnxStdDyingGasp
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects added to support SNMP trap destinations in the
+         Nokia SROS series systems release 22.0."
+    ::= { tmnxLogGroups 67 }
 
 tmnxLogNotifyPrefix              OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 12 }
 

@@ -11,7 +11,7 @@ if (\LibreNMS\Config::get('enable_syslog')) {
         echo '        </div>
               <table class="table table-hover table-condensed table-striped">';
         foreach ($syslog as $entry) {
-            unset($syslog_output);
+            $syslog_output = '';
             include 'includes/html/print-syslog.inc.php';
             echo $syslog_output;
         }

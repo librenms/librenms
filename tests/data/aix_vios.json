@@ -7,14 +7,14 @@
                     "sysObjectID": ".1.3.6.1.4.1.2.3.1.2.1.1.3",
                     "sysDescr": "IBM PowerPC CHRP Computer\nMachine Type: 0x0800004c Processor id: 00FB98004C00\nBase Operating System Runtime VIOS version: 06.01.0009.0100\nTCP/IP Client Support  version: 06.01.0009.0102",
                     "sysContact": "<private>",
-                    "version": "6.1",
-                    "hardware": null,
+                    "version": "6.1.9.100",
+                    "hardware": "0x0800004c",
                     "features": null,
+                    "location": "<private>",
                     "os": "aix",
                     "type": "server",
                     "serial": "00FB98004C00",
-                    "icon": "aix.svg",
-                    "location": "<private>"
+                    "icon": "aix.svg"
                 }
             ]
         },

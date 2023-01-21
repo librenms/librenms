@@ -421,7 +421,7 @@ lnms config:set overview_show_sysDescr true
 Enable or disable the sysDescr output for a device.
 
 ```bash
-lnms config:set device_default_display '{{ $hostname }}'
+lnms config:set device_display_default '{{ $hostname }}'
 ```
 
 This is a simple template to control the display of device names by default.
@@ -639,7 +639,6 @@ Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Pa
 ```bash
 lnms config:set enable_ports_etherlike false
 lnms config:set enable_ports_junoseatmvp false
-lnms config:set enable_ports_adsl true
 lnms config:set enable_ports_poe false
 ```
 
@@ -730,19 +729,19 @@ there.
 Exact Matching:
 
 ```bash
-lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Matching:
 
 ```bash
-lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Match Substitution:
 
 ```bash
-lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
+lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match

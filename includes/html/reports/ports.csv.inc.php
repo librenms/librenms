@@ -96,7 +96,7 @@ foreach ($vars as $var => $value) {
     }//end if
 }//end foreach
 
-$query = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ' . $where . ' ' . $query_sort;
+$query = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE I.device_id = D.device_id ' . $where;
 
 $row = 1;
 

@@ -30,29 +30,13 @@ namespace LibreNMS\Snmptrap\Handlers;
 
 class RuckusSzSeverity
 {
-    public static function getSeverity($severity)
+    public static function getSeverity(string $severity): int
     {
-        switch ($severity) {
-            case 'Critical':
-                $severityNum = 5;
-                break;
-            case 'Major':
-                $severityNum = 4;
-                break;
-            case 'Minor':
-                $severityNum = 4;
-                break;
-            case 'Warning':
-                $severityNum = 3;
-                break;
-            case 'Informational':
-                $severityNum = 2;
-                break;
-            default:
-                $severityNum = 2;
-                break;
-        }
-
-        return $severityNum;
+        return match ($severity) {
+            'Critical' => 5,
+            'Major', 'Minor' => 4,
+            'Warning' => 3,
+            default => 2 // Informational
+        };
     }
 }

@@ -10,11 +10,11 @@
                     "version": "2.20",
                     "hardware": "Aficio MP C3002",
                     "features": null,
+                    "location": "<private>",
                     "os": "ricoh",
                     "type": "printer",
                     "serial": "W492KB03439",
-                    "icon": "ricoh.svg",
-                    "location": "<private>"
+                    "icon": "ricoh.svg"
                 }
             ]
         },
@@ -712,6 +712,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -736,6 +737,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -760,6 +762,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrDeviceStatus"
                 },
                 {
@@ -784,6 +787,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrPrinterDetectedErrorState"
                 }
             ],

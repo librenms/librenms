@@ -124,11 +124,11 @@
                     "version": "5.4.83-v7+",
                     "hardware": "Generic ARMv7",
                     "features": null,
+                    "location": null,
                     "os": "linux",
                     "type": "server",
                     "serial": null,
-                    "icon": "linux.svg",
-                    "location": null
+                    "icon": "linux.svg"
                 }
             ]
         },

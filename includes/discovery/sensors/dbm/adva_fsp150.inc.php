@@ -38,7 +38,7 @@ $divisor = 1;
 
 // Adva Network Port dBm
 foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
-    if ($entry['cmEthernetNetPortMediaType'] == 'fiber') {
+    if (isset($entry['cmEthernetNetPortMediaType']) && $entry['cmEthernetNetPortMediaType'] == 'fiber') {
         // Discover receive power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.5.1.33.' . $index . '.3';
@@ -94,7 +94,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     }
 
     // Adva Access Ports dBm
-    if ($entry['cmEthernetAccPortMediaType'] == 'fiber') {
+    if (isset($entry['cmEthernetAccPortMediaType']) && $entry['cmEthernetAccPortMediaType'] == 'fiber') {
         //Discover receive power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.1.1.33.' . $index . '.3';
@@ -151,7 +151,7 @@ foreach ($pre_cache['adva_fsp150_ports'] as $index => $entry) {
     }
 
     // Adva Traffic Port dBm
-    if ($entry['cmEthernetTrafficPortMediaType'] == 'fiber') {
+    if (isset($entry['cmEthernetTrafficPortMediaType']) && $entry['cmEthernetTrafficPortMediaType'] == 'fiber') {
         //Discover receivn power level
         $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34.' . $index . '.3';
         $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33.' . $index . '.3';

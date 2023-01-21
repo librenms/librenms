@@ -938,41 +938,6 @@ Output:
 
 Output is an image.
 
-### `list_locations`
-
-Return a list of locations.
-
-Route: `/api/v0/resources/locations`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "locations": [
-        {
-            "id": "1",
-            "location": "Example location, Example city, Example Country",
-            "lat": "-18.911436",
-            "lng": "47.517446",
-            "timestamp": "2017-04-01 02:40:05"
-        },
-        ...
-    ],
-    "count": 100
-}
-```
-
 ### `list_sensors`
 
 Get a list of all Sensors.
@@ -1049,8 +1014,11 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - location_id: serach by locaiton_id
   - hostname: search by hostname
+  - sysName: search by sysName
   - device_id: exact match by device-id
+  - type: search by device type
 - query: If searching by, then this will be used as the input.
 
 Example:

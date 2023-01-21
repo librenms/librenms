@@ -58,4 +58,4 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     }
 }
 
-include_once Config::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';
+include Config::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';

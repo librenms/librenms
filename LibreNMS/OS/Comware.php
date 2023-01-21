@@ -27,6 +27,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -80,7 +81,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
     public function discoverMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $data = snmpwalk_group($this->getDeviceArray(), 'hh3cEntityExtMemUsage', 'HH3C-ENTITY-EXT-MIB');
 
         if (empty($data)) {

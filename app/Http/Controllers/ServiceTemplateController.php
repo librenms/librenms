@@ -355,7 +355,7 @@ class ServiceTemplateController extends Controller
         Service::where('service_template_id', $template->id)->delete();
         $template->delete();
 
-        $msg = __('Service Template :name deleted, Services removed', ['name' => $template->name]);
+        $msg = __('Service Template :name deleted, Services removed', ['name' => htmlentities($template->name)]);
 
         return response($msg, 200);
     }

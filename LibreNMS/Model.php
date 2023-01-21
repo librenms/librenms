@@ -145,9 +145,13 @@ abstract class Model
             $params
         );
 
-        $this->$key = $row[$key];
+        if (is_array($row)) {
+            $this->$key = $row[$key];
 
-        return $row;
+            return $row;
+        }
+
+        return null;
     }
 
     /**

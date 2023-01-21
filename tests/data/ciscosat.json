@@ -10,11 +10,11 @@
                     "version": "1.50(1.11)",
                     "hardware": "D9859",
                     "features": null,
+                    "location": "<private>",
                     "os": "ciscosat",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -93,6 +95,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -117,6 +120,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -141,6 +145,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -165,6 +170,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -189,6 +195,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -213,6 +220,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "inputStatusSatLock"
                 }
             ],
@@ -271,7 +279,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -292,7 +301,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -313,7 +323,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -334,7 +345,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },
@@ -359,7 +371,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.6.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -380,7 +393,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.5.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -401,7 +415,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.7.1\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -422,7 +437,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.1429.2.2.5.5.3.1.1.12.1\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         }

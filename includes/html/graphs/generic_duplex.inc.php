@@ -17,10 +17,12 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$length = '10';
+$length = 10;
+$percentile = $percentile ?? false;
+$print_total = $print_total ?? false;
 
 if (! isset($percentile)) {
-    $length += '2';
+    $length += 2;
 }
 
 if (! isset($out_text)) {
@@ -54,12 +56,12 @@ if ($percentile) {
     $rrd_options .= ' VDEF:dpercentile_out=dout,' . $percentile . ',PERCENT';
 }
 
-if ($graph_max) {
+if (! empty($graph_max)) {
     $rrd_options .= ' AREA:in_max#' . $colour_area_in_max . $stacked['transparency'] . ':';
     $rrd_options .= ' AREA:dout_max#' . $colour_area_out_max . $stacked['transparency'] . ':';
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' DEF:' . $out . 'X=' . $rrd_filename . ':' . $ds_out . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $in . 'X=' . $rrd_filename . ':' . $ds_in . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
     $rrd_options .= ' DEF:' . $out . '_maxX=' . $rrd_filename . ':' . $ds_out . ':MAX:start=' . $prev_from . ':end=' . $from;
@@ -131,7 +133,7 @@ if ($percentile) {
     $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 }
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     $rrd_options .= ' LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
     $rrd_options .= ' AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
     $rrd_options .= ' LINE1.25:dout' . $format . "X#666666:'Prev Out'";
