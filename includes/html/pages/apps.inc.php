@@ -397,7 +397,6 @@ $graphs['cape'] = [
     'pkg_tasks_all',
 ];
 
-
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
