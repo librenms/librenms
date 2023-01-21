@@ -112,7 +112,7 @@ if (isset($vars['package'])) {
         'cape_pkg_tasks' => 'Package Tasks',
         'cape_run_stats' => 'Run Stats',
         'cape_malscore_stats' => 'Malscore Averages',
-     ];
+    ];
     if ($vars['bytimeslot'] == 'on') {
         $graphs['cape_malscore'] = 'Malscore Stats During Time Slot';
         $graphs['cape_anti_issues'] = 'Anti Issues Per Run Stats During Time Slot';

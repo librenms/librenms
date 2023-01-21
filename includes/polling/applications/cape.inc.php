@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'cape';

@@ -61,7 +61,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
             'filename' => $rrd_filename,
             'descr'    => 'StdDevP',
             'ds'       => 's9malscore',
-    ];
+        ];
     }
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
