@@ -11,16 +11,16 @@ $transparency = 15;
 $float_precision = 3;
 
 if (isset($vars['package'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-anti_issues___-___',$vars['package']]);
-}else{
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'anti_issues']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-anti_issues___-___', $vars['package']]);
+} else {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'anti_issues']);
 }
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
-   $filename = $rrd_filename;
-   $descr = 'Average';
-   $ds = 's3anti_issues';
+    $filename = $rrd_filename;
+    $descr = 'Average';
+    $ds = 's3anti_issues';
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
 }

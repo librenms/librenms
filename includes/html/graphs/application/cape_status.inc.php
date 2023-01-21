@@ -19,11 +19,11 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'descr'    => 'banned',
         'ds'       => 'banned',
     ];
-#    $rrd_list[] = [
-#        'filename' => $rrd_filename,
-#        'descr'    => 'pending',
-#        'ds'       => 'pending',
-#    ];
+//    $rrd_list[] = [
+//        'filename' => $rrd_filename,
+//        'descr'    => 'pending',
+//        'ds'       => 'pending',
+//    ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => 'running',

@@ -12,16 +12,16 @@ $float_precision = 3;
 
 if (isset($vars['stddev'])) {
     if ($vars['stddev'] != 'on' and $vars['stddev'] != 'off') {
-        $vars['stddev']='off';
+        $vars['stddev'] = 'off';
     }
-}else{
-    $vars['stddev']='off';
+} else {
+    $vars['stddev'] = 'off';
 }
 
 if (isset($vars['package'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-dropped_files___-___',$vars['package']]);
-}else{
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'dropped_files']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-dropped_files___-___', $vars['package']]);
+} else {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'dropped_files']);
 }
 
 $rrd_list = [];
@@ -51,7 +51,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
         'descr'    => 'Mode',
         'ds'       => 's5dropped_files',
     ];
-    if ($vars['stddev'] == 'on'){
+    if ($vars['stddev'] == 'on') {
         $rrd_list[] = [
             'filename' => $rrd_filename,
             'descr'    => 'StdDev',

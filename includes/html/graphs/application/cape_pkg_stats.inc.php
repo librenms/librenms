@@ -10,17 +10,16 @@ $addarea = 0;
 $transparency = 15;
 $float_precision = 3;
 
-$rrd_filename_anti_issues = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-anti_issues___-___',$vars['package']]);
-$rrd_filename_api_calls = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-api_calls___-___',$vars['package']]);
-$rrd_filename_domains = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-domains___-___',$vars['package']]);
-$rrd_filename_crash_issues = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-crash_issues___-___',$vars['package']]);
-$rrd_filename_dropped_files = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-dropped_files___-___',$vars['package']]);
-$rrd_filename_files_written = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-files_written___-___',$vars['package']]);
-$rrd_filename_reg_keys_mod = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-reg_keys_mod___-___',$vars['package']]);
-$rrd_filename_running_processes = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-running_processes___-___',$vars['package']]);
-$rrd_filename_signatures_alert = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-signatures_alert___-___',$vars['package']]);
-$rrd_filename_signatures_total = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-signatures_total___-___',$vars['package']]);
-
+$rrd_filename_anti_issues = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-anti_issues___-___', $vars['package']]);
+$rrd_filename_api_calls = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-api_calls___-___', $vars['package']]);
+$rrd_filename_domains = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-domains___-___', $vars['package']]);
+$rrd_filename_crash_issues = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-crash_issues___-___', $vars['package']]);
+$rrd_filename_dropped_files = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-dropped_files___-___', $vars['package']]);
+$rrd_filename_files_written = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-files_written___-___', $vars['package']]);
+$rrd_filename_reg_keys_mod = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-reg_keys_mod___-___', $vars['package']]);
+$rrd_filename_running_processes = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-running_processes___-___', $vars['package']]);
+$rrd_filename_signatures_alert = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-signatures_alert___-___', $vars['package']]);
+$rrd_filename_signatures_total = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-signatures_total___-___', $vars['package']]);
 
 $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename_dropped_files)) {

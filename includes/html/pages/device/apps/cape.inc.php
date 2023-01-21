@@ -6,7 +6,7 @@ foreach ($packages as $index => $value) {
     $packages[$index] = preg_replace('/^pkg___-___-/', '', $value);
 }
 
-$vars_to_check=[
+$vars_to_check = [
     'stddev',
     'bytimeslot',
     'bypkg',
@@ -15,10 +15,10 @@ $vars_to_check=[
 foreach ($vars_to_check as $index => $value) {
     if (isset($vars[$value])) {
         if ($vars[$value] != 'on' and $vars[$value] != 'off') {
-            $vars[$value]='off';
+            $vars[$value] = 'off';
         }
-    }else{
-        $vars[$value]='off';
+    } else {
+        $vars[$value] = 'off';
     }
 }
 
@@ -27,14 +27,14 @@ if (sizeof($packages) > 0) {
 
     if (isset($vars['package'])) {
         echo generate_link('General', $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg']]);
-    }else{
+    } else {
         $label = '<span class="pagemenu-selected">General</span>';
         echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg']]);
     }
 
-    echo " | <b>Packages:</b> ";
+    echo ' | <b>Packages:</b> ';
     $packages_int = 0;
-    while(isset($packages[$packages_int])) {
+    while (isset($packages[$packages_int])) {
         $package = $packages[$packages_int];
         $label = $package;
 
@@ -50,57 +50,56 @@ if (sizeof($packages) > 0) {
         }
 
         echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$package, 'statsavg'=>$vars['statsavg']]) . $append;
-
     }
 
     echo "<br>\n";
 
-    echo "<b>Run Stats Averages:</b> ";
+    echo '<b>Run Stats Averages:</b> ';
     if ($vars['statsavg'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
         echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on']) . ', ' .
         generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off']);
-    }else{
+    } else {
         $label = '<span class="pagemenu-selected">Off</span>';
         echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on']) . ', ' .
         generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off']);
     }
 
-    echo "  |  ";
+    echo '  |  ';
 
-    echo "<b>By Time Slot:</b> ";
+    echo '<b>By Time Slot:</b> ';
     if ($vars['bytimeslot'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
         echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
         generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
-    }else{
+    } else {
         $label = '<span class="pagemenu-selected">Off</span>';
         echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
         generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
     }
 
-    if (!isset($vars['package'])) {
-        echo "  |  ";
-        echo "<b>By Package:</b> ";
+    if (! isset($vars['package'])) {
+        echo '  |  ';
+        echo '<b>By Package:</b> ';
         if ($vars['bypkg'] == 'on') {
             $label = '<span class="pagemenu-selected">On</span>';
             echo generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
             generate_link('Off', $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
-        }else{
+        } else {
             $label = '<span class="pagemenu-selected">Off</span>';
             echo generate_link('On', $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
             generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
         }
     }
 
-    echo "  |  ";
+    echo '  |  ';
 
-    echo "<b>Standard Deviation:</b> ";
+    echo '<b>Standard Deviation:</b> ';
     if ($vars['stddev'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
         echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
         generate_link('Off', $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
-    }else{
+    } else {
         $label = '<span class="pagemenu-selected">Off</span>';
         echo generate_link('On', $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
         generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
@@ -114,18 +113,18 @@ if (isset($vars['package'])) {
         'cape_run_stats' => 'Run Stats',
         'cape_malscore_stats' => 'Malscore Averages',
      ];
-     if ($vars['bytimeslot'] == 'on') {
-         $graphs['cape_malscore'] = 'Malscore Stats During Time Slot';
-         $graphs['cape_anti_issues'] = 'Anti Issues Per Run Stats During Time Slot';
-         $graphs['cape_api_calls'] = 'API Calls Per Run Stats During Time Slot';
-         $graphs['cape_crash_issues'] = 'Crash Issues Per Run Stats During Time Slot';
-         $graphs['cape_domains'] = 'Domains Per Run Stats During Time Slot';
-         $graphs['cape_dropped_files'] = 'Dropped Files Per Run Stats During Time Slot';
-         $graphs['cape_files_written'] = 'Files Written Per Run Stats During Time Slot';
-         $graphs['cape_registry_keys_modified'] = 'Registry Keys Modified Per Run Stats During Time Slot';
-         $graphs['cape_running_processes'] = 'Running Processes Per Run Stats During Time Slot';
-         $graphs['cape_signatures_alert'] = 'Signatures Alert Per Run Stats During Time Slot';
-         $graphs['cape_signatures_total'] = 'Signatures Total Per Run Stats During Time Slot';
+    if ($vars['bytimeslot'] == 'on') {
+        $graphs['cape_malscore'] = 'Malscore Stats During Time Slot';
+        $graphs['cape_anti_issues'] = 'Anti Issues Per Run Stats During Time Slot';
+        $graphs['cape_api_calls'] = 'API Calls Per Run Stats During Time Slot';
+        $graphs['cape_crash_issues'] = 'Crash Issues Per Run Stats During Time Slot';
+        $graphs['cape_domains'] = 'Domains Per Run Stats During Time Slot';
+        $graphs['cape_dropped_files'] = 'Dropped Files Per Run Stats During Time Slot';
+        $graphs['cape_files_written'] = 'Files Written Per Run Stats During Time Slot';
+        $graphs['cape_registry_keys_modified'] = 'Registry Keys Modified Per Run Stats During Time Slot';
+        $graphs['cape_running_processes'] = 'Running Processes Per Run Stats During Time Slot';
+        $graphs['cape_signatures_alert'] = 'Signatures Alert Per Run Stats During Time Slot';
+        $graphs['cape_signatures_total'] = 'Signatures Total Per Run Stats During Time Slot';
     }
     if ($vars['statsavg'] == 'on') {
         $graphs['cape_anti_issues_avg'] = 'Anti Issues Per Run Average';
@@ -139,7 +138,7 @@ if (isset($vars['package'])) {
         $graphs['cape_signatures_alert_avg'] = 'Signatures Alert Per Run Average';
         $graphs['cape_signatures_total_avg'] = 'Signatures Total Per Run Average';
     }
-}else{
+} else {
     if (sizeof($packages) > 0) {
         $graphs = [
             'cape_status' => 'Run Statuses',
@@ -194,7 +193,7 @@ if (isset($vars['package'])) {
             'cape_lines' => 'Log Lines',
             'cape_pending' => 'Pending',
         ];
-   }
+    }
 }
 
 foreach ($graphs as $key => $text) {

@@ -12,16 +12,16 @@ $float_precision = 3;
 
 if (isset($vars['stddev'])) {
     if ($vars['stddev'] != 'on' and $vars['stddev'] != 'off') {
-        $vars['stddev']='off';
+        $vars['stddev'] = 'off';
     }
-}else{
-    $vars['stddev']='off';
+} else {
+    $vars['stddev'] = 'off';
 }
 
 if (isset($vars['package'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'pkg-crash_issues___-___',$vars['package']]);
-}else{
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'],'crash_issues']);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'pkg-crash_issues___-___', $vars['package']]);
+} else {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], 'crash_issues']);
 }
 
 $rrd_list = [];
