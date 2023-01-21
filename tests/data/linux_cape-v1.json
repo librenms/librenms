@@ -51,6 +51,12 @@
                     "app_type": "cape"
                 },
                 {
+                    "metric": "confidence",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "cape"
+                },
+                {
                     "metric": "crash_issues",
                     "value": 0,
                     "value_prev": null,
