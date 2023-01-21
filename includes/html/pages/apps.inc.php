@@ -388,6 +388,15 @@ $graphs['chronyd'] = [
     'frequency',
     'root',
 ];
+$graphs['cape'] = [
+    'status',
+    'pending',
+    'run_stats',
+    'lines',
+    'malscore_stats',
+    'pkg_tasks_all',
+];
+
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
