@@ -26,7 +26,6 @@
 namespace App\Jobs;
 
 use App\Models\Device;
-use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
