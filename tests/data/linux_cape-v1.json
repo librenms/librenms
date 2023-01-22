@@ -1053,7 +1053,7 @@
                     "app_type": "cape"
                 },
                 {
-                    "metric": "?",
+                    "metric": "wrong_prog",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "cape"
