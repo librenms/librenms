@@ -130,6 +130,7 @@ These devices are excluded by default:
 
 ```php
 $config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cisco Lightweight Access Point
+$config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-k9w8 /'; // Cisco Lightweight Access Point
 $config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
 ```
 
