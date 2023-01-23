@@ -53,7 +53,7 @@ class Telegram extends Transport
             }
         }
         $messageThreadId = '';
-        if (!empty($data['message_thread_id'])) {
+        if (! empty($data['message_thread_id'])) {
             $messageThreadId = '&message_thread_id=' . $data['message_thread_id'];
         }
         curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}$messageThreadId&text=$text{$format}"));
