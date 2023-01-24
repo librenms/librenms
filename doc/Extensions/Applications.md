@@ -432,6 +432,34 @@ extend certificate /etc/snmp/certificate.py
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+## CAPEv2
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/cape -O /etc/snmp/cape
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/cape
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend cape /etc/snmp/cape
+```
+
+4. Install the required packages.
+```
+apt-get install libfile-readbackwards-perl libjson-perl libconfig-tiny-perl libdbi-perl libfile-slurp-perl libstatistics-lite-perl
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## C.H.I.P
 
 C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
