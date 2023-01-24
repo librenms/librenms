@@ -399,6 +399,14 @@ $graphs['chronyd'] = [
     'frequency',
     'root',
 ];
+$graphs['cape'] = [
+    'status',
+    'pending',
+    'run_stats',
+    'lines',
+    'malscore_stats',
+    'pkg_tasks_all',
+];
 $graphs['sagan'] = [
     'after',
     'bytes_ignored',
