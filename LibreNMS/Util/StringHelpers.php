@@ -47,6 +47,7 @@ class StringHelpers
     {
         $replacements = [
             'bind' => 'BIND',
+            'cape' => 'CAPEv2',
             'dbm' => 'dBm',
             'dhcp-stats' => 'DHCP Stats',
             'entropy' => 'Random entropy',
