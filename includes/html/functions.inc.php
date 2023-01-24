@@ -924,7 +924,7 @@ function search_oxidized_config($search_in_conf_textbox)
     foreach ($nodes as &$n) {
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
-        $n['full_name'] = $dev['device_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
+        $n['full_name'] = $n['dev_id'] ? DeviceCache::get($n['dev_id'])->displayName() : $n['full_name'];
     }
 
     /*
