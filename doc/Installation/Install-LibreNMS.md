@@ -133,8 +133,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 
 === "Debian 11"
     ```bash
-    vi /etc/php/8.1/fpm/php.ini
-    vi /etc/php/8.1/cli/php.ini
+    vi /etc/php/8.2/fpm/php.ini
+    vi /etc/php/8.2/cli/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -214,8 +214,8 @@ exit
 
 === "Debian 11"
     ```bash
-    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
-    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
+    vi /etc/php/8.2/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -470,7 +470,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php8.1-fpm
+        systemctl restart php8.2-fpm
         ```
 
 ## SELinux
