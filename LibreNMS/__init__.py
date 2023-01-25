@@ -433,7 +433,7 @@ class RedisLock(Lock):
             kwargs = {
                 k: v
                 for k, v in redis_kwargs.items()
-                if k in ["decode_responses", "password", "db", "socket_timeout"]
+                if k in ["decode_responses", "username", "password", "db", "socket_timeout"]
             }
             self._redis = Sentinel(sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs).master_for(sentinel_service)
         else:
@@ -540,7 +540,7 @@ class RedisUniqueQueue(object):
             kwargs = {
                 k: v
                 for k, v in redis_kwargs.items()
-                if k in ["decode_responses", "password", "db", "socket_timeout"]
+                if k in ["decode_responses", "username", "password", "db", "socket_timeout"]
             }
             self._redis = Sentinel(sentinels, sentinel_kwargs, **kwargs).master_for(sentinel_service)
         else:
