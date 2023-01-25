@@ -235,7 +235,7 @@ class QueueManager:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Could not connect to Redis. {}".format(e))
+                logger.critical("Queue manager could not connect to Redis. {}: {}".format(type(e).__name__, e))
                 exit(2)
 
         return LibreNMS.UniqueQueue()

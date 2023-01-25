@@ -682,15 +682,13 @@ class Service:
                     "Please install redis-py, either through your os software repository or from PyPI"
                 )
                 self.exit(2)
-        """
         except Exception as e:
             if self.config.distributed:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Could not connect to Redis. {}: {}".format(type(e).__name__, e))
+                logger.critical("Lock manager could not connect to Redis. {}: {}".format(type(e).__name__, e))
                 self.exit(2)
-        """
 
         return LibreNMS.ThreadingLock()
 
