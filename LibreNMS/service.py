@@ -198,11 +198,11 @@ class ServiceConfig(DBConfig):
         )
         self.redis_sentinel_user = os.getenv(
             "REDIS_SENTINEL_USERNAME",
-            config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user)
+            config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user),
         )
         self.redis_sentinel_pass = os.getenv(
             "REDIS_SENTINEL_PASSWORD",
-            config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass)
+            config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass),
         )
         self.redis_sentinel_service = os.getenv(
             "REDIS_SENTINEL_SERVICE",
