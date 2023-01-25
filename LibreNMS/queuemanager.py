@@ -203,10 +203,17 @@ class QueueManager:
         try:
             return LibreNMS.RedisUniqueQueue(
                 self.queue_name(queue_type, group),
+                sentinel_kwargs={
+                    'username': self.config.redis_sentinel_user,
+                    'password': self.config.redis_sentinel_pass,
+                    'socket_timeout': self.config.redis_timeout,
+                    'unix_socket_path': self.config.redis_socket
+                },
                 namespace="librenms.queue",
                 host=self.config.redis_host,
                 port=self.config.redis_port,
                 db=self.config.redis_db,
+                username=self.config.redis_user,
                 password=self.config.redis_pass,
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,

@@ -420,7 +420,7 @@ class ThreadingLock(Lock):
 
 
 class RedisLock(Lock):
-    def __init__(self, namespace="lock", **redis_kwargs):
+    def __init__(self, namespace="lock", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
 
@@ -435,7 +435,7 @@ class RedisLock(Lock):
                 for k, v in redis_kwargs.items()
                 if k in ["decode_responses", "password", "db", "socket_timeout"]
             }
-            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+            self._redis = Sentinel(sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
@@ -527,7 +527,7 @@ class RedisLock(Lock):
 
 
 class RedisUniqueQueue(object):
-    def __init__(self, name, namespace="queue", **redis_kwargs):
+    def __init__(self, name, namespace="queue", sentinel_kwargs=None, **redis_kwargs):
         import redis  # pylint: disable=import-error
         from redis.sentinel import Sentinel  # pylint: disable=import-error
 
@@ -542,7 +542,7 @@ class RedisUniqueQueue(object):
                 for k, v in redis_kwargs.items()
                 if k in ["decode_responses", "password", "db", "socket_timeout"]
             }
-            self._redis = Sentinel(sentinels, **kwargs).master_for(sentinel_service)
+            self._redis = Sentinel(sentinels, sentinel_kwargs, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
