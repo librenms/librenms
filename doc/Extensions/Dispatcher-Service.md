@@ -99,7 +99,7 @@ REDIS_PASSWORD=PasswordGoesHere
 REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
 REDIS_SENTINEL_SERVICE=mymaster
 
-# If requirepass is set in sentinel, set everything above as well as (recommended)
+# If requirepass is set in sentinel, set everything above as well as: (recommended)
 REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 
 # If ACL's are in use, set everything above as well as: (highly recommended)
