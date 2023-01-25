@@ -204,10 +204,10 @@ class QueueManager:
             return LibreNMS.RedisUniqueQueue(
                 self.queue_name(queue_type, group),
                 sentinel_kwargs={
-                    'username': self.config.redis_sentinel_user,
-                    'password': self.config.redis_sentinel_pass,
-                    'socket_timeout': self.config.redis_timeout,
-                    'unix_socket_path': self.config.redis_socket
+                    "username": self.config.redis_sentinel_user,
+                    "password": self.config.redis_sentinel_pass,
+                    "socket_timeout": self.config.redis_timeout,
+                    "unix_socket_path": self.config.redis_socket,
                 },
                 namespace="librenms.queue",
                 host=self.config.redis_host,
@@ -218,7 +218,7 @@ class QueueManager:
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
-                socket_timeout=self.config.redis_timeout
+                socket_timeout=self.config.redis_timeout,
             )
 
         except ImportError:
@@ -235,7 +235,11 @@ class QueueManager:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Queue manager could not connect to Redis. {}: {}".format(type(e).__name__, e))
+                logger.critical(
+                    "Queue manager could not connect to Redis. {}: {}".format(
+                        type(e).__name__, e
+                    )
+                )
                 exit(2)
 
         return LibreNMS.UniqueQueue()

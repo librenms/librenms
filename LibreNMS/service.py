@@ -197,10 +197,12 @@ class ServiceConfig(DBConfig):
             "REDIS_SENTINEL", config.get("redis_sentinel", ServiceConfig.redis_sentinel)
         )
         self.redis_sentinel_user = os.getenv(
-            "REDIS_SENTINEL_USERNAME", config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user)
+            "REDIS_SENTINEL_USERNAME",
+            config.get("redis_sentinel_user", ServiceConfig.redis_sentinel_user)
         )
         self.redis_sentinel_pass = os.getenv(
-            "REDIS_SENTINEL_PASSWORD", config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass)
+            "REDIS_SENTINEL_PASSWORD",
+            config.get("redis_sentinel_pass", ServiceConfig.redis_sentinel_pass)
         )
         self.redis_sentinel_service = os.getenv(
             "REDIS_SENTINEL_SERVICE",
@@ -657,10 +659,10 @@ class Service:
         try:
             return LibreNMS.RedisLock(
                 sentinel_kwargs={
-                    'username': self.config.redis_sentinel_user,
-                    'password': self.config.redis_sentinel_pass,
-                    'socket_timeout': self.config.redis_timeout,
-                    'unix_socket_path': self.config.redis_socket
+                    "username": self.config.redis_sentinel_user,
+                    "password": self.config.redis_sentinel_pass,
+                    "socket_timeout": self.config.redis_timeout,
+                    "unix_socket_path": self.config.redis_socket,
                 },
                 namespace="librenms.lock",
                 host=self.config.redis_host,
@@ -671,7 +673,7 @@ class Service:
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
-                socket_timeout=self.config.redis_timeout
+                socket_timeout=self.config.redis_timeout,
             )
         except ImportError:
             if self.config.distributed:
@@ -687,7 +689,11 @@ class Service:
                 logger.critical(
                     "ERROR: Redis connection required for distributed polling"
                 )
-                logger.critical("Lock manager could not connect to Redis. {}: {}".format(type(e).__name__, e))
+                logger.critical(
+                    "Lock manager could not connect to Redis. {}: {}".format(
+                        type(e).__name__, e
+                    )
+                )
                 self.exit(2)
 
         return LibreNMS.ThreadingLock()
