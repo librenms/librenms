@@ -542,7 +542,7 @@ class RedisUniqueQueue(object):
                 for k, v in redis_kwargs.items()
                 if k in ["decode_responses", "username", "password", "db", "socket_timeout"]
             }
-            self._redis = Sentinel(sentinels, sentinel_kwargs, **kwargs).master_for(sentinel_service)
+            self._redis = Sentinel(sentinels, sentinel_kwargs=sentinel_kwargs, **kwargs).master_for(sentinel_service)
         else:
             kwargs = {k: v for k, v in redis_kwargs.items() if "sentinel" not in k}
             self._redis = redis.Redis(**kwargs)
