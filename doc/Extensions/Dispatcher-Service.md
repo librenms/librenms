@@ -91,7 +91,7 @@ REDIS_TIMEOUT=60
 REDIS_PASSWORD=PasswordGoesHere
 
 # If ACL's are in use, set everything above as well as: (highly recommended)
-REDIS_PASSWORD=PasswordGoesHere
+REDIS_USERNAME=UsernameGoesHere
 
 ##
 ## Sentinel
@@ -100,13 +100,15 @@ REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003
 REDIS_SENTINEL_SERVICE=mymaster
 
 # If requirepass is set in sentinel, set everything above as well as: (recommended)
-REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
+REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
 
 # If ACL's are in use, set everything above as well as: (highly recommended)
-REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
+REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
 
 For more information on ACL's, see <https://redis.io/docs/management/security/acl/> 
+
+Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT` - Sentinel just provides the address of the instance currently accepting writes and manages failover. It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
 
 ### Basic Configuration
 
