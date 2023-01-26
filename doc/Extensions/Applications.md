@@ -2186,7 +2186,7 @@ chmod +x /etc/snmp/redis.py
 extend redis /etc/snmp/redis.py
 ```
 
-4; (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
 ```
 cat << EOF > snmpd_redis.te
 module snmpd_redis 1.0;
