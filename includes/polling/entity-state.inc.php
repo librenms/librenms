@@ -64,7 +64,7 @@ if (! empty($entityStatesIndexes)) {
                         ->format('Y-m-d H:i:s');
 
                     // check if anything has changed
-                    $update = array_diff_assoc(
+                    $update = array_diff(
                         $new_states,
                         dbFetchRow(
                             'SELECT * FROM entityState WHERE entity_state_id=?',
