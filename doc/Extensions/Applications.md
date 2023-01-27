@@ -1237,7 +1237,28 @@ chmod +x /etc/snmp/nginx
 extend nginx /etc/snmp/nginx
 ```
 
-4. Restart snmpd on your host
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can request /nginx-status:
+```
+cat << EOF > snmpd_nginx.te
+module snmpd_nginx 1.0;
+
+require {
+        type httpd_t;
+        type http_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t http_port_t:tcp_socket name_connect;
+EOF
+checkmodule -M -m -o snmpd_nginx.mod snmpd_nginx.te
+semodule_package -o snmpd_nginx.pp -m snmpd_nginx.mod
+semodule -i snmpd_nginx.pp
+```
+
+5. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
