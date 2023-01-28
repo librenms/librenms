@@ -5,9 +5,8 @@ $unit_text = 'Availability(%)';
 $float_precision = '3';
 
 if ($vars['duration'] > 86400) {
-   $scale_min = '0';
-   $scale_max = '100';
-
+    $scale_min = '0';
+    $scale_max = '100';
 
     $rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
 
@@ -23,7 +22,7 @@ if ($vars['duration'] > 86400) {
     $graph_max = 1;
 
     require 'includes/html/graphs/generic_simplex.inc.php';
-}else{
+} else {
     $colours = 'blues';
 
     $filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
