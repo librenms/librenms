@@ -1,24 +1,33 @@
 <?php
 
-$scale_min = '0';
-$scale_max = '100';
+$ds = 'availability';
+$unit_text = 'Availability(%)';
 $float_precision = '3';
 
-$rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
+if ($vars['duration'] > 86400) {
+   $scale_min = '0';
+   $scale_max = '100';
 
-$ds = 'availability';
 
-$colour_line = '000000';
-$colour_area = '8B8BEB44';
+    $rrd_filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
 
-$colour_area_max = 'cc9999';
+    $colour_line = '000000';
+    $colour_area = '8B8BEB44';
 
-$line_text = \LibreNMS\Util\Time::formatInterval($vars['duration'], parts: 1);
+    $colour_area_max = 'cc9999';
 
-$graph_title .= '::' . $line_text;
+    $line_text = \LibreNMS\Util\Time::formatInterval($vars['duration']);
 
-$graph_max = 1;
+    $graph_title .= '::' . $line_text;
 
-$unit_text = 'Availability(%)';
+    $graph_max = 1;
 
-require 'includes/html/graphs/generic_simplex.inc.php';
+    require 'includes/html/graphs/generic_simplex.inc.php';
+}else{
+    $colours = 'blues';
+
+    $filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
+    $descr = '';
+
+    require 'includes/html/graphs/generic_stats.inc.php';
+}
