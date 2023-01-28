@@ -109,7 +109,7 @@ if (sizeof($packages) > 0) {
     if (! isset($vars['package'])) {
         echo '  |  ';
         echo '<b>Run Statuses Averages:</b> ';
-        if ($vars['bypkg'] == 'on') {
+        if ($vars['runstats'] == 'on') {
             $label = '<span class="pagemenu-selected">On</span>';
             echo generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'on']) . ', ' .
             generate_link('Off', $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'off']);
