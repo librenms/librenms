@@ -14,7 +14,6 @@ if (isset($vars['vm'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
-
 if (Rrd::checkRrdExists($rrd_filename)) {
     $filename = $rrd_filename;
     $descr = 'Snaps';
