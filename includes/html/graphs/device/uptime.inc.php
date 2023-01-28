@@ -4,7 +4,7 @@ $scale_min = 0;
 
 $filename = Rrd::name($device['hostname'], 'uptime');
 
-$ds='uptime';
+$ds = 'uptime';
 
 $colours = 'greens';
 $float_precision = 3;
