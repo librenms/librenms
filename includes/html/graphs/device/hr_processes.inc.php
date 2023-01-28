@@ -1,7 +1,5 @@
 <?php
 
-$scale_min = '0';
-
 $filename = Rrd::name($device['hostname'], 'hr_processes');
 
 $ds = 'procs';

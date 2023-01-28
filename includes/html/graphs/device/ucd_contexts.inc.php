@@ -4,7 +4,6 @@ $filename = Rrd::name($device['hostname'], 'ucd_ssRawContexts');
 
 $ds = 'value';
 
-
 $unit_text = 'Switches/s';
 
 $colours = 'blues';

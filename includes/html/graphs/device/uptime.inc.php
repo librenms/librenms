@@ -1,5 +1,7 @@
 <?php
 
+$scale_min=0;
+
 $filename = Rrd::name($device['hostname'], 'uptime');
 
 $ds='uptime';
