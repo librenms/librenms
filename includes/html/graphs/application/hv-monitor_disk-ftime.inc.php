@@ -16,15 +16,12 @@ if (isset($vars['vmdisk']) && isset($vars['vm'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
-$rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $rrd_filename,
-        'descr'    => 'Flush Time',
-        'ds'       => 'ftime',
-    ];
+    $filename = $rrd_filename;
+    $descr = 'Flush Time';
+    $ds = 'ftime';
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
 }
 
-require 'includes/html/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_stats.inc.php';

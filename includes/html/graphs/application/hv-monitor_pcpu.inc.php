@@ -1,7 +1,7 @@
 <?php
 
 $name = 'hv-monitor';
-$unit_text = 'Memory Usage %';
+$unit_text = 'CPU Usage %';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
@@ -14,15 +14,12 @@ if (isset($vars['vm'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id]);
 }
 
-$rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $rrd_filename,
-        'descr'    => 'CPU%',
-        'ds'       => 'pcpu',
-    ];
+    $filename = $rrd_filename;
+    $descr = 'CPU%';
+    $ds = 'pcpu';
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
 }
 
-require 'includes/html/graphs/generic_multi_line.inc.php';
+require 'includes/html/graphs/generic_stats.inc.php';
