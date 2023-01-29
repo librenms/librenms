@@ -1,7 +1,7 @@
 <?php
 
 $name = 'hv-monitor';
-$unit_text = 'Memory Usage %';
+$unit_text = 'CPU Usage %';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
