@@ -11,6 +11,7 @@ $vars_to_check = [
     'bytimeslot',
     'bypkg',
     'statsavg',
+    'runstats',
 ];
 foreach ($vars_to_check as $index => $value) {
     if (isset($vars[$value])) {
@@ -26,10 +27,10 @@ if (sizeof($packages) > 0) {
     print_optionbar_start();
 
     if (isset($vars['package'])) {
-        echo generate_link('General', $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link('General', $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     } else {
         $label = '<span class="pagemenu-selected">General</span>';
-        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     }
 
     echo ' | <b>Packages:</b> ';
@@ -49,7 +50,7 @@ if (sizeof($packages) > 0) {
             $append = ', ';
         }
 
-        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$package, 'statsavg'=>$vars['statsavg']]) . $append;
+        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>$vars['stddev'], 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$package, 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . $append;
     }
 
     echo "<br>\n";
@@ -57,12 +58,12 @@ if (sizeof($packages) > 0) {
     echo '<b>Run Stats Averages:</b> ';
     if ($vars['statsavg'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
-        echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on']) . ', ' .
-        generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off']);
+        echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on', 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off', 'runstats'=>$vars['runstats']]);
     } else {
         $label = '<span class="pagemenu-selected">Off</span>';
-        echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on']) . ', ' .
-        generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off']);
+        echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'on', 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>$vars['bytimeslot'], 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>'off', 'runstats'=>$vars['runstats']]);
     }
 
     echo '  |  ';
@@ -70,12 +71,12 @@ if (sizeof($packages) > 0) {
     echo '<b>By Time Slot:</b> ';
     if ($vars['bytimeslot'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
-        echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-        generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link('Off', $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     } else {
         $label = '<span class="pagemenu-selected">Off</span>';
-        echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-        generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link('On', $link_array, ['app'=>'cape', 'bytimeslot'=>'on', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link($label, $link_array, ['app'=>'cape', 'bytimeslot'=>'off', 'bypkg'=>$vars['bypkg'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     }
 
     if (! isset($vars['package'])) {
@@ -83,12 +84,12 @@ if (sizeof($packages) > 0) {
         echo '<b>By Package:</b> ';
         if ($vars['bypkg'] == 'on') {
             $label = '<span class="pagemenu-selected">On</span>';
-            echo generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-            generate_link('Off', $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+            echo generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+            generate_link('Off', $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
         } else {
             $label = '<span class="pagemenu-selected">Off</span>';
-            echo generate_link('On', $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-            generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+            echo generate_link('On', $link_array, ['app'=>'cape', 'bypkg'=>'on', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+            generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>'off', 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
         }
     }
 
@@ -97,13 +98,28 @@ if (sizeof($packages) > 0) {
     echo '<b>Standard Deviation:</b> ';
     if ($vars['stddev'] == 'on') {
         $label = '<span class="pagemenu-selected">On</span>';
-        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-        generate_link('Off', $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link('Off', $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     } else {
         $label = '<span class="pagemenu-selected">Off</span>';
-        echo generate_link('On', $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]) . ', ' .
-        generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg']]);
+        echo generate_link('On', $link_array, ['app'=>'cape', 'stddev'=>'on', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]) . ', ' .
+        generate_link($label, $link_array, ['app'=>'cape', 'stddev'=>'off', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>$vars['runstats']]);
     }
+
+    if (! isset($vars['package'])) {
+        echo '  |  ';
+        echo '<b>Run Statuses Averages:</b> ';
+        if ($vars['runstats'] == 'on') {
+            $label = '<span class="pagemenu-selected">On</span>';
+            echo generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'on']) . ', ' .
+            generate_link('Off', $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'off']);
+        } else {
+            $label = '<span class="pagemenu-selected">Off</span>';
+            echo generate_link('On', $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'on']) . ', ' .
+            generate_link($label, $link_array, ['app'=>'cape', 'bypkg'=>$vars['bypkg'], 'bytimeslot'=>$vars['bytimeslot'], 'stddev'=>$vars['stddev'], 'package'=>$vars['package'], 'statsavg'=>$vars['statsavg'], 'runstats'=>'off']);
+        }
+    }
+
     print_optionbar_end();
 }
 
@@ -148,6 +164,18 @@ if (isset($vars['package'])) {
             'cape_malscore_stats' => 'Malscore Averages',
             'cape_pkg_tasks_all' => 'Package Tasks',
         ];
+
+        if ($vars['runstats'] == 'on') {
+            $graphs['cape_banned'] = 'Banned Run Statuses Averages';
+            $graphs['cape_running'] = 'Running Run Statuses Averages';
+            $graphs['cape_completed'] = 'Completed Run Statuses Averages';
+            $graphs['cape_distributed'] = 'Distributed Run Statuses Averages';
+            $graphs['cape_reported'] = 'Reported Run Statuses Averages';
+            $graphs['cape_recovered'] = 'Recovered Run Statuses Averages';
+            $graphs['cape_failed_analysis'] = 'Failed Analysis Run Statuses Averages';
+            $graphs['cape_failed_processing'] = 'Failed Processing Run Statuses Averages';
+            $graphs['cape_failed_reporting'] = 'Failed Reporting  Run Statuses Averages';
+        }
 
         if ($vars['bypkg'] == 'on') {
             $graphs['cape_anti_issues_pkg'] = 'Anti Issues Per Run Stats During Time Slot By Package';
