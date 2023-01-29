@@ -1443,7 +1443,8 @@ function search_oxidized(Illuminate\Http\Request $request)
 function get_oxidized_config(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('device_name');
-    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . $hostname . '?format=json'), true);
+    $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $hostname . '?format=json'), true);
+    $result = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $hostname . '?format=json'), true);
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');
     } else {
