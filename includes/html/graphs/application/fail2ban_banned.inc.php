@@ -7,7 +7,7 @@ $ds = 'banned';
 
 $filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id]);
 
-if (!Rrd::checkRrdExists($filename)) {
+if (! Rrd::checkRrdExists($filename)) {
     d_echo('RRD "' . $filename . '" not found');
 }
 
