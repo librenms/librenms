@@ -10,11 +10,11 @@
                     "version": "V04.02.00",
                     "hardware": "XC206-2SFP",
                     "features": "6GK5 206-2BS00-2AC2",
+                    "location": "<private>",
                     "os": "scalance",
                     "type": "network",
                     "serial": "VPM8190273",
-                    "icon": "siemens.svg",
-                    "location": "<private>"
+                    "icon": "siemens.svg"
                 }
             ]
         },
@@ -2620,6 +2620,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2644,6 +2645,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2668,6 +2670,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2692,6 +2695,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2716,6 +2720,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2740,6 +2745,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2764,6 +2770,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "C-Plug"
                 },
                 {
@@ -2788,6 +2795,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Faults"
                 },
                 {
@@ -2812,6 +2820,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Power Supply 1"
                 },
                 {
@@ -2836,6 +2845,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Power Supply 2"
                 },
                 {
@@ -2860,6 +2870,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2869,7 +2880,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.4329.20.1.1.1.1.79.7.1.16.1",
                     "sensor_index": "snMspsDiagnosticsTemperatureValue.1",
                     "sensor_type": "scalance",
-                    "sensor_descr": "P0.7 3rd Party S\n46 50 20 6F 70 74 2E 20 31 20 47 42 69 74 2F 73 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 ",
+                    "sensor_descr": "P0.7 3rd Party S\n46 50 20 6F 70 74 2E 20 31 20 47 42 69 74 2F 73 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2884,6 +2895,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2893,7 +2905,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.4329.20.1.1.1.1.79.7.1.16.2",
                     "sensor_index": "snMspsDiagnosticsTemperatureValue.2",
                     "sensor_type": "scalance",
-                    "sensor_descr": "P0.8 SFP992-1LD.\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 ",
+                    "sensor_descr": "P0.8 SFP992-1LD.\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 \n00 00 00 00",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2908,6 +2920,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2932,6 +2945,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2956,6 +2970,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

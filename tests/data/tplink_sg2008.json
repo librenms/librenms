@@ -10,11 +10,11 @@
                     "version": "1.0.5 Build 20160401 Rel.43046",
                     "hardware": "TL-SG2008 1.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "tplink",
                     "type": "network",
                     "serial": null,
-                    "icon": "tplink.svg",
-                    "location": "<private>"
+                    "icon": "tplink.svg"
                 }
             ]
         },

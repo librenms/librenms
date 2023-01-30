@@ -10,11 +10,11 @@
                     "version": "11.5.4.50000-6",
                     "hardware": "ciscoUCVirtualMachine",
                     "features": "CER",
+                    "location": "<private>",
                     "os": "ucos",
                     "type": "collaboration",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

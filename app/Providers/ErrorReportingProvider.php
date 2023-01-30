@@ -25,8 +25,11 @@
 
 namespace App\Providers;
 
+use App\Logging\Reporting\Middleware\AddGitInformation;
 use App\Logging\Reporting\Middleware\CleanContext;
 use App\Logging\Reporting\Middleware\SetGroups;
+use App\Logging\Reporting\Middleware\SetInstanceId;
+use App\Models\Callback;
 use ErrorException;
 use Facade\FlareClient\Report;
 use Facade\Ignition\Facades\Flare;
@@ -43,6 +46,8 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
     private $laravelErrorHandler;
     /** @var bool */
     private $reportingEnabled;
+    /** @var string|null */
+    private static $instanceId;
 
     public function boot(): void
     {
@@ -69,12 +74,16 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
             return \LibreNMS\Util\Version::VERSION;
         });
 
+        // add git information, but cache it unlike the upstream provider
+        Flare::registerMiddleware(AddGitInformation::class);
+
         // Filter some extra fields for privacy
         // Move to header middleware when switching to spatie/laravel-ignition
         Flare::registerMiddleware(CleanContext::class);
 
         // Add more LibreNMS related info
         Flare::registerMiddleware(SetGroups::class);
+        Flare::registerMiddleware(SetInstanceId::class);
 
         // Override the Laravel error handler but save it to call when in modern code
         $this->laravelErrorHandler = set_error_handler([$this, 'handleError']);
@@ -114,20 +123,21 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         // Check git
-        if (Git::repoPresent()) {
-            if (! Str::contains(Git::remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
+        $git = Git::make(180);
+        if ($git->isAvailable()) {
+            if (! Str::contains($git->remoteUrl(), ['git@github.com:librenms/librenms.git', 'https://github.com/librenms/librenms.git'])) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
-            if (! Git::unchanged()) {
+            if ($git->hasChanges()) {
                 \Log::debug('Reporting disabled because LibreNMS is not from the official repository');
 
                 return false;
             }
 
-            if (! Git::officalCommit()) {
+            if (! $git->isOfficialCommit()) {
                 \Log::debug('Reporting disabled due to local modifications');
 
                 return false;
@@ -164,5 +174,21 @@ class ErrorReportingProvider extends \Facade\Ignition\IgnitionServiceProvider
         }
 
         return true;
+    }
+
+    public static function getInstanceId(): string
+    {
+        if (is_null(self::$instanceId)) {
+            $uuid = Callback::get('error_reporting_uuid');
+
+            if (! $uuid) {
+                $uuid = Str::uuid();
+                Callback::set('error_reporting_uuid', $uuid);
+            }
+
+            self::$instanceId = $uuid;
+        }
+
+        return self::$instanceId;
     }
 }

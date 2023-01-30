@@ -10,11 +10,11 @@
                     "version": "1.7.0.13",
                     "hardware": "OmniStack LS 6224P",
                     "features": null,
+                    "location": "<private>",
                     "os": "aos",
                     "type": "network",
                     "serial": null,
-                    "icon": "alcatellucent.svg",
-                    "location": "<private>"
+                    "icon": "alcatellucent.svg"
                 }
             ]
         },
@@ -7213,6 +7213,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -7237,6 +7238,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -7261,6 +7263,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonFanStatusTable"
                 },
                 {
@@ -7285,6 +7288,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rlEnvMonSupplyStatusTable"
                 },
                 {
@@ -7309,6 +7313,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

@@ -10,11 +10,11 @@
                     "version": "10.09.30",
                     "hardware": "608 (rev 2)",
                     "features": null,
+                    "location": "<private>",
                     "os": "teldat",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "teldat.png",
-                    "location": "<private>"
+                    "icon": "teldat.png"
                 }
             ]
         },

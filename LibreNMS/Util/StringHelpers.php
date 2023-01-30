@@ -47,6 +47,7 @@ class StringHelpers
     {
         $replacements = [
             'bind' => 'BIND',
+            'cape' => 'CAPEv2',
             'dbm' => 'dBm',
             'dhcp-stats' => 'DHCP Stats',
             'entropy' => 'Random entropy',
@@ -55,6 +56,7 @@ class StringHelpers
             'fbsd-nfs-server' => 'FreeBSD NFS Server',
             'freeradius' => 'FreeRADIUS',
             'gpsd' => 'GPSD',
+            'hv-monitor' => 'HV Monitor',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
             'nfs-server' => 'NFS Server',

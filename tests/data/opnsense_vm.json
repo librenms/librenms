@@ -10,11 +10,11 @@
                     "version": "12.1-RELEASE-p19-HBSD",
                     "hardware": "amd64",
                     "features": null,
+                    "location": "<private>",
                     "os": "opnsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "opnsense.svg",
-                    "location": "<private>"
+                    "icon": "opnsense.svg"
                 }
             ]
         },

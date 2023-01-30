@@ -180,7 +180,7 @@ class UserController extends Controller
             }
         }
 
-        $user->fill($request->all());
+        $user->fill($request->validated());
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
             $flasher->addSuccess(__('Updated dashboard for :username', ['username' => $user->username]));

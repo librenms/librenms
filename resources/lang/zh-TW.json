@@ -456,5 +456,7 @@
     "Pollers": "輪詢器",
     "Groups": "群組",
     "Performance": "效能",
-    "History": "歷程"
+    "History": "歷程",
+    "(Un) Acknowledgement note:": "認可/取消認可 備註說明",
+    "Port Groups": "連接埠群組"
 }

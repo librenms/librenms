@@ -144,7 +144,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             echo "\n";
         }
 
-        foreach (array_keys($agent_data['app']) as $key) {
+        foreach (array_keys($agent_data['app'] ?? []) as $key) {
             if (file_exists("includes/polling/applications/$key.inc.php")) {
                 d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
 
@@ -159,7 +159,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         // memcached
         if (! empty($agent_data['app']['memcached'])) {
-            $agent_data['app']['memcached'] = unserialize($agent_data['app']['memcached']);
+            $agent_data['app']['memcached'] = json_decode($agent_data['app']['memcached'], true);
             foreach ($agent_data['app']['memcached'] as $memcached_host => $memcached_data) {
                 if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'memcached', $memcached_host]) == '0') {
                     echo "Found new application 'Memcached' $memcached_host\n";

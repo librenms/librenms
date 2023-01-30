@@ -53,7 +53,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' DEF:' . $rrd['ds'] . $i . 'max=' . $rrd['filename'] . ':' . $rrd['ds'] . ':MAX ';
     }
 
-    if ($_GET['previous']) {
+    if ($graph_params->visible('previous')) {
         $rrd_options .= ' DEF:' . $i . 'X=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE:start=' . $prev_from . ':end=' . $from;
         $rrd_options .= ' SHIFT:' . $i . "X:$period";
         $thingX .= $seperatorX . $i . 'X,UN,0,' . $i . 'X,IF';
@@ -100,7 +100,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= " COMMENT:'\\n'";
 }//end foreach
 
-if ($_GET['previous'] == 'yes') {
+if ($graph_params->visible('previous')) {
     if (is_numeric($multiplier)) {
         $rrd_options .= ' CDEF:X=' . $thingX . $plusesX . ',' . $multiplier . ',*';
     } elseif (is_numeric($divider)) {

@@ -107,8 +107,8 @@ function getLastMeasurement($bill_id)
     $row = dbFetchRow('SELECT timestamp,delta,in_delta,out_delta FROM bill_data WHERE bill_id = ? ORDER BY timestamp DESC LIMIT 1', [$bill_id]);
     if (! is_null($row)) {
         $return['delta'] = $row['delta'];
-        $return['delta_in'] = $row['delta_in'];
-        $return['delta_out'] = $row['delta_out'];
+        $return['in_delta'] = $row['in_delta'];
+        $return['out_delta'] = $row['out_delta'];
         $return['timestamp'] = $row['timestamp'];
         $return['state'] = 'ok';
     } else {
@@ -192,9 +192,9 @@ function getRates($bill_id, $datefrom, $dateto, $dir_95th)
     $data['total_data'] = $mtot;
     $data['total_data_in'] = $mtot_in;
     $data['total_data_out'] = $mtot_out;
-    $data['rate_average'] = ($mtot / $ptot * 8);
-    $data['rate_average_in'] = ($mtot_in / $ptot * 8);
-    $data['rate_average_out'] = ($mtot_out / $ptot * 8);
+    $data['rate_average'] = ! empty($ptot) ? ($mtot / $ptot * 8) : 0;
+    $data['rate_average_in'] = ! empty($ptot) ? ($mtot_in / $ptot * 8) : 0;
+    $data['rate_average_out'] = ! empty($ptot) ? ($mtot_out / $ptot * 8) : 0;
 
     // print_r($data);
     return $data;

@@ -22,7 +22,7 @@ if ($device['os_group'] == 'cisco') {
     $valid_tunnels = [];
 
     foreach ($ipsec_array as $index => $tunnel) {
-        if (isset($tunnel['cipSecTunIkeTunnelIndex']) && isset($ike_array[$tunnel['cipSecTunIkeTunnelIndex']])) {
+        if (isset($tunnel['cipSecTunIkeTunnelIndex']) && isset($ike_array[$tunnel['cipSecTunIkeTunnelIndex']]) && is_array($ike_array[$tunnel['cipSecTunIkeTunnelIndex']])) {
             $tunnel_full = array_merge($tunnel, $ike_array[$tunnel['cipSecTunIkeTunnelIndex']]);
         } else {
             $tunnel_full = $tunnel;
@@ -180,7 +180,10 @@ if ($device['os_group'] == 'firebrick') {
     ];
 
     foreach ($ipsec_array as $index => $tunnel) {
-        if (! is_array($tunnels[$tunnel['fbIPsecConnectionName']]) && ! empty($tunnel['fbIPsecConnectionName'])) {
+        if (
+            (! isset($tunnels[$tunnel['fbIPsecConnectionName']]) || ! is_array($tunnels[$tunnel['fbIPsecConnectionName']]))
+            && ! empty($tunnel['fbIPsecConnectionName'])
+        ) {
             $tunnel_id = dbInsert([
                 'device_id' => $device['device_id'],
                 'peer_addr' => $tunnel['fbIPsecConnectionPeerAddress'],

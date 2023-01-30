@@ -10,11 +10,11 @@
                     "version": "CAT9K_IOSXE 16.6.7",
                     "hardware": "C9300-48P",
                     "features": "Everest",
+                    "location": "<private>",
                     "os": "iosxe",
                     "type": "network",
                     "serial": "FCW2204L050",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

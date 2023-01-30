@@ -925,7 +925,7 @@ return [
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Interfaces, entrées plus anciennes que',
+            'description' => 'Purger les ports supprimés',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'public_status' => [
@@ -1077,8 +1077,8 @@ return [
         'update_channel' => [
             'description' => 'Choisir le canal des mises à jour',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

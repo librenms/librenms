@@ -729,7 +729,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '連接埠大於',
+            'description' => '清除端口已刪除',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -925,8 +925,8 @@ return [
         'update_channel' => [
             'description' => '設定更新頻道',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

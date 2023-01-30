@@ -58,8 +58,8 @@ Connect to the server command line and follow the instructions below.
         dnf -y install epel-release
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
-        dnf module enable php:8.1
-        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
+        dnf module enable php:remi-8.1
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip gcc python3-devel
         ```
 
 === "Debian 11"
@@ -133,8 +133,8 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 
 === "Debian 11"
     ```bash
-    vi /etc/php/8.1/fpm/php.ini
-    vi /etc/php/8.1/cli/php.ini
+    vi /etc/php/8.2/fpm/php.ini
+    vi /etc/php/8.2/cli/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -214,8 +214,8 @@ exit
 
 === "Debian 11"
     ```bash
-    cp /etc/php/8.1/fpm/pool.d/www.conf /etc/php/8.1/fpm/pool.d/librenms.conf
-    vi /etc/php/8.1/fpm/pool.d/librenms.conf
+    cp /etc/php/8.2/fpm/pool.d/www.conf /etc/php/8.2/fpm/pool.d/librenms.conf
+    vi /etc/php/8.2/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -470,7 +470,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php8.1-fpm
+        systemctl restart php8.2-fpm
         ```
 
 ## SELinux

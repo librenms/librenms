@@ -40,6 +40,10 @@ class Stellar extends OS implements
         $combined_oid = sprintf('%s::%s', $device['hardware'], 'apClientWlanService');
         $oid = snmp_translate($combined_oid, 'ALL', 'nokia/stellar', '-On');
 
+        if (empty($oid)) {
+            return $sensors;
+        }
+
         foreach ($client_ws_data as $client_entry) {
             $ssid[$client_entry['apClientWlanService']] += 1;
         }

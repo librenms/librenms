@@ -1185,7 +1185,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than',
+            'description' => 'Elimina le porte',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1491,8 +1491,8 @@ return [
         'update_channel' => [
             'description' => 'Set update Channel',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

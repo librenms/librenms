@@ -10,11 +10,11 @@
                     "version": "17.2.2",
                     "hardware": "Viptela vEdge-1000",
                     "features": null,
+                    "location": "<private>",
                     "os": "viptela",
                     "type": "network",
                     "serial": "11OG440170513",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

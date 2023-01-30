@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.36673.100.1.2.1.1.2",
+                    "sysDescr": "Hardware Model:UFI_S9600-32X, Software version: OcNOS,6.0.1.11",
+                    "sysContact": null,
+                    "version": "6.0.1.11",
+                    "hardware": "Ufi Space S9600-32X-R",
+                    "features": null,
+                    "location": null,
+                    "os": "ocnos",
+                    "type": "network",
+                    "serial": "AAA0A0A00000A0",
+                    "icon": "ipinfusion.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

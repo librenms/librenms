@@ -19,10 +19,15 @@ unset($seperator);
 
 // show title from config file (but ucwords it)
 $ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($descr) {
+    if (is_array($descr)) {
+        return strtolower($descr[0]);
+    }
+
     return strtolower($descr);
 });
 array_walk($types_array, function (&$type) use ($ctypes) {
-    $type = ucwords($ctypes->get(strtolower($type), $type));
+    $name = $ctypes->get(strtolower($type), $type);
+    $type = ucwords(is_array($name) ? $name[0] : $name);
 });
 
 $types = implode(' + ', $types_array);
@@ -67,7 +72,7 @@ if ($if_list) {
 
         echo '<br />';
 
-        if (file_exists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
+        if (Rrd::checkRrdExists(get_port_rrdfile_path($port['hostname'], $port['port_id']))) {
             $graph_type = 'port_bits';
 
             include 'includes/html/print-interface-graphs.inc.php';

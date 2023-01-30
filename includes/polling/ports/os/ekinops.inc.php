@@ -43,12 +43,10 @@ foreach ($port_stats as $index => $port) {
     $intName = preg_split("/[\/,\(,\)]/", $port['ifName']);
 
     // Make ifDescr slot/card/int
-
     $ifDescr = $intName[2] . '/' . $intName[3] . '/' . $intName[4];
 
     // Make ifAlias descr
-
-    $ifAlias = $intName[5];
+    $ifAlias = $intName[5] ?? null;
 
     $port_stats[$index]['ifAlias'] = $ifAlias;
     $port_stats[$index]['ifDescr'] = $ifDescr;

@@ -39,6 +39,7 @@ class LegacyModule implements Module
     /** @var array */
     private $module_deps = [
         'arp-table' => ['ports'],
+        'bgp-peers' => ['ports', 'vrf'],
         'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
         'vlans' => ['ports'],

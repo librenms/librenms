@@ -1176,7 +1176,7 @@ return [
             'help' => 'Очистка виконується daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Записи портів старші за',
+            'description' => 'Порти очищення видалено',
             'help' => 'Очистка виконується daily.sh',
         ],
         'prometheus' => [
@@ -1482,8 +1482,8 @@ return [
         'update_channel' => [
             'description' => 'Визначити канал оновлень',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'uptime_warning' => [

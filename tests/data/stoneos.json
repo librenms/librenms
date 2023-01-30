@@ -10,11 +10,11 @@
                     "version": "5.5",
                     "hardware": "SG-6000-E3965",
                     "features": null,
+                    "location": "<private>",
                     "os": "stoneos",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "hillstone.svg",
-                    "location": "<private>"
+                    "icon": "hillstone.svg"
                 }
             ]
         },
@@ -1954,8 +1954,8 @@
                     "ifName": "vswitchif1",
                     "portName": null,
                     "ifIndex": 9,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -3319,8 +3319,8 @@
                     "ifName": "xethernet0/9.6",
                     "portName": null,
                     "ifIndex": 22,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3424,8 +3424,8 @@
                     "ifName": "xethernet0/9.2",
                     "portName": null,
                     "ifIndex": 23,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3529,8 +3529,8 @@
                     "ifName": "xethernet0/9.7",
                     "portName": null,
                     "ifIndex": 24,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3634,8 +3634,8 @@
                     "ifName": "xethernet0/9.3",
                     "portName": null,
                     "ifIndex": 25,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3739,8 +3739,8 @@
                     "ifName": "xethernet0/9.5",
                     "portName": null,
                     "ifIndex": 26,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3880,6 +3880,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hillstonePowerState"
                 },
                 {
@@ -3904,6 +3905,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hillstonePowerState"
                 },
                 {
@@ -3928,6 +3930,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3952,6 +3955,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3976,6 +3980,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4000,6 +4005,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4024,6 +4030,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

@@ -10,11 +10,11 @@
                     "version": "3.2.1-04",
                     "hardware": "CentreCOM 9924Ts",
                     "features": "08-Sep-2009",
+                    "location": "<private>",
                     "os": "allied",
                     "type": "network",
                     "serial": "30BZ32000",
-                    "icon": "alliedtelesis.svg",
-                    "location": "<private>"
+                    "icon": "alliedtelesis.svg"
                 }
             ]
         },

@@ -62,8 +62,9 @@ if (! $ups_nut) {
     $UPSUPSOverloaded,
     $UPSUPSBuck,
     $UPSUPSBoost,
-    $UPSForcedShutdown
-    ] = explode("\n", $ups_nut);
+    $UPSForcedShutdown,
+    $UPSAlarm
+] = array_pad(explode("\n", $ups_nut), 23, 0);
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()
@@ -102,6 +103,7 @@ $sensors = [
     ['state_name' => 'UPSUPSBuck', 'value' => $UPSUPSBuck],
     ['state_name' => 'UPSUPSBoost', 'value' => $UPSUPSBoost],
     ['state_name' => 'UPSForcedShutdown', 'value' => $UPSForcedShutdown],
+    ['state_name' => 'UPSAlarm', 'value' => $UPSAlarm],
 ];
 
 foreach ($sensors as $index => $sensor) {

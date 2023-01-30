@@ -3,6 +3,7 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'asterisk';
+$app_id = $app->app_id;
 
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
@@ -73,4 +74,4 @@ update_application($app, $rawdata, $asterisk_metrics);
 
 unset($rrd_name, $rrd_def, $iax2_fields, $iax2_tags);
 
-unset($asterisk, $asterisk_metrics, $rawdata); // these are used for all rrds
+unset($asterisk, $asterisk_metrics, $rawdata, $app_id); // these are used for all rrds

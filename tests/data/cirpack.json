@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "cirpack",
                     "type": "server",
                     "serial": null,
-                    "icon": "cirpack.png",
-                    "location": "<private>"
+                    "icon": "cirpack.png"
                 }
             ]
         },
@@ -1297,8 +1297,8 @@
                     "ifName": "eth2",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1402,8 +1402,8 @@
                     "ifName": "eth3",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1507,8 +1507,8 @@
                     "ifName": "usb0",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2328,7 +2328,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.1",
                     "sensor_index": "kKey.1",
                     "sensor_type": "Status",
-                    "sensor_descr": "HA, HA, ",
+                    "sensor_descr": "HA, HA,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2343,6 +2343,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2352,7 +2353,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.10",
                     "sensor_index": "kKey.10",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2367,6 +2368,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2376,7 +2378,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.11",
                     "sensor_index": "kKey.11",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2391,6 +2393,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2400,7 +2403,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.12",
                     "sensor_index": "kKey.12",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2415,6 +2418,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2424,7 +2428,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.13",
                     "sensor_index": "kKey.13",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2439,6 +2443,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2448,7 +2453,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.14",
                     "sensor_index": "kKey.14",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2463,6 +2468,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2472,7 +2478,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.15",
                     "sensor_index": "kKey.15",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2487,6 +2493,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2496,7 +2503,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.16",
                     "sensor_index": "kKey.16",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2511,6 +2518,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2520,7 +2528,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.17",
                     "sensor_index": "kKey.17",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2535,6 +2543,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2544,7 +2553,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.18",
                     "sensor_index": "kKey.18",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2559,6 +2568,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2568,7 +2578,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.19",
                     "sensor_index": "kKey.19",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2583,6 +2593,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2607,6 +2618,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2616,7 +2628,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.20",
                     "sensor_index": "kKey.20",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2631,6 +2643,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2640,7 +2653,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.21",
                     "sensor_index": "kKey.21",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2655,6 +2668,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2664,7 +2678,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.22",
                     "sensor_index": "kKey.22",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2679,6 +2693,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2688,7 +2703,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.23",
                     "sensor_index": "kKey.23",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2703,6 +2718,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2712,7 +2728,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.24",
                     "sensor_index": "kKey.24",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2727,6 +2743,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2736,7 +2753,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.25",
                     "sensor_index": "kKey.25",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2751,6 +2768,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2760,7 +2778,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.26",
                     "sensor_index": "kKey.26",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2775,6 +2793,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2784,7 +2803,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.27",
                     "sensor_index": "kKey.27",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2799,6 +2818,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2808,7 +2828,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.28",
                     "sensor_index": "kKey.28",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2823,6 +2843,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2832,7 +2853,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.29",
                     "sensor_index": "kKey.29",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2847,6 +2868,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2856,7 +2878,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.3",
                     "sensor_index": "kKey.3",
                     "sensor_type": "Status",
-                    "sensor_descr": "ss7board16, <private>, ",
+                    "sensor_descr": "ss7board16, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2871,6 +2893,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2880,7 +2903,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.30",
                     "sensor_index": "kKey.30",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2895,6 +2918,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2904,7 +2928,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.31",
                     "sensor_index": "kKey.31",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2919,6 +2943,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2928,7 +2953,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.32",
                     "sensor_index": "kKey.32",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2943,6 +2968,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2952,7 +2978,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.33",
                     "sensor_index": "kKey.33",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2967,6 +2993,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -2976,7 +3003,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.34",
                     "sensor_index": "kKey.34",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2991,6 +3018,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3000,7 +3028,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.35",
                     "sensor_index": "kKey.35",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3015,6 +3043,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3024,7 +3053,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.36",
                     "sensor_index": "kKey.36",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3039,6 +3068,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3048,7 +3078,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.37",
                     "sensor_index": "kKey.37",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3063,6 +3093,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3072,7 +3103,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.38",
                     "sensor_index": "kKey.38",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3087,6 +3118,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3096,7 +3128,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.39",
                     "sensor_index": "kKey.39",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3111,6 +3143,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3120,7 +3153,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.4",
                     "sensor_index": "kKey.4",
                     "sensor_type": "Status",
-                    "sensor_descr": "ss7board17, <private>, ",
+                    "sensor_descr": "ss7board17, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3135,6 +3168,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3144,7 +3178,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.40",
                     "sensor_index": "kKey.40",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3159,6 +3193,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3168,7 +3203,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.41",
                     "sensor_index": "kKey.41",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3183,6 +3218,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3192,7 +3228,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.42",
                     "sensor_index": "kKey.42",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3207,6 +3243,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3216,7 +3253,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.43",
                     "sensor_index": "kKey.43",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3231,6 +3268,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3240,7 +3278,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.44",
                     "sensor_index": "kKey.44",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3255,6 +3293,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3264,7 +3303,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.45",
                     "sensor_index": "kKey.45",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3279,6 +3318,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3288,7 +3328,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.46",
                     "sensor_index": "kKey.46",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3303,6 +3343,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3312,7 +3353,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.47",
                     "sensor_index": "kKey.47",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3327,6 +3368,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3336,7 +3378,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.48",
                     "sensor_index": "kKey.48",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3351,6 +3393,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3360,7 +3403,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.49",
                     "sensor_index": "kKey.49",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3375,6 +3418,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3384,7 +3428,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.5",
                     "sensor_index": "kKey.5",
                     "sensor_type": "Status",
-                    "sensor_descr": "ss7board18, <private>, ",
+                    "sensor_descr": "ss7board18, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3399,6 +3443,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3408,7 +3453,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.50",
                     "sensor_index": "kKey.50",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3423,6 +3468,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3432,7 +3478,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.51",
                     "sensor_index": "kKey.51",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3447,6 +3493,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3456,7 +3503,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.52",
                     "sensor_index": "kKey.52",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3471,6 +3518,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3480,7 +3528,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.53",
                     "sensor_index": "kKey.53",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3495,6 +3543,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3504,7 +3553,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.54",
                     "sensor_index": "kKey.54",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3519,6 +3568,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3528,7 +3578,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.55",
                     "sensor_index": "kKey.55",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3543,6 +3593,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3552,7 +3603,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.56",
                     "sensor_index": "kKey.56",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3567,6 +3618,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3576,7 +3628,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.57",
                     "sensor_index": "kKey.57",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3591,6 +3643,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3600,7 +3653,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.58",
                     "sensor_index": "kKey.58",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3615,6 +3668,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3624,7 +3678,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.59",
                     "sensor_index": "kKey.59",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3639,6 +3693,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3648,7 +3703,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.6",
                     "sensor_index": "kKey.6",
                     "sensor_type": "Status",
-                    "sensor_descr": "RPC1, <private>, ",
+                    "sensor_descr": "RPC1, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3663,6 +3718,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3672,7 +3728,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.60",
                     "sensor_index": "kKey.60",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3687,6 +3743,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3696,7 +3753,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.61",
                     "sensor_index": "kKey.61",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3711,6 +3768,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3720,7 +3778,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.62",
                     "sensor_index": "kKey.62",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3735,6 +3793,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3744,7 +3803,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.63",
                     "sensor_index": "kKey.63",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3759,6 +3818,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3768,7 +3828,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.64",
                     "sensor_index": "kKey.64",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3783,6 +3843,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3792,7 +3853,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.65",
                     "sensor_index": "kKey.65",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3807,6 +3868,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3816,7 +3878,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.66",
                     "sensor_index": "kKey.66",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3831,6 +3893,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3840,7 +3903,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.67",
                     "sensor_index": "kKey.67",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3855,6 +3918,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3864,7 +3928,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.68",
                     "sensor_index": "kKey.68",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3879,6 +3943,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3888,7 +3953,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.69",
                     "sensor_index": "kKey.69",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3903,6 +3968,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3912,7 +3978,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.7",
                     "sensor_index": "kKey.7",
                     "sensor_type": "Status",
-                    "sensor_descr": "RPC2, <private>, ",
+                    "sensor_descr": "RPC2, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3927,6 +3993,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3936,7 +4003,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.70",
                     "sensor_index": "kKey.70",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3951,6 +4018,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3960,7 +4028,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.71",
                     "sensor_index": "kKey.71",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3975,6 +4043,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -3984,7 +4053,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.72",
                     "sensor_index": "kKey.72",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3999,6 +4068,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4008,7 +4078,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.73",
                     "sensor_index": "kKey.73",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4023,6 +4093,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4032,7 +4103,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.74",
                     "sensor_index": "kKey.74",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4047,6 +4118,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4056,7 +4128,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.75",
                     "sensor_index": "kKey.75",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4071,6 +4143,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4080,7 +4153,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.76",
                     "sensor_index": "kKey.76",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4095,6 +4168,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4104,7 +4178,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.77",
                     "sensor_index": "kKey.77",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4119,6 +4193,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4128,7 +4203,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.78",
                     "sensor_index": "kKey.78",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4143,6 +4218,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4152,7 +4228,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.79",
                     "sensor_index": "kKey.79",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4167,6 +4243,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4176,7 +4253,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.8",
                     "sensor_index": "kKey.8",
                     "sensor_type": "Status",
-                    "sensor_descr": "RPC3, <private>, ",
+                    "sensor_descr": "RPC3, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4191,6 +4268,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4200,7 +4278,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.80",
                     "sensor_index": "kKey.80",
                     "sensor_type": "Status",
-                    "sensor_descr": "<private>, <private>, ",
+                    "sensor_descr": "<private>, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4215,6 +4293,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 },
                 {
@@ -4224,7 +4303,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.9193.3.1.7.9",
                     "sensor_index": "kKey.9",
                     "sensor_type": "Status",
-                    "sensor_descr": "RPC6, <private>, ",
+                    "sensor_descr": "RPC6, <private>,",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -4239,6 +4318,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "Status"
                 }
             ],

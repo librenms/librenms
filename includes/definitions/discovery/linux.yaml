@@ -23,7 +23,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.36.{{ $index }}'
                     index: 'slot.{{ $index }}'
                     group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
-                    descr:  '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }}'
+                    descr: '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }}'
         count:
             data:
                 -
@@ -57,6 +57,30 @@ modules:
                     group: 'RAID Controller {{ $adapterID-APT }}'
                     warn_limit: 1
                     descr: 'Failed disks'
+                -
+                    oid: physicalDriveTable
+                    value: mediaErrCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.7.{{ $index }}'
+                    index: 'mediaerr.slot.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }} Media Errors'
+                -
+                    oid: physicalDriveTable
+                    value: otherErrCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.8.{{ $index }}'
+                    index: 'othererr.slot.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }} Other Errors'
+                -
+                    oid: physicalDriveTable
+                    value: predFailCount
+                    num_oid: '.1.3.6.1.4.1.3582.4.1.4.2.1.2.1.9.{{ $index }}'
+                    index: 'predfail.slot.{{ $index }}'
+                    group: 'RAID Controller {{ $adpID-PDT }} Enclosure {{ enclDeviceId }}'
+                    warn_limit: 1
+                    descr: '/c{{ $adpID-PDT }}/e{{ $enclDeviceId }}/s{{ $slotNumber }} Predictive Failures'
         state:
             data:
                 -

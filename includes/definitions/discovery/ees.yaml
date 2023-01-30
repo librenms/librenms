@@ -11,8 +11,34 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.2.{{ $index }}'
                     value: psTemperatureMeasurement
                     index: 'psTemperatureMeasurement.{{ $index }}'
-                    descr: psTemperatureName
+                    divisor: 1000
+                    descr: Ambiant {{ $psTemperatureName }}
+                    skip_values:
+                        -
+                            oid: psTemperatureType
+                            op: '!='
+                            value: '1'
+                        -
+                            oid: psTemperatureMeasurement
+                            op: '<'
+                            value: 0
+                -
+                    oid: psTemperatureTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.2.{{ $index }}'
+                    value: psTemperatureMeasurement
+                    index: 'psTemperatureMeasurement.{{ $index }}'
+                    divisor: 1000
+                    descr: Battery {{ $psTemperatureName }}
                     skip_value_lt: 0
+                    skip_values:
+                        -
+                            oid: psTemperatureType
+                            op: '!='
+                            value: '2'
+                        -
+                            oid: psTemperatureMeasurement
+                            op: '<'
+                            value: 0
         voltage:
             data:
                 -
@@ -55,7 +81,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.4.{{ $index }}'
                     divisor: 1000
                     index: 'psConverterVoltage.{{ $index }}'
-                    descr: 'Convertor Voltage'
+                    descr: 'Converter Voltage'
                     skip_values: 2147483647
         current:
             data:
@@ -147,26 +173,47 @@ modules:
                     index: 'psStatusBatteryMode.{{ $index }}'
                     states:
                         - { descr: unknown, graph: 1, value: 1, generic: 3 }
-                        - { descr: floatCharging, graph: 1, value: 2, generic: 1 }
-                        - { descr: shortTest, graph: 1, value: 3, generic: 1 }
-                        - { descr: bcForTest, graph: 1, value: 4, generic: 1 }
-                        - { descr: manualTesting, graph: 1, value: 5, generic: 1 }
-                        - { descr: planTesting, graph: 1, value: 6, generic: 1 }
-                        - { descr: acFailTesting, graph: 1, value: 7, generic: 1 }
+                        - { descr: floatCharging, graph: 1, value: 2, generic: 0 }
+                        - { descr: shortTest, graph: 1, value: 3, generic: 3 }
+                        - { descr: bcForTest, graph: 1, value: 4, generic: 3 }
+                        - { descr: manualTesting, graph: 1, value: 5, generic: 3 }
+                        - { descr: planTesting, graph: 1, value: 6, generic: 3 }
+                        - { descr: acFailTesting, graph: 1, value: 7, generic: 3 }
                         - { descr: acFail, graph: 1, value: 8, generic: 2 }
-                        - { descr: manualBC, graph: 1, value: 9, generic: 1 }
-                        - { descr: autoBC, graph: 1, value: 10, generic: 1 }
-                        - { descr: cyclicBC, graph: 1, value: 11, generic: 1 }
-                        - { descr: masterBC, graph: 1, value: 12, generic: 1 }
-                        - { descr: masterBT, graph: 1, value: 13, generic: 1 }
+                        - { descr: manualBC, graph: 1, value: 9, generic: 3 }
+                        - { descr: autoBC, graph: 1, value: 10, generic: 3 }
+                        - { descr: cyclicBC, graph: 1, value: 11, generic: 3 }
+                        - { descr: masterBC, graph: 1, value: 12, generic: 3 }
+                        - { descr: masterBT, graph: 1, value: 13, generic: 3 }
                 -
                     oid: psTemperatureTable
                     num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.5.{{ $index }}'
                     value: psTemperatureAlarmStatus
                     index: 'psTemperatureAlarmStatus.{{ $index }}'
-                    descr: psTemperatureName
+                    descr: Ambiant {{ $psTemperatureName }} Alarm
+                    skip_values:
+                        -
+                            oid: psTemperatureType
+                            op: '!='
+                            value: '1'
                     states:
-                        - { descr: high, graph: 1, value: 1, generic: 2 }
-                        - { descr: low, graph: 1, value: 2, generic: 2 }
-                        - { descr: fail, graph: 1, value: 3, generic: 2 }
-                        - { descr: none, graph: 1, value: 4, generic: 3 }
+                        - { descr: high, graph: 1, value: 0, generic: 2 }
+                        - { descr: low, graph: 1, value: 1, generic: 2 }
+                        - { descr: fail, graph: 1, value: 2, generic: 2 }
+                        - { descr: none, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: psTemperatureTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.5.{{ $index }}'
+                    value: psTemperatureAlarmStatus
+                    index: 'psTemperatureAlarmStatus.{{ $index }}'
+                    descr: Battery {{ $psTemperatureName }} Alarm
+                    skip_values:
+                        -
+                            oid: psTemperatureType
+                            op: '!='
+                            value: '2'
+                    states:
+                        - { descr: high, graph: 1, value: 0, generic: 2 }
+                        - { descr: low, graph: 1, value: 1, generic: 2 }
+                        - { descr: fail, graph: 1, value: 2, generic: 2 }
+                        - { descr: none, graph: 1, value: 3, generic: 0 }

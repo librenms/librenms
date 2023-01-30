@@ -10,11 +10,11 @@
                     "version": "9.12(3)",
                     "hardware": "ASA5555",
                     "features": null,
+                    "location": "<private>",
                     "os": "asa",
                     "type": "firewall",
                     "serial": "FGL1641413L",
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },
@@ -3153,6 +3153,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3177,6 +3178,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3201,6 +3203,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3225,6 +3228,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3249,6 +3253,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3273,6 +3278,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3297,6 +3303,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3321,6 +3328,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3330,7 +3338,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.22",
                     "sensor_index": "22",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Power Supply 0 Fan ",
+                    "sensor_descr": "Power Supply 0 Fan",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3345,6 +3353,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3354,7 +3363,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.28",
                     "sensor_index": "28",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Power Supply 1 Fan ",
+                    "sensor_descr": "Power Supply 1 Fan",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3369,6 +3378,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3378,7 +3388,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.23",
                     "sensor_index": "23",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Power Supply 0 Temperature ",
+                    "sensor_descr": "Power Supply 0 Temperature",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3393,6 +3403,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3402,7 +3413,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.29",
                     "sensor_index": "29",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Power Supply 1 Temperature ",
+                    "sensor_descr": "Power Supply 1 Temperature",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3417,6 +3428,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3441,6 +3453,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3465,6 +3478,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3489,6 +3503,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3513,6 +3528,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]
@@ -3525,7 +3541,6 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "<private>",
-                    "local_addr": "<private>",
                     "local_port": 0,
                     "tunnel_name": "<private>",
                     "tunnel_status": ""

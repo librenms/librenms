@@ -14,7 +14,7 @@
     "homepage": "https://www.librenms.org/",
     "license": "GPL-3.0-or-later",
     "require": {
-        "php": "^7.3 || ^8.0",
+        "php": "^8.1",
         "ext-curl": "*",
         "ext-gd": "*",
         "ext-json": "*",
@@ -22,6 +22,7 @@
         "ext-pcre": "*",
         "ext-pdo": "*",
         "ext-session": "*",
+        "ext-simplexml": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
@@ -36,7 +37,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "influxdb/influxdb-php": "^1.14",
         "justinrainbow/json-schema": "^5.2",
-        "laravel-notification-channels/webpush": "^5.1",
+        "laravel-notification-channels/webpush": "^7.0",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
@@ -88,7 +89,8 @@
         "laravel": {
             "dont-discover": [
                 "nunomaduro/laravel-console-summary",
-                "facade/ignition"
+                "facade/ignition",
+                "socialiteproviders/manager"
             ]
         }
     },

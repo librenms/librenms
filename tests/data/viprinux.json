@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "Viprinet VPN Router",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "viprinux",
                     "type": "network",
                     "serial": null,
-                    "icon": "viprinux.png",
-                    "location": null
+                    "icon": "viprinux.png"
                 }
             ]
         },

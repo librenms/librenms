@@ -10,11 +10,11 @@
                     "version": "15.1(2)SY10",
                     "hardware": "cat6509",
                     "features": "IPSERVICESK9",
+                    "location": "<private>",
                     "os": "ios",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

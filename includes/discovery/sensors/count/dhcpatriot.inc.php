@@ -57,6 +57,9 @@ foreach ($oids as $index => $entry) {
     $type = $entry['type'];
     $descr = $entry['descr'];
 
+    if (! isset($tmp_snmp_multi[$oid])) {
+        continue;
+    }
     $current = $tmp_snmp_multi[$oid];
 
     if ($type === 'dhcpatriotLicenseExpiration' && $current !== 'FULL:0' && gettype($current) === 'string') {

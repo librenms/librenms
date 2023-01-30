@@ -84,7 +84,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
 
         $class = $notif['severity'] == 2 ? 'text-danger' : 'text-warning';
         echo "<h4 class='$class' id='${notif['notifications_id']}'>";
-        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;${notif['title']}</strong>";
+        echo "<strong><i class='fa fa-bell-o'></i>&nbsp;" . htmlentities($notif['title']) . '</strong>';
         echo "<span class='pull-right'>";
 
         if ($notif['user_id'] != Auth::id()) {
@@ -125,7 +125,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
         } elseif ($notif['severity'] == 2) {
             $class = 'text-danger';
         }
-        echo "<h4 class='$class' id='${notif['notifications_id']}'>${notif['title']}<span class='pull-right'>";
+        echo "<h4 class='$class' id='${notif['notifications_id']}'>" . htmlentities($notif['title']) . "<span class='pull-right'>";
 
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button>';
@@ -168,7 +168,7 @@ if ($notifications['count'] > 0 && ! isset($vars['archive'])) {
         } elseif ($notif['severity'] == 2) {
             echo ' class="text-danger"';
         }
-        echo  " id='${notif['notifications_id']}'>${notif['title']}";
+        echo  " id='${notif['notifications_id']}'>" . htmlentities($notif['title']);
 
         if (Auth::user()->isAdmin()) {
             echo '<span class="pull-right"><button class="btn btn-primary fa fa-bell-o stick-notif" data-toggle="tooltip" data-placement="bottom" title="Mark as Sticky" style="margin-top:-10px;"></button></span>';

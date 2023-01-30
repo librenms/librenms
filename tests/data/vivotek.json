@@ -440,11 +440,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "vivotek",
                     "type": "camera",
                     "serial": null,
-                    "icon": "vivotek.svg",
-                    "location": "<private>"
+                    "icon": "vivotek.svg"
                 }
             ]
         },

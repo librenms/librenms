@@ -10,11 +10,11 @@
                     "version": "7.0.0.10100",
                     "hardware": null,
                     "features": "build 16386292",
+                    "location": "<private>",
                     "os": "vmware-vcsa",
                     "type": "server",
                     "serial": null,
-                    "icon": "vmware.svg",
-                    "location": "<private>"
+                    "icon": "vmware.svg"
                 }
             ]
         },

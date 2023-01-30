@@ -10,11 +10,11 @@
                     "version": "4.2.4",
                     "hardware": "Room Alert 4E",
                     "features": null,
+                    "location": "<private>",
                     "os": "avtech",
                     "type": "environment",
                     "serial": null,
-                    "icon": "avtech.svg",
-                    "location": "<private>"
+                    "icon": "avtech.svg"
                 }
             ]
         },
@@ -265,6 +265,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "switch"
                 },
                 {
@@ -289,6 +290,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -313,6 +315,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -337,6 +340,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

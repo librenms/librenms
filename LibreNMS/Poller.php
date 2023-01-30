@@ -40,9 +40,9 @@ use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
-use LibreNMS\Util\Git;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -83,7 +83,7 @@ class Poller
         $polled = 0;
         $this->printHeader();
 
-        if (Debug::isEnabled()) {
+        if (Debug::isEnabled() && ! defined('PHPUNIT_RUNNING')) {
             \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         }
 
@@ -145,7 +145,7 @@ class Poller
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                \Log::event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                \App\Models\Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', 5);
             }
         }
@@ -188,7 +188,7 @@ class Poller
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
-                    \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
+                    \App\Models\Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                     report($e);
                 }
 
@@ -362,27 +362,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
     private function printHeader(): void
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
-            $version = \LibreNMS\Util\Version::get();
-            $this->logger->info(sprintf(<<<'EOH'
-===================================
-Version info:
-Commit SHA: %s
-Commit Date: %s
-DB Schema: %s
-PHP: %s
-Database: %s
-RRDTool: %s
-SNMP: %s
-==================================
-EOH,
-                Git::localCommit(),
-                Git::localDate(),
-                vsprintf('%s (%s)', $version->database()),
-                phpversion(),
-                $version->databaseServer(),
-                $version->rrdtool(),
-                $version->netSnmp()
-            ));
+            $this->logger->info(Version::get()->header());
         }
     }
 }

@@ -160,15 +160,15 @@ Running in Ganeti Cluster with 2x Dell PER730xd - 64GB, Dual E5-2660 v3
 |                | LibreNMS            | MariaDB             |
 | -------------- | ------------------- | ------------------- |
 | Type           | VM                  | Same Server         |
-| OS             | Ubuntu 18.04 LTS    |                     |
-| CPU            | 2 vCore             |                     |
-| Memory         | 1GB                 |                     |
+| OS             | Debian 11           |                     |
+| CPU            | 4 vCore             |                     |
+| Memory         | 4GB                 |                     |
 | Disk Type      | Raid 1, SSD         |                     |
-| Disk Space     | 25 GB               |                     |
-| Devices        | 30                  |                     |
-| Ports          | 196                 |                     |
-| Health sensors | 207                 |                     |
-| Load           | < 3.65              |                     |
+| Disk Space     | 50 GB               |                     |
+| Devices        | 41                  |                     |
+| Ports          | 317                 |                     |
+| Health sensors | 243                 |                     |
+| Load           | < 3.15              |                     |
 
 ## [VVelox](https://github.com/VVelox)
 
