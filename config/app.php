@@ -173,21 +173,18 @@ return [
         /*
          * Package Service Providers...
          */
-        \SocialiteProviders\Manager\ServiceProvider::class,
 
         /*
          * LibreNMS Service Providers...
          */
+        App\Providers\ConfigServiceProvider::class,
+        App\Providers\ErrorReportingProvider::class, // This should always be after the config is loaded
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
-        App\Providers\ConfigServiceProvider::class,
-        App\Providers\SocialiteListenersServiceProvider::class,
-
         App\Providers\ComposerServiceProvider::class,
         App\Providers\DatastoreServiceProvider::class,
         App\Providers\SnmptrapProvider::class,
@@ -246,6 +243,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
+        'Flare' => Facade\Ignition\Facades\Flare::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,

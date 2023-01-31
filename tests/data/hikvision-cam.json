@@ -3,18 +3,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "V5.5.3 build 171025",
                     "hardware": "DS-2CD2185FWD-I",
                     "features": "H.264-MJPEG",
+                    "location": null,
                     "os": "hikvision-cam",
                     "type": "network",
                     "serial": null,
-                    "icon": "hikvision.png",
-                    "location": null
+                    "icon": "hikvision.png"
                 }
             ]
         },
@@ -60,26 +60,6 @@
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
                     "mempool_perc_warn": 90
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
-    "storage": {
-        "discovery": {
-            "storage": [
-                {
-                    "storage_mib": "HIK-DEVICE-MIB",
-                    "storage_index": "0",
-                    "storage_type": "hikvision-cam",
-                    "storage_descr": "Storage",
-                    "storage_size": 0,
-                    "storage_units": 0,
-                    "storage_used": 0,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
                 }
             ]
         },

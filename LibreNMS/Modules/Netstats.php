@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
+use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -34,8 +36,16 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Netstats implements \LibreNMS\Interfaces\Module
+class Netstats implements Module
 {
+    /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return [];
+    }
+
     /**
      * @var string[][]
      */
@@ -208,9 +218,17 @@ class Netstats implements \LibreNMS\Interfaces\Module
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os): void
+    public function cleanup(Device $device): void
     {
         // no cleanup
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return false; // no database data to dump (may add rrd later)
     }
 
     private function statName(string $oid): string

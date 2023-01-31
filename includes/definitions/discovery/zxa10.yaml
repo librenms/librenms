@@ -1,4 +1,4 @@
-mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB:ZTE-AN-PON-BASE-MIB:IF-MIB
+mib: ZTE-AN-SMI:ZTE-AN-CHASSIS-MIB:ZTE-AN-ENVMON-MIB:ZTE-AN-OPTICAL-MODULE-MIB
 modules:
     mempools:
         pre-cache:
@@ -8,7 +8,7 @@ modules:
             -
                 total: ZTE-AN-CHASSIS-MIB::zxAnCardMemSize
                 percent_used: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
-                descr: 'Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }} ({{ subindex2 }})'
+                descr: 'Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}'
                 skip_values:
                     -
                         oid: ZTE-AN-CHASSIS-MIB::zxAnCardMemUsage
@@ -20,28 +20,23 @@ modules:
                 oid: zxAnCardTable
                 value: zxAnCardCpuLoad
                 num_oid: '.1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.{{ $index }}'
-                descr: '{{ $zxAnCardActualType }} ({{ subindex2 }}) Processor'
-                skip_values:
-                    -
-                        oid: zxAnCardCpuLoad
-                        op: '='
-                        value: 0
+                descr: '{{ $zxAnCardActualType }} Processor'
     sensors:
         pre-cache:
             data:
                 -
                     oid:
                         - zxAnCardActualType
-                        - ifName
+                        - zxAnEnvRack
+                        - zxAnEnvShelf
+                        - zxAnEnvSlot
         temperature:
             data:
                 -
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardTemp
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2.{{ $index }}'
-                    descr: "Temp Card {{ $zxAnCardActualType }} ({{ subindex2 }})"
-                    low_limit: 0
-                    skip_value_lt: 1
+                    descr: "Temp Card {{ $zxAnCardActualType }}"
         fanspeed:
             data:
                 -
@@ -63,67 +58,17 @@ modules:
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardVoltage
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.4.{{ $index }}'
-                    descr: "Voltage Card {{ $zxAnCardActualType }} ({{ subindex2 }})"
+                    descr: "Voltage Card {{ $zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
-        dbm:
-            data:
-                -
-                    oid: zxAnOpticalModuleInfoTable
-                    value: zxAnOpticalIfRxPwrCurrValue
-                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.2.{{ $index }}'
-                    index: 'zxAnOpticalIfRxPwrCurrValue.{{ $index }}'
-                    descr: "{{ $ifName }} Rx"
-                    group: OLT Interfaces
-                    skip_values:
-                        -
-                            oid: zxAnOpticalIfRxPwrCurrValue
-                            op: '='
-                            value: '2147483647'
-                    divisor: 1000
-                    high_limit: -8
-                    warn_limit: -10
-                    low_warn_limit: -30
-                    low_limit: -34
-                -
-                    oid: zxAnOpticalModuleInfoTable
-                    value: zxAnOpticalIfTxPwrCurrValue
-                    num_oid: '.1.3.6.1.4.1.3902.1082.30.40.2.4.1.2.{{ $index }}'
-                    index: 'zxAnOpticalIfTxPwrCurrValue.{{ $index }}'
-                    descr: "{{ $ifName }} Tx"
-                    group: OLT Interfaces
-                    skip_values:
-                        -
-                            oid: zxAnOpticalIfTxPwrCurrValue
-                            op: '='
-                            value: '2147483647'
-                    divisor: 1000
-                    high_limit: 4
-                    low_limit: -4
-                -
-                    oid: zxAnPonRxOpticalPowerTable
-                    value: zxAnPonRxOpticalPower
-                    num_oid: '.1.3.6.1.4.1.3902.1082.500.1.2.4.2.1.2.{{ $index }}'
-                    index: 'zxAnPonRxOpticalPower.{{ $index }}'
-                    descr: 'ONU Rx {{ $ifName }}:{{ $subindex1 }}'
-                    group: '{{ $ifName }} ONU Rx Signals'
-                    skip_values:
-                        -
-                            oid: zxAnPonRxOpticalPower
-                            op: '='
-                            value: '65535000'
-                    divisor: 1000
-                    high_limit: -8
-                    warn_limit: -10
-                    low_warn_limit: -32
-                    low_limit: -34
+
         power:
             data:
                 -
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardPowerConsumption
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.3.{{ $index }}'
-                    descr: "Power Consumption Card {{ $zxAnCardActualType }} ({{ subindex2 }})"
+                    descr: "Power Consumption Card {{ $zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
         current:
@@ -132,7 +77,7 @@ modules:
                     oid: zxAnCardEnvParamTable
                     value: zxAnCardCurrent
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.5.{{ $index }}'
-                    descr: "Current Card {{ $zxAnCardActualType }} ({{ subindex2 }})"
+                    descr: "Current Card {{ $zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
 
@@ -140,38 +85,35 @@ modules:
             data:
                 -
                     oid: zxAnEnvFanTable
-                    value: zxAnEnvFanOperStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.5.{{ $index }}'
-                    index: 'zxAnEnvFanOperStatus.{{ $index }}'
-                    descr: "Fan speed Slot {{ $subindex2 }} Oper Status"
+                    index: 'zxAnEnvFanOperStatus.{{ $index}}'
+                    descr: "Fan speed Slot {{ $index }} Oper Status"
                     group: Fans
                     state_name: zxAnEnvFanOperStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'up' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'down' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'up' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'down' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'unknown' }
                 -
                     oid: zxAnEnvFanTable
-                    value: zxAnEnvFanOnlineStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.6.{{ $index }}'
                     index: 'zxAnEnvFanOnlineStatus.{{ $index }}'
-                    descr: "Fan speed Slot {{ $subindex2 }} Online Status"
+                    descr: "Fan speed Slot {{ $index }} Online Status"
                     group: Fans
                     state_name: zxAnEnvFanOnlineStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'online' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'offline' }
-                        - { value: 3, generic: 2, graph: 1, descr: 'unknown' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'online' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'offline' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'unknown' }
                 -
                     oid: zxAnPowerSupplyTable
-                    value: zxAnPowerSupplyInVoltageStatus
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.3.11.1.3.{{ $index }}'
                     index: 'zxAnPowerSupplyInVoltageStatus.{{ $index }}'
-                    descr: "Power Supply {{ $subindex2 }} Voltage Status"
+                    descr: "Power Supply {{ $index }} Status"
                     group: Power
                     state_name: zxAnPowerSupplyInVoltageStatus
                     states:
-                        - { value: 1, generic: 0, graph: 1, descr: 'normal' }
-                        - { value: 2, generic: 1, graph: 1, descr: 'overVoltage' }
-                        - { value: 3, generic: 1, graph: 1, descr: 'underVoltage' }
-                        - { value: 4, generic: 2, graph: 1, descr: 'off' }
+                        - { value: 1, generic: 0, graph: 0, descr: 'normal' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'overVoltage' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'underVoltage' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'off' }

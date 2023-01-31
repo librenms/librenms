@@ -40,7 +40,7 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
-if (is_numeric($vars['device_group'])) {
+if (isset($vars['device_group']) && is_numeric($vars['device_group'])) {
     $where .= ' AND D.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $param[] = $vars['device_group'];
 }
@@ -112,7 +112,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
-        'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
+        'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",

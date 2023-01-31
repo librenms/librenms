@@ -10,11 +10,11 @@
                     "version": "1.0/0",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "L0927005263069628",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },
@@ -1402,8 +1402,8 @@
                     "ifName": "FastEthernet0/2",
                     "portName": null,
                     "ifIndex": 103,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1507,8 +1507,8 @@
                     "ifName": "FastEthernet0/3",
                     "portName": null,
                     "ifIndex": 104,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1822,8 +1822,8 @@
                     "ifName": "Null0",
                     "portName": null,
                     "ifIndex": 9901,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -1927,8 +1927,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 9902,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2032,8 +2032,8 @@
                     "ifName": "Loopback1",
                     "portName": null,
                     "ifIndex": 9903,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2410,6 +2410,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2434,6 +2435,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2458,6 +2460,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2482,6 +2485,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2506,6 +2510,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -2530,6 +2535,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 }
             ],

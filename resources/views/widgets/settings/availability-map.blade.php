@@ -15,13 +15,13 @@
     </div>
 
     <div class="form-group" id="color_only_select-group-{{ $id }}" style="display: {{ $type == 0 ? 'block' : 'none' }};">
-        <label for="color_only_select-{{ $id }}" class="control-label">{{ __('Display Text') }}</label>
+        <label for="color_only_select-{{ $id }}" class="control-label">{{ __('Label') }}</label>
         <select class="form-control" name="color_only_select" id="color_only_select-{{ $id }}">
             <option value="1" @if($color_only_select == 1) selected @endif>{{ __('empty') }}</option>
             <option value="4" @if($color_only_select == 4) selected @endunless>{{ __('Display Name') }}</option>
             <option value="2" @if($color_only_select == 2) selected @endunless>{{ __('Hostname') }}</option>
-            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('Sysname') }}</option>
-            <option value="0" @unless($color_only_select) selected @endunless>{{ __('Device Status') }}</option>
+            <option value="3" @if($color_only_select == 3) selected @endunless>{{ __('SNMP sysName') }}</option>
+            <option value="0" @unless($color_only_select) selected @endunless>{{ __('Status') }}</option>
         </select>
     </div>
 
@@ -52,8 +52,9 @@
     <div class="form-group">
         <label for="order_by-{{ $id }}" class="control-label">{{ __('Order By') }}</label>
         <select class="form-control" name="order_by" id="order_by-{{ $id }}">
-            <option value="hostname" @if($order_by == 'hostname') selected @endif>{{ __('Hostname') }}</option>
+            <option value="label" @if($order_by == 'label') selected @endif>{{ __('Label') }}</option>
             <option value="status" @if($order_by == 'status') selected @endif>{{ __('Status') }}</option>
+            <option value="display-name" @if($order_by == 'display-name') selected @endif>{{ __('Display Name') }}</option>
         </select>
     </div>
 
@@ -72,7 +73,6 @@
         init_select2('#device_group-{{ $id }}', 'device-group', {});
 
         function toggle_availability_type(el, id) {
-            console.log(el.value);
             if (el.value === '0') {
                 $('#tile_size-group-' + id).hide();
                 $('#color_only_select-group-' + id).show();

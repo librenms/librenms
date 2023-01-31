@@ -10,11 +10,11 @@
                     "version": "V.10.2.9.102",
                     "hardware": "be.IP plus 1.0",
                     "features": null,
+                    "location": "<private>",
                     "os": "bintec-beip-plus",
                     "type": "network",
                     "serial": "BE2CAM019320050",
-                    "icon": "bintec.png",
-                    "location": "<private>"
+                    "icon": "bintec.png"
                 }
             ]
         },

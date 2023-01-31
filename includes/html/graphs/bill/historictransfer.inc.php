@@ -21,7 +21,7 @@ for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
         $date = strtotime($graph_data['ticklabels'][$i]);
 
         if ($vars['imgtype'] === 'day') {
-            $graph_data['ticklabels'][$i] = strftime("%e\n%b", $date);
+            $graph_data['ticklabels'][$i] = date("j\nM", $date);
         }
     }
 }

@@ -5,7 +5,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use Log;
 
 class VeeamVmBackupCompleted implements SnmptrapHandler
 {
@@ -25,6 +24,6 @@ class VeeamVmBackupCompleted implements SnmptrapHandler
         $result = $trap->getOidData('VEEAM-MIB::vmBackupResult');
         $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
 
-        Log::event('SNMP Trap: VM backup ' . $result . ' - ' . $vm_name . ' Job: ' . $job_name . ' - ' . $comment, $device->device_id, 'backup', $color[$result]);
+        $trap->log('SNMP Trap: VM backup ' . $result . ' - ' . $vm_name . ' Job: ' . $job_name . ' - ' . $comment, $color[$result], 'backup');
     }
 }

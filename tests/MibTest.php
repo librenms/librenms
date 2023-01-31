@@ -139,7 +139,7 @@ class MibTest extends TestCase
             if ($file->isDir()) {
                 continue;
             }
-            $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathName());
+            $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathname());
             $file_list[$mib_path] = [
                 str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),

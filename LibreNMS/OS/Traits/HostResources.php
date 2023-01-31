@@ -28,6 +28,7 @@ namespace LibreNMS\OS\Traits;
 use App\Models\Mempool;
 use Closure;
 use Exception;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use Rrd;
@@ -87,7 +88,7 @@ trait HostResources
 
         foreach ($hrProcessorLoad as $index => $usage) {
             $usage_oid = '.1.3.6.1.2.1.25.3.3.1.2.' . $index;
-            $descr = $hrDeviceDescr[$index];
+            $descr = $hrDeviceDescr[$index] ?? null;
 
             if (! is_numeric($usage)) {
                 continue;
@@ -146,7 +147,7 @@ trait HostResources
         $hr_storage = $this->getCacheTable('hrStorageTable', 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES');
 
         if (! is_array($hr_storage)) {
-            return collect();
+            return new Collection();
         }
 
         $ram_bytes = snmp_get($this->getDeviceArray(), 'hrMemorySize.0', '-OQUv', 'HOST-RESOURCES-MIB') * 1024

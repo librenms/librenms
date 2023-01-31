@@ -1,6 +1,6 @@
 <?php
 
-if (! is_array($storage_cache['dsk'])) {
+if (! isset($storage_cache['dsk'])) {
     $storage_cache['dsk'] = snmpwalk_cache_oid($device, 'dskTable', null, 'UCD-SNMP-MIB');
     d_echo($storage_cache);
 }

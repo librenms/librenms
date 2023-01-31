@@ -421,21 +421,22 @@ lnms config:set overview_show_sysDescr true
 Enable or disable the sysDescr output for a device.
 
 ```bash
-lnms config:set force_ip_to_sysname false
+lnms config:set device_display_default '{{ $hostname }}'
 ```
 
-When using IP addresses as a hostname you can instead represent the
-devices on the WebUI by its SNMP sysName resulting in an easier to
-read overview of your network. This would apply on networks where you
-don't have DNS records for most of your devices.
+This is a simple template to control the display of device names by default.
+You can override this setting per-device.
 
-```bash
-lnms config:set force_hostname_to_sysname false
-```
+You may enter any free-form text including one or more of the following template replacements:
 
-When using a dynamic DNS hostname or one that does not resolve, this
-option would allow you to make use of the SNMP sysName instead as the
-preferred reference to the device.
+| Template                    | Replacement                                                          |
+|-----------------------------|----------------------------------------------------------------------|
+| `{{ $hostname }}`           | The hostname or IP of the device that was set when added  *default   |
+| `{{ $sysName_fallback }}`   | The hostname or sysName if hostname is an IP                         |
+| `{{ $sysName }}`            | The SNMP sysName of the device, falls back to hostname/IP if missing |
+| `{{ $ip }}`                 | The actual polled IP of the device, will not display a hostname      |
+
+For example, `{{ $sysName_fallback }} ({{ $ip }})` will display something like `server (192.168.1.1)`
 
 ```bash
 lnms config:set device_traffic_iftype.+ '/loopback/'
@@ -638,7 +639,6 @@ Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Pa
 ```bash
 lnms config:set enable_ports_etherlike false
 lnms config:set enable_ports_junoseatmvp false
-lnms config:set enable_ports_adsl true
 lnms config:set enable_ports_poe false
 ```
 
@@ -729,19 +729,19 @@ there.
 Exact Matching:
 
 ```bash
-lnms config:set location_map '["Under the Sink": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map '{"Under the Sink": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Matching:
 
 ```bash
-lnms config:set location_map_regex '["/Sink/": "Under The Sink, The Office, London, UK"]'
+lnms config:set location_map_regex '{"/Sink/": "Under The Sink, The Office, London, UK"}'
 ```
 
 Regex Match Substitution:
 
 ```bash
-lnms config:set location_map_regex_sub '["/Sink/": "Under The Sink, The Office, London, UK [lat, long]"]'
+lnms config:set location_map_regex_sub '{"/Sink/": "Under The Sink, The Office, London, UK [lat, long]"}'
 ```
 
 If you have an SNMP SysLocation of "Rack10,Rm-314,Sink", Regex Match

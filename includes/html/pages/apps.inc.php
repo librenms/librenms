@@ -130,6 +130,17 @@ $graphs['nfs-server'] = [
 $graphs['os-updates'] = [
     'packages',
 ];
+$graphs['opensearch'] = [
+    'status',
+    'c_nodes',
+    'c_data_nodes',
+    'c_pending_tasks',
+    'c_in_fl_fetch',
+    'c_task_max_in_time',
+    'c_act_shards_perc',
+    'mem_all',
+    'time_all',
+];
 $graphs['dhcp-stats'] = [
     'stats',
     'pools_percent',
@@ -391,6 +402,60 @@ $graphs['chronyd'] = [
     'time',
     'frequency',
     'root',
+];
+$graphs['cape'] = [
+    'status',
+    'pending',
+    'run_stats',
+    'lines',
+    'malscore_stats',
+    'pkg_tasks_all',
+];
+$graphs['sagan'] = [
+    'after',
+    'bytes_ignored',
+    'bytes',
+    'drop_percent',
+    'drop',
+    'eps',
+    'f_drop_percent',
+    'f_dropped',
+    'f_total',
+    'ignore',
+    'match',
+    'max_bytes_log_line',
+    'threshold',
+    'total',
+    'uptime',
+    'alert',
+];
+$graphs['hv-monitor'] = [
+    'status',
+    'memory',
+    'pmem',
+    'time',
+    'pcpu',
+    'flt',
+    'csw',
+    'cow',
+    'etimes',
+    'snaps',
+    'snaps_size',
+];
+$graphs['pwrstatd'] = [
+    'wattage',
+    'voltage',
+    'percentage',
+    'minutes',
+];
+$graphs['systemd'] = [
+    'sub',
+    'active',
+    'load',
+];
+$graphs['wireguard'] = [
+    'traffic',
+    'time',
 ];
 
 echo '<div class="panel panel-default">';

@@ -147,7 +147,7 @@ function getImageTitle($device)
 
 function getImageName($device, $use_database = true, $dir = 'images/os/')
 {
-    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'], $use_database ? $device['icon'] : null, $dir);
+    return \LibreNMS\Util\Url::findOsImage($device['os'], $device['features'] ?? '', $use_database ? $device['icon'] : null, $dir);
 }
 
 function renamehost($id, $new, $source = 'console')
@@ -499,28 +499,9 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-function get_astext($asn)
+function get_astext(string|int|null $asn): string
 {
-    global $cache;
-
-    if (Config::has("astext.$asn")) {
-        return Config::get("astext.$asn");
-    }
-
-    if (isset($cache['astext'][$asn])) {
-        return $cache['astext'][$asn];
-    }
-
-    $result = @dns_get_record("AS$asn.asn.cymru.com", DNS_TXT);
-    if (! empty($result[0]['txt'])) {
-        $txt = explode('|', $result[0]['txt']);
-        $result = trim($txt[4], ' "');
-        $cache['astext'][$asn] = $result;
-
-        return $result;
-    }
-
-    return '';
+    return \LibreNMS\Util\AutonomousSystem::get($asn)->name();
 }
 
 /**
@@ -539,7 +520,7 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
         $device = $device['device_id'];
     }
 
-    Log::event($text, $device, $type, $severity, $reference);
+    \App\Models\Eventlog::log($text, $device, $type, $severity, $reference);
 }
 
 // Parse string with emails. Return array with email (as key) and name (as value)
@@ -627,9 +608,9 @@ function is_port_valid($port, $device)
 
     $ifDescr = $port['ifDescr'];
     $ifName = $port['ifName'];
-    $ifAlias = $port['ifAlias'];
+    $ifAlias = $port['ifAlias'] ?? '';
     $ifType = $port['ifType'];
-    $ifOperStatus = $port['ifOperStatus'];
+    $ifOperStatus = $port['ifOperStatus'] ?? '';
 
     if (str_i_contains($ifDescr, Config::getOsSetting($device['os'], 'good_if', Config::get('good_if')))) {
         return true;
@@ -689,14 +670,24 @@ function is_port_valid($port, $device)
 /**
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
+ * Also trims the data
  *
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing_and_trim(&$port, $device)
 {
+    if (isset($port['ifDescr'])) {
+        $port['ifDescr'] = trim($port['ifDescr']);
+    }
+    if (isset($port['ifAlias'])) {
+        $port['ifAlias'] = trim($port['ifAlias']);
+    }
+    if (isset($port['ifName'])) {
+        $port['ifName'] = trim($port['ifName']);
+    }
     // When devices do not provide data, populate with other data if available
-    if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
+    if (! isset($port['ifDescr']) || $port['ifDescr'] == '') {
         $port['ifDescr'] = $port['ifName'];
         d_echo(' Using ifName as ifDescr');
     }
@@ -704,12 +695,12 @@ function port_fill_missing(&$port, $device)
         // ifAlias overridden by user, don't update it
         unset($port['ifAlias']);
         d_echo(' ifAlias overriden by user');
-    } elseif ($port['ifAlias'] == '' || $port['ifAlias'] == null) {
+    } elseif (! isset($port['ifAlias']) || $port['ifAlias'] == '') {
         $port['ifAlias'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifAlias');
     }
 
-    if ($port['ifName'] == '' || $port['ifName'] == null) {
+    if (! isset($port['ifName']) || $port['ifName'] == '') {
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
@@ -864,7 +855,7 @@ function dnslookup($device, $type = false, $return = false)
     }
     $record = dns_get_record($device['hostname'], $type);
 
-    return $record[0][$return];
+    return $record[0][$return] ?? null;
 }//end dnslookup
 
 /**
@@ -1268,7 +1259,7 @@ function cache_peeringdb()
                 $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
-                foreach ($ixs as $ix) {
+                foreach ($ixs ?? [] as $ix) {
                     $ixid = $ix->{'ix_id'};
                     $tmp_ix = dbFetchRow('SELECT * FROM `pdb_ix` WHERE `ix_id` = ? AND asn = ?', [$ixid, $asn]);
                     if ($tmp_ix) {
@@ -1289,7 +1280,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers as $index => $peer) {
+                    foreach ($peers ?? [] as $index => $peer) {
                         $peer_name = get_astext($peer->{'asn'});
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {

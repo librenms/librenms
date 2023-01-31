@@ -314,7 +314,7 @@ If you are using RRDCached with the -B switch and smokeping RRD's inside the Lib
 
 ```
 cat > smokeping_librenms.te << EOF
-odule smokeping_librenms 1.0;
+module smokeping_librenms 1.0;
  
 require {
 type httpd_t;

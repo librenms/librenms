@@ -171,8 +171,12 @@ class QueryBuilderParser implements \JsonSerializable
         $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
         foreach ($split as $chunk) {
-            if (count($chunk) < 2 && empty($chunk[0])) {
-                continue; // likely the ending && or ||
+            if (count($chunk) < 2) {
+                if (empty($chunk[0])) {
+                    continue; // likely the ending && or ||
+                }
+
+                $chunk[1] = '';
             }
 
             @[$rule_text, $rule_operator] = $chunk;
@@ -181,8 +185,11 @@ class QueryBuilderParser implements \JsonSerializable
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            @[$field, $op, $value] = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
-            $field = ltrim($field, '%');
+            $rule_split = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+
+            $field = ltrim($rule_split[0], '%');
+            $op = $rule_split[1] ?? null;
+            $value = $rule_split[2] ?? null;
 
             // for rules missing values just use '= 1'
             $operator = isset(self::$legacy_operators[$op]) ? self::$legacy_operators[$op] : 'equal';
@@ -467,6 +474,7 @@ class QueryBuilderParser implements \JsonSerializable
      *
      * @since 5.4.0
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->builder;

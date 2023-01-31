@@ -10,11 +10,11 @@
                     "version": "Build 3.00.B47",
                     "hardware": "DGS-3627G Rev. A1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dlink",
                     "type": "network",
                     "serial": "P417183000294",
-                    "icon": "dlink.svg",
-                    "location": "<private>"
+                    "icon": "dlink.svg"
                 }
             ]
         },

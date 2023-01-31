@@ -90,14 +90,14 @@ class Number
      * Cast string to int or float.
      * Returns 0 if string is not numeric
      *
-     * @param  string  $number
+     * @param  mixed  $number
      * @return float|int
      */
     public static function cast($number)
     {
         if (! is_numeric($number)) {
             // match pre-PHP8 behavior
-            if (! preg_match('/^-?\d+(\.\d+)?/', $number, $matches)) {
+            if (! preg_match('/^\s*-?\d+(\.\d+)?/', $number ?? '', $matches)) {
                 return 0;
             }
             $number = $matches[0];
@@ -107,5 +107,22 @@ class Number
         $int = (int) $number;
 
         return $float == $int ? $int : $float;
+    }
+
+    /**
+     * Calculate a percent, but make sure to not divide by zero.  In that case, return 0.
+     *
+     * @param  int|float  $part
+     * @param  int|float  $total
+     * @param  int  $precision
+     * @return float
+     */
+    public static function calculatePercent($part, $total, int $precision = 2): float
+    {
+        if ($total == 0) {
+            return 0;
+        }
+
+        return round($part / $total * 100, $precision);
     }
 }

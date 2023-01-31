@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "alfo80hd",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "siae.png",
-                    "location": "<private>"
+                    "icon": "siae.png"
                 }
             ]
         },

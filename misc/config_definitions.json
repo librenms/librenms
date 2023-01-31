@@ -813,18 +813,6 @@
             "default": 1000,
             "type": "integer"
         },
-        "billing.bill_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.circuit_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
-        "billing.customer_autoadd": {
-            "default": false,
-            "type": "boolean"
-        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
@@ -972,51 +960,6 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "server.png",
-                    "text": "Servers",
-                    "type": "server"
-                },
-                {
-                    "icon": "network.png",
-                    "text": "Network",
-                    "type": "network"
-                },
-                {
-                    "icon": "wireless.png",
-                    "text": "Wireless",
-                    "type": "wireless"
-                },
-                {
-                    "icon": "firewall.png",
-                    "text": "Firewalls",
-                    "type": "firewall"
-                },
-                {
-                    "icon": "power.png",
-                    "text": "Power",
-                    "type": "power"
-                },
-                {
-                    "icon": "environment.png",
-                    "text": "Environment",
-                    "type": "environment"
-                },
-                {
-                    "icon": "loadbalancer.png",
-                    "text": "Load Balancers",
-                    "type": "loadbalancer"
-                },
-                {
-                    "icon": "storage.png",
-                    "text": "Storage",
-                    "type": "storage"
-                },
-                {
-                    "icon": "printer.png",
-                    "text": "Printers",
-                    "type": "printer"
-                },
-                {
                     "icon": "appliance.png",
                     "text": "Appliance",
                     "type": "appliance"
@@ -1025,6 +968,51 @@
                     "icon": "collaboration.png",
                     "text": "Collaboration",
                     "type": "collaboration"
+                },
+                {
+                    "icon": "environment.png",
+                    "text": "Environment",
+                    "type": "environment"
+                },
+                {
+                    "icon": "firewall.png",
+                    "text": "Firewalls",
+                    "type": "firewall"
+                },
+                {
+                    "icon": "loadbalancer.png",
+                    "text": "Load Balancers",
+                    "type": "loadbalancer"
+                },
+                {
+                    "icon": "network.png",
+                    "text": "Network",
+                    "type": "network"
+                },
+                {
+                    "icon": "printer.png",
+                    "text": "Printers",
+                    "type": "printer"
+                },
+                {
+                    "icon": "power.png",
+                    "text": "Power",
+                    "type": "power"
+                },
+                {
+                    "icon": "server.png",
+                    "text": "Servers",
+                    "type": "server"
+                },
+                {
+                    "icon": "storage.png",
+                    "text": "Storage",
+                    "type": "storage"
+                },
+                {
+                    "icon": "wireless.png",
+                    "text": "Wireless",
+                    "type": "wireless"
                 },
                 {
                     "icon": "workstation.png",
@@ -1076,6 +1064,13 @@
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.xdsl": {
+            "order": 255,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": false,
             "type": "boolean"
         },
         "discovery_modules.entity-physical": {
@@ -1426,6 +1421,13 @@
                 "operator": "equals",
                 "value": "smtp"
             }
+        },
+        "email_attach_graphs": {
+            "default": true,
+            "group": "alerting",
+            "section": "email",
+            "order": 4,
+            "type": "boolean"
         },
         "email_backend": {
             "default": "mail",
@@ -4293,6 +4295,7 @@
                         {"match": "f5", "value": "tmos"},
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
+                        {"match": "fortiswitch", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
                         {"match": "oneaccess", "value": "oneos"}
@@ -4302,7 +4305,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
@@ -4508,6 +4511,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.xdsl": {
+            "order": 345,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.customoid": {
@@ -4772,9 +4782,8 @@
             "group": "system",
             "section": "cleanup",
             "order": 9,
-            "units": "days",
-            "default": "10",
-            "type": "integer"
+            "default": true,
+            "type": "boolean"
         },
         "project_home": {
             "default": "https://www.librenms.org/",
@@ -4853,6 +4862,24 @@
                 "git": "Git"
             }
         },
+        "reporting.error": {
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.dump_errors": {
+            "group": "system",
+            "section": "reporting",
+            "order": 1,
+            "default": false,
+            "type": "boolean"
+        },
+        "reporting.usage": {
+            "group": "system",
+            "section": "reporting",
+            "order": 0,
+            "default": false,
+            "type": "boolean"
+        },
         "rewrite_if": {
             "type": "array"
         },
@@ -4919,11 +4946,11 @@
             "type": "text"
         },
         "rrdgraph_def_text": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_dark": {
-            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e",
             "type": "text"
         },
         "rrdgraph_def_text_color": {

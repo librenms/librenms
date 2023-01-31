@@ -213,7 +213,7 @@ alerts on a browser on the user preferences page.
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis
 which are then converted to canopsis events.
 
-[Canopsis Docs](https://doc.canopsis.net/guide-developpement/struct-event/)
+[Canopsis Docs](https://doc.canopsis.net/guide-developpement/structures/#structure-des-evenements)
 
 **Example:**
 
@@ -285,15 +285,13 @@ in the Discord Docs below.
 You can have LibreNMS send alerts to an elasticsearch database. Each
 fault will be sent as a separate document.
 
-The index pattern uses strftime() formatting.
-
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | Host | 127.0.0.1 |
 | Port | 9200 |
-| Index Patter | librenms-%Y.%m.%d |
+| Index Pattern | \l\i\b\r\e\n\m\s-Y.m.d |
 
 ## GitLab
 
@@ -381,8 +379,18 @@ LibreNMS database.
 
 ## Mail
 
-The E-Mail transports uses the same email-configuration like the rest of LibreNMS.
-As a small reminder, here is it's configuration directives including defaults:
+The E-Mail transports uses the same email-configuration as the rest of LibreNMS.
+As a small reminder, here is its configuration directives including defaults:
+
+Emails will attach all graphs included with the @signedGraphTag directive.
+If the email format is set to html, they will be embedded.
+To disable attaching images, set email_attach_graphs to false.
+
+!!! setting "alerting/email"
+```bash
+lnms config:set email_html true
+lnms config:set email_attach_graphs false
+```
 
 **Example:**
 

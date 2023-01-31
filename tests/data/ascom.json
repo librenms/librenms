@@ -10,11 +10,11 @@
                     "version": "IPBS2[10.3.9], Bootcode[10.3.9]",
                     "hardware": "IPBS2-C3/1B1",
                     "features": null,
+                    "location": "<private>",
                     "os": "ascom",
                     "type": "network",
                     "serial": null,
-                    "icon": "ascom.svg",
-                    "location": "<private>"
+                    "icon": "ascom.svg"
                 }
             ]
         },

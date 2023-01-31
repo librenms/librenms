@@ -23,6 +23,10 @@ Route::prefix('auth')->name('socialite.')->group(function () {
     Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
 });
 
+Route::get('graph/{path?}', 'GraphController')
+    ->where('path', '.*')
+    ->middleware(['web', \App\Http\Middleware\AuthenticateGraph::class])->name('graph');
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
@@ -47,7 +51,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
-    Route::get('about', 'AboutController@index');
+    Route::get('about', [\App\Http\Controllers\AboutController::class, 'index'])->name('about');
+    Route::delete('reporting', [\App\Http\Controllers\AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
@@ -223,6 +228,7 @@ Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
     Route::get('/user', 'MakeUserController@index')->name('install.user');
     Route::get('/finish', 'FinalizeController@index')->name('install.finish');
 
+    Route::post('/finish', 'FinalizeController@saveConfig')->name('install.finish.save');
     Route::post('/user/create', 'MakeUserController@create')->name('install.action.user');
     Route::post('/database/test', 'DatabaseController@test')->name('install.acton.test-database');
     Route::get('/ajax/database/migrate', 'DatabaseController@migrate')->name('install.action.migrate');

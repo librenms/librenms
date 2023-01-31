@@ -10,11 +10,11 @@
                     "version": "200",
                     "hardware": "NVR",
                     "features": null,
+                    "location": "<private>",
                     "os": "hikvision-nvr",
                     "type": "network",
                     "serial": "0820160719AARR624053979WCVU",
-                    "icon": "hikvision.png",
-                    "location": "<private>"
+                    "icon": "hikvision.png"
                 }
             ]
         },

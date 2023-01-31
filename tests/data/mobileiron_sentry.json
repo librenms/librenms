@@ -10,11 +10,11 @@
                     "version": "2.6.32-754.24.3.el6.x86_64",
                     "hardware": "Generic x86 64-bit",
                     "features": null,
+                    "location": "<private>",
                     "os": "mobileiron",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "mobileiron.png",
-                    "location": "<private>"
+                    "icon": "mobileiron.png"
                 }
             ]
         },
@@ -667,8 +667,8 @@
                     "ifName": "tun0",
                     "portName": null,
                     "ifIndex": 3,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -772,8 +772,8 @@
                     "ifName": "tun1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",

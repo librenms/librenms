@@ -24,6 +24,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesPowSupplyItemState"
                 },
                 {
@@ -48,6 +49,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -116,11 +118,11 @@
                     "version": "10.0.2.26",
                     "hardware": "M4100-D12G",
                     "features": null,
+                    "location": "<private>",
                     "os": "netgear",
                     "type": "network",
                     "serial": null,
-                    "icon": "netgear.svg",
-                    "location": "<private>"
+                    "icon": "netgear.svg"
                 }
             ]
         },

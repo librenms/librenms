@@ -1,0 +1,560 @@
+UBNT-UFIBER-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+        IpAddress, TimeTicks FROM SNMPv2-SMI
+        DisplayString, TruthValue, MacAddress FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+        ubntEdgeMaxGroups, ubntMIB FROM UBNT-MIB;
+
+    ubntEdgeMax MODULE-IDENTITY
+    LAST-UPDATED "201801030000Z"
+    ORGANIZATION "Ubiquiti Networks, Inc."
+    CONTACT-INFO "support@ubnt.com"
+    DESCRIPTION  "The EdgeMax MIB module for Ubiquiti Networks, Inc. entities"
+    REVISION "201801030000Z"
+    DESCRIPTION "ubntEdgeMax revision"
+    ::= { ubntMIB 5 }
+
+    -- --------------------------------------------------------------------------------
+    --                            product identification
+    -- --------------------------------------------------------------------------------
+
+    ubntProductIdent     OBJECT IDENTIFIER ::= { ubntEdgeMax 1 }
+
+    ubntModel OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Product model."
+        ::= { ubntProductIdent 1 }
+
+    ubntSerialNumber OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Serial number."
+        ::= { ubntProductIdent 2 }
+
+    ubntVersion OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Firmware version."
+        ::= { ubntProductIdent 3 }
+
+    -- --------------------------------------------------------------------------------
+    --                              power outputs
+    -- --------------------------------------------------------------------------------
+
+    ubntPowerOuts         OBJECT IDENTIFIER ::= { ubntEdgeMax 2 }
+
+    ubntPowerOutsCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of power outputs present on this system."
+        ::= { ubntPowerOuts 1 }
+
+    ubntPowerOutTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntPowerOutEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "A list of power out entries. The number of entries is given by the value of ubntPowerOutsCount."
+        ::= { ubntPowerOuts 2 }
+
+    ubntPowerOutEntry OBJECT-TYPE
+       SYNTAX     UbntPowerOutEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntPowerOutTable."
+       INDEX      { ubntPowerOutIndex }
+       ::= { ubntPowerOutTable 1 }
+
+    UbntPowerOutTable ::= SEQUENCE {
+        ubntPowerOutIndex   Integer32,
+        ubntPowerOutVoltage Integer32,
+        ubntPowerOutCurrent Integer32,
+        ubntPowerOutPower   Integer32
+    }
+
+    ubntPowerOutIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "A unique value for each power output."
+        ::= { ubntPowerOutEntry 1 }
+
+    ubntPowerOutVoltage OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Output voltage in mV."
+        ::= { ubntPowerOutEntry 2 }
+
+    ubntPowerOutCurrent OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Output current in mA."
+        ::= { ubntPowerOutEntry 3 }
+
+    ubntPowerOutPower OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Output power in mW."
+        ::= { ubntPowerOutEntry 4 }
+
+    -- --------------------------------------------------------------------------------
+    --                            power supplies
+    -- --------------------------------------------------------------------------------
+
+    ubntPowerSupplies    OBJECT IDENTIFIER ::= { ubntEdgeMax 3 }
+
+    ubntPsuBaysNumber OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of PSU bays available on this system."
+        ::= { ubntPowerSupplies 1 }
+
+    ubntPsuTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntPsuEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "A list of PSU entries. The number of entries is given by the value of ubntPsuBaysNumber."
+        ::= { ubntPowerSupplies 2 }
+
+    ubntPsuEntry OBJECT-TYPE
+       SYNTAX     UbntPsuEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION "An entry in the ubntPsuTable."
+       INDEX      { ubntPsuIndex }
+       ::= { ubntPsuTable 1 }
+
+    UbntPsuEntry ::= SEQUENCE {
+        ubntPsuIndex             Integer32,
+        ubntPsuType              Integer32,
+        ubntPsuStatus            Integer32,
+        ubntPsuOperStatus        Integer32,
+        ubntPsuVoltage           Integer32,
+        ubntPsuTemperature       Integer32,
+        ubntPsuCharging          Integer32,
+        ubntPsuBatteryQuantity   Integer32
+    }
+
+    ubntPsuIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "A unique value for each PSU."
+        ::= { ubntPsuEntry 1 }
+
+    ubntPsuType OBJECT-TYPE
+        SYNTAX     INTEGER { unknown(0),ac(1),dc(2),poe(3) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "PSU Type."
+        ::= { ubntPsuEntry 2 }
+
+    ubntPsuStatus OBJECT-TYPE
+        SYNTAX     INTEGER { unknown(0),on(1),off(2),standby(3) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "PSU Status."
+        ::= { ubntPsuEntry 3 }
+
+    ubntPsuOperStatus OBJECT-TYPE
+        SYNTAX     INTEGER { down(0),up(1) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "PSU operational status."
+        ::= { ubntPsuEntry 4 }
+
+    ubntPsuVoltage OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "PSU voltage in mV."
+        ::= { ubntPsuEntry 5 }
+
+    ubntPsuTemperature OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "PSU temperature in thousands of degrees Celsius."
+        ::= { ubntPsuEntry 6 }
+
+    ubntPsuCharging OBJECT-TYPE
+        SYNTAX     INTEGER { unknown(0),on(1),off(2) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Shows PSU charging state if it is supported."
+        ::= { ubntPsuEntry 7 }
+
+    ubntPsuBatteryQuantity OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Number of batteries connected to PSU."
+        ::= { ubntPsuEntry 8 }
+
+    -- --------------------------------------------------------------------------------
+    --                             thermometers
+    -- --------------------------------------------------------------------------------
+
+    ubntThermometers     OBJECT IDENTIFIER ::= { ubntEdgeMax 4 }
+
+    ubntThermometersCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of installed thermometers on this system."
+        ::= { ubntThermometers 1 }
+
+    ubntThermsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntThermsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "A list of thermometers entries. The number of entries is given by the value of ubntThermometersCount."
+        ::= { ubntThermometers 2 }
+
+    ubntThermsEntry OBJECT-TYPE
+        SYNTAX     UbntThermsEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "An entry in the ubntThermsTable."
+        INDEX      { ubntThermIndex }
+        ::= { ubntThermsTable 1 }
+
+    UbntThermsEntry ::= SEQUENCE {
+        ubntThermIndex        Integer32,
+        ubntThermType         Integer32,
+        ubntThermTemperature  Integer32
+    }
+
+    ubntThermIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "A unique value for thermometer."
+        ::= { ubntThermsEntry 1 }
+
+    ubntThermType OBJECT-TYPE
+        SYNTAX     INTEGER { other(0),board(1),cpu(2),power(3) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Type of thermometer."
+        ::= { ubntThermsEntry 2 }
+
+    ubntThermTemperature OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Temperature in thousands of degrees Celsius."
+        ::= { ubntThermsEntry 3 }
+
+    -- --------------------------------------------------------------------------------
+    --                                  fans
+    -- --------------------------------------------------------------------------------
+
+    ubntFans             OBJECT IDENTIFIER ::= { ubntEdgeMax 5 }
+
+    ubntFansCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of installed fans on this system."
+        ::= { ubntFans 1 }
+
+    ubntFansTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "A list of fan entries. The number of entries is given by the value of ubntFansCount."
+        ::= { ubntFans 2 }
+
+    ubntFanEntry OBJECT-TYPE
+        SYNTAX     UbntFanEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "An entry in the ubntFansTable."
+        INDEX      { ubntFanIndex }
+        ::= { ubntFansTable 1 }
+
+    UbntFanEntry ::= SEQUENCE {
+        ubntFanIndex      Integer32,
+        ubntFanType       Integer32,
+        ubntFanRpm        Integer32
+    }
+
+    ubntFanIndex OBJECT-TYPE
+        SYNTAX     Integer32 (1..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "A unique value for fan."
+        ::= { ubntFanEntry 1 }
+
+    ubntFanType OBJECT-TYPE
+        SYNTAX     INTEGER { other(0),board(1),cpu(2),power(3) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Type of fan."
+        ::= { ubntFanEntry 2 }
+
+    ubntFanRpm OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "Fan RPM."
+        ::= { ubntFanEntry 3 }
+
+    -- --------------------------------------------------------------------------------
+    --                                  gpon ONUs
+    -- --------------------------------------------------------------------------------
+    
+    UbntOnuSN ::= TEXTUAL-CONVENTION
+        STATUS      current
+        SYNTAX      DisplayString (SIZE (0..12))
+
+    SignalLevel ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DISPLAY-HINT    "d-2"
+        SYNTAX          Integer32
+
+    ubntOnus OBJECT IDENTIFIER ::= { ubntEdgeMax 6 }
+
+    ubntOnusCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnus 1 }
+
+    ubntOnusTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntOnuEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        ::= { ubntOnus 2 }
+
+    ubntOnuEntry OBJECT-TYPE
+        SYNTAX     UbntOnuEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        INDEX      { ubntOnuIndex }
+        ::= { ubntOnusTable 1 }
+
+    UbntOnuEntry ::= SEQUENCE {
+        ubntOnuIndex          Integer32,
+        ubntOnuSN             Integer32,
+        ubntOnuName           DisplayString,
+        ubntOnuOnline         TruthValue,
+        ubntOnuModel          DisplayString,
+        ubntOnuPort           Integer32,
+        ubntOnuConnectedTime  TimeTicks,
+        ubntOnuUpTime         TimeTicks,
+        ubntOnuTxPower        SignalLevel,
+        ubntOnuRxPower        SignalLevel,
+        ubntOnuTxBytes        Counter64,
+        ubntOnuRxBytes        Counter64
+    }
+
+
+    ubntOnuIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 1 }
+
+    ubntOnuSN OBJECT-TYPE
+        SYNTAX UbntOnuSN
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 1 }
+
+    ubntOnuName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 2 }
+    
+    ubntOnuOnline OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 3 }
+
+    ubntOnuModel OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 4 }
+
+    ubntOnuOltPort OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 5 }
+
+    ubntOnuConnectedTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 6 }
+
+    ubntOnuUpTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 7 }
+
+    ubntOnuTxPower OBJECT-TYPE
+        SYNTAX     SignalLevel
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "in hundredths of dBm"
+        ::= { ubntOnuEntry 8 }
+
+    ubntOnuRxPower OBJECT-TYPE
+        SYNTAX     SignalLevel
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "in hundredths of dBm"
+        ::= { ubntOnuEntry 9 }
+
+    ubntOnuTxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 10 }
+
+    ubntOnuRxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuEntry 11 }
+
+    -- --------------------------------------------------------------------------------
+    --                                  SFP 
+    -- --------------------------------------------------------------------------------
+
+    ubntSfps OBJECT IDENTIFIER ::= { ubntEdgeMax 7 }
+
+    ubntSfpsCount OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of SFPs"
+        ::= { ubntSfps 1 }
+
+    ubntSfpsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntSfpEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        ::= { ubntSfps 2 }
+
+
+    ubntSfpEntry OBJECT-TYPE
+        SYNTAX     UbntSfpEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        INDEX      { ubntSfpIndex }
+        ::= { ubntSfpsTable 1 }
+
+    UbntSfpEntry ::= SEQUENCE {
+        ubntSfpIndex          Integer32,
+        ubntSfpUp             TruthValue,
+        ubntSfpVendor         DisplayString,
+        ubntSfpVendorPn       DisplayString,
+        ubntSfpTxBytes        Counter64,
+        ubntSfpRxBytes        Counter64
+    }
+    
+    ubntSfpIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 1 }
+
+    ubntSfpName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 2 }
+
+    ubntSfpUp OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 3 }
+
+    ubntSfpVendor OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 4 }
+
+    ubntSfpVendorPn OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (0..16))
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 5 }
+
+    ubntSfpTxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 6 }
+
+    ubntSfpRxBytes OBJECT-TYPE
+        SYNTAX     Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntSfpEntry 7 }
+    
+
+    -- --------------------------------------------------------------------------------
+    --                                  gpon ONU ports
+    -- --------------------------------------------------------------------------------
+
+    ubntOnuPorts OBJECT IDENTIFIER ::= { ubntEdgeMax 8 }
+
+    ubntOnuPortsTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF UbntOnuPortEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        ::= { ubntOnuPorts 1 }
+
+    ubntOnuPortEntry OBJECT-TYPE
+        SYNTAX     UbntOnuPortEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        INDEX      { ubntOnuPortSN, ubntOnuPortIndex }
+        ::= { ubntOnuPortsTable 1 }
+
+    UbntOnuPortEntry ::= SEQUENCE {
+        ubntOnuPortSN         UbntOnuSN,
+        ubntOnuPortIndex      Integer32,
+        ubntOnuPortIfSpeed    Gauge32
+    }
+
+    ubntOnuPortSN OBJECT-TYPE
+        SYNTAX     UbntOnuSN
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= { ubntOnuPortEntry 1 }
+
+    ubntOnuPortIndex OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        ::= {ubntOnuPortEntry 2 }
+
+    ubntOnuPortIfSpeed OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "in bits per second, see IF-MIB::ifSpeed"
+        ::= { ubntOnuPortEntry 3 }
+
+END

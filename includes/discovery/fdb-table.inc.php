@@ -34,10 +34,11 @@ if (! empty($insert)) {
     $now = \Carbon\Carbon::now();
     // synchronize with the database
     foreach ($insert as $vlan_id => $mac_address_table) {
-        echo " {$vlans_by_id[$vlan_id]}: ";
+        $vlan_name = $vlans_by_id[$vlan_id] ?? $vlan_id;
+        echo " $vlan_name: ";
 
         foreach ($mac_address_table as $mac_address_entry => $entry) {
-            if ($existing_fdbs[$vlan_id][$mac_address_entry]) {
+            if (isset($existing_fdbs[$vlan_id][$mac_address_entry])) {
                 $new_port = $entry['port_id'];
                 $port_fdb_id = $existing_fdbs[$vlan_id][$mac_address_entry]['ports_fdb_id'];
 

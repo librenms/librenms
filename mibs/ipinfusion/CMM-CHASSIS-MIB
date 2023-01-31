@@ -1,0 +1,4575 @@
+    CMM-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+    --  This module provides authoritative definitions for cmm modules
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+        OBJECT-TYPE,
+        Gauge32, Counter32, Unsigned32,
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString,
+        MacAddress, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        enterprises,OBJECT-IDENTITY
+            FROM SNMPv2-SMI
+	    ipi FROM OCNOS-IPI-MODULE-MIB;
+
+
+	cmm  MODULE-IDENTITY
+	LAST-UPDATED "201711091200Z"   -- Nov 09, 2017 12:00:00 GMT
+	ORGANIZATION
+	  "IPI."
+	CONTACT-INFO
+	  "support@ipinfusion.com"
+
+	DESCRIPTION
+	   "The Structure of CMM Management Information for
+	    the IPI enterprise."
+	::= { ipi 100 }
+
+
+    -- ### Groups ###
+
+    CmmChassisObject      OBJECT IDENTIFIER ::={ cmm 1 }
+    cmmObjects            OBJECT IDENTIFIER ::={ CmmChassisObject 1 }
+    cmmSysObjects         OBJECT IDENTIFIER ::={ CmmChassisObject 2 }
+    cmmAlarmObjects       OBJECT IDENTIFIER ::={ CmmChassisObject 3 }
+
+    -- ### Textual Convention
+    LedColorCode ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+          "The color code value for led's in the unit."
+       SYNTAX  INTEGER   {
+                    none(1),
+                    green(2),
+                    blinking-green(3),
+                    solid-green(4),
+                    amber(5),
+                    blinking-amber(6),
+                    solid-amber(7),
+                    red(8),
+                    blinking-red(9),
+                    solid-red(10),
+                    blue(11),
+                    blinking-blue(12),
+                    yellow(13),
+                    blinking-yellow(14),
+                    orange(15),
+                    slow-blinking-green(16),
+                    fast-blinking-green(17),
+                    unknown(30)
+                    }
+
+    SystemStatusCode ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+          "The components for system status in the unit.
+           Value '0' means there is no fault in the system."
+        SYNTAX        BITS   {
+                        cpu(0),
+                        ram(1),
+                        disk(2),
+                        low-temperature(3),
+                        high-temperature(4),
+                        fan(5),
+                        power(6),
+                        software(7)
+                        }
+    -- ### Chassis Information
+
+      cmmNumStackUnits     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of stack units configured
+            on the chassis."
+        ::= { cmmObjects 1 }
+
+
+
+    -- ### Chassis System  ###
+
+
+    -- ## StackUnit Table
+
+    -- The Cmm chassis is a single virtual system to
+    -- have the stackable units as virtual slots.
+    -- In the chassis, there can be multiple physical units
+    -- stacked together.
+
+    -- The StackUnit table contains the management information
+    -- of each stacked unit in the chassis.
+
+      cmmStackUnitTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmStackUnitEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of entries containing information 
+             for each stacked unit."
+        ::= { cmmSysObjects 1 }
+
+      cmmStackUnitEntry  OBJECT-TYPE
+        SYNTAX        CmmStackUnitEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of entries containing information 
+             for each stacked unit."
+        INDEX    { cmmStackUnitIndex }
+        ::= { cmmStackUnitTable 1 }
+
+      CmmStackUnitEntry    ::=
+        SEQUENCE {
+           cmmStackUnitIndex                   INTEGER,
+           cmmStackUnitModelName               DisplayString,
+           cmmStackUnitSerialNumber            DisplayString,
+           cmmStackUnitUpTime                  TimeTicks,
+           cmmStackUnitMfgDate                 DateAndTime,
+           cmmStackUnitMacAddress              MacAddress,
+           cmmStackUnitPartNum                 DisplayString,
+           cmmStackLabelRevision               DisplayString,
+           cmmStackUnitCountryCode             OCTET STRING,
+           cmmStackUnitServiceTag              DisplayString,
+           cmmStackPlatformName                DisplayString,
+           cmmStackOnieVersion                 DisplayString,
+           cmmStackMfgName                     DisplayString,
+           cmmStackVendorName                  DisplayString,
+           cmmStackDiagVersion                 DisplayString,
+           cmmStackCrc32                       OCTET STRING,
+           cmmStackUnitNumFanControllers       INTEGER,
+           cmmStackUnitNumFanTrays             INTEGER,
+           cmmStackUnitNumPowerSupplies        INTEGER,
+           cmmStackUnitNumPluggableModules     INTEGER,
+           cmmStackUnitNumFastEtherPorts       INTEGER,
+           cmmStackUnitNumGigEtherPorts        INTEGER,
+           cmmStackUnitNum10GigEtherPorts      INTEGER,
+           cmmStackUnitNum25GigEtherPorts      INTEGER,
+           cmmStackUnitNum40GigEtherPorts      INTEGER,
+           cmmStackUnitNum50GigEtherPorts      INTEGER,
+           cmmStackUnitNum100GigEtherPorts     INTEGER,
+           cmmStackUnitSwitchChipRev           DisplayString,
+           cmmStackSupportedLabelRevision      DisplayString,
+           cmmStackUnitSupportedSwitchChipRev  DisplayString
+        }
+
+       cmmStackUnitIndex  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "The unique stack unit number."
+        ::= { cmmStackUnitEntry 1 }
+
+       cmmStackUnitModelName  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The plugged-in model name for this unit.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 2 }
+
+       cmmStackUnitSerialNumber OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's serial number.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 3 }
+
+       cmmStackUnitUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system up time of the unit."
+        ::= { cmmStackUnitEntry 4 }
+
+       cmmStackUnitMfgDate    OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date the unit is manufactured.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 5 }
+
+       cmmStackUnitMacAddress   OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "A 6-octet MAC Address assigned to this unit."
+        ::= { cmmStackUnitEntry 6 }
+
+       cmmStackUnitPartNum    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit part number.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 7 }
+
+        cmmStackLabelRevision OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's label Revision.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 8 }
+
+       cmmStackUnitCountryCode    OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit manufacturer's country code."
+        ::= { cmmStackUnitEntry 9 }
+
+       cmmStackUnitServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's service tag.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 10 }
+
+       cmmStackPlatformName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Platform Name for the Unit.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 11 }
+
+       cmmStackOnieVersion OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's ONIE Version.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 12 }
+
+       cmmStackMfgName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's Manufacturer Name.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 13 }
+
+       cmmStackVendorName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's Vendor Name.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 14 }
+
+       cmmStackDiagVersion OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's Diagnostic Version.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 15 }
+
+        cmmStackCrc32 OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(4))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's Cyclic Redundancy Check 32 Bit value in hex."
+        ::= { cmmStackUnitEntry 16 }
+
+       cmmStackUnitNumFanControllers OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of fan controllers on the unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 17 }
+
+       cmmStackUnitNumFanTrays  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of fan trays on the unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 18 }
+
+       cmmStackUnitNumPowerSupplies     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of power supplies available to the unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 19 }
+
+       cmmStackUnitNumPluggableModules OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of pluggable modules in the stack.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 20 }
+
+       cmmStackUnitNumFastEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 100M Ethernet/802.3 interfaces in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 21 }
+
+       cmmStackUnitNumGigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 1G Ethernet/802.3 interfaces in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 22 }
+
+       cmmStackUnitNum10GigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 10G Ethernet/802.3 interfaces in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 23 }
+
+       cmmStackUnitNum25GigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 25G Ethernet/802.3 interfaces in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 24 }
+
+       cmmStackUnitNum40GigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 40G Ethernet/802.3 interfaces in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 25 }
+
+       cmmStackUnitNum50GigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 50G Ethernet/802.3 interfaces
+            in this unit. '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 26 }
+
+       cmmStackUnitNum100GigEtherPorts     OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 100G Ethernet/802.3 interfaces
+            in this unit. '-100001' indicates unavailable"
+        ::= { cmmStackUnitEntry 27 }
+
+       cmmStackUnitSwitchChipRev  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Unit's Switch Chip Revision."
+        ::= { cmmStackUnitEntry 28 }
+
+        cmmStackSupportedLabelRevision OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's supported label Revision.
+             Blank indicates unavailable"
+        ::= { cmmStackUnitEntry 29 }
+
+       cmmStackUnitSupportedSwitchChipRev  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Unit's Switch Supported Chip Revision."
+        ::= { cmmStackUnitEntry 30 }
+
+
+    -- ## Transceiver EEPROM Entry
+     cmmTransEEPROMTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmTransEEPROMEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "A Transceiver entry containing eeprom related objects for a particular port."
+     ::= { cmmSysObjects 2 }
+
+      cmmTransEEPROMEntry      OBJECT-TYPE
+        SYNTAX        CmmTransEEPROMEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A Transceiver entry containing eeprom related objects for a particular port."
+        INDEX    { cmmStackUnitIndex,
+                   cmmTransIndex }
+        ::= { cmmTransEEPROMTable 1 }
+
+      CmmTransEEPROMEntry::=
+        SEQUENCE {
+           cmmTransIndex                  INTEGER,
+           cmmTransType                   INTEGER,
+           cmmTransNoOfChannels           INTEGER,
+           cmmTransidentifier             INTEGER,
+           cmmTransSFPextendedidentifier  INTEGER,
+           cmmTransQSFPextendedidentifier BITS,
+           cmmTransconnectortype          INTEGER,
+           cmmTransEthCompliance          INTEGER,
+           cmmTransExtEthCompliance       BITS,
+           cmmTransSonetCompliance        BITS,
+           cmmTransFiberChnlLinkLen       BITS,
+           cmmTransFiberChnlTransTech     BITS,
+           cmmTransFiberChnlTransMedia    BITS,
+           cmmTransSFPFiberChnlSpeed      BITS,
+           cmmTransQSFPFiberChnlSpeed     BITS,
+           cmmTransSFPInfiniBandCompliance   INTEGER,
+           cmmTransSFPEsconCompliance        INTEGER,
+           cmmTransSfpPlusCableTech       INTEGER,
+           cmmTransEncoding               INTEGER,
+           cmmTransLengthKmtrs            INTEGER,
+           cmmTransLengthMtrs             INTEGER,
+           cmmTransLengthOM1              INTEGER,
+           cmmTransLengthOM2              INTEGER,
+           cmmTransLengthOM3              INTEGER,
+           cmmTransLengthOM4              INTEGER,
+           cmmTransVendorName             DisplayString,
+           cmmTransVendorOUI              DisplayString,
+           cmmTransVendorPartNumber       DisplayString,
+           cmmTransVendorRevision         DisplayString,
+           cmmTransCheckCode              OCTET STRING,
+           cmmTransCheckCodeExtended      OCTET STRING,
+           cmmTransNominalBitRate         INTEGER,
+           cmmTransBitRateMax             INTEGER,
+           cmmTransBitRateMin             INTEGER,
+           cmmTransVendorSerialNumber     DisplayString,
+           cmmTransDateCode               DisplayString,
+           cmmTransDDMSupport             INTEGER,
+           cmmTransMaxCaseTemp            INTEGER,
+           cmmTransSFPOptionsImp          BITS, 
+           cmmTransQSFPOptionsImp         BITS,
+           cmmTransPresence               INTEGER
+           cmmTransFrontPanelPortNumber   INTEGER
+        }
+
+       cmmTransIndex   OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            " A unique value, greater than zero,for each slot within the unit"
+        ::= { cmmTransEEPROMEntry 1 }
+
+       cmmTransType     OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               sfp(1),
+                               qsfp(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver type"
+        ::= { cmmTransEEPROMEntry 2 }
+
+       cmmTransNoOfChannels    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of channels available for this transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 3 }
+
+        cmmTransidentifier OBJECT-TYPE
+        SYNTAX        INTEGER {
+                             unknown(1),
+                             gbic(2),
+                             soldered-to-motherboard(3),
+                             sfp-or-sfpplus-or-sfp28(4),
+                             xbi-300pin(5),
+                             xenpak(6),
+                             xep(7),
+                             xff(8),
+                             xfpe(9),
+                             xpak(10),
+                             x2(11),
+                             dwdmsfp-or-dwdmsfpplus(12),
+                             qsfp(13),
+                             qsfpplus-or-later(14),
+                             cxp-or-later(15),
+                             shielded-mini-multilane-hd4x(16),
+                             shielded-mini-multilane-hd8x(17),
+                             qsfp28-or-later(18),
+                             cxp2-aka-cxp28-or-later(19),
+                             cdfpstyle1-or-cdfpstyle2(20),
+                             shielded-mini-multilane-hd4x-fanoutcable(21),
+                             shielded-mini-multilane-hd8x-fanoutcable(22),
+                             cdfpstyle3(23),
+                             microqsfp(24),
+                             qsfp-doubledensity-8x-pluggable-transceiver(25),
+                             reserved(26),
+                             vendor-specific(27)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Type of transceiver present eg:SFP/SFP+/SFP28/QSFP/QSFP+/QSFP28."
+        ::= { cmmTransEEPROMEntry 4 }
+
+        cmmTransSFPextendedidentifier OBJECT-TYPE
+        SYNTAX        INTEGER {
+                             gbic-notspecified-or-compliant-with-moddef(1),
+                             gbic-compliant-with-moddef1(2),
+                             gbic-compliant-with-moddef2(3),
+                             gbic-compliant-with-moddef3(4),
+                             gbic-or-sfp-definedby-twowire-interfaceid-only (5),
+                             gbic-compliant-with-moddef5(6),
+                             gbic-compliant-with-moddef6(7),
+                             gbic-compliant-with-moddef7(8),
+                             unallocated(9),
+                             unknown(10)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Extended identifier of SFP transceiver for additional information."
+        ::= { cmmTransEEPROMEntry 5 }
+
+        cmmTransQSFPextendedidentifier OBJECT-TYPE
+        SYNTAX        BITS   {
+                             powerclass1-1dot5wmax(0),
+                             powerclass2-2wmax(1),
+                             powerclass3-2dot5wmax(2),
+                             powerclass4-3dot5wmax(3),
+                             cleicode-present(4),
+                             cdrpresent-in-tx(5),
+                             cdrpresent-in-rx(6),
+                             powerclass5-4wmax(7),
+                             powerclass6-4dot5wmax(8),
+                             powerclass7-5wmax(9)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Extended identifier of QSFP transceiver for additional information.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 6 }
+
+        cmmTransconnectortype   OBJECT-TYPE
+        SYNTAX        INTEGER {
+                             unknown(1),
+                             subscriber-connector(2),
+                             fibrechannel-style1-copperconnector(3),
+                             fibrechannel-style2-copperconnector(4),
+                             bayonet-or-threaded-neill-concelman(5),
+                             fibrechannel-coaxheaders(6),
+                             fiber-jack(7),
+                             lucent-connector(8),
+                             mechanical-transfer-registeredjack(9),
+                             multiple-optical(10),
+                             sg(11),
+                             optical-pigtail(12),
+                             multifiber-paralleloptic-1x12(13),
+                             multifiber-paralleloptic-1x16(14),
+                             reserved(15),
+                             hssdcii(16),
+                             copper-pigtail(17),
+                             rj45(18),
+                             no-separable-connector(19),
+                             mxc2-x16(20),
+                             reserved(21),
+                             vendor-specific(22)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Connector type for the transceiver."
+        ::= { cmmTransEEPROMEntry 7 }
+
+        cmmTransEthCompliance   OBJECT-TYPE
+        SYNTAX        INTEGER {
+                             ec-unknown(1),
+                             ec-10gbase-sr(2),
+                             ec-10gbase-lr(3),
+                             ec-10gbase-lrm(4),
+                             ec-10gbase-er(5),
+                             ec-1000base-sx(6),
+                             ec-1000base-lx(7),
+                             ec-1000base-cx(8),
+                             ec-1000base-t(9),
+                             ec-100base-lx-or-lx10(10),
+                             ec-100base-fx(11),
+                             ec-base-bx10(12),
+                             ec-base-px(13),
+                             ec-40gbase-cr4(14),
+                             ec-40gbase-sr4(15),
+                             ec-40gbase-lr4(16),
+                             ec-40g-activecable(17)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Values of Ethernet Compliance codes."
+        ::= { cmmTransEEPROMEntry 8 }
+
+        cmmTransExtEthCompliance   OBJECT-TYPE
+        SYNTAX        BITS   {
+                             eec-unspecified(0),
+                             eec-100g-activeopticalcable-or-25g-auic2maoc(1),
+                             eec-100gbase-sr4-or-25gbase-sr(2),
+                             eec-100gbase-lr4-or-25gbase-lr(3),
+                             eec-100gbase-er4-or-25gbase-er(4),
+                             eec-100gbase-sr10(5),
+                             eec-100g-cwdm4(6),
+                             eec-100g-psm4-parallelsmf(7),
+                             eec-100g-activecoppercable-or-25g-auic2macc(8),
+                             eec-obsolete(9),
+                             eec-reserved(10),
+                             eec-100gbase-cr4-or-25gbase-crca-l(11),
+                             eec-25gbase-crca-s(12),
+                             eec-25gbase-crca-n(13),
+                             eec-40gbase-er4(14),
+                             eec-4x10gbase-sr(15),
+                             eec-40g-psm4-parallelsmf(16),
+                             eec-g959-dot1-profilep1-i1-2d1(17),
+                             eec-g959-dot1-profilep1-s1-2d2(18),
+                             eec-g959-dot1-profilep1-l1-2d2(19),
+                             eec-100gbase-t-with-sfi-electricalinterface(20),
+                             eec-100g-clr4(21),
+                             eec-100g-aoc-or-25g-auic2maoc(22),
+                             eec-100g-acc-or-25g-auic2macc(23),
+                             eec-100ge-dwdm2(24)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Bitmap of Extended Ethernet Compliance codes.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 9 }
+
+        cmmTransSonetCompliance   OBJECT-TYPE
+        SYNTAX        BITS   {
+                             oc192-shortreach(0),
+                             sonet-reachspecifier-bit1(1),
+                             sonet-reachspecifier-bit2(2),
+                             oc48-longreach(3),
+                             oc48-intermediatereach(4),
+                             oc48-shortreach(5),
+                             oc12-singlemode-longreach(6),
+                             oc12-singlemode-intermediatereach(7),
+                             oc12-singlemode-shortreach(8),
+                             oc3-singlemode-longreach(9),
+                             oc3-singlemode-intermediatereach(10),
+                             oc3-singlemode-shortreach(11)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Sonet Compliance codes of transceiver.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 10 }
+
+        cmmTransFiberChnlLinkLen  OBJECT-TYPE
+        SYNTAX        BITS {
+                           short(0),
+                           medium(1),
+                           intermediate(2),
+                           long(3),
+                           verylong(4)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fiber Channel Link Length.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 11 }
+
+        cmmTransFiberChnlTransTech  OBJECT-TYPE
+        SYNTAX        BITS {
+                           shortwaveLaserLinearRx(0),
+                           longwaveLaserLC(1),
+                           electricalInter-Enclosure(2),
+                           electricalIntra-Enclosure(3),
+                           shortwaveLaserWithOutOFC(4),
+                           shortwaveLaserwithOFC(5),
+                           longwaveLaserLL(6)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fiber Channel Transmitter Technology.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 12 }
+
+        cmmTransFiberChnlTransMedia  OBJECT-TYPE
+        SYNTAX        BITS {
+                           twinaxial-pair(0),
+                           twisted-pair(1),
+                           miniature-coax(2),
+                           video-coax(3),
+                           multi-mode62dot5m(4),
+                           multi-mode50m(5),
+                           multi-mode50um(6),
+                           single-mode(7)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fiber Channel Transmitter Media.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 13 }
+
+        cmmTransSFPFiberChnlSpeed  OBJECT-TYPE
+        SYNTAX        BITS  {
+                             fcs-3200mbps(0),
+                             fcs-1600mbps(1),
+                             fcs-1200mbps(2),
+                             fcs-800mbps(3),
+                             fcs-400mbps(4),
+                             fcs-200mbps(5),
+                             fcs-100mbps(6)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SFP Fiber Channel Speed.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 14 }
+
+        cmmTransQSFPFiberChnlSpeed  OBJECT-TYPE
+        SYNTAX        BITS  {
+                             fcs-3200mbps(0),
+                             fcs-1600mbps(1),
+                             fcs-1200mbps(2),
+                             fcs-800mbps(3),
+                             fcs-400mbps(4),
+                             fcs-200mbps(5),
+                             fcs-100mbps(6)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "QSFP Fiber Channel Speed.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 15 }
+
+        cmmTransSFPInfiniBandCompliance OBJECT-TYPE
+        SYNTAX        INTEGER {
+                           ibc-1xsx(1),
+                           ibc-1xlx(2),
+                           ibc-1xcopperactive(3),
+                           ibc-1xcopperpassive(4),
+                           ibc-unknown(5),
+                           ibc-notapplicable(6)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SFP InfiniBand Compliance."
+        ::= { cmmTransEEPROMEntry 16 }
+
+        cmmTransSFPEsconCompliance  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                           escon-mmf-1310nm-led(1),
+                           escon-smf-1310nm-laser(2),
+                           unknown(3),
+                           notapplicable(4)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SFP Enterprise Systems Connection compliance."
+        ::= { cmmTransEEPROMEntry 17 }
+
+        cmmTransSfpPlusCableTech  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              active(1),
+                              passive(2),
+                              unknown(3),
+                              notapplicable(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "SFP+ Cable Technology."
+        ::= { cmmTransEEPROMEntry 18 }
+
+        cmmTransEncoding  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              enc-unspecified(1),
+                              enc-8b-or-10b(2),
+                              enc-4b-or-5b(3),
+                              enc-nrz(4),
+                              enc-manchester(5),
+                              enc-sonet-scrambled(6),
+                              enc-64b-or-66b(7),
+                              enc-256b-or-257b(8),
+                              enc-pam4(9),
+                              enc-reserved(10)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Code for high speed serial encoding algorithm."
+        ::= { cmmTransEEPROMEntry 19 }
+
+        cmmTransLengthKmtrs  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS          "km"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for single mode fiber, units of km.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 20 }
+
+        cmmTransLengthMtrs  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "100 m"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for single mode fiber, units of 100 m.
+            '-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmTransEEPROMEntry 21 }
+
+        cmmTransLengthOM1 OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "10 m"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for 62.5 um OM1 fiber, units of 10 m.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 22 }
+
+        cmmTransLengthOM2 OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "10 m"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for 50 um OM2 fiber, units of 10 m.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 23 }
+
+        cmmTransLengthOM3 OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "10 m"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for 50 um OM3 fiber, units of 10 m.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 24 }
+
+        cmmTransLengthOM4 OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "10 m"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Link length supported for 50 um OM4 fiber, units of 10 m.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 25 }
+
+        cmmTransVendorName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver vendor name.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 26 }
+
+        cmmTransVendorOUI OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver vendor IEEE company ID.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 27 }
+
+        cmmTransVendorPartNumber  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Part number provided by tarnsceiver vendor.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 28 }
+
+        cmmTransVendorRevision  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Revision level for part number provided by vendor.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 29 }
+
+        cmmTransCheckCode  OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (1))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Check code for Base ID Fields.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 30 }
+
+        cmmTransCheckCodeExtended  OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (1))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Check code for the Extended ID Fields.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 31 }
+
+        cmmTransNominalBitRate OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "100MBd"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Nominal signalling rate, units of 100MBd.
+             '-100001' indicates unavailable"
+        ::= { cmmTransEEPROMEntry 32 }
+
+        cmmTransBitRateMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Upper bit rate margin, units of 1% above the Nominal Bit Rate.
+            Value '0' indicates this field is not specified.
+             '-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmTransEEPROMEntry 33 }
+
+        cmmTransBitRateMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Lower bit rate margin, units of 1% below the Nominal Bit Rate.
+            Value '0' indicates this field is not specified.
+             '-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmTransEEPROMEntry 34 }
+
+        cmmTransVendorSerialNumber  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Serial number provided by vendor.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 35 }
+
+        cmmTransDateCode  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Vendor's manufacturing date code.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 36 }
+
+        cmmTransDDMSupport  OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             yes(1),
+                             no(2),
+                             unknown(3)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Indicates whether diagnostics monitoring is
+            supported or not."
+        ::= { cmmTransEEPROMEntry 37 }
+
+        cmmTransMaxCaseTemp   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " 0.01 C "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Maximum case temperature in Celsius.'-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmTransEEPROMEntry 38 }
+
+        cmmTransSFPOptionsImp  OBJECT-TYPE
+        SYNTAX        BITS {
+                           reserved(0),
+                           power-level3(1),
+                           paging(2),
+                           internal-retimer-or-cdr(3),
+                           cooled-laser-transmitter(4),
+                           power-level2(5),
+                           power-level1(6),
+                           linear-receiver-output(7),
+                           receiver-decision-threshold(8),
+                           transmitter-wavelength-or-tunable-frequency(9),
+                           rate-select(10),
+                           tx-disable(11),
+                           tx-fault(12),
+                           rx-loss-of-signal(13)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver Options Implemented for SFP Transceiver.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 39 }
+
+        cmmTransQSFPOptionsImp  OBJECT-TYPE
+        SYNTAX        BITS {
+                           reserved(0),
+                           tx-inputequalization-auto-adaptive(1),
+                           tx-inputequalization-fixed-programmable(2),
+                           tx-outputemphasis-fixed-programmable(3),
+                           tx-outputamplitude-fixed-programmable(4),
+                           tx-cdr-on-or-off-controllable(5),
+                           tx-cdr-on-or-off-fixed(6),
+                           rx-cdr-on-or-off-controllable(7),
+                           rx-cdr-on-or-off-fixed(8),
+                           tx-cdr-lossoflock(9),
+                           rx-cdr-lossoflock(10),
+                           rx-squelch-disable(11),
+                           rx-output-disable(12),
+                           tx-squelch-disable(13),
+                           tx-squelch(14),
+                           page2-provided(15),
+                           page1-provided(16),
+                           rateselect-controllable(17),
+                           rateselect-fixed(18),
+                           tx-disable(19),
+                           tx-fault(20),
+                           tx-squelch-to-reduce-pave(21),
+                           tx-squelch-to-reduce-oma(22),
+                           tx-loss-of-signal(23)
+                           }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver Options Implemented for QSFP Transceiver.
+             Blank indicates unavailable"
+        ::= { cmmTransEEPROMEntry 40 }
+
+        cmmTransPresence  OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             present(1),
+                             notpresent(2),
+                             unknown(3)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Indicates Transceiver presence status."
+        ::= { cmmTransEEPROMEntry 41 }
+
+        cmmTransFrontPanelPortNumber     OBJECT-TYPE
+         SYNTAX        INTEGER
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Front panel port number"
+         ::= { cmmTransEEPROMEntry 42 }
+
+    -- ## DDMChannel Entry
+     cmmTransDDMTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmTransDDMEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "Information about Digital Optical Monitoring for each
+          interface per channel."
+     ::= { cmmSysObjects 3 }
+
+      cmmTransDDMEntry OBJECT-TYPE
+        SYNTAX        CmmTransDDMChannelEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Information about Digital Optical Monitoring for each
+            interface per channel."
+        INDEX    { cmmStackUnitIndex,
+                   cmmTransIndex,
+                   cmmTransChannelIndex
+                 }
+        ::= { cmmTransDDMTable 1 }
+
+      CmmTransDDMChannelEntry    ::=
+        SEQUENCE {
+           cmmTransChannelIndex                       INTEGER,
+           cmmTransTemperature                        INTEGER,
+           cmmTransTempCriticalThresholdMin           INTEGER,
+           cmmTransTempCriticalThresholdMax           INTEGER,
+           cmmTransTempAlertThresholdMin              INTEGER,
+           cmmTransTempAlertThresholdMax              INTEGER,
+           cmmTransVoltage                            INTEGER,
+           cmmTransVoltCriticalThresholdMin           INTEGER,
+           cmmTransVoltCriticalThresholdMax           INTEGER,
+           cmmTransVoltAlertThresholdMin              INTEGER,
+           cmmTransVoltAlertThresholdMax              INTEGER,
+           cmmTransLaserBiasCurrent                   INTEGER,
+           cmmTransLaserBiasCurrCriticalThresholdMin  INTEGER,
+           cmmTransLaserBiasCurrCriticalThresholdMax  INTEGER,
+           cmmTransLaserBiasCurrAlertThresholdMin     INTEGER,
+           cmmTransLaserBiasCurrAlertThresholdMax     INTEGER,
+           cmmTransTxPower                            INTEGER,
+           cmmTransTxPowerCriticalThresholdMin        INTEGER,
+           cmmTransTxPowerCriticalThresholdMax        INTEGER,
+           cmmTransTxPowerAlertThresholdMin           INTEGER,
+           cmmTransTxPowerAlertThresholdMax           INTEGER,
+           cmmTransRxPower                            INTEGER,
+           cmmTransRxPowerCriticalThresholdMin        INTEGER,
+           cmmTransRxPowerCriticalThresholdMax        INTEGER,
+           cmmTransRxPowerAlertThresholdMin           INTEGER,
+           cmmTransRxPowerAlertThresholdMax           INTEGER,
+           cmmTransTxPowerSupported                   INTEGER,
+           cmmTransRxPowerSupported                   INTEGER,
+           cmmTransDDMStatus                          INTEGER,
+           cmmTransTxState                            INTEGER,
+           cmmTransRxLosState                         INTEGER,
+           cmmTransTxLosState                         INTEGER,
+           cmmTransResetState                         INTEGER,
+           cmmTransPowerMode                          INTEGER
+           }
+
+       cmmTransChannelIndex   OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            " A unique value, greater than zero,for each channel in the transceiver
+              within the unit. For SFP transceivers, only channel '1' is applicable."
+        ::= { cmmTransDDMEntry 1 }
+
+        cmmTransTemperature  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Internally measured temperature of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 2 }
+
+        cmmTransTempCriticalThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alarm Threshold temperature of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 3 }
+
+        cmmTransTempCriticalThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alarm Threshold temperature of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 4}
+
+        cmmTransTempAlertThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alert Threshold temperature of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 5}
+
+        cmmTransTempAlertThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alert Threshold temperature of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 6}
+
+        cmmTransVoltage  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Internally measured supply voltage of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 7 }
+
+        cmmTransVoltCriticalThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alarm Threshold voltage of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 8 }
+
+        cmmTransVoltCriticalThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alarm Threshold voltage of the transceiver in Volts.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 9 }
+
+        cmmTransVoltAlertThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alert Threshold voltage of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 10 }
+
+        cmmTransVoltAlertThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alert Threshold voltage of the transceiver.
+             This is common across channels for a transceiver.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 11 }
+
+        cmmTransLaserBiasCurrent  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 mA"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Internally measured TX Bias Current in Channel of transceiver
+            '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 12 }
+
+        cmmTransLaserBiasCurrCriticalThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 mA"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alarm Threshold of Laser Bias Current per channel.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 13 }
+
+        cmmTransLaserBiasCurrCriticalThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 mA"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alarm Threshold of Laser Bias Current per channel.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 14 }
+
+        cmmTransLaserBiasCurrAlertThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 mA"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alert Threshold of Laser Bias Current per channel.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 15 }
+
+        cmmTransLaserBiasCurrAlertThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 mA"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alert Threshold of Laser Bias Current per channel.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 16 }
+
+        cmmTransTxPower  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Measured TX output power in Channel of transceiver.
+            '-100000' value represents no power.
+            '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 17 }
+
+        cmmTransTxPowerCriticalThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alarm Threshold of TxOutput Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 18 }
+
+        cmmTransTxPowerCriticalThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alarm Threshold of TxOutput Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 19 }
+
+        cmmTransTxPowerAlertThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alert Threshold of TxOutput Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 20 }
+
+        cmmTransTxPowerAlertThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alert Threshold of TxOutput Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 21 }
+
+        cmmTransRxPower  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Measured RX input power in Channel of transceiver
+            '-100000' value represents no power in the transceiver.
+            '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 22 }
+
+        cmmTransRxPowerCriticalThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alarm Threshold value of Rx Input Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 23 }
+
+        cmmTransRxPowerCriticalThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alarm Threshold value of Rx Input Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 24 }
+
+        cmmTransRxPowerAlertThresholdMin  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Min Alert Threshold value of Rx Input Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 25 }
+
+        cmmTransRxPowerAlertThresholdMax  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 dBm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Max Alert Threshold value of Rx Input Power per channel.
+             '-100000' value represents no power.
+             '-100001' indicates unavailable"
+        ::= { cmmTransDDMEntry 26 }
+
+
+        cmmTransTxPowerSupported  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               supported(1),
+                               unsupported(2),
+                               notapplicable(3),
+                               unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver TxPower Support"
+        ::= { cmmTransDDMEntry 27 }
+
+        cmmTransRxPowerSupported  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               supported(1),
+                               unsupported(2),
+                               notapplicable(3),
+                               unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver RxPower Support"
+        ::= { cmmTransDDMEntry 28 }
+
+        cmmTransDDMStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                active(1),
+                                activeunsupported(2),
+                                inactive(3),
+                                inactiveunsupported(4),
+                                notapplicable(5),
+                                unknown(6)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver DDM Status"
+        ::= { cmmTransDDMEntry 29 }
+
+        cmmTransTxState  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               enable(1),
+                               disable(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver TX State"
+        ::= { cmmTransDDMEntry 30 }
+
+        cmmTransRxLosState  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               enable(1),
+                               disable(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver RX Los State"
+        ::= { cmmTransDDMEntry 31 }
+
+        cmmTransTxLosState  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               enable(1),
+                               disable(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver TX Los State (applicable only for QSFP).
+            '-100002' indicates not-applicable."
+        ::= { cmmTransDDMEntry 32 }
+
+       cmmTransResetState  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               normal(1),
+                               reset(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver Reset State (applicable only for QSFP).
+            '-100002' indicates not-applicable."
+        ::= { cmmTransDDMEntry 33 }
+
+        cmmTransPowerMode  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                               low(1),
+                               high(2),
+                               unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Transceiver Power mode (applicable only for QSFP).
+            '-100002' indicates not-applicable."
+        ::= { cmmTransDDMEntry 34 }
+
+    -- ### Ram Table
+
+     cmmSysRamTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmSysRamEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "An entry containing RAM related information of the Unit."
+     ::= { cmmSysObjects 4 }
+
+       cmmSysRamEntry OBJECT-TYPE
+       SYNTAX        CmmSysRamEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "An entry containing RAM related information of the Unit."
+       INDEX    { cmmStackUnitIndex }
+       ::= { cmmSysRamTable 1 }
+
+     CmmSysRamEntry    ::=
+       SEQUENCE {
+          cmmSysRamTotalMem            INTEGER,
+          cmmSysRamUsedMem             INTEGER,
+          cmmSysRamFreeMem             INTEGER,
+          cmmSysRamCriticalThreshold   INTEGER,
+          cmmSysRamAlertThreshold      INTEGER
+         }
+
+        cmmSysRamTotalMem  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " MBytes "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total RAM available in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysRamEntry 1 }
+
+        cmmSysRamUsedMem  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Used RAM in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysRamEntry 2 }
+
+        cmmSysRamFreeMem  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Free RAM available in this unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysRamEntry 3 }
+
+        cmmSysRamCriticalThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "RAM usage threshold % for Critical level.
+             '-100001' indicates unavailable"
+        ::= { cmmSysRamEntry 4 }
+
+        cmmSysRamAlertThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "RAM usage threshold % for Alert level.
+             '-100001' indicates unavailable"
+        ::= { cmmSysRamEntry 5 }
+
+    -- ### cmmStackCpuTable
+
+       cmmStackCpuTable    OBJECT-TYPE
+       SYNTAX        SEQUENCE OF CmmStackCpuEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "An entry containing cpu load information."
+       ::= { cmmSysObjects 5 }
+
+       cmmStackCpuEntry OBJECT-TYPE
+       SYNTAX        CmmStackCpuEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "An entry containing cpu load information."
+       INDEX    { cmmStackUnitIndex }
+       ::= { cmmStackCpuTable 1 }
+
+     CmmStackCpuEntry    ::=
+       SEQUENCE {
+          cmmStackUnitNumCpuProcessor               INTEGER,
+          cmmStackUnitCpuLoad1Min                   INTEGER,
+          cmmStackUnitCpuLoad5Min                   INTEGER,
+          cmmStackUnitCpuLoad15Min                  INTEGER,
+          cmmStackCpuLoad1minAlertThreshold         INTEGER,
+          cmmStackCpuLoad1minCriticalThreshold      INTEGER,
+          cmmStackCpuLoad5minCriticalThreshold      INTEGER,
+          cmmStackCpuLoad15minCriticalThreshold     INTEGER,
+          cmmStackUnitCpuUtilization                INTEGER,
+          cmmStackUnitCpuUtilAlertThreshold         INTEGER,
+          cmmStackUnitCpuUtilCriticalThreshold      INTEGER
+         }
+
+        cmmStackUnitNumCpuProcessor  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of Online Processors Available.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 1 }
+
+        cmmStackUnitCpuLoad1Min  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "CPU Load in percentage for last 1 minute.
+              '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 2 }
+
+        cmmStackUnitCpuLoad5Min  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU Load in percentage for last 5 minutes.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 3 }
+
+        cmmStackUnitCpuLoad15Min  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPU Load in percentage for last 15 minutes.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 4 }
+
+        cmmStackCpuLoad1minAlertThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU Alert Threshold percentage value for 1 min load.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 5 }
+
+        cmmStackCpuLoad1minCriticalThreshold OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU Critical Threshold percentage value for 1 min load.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 6 }
+
+        cmmStackCpuLoad5minCriticalThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU Threshold percentage value for 5 min load.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 7 }
+
+        cmmStackCpuLoad15minCriticalThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU Threshold percentage value for 15 min load.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 8 }
+
+       cmmStackUnitCpuUtilization  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+          "CPU Utilization at this instance in percentage for this unit.
+           '-100001' indicates unavailable"
+        ::= {cmmStackCpuEntry 9 }
+
+        cmmStackUnitCpuUtilAlertThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU utilization Alert Threshold %.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 10 }
+
+        cmmStackUnitCpuUtilCriticalThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The CPU utilization Critical Threshold %.
+             '-100001' indicates unavailable"
+        ::= { cmmStackCpuEntry 11 }
+
+    -- ### Power Supply Table
+
+   cmmSysPowerSupplyTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmSysPowerSupplyEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+           "A power supply entry containing objects for a
+           particular power supply Unit."
+     ::= { cmmSysObjects 6 }
+
+     cmmSysPowerSupplyEntry    OBJECT-TYPE
+       SYNTAX        CmmSysPowerSupplyEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "A power supply entry containing objects for a
+           particular power supply Unit."
+       INDEX    { cmmStackUnitIndex,
+                  cmmSysPSUIndex }
+       ::= { cmmSysPowerSupplyTable 1 }
+
+     CmmSysPowerSupplyEntry    ::=
+       SEQUENCE {
+          cmmSysPSUIndex               INTEGER,
+          cmmSysPowerSupplyOperStatus  INTEGER,
+          cmmSysPowerSupplyType        INTEGER,
+          cmmSysHotSwapStat            INTEGER,
+          cmmSysPSConsumption          INTEGER,
+          cmmSysInputPower             INTEGER,
+          cmmSysInputVoltage           INTEGER,
+          cmmSysOutputVoltage          INTEGER,
+          cmmSysInputCurrent           INTEGER,
+          cmmSysOutputCurrent          INTEGER,
+          cmmSysPSTemperature1         INTEGER,
+          cmmSysPSTemperature2         INTEGER,
+          cmmSysPSFan1Rpm              INTEGER,
+          cmmSysPSFan2Rpm              INTEGER,
+          cmmSysPS12VPg                INTEGER,
+          cmmSysPSAcAlert              INTEGER,
+          cmmSysPSParamsSupport        BITS
+       }
+
+        cmmSysPSUIndex    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unique index of the power supply."
+        ::= { cmmSysPowerSupplyEntry 1 }
+
+       cmmSysPowerSupplyOperStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              notpresent(1),
+                              running(2),
+                              faulty(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of the power supply."
+        ::= { cmmSysPowerSupplyEntry 2 }
+
+       cmmSysPowerSupplyType    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            ac-normal(1),
+                            ac-reverse(2),
+                            dc-normal(3),
+                            dc-reverse(4),
+                            unknown(5),
+                            notapplicable(6)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the power supply."
+        ::= { cmmSysPowerSupplyEntry 3 }
+
+
+       cmmSysHotSwapStat    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status for HOT SWAP."
+        ::= { cmmSysPowerSupplyEntry 4 }
+
+        cmmSysPSConsumption    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 W"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Output Power of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 5 }
+
+        cmmSysInputPower    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 W"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Input Power of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 6 }
+
+        cmmSysInputVoltage    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Input Voltage of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 7 }
+
+        cmmSysOutputVoltage    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 V"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Output Voltage of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 8 }
+
+        cmmSysInputCurrent    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 A"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Input Current of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 9 }
+
+        cmmSysOutputCurrent    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 A"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Output Current of Power supply.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 10 }
+
+        cmmSysPSTemperature1    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Temperature of Power supply sensor 1.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 11 }
+
+        cmmSysPSTemperature2    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Temperature of Power supply sensor 2.
+             '-100001' indicates unavailable"
+        ::= { cmmSysPowerSupplyEntry 12 }
+
+        cmmSysPSFan1Rpm    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fan1 rpm of Power supply.
+            '-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmSysPowerSupplyEntry 13 }
+
+        cmmSysPSFan2Rpm    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fan2 rpm of Power supply.
+            '-100001' indicates unavailable
+            '-100002' indicates not-applicable."
+        ::= { cmmSysPowerSupplyEntry 14 }
+
+       cmmSysPS12VPg  OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Output Power"
+        ::= { cmmSysPowerSupplyEntry 15 }
+
+       cmmSysPSAcAlert  OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Input Power"
+        ::= { cmmSysPowerSupplyEntry 16 }
+
+       cmmSysPSParamsSupport  OBJECT-TYPE
+        SYNTAX        BITS   {
+                        volt-in(0),
+                        volt-out(1),
+                        curr-in(2),
+                        curr-out(3),
+                        power-in(4),
+                        power-out(5),
+                        temp-1(6),
+                        temp-2(7),
+                        fan-1(8),
+                        fan-2(9)
+                        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Bitmap of supported paramaters of PSU Unit.
+             0 - not supported (values only for information)
+             1 - supported (values can be used for monitoring)
+             Blank indicates unavailable."
+        ::= { cmmSysPowerSupplyEntry 17 }
+
+    -- ## Power Rail Table
+
+   cmmSysPowerRailTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmSysPowerRailEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+           "An entry containing objects for power rails in the unit."
+     ::= { cmmSysObjects 7 }
+
+     cmmSysPowerRailEntry    OBJECT-TYPE
+       SYNTAX        CmmSysPowerRailEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "An entry containing objects for power rails in the unit."
+       INDEX    { cmmStackUnitIndex }
+       ::= { cmmSysPowerRailTable 1 }
+
+      CmmSysPowerRailEntry    ::=
+        SEQUENCE {
+          cmmSysPOWERVDDR              INTEGER,
+          cmmSysPOWERCORE              INTEGER,
+          cmmSysV1P1POWERRAIL          INTEGER,
+          cmmSysMAINBOARDPOWERRAIL     INTEGER,
+          cmmSysV1P05POWERRAIL         INTEGER,
+          cmmSysV1P5POWERRAIL          INTEGER,
+          cmmSysVCCPOWERRAIL           INTEGER,
+          cmmSysSBV1P5POWERRAIL        INTEGER,
+          cmmSysV1P0POWERRAIL          INTEGER,
+          cmmSysV3P3POWERRAIL          INTEGER,
+          cmmSysV1P8POWERRAIL          INTEGER,
+          cmmSysV1P35POWERRAIL         INTEGER,
+          cmmSysVCC5V                  INTEGER,
+          cmmSysVCC33V                 INTEGER,
+          cmmSysVCCMAC1V               INTEGER,
+          cmmSysVCCMACAVS1V            INTEGER,
+          cmmSysVCCV1P05               INTEGER,
+          cmmSysVCCV1P5                INTEGER,
+          cmmSysVCCV1P8                INTEGER,
+          cmmSysVCCAVS1V               INTEGER,
+          cmmSysDDRVTT                 INTEGER
+          }
+
+        cmmSysPOWERVDDR    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power statistics for VCC 3.3v on Main board."
+        ::= { cmmSysPowerRailEntry 1 }
+
+       cmmSysPOWERCORE    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power statistics for Mac 1v on Main board."
+        ::= { cmmSysPowerRailEntry 2 }
+
+       cmmSysV1P1POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power statistics for Mac AVS 1v on Main board."
+        ::= { cmmSysPowerRailEntry 3 }
+
+       cmmSysMAINBOARDPOWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status  for Main Board."
+        ::= { cmmSysPowerRailEntry 4 }
+
+       cmmSysV1P05POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of V1P05POWERRAIL."
+        ::= { cmmSysPowerRailEntry 5 }
+
+       cmmSysV1P5POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of V1P5POWERRAIL."
+        ::= { cmmSysPowerRailEntry 6 }
+
+       cmmSysVCCPOWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCCPOWERRAIL."
+        ::= { cmmSysPowerRailEntry 7 }
+
+       cmmSysSBV1P5POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of SBV1P5POWERRAIL."
+        ::= { cmmSysPowerRailEntry 8 }
+
+       cmmSysV1P0POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power rail 1.0V Status."
+        ::= { cmmSysPowerRailEntry 9 }
+
+       cmmSysV3P3POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power rail 3.3V Status."
+        ::= { cmmSysPowerRailEntry 10 }
+
+       cmmSysV1P8POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power rail 1.8V Status."
+        ::= { cmmSysPowerRailEntry 11 }
+
+       cmmSysV1P35POWERRAIL    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power Rail 1.35 Status."
+        ::= { cmmSysPowerRailEntry 12 }
+
+       cmmSysVCC5V    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCC 5V."
+        ::= { cmmSysPowerRailEntry 13 }
+
+       cmmSysVCC33V    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCC 33 V."
+        ::= { cmmSysPowerRailEntry 14 }
+
+       cmmSysVCCMAC1V    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCCMAC1V."
+        ::= { cmmSysPowerRailEntry 15 }
+
+       cmmSysVCCMACAVS1V    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCCMACAVS1V."
+        ::= { cmmSysPowerRailEntry 16 }
+
+       cmmSysVCCV1P05    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power Status of VCCV1P05."
+        ::= { cmmSysPowerRailEntry 17 }
+
+       cmmSysVCCV1P5    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power Status of VCCV1P5."
+        ::= { cmmSysPowerRailEntry 18 }
+
+       cmmSysVCCV1P8    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCCV1P8."
+        ::= { cmmSysPowerRailEntry 19 }
+
+       cmmSysVCCAVS1V    OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power status of VCCAVS1V."
+        ::= { cmmSysPowerRailEntry 20 }
+
+        cmmSysDDRVTT   OBJECT-TYPE
+        SYNTAX        INTEGER{
+                             good(1),
+                             fail(2),
+                             unknown(3),
+                             notapplicable(4)
+                             }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Power statistics for VCC 5v on Main board."
+        ::= { cmmSysPowerRailEntry 21 }
+
+    -- ## Fan Tray Table
+
+       cmmFanTrayTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmFanTrayEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A Fan Tray entry containing information of fan tray."
+        ::= { cmmSysObjects 8 }
+
+      cmmFanTrayEntry    OBJECT-TYPE
+        SYNTAX        CmmFanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A Fan Tray entry containing information of fan tray."
+        INDEX    { cmmStackUnitIndex,
+                   cmmFanTrayNumber
+                   }
+        ::= { cmmFanTrayTable 1 }
+
+      CmmFanTrayEntry    ::=
+        SEQUENCE {
+           cmmFanTrayNumber       INTEGER,
+           cmmFanTrayStatus       INTEGER,
+           cmmFanTrayLedColor     LedColorCode
+        }
+
+       cmmFanTrayNumber    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the fan tray Number."
+        ::= { cmmFanTrayEntry 1 }
+
+        cmmFanTrayStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              notpresent(1),
+                              present(2),
+                              unknown(3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the fan tray status."
+        ::= { cmmFanTrayEntry 2 }
+
+
+        cmmFanTrayLedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the fan led."
+        ::= { cmmFanTrayEntry 3 }
+
+    -- ## Fan Entry in FanTray Table
+
+       cmmFanTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmFanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A fan entry containing objects for a particular fan in a fan tray."
+        ::= { cmmSysObjects 9 }
+
+      cmmFanEntry    OBJECT-TYPE
+        SYNTAX        CmmFanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A fan entry containing objects for a particular fan in a fan tray."
+        INDEX    { cmmStackUnitIndex,
+                   cmmFanTrayNumber,
+                   cmmFanIndex }
+        ::= { cmmFanTable 1 }
+
+      CmmFanEntry    ::=
+        SEQUENCE {
+           cmmFanIndex            INTEGER,
+           cmmFanRpm              INTEGER,
+           cmmFanRpmMin           INTEGER,
+           cmmFanRpmMax           INTEGER,
+           cmmFanStatus           INTEGER,
+           cmmFanLocation         INTEGER
+        }
+
+       cmmFanIndex    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Index of the fan per fantray."
+        ::= { cmmFanEntry 1 }
+
+       cmmFanRpm    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the fan rpm.
+             '-100001' indicates unavailable"
+        ::= { cmmFanEntry 2 }
+
+       cmmFanRpmMin    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the minimum supported RPM of fan.
+             '-100001' indicates unavailable"
+        ::= { cmmFanEntry 3 }
+
+       cmmFanRpmMax    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the maximum supported RPM of fan.
+             '-100001' indicates unavailable"
+        ::= { cmmFanEntry 4 }
+
+       cmmFanStatus    OBJECT-TYPE
+       SYNTAX        INTEGER {
+                             notpresent(1),
+                             running(2),
+                             faulty(3),
+                             stalled(4),
+                             unknown(5)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the fan."
+        ::= { cmmFanEntry 5 }
+
+       cmmFanLocation    OBJECT-TYPE
+       SYNTAX        INTEGER {
+                             front(1),
+                             rear(2),
+                             unknown(3),
+                             not-applicable(4)
+                             }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The location of fan in tray"
+        ::= { cmmFanEntry 6 }
+
+-- ## Stack Temperature Table
+        cmmSysTemperatureTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSysTemperatureEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A temperature entry containing objects related to particular temperature sensor"
+        ::= { cmmSysObjects 10 }
+
+      cmmSysTemperatureEntry  OBJECT-TYPE 
+        SYNTAX        CmmSysTemperatureEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A temperature entry containing objects related to particular temperature sensor"
+        INDEX    { cmmStackUnitIndex,
+                   cmmSysTemperatureSensorIndex }
+        ::= { cmmSysTemperatureTable 1 }
+
+      CmmSysTemperatureEntry    ::=
+        SEQUENCE {
+          cmmSysTemperatureSensorIndex       INTEGER,
+          cmmSysTemperatureSensorName        DisplayString,
+          cmmSysTemperatureValue             INTEGER,
+          cmmSysTempEmergencyThresholdMin    INTEGER,
+          cmmSysTempEmergencyThresholdMax    INTEGER,
+          cmmSysTempAlertThresholdMin        INTEGER,
+          cmmSysTempAlertThresholdMax        INTEGER,
+          cmmSysTempCriticalThresholdMin     INTEGER,
+          cmmSysTempCriticalThresholdMax     INTEGER
+        }
+
+        cmmSysTemperatureSensorIndex    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Index"
+        ::= { cmmSysTemperatureEntry 1 }
+
+        cmmSysTemperatureSensorName    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Temperature Sensor Name.
+             Blank indicates unavailable"
+        ::= { cmmSysTemperatureEntry 2 }
+
+        cmmSysTemperatureValue    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor value. 
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 3 }
+
+        cmmSysTempEmergencyThresholdMin    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Min Emergency threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 4 }
+
+        cmmSysTempEmergencyThresholdMax    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Max Emergency threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 5 }
+
+        cmmSysTempAlertThresholdMin    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Min Alert threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 6 }
+ 
+        cmmSysTempAlertThresholdMax    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Max Alert threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 7 }
+
+        cmmSysTempCriticalThresholdMin   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Min Critical threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 8 }
+
+        cmmSysTempCriticalThresholdMax   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Sensor Max Critical threshold.
+             '-100001' indicates unavailable"
+        ::= { cmmSysTemperatureEntry 9 }
+
+-- ## Component Status Table
+        cmmSysComponentStatusTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSysComponentStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing each component status in the Unit."
+        ::= { cmmSysObjects 11 }
+
+      cmmSysComponentStatusEntry  OBJECT-TYPE
+        SYNTAX        CmmSysComponentStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing each component status in the Unit."
+        INDEX    { cmmStackUnitIndex }
+        ::= { cmmSysComponentStatusTable 1 }
+
+      CmmSysComponentStatusEntry    ::=
+        SEQUENCE {
+          cmmSysPsu1Status           INTEGER,
+          cmmSysPsu1LedColor         LedColorCode,
+          cmmSysPsu2Status           INTEGER,
+          cmmSysPsu2LedColor         LedColorCode,
+          cmmSysLocatorLedStatus     INTEGER,
+          cmmSysLocatorLedColor      LedColorCode,
+          cmmSysMasterLedStatus      INTEGER,
+          cmmSysMasterLedColor       LedColorCode,
+          cmmSysFanStatus            INTEGER,
+          cmmSysFrontFanLedColor     LedColorCode, 
+          cmmSysRamStatus            INTEGER,
+          cmmSysCpuStatus            INTEGER,
+          cmmSysDiskStatus           INTEGER,
+          cmmSysTemperatureStatus    INTEGER
+        }
+
+        cmmSysPsu1Status    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of PSU1."
+        ::= { cmmSysComponentStatusEntry 1 }
+
+        cmmSysPsu1LedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the power led of PSU1."
+        ::= { cmmSysComponentStatusEntry 2 }
+
+        cmmSysPsu2Status    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of PSU2."
+        ::= { cmmSysComponentStatusEntry 3 }
+
+        cmmSysPsu2LedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the power led of PSU2."
+        ::= { cmmSysComponentStatusEntry 4 }
+
+        cmmSysLocatorLedStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              notpresent(1),
+                              on(2),
+                              off(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Locater led."
+        ::= { cmmSysComponentStatusEntry 5 }
+
+        cmmSysLocatorLedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the Locator led."
+        ::= { cmmSysComponentStatusEntry 6 }
+
+        cmmSysMasterLedStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              notpresent(1),
+                              on(2),
+                              off(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Master led."
+        ::= { cmmSysComponentStatusEntry 7 }
+
+        cmmSysMasterLedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the master led."
+        ::= { cmmSysComponentStatusEntry 8 }
+
+        cmmSysFanStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Overall Status of Fans in the Unit."
+        ::= { cmmSysComponentStatusEntry 9 }
+
+        cmmSysFrontFanLedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the Front Fan led."
+        ::= { cmmSysComponentStatusEntry 10 }
+
+        cmmSysRamStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of RAM in the unit."
+        ::= { cmmSysComponentStatusEntry 11 }
+
+        cmmSysCpuStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of CPU in the unit."
+        ::= { cmmSysComponentStatusEntry 12 }
+
+        cmmSysDiskStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Disk in the unit."
+        ::= { cmmSysComponentStatusEntry 13 }
+
+        cmmSysTemperatureStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1),
+                              minor-fault(2),
+                              major-fault(3),
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Status of Temperature sensors in the unit."
+        ::= { cmmSysComponentStatusEntry 14 }
+
+    -- ## Software Module Table 
+
+       cmmSysSwModuleTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Software module information" 
+        ::= { cmmSysObjects 12 }
+
+      cmmSysSwModuleEntry    OBJECT-TYPE 
+        SYNTAX        CmmSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Software module information" 
+        INDEX    { cmmStackUnitIndex }
+        ::= { cmmSysSwModuleTable 1 }
+
+      CmmSysSwModuleEntry    ::=
+        SEQUENCE {
+           cmmSysSwRuntimeImgVersion     DisplayString,
+           cmmSysSwRuntimeImgDate        DateAndTime
+        }
+
+       cmmSysSwRuntimeImgVersion    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This variable indicates the software 
+            module version that is currently
+            running on the unit.  
+            The software release version is in 
+            the format as follow:
+            <major version>.<minor version>.<minor 
+            version>......
+            '1.2' indicate major version of 1 and
+            minor release of 2.
+            Blank indicates unavailable"
+        ::= { cmmSysSwModuleEntry 1 }
+
+       cmmSysSwRuntimeImgDate    OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The release date of this software module.
+             Blank indicates unavailable"
+        ::= { cmmSysSwModuleEntry 2 }
+
+-- ## Switching Chip Temperature Table
+        cmmSwitchTemperatureTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSwitchTemperatureEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A temperature entry containing objects related to particular temp monitor in switching chip"
+        ::= { cmmSysObjects 13 }
+
+      cmmSwitchTemperatureEntry  OBJECT-TYPE
+        SYNTAX        CmmSwitchTemperatureEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A temperature entry containing objects related to particular temp monitor in switching chip"
+        INDEX    { cmmStackUnitIndex,
+                   cmmSwitchTemperatureSensorIndex }
+        ::= { cmmSwitchTemperatureTable 1 }
+
+      CmmSwitchTemperatureEntry    ::=
+        SEQUENCE {
+          cmmSwitchTemperatureSensorIndex  INTEGER,
+          cmmSwitchTemperatureValue        INTEGER,
+          cmmSwitchTempPeakValue           INTEGER
+        }
+
+        cmmSwitchTemperatureSensorIndex    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature Monitor Index inside chip.
+             '-100001' indicates unavailable"
+        ::= { cmmSwitchTemperatureEntry 1 }
+
+        cmmSwitchTemperatureValue    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature monitor value.
+             '-100001' indicates unavailable"
+        ::= { cmmSwitchTemperatureEntry 2 }
+
+        cmmSwitchTempPeakValue    OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 C"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents Temperature monitor peak value since last reading.
+             '-100001' indicates unavailable"
+        ::= { cmmSwitchTemperatureEntry 3 }
+
+
+-- ## Hard disk Table
+        cmmSysHardDiskTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSysHardDiskEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing Hard disk information of the Unit."
+        ::= { cmmSysObjects 14 }
+
+      cmmSysHardDiskEntry  OBJECT-TYPE
+        SYNTAX        CmmSysHardDiskEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing Hard disk information of the Unit."
+        INDEX    { cmmStackUnitIndex }
+        ::= { cmmSysHardDiskTable 1 }
+
+      CmmSysHardDiskEntry    ::=
+        SEQUENCE {
+          cmmSysHarddiskSerialno                  DisplayString,
+          cmmSysHarddiskModelno                   DisplayString,
+          cmmSysHarddiskFirmwarerev               DisplayString,
+          cmmSysHarddiskCylinders                 INTEGER,
+          cmmSysHarddiskHeads                     INTEGER,
+          cmmSysHarddiskSectors                   INTEGER,
+          cmmSysHarddiskUnformattedBytesorTrack   INTEGER,
+          cmmSysHarddiskUnformattedBytesorSector  INTEGER,
+          cmmSysHarddiskRevisionNum               DisplayString,
+          cmmSysHarddiskTotalsize                 INTEGER, 
+          cmmSysHarddiskUsedMem                   INTEGER,
+          cmmSysHarddiskFreeMem                   INTEGER,
+          cmmSysHarddiskCriticalThreshold         INTEGER,
+          cmmSysHarddiskAlertThreshold            INTEGER
+        }
+
+        cmmSysHarddiskSerialno    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's serial number.
+             Blank indicates unavailable"
+        ::= { cmmSysHardDiskEntry 1 }
+
+        cmmSysHarddiskModelno    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's model number.
+             Blank indicates unavailable"
+        ::= { cmmSysHardDiskEntry 2 }
+
+        cmmSysHarddiskFirmwarerev    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's firmware revision.
+             Blank indicates unavailable"
+        ::= { cmmSysHardDiskEntry 3 }
+
+        cmmSysHarddiskCylinders    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's Cylinder unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 4 }
+
+        cmmSysHarddiskHeads    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's Head unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 5 }
+
+        cmmSysHarddiskSectors    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's Sector unit.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 6 }
+
+        cmmSysHarddiskUnformattedBytesorTrack    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's unformated bytes or track.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 7 }
+
+        cmmSysHarddiskUnformattedBytesorSector    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's unformated bytes or sectors.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 8 }
+
+        cmmSysHarddiskRevisionNum    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Hard disk's Revision number.
+             Blank indicates unavailable"
+        ::= { cmmSysHardDiskEntry 9 }
+
+        cmmSysHarddiskTotalsize    OBJECT-TYPE
+        SYNTAX        INTEGER 
+        UNITS         " MBytes "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total memory of the Hard disk.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 10 }
+
+        cmmSysHarddiskUsedMem  OBJECT-TYPE
+        SYNTAX        INTEGER 
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Used Memory in the Hard disk.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 11 }
+
+        cmmSysHarddiskFreeMem  OBJECT-TYPE
+        SYNTAX        INTEGER 
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Free Memory in the Hard disk.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 12 }
+
+        cmmSysHarddiskCriticalThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER 
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Harddisk usage threshold %  for Critical Level.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 13 }
+
+        cmmSysHarddiskAlertThreshold  OBJECT-TYPE
+        SYNTAX        INTEGER 
+        UNITS         " % "
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Harddisk usage threshold %  for Alert Level.
+             '-100001' indicates unavailable"
+        ::= { cmmSysHardDiskEntry 14 }
+
+-- ## System Overall Status Table
+        cmmSystemStatusTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSystemStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A Table containing overall system status of the Unit."
+        ::= { cmmSysObjects 15 }
+
+      cmmSystemStatusEntry  OBJECT-TYPE
+        SYNTAX        CmmSystemStatusEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing component status and overall system status of the Unit."
+        INDEX    { cmmStackUnitIndex }
+        ::= { cmmSystemStatusTable 1 }
+
+      CmmSystemStatusEntry    ::=
+        SEQUENCE {
+               cmmSystemMinorFaultStatus SystemStatusCode,
+               cmmSystemMajorFaultStatus SystemStatusCode,
+               cmmSysStatus              INTEGER,
+               cmmSysLedColor            LedColorCode
+                }
+
+        cmmSystemMinorFaultStatus OBJECT-TYPE
+        SYNTAX        SystemStatusCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "overall Alert status caused by individual components in the unit."
+        ::= { cmmSystemStatusEntry 1 }
+
+        cmmSystemMajorFaultStatus OBJECT-TYPE
+        SYNTAX        SystemStatusCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "overall Critical status caused by individual components in the unit."
+        ::= { cmmSystemStatusEntry 2 }
+
+        cmmSysStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              normal(1), -- self diagnostics test is success
+                              minor-fault(2), -- minor system fault
+                              major-fault(3), -- major system fault
+                              unknown(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Overall Status/Health of System."
+        ::= { cmmSystemStatusEntry 3 }
+
+        cmmSysLedColor    OBJECT-TYPE
+        SYNTAX        LedColorCode
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Value represents the Color of the system led."
+        ::= { cmmSystemStatusEntry 4 }
+
+-- CPU per core utilisation table 
+
+        cmmCpuCoreUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmCpuCoreUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing cpu utilisation information."
+        ::= { cmmSysObjects 16 }
+
+      cmmCpuCoreUtilEntry  OBJECT-TYPE
+        SYNTAX        CmmCpuCoreUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry containing cpu utilisation information."
+        INDEX    { cmmStackUnitIndex, cmmCpuCoreIndex }
+        ::= { cmmCpuCoreUtilTable 1 }
+
+      CmmCpuCoreUtilEntry ::=
+        SEQUENCE {
+               cmmCpuCoreIndex                        INTEGER,
+               cmmCpuCoreUtilization                  INTEGER,
+               cmmCpuCoreModelName                    DisplayString
+                }
+
+        cmmCpuCoreIndex  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Cpu Core number."
+        ::= { cmmCpuCoreUtilEntry 1 }
+
+        cmmCpuCoreUtilization   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.01 %"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Cpu Utilization per core."
+        ::= { cmmCpuCoreUtilEntry 2 }
+
+        cmmCpuCoreModelName  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "Displays CPU processor Model Name.
+              Blank indicates unavailable"
+        ::= { cmmCpuCoreUtilEntry 3 }
+
+    -- ### Psu Fru Table
+
+   cmmPsuFruTable    OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CmmPsuFruEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "A psu fru entry containing objects
+            for PSU inventory information"
+     ::= { cmmSysObjects 17 }
+
+     cmmPsuFruEntry    OBJECT-TYPE
+       SYNTAX          CmmPsuFruEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A psu fru entry containing objects for a
+           particular power supply Unit."
+       INDEX    { cmmStackUnitIndex, cmmSysPSUIndex }
+       ::= { cmmPsuFruTable 1 }
+
+     CmmPsuFruEntry    ::=
+       SEQUENCE {
+          cmmPsuPpid                   DisplayString,
+          cmmPsuCountryofOrigin        DisplayString,
+          cmmPsuPpidPartNum            DisplayString,
+          cmmPsuPpidPartNumRev         DisplayString,
+          cmmPsuManufactureId          DisplayString,
+          cmmPsuDateCode               OCTET STRING,
+          cmmPsuSerialNumber           DisplayString,
+          cmmPsuPartNum                DisplayString,
+          cmmPsuPartNumRev             DisplayString,
+          cmmPsuNumOfFanPerTray        INTEGER,
+          cmmPsuType                   INTEGER,
+          cmmPsuServiceTag             DisplayString,
+          cmmPsuIanaNum                DisplayString,
+          cmmPsuFanMaxRpm              INTEGER,
+          cmmPsuAirFlowDir             DisplayString,
+          cmmPsuMaxOutputWatt          INTEGER
+       }
+
+        cmmPsuPpid     OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The unique ppid of the power supply.
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 1 }
+
+        cmmPsuCountryofOrigin     OBJECT-TYPE
+        SYNTAX                    DisplayString
+        MAX-ACCESS                read-only
+        STATUS                    current
+        DESCRIPTION
+            "Country of Origin
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 2 }
+
+        cmmPsuPpidPartNum     OBJECT-TYPE
+        SYNTAX                DisplayString
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+            "PPID Part Number
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 3 }
+
+        cmmPsuPpidPartNumRev     OBJECT-TYPE
+        SYNTAX                   DisplayString
+        MAX-ACCESS               read-only
+        STATUS                   current
+        DESCRIPTION
+            "PPID Part Number Rev
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 4 }
+
+        cmmPsuManufactureId      OBJECT-TYPE
+        SYNTAX                   DisplayString
+        MAX-ACCESS               read-only
+        STATUS                   current
+        DESCRIPTION
+            "Manufacturer ID
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 5 }
+
+        cmmPsuDateCode     OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (8 | 11))
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+            "Date Code
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 6 }
+
+        cmmPsuSerialNumber     OBJECT-TYPE
+        SYNTAX                 DisplayString
+        MAX-ACCESS             read-only
+        STATUS                 current
+        DESCRIPTION
+            "Serial Number
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 7 }
+
+        cmmPsuPartNum     OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "Part Number
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 8 }
+
+        cmmPsuPartNumRev     OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "Part Number Revision
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 9 }
+
+        cmmPsuNumOfFanPerTray  OBJECT-TYPE
+        SYNTAX                 INTEGER
+        MAX-ACCESS             read-only
+        STATUS                 current
+        DESCRIPTION
+            "Number of Fans in the tray
+            '-100001' indicates unavailable"
+        ::= { cmmPsuFruEntry 10 }
+
+        cmmPsuType     OBJECT-TYPE
+        SYNTAX         INTEGER {
+                           ac-normal(1),
+                           ac-reverse(2),
+                           dc-normal(3),
+                           dc-reverse(4),
+                           not-applicable(5)
+                               }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "Type of psu"
+        ::= { cmmPsuFruEntry 11 }
+
+        cmmPsuServiceTag     OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "Service Tag
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 12 }
+
+        cmmPsuIanaNum     OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "IANA Number
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 13 }
+
+        cmmPsuFanMaxRpm     OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Max RPM
+            '-100001' indicates unavailable"
+        ::= { cmmPsuFruEntry 14 }
+
+        cmmPsuAirFlowDir     OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "Airflow Direction
+             Blank indicates unavailable"
+        ::= { cmmPsuFruEntry 15 }
+
+        cmmPsuMaxOutputWatt     OBJECT-TYPE
+        SYNTAX                  INTEGER
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+            "Max Output Wattage
+            '-100001' indicates unavailable"
+        ::= { cmmPsuFruEntry 16 }
+
+    -- ### Fan Fru Table
+
+   cmmFanFruTable    OBJECT-TYPE
+     SYNTAX          SEQUENCE OF CmmFanFruEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+           "A fan fru entry containing objects for a
+           particular fantray."
+     ::= { cmmSysObjects 18 }
+
+     cmmFanFruEntry    OBJECT-TYPE
+       SYNTAX          CmmFanFruEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+           "A fan fru entry containing objects for a
+           particular fantray"
+       INDEX    { cmmStackUnitIndex, cmmFanTrayNumber}
+       ::= { cmmFanFruTable 1 }
+
+     CmmFanFruEntry    ::=
+       SEQUENCE {
+          cmmFanPpid                   DisplayString,
+          cmmFanCountryofOrigin        DisplayString,
+          cmmFanPpidPartNum            DisplayString,
+          cmmFanPpidPartNumRev         DisplayString,
+          cmmFanManufactureId          DisplayString,
+          cmmFanDateCode               DisplayString,
+          cmmFanSerialNumber           DisplayString,
+          cmmFanPartNum                DisplayString,
+          cmmFanPartNumRev             DisplayString,
+          cmmFanNumOfFanPerTray        INTEGER,
+          cmmFanType                   INTEGER,
+          cmmFanServiceTag             DisplayString,
+          cmmFanIanaNum                DisplayString,
+          cmmFanMaxRpm                 INTEGER
+       }
+
+        cmmFanPpid     OBJECT-TYPE
+        SYNTAX         DisplayString
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "The unique ppid of the fan tray
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 1 }
+
+        cmmFanCountryofOrigin     OBJECT-TYPE
+        SYNTAX                    DisplayString
+        MAX-ACCESS                read-only
+        STATUS                    current
+        DESCRIPTION
+            "Country of Origin
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 2 }
+
+        cmmFanPpidPartNum     OBJECT-TYPE
+        SYNTAX                DisplayString
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+            "PPID Part Number
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 3 }
+
+        cmmFanPpidPartNumRev     OBJECT-TYPE
+        SYNTAX                   DisplayString
+        MAX-ACCESS               read-only
+        STATUS                   current
+        DESCRIPTION
+            "PPID Part Number Rev
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 4 }
+
+        cmmFanManufactureId      OBJECT-TYPE
+        SYNTAX                   DisplayString
+        MAX-ACCESS               read-only
+        STATUS                   current
+        DESCRIPTION
+            "Manufacturer ID
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 5 }
+
+        cmmFanDateCode     OBJECT-TYPE
+        SYNTAX             DisplayString
+        MAX-ACCESS         read-only
+        STATUS             current
+        DESCRIPTION
+            "Date Code
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 6 }
+
+        cmmFanSerialNumber     OBJECT-TYPE
+        SYNTAX                 DisplayString
+        MAX-ACCESS             read-only
+        STATUS                 current
+        DESCRIPTION
+            "Serial Number
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 7 }
+
+        cmmFanPartNum     OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "Part Number
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 8 }
+
+        cmmFanPartNumRev     OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "Part Number Revision
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 9 }
+
+        cmmFanNumOfFanPerTray  OBJECT-TYPE
+        SYNTAX                 INTEGER
+        MAX-ACCESS             read-only
+        STATUS                 current
+        DESCRIPTION
+            "Number of Fans in the tray
+            '-100001' indicates unavailable"
+        ::= { cmmFanFruEntry 10 }
+
+        cmmFanType     OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               blow-outfan(1),
+                               blow-infan(2),
+                               fan-type-unknown(3)
+                               }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+            "Fan Type"
+        ::= { cmmFanFruEntry 11 }
+
+        cmmFanServiceTag     OBJECT-TYPE
+        SYNTAX               DisplayString
+        MAX-ACCESS           read-only
+        STATUS               current
+        DESCRIPTION
+            "Service Tag
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 12 }
+
+        cmmFanIanaNum     OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "IANA Number
+             Blank indicates unavailable"
+        ::= { cmmFanFruEntry 13 }
+
+        cmmFanMaxRpm     OBJECT-TYPE
+        SYNTAX           INTEGER
+        MAX-ACCESS       read-only
+        STATUS           current
+        DESCRIPTION
+            "Max RPM
+            '-100001' indicates unavailable"
+        ::= { cmmFanFruEntry 14 }
+
+-- ## Stack CPLD Table
+        cmmSysCpldTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmSysCpldEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A cpld entry containing objects related to CPLD versions"
+        ::= { cmmSysObjects 19 }
+
+      cmmSysCpldEntry  OBJECT-TYPE
+        SYNTAX        CmmSysCpldEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A cpld entry containing objects related to CPLD versions"
+        INDEX    { cmmStackUnitIndex,
+                   cmmSysCpldIndex }
+        ::= { cmmSysCpldTable 1 }
+
+      CmmSysCpldEntry    ::=
+        SEQUENCE {
+          cmmSysCpldIndex              INTERGER,
+          cmmSysCpldName               DisplayString,
+          cmmSysCpldSupportedVer       DisplayString,
+          cmmSysCpldCurrentVer         DisplayString
+        }
+
+        cmmSysCpldIndex  OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "Value represents CPLD Index."
+        ::= { cmmSysCpldEntry 1 }
+
+        cmmSysCpldName    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPLD Name.
+             Blank indicates unavailable"
+        ::= { cmmSysCpldEntry 2 }
+
+        cmmSysCpldSupportedVer    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPLD supported version on board.
+             Blank indicates unavailable"
+        ::= { cmmSysCpldEntry 3 }
+
+        cmmSysCpldCurrentVer    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "CPLD current version on board.
+             Blank indicates unavailable"
+        ::= { cmmSysCpldEntry 4 }
+
+
+    --
+    -- ## Notifications 
+    --
+    
+    cmmAlarmVariable             OBJECT IDENTIFIER ::= { cmmAlarmObjects 0 } 
+    cmmAlarmMibNotifications     OBJECT IDENTIFIER ::= { cmmAlarmObjects 1 }  
+    cmmTransMibNotifications     OBJECT IDENTIFIER ::= { cmmAlarmObjects 2 }  
+
+    cmmAlarmVarInteger OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "An generic INTEGER value in the TRAP object"
+    ::= { cmmAlarmVariable 1 }
+   
+    cmmAlarmVarString OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "An generic string value in the TRAP object"
+    ::= { cmmAlarmVariable 2 }
+
+    --
+    -- SYSTEM RELATED TRAPS
+    --
+
+    cmmCpuLoad15MinCritical  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad15minCriticalThreshold,
+                     cmmStackUnitCpuLoad15Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for 15min critical threshold and
+             CPU Utilisation"
+        ::= { cmmAlarmMibNotifications 1 }
+
+    cmmCpuLoad5MinCritical  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad5minCriticalThreshold,
+                     cmmStackUnitCpuLoad5Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for 5min critical threshold and
+             CPU Utilisation"
+        ::= { cmmAlarmMibNotifications 2 }
+
+    cmmCpuLoad1MinAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad1minAlertThreshold,
+                     cmmStackUnitCpuLoad1Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for 1min alert level threshold and 
+             CPU Utilisation"
+        ::= { cmmAlarmMibNotifications 3 }
+
+    cmmCpuLoad1MinCritical  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad1minCriticalThreshold,
+                     cmmStackUnitCpuLoad1Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for 1min critical level threshold and 
+             CPU Utilisation"
+        ::= { cmmAlarmMibNotifications 4 }
+
+    cmmCpuLoad1MinAlertRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad1minAlertThreshold,
+                     cmmStackUnitCpuLoad1Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU usage recovered from Alert Condition"
+        ::= { cmmAlarmMibNotifications 5 }
+
+    cmmCpuLoad15MinCriticalRecovery NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad15minCriticalThreshold,
+                     cmmStackUnitCpuLoad15Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU usage recovered from 15 min Critical Condition"
+        ::= { cmmAlarmMibNotifications 6 }
+
+    cmmCpuLoad5MinCriticalRecovery NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad5minCriticalThreshold,
+                     cmmStackUnitCpuLoad5Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU usage recovered from 5 min Critical Condition"
+        ::= { cmmAlarmMibNotifications 7 }
+
+    cmmCpuLoad1MinCriticalRecovery NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackCpuLoad1minCriticalThreshold,
+                     cmmStackUnitCpuLoad1Min
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU usage recovered from 15 min Critical Condition"
+        ::= { cmmAlarmMibNotifications 8 }
+
+    cmmCpuCoreUtilHighAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackUnitCpuUtilAlertThreshold,
+                     cmmStackUnitCpuUtilization
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU utilization in alert condition."
+        ::= { cmmAlarmMibNotifications 9 }
+
+    cmmCpuCoreUtilHighCritical  NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackUnitCpuUtilCriticalThreshold,
+                     cmmStackUnitCpuUtilization
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU utilization in critical condition."
+        ::= { cmmAlarmMibNotifications 10 }
+
+    cmmCpuCoreUtilHighAlertRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackUnitCpuUtilization
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU utilization after alert recovery."
+        ::= { cmmAlarmMibNotifications 11 }
+
+    cmmCpuCoreUtilHighCriticalRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmStackUnitCpuUtilization
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send information for CPU utilization after critical recovery."
+        ::= { cmmAlarmMibNotifications 12 }
+
+    cmmRamUsageRisingAlert   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysRamUsedMem,
+                      cmmSysRamAlertThreshold
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when RAM usage exceeds Alert Threshold"
+        ::= { cmmAlarmMibNotifications 21 }
+
+    cmmRamUsageRisingCritical   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysRamUsedMem,
+                      cmmSysRamCriticalThreshold 
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when RAM usage exceeds Critical Threshold"
+        ::= { cmmAlarmMibNotifications 22 }
+
+    cmmRamUsageAlertRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysRamUsedMem,
+                      cmmSysRamAlertThreshold
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when RAM usage recovers from Alert Condition"
+        ::= { cmmAlarmMibNotifications 23 }
+
+    cmmRamUsageCriticalRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysRamUsedMem,
+                      cmmSysRamCriticalThreshold
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when RAM usage recovers under Critical threshold."
+        ::= { cmmAlarmMibNotifications 24 }
+
+    cmmHardDiskUsageRisingAlert  NOTIFICATION-TYPE
+        OBJECTS       {
+                      cmmStackUnitIndex,
+                      cmmSysHarddiskUsedMem,
+                      cmmSysHarddiskAlertThreshold 
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when Hard Disk usage exceeds alert threshold."
+        ::= { cmmAlarmMibNotifications 25 }
+
+    cmmHardDiskUsageRisingCritical  NOTIFICATION-TYPE
+        OBJECTS       {
+                      cmmStackUnitIndex,
+                      cmmSysHarddiskUsedMem,
+                      cmmSysHarddiskCriticalThreshold
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when Hard Disk usage exceeds critical threshold."
+        ::= { cmmAlarmMibNotifications 26 }
+
+    cmmHardDiskUsageAlertRecovery  NOTIFICATION-TYPE
+        OBJECTS       {
+                      cmmStackUnitIndex,
+                      cmmSysHarddiskUsedMem,
+                      cmmSysHarddiskAlertThreshold 
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when Hard Disk usage recovers under alert threshold."
+        ::= { cmmAlarmMibNotifications 27 }
+
+    cmmHardDiskUsageCriticalRecovery  NOTIFICATION-TYPE
+        OBJECTS       {
+                      cmmStackUnitIndex,
+                      cmmSysHarddiskUsedMem,
+                      cmmSysHarddiskCriticalThreshold
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Trap to send when Hard Disk usage recovers under critical threshold."
+        ::= { cmmAlarmMibNotifications 28 }
+
+    cmmTemperatureLowEmergency   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempEmergencyThresholdMin,
+                      cmmSysTempEmergencyThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature will be below lower threshold for sensor"
+        ::= { cmmAlarmMibNotifications 31 }
+
+    cmmTemperatureHighEmergency   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempEmergencyThresholdMin,
+                      cmmSysTempEmergencyThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature will be above threshold for sensor"
+        ::= { cmmAlarmMibNotifications 32 }
+
+    cmmTemperatureLowAlert   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempAlertThresholdMin,
+                      cmmSysTempAlertThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is nearing low emergency condition for sensor"
+        ::= { cmmAlarmMibNotifications 33 }
+
+    cmmTemperatureHighAlert   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempAlertThresholdMin,
+                      cmmSysTempAlertThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is nearing high emergency condition for sensor"
+        ::= { cmmAlarmMibNotifications 34 }
+
+    cmmTemperatureLowCritical   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempCriticalThresholdMin,
+                      cmmSysTempCriticalThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature has reached low critical condition for sensor"
+        ::= { cmmAlarmMibNotifications 35 }
+
+    cmmTemperatureHighCritical   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempCriticalThresholdMin,
+                      cmmSysTempCriticalThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature has reached high critical condition for sensor"
+        ::= { cmmAlarmMibNotifications 36 }
+
+    cmmTemperatureHighAlertRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempAlertThresholdMin,
+                      cmmSysTempAlertThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is recovered to normal range from alert level high for sensor"
+        ::= { cmmAlarmMibNotifications 37 }
+
+    cmmTemperatureLowAlertRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempAlertThresholdMin,
+                      cmmSysTempAlertThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is recovered to normal range from alert level low for sensor"
+        ::= { cmmAlarmMibNotifications 38 }
+
+    cmmTemperatureHighCriticalRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempCriticalThresholdMin,
+                      cmmSysTempCriticalThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is recovered to normal range from critical level high for sensor"
+        ::= { cmmAlarmMibNotifications 39 }
+
+    cmmTemperatureLowCriticalRecovery   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysTemperatureSensorIndex,
+                      cmmSysTemperatureValue,
+                      cmmSysTempCriticalThresholdMin,
+                      cmmSysTempCriticalThresholdMax,
+                      cmmSysTemperatureSensorName
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Temperature is recovered to normal range from critical level low for sensor"
+        ::= { cmmAlarmMibNotifications 40 }
+
+    cmmPsuInsertedNotify   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex,
+                      cmmSysPowerSupplyOperStatus,
+                      cmmPsuSerialNumber 
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit is inserted"
+        ::= { cmmAlarmMibNotifications 41 }
+
+    cmmPsuRemovedAlert   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex,
+                      cmmSysPowerSupplyOperStatus,
+                      cmmPsuSerialNumber 
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit is Removed"
+        ::= { cmmAlarmMibNotifications 42 }
+
+    cmmPsuAcFailedAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit has no input power"
+        ::= { cmmAlarmMibNotifications 43 }
+
+    cmmPsuAcRecover  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit input is restored"
+        ::= { cmmAlarmMibNotifications 44 }
+
+    cmmPsu12vPgFailedAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit has no output power"
+        ::= { cmmAlarmMibNotifications 45 }
+
+    cmmPsu12vPgRecover  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmSysPSUIndex
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Power supply unit has restored output"
+        ::= { cmmAlarmMibNotifications 46 }
+
+    cmmFanTrayInsertedNotify   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmFanTrayNumber,
+                      cmmFanSerialNumber
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when fan tray is inserted"
+        ::= { cmmAlarmMibNotifications 51 }
+
+    cmmFanTrayRemovedAlert   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmFanTrayNumber,
+                      cmmFanSerialNumber
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when fan tray is Removed"
+        ::= { cmmAlarmMibNotifications 52 }
+
+    cmmFanTrayFaultyAlert  NOTIFICATION-TYPE
+       OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmFanTrayNumber,
+                     cmmFanIndex
+                    }
+        STATUS       current
+        DESCRIPTION
+            "Set when Given Fan Tray Faulty."
+        ::= { cmmAlarmMibNotifications 53 }
+
+    cmmFanTrayRecovered  NOTIFICATION-TYPE
+       OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmFanTrayNumber,
+                     cmmFanIndex
+                    }
+        STATUS       current
+        DESCRIPTION
+            "Set when Given Fan Tray is recovered."
+        ::= { cmmAlarmMibNotifications 54 }
+
+    cmmFanTrayStallAlert  NOTIFICATION-TYPE
+       OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmFanTrayNumber,
+                     cmmFanIndex
+                    }
+        STATUS       current
+        DESCRIPTION
+            "Set when Given Fan Tray Stalled."
+        ::= { cmmAlarmMibNotifications 55 }
+
+    cmmFanTrayStallRecovered  NOTIFICATION-TYPE
+       OBJECTS      {
+                     cmmStackUnitIndex,
+                     cmmFanTrayNumber,
+                     cmmFanIndex
+                    }
+        STATUS       current
+        DESCRIPTION
+            "Set when Given Fan Tray is recovered from stall."
+        ::= { cmmAlarmMibNotifications 56 }
+
+    cmmFanRPMMinAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmFanTrayNumber,
+                      cmmFanIndex,
+                      cmmFanRpmMin
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when fan RPM set to its minimum value."
+        ::= { cmmAlarmMibNotifications 57 }
+
+    cmmFanRPMMaxAlert  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmFanTrayNumber,
+                      cmmFanIndex,
+                      cmmFanRpmMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when fan RPM set to its maximum value."
+        ::= { cmmAlarmMibNotifications 58 }
+
+     cmmAlertIncompatibleTransceiverPresence   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Incompatible Trasceiver is Present"
+        ::= { cmmTransMibNotifications 54}
+
+     cmmNotifyIncompatibleTransceiverRemoved   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Incompatible Trasceiver is Removed"
+        ::= { cmmTransMibNotifications 55}
+
+    --
+    -- TRANSCEIVER(DDM) RELATED TRAPS
+    --
+
+    cmmTransCriticalTempHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransTemperature,
+                      cmmTransTempCriticalThresholdMin,
+                      cmmTransTempCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal temperature of transceiver exceeds high alarm level."
+        ::= { cmmTransMibNotifications  1}
+
+    cmmTransCriticalTempLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransTemperature,
+                      cmmTransTempCriticalThresholdMin,
+                      cmmTransTempCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal temperature of transceiver is below low alarm level."
+        ::= { cmmTransMibNotifications  2}
+
+    cmmTransAlertTempHigh  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransTemperature,
+                      cmmTransTempAlertThresholdMin,
+                      cmmTransTempAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal temperature of transceiver exceeds high Alert level."
+        ::= { cmmTransMibNotifications  3}
+
+    cmmTransAlertTempLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransTemperature,
+                      cmmTransTempAlertThresholdMin,
+                      cmmTransTempAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal temperature of transceiver is below low Alert level"
+        ::= { cmmTransMibNotifications  4}
+
+    cmmTransNotifyTransceiverTempRecovered  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransTemperature
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is recovered from temperature fault."
+        ::= { cmmTransMibNotifications 5}
+
+    cmmTransCriticalVoltageHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVoltage,
+                      cmmTransVoltCriticalThresholdMin,
+                      cmmTransVoltCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal supply voltage of transceiver exceeds high alarm level."
+        ::= { cmmTransMibNotifications 11}
+
+    cmmTransCriticalVoltageLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVoltage,
+                      cmmTransVoltCriticalThresholdMin,
+                      cmmTransVoltCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal supply voltage of transceiver is below low alarm level."
+        ::= { cmmTransMibNotifications 12}
+
+    cmmTransAlertVoltageHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVoltage,
+                      cmmTransVoltAlertThresholdMin,
+                      cmmTransVoltAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal supply voltage of transceiver exceeds high Alert level."
+        ::= { cmmTransMibNotifications 13}
+
+    cmmTransAlertVoltageLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVoltage,
+                      cmmTransVoltAlertThresholdMin,
+                      cmmTransVoltAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when internal supply voltage of transceiver is below low Alert level"
+        ::= { cmmTransMibNotifications 14}
+
+    cmmTransNotifyTransceiverVoltRecovered  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVoltage
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is recovered from voltage fault."
+        ::= { cmmTransMibNotifications 15}
+
+    cmmTransCriticalBiasHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransLaserBiasCurrent,
+                      cmmTransLaserBiasCurrCriticalThresholdMin,
+                      cmmTransLaserBiasCurrCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when TX Bias current of transceiver exceeds high alarm level."
+        ::= { cmmTransMibNotifications 21}
+
+    cmmTransCriticalBiasLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransLaserBiasCurrent,
+                      cmmTransLaserBiasCurrCriticalThresholdMin,
+                      cmmTransLaserBiasCurrCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when TX Bias current of transceiver is below low alarm level."
+        ::= { cmmTransMibNotifications 22 }
+
+    cmmTransAlertBiashigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransLaserBiasCurrent,
+                      cmmTransLaserBiasCurrAlertThresholdMin,
+                      cmmTransLaserBiasCurrAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when TX Bias current of transceiver exceeds high Alert level."
+        ::= { cmmTransMibNotifications 23}
+
+    cmmTransAlertBiasLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransLaserBiasCurrent,
+                      cmmTransLaserBiasCurrAlertThresholdMin,
+                      cmmTransLaserBiasCurrAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when TX Bias current of transceiver is below low Alert level."
+        ::= { cmmTransMibNotifications 24}
+
+    cmmTransNotifyTransceiverBiasRecovered  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransLaserBiasCurrent
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is recovered from Bias current fault."
+        ::= { cmmTransMibNotifications 25}
+
+    cmmTransCriticalRxPowerHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransRxPower,
+                      cmmTransRxPowerCriticalThresholdMin,
+                      cmmTransRxPowerCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Received Power of transceiver exceeds high alarm level."
+        ::= { cmmTransMibNotifications 31}
+
+    cmmTransCriticalRxPowerLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransRxPower,
+                      cmmTransRxPowerCriticalThresholdMin,
+                      cmmTransRxPowerCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Received Power of transceiver is below low alarm level."
+        ::= { cmmTransMibNotifications 32}
+
+    cmmTransAlertRxPowerHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransRxPower,
+                      cmmTransRxPowerAlertThresholdMin,
+                      cmmTransRxPowerAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Received Power of transceiver exceeds high Alert level."
+        ::= { cmmTransMibNotifications 33}
+
+    cmmTransAlertRxPowerLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransRxPower,
+                      cmmTransRxPowerAlertThresholdMin,
+                      cmmTransRxPowerAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Received Power of transceiver is below low Alert level."
+        ::= { cmmTransMibNotifications 34}
+
+    cmmTransNotifyTransceiverRxPowRecovered  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransRxPower
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is recovered from Rx power fault."
+        ::= { cmmTransMibNotifications 35}
+
+    cmmTransCriticalTxPowerHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransTxPower,
+                      cmmTransTxPowerCriticalThresholdMin,
+                      cmmTransTxPowerCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Transferred Power of transceiver exceeds high alarm level."
+        ::= { cmmTransMibNotifications 41}
+
+    cmmTransCriticalTxPowerLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransTxPower,
+                      cmmTransTxPowerCriticalThresholdMin,
+                      cmmTransTxPowerCriticalThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Transferred Power of transceiver is below low alarm level."
+        ::= { cmmTransMibNotifications 42}
+
+    cmmTransAlertTxPowerHigh   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransTxPower,
+                      cmmTransTxPowerAlertThresholdMin,
+                      cmmTransTxPowerAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Transferred Power of transceiver exceeds high Alert level."
+        ::= { cmmTransMibNotifications 43}
+
+    cmmTransAlertTxPowerLow   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransTxPower,
+                      cmmTransTxPowerAlertThresholdMin,
+                      cmmTransTxPowerAlertThresholdMax
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Transferred Power of transceiver is below low Alert level."
+        ::= { cmmTransMibNotifications 44}
+
+    cmmTransNotifyTransceiverTxPowRecovered  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransChannelIndex,
+                      cmmTransTxPower
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is recovered from Tx Power fault."
+        ::= { cmmTransMibNotifications 45}
+
+    cmmTransNotifyTransceiverInserted   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVendorName,
+                      cmmTransVendorSerialNumber,
+                      cmmTransconnectortype
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is inserted."
+        ::= { cmmTransMibNotifications 51}
+
+    cmmTransAlertTransceiverRemoved  NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType,
+                      cmmTransVendorName,
+                      cmmTransVendorSerialNumber,
+                      cmmTransconnectortype
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is removed."
+        ::= { cmmTransMibNotifications 52}
+
+    cmmTransAlertFaultyTransceiverInserted   NOTIFICATION-TYPE
+        OBJECTS      {
+                      cmmStackUnitIndex,
+                      cmmTransIndex,
+                      cmmTransType
+                     }
+        STATUS       current
+        DESCRIPTION
+            "Set when Trasceiver is inserted and failed to read transceiver EEPROM information."
+        ::= { cmmTransMibNotifications 53}
+
+   END

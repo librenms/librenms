@@ -1,0 +1,59 @@
+{
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "cisco-flash",
+                    "storage_index": "1.1",
+                    "storage_type": "flash",
+                    "storage_descr": "flash1(flash1):",
+                    "storage_size": 122185728,
+                    "storage_units": 1,
+                    "storage_used": 53897216,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "cisco-flash",
+                    "storage_index": "1.1",
+                    "storage_type": "flash",
+                    "storage_descr": "flash1(flash1):",
+                    "storage_size": 122185728,
+                    "storage_units": 1,
+                    "storage_used": 53897216,
+                    "storage_free": 68288512,
+                    "storage_perc": 44,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.1208",
+                    "sysDescr": "Cisco IOS Software, C2960X Software (C2960X-UNIVERSALK9-M), Version 15.2(7)E0a, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2019 by Cisco Systems, Inc.\r\nCompiled Fri 12-Apr-19 04:09 by prod_rel_team",
+                    "sysContact": null,
+                    "version": "15.2(7)E0a",
+                    "hardware": "cat29xxStack",
+                    "features": "UNIVERSALK9",
+                    "location": null,
+                    "os": "ios",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

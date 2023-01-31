@@ -416,11 +416,6 @@ parameters:
 			path: LibreNMS/Alert/Transport/Linenotify.php
 
 		-
-			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Linenotify\\:\\:contactLinenotify\\(\\) is unused\\.$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Linenotify.php
-
-		-
 			message: "#^Method LibreNMS\\\\Alert\\\\Transport\\\\Mail\\:\\:contactMail\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Transport/Mail.php
@@ -921,11 +916,6 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFilter.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderParser.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alerting\\\\QueryBuilderParser\\:\\:\\$builder has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
@@ -1006,11 +996,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:getDomainSid\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:getFullname\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1066,11 +1051,6 @@ parameters:
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\ADAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
@@ -1122,11 +1102,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\ActiveDirectoryAuthorizer\\:\\:getDn\\(\\) has parameter \\$samaccountname with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\ActiveDirectoryAuthorizer\\:\\:getDomainSid\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ActiveDirectoryAuthorizer.php
 
@@ -1301,11 +1276,6 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
-
-		-
 			message: "#^Property LibreNMS\\\\Authentication\\\\LdapAuthorizationAuthorizer\\:\\:\\$AUTH_IS_EXTERNAL has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
@@ -1322,11 +1292,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:bind\\(\\) has parameter \\$credentials with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizer\\:\\:connect\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizer.php
 
@@ -1441,12 +1406,7 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/TwoFactor.php
-
-		-
-			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
@@ -1459,31 +1419,6 @@ parameters:
 			message: "#^Property LibreNMS\\\\Authentication\\\\TwoFactor\\:\\:\\$base32_enc has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
-
-		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$field with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Method LibreNMS\\\\Cache\\\\Device\\:\\:load\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<int,mixed\\>\\:\\:get\\(\\) expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$devices has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
-
-		-
-			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$primary has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Cache/Device.php
 
 		-
 			message: "#^Property LibreNMS\\\\Cache\\\\PermissionsCache\\:\\:\\$billPermissions has no type specified\\.$#"
@@ -2491,44 +2426,9 @@ parameters:
 			path: LibreNMS/Device/WirelessSensor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has parameter \\$oid with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
 			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:preCache\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Property LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:\\$cache_time has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:__construct\\(\\) has parameter \\$output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\ApiException\\:\\:getOutput\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\ApiException\\:\\:\\$output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/ApiException.php
 
 		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\AuthenticationException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
@@ -2749,31 +2649,6 @@ parameters:
 			message: "#^Property LibreNMS\\\\Exceptions\\\\JsonAppWrongVersionException\\:\\:\\$parsed_json has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/JsonAppWrongVersionException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$error with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$exit_code with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:__construct\\(\\) has parameter \\$image_output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Method LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:getImage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
-
-		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\RrdGraphException\\:\\:\\$image_output has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/RrdGraphException.php
 
 		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\UnserializableRouteCache\\:\\:__construct\\(\\) has parameter \\$cli_php_version with no type specified\\.$#"
@@ -3301,21 +3176,6 @@ parameters:
 			path: LibreNMS/Interfaces/Discovery/SlaDiscovery.php
 
 		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Module\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Module.php
-
-		-
 			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\MplsPolling\\:\\:pollMplsTunnelArHops\\(\\) has parameter \\$paths with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Interfaces/Polling/MplsPolling.php
@@ -3386,42 +3246,7 @@ parameters:
 			path: LibreNMS/Model.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:discoveryIsSlow\\(\\) has parameter \\$def with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Core\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Core.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:parseAdjacencyTime\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
 
@@ -3434,46 +3259,6 @@ parameters:
 			message: "#^Variable \\$adjacencies in empty\\(\\) always exists and is not falsy\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:calculateAvailable\\(\\) never returns void so it can be removed from the return type\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mempools\\:\\:printMempool\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mempools.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Mpls\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Mpls.php
 
 		-
 			message: "#^Variable \\$lsps might not be defined\\.$#"
@@ -3494,21 +3279,6 @@ parameters:
 			message: "#^Variable \\$svcs might not be defined\\.$#"
 			count: 2
 			path: LibreNMS/Modules/Mpls.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Nac\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Nac.php
 
 		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
@@ -3541,16 +3311,6 @@ parameters:
 			path: LibreNMS/Modules/Ospf.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryLevels\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
@@ -3559,26 +3319,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:discoveryPapers\\(\\) has parameter \\$device with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/PrinterSupplies.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\Slas\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/Slas.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:discoverYamlMempools\\(\\) has no return type specified\\.$#"
@@ -3682,16 +3422,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:hasYamlDiscovery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
 
@@ -3831,19 +3561,9 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$version \\(string\\|null\\) does not accept int\\.$#"
-			count: 1
-			path: LibreNMS/OS/Aix.php
-
-		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
 			count: 2
 			path: LibreNMS/OS/ArrisDsr4410md.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/ArubaInstant.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\ArubaInstant\\:\\:decodeChannel\\(\\) has parameter \\$channel with no type specified\\.$#"
@@ -4171,16 +3891,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:parseRegex\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php
@@ -4311,16 +4021,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Unix.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:parseRegex\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Unix.php
@@ -4387,16 +4087,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:findFirst\\(\\) has parameter \\$oids with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:isNumeric\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:isNumeric\\(\\) has parameter \\$oids with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Zyxel.php
 
@@ -4502,16 +4192,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Timos\\:\\:pollMplsTunnelCHops\\(\\) has parameter \\$paths with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Timos.php
-
-		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/OS/Timos.php
-
-		-
-			message: "#^Parameter \\#9 \\$divisor of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Timos.php
 
@@ -4719,351 +4399,6 @@ parameters:
 			message: "#^Property LibreNMS\\\\RRD\\\\RrdDefinition\\:\\:\\$types has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/RRD/RrdDefinition.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Dispatcher\\:\\:handle\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Dispatcher.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAccThresholdCrossingAlert\\:\\:getThresholdMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAccThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAccThresholdCrossingAlert\\:\\:getThresholdMessage\\(\\) has parameter \\$thresholdOid with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAccThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAccThresholdCrossingAlert\\:\\:getThresholds\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAccThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortShaperChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortShaperChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAccPortShaperChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAclChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAclChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAclChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAuthSvrChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAuthSvrChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleAuthSvrChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleDyingGaspChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleDyingGaspChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleDyingGaspChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleFlowChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleFlowChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleFlowChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleLagChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleLagChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleLagChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNeChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNeChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNeChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNetPortChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNetPortChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNetPortChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNtpChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNtpChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleNtpChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosFlowChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosFlowChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosFlowChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosShaperChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosShaperChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleQosShaperChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleSyslogChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleSyslogChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleSyslogChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeSrcChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeSrcChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeSrcChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeZoneChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeZoneChg\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaAttributeChange\\:\\:handleTimeZoneChg\\(\\) has parameter \\$trap with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaAttributeChange.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaNetThresholdCrossingAlert\\:\\:getThresholdMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaNetThresholdCrossingAlert\\:\\:getThresholdMessage\\(\\) has parameter \\$thresholdOid with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\AdvaNetThresholdCrossingAlert\\:\\:getThresholds\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\EquipStatusTrap\\:\\:getSeverity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/EquipStatusTrap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\EquipStatusTrap\\:\\:getSeverity\\(\\) has parameter \\$state with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/EquipStatusTrap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\JnxDomAlarmId\\:\\:getAlarms\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/JnxDomAlarmId.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\JnxDomAlarmId\\:\\:getAlarms\\(\\) has parameter \\$currentAlarm with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/JnxDomAlarmId.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\JnxDomLaneAlarmId\\:\\:getLaneAlarms\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmId.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\JnxDomLaneAlarmId\\:\\:getLaneAlarms\\(\\) has parameter \\$currentAlarm with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/JnxDomLaneAlarmId.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\LogTrap\\:\\:getSeverity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/LogTrap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\LogTrap\\:\\:getSeverity\\(\\) has parameter \\$state with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/LogTrap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\RuckusSzSeverity\\:\\:getSeverity\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/RuckusSzSeverity.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\RuckusSzSeverity\\:\\:getSeverity\\(\\) has parameter \\$severity with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/RuckusSzSeverity.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Trap\\:\\:getOidData\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Trap\\:\\:getOidData\\(\\) has parameter \\$oid with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Method LibreNMS\\\\Snmptrap\\\\Trap\\:\\:parse\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Property LibreNMS\\\\Snmptrap\\\\Trap\\:\\:\\$device has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Property LibreNMS\\\\Snmptrap\\\\Trap\\:\\:\\$hostname has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Property LibreNMS\\\\Snmptrap\\\\Trap\\:\\:\\$ip has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
-
-		-
-			message: "#^Property LibreNMS\\\\Snmptrap\\\\Trap\\:\\:\\$raw has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Trap.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\Categorizer\\:\\:__construct\\(\\) has parameter \\$items with no type specified\\.$#"
@@ -5616,17 +4951,12 @@ parameters:
 			path: LibreNMS/Util/GitHub.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has no return type specified\\.$#"
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getOverviewGraphsForDevice\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Graph.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Graph\\:\\:getTypes\\(\\) has no return type specified\\.$#"
+			message: "#^Variable \\$rrd_options in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
 			path: LibreNMS/Util/Graph.php
 
@@ -5866,27 +5196,7 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_deps has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$module_tables has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$modules has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:\\$os is never read, only written\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
@@ -6296,7 +5606,7 @@ parameters:
 			path: LibreNMS/Util/Snmpsim.php
 
 		-
-			message: "#^Anonymous function should return non\\-empty\\-string but returns string\\.$#"
+			message: "#^Anonymous function should return non\\-falsy\\-string but returns string\\.$#"
 			count: 1
 			path: LibreNMS/Util/StringHelpers.php
 
@@ -6309,41 +5619,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\StringHelpers\\:\\:niceCase\\(\\) has parameter \\$string with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/StringHelpers.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$format with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$interval with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has parameter \\$s with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has parameter \\$description with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\Url\\:\\:escapeBothQuotes\\(\\) has no return type specified\\.$#"
@@ -6594,96 +5869,6 @@ parameters:
 			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$authlevel \\('authNoPriv'\\|'authPriv'\\|'noAuthNoPriv'\\) does not accept null\\.$#"
 			count: 1
 			path: app/Actions/Device/ValidateDeviceAndCreate.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$client has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BingApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\BingApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BingApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GoogleMapsApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GoogleMapsApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GoogleMapsApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:getAddresses\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:getStreams\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Method App\\\\ApiClients\\\\GraylogApi\\:\\:isConfigured\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GraylogApi\\:\\:\\$api_prefix has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\GraylogApi\\:\\:\\$client has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/GraylogApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/MapquestApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\MapquestApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/MapquestApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/NominatimApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\NominatimApi\\:\\:\\$geocoding_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/NominatimApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$abuse_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$base_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
-
-		-
-			message: "#^Property App\\\\ApiClients\\\\RipeApi\\:\\:\\$whois_uri has no type specified\\.$#"
-			count: 1
-			path: app/ApiClients/RipeApi.php
 
 		-
 			message: "#^Method App\\\\Checks\\:\\:postAuth\\(\\) has no return type specified\\.$#"
@@ -6981,11 +6166,6 @@ parameters:
 			path: app/Exceptions/Handler.php
 
 		-
-			message: "#^Method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Facades/LogManager.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\AboutController\\:\\:index\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/AboutController.php
@@ -7122,11 +6302,6 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:buildDeviceGraphArrays\\(\\) has parameter \\$device with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:deviceLinkMenu\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
 
@@ -7846,16 +7021,6 @@ parameters:
 			path: app/Http/Controllers/UserPreferencesController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\AvailabilityMapController\\:\\:getServices\\(\\) has parameter \\$request with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Widgets/AvailabilityMapController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Widgets\\\\DeviceSummaryController\\:\\:getData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Widgets/DeviceSummaryController.php
@@ -8051,22 +7216,12 @@ parameters:
 			path: app/Jobs/PingCheck.php
 
 		-
-			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:defer\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
 			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:fetchDevices\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 
 		-
 			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:processTier\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Jobs/PingCheck.php
-
-		-
-			message: "#^Method App\\\\Jobs\\\\PingCheck\\:\\:recordData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 
@@ -8751,11 +7906,6 @@ parameters:
 			path: app/Models/DeviceRelatedModel.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Eventlog\\:\\:log\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Eventlog.php
-
-		-
 			message: "#^Method App\\\\Models\\\\IsisAdjacency\\:\\:device\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/IsisAdjacency.php
@@ -8904,26 +8054,6 @@ parameters:
 			message: "#^Method App\\\\Models\\\\Plugin\\:\\:scopeVersionTwo\\(\\) has parameter \\$query with no type specified\\.$#"
 			count: 1
 			path: app/Models/Plugin.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:scopeIsActive\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:scopeIsActive\\(\\) has parameter \\$query with no type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:setPollerGroupsAttribute\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
-
-		-
-			message: "#^Method App\\\\Models\\\\PollerCluster\\:\\:setPollerGroupsAttribute\\(\\) has parameter \\$groups with no type specified\\.$#"
-			count: 1
-			path: app/Models/PollerCluster.php
 
 		-
 			message: "#^Method App\\\\Models\\\\PollerGroup\\:\\:list\\(\\) has no return type specified\\.$#"
@@ -9956,691 +9086,6 @@ parameters:
 			path: tests/DocsTest.php
 
 		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAccThresholdCrossingAlertTest\\:\\:testAccThresholdTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAccThresholdCrossingAlertTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testAccFlowModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testAccPortModied\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testAccShaper\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testAclModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testAuthServerModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testBannerModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testLagModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testNeModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testNetPortModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testNtpModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testQosFlowPolicerModfied\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testQosShaperModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testSnmpDyingGaspStateModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testSyslogIP6AddrModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testSyslogIPAddrModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testSyslogIPVersionModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testSyslogPortModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testTimeSourceModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaAttributeChangeTest\\:\\:testTimeZoneModified\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaAttributeChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaDyingGaspTrapTest\\:\\:testDyingGasp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaDyingGaspTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaNetThresholdCrossingAlertTest\\:\\:testNetThresholdTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaNetThresholdCrossingAlertTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaNetworkElementAlmTrapTest\\:\\:testElementAlarmCleared\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaNetworkElementAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaNetworkElementAlmTrapTest\\:\\:testElementAlarmCritical\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaNetworkElementAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaNetworkElementAlmTrapTest\\:\\:testElementAlarmMajor\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaNetworkElementAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaNetworkElementAlmTrapTest\\:\\:testElementAlarmMinor\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaNetworkElementAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectCreationTest\\:\\:testLagCreation\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectCreationTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectCreationTest\\:\\:testUserCreation\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectCreationTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectDeletionTest\\:\\:testFLowDeletion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectDeletionTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectDeletionTest\\:\\:testLagDeletion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectDeletionTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectDeletionTest\\:\\:testLagPortDeletion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectDeletionTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaObjectDeletionTest\\:\\:testUserDeletion\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaObjectDeletionTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaStateChangeTrapTest\\:\\:testAccessPortChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaStateChangeTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaStateChangeTrapTest\\:\\:testFlowStateChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaStateChangeTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaStateChangeTrapTest\\:\\:testNetworkPortChg\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaStateChangeTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaSysAlmTrapTest\\:\\:testClearedAlarm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaSysAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaSysAlmTrapTest\\:\\:testCriticalAlarm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaSysAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaSysAlmTrapTest\\:\\:testMajorAlarm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaSysAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\AdvaSysAlmTrapTest\\:\\:testMinorAlarm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/AdvaSysAlmTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\ApcPduOutletTest\\:\\:testOutletOff\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/ApcPduOutletTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\ApcPduOutletTest\\:\\:testOutletOn\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/ApcPduOutletTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\ApcPduOutletTest\\:\\:testOutletReboot\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/ApcPduOutletTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\BgpTrapTest\\:\\:testBgpDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/BgpTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\BgpTrapTest\\:\\:testBgpUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/BgpTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testAuthorization\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testBridgeNewRoot\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testBridgeTopologyChanged\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testColdStart\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testEntityDatabaseChanged\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testFindByIp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testGarbage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testGenericTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CommonTrapTest\\:\\:testWarmStart\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CommonTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpLowBattery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpPowerRestored\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpRtOverLoad\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpRtnChargerFailure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpRtnDischarged\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpRtnLowBattery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpRtnOverTemp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsBatteryNotPresent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsChargerFailure\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsDiagFailed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsDiagPassed\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsDischarged\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsOnBattery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsOverTemp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsOverload\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsRebootStarted\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsSleeping\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsTurnedOff\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\CyberPowerTrapsTest\\:\\:testCpUpsWokeUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/CyberPowerTrapsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapAvOversizeTest\\:\\:testAvOversize\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapAvOversizeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapIpsTest\\:\\:testIpsAnomaly\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapIpsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapIpsTest\\:\\:testIpsPkgUdate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapIpsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapIpsTest\\:\\:testIpsSignature\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapIpsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapVpnTunTest\\:\\:testVpnTunDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapVpnTunTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FgTrapVpnTunTest\\:\\:testVpnTunUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FgTrapVpnTunTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\FmTrapLogRateThresholdTest\\:\\:testAvOversize\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/FmTrapLogRateThresholdTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxBgpM2Test\\:\\:testBgpBackwardTrasition\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxBgpM2Test.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxBgpM2Test\\:\\:testBgpEstablished\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxBgpM2Test.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxBgpM2Test\\:\\:testBgpPeerUnknown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxBgpM2Test.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxCmCfgChangeTest\\:\\:testConfigChangeTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxCmCfgChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxCmCfgChangeTest\\:\\:testConfigRollbackTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxCmCfgChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxDomAlarmTest\\:\\:testJnxDomAlarmClearTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxDomAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxDomAlarmTest\\:\\:testJnxDomAlarmSetTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxDomAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxDomLaneAlarmTest\\:\\:testJnxDomLaneAlarmClearedTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxDomLaneAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxDomLaneAlarmTest\\:\\:testJnxDomLaneAlarmSetTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxDomLaneAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxLdpLspTest\\:\\:testLdpLspDownTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxLdpLspTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxLdpLspTest\\:\\:testLdpLspUpTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxLdpLspTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxLdpSesTest\\:\\:testJnxLdpSesDownTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxLdpSesTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxLdpSesTest\\:\\:testJnxLdpSesUpTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxLdpSesTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxPowerSupplyTest\\:\\:testJnxPowerSupplyFailureTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxPowerSupplyTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxPowerSupplyTest\\:\\:testJnxPowerSupplyOkTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxPowerSupplyTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxVpnIfTest\\:\\:testVpnIfDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxVpnIfTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxVpnIfTest\\:\\:testVpnIfUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxVpnIfTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxVpnPwTest\\:\\:testVpnPwDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxVpnPwTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\JnxVpnPwTest\\:\\:testVpnPwUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/JnxVpnPwTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsAlarmTest\\:\\:genEkiAlarm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsAlarmTest\\:\\:testAlarmAddText\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsAlarmTest\\:\\:testAlarmClear\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsAlarmTest\\:\\:testAlarmPort\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsAlarmTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsEventTest\\:\\:genEkiEvent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsEventTest\\:\\:testEvent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsEventTest\\:\\:testEventAddText\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\MgmtTrapNmsEventTest\\:\\:testEventPort\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/MgmtTrapNmsEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\NetgearFailedUserLoginTest\\:\\:testManagedSeries\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/NetgearFailedUserLoginTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\NetgearFailedUserLoginTest\\:\\:testSmartSeries\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/NetgearFailedUserLoginTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfBdr\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfDr\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfLoop\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfOdr\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfPtp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfIfStateChangeTest\\:\\:testOspfIfWait\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfIfStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfNbrStateChangeTest\\:\\:testOspfNbrDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfNbrStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfNbrStateChangeTest\\:\\:testOspfNbrFull\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfNbrStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\OspfNbrStateChangeTest\\:\\:testOspfNbrOther\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/OspfNbrStateChangeTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\PortsTrapTest\\:\\:testLinkDown\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/PortsTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\PortsTrapTest\\:\\:testLinkUp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/PortsTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusEventTest\\:\\:testRuckusAssocTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusEventTest\\:\\:testRuckusDiassocTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusEventTest\\:\\:testRuckusSetErrorTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzClusterStateTest\\:\\:testClusterInMaintenance\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzClusterStateTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzClusterStateTest\\:\\:testClusterInService\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzClusterStateTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzEventTest\\:\\:testSzApConf\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzEventTest\\:\\:testSzApConnect\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzEventTest\\:\\:testSzApMiscEvent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\RuckusSzEventTest\\:\\:testSzApRebooted\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/RuckusSzEventTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\TrippliteTrapTest\\:\\:testTlpNotificationsAlarmEntryAdded\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/TrippliteTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\TrippliteTrapTest\\:\\:testTlpNotificationsAlarmEntryRemoved\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/TrippliteTrapTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\UpsTrapsOnBatteryTest\\:\\:testOnBattery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/UpsTrapsOnBatteryTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\VmwHBTest\\:\\:testVmwVmHBDetectedTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/VmwHBTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\VmwHBTest\\:\\:testVmwVmHBLostTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/VmwHBTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\VmwPowerStateTest\\:\\:testVmwVmPoweredONTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/VmwPowerStateTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\VmwPowerStateTest\\:\\:testVmwVmPoweredOffTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/VmwPowerStateTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\SnmpTraps\\\\VmwPowerStateTest\\:\\:testVmwVmSuspendedTrap\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/Feature/SnmpTraps/VmwPowerStateTest.php
-
-		-
 			message: "#^Method LibreNMS\\\\Tests\\\\Feature\\\\TestScheduledMaintenance\\:\\:assertScheduleActive\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/Feature/TestScheduledMaintenance.php
@@ -10864,11 +9309,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Tests\\\\MibTest\\:\\:testMibNameMatches\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/MibTest.php
-
-		-
-			message: "#^Property LibreNMS\\\\Tests\\\\Mocks\\\\SnmpQueryMock\\:\\:\\$context is never read, only written\\.$#"
-			count: 1
-			path: tests/Mocks/SnmpQueryMock.php
 
 		-
 			message: "#^Method LibreNMS\\\\Tests\\\\OSDiscoveryTest\\:\\:checkOS\\(\\) has no return type specified\\.$#"
@@ -11679,4 +10119,5 @@ parameters:
 			message: "#^Property LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:\\$excluded has no type specified\\.$#"
 			count: 1
 			path: tests/YamlSchemaTest.php
+
 

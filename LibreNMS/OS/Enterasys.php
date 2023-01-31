@@ -26,13 +26,14 @@
 namespace LibreNMS\OS;
 
 use App\Models\Mempool;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 
 class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
 {
     public function discoverMempools()
     {
-        $mempools = collect();
+        $mempools = new Collection();
         $mem = snmpwalk_group($this->getDeviceArray(), 'etsysResourceStorageTable', 'ENTERASYS-RESOURCE-UTILIZATION-MIB', 3);
 
         foreach ($mem as $index => $mem_data) {

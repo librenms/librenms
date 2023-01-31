@@ -19,30 +19,20 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Tony Murray
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS;
+use LibreNMS\OS\Shared\Unix;
 
-class Aix extends OS implements OSDiscovery
+class Aix extends Unix
 {
     public function discoverOS(Device $device): void
     {
-        $aix_descr = explode("\n", $device->sysDescr);
-        // AIX standard snmp deamon
-        if (! empty($aix_descr[1])) {
-            $device->serial = explode('Processor id: ', $aix_descr[1])[1];
-            $aix_long_version = explode(' version: ', $aix_descr[2])[1];
-            [$device->version, $aix_version_min] = array_map('intval', explode('.', $aix_long_version));
-        // AIX net-snmp
-        } else {
-            [, , $aix_version_min, $device->version, $device->serial] = explode(' ', $aix_descr[0]);
-        }
-        $device->version .= '.' . $aix_version_min;
+        // don't support server hardware detection or extends
+        $this->discoverYamlOS($device);
     }
 }

@@ -35,6 +35,8 @@ trait ResolvesPortIds
      * @var array
      */
     private $basePortIdMap;
+    /** @var string[] */
+    private $ifIndexToNameMap;
 
     /**
      * Figure out the port_id from the BRIDGE-MIB::dot1dBasePort
@@ -56,6 +58,21 @@ trait ResolvesPortIds
     public function ifIndexToId($ifIndex): int
     {
         return $this->ifIndexToPortIdMap()[$ifIndex] ?? 0;
+    }
+
+    /**
+     * Get IF-MIB::ifName from IF-MIB::ifIndex
+     *
+     * @param  int|string  $ifIndex
+     * @return string
+     */
+    public function ifIndexToName($ifIndex): string
+    {
+        if ($this->ifIndexToNameMap === null) {
+            $this->ifIndexToNameMap = $this->getDevice()->ports()->pluck('ifName', 'ifIndex')->all();
+        }
+
+        return $this->ifIndexToNameMap[$ifIndex] ?? '';
     }
 
     private function ifIndexToPortIdMap(): array

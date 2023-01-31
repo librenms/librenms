@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $col_w = 7 + strlen($unit);
-$rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";
+$rrd_options .= " COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
 
 foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_index`', [$class, $device['device_id']]) as $index => $sensor) {
     // FIXME generic colour function
@@ -43,6 +43,7 @@ foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `sensor_class` = ? AND `devi
     $rrd_options .= " LINE1:sensor{$sensor['sensor_id']}#$colour:'$sensor_descr_fixed'";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:LAST:%5.1lf$unit";
     $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MIN:%5.1lf$unit";
-    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MAX:%5.1lf$unit\\l ";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:MAX:%5.1lf$unit";
+    $rrd_options .= " GPRINT:sensor{$sensor['sensor_id']}:AVERAGE:%5.2lf$unit\\l ";
     $iter++;
 }//end foreach

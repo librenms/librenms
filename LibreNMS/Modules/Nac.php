@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use App\Models\PortsNac;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Interfaces\Module;
@@ -34,12 +35,20 @@ use LibreNMS\OS;
 class Nac implements Module
 {
     /**
+     * @inheritDoc
+     */
+    public function dependencies(): array
+    {
+        return ['ports'];
+    }
+
+    /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  Os  $os
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         // not implemented
     }
@@ -51,7 +60,7 @@ class Nac implements Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         if ($os instanceof NacPolling) {
             // discovery output (but don't install it twice (testing can can do this)
@@ -81,11 +90,22 @@ class Nac implements Module
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
-     *
-     * @param  \LibreNMS\OS  $os
      */
-    public function cleanup(OS $os)
+    public function cleanup(Device $device): void
     {
-        $os->getDevice()->portsNac()->delete();
+        $device->portsNac()->delete();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function dump(Device $device)
+    {
+        return [
+            'ports_nac' => $device->portsNac()->orderBy('ports.ifIndex')->orderBy('mac_address')
+                ->leftJoin('ports', 'ports_nac.port_id', 'ports.port_id')
+                ->select(['ports_nac.*', 'ifIndex'])
+                ->get()->map->makeHidden(['ports_nac_id', 'device_id', 'port_id']),
+        ];
     }
 }

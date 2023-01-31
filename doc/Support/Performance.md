@@ -182,7 +182,7 @@ Some distributions allow separate cli, mod_php and php-fpm configurations, we ca
 
 ### For web servers using mod_php and php-fpm
 
-Update your web PHP opcache.ini.  Possible locations: `/etc/php/7.2/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your web PHP opcache.ini.  Possible locations: `/etc/php/8.1/fpm/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache
@@ -197,7 +197,7 @@ If you are having caching issues, you can clear the opcache by simply restarting
 Create a cache directory that is writable by the librenms user first:
 `sudo mkdir -p /tmp/cache && sudo chmod 775 /tmp/cache && sudo chown -R librenms /tmp/cache`
 
-Update your PHP opcache.ini.  Possible locations: `/etc/php/7.2/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
+Update your PHP opcache.ini.  Possible locations: `/etc/php/8.1/cli/conf.d/opcache.ini`, `/etc/php.d/opcache.ini`, or `/etc/php/conf.d/opcache.ini`.
 
 ```
 zend_extension=opcache.so

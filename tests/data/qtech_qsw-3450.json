@@ -10,11 +10,11 @@
                     "version": "7.0.3.5(R0237.0034)",
                     "hardware": "QSW-3450-28T-AC",
                     "features": null,
+                    "location": "<private>",
                     "os": "qtech",
                     "type": "network",
                     "serial": "00030661509010026177",
-                    "icon": "qtech.svg",
-                    "location": "<private>"
+                    "icon": "qtech.svg"
                 }
             ]
         },
@@ -6700,5 +6700,31 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "001fce733b74",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 65535,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "000000000000",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 0,
+                    "helloTime": 0,
+                    "holdTime": 1,
+                    "forwardDelay": 0,
+                    "bridgeMaxAge": 0,
+                    "bridgeHelloTime": 0,
+                    "bridgeForwardDelay": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

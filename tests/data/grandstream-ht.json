@@ -10,11 +10,11 @@
                     "version": "Core: 1.0.5.3, Base: 1.0.5.11",
                     "hardware": null,
                     "features": null,
+                    "location": "<private>",
                     "os": "grandstream-ht",
                     "type": "network",
                     "serial": "9610005015A",
-                    "icon": "grandstream.png",
-                    "location": "<private>"
+                    "icon": "grandstream.png"
                 }
             ]
         },

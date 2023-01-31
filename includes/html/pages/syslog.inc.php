@@ -20,7 +20,7 @@ $no_refresh = true;
 $param = [];
 $device_id = (int) $vars['device'];
 
-if ($vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
+if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
     dbQuery('TRUNCATE TABLE `syslog`');
     print_message('syslog truncated');
 }
@@ -63,7 +63,7 @@ $pagetitle[] = 'Syslog';
         '<select name="program" id="program" class="form-control">' +
         '<option value="">All Programs&nbsp;&nbsp;</option>' +
         <?php
-        if ($vars['program']) {
+        if (! empty($vars['program'])) {
             $js_program = addcslashes(htmlentities($vars['program']), "'");
             echo "'<option value=\"$js_program\">$js_program</option>' +";
         }
@@ -74,7 +74,7 @@ $pagetitle[] = 'Syslog';
         '<select name="priority" id="priority" class="form-control">' +
         '<option value="">All Priorities</option>' +
         <?php
-        if ($vars['priority']) {
+        if (! empty($vars['priority'])) {
             $js_priority = addcslashes(htmlentities($vars['priority']), "'");
             echo "'<option value=\"$js_priority\">$js_priority</option>' +";
         }
@@ -82,10 +82,10 @@ $pagetitle[] = 'Syslog';
         '</select>' +
         '</div>' +
         '&nbsp;&nbsp;<div class="form-group">' +
-        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from']; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+        '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="<?php echo $vars['from'] ?? ''; ?>" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '<div class="form-group">' +
-        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to']; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+        '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="<?php echo $vars['to'] ?? ''; ?>" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
         '</div>' +
         '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
         '</form>' +
@@ -171,7 +171,7 @@ $pagetitle[] = 'Syslog';
                 }
             }
         }
-    })<?php echo $vars['program'] ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
+    })<?php echo isset($vars['program']) ? ".val('" . addcslashes($vars['program'], "'") . "').trigger('change');" : ''; ?>;
 
     $("#priority").select2({
         theme: "bootstrap",
@@ -191,6 +191,6 @@ $pagetitle[] = 'Syslog';
                 }
             }
         }
-    })<?php echo $vars['priority'] ? ".val('" . addcslashes($vars['priority'], "'") . "').trigger('change');" : ''; ?>;
+    })<?php echo isset($vars['priority']) ? ".val('" . addcslashes($vars['priority'], "'") . "').trigger('change');" : ''; ?>;
 </script>
 
