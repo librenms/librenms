@@ -727,7 +727,7 @@
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
             "type": "array",
             "default": [
-                "/-K9W8-/"
+                "/-K9W8/"
             ]
         },
         "bad_entity_sensor_regex": {
