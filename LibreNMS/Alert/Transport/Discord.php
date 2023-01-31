@@ -29,6 +29,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Proxy;
 
 class Discord extends Transport
@@ -56,8 +57,8 @@ class Discord extends Transport
         $host = $discord_opts['url'];
         $curl = curl_init();
         $discord_title = '#' . $obj['uid'] . ' ' . $obj['title'];
-        $discord_msg = strip_tags($obj['msg']);
-        $color = self::getColorForState($obj['state']);
+        $discord_msg = $obj['msg'];
+        $color = hexdec(preg_replace('/[^\dA-Fa-f]/', '', self::getColorForState($obj['state'])));
 
         // Special handling for the elapsed text in the footer if the elapsed is not set.
         $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
@@ -66,7 +67,7 @@ class Discord extends Transport
             'embeds' => [
                 [
                     'title' => $discord_title,
-                    'color' => hexdec($color),
+                    'color' => $color,
                     'description' => $discord_msg,
                     'fields' => $this->createDiscordFields($obj, $discord_opts),
                     'footer' => [
@@ -79,6 +80,10 @@ class Discord extends Transport
             $data = array_merge($data, $discord_opts['options']);
         }
 
+        $data = $this->embedGraphs($data);
+
+        // remove all remaining HTML tags
+        $data['embeds'][0]['description'] = strip_tags($data['embeds'][0]['description']);
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         Proxy::applyToCurl($curl);
@@ -90,14 +95,26 @@ class Discord extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code != 204) {
-            var_dump("API '$host' returned Error"); //FIXME: propper debuging
-            var_dump('Params: ' . $alert_message); //FIXME: propper debuging
-            var_dump('Return: ' . $ret); //FIXME: propper debuging
-
-            return 'HTTP Status code ' . $code;
+            throw new AlertTransportDeliveryException($obj, $code, $ret, $alert_message, $data);
         }
 
         return true;
+    }
+
+    private function embedGraphs(array $data): array
+    {
+        $count = 1;
+        $data['embeds'][0]['description'] = preg_replace_callback('#<img class="librenms-graph" src="(.*?)" />#', function ($match) use (&$data, &$count) {
+            $data['embeds'][] = [
+                'image' => [
+                    'url' => $match[1],
+                ],
+            ];
+
+            return '[Image ' . ($count++) . ']';
+        }, $data['embeds'][0]['description']);
+
+        return $data;
     }
 
     public function createDiscordFields($obj, $discord_opts)

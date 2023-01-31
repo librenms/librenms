@@ -31,12 +31,13 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Models\Eventlog;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
-use Log;
 
 class RunAlerts
 {
@@ -102,7 +103,7 @@ class RunAlerts
         $obj['features'] = $device->features;
         $obj['location'] = (string) $device->location;
         $obj['uptime'] = $device->uptime;
-        $obj['uptime_short'] = Time::formatInterval($device->uptime, 'short');
+        $obj['uptime_short'] = Time::formatInterval($device->uptime, true);
         $obj['uptime_long'] = Time::formatInterval($device->uptime);
         $obj['description'] = $device->purpose;
         $obj['notes'] = $device->notes;
@@ -147,7 +148,7 @@ class RunAlerts
                     }
                 }
             }
-            $obj['elapsed'] = $this->timeFormat(time() - strtotime($alert['time_logged']));
+            $obj['elapsed'] = Time::formatInterval(time() - strtotime($alert['time_logged']), true) ?: 'none';
             if (! empty($extra['diff'])) {
                 $obj['diff'] = $extra['diff'];
             }
@@ -168,11 +169,12 @@ class RunAlerts
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
             $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
-            $obj['elapsed'] = $this->timeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
+            $obj['elapsed'] = Time::formatInterval(strtotime($alert['time_logged']) - strtotime($id['time_logged']), true) ?: 'none';
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {
                 $i++;
                 $obj['faults'][$i] = $incident;
+                $obj['faults'][$i]['string'] = '';
                 foreach ($incident as $k => $v) {
                     if (! empty($v) && $k != 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
                         $obj['faults'][$i]['string'] .= $k . ' => ' . $v . '; ';
@@ -186,7 +188,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'];
+        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
@@ -195,36 +197,6 @@ class RunAlerts
         $obj['template'] = $template;
 
         return $obj;
-    }
-
-    /**
-     * Format Elapsed Time
-     *
-     * @param  int  $secs  Seconds elapsed
-     * @return string
-     */
-    public function timeFormat($secs)
-    {
-        $bit = [
-            'y' => $secs / 31556926 % 12,
-            'w' => $secs / 604800 % 52,
-            'd' => $secs / 86400 % 7,
-            'h' => $secs / 3600 % 24,
-            'm' => $secs / 60 % 60,
-            's' => $secs % 60,
-        ];
-        $ret = [];
-        foreach ($bit as $k => $v) {
-            if ($v > 0) {
-                $ret[] = $v . $k;
-            }
-        }
-
-        if (empty($ret)) {
-            return 'none';
-        }
-
-        return join(' ', $ret);
     }
 
     public function clearStaleAlerts()
@@ -476,7 +448,7 @@ class RunAlerts
 
             if ($this->isParentDown($alert['device_id'])) {
                 $noiss = true;
-                Log::event('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
+                Eventlog::log('Skipped alerts because all parent devices are down', $alert['device_id'], 'alert', 1);
             }
 
             if ($alert['state'] == AlertState::RECOVERED && $rextra['recovery'] == false) {
@@ -535,8 +507,11 @@ class RunAlerts
                 c_echo(" :: $transport_title => ");
                 try {
                     $instance = new $class($item['transport_id']);
-                    $tmp = $instance->deliverAlert($obj, $item['opts']);
+                    $tmp = $instance->deliverAlert($obj, $item['opts'] ?? []);
                     $this->alertLog($tmp, $obj, $obj['transport']);
+                } catch (AlertTransportDeliveryException $e) {
+                    Eventlog::log($e->getMessage(), $obj['device_id'], 'alert', Alert::ERROR);
+                    $this->alertLog($e->getMessage(), $obj, $obj['transport']);
                 } catch (\Exception $e) {
                     $this->alertLog($e, $obj, $obj['transport']);
                 }
@@ -573,13 +548,13 @@ class RunAlerts
 
         if ($result === true) {
             echo 'OK';
-            Log::event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
+            Eventlog::log('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
         } else {
             echo "ERROR: $result\r\n";
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
+            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
         }
     }
 

@@ -119,7 +119,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
 
                     // Check whether the Virtual Machine is already known for this host.
                     $result = dbFetchRow("SELECT * FROM `vminfo` WHERE `device_id` = ? AND `vmwVmVMID` = ? AND `vm_type` = 'libvirt'", [$device['device_id'], $dom_id]);
-                    if (count($result['device_id']) == 0) {
+                    if (empty($result)) {
                         $inserted_id = dbInsert(['device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => $vmwVmDisplayName, 'vmwVmGuestOS' => $vmwVmGuestOS, 'vmwVmMemSize' => $vmwVmMemSize, 'vmwVmCpus' => $vmwVmCpus, 'vmwVmState' => $vmwVmState], 'vminfo');
                         echo '+';
                         log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', 3, $inserted_id);

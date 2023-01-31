@@ -10,11 +10,11 @@
                     "version": "01.21",
                     "hardware": "TM-5300",
                     "features": null,
+                    "location": "<private>",
                     "os": "canonprinter",
                     "type": "printer",
                     "serial": null,
-                    "icon": "canon.svg",
-                    "location": "<private>"
+                    "icon": "canon.svg"
                 }
             ]
         },
@@ -475,6 +475,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -499,6 +500,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -523,6 +525,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrDeviceStatus"
                 },
                 {
@@ -547,6 +550,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "hrPrinterDetectedErrorState"
                 }
             ],

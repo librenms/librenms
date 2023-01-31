@@ -40,20 +40,21 @@ if (isset($options['snmpsim'])) {
 
 if (isset($options['h'])
     || isset($options['help'])
-    || (isset($options['o']) || isset($options['os'])) && ! (isset($options['v']) || isset($options['variant']))
     || ! (isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
 ) {
     echo "Script to update test data. Database data is saved in tests/data.
 
 Usage:
-  You must specify a valid OS (and variant) and/or module(s).
+  - This script can process new test data (by specifying both OS and VARIANT).
+  - This script can refresh test data.
+    -> if an OS is specified, only this OS will be refreshed.
+    -> if MODULES are specified, only these modules will be refreshed.
 
-Required:
-  -o, --os           Name of the OS to save test data for
-  -v, --variant      The variant of the OS to use, usually the device model
-
-Optional:
-  -m, --modules      The discovery/poller module(s) to collect data for, comma delimited
+Parameters:
+  -o, --os           Name of the OS to save test data for.
+  -v, --variant      The variant of the OS to use, usually the device model.
+  -m, --modules      The discovery/poller module(s) to collect data for, comma delimited.
+                     Use -m 'all' for all modules.
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
@@ -73,7 +74,10 @@ if (isset($options['o'])) {
     $os_name = $options['os'];
 }
 
-if (isset($options['m'])) {
+if ((isset($options['m']) && $options['m'] == 'all') || (isset($options['modules']) && $options['modules'] == 'all')) {
+    $modules_input = 'all';
+    $modules = [];
+} elseif (isset($options['m'])) {
     $modules_input = $options['m'];
     $modules = explode(',', $modules_input);
 } elseif (isset($options['modules'])) {
@@ -85,7 +89,8 @@ if (isset($options['m'])) {
 }
 
 $full_os_name = $os_name;
-$variant = '';
+$variant = null;
+
 if (isset($options['v'])) {
     $variant = $options['v'];
     $full_os_name = $os_name . '_' . $variant;
@@ -96,8 +101,10 @@ if (isset($options['v'])) {
 
 $os_list = [];
 
-if ($os_name) {
+if (isset($os_name) && isset($variant)) {
     $os_list = [$full_os_name => [$os_name, $variant]];
+} elseif (isset($os_name)) {
+    $os_list = ModuleTestHelper::findOsWithData($modules, $os_name);
 } else {
     $os_list = ModuleTestHelper::findOsWithData($modules);
 }
@@ -122,6 +129,10 @@ if (! $snmpsim->isRunning()) {
     echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
     exit(1);
 }
+
+echo "Pausing 10 seconds to allow snmpsim to initialize...\n";
+sleep(10);
+echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);

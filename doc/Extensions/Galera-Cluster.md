@@ -4,7 +4,7 @@ This is currently being tested, use at your own risk.
 
 LibreNMS can be used with a MariaDB Galera Cluster. This is a Multi Master cluster, meaning each
 node in the cluster can read and write to the database. They all have the same ability. LibreNMS will
-randomly choose a working node to read and write requests to. 
+randomly choose a working node to read and write requests to.
 
 
 For more information see
@@ -14,7 +14,7 @@ For more information see
 ## Getting Started
 
  * It is best practice to have a minimum of 3 nodes in the cluster, A odd number of nodes is recommended in the event nodes have a disagreement on data, they will have a tie breaker.
- * It's recommended that all servers be similar in hardware performance, cluster performance can be affected by the slowest server in the cluster. 
+ * It's recommended that all servers be similar in hardware performance, cluster performance can be affected by the slowest server in the cluster.
  * Backup the database before starting, and backing up the database regularly is still recommended even in a working cluster environment.
 
 ## Install and Configure Galera
@@ -52,7 +52,7 @@ wsrep_sst_method=rsync
 wsrep_node_address="192.168.1.35"
 wsrep_node_name="librenms1.35"
 ```
-Change the following values for your environment. 
+Change the following values for your environment.
 * wsrep_cluster_address -  All the IP address's of your nodes.
 * wsrep_cluster_name - Name of cluster, should be the same for all nodes
 * wsrep_node_address - IP address of this node.
@@ -60,12 +60,12 @@ Change the following values for your environment.
 
 ### Edit LibreNMS .env
 
-LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node. 
-The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too. 
+LibreNMS supports up to 9 galera nodes, you define these nodes in the .env file. For each node we have the ability to define if this librenms installation/poller is able to write, read or both to that node.
+The galera nodes you define here can be the same or differnt for each librenms poller. If you have a poller you only want to write/read to one galera node, you would simply add one DB_HOST, and omit all the rest. This allows you to precisely control what galera nodes a librenms poller is reading and or writing too.
 
 * DB_HOST is always set to read/write.
 * DB_HOST must be set, however, it does not have to be the same on each poller, it can be different as long as it's part of the same galera cluster.
-* If the node that is set to DB_HOST is down, things like ```lnms db``` command no longer work, as they only use DB_HOST and don't failover to other nodes. 
+* If the node that is set to DB_HOST is down, things like ```lnms db``` command no longer work, as they only use DB_HOST and don't failover to other nodes.
 * Set DB_CONNECTION=mysql_cluster to enable
 * DB_STICKY can be used if you are pulling out of sync data form the database in a read request. For more information see
 <https://laravel.com/docs/database#the-sticky-option>
@@ -88,7 +88,7 @@ DB_USERNAME=librenms
 DB_PASSWORD=password
 ```
 The above .env on a librenms installation/poller would communicate to each galera node as follows.
- 
+
 * 192.168.1.35 - Read/Write
 * 192.168.1.36 - Read/Write
 * 192.168.1.37 - Read/Write
@@ -98,17 +98,17 @@ The above .env on a librenms installation/poller would communicate to each galer
 ### Starting Galera Cluster for the first time.
 
 1) Shutdown MariaDB server on ALL nodes.
-	```bash
-	sudo systemctl stop mariadb-server
-	```
+    ```bash
+    sudo systemctl stop mariadb-server
+    ```
 2) On the server with your existing database or any mariadb server if you are starting without existing data, run the following command
-	```bash
-	sudo galera_new_cluster
-	```
+    ```bash
+    sudo galera_new_cluster
+    ```
 3) Start the rest of the nodes normally.
-	```bash
-	sudo systemctl start mariadb-server
-	```
+    ```bash
+    sudo systemctl start mariadb-server
+    ```
 
 ### Galera Cluster Status
 
@@ -122,7 +122,7 @@ In the database run following mysql query
 SHOW GLOBAL STATUS LIKE 'wsrep_%';
 ```
 
-|    Variable Name                     |    Value                                                        |   Notes                                                 |  
+|    Variable Name                     |    Value                                                        |   Notes                                                 |
 |    :----:                            |    :----:                                                       |    :----:                                               |
 | -----------------------------------  | ----------------------------------------------------------------|---------------------------------------------------------|
 | wsrep_cluster_size                   | 2                                                               | Current number of nodes in Cluster                      |
@@ -150,6 +150,6 @@ seqno:   -1
 safe_to_bootstrap: 1
 ```
 
-If the safe_to_bootstrap = 1, then Galera determined that this node has the most up-to-date database and can be safeley used to start the cluster. 
+If the safe_to_bootstrap = 1, then Galera determined that this node has the most up-to-date database and can be safeley used to start the cluster.
 
 Once you have found a node that can be used for starting the cluster, follow the steps in starting for the first time.

@@ -10,11 +10,11 @@
                     "version": "3.4.11-rt19",
                     "hardware": "LBB_154",
                     "features": null,
+                    "location": "<private>",
                     "os": "oneaccess",
                     "type": "network",
                     "serial": "S2116008555223620",
-                    "icon": "oneaccess.png",
-                    "location": "<private>"
+                    "icon": "oneaccess.png"
                 }
             ]
         },
@@ -877,8 +877,8 @@
                     "ifName": "GigabitEthernet0/0",
                     "portName": null,
                     "ifIndex": 524288,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -982,8 +982,8 @@
                     "ifName": "GigabitEthernet0/1",
                     "portName": null,
                     "ifIndex": 528384,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1087,8 +1087,8 @@
                     "ifName": "GigabitEthernet0/2",
                     "portName": null,
                     "ifIndex": 532480,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1297,8 +1297,8 @@
                     "ifName": "GigabitEthernet1/0",
                     "portName": null,
                     "ifIndex": 589824,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1507,8 +1507,8 @@
                     "ifName": "Null0",
                     "portName": null,
                     "ifIndex": 1879048192,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -1612,8 +1612,8 @@
                     "ifName": "Loopback1",
                     "portName": null,
                     "ifIndex": 1912602625,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -1791,6 +1791,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1815,6 +1816,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1839,6 +1841,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1863,6 +1866,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1887,6 +1891,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1911,6 +1916,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -1935,6 +1941,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacCellRadioAccessTechnology"
                 },
                 {
@@ -1959,6 +1966,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 },
                 {
@@ -1983,6 +1991,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "oacSysCpuUsedCoreType"
                 }
             ],

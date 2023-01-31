@@ -10,11 +10,11 @@
                     "version": "3.3.0",
                     "hardware": "Room Alert 12E",
                     "features": null,
+                    "location": "<private>",
                     "os": "avtech",
                     "type": "environment",
                     "serial": null,
-                    "icon": "avtech.svg",
-                    "location": "<private>"
+                    "icon": "avtech.svg"
                 }
             ]
         },
@@ -265,6 +265,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -289,6 +290,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -313,6 +315,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

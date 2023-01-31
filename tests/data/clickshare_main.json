@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": "R9861520EU.",
+                    "location": "Zentraler Semina72 72 61 75 6D 00",
                     "os": "clickshare",
                     "type": "collaboration",
                     "serial": "1874830543.",
-                    "icon": "barco.svg",
-                    "location": "Zentraler Semina72 72 61 75 6D 00"
+                    "icon": "barco.svg"
                 }
             ]
         },
@@ -895,6 +895,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -919,6 +920,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

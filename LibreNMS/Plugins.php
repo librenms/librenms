@@ -27,6 +27,7 @@
 namespace LibreNMS;
 
 use App\Models\Plugin;
+use LibreNMS\Util\Notifications;
 use Log;
 
 /**
@@ -109,7 +110,7 @@ class Plugins
 
             foreach ((array) $hooks as $hookName) {
                 if ($hookName[0] != '_') {
-                    self::$plugins[$hookName][] = $class;
+                    self::$plugins[$hookName][] = $plugin;
                 }
             }
         }
@@ -183,15 +184,21 @@ class Plugins
 
         ob_start();
         if (! empty(self::$plugins[$hook])) {
-            foreach (self::$plugins[$hook] as $name) {
+            foreach (self::$plugins[$hook] as $plugin) {
                 try {
                     if (! is_array($params)) {
-                        @call_user_func([$name, $hook]);
+                        @call_user_func([$plugin, $hook]);
                     } else {
-                        @call_user_func_array([$name, $hook], $params);
+                        @call_user_func_array([$plugin, $hook], $params);
                     }
-                } catch (\Exception $e) {
+                } catch (\Exception|\Error $e) {
                     Log::error($e);
+
+                    $class = (string) get_class($plugin);
+                    $name = property_exists($class, 'name') ? $class::$name : basename(str_replace('\\', '/', $class));
+
+                    Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);
+                    Plugin::where('plugin_name', $name)->update(['plugin_active' => 0]);
                 }
             }
         }

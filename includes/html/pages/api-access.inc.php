@@ -59,7 +59,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <select class="form-control" id="user_id" name="user_id">
     <?php
     foreach ($userlist = User::all() as $user) {
-        echo '<option value="' . $user->user_id . '">' . $user->username . ' (' . $user->auth_type . ')</option>';
+        echo '<option value="' . $user->user_id . '">' . htmlentities($user->username) . ' (' . htmlentities($user->auth_type) . ')</option>';
     } ?>
                 </select>
               </div>

@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `access_points`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `access_points` (
   `accesspoint_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE `access_points` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_device_map`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_device_map` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule_id` int(10) unsigned NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE `alert_device_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_group_map`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_group_map` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule_id` int(10) unsigned NOT NULL,
@@ -52,7 +52,7 @@ CREATE TABLE `alert_group_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_location_map`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_location_map` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule_id` int(10) unsigned NOT NULL,
@@ -63,7 +63,7 @@ CREATE TABLE `alert_location_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_log`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_log` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule_id` int(10) unsigned NOT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `alert_log` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_rules`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_rules` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE `alert_rules` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_schedulables`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_schedulables` (
   `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `schedule_id` int(10) unsigned NOT NULL,
@@ -112,7 +112,7 @@ CREATE TABLE `alert_schedulables` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_schedule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_schedule` (
   `schedule_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `recurring` tinyint(1) unsigned NOT NULL DEFAULT '0',
@@ -126,7 +126,7 @@ CREATE TABLE `alert_schedule` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_template_map`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_template_map` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `alert_templates_id` int(10) unsigned NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE `alert_template_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_templates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_templates` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -149,7 +149,7 @@ CREATE TABLE `alert_templates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_transport_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_transport_groups` (
   `transport_group_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `transport_group_name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -158,7 +158,7 @@ CREATE TABLE `alert_transport_groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_transport_map`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_transport_map` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rule_id` int(10) unsigned NOT NULL,
@@ -169,7 +169,7 @@ CREATE TABLE `alert_transport_map` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alert_transports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alert_transports` (
   `transport_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `transport_name` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -181,7 +181,7 @@ CREATE TABLE `alert_transports` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `alerts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `alerts` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -200,7 +200,7 @@ CREATE TABLE `alerts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `api_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `api_tokens` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -213,7 +213,7 @@ CREATE TABLE `api_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `application_metrics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `application_metrics` (
   `app_id` int(10) unsigned NOT NULL,
   `metric` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -224,7 +224,7 @@ CREATE TABLE `application_metrics` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `applications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `applications` (
   `app_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -232,16 +232,17 @@ CREATE TABLE `applications` (
   `app_state` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'UNKNOWN',
   `discovered` tinyint(4) NOT NULL DEFAULT '0',
   `app_state_prev` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `app_status` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `app_status` varchar(1024) COLLATE utf8mb4_unicode_ci NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `app_instance` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `data` longtext COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`app_id`),
   UNIQUE KEY `applications_device_id_app_type_unique` (`device_id`,`app_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `authlog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `authlog` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `datetime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -253,7 +254,7 @@ CREATE TABLE `authlog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `availability`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `availability` (
   `availability_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -266,7 +267,7 @@ CREATE TABLE `availability` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bgpPeers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bgpPeers` (
   `bgpPeer_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -279,6 +280,7 @@ CREATE TABLE `bgpPeers` (
   `bgpPeerLastErrorCode` int(11) DEFAULT NULL,
   `bgpPeerLastErrorSubCode` int(11) DEFAULT NULL,
   `bgpPeerLastErrorText` varchar(254) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bgpPeerIface` int(10) unsigned DEFAULT NULL,
   `bgpLocalAddr` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `bgpPeerRemoteAddr` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `bgpPeerDescr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -295,7 +297,7 @@ CREATE TABLE `bgpPeers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bgpPeers_cbgp`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bgpPeers_cbgp` (
   `device_id` int(10) unsigned NOT NULL,
   `bgpPeerIdentifier` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -326,7 +328,7 @@ CREATE TABLE `bgpPeers_cbgp` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_data`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_data` (
   `bill_id` int(10) unsigned NOT NULL,
   `timestamp` datetime NOT NULL,
@@ -340,7 +342,7 @@ CREATE TABLE `bill_data` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_history`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_history` (
   `bill_hist_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `bill_id` int(10) unsigned NOT NULL,
@@ -362,6 +364,8 @@ CREATE TABLE `bill_history` (
   `traf_in` bigint(20) NOT NULL,
   `traf_out` bigint(20) NOT NULL,
   `traf_total` bigint(20) NOT NULL,
+  `bill_peak_out` bigint(20) DEFAULT NULL,
+  `bill_peak_in` bigint(20) DEFAULT NULL,
   `pdf` longblob,
   PRIMARY KEY (`bill_hist_id`),
   UNIQUE KEY `bill_history_bill_id_bill_datefrom_bill_dateto_unique` (`bill_id`,`bill_datefrom`,`bill_dateto`),
@@ -370,7 +374,7 @@ CREATE TABLE `bill_history` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_perms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_perms` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -380,7 +384,7 @@ CREATE TABLE `bill_perms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_port_counters`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_port_counters` (
   `port_id` int(10) unsigned NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -394,7 +398,7 @@ CREATE TABLE `bill_port_counters` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bill_ports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bill_ports` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `bill_id` int(10) unsigned NOT NULL,
@@ -405,7 +409,7 @@ CREATE TABLE `bill_ports` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `bills`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `bills` (
   `bill_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `bill_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -433,17 +437,17 @@ CREATE TABLE `bills` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `value` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   `expiration` int(11) NOT NULL,
   UNIQUE KEY `cache_key_unique` (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cache_locks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cache_locks` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -453,7 +457,7 @@ CREATE TABLE `cache_locks` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `callback`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `callback` (
   `callback_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -463,7 +467,7 @@ CREATE TABLE `callback` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cef_switching`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `cef_switching` (
   `cef_switching_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -485,7 +489,7 @@ CREATE TABLE `cef_switching` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ciscoASA`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ciscoASA` (
   `ciscoASA_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -500,7 +504,7 @@ CREATE TABLE `ciscoASA` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `component`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `component` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID for each component, unique index',
   `device_id` int(10) unsigned NOT NULL COMMENT 'device_id from the devices table',
@@ -517,7 +521,7 @@ CREATE TABLE `component` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `component_prefs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `component_prefs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID for each entry',
   `component` int(10) unsigned NOT NULL COMMENT 'id from the component table',
@@ -530,7 +534,7 @@ CREATE TABLE `component_prefs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `component_statuslog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `component_statuslog` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID for each log entry, unique index',
   `component_id` int(10) unsigned NOT NULL COMMENT 'id from the component table',
@@ -544,18 +548,18 @@ CREATE TABLE `component_statuslog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `config`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `config` (
   `config_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `config_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `config_value` varchar(512) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `config_value` mediumtext COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`config_id`),
   UNIQUE KEY `config_config_name_unique` (`config_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `customers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customers` (
   `customer_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `username` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -568,7 +572,7 @@ CREATE TABLE `customers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `customoids`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `customoids` (
   `customoid_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -594,7 +598,7 @@ CREATE TABLE `customoids` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `dashboards`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dashboards` (
   `dashboard_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -605,7 +609,7 @@ CREATE TABLE `dashboards` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `dbSchema`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dbSchema` (
   `version` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`version`)
@@ -613,7 +617,7 @@ CREATE TABLE `dbSchema` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_graphs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_graphs` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -624,7 +628,7 @@ CREATE TABLE `device_graphs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_group_device`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_group_device` (
   `device_group_id` int(10) unsigned NOT NULL,
   `device_id` int(10) unsigned NOT NULL,
@@ -637,7 +641,7 @@ CREATE TABLE `device_group_device` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -651,18 +655,20 @@ CREATE TABLE `device_groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_outages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_outages` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
   `going_down` bigint(20) NOT NULL,
   `up_again` bigint(20) DEFAULT NULL,
+  PRIMARY KEY (`id`),
   UNIQUE KEY `device_outages_device_id_going_down_unique` (`device_id`,`going_down`),
   KEY `device_outages_device_id_index` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_perf`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_perf` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -681,7 +687,7 @@ CREATE TABLE `device_perf` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `device_relationships`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `device_relationships` (
   `parent_device_id` int(10) unsigned NOT NULL DEFAULT '0',
   `child_device_id` int(10) unsigned NOT NULL,
@@ -693,12 +699,13 @@ CREATE TABLE `device_relationships` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `devices`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `devices` (
   `device_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `inserted` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `hostname` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
   `sysName` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `display` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ip` varbinary(16) DEFAULT NULL,
   `overwrite_ip` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `community` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -747,21 +754,21 @@ CREATE TABLE `devices` (
   `max_depth` int(11) NOT NULL DEFAULT '0',
   `disable_notify` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`device_id`),
-  KEY `devices_hostname_index` (`hostname`),
   KEY `devices_sysname_index` (`sysName`),
   KEY `devices_os_index` (`os`),
   KEY `devices_status_index` (`status`),
   KEY `devices_last_polled_index` (`last_polled`),
-  KEY `devices_last_poll_attempted_index` (`last_poll_attempted`)
+  KEY `devices_last_poll_attempted_index` (`last_poll_attempted`),
+  KEY `devices_hostname_sysname_display_index` (`hostname`,`sysName`,`display`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `devices_attribs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `devices_attribs` (
   `attrib_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
-  `attrib_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attrib_type` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `attrib_value` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`attrib_id`),
@@ -770,7 +777,7 @@ CREATE TABLE `devices_attribs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `devices_group_perms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `devices_group_perms` (
   `user_id` int(10) unsigned NOT NULL,
   `device_group_id` int(10) unsigned NOT NULL,
@@ -781,7 +788,7 @@ CREATE TABLE `devices_group_perms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `devices_perms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `devices_perms` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -792,7 +799,7 @@ CREATE TABLE `devices_perms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `entPhysical`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `entPhysical` (
   `entPhysical_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -819,7 +826,7 @@ CREATE TABLE `entPhysical` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `entPhysical_state`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `entPhysical_state` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -834,7 +841,7 @@ CREATE TABLE `entPhysical_state` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `entityState`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `entityState` (
   `entity_state_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned DEFAULT NULL,
@@ -851,7 +858,7 @@ CREATE TABLE `entityState` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `eventlog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `eventlog` (
   `event_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned DEFAULT NULL,
@@ -868,7 +875,7 @@ CREATE TABLE `eventlog` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `graph_types`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `graph_types` (
   `graph_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `graph_subtype` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -883,7 +890,7 @@ CREATE TABLE `graph_types` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `hrDevice`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hrDevice` (
   `hrDevice_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -897,9 +904,22 @@ CREATE TABLE `hrDevice` (
   KEY `hrdevice_device_id_index` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `hrSystem`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `hrSystem` (
+  `hrSystem_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `device_id` int(10) unsigned NOT NULL,
+  `hrSystemNumUsers` int(11) DEFAULT NULL,
+  `hrSystemProcesses` int(11) DEFAULT NULL,
+  `hrSystemMaxProcesses` int(11) DEFAULT NULL,
+  PRIMARY KEY (`hrSystem_id`),
+  KEY `hrsystem_device_id_index` (`device_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipsec_tunnels`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipsec_tunnels` (
   `tunnel_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -915,7 +935,7 @@ CREATE TABLE `ipsec_tunnels` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipv4_addresses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipv4_addresses` (
   `ipv4_address_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ipv4_address` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -929,7 +949,7 @@ CREATE TABLE `ipv4_addresses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipv4_mac`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipv4_mac` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `port_id` int(10) unsigned NOT NULL,
@@ -944,7 +964,7 @@ CREATE TABLE `ipv4_mac` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipv4_networks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipv4_networks` (
   `ipv4_network_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ipv4_network` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -954,7 +974,7 @@ CREATE TABLE `ipv4_networks` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipv6_addresses`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipv6_addresses` (
   `ipv6_address_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ipv6_address` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -970,7 +990,7 @@ CREATE TABLE `ipv6_addresses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ipv6_networks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ipv6_networks` (
   `ipv6_network_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ipv6_network` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -978,9 +998,33 @@ CREATE TABLE `ipv6_networks` (
   PRIMARY KEY (`ipv6_network_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `isis_adjacencies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `isis_adjacencies` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `device_id` int(11) NOT NULL,
+  `index` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `port_id` int(11) DEFAULT NULL,
+  `ifIndex` int(11) NOT NULL,
+  `isisISAdjState` varchar(13) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `isisISAdjNeighSysType` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisISAdjNeighSysID` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisISAdjNeighPriority` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisISAdjLastUpTime` bigint(20) unsigned DEFAULT NULL,
+  `isisISAdjAreaAddress` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisISAdjIPAddrType` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisISAdjIPAddrAddress` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `isisCircAdminState` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'off',
+  PRIMARY KEY (`id`),
+  KEY `isis_adjacencies_device_id_index` (`device_id`),
+  KEY `isis_adjacencies_port_id_index` (`port_id`),
+  KEY `isis_adjacencies_ifindex_index` (`ifIndex`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `juniAtmVp`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `juniAtmVp` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `juniAtmVp_id` int(10) unsigned NOT NULL,
@@ -993,7 +1037,7 @@ CREATE TABLE `juniAtmVp` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `links`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `links` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `local_port_id` int(10) unsigned DEFAULT NULL,
@@ -1014,7 +1058,7 @@ CREATE TABLE `links` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `loadbalancer_rservers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `loadbalancer_rservers` (
   `rserver_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `farm_id` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1025,7 +1069,7 @@ CREATE TABLE `loadbalancer_rservers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `loadbalancer_vservers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `loadbalancer_vservers` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `classmap_id` int(10) unsigned NOT NULL,
@@ -1038,20 +1082,21 @@ CREATE TABLE `loadbalancer_vservers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `locations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `locations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `location` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `lat` double(10,6) DEFAULT NULL,
   `lng` double(10,6) DEFAULT NULL,
   `timestamp` datetime NOT NULL,
+  `fixed_coordinates` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `locations_location_unique` (`location`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mac_accounting`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mac_accounting` (
   `ma_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `port_id` int(10) unsigned NOT NULL,
@@ -1085,7 +1130,7 @@ CREATE TABLE `mac_accounting` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mefinfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mefinfo` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1102,7 +1147,7 @@ CREATE TABLE `mefinfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mempools`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mempools` (
   `mempool_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mempool_index` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1130,7 +1175,7 @@ CREATE TABLE `mempools` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `migrations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1140,7 +1185,7 @@ CREATE TABLE `migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_lsp_paths`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_lsp_paths` (
   `lsp_path_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `lsp_id` int(10) unsigned NOT NULL,
@@ -1169,7 +1214,7 @@ CREATE TABLE `mpls_lsp_paths` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_lsps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_lsps` (
   `lsp_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `vrf_oid` int(10) unsigned NOT NULL,
@@ -1199,7 +1244,7 @@ CREATE TABLE `mpls_lsps` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_saps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_saps` (
   `sap_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `svc_id` int(10) unsigned NOT NULL,
@@ -1221,7 +1266,7 @@ CREATE TABLE `mpls_saps` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_sdp_binds`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_sdp_binds` (
   `bind_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sdp_id` int(10) unsigned NOT NULL,
@@ -1246,7 +1291,7 @@ CREATE TABLE `mpls_sdp_binds` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_sdps`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_sdps` (
   `sdp_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sdp_oid` int(10) unsigned NOT NULL,
@@ -1269,7 +1314,7 @@ CREATE TABLE `mpls_sdps` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_services`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_services` (
   `svc_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `svc_oid` int(10) unsigned NOT NULL,
@@ -1297,7 +1342,7 @@ CREATE TABLE `mpls_services` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_tunnel_ar_hops`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_tunnel_ar_hops` (
   `ar_hop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mplsTunnelARHopListIndex` int(10) unsigned NOT NULL,
@@ -1320,7 +1365,7 @@ CREATE TABLE `mpls_tunnel_ar_hops` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `mpls_tunnel_c_hops`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mpls_tunnel_c_hops` (
   `c_hop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mplsTunnelCHopListIndex` int(10) unsigned NOT NULL,
@@ -1339,7 +1384,7 @@ CREATE TABLE `mpls_tunnel_c_hops` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `munin_plugins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `munin_plugins` (
   `mplug_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1359,7 +1404,7 @@ CREATE TABLE `munin_plugins` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `munin_plugins_ds`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `munin_plugins_ds` (
   `mplug_id` int(10) unsigned NOT NULL,
   `ds_name` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1384,7 +1429,7 @@ CREATE TABLE `munin_plugins_ds` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `netscaler_vservers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `netscaler_vservers` (
   `vsvr_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1403,7 +1448,7 @@ CREATE TABLE `netscaler_vservers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notifications` (
   `notifications_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -1419,7 +1464,7 @@ CREATE TABLE `notifications` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notifications_attribs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `notifications_attribs` (
   `attrib_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `notifications_id` int(10) unsigned NOT NULL,
@@ -1432,7 +1477,7 @@ CREATE TABLE `notifications_attribs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ospf_areas`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ospf_areas` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1453,7 +1498,7 @@ CREATE TABLE `ospf_areas` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ospf_instances`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ospf_instances` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1479,7 +1524,7 @@ CREATE TABLE `ospf_instances` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ospf_nbrs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ospf_nbrs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1503,7 +1548,7 @@ CREATE TABLE `ospf_nbrs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ospf_ports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ospf_ports` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1541,7 +1586,7 @@ CREATE TABLE `ospf_ports` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `packages`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `packages` (
   `pkg_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1559,7 +1604,7 @@ CREATE TABLE `packages` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pdb_ix`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pdb_ix` (
   `pdb_ix_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ix_id` int(10) unsigned NOT NULL,
@@ -1571,7 +1616,7 @@ CREATE TABLE `pdb_ix` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pdb_ix_peers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pdb_ix_peers` (
   `pdb_ix_peers_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ix_id` int(10) unsigned NOT NULL,
@@ -1584,34 +1629,22 @@ CREATE TABLE `pdb_ix_peers` (
   PRIMARY KEY (`pdb_ix_peers_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `perf_times`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `perf_times` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `type` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `doing` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `start` int(10) unsigned NOT NULL,
-  `duration` double(8,2) NOT NULL,
-  `devices` int(10) unsigned NOT NULL,
-  `poller` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `perf_times_type_index` (`type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `plugins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `plugins` (
   `plugin_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `plugin_name` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
   `plugin_active` int(11) NOT NULL,
-  PRIMARY KEY (`plugin_id`)
+  `version` int(11) NOT NULL DEFAULT '1',
+  `settings` longtext COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`plugin_id`),
+  UNIQUE KEY `plugins_version_plugin_name_unique` (`version`,`plugin_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `poller_cluster`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `poller_cluster` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `node_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1648,7 +1681,7 @@ CREATE TABLE `poller_cluster` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `poller_cluster_stats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `poller_cluster_stats` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `parent_poller` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1664,7 +1697,7 @@ CREATE TABLE `poller_cluster_stats` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `poller_groups`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `poller_groups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `group_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1674,7 +1707,7 @@ CREATE TABLE `poller_groups` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pollers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pollers` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `poller_name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1685,9 +1718,33 @@ CREATE TABLE `pollers` (
   UNIQUE KEY `pollers_poller_name_unique` (`poller_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `port_group_port`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `port_group_port` (
+  `port_group_id` int(10) unsigned NOT NULL,
+  `port_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`port_group_id`,`port_id`),
+  KEY `port_group_port_port_group_id_index` (`port_group_id`),
+  KEY `port_group_port_port_id_index` (`port_id`),
+  CONSTRAINT `port_group_port_port_group_id_foreign` FOREIGN KEY (`port_group_id`) REFERENCES `port_groups` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `port_group_port_port_id_foreign` FOREIGN KEY (`port_id`) REFERENCES `ports` (`port_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `port_groups`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `port_groups` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `desc` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `port_groups_name_unique` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports` (
   `port_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1704,17 +1761,15 @@ CREATE TABLE `ports` (
   `ifSpeed_prev` bigint(20) DEFAULT NULL,
   `ifConnectorPresent` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifPromiscuousMode` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ifHighSpeed` int(11) DEFAULT NULL,
-  `ifHighSpeed_prev` int(11) DEFAULT NULL,
   `ifOperStatus` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifOperStatus_prev` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifAdminStatus` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifAdminStatus_prev` varchar(16) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifDuplex` varchar(12) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifMtu` int(11) DEFAULT NULL,
-  `ifType` text COLLATE utf8mb4_unicode_ci,
-  `ifAlias` text COLLATE utf8mb4_unicode_ci,
-  `ifPhysAddress` text COLLATE utf8mb4_unicode_ci,
+  `ifType` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ifAlias` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ifPhysAddress` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifHardType` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `ifLastChange` bigint(20) unsigned NOT NULL DEFAULT '0',
   `ifVlan` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
@@ -1765,38 +1820,39 @@ CREATE TABLE `ports` (
   `poll_period` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`port_id`),
   UNIQUE KEY `ports_device_id_ifindex_unique` (`device_id`,`ifIndex`),
-  KEY `ports_ifdescr_index` (`ifDescr`)
+  KEY `ports_ifalias_port_descr_descr_portname_index` (`ifAlias`,`port_descr_descr`,`portName`),
+  KEY `ports_ifdescr_ifname_index` (`ifDescr`,`ifName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_adsl`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_adsl` (
   `port_id` int(10) unsigned NOT NULL,
   `port_adsl_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `adslLineCoding` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslLineType` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAtucInvVendorID` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAtucInvVersionNumber` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAtucCurrSnrMgn` decimal(5,1) NOT NULL,
-  `adslAtucCurrAtn` decimal(5,1) NOT NULL,
-  `adslAtucCurrOutputPwr` decimal(5,1) NOT NULL,
-  `adslAtucCurrAttainableRate` int(11) NOT NULL,
-  `adslAtucChanCurrTxRate` int(11) NOT NULL,
-  `adslAturInvSerialNumber` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAturInvVendorID` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAturInvVersionNumber` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `adslAturChanCurrTxRate` int(11) NOT NULL,
-  `adslAturCurrSnrMgn` decimal(5,1) NOT NULL,
-  `adslAturCurrAtn` decimal(5,1) NOT NULL,
-  `adslAturCurrOutputPwr` decimal(5,1) NOT NULL,
-  `adslAturCurrAttainableRate` int(11) NOT NULL,
+  `adslLineCoding` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslLineType` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAtucInvVendorID` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAtucInvVersionNumber` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAtucCurrSnrMgn` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAtucCurrAtn` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAtucCurrOutputPwr` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAtucCurrAttainableRate` int(11) NOT NULL DEFAULT '0',
+  `adslAtucChanCurrTxRate` int(11) NOT NULL DEFAULT '0',
+  `adslAturInvSerialNumber` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAturInvVendorID` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAturInvVersionNumber` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `adslAturChanCurrTxRate` int(11) NOT NULL DEFAULT '0',
+  `adslAturCurrSnrMgn` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAturCurrAtn` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAturCurrOutputPwr` decimal(5,1) NOT NULL DEFAULT '0.0',
+  `adslAturCurrAttainableRate` int(11) NOT NULL DEFAULT '0',
   UNIQUE KEY `ports_adsl_port_id_unique` (`port_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_fdb`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_fdb` (
   `ports_fdb_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `port_id` int(10) unsigned NOT NULL,
@@ -1814,7 +1870,7 @@ CREATE TABLE `ports_fdb` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_nac`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_nac` (
   `ports_nac_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `auth_id` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1840,7 +1896,7 @@ CREATE TABLE `ports_nac` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_perms`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_perms` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -1850,7 +1906,7 @@ CREATE TABLE `ports_perms` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_stack`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_stack` (
   `device_id` int(10) unsigned NOT NULL,
   `port_id_high` int(10) unsigned NOT NULL,
@@ -1861,7 +1917,7 @@ CREATE TABLE `ports_stack` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_statistics`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_statistics` (
   `port_id` int(10) unsigned NOT NULL,
   `ifInNUcastPkts` bigint(20) DEFAULT NULL,
@@ -1905,27 +1961,44 @@ CREATE TABLE `ports_statistics` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_stp`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_stp` (
   `port_stp_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
+  `vlan` int(10) unsigned DEFAULT NULL,
   `port_id` int(10) unsigned NOT NULL,
+  `port_index` int(10) unsigned NOT NULL DEFAULT '0',
   `priority` tinyint(3) unsigned NOT NULL,
   `state` varchar(11) COLLATE utf8mb4_unicode_ci NOT NULL,
   `enable` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `pathCost` int(10) unsigned NOT NULL,
   `designatedRoot` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `designatedCost` smallint(5) unsigned NOT NULL,
+  `designatedCost` int(10) unsigned NOT NULL,
   `designatedBridge` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `designatedPort` mediumint(9) NOT NULL,
   `forwardTransitions` int(10) unsigned NOT NULL,
   PRIMARY KEY (`port_stp_id`),
-  UNIQUE KEY `ports_stp_device_id_port_id_unique` (`device_id`,`port_id`)
+  UNIQUE KEY `ports_stp_device_id_vlan_port_index_unique` (`device_id`,`vlan`,`port_index`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `ports_vdsl`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ports_vdsl` (
+  `port_id` int(10) unsigned NOT NULL,
+  `port_vdsl_updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `xdsl2LineStatusAttainableRateDs` int(11) NOT NULL DEFAULT '0',
+  `xdsl2LineStatusAttainableRateUs` int(11) NOT NULL DEFAULT '0',
+  `xdsl2ChStatusActDataRateXtur` int(11) NOT NULL DEFAULT '0',
+  `xdsl2ChStatusActDataRateXtuc` int(11) NOT NULL DEFAULT '0',
+  `xdsl2LineStatusActAtpDs` decimal(8,2) NOT NULL DEFAULT '0.00',
+  `xdsl2LineStatusActAtpUs` decimal(8,2) NOT NULL DEFAULT '0.00',
+  UNIQUE KEY `ports_vdsl_port_id_unique` (`port_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ports_vlans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ports_vlans` (
   `port_vlan_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1940,9 +2013,26 @@ CREATE TABLE `ports_vlans` (
   UNIQUE KEY `ports_vlans_device_id_port_id_vlan_unique` (`device_id`,`port_id`,`vlan`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `printer_supplies`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `printer_supplies` (
+  `supply_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `device_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `supply_index` int(11) NOT NULL,
+  `supply_type` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supply_oid` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `supply_descr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `supply_capacity` int(11) NOT NULL DEFAULT '0',
+  `supply_current` int(11) NOT NULL DEFAULT '0',
+  `supply_capacity_oid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`supply_id`),
+  KEY `toner_device_id_index` (`device_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `processes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `processes` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -1958,7 +2048,7 @@ CREATE TABLE `processes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `processors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `processors` (
   `processor_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `entPhysicalIndex` int(11) NOT NULL DEFAULT '0',
@@ -1977,7 +2067,7 @@ CREATE TABLE `processors` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `proxmox`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `proxmox` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1991,7 +2081,7 @@ CREATE TABLE `proxmox` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `proxmox_ports`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `proxmox_ports` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `vm_id` int(11) NOT NULL,
@@ -2003,14 +2093,14 @@ CREATE TABLE `proxmox_ports` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pseudowires`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `pseudowires` (
   `pseudowire_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
   `port_id` int(10) unsigned NOT NULL,
   `peer_device_id` int(10) unsigned NOT NULL,
   `peer_ldp_id` int(11) NOT NULL,
-  `cpwVcID` int(11) NOT NULL,
+  `cpwVcID` int(10) unsigned NOT NULL,
   `cpwOid` int(11) NOT NULL,
   `pw_type` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `pw_psntype` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2020,9 +2110,28 @@ CREATE TABLE `pseudowires` (
   PRIMARY KEY (`pseudowire_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `push_subscriptions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `push_subscriptions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `subscribable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `subscribable_id` bigint(20) unsigned NOT NULL,
+  `endpoint` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `public_key` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `auth_token` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `content_encoding` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `push_subscriptions_endpoint_unique` (`endpoint`),
+  KEY `push_subscriptions_subscribable_type_subscribable_id_index` (`subscribable_type`,`subscribable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `route`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `route` (
   `route_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `created_at` timestamp NULL DEFAULT NULL,
@@ -2046,7 +2155,7 @@ CREATE TABLE `route` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `sensors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sensors` (
   `sensor_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sensor_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -2072,6 +2181,7 @@ CREATE TABLE `sensors` (
   `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `sensor_prev` double DEFAULT NULL,
   `user_func` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `rrd_type` enum('GAUGE','COUNTER','DERIVE','DCOUNTER','DDERIVE','ABSOLUTE') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GAUGE',
   PRIMARY KEY (`sensor_id`),
   KEY `sensors_sensor_class_index` (`sensor_class`),
   KEY `sensors_device_id_index` (`device_id`),
@@ -2081,7 +2191,7 @@ CREATE TABLE `sensors` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `sensors_to_state_indexes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sensors_to_state_indexes` (
   `sensors_to_state_translations_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sensor_id` int(10) unsigned NOT NULL,
@@ -2095,15 +2205,13 @@ CREATE TABLE `sensors_to_state_indexes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `service_templates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `service_templates` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip` text COLLATE utf8mb4_unicode_ci,
-  `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `dtype` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'static',
-  `dgtype` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'static',
-  `drules` text COLLATE utf8mb4_unicode_ci,
-  `dgrules` text COLLATE utf8mb4_unicode_ci,
+  `check` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'static',
+  `rules` text COLLATE utf8mb4_unicode_ci,
   `desc` text COLLATE utf8mb4_unicode_ci,
   `param` text COLLATE utf8mb4_unicode_ci,
   `ignore` tinyint(1) NOT NULL DEFAULT '0',
@@ -2115,7 +2223,7 @@ CREATE TABLE `service_templates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `service_templates_device`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `service_templates_device` (
   `service_template_id` int(10) unsigned NOT NULL,
   `device_id` int(10) unsigned NOT NULL,
@@ -2128,7 +2236,7 @@ CREATE TABLE `service_templates_device` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `service_templates_device_group`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `service_templates_device_group` (
   `service_template_id` int(10) unsigned NOT NULL,
   `device_group_id` int(10) unsigned NOT NULL,
@@ -2141,7 +2249,7 @@ CREATE TABLE `service_templates_device_group` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `services`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `services` (
   `service_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2163,7 +2271,7 @@ CREATE TABLE `services` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `session`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `session` (
   `session_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `session_username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2175,16 +2283,32 @@ CREATE TABLE `session` (
   UNIQUE KEY `session_session_value_unique` (`session_value`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `sessions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sessions` (
+  `id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text COLLATE utf8mb4_unicode_ci,
+  `payload` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_activity` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `sessions_user_id_index` (`user_id`),
+  KEY `sessions_last_activity_index` (`last_activity`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `slas`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `slas` (
   `sla_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
-  `sla_nr` int(11) NOT NULL,
+  `sla_nr` int(10) unsigned NOT NULL,
   `owner` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `tag` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `rtt_type` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `rtt` double(8,2) unsigned DEFAULT NULL,
   `status` tinyint(1) NOT NULL,
   `opstatus` tinyint(1) NOT NULL DEFAULT '0',
   `deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -2195,7 +2319,7 @@ CREATE TABLE `slas` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `state_indexes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `state_indexes` (
   `state_index_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `state_name` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2205,7 +2329,7 @@ CREATE TABLE `state_indexes` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `state_translations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `state_translations` (
   `state_translation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `state_index_id` int(10) unsigned NOT NULL,
@@ -2220,7 +2344,7 @@ CREATE TABLE `state_translations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `storage`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `storage` (
   `storage_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2242,10 +2366,11 @@ CREATE TABLE `storage` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `stp`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `stp` (
   `stp_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
+  `vlan` int(10) unsigned DEFAULT NULL,
   `rootBridge` tinyint(1) NOT NULL,
   `bridgeAddress` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `protocolSpecification` varchar(16) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2268,7 +2393,7 @@ CREATE TABLE `stp` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `syslog`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `syslog` (
   `device_id` int(10) unsigned DEFAULT NULL,
   `facility` varchar(10) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -2284,12 +2409,14 @@ CREATE TABLE `syslog` (
   KEY `syslog_device_id_timestamp_index` (`device_id`,`timestamp`),
   KEY `syslog_device_id_index` (`device_id`),
   KEY `syslog_timestamp_index` (`timestamp`),
-  KEY `syslog_program_index` (`program`)
+  KEY `syslog_program_index` (`program`),
+  KEY `syslog_device_id_program_index` (`device_id`,`program`),
+  KEY `syslog_device_id_priority_index` (`device_id`,`priority`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `tnmsneinfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `tnmsneinfo` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2305,26 +2432,9 @@ CREATE TABLE `tnmsneinfo` (
   KEY `tnmsneinfo_neid_index` (`neID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `toner`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `toner` (
-  `toner_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `device_id` int(10) unsigned NOT NULL DEFAULT '0',
-  `toner_index` int(11) NOT NULL,
-  `toner_type` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `toner_oid` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `toner_descr` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `toner_capacity` int(11) NOT NULL DEFAULT '0',
-  `toner_current` int(11) NOT NULL DEFAULT '0',
-  `toner_capacity_oid` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY (`toner_id`),
-  KEY `toner_device_id_index` (`device_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `transport_group_transport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `transport_group_transport` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `transport_group_id` int(10) unsigned NOT NULL,
@@ -2334,7 +2444,7 @@ CREATE TABLE `transport_group_transport` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `ucd_diskio`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ucd_diskio` (
   `diskio_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2346,11 +2456,11 @@ CREATE TABLE `ucd_diskio` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `user_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `auth_type` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `auth_id` int(11) DEFAULT NULL,
+  `auth_id` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `username` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `realname` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2368,7 +2478,7 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users_prefs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users_prefs` (
   `user_id` int(10) unsigned NOT NULL,
   `pref` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2378,11 +2488,11 @@ CREATE TABLE `users_prefs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users_widgets`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users_widgets` (
   `user_widget_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
-  `widget_id` int(10) unsigned NOT NULL,
+  `widget` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
   `col` tinyint(4) NOT NULL,
   `row` tinyint(4) NOT NULL,
   `size_x` tinyint(4) NOT NULL,
@@ -2392,12 +2502,12 @@ CREATE TABLE `users_widgets` (
   `settings` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `dashboard_id` int(10) unsigned NOT NULL,
   PRIMARY KEY (`user_widget_id`),
-  KEY `user_id` (`user_id`,`widget_id`)
+  KEY `user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vlans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vlans` (
   `vlan_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned DEFAULT NULL,
@@ -2412,7 +2522,7 @@ CREATE TABLE `vlans` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vminfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vminfo` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2430,7 +2540,7 @@ CREATE TABLE `vminfo` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vrf_lite_cisco`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vrf_lite_cisco` (
   `vrf_lite_cisco_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `device_id` int(10) unsigned NOT NULL,
@@ -2446,7 +2556,7 @@ CREATE TABLE `vrf_lite_cisco` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `vrfs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `vrfs` (
   `vrf_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `vrf_oid` varchar(256) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -2459,21 +2569,9 @@ CREATE TABLE `vrfs` (
   KEY `vrfs_device_id_index` (`device_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-DROP TABLE IF EXISTS `widgets`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `widgets` (
-  `widget_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `widget_title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `widget` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `base_dimensions` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY (`widget_id`),
-  UNIQUE KEY `widgets_widget_unique` (`widget`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `wireless_sensors`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `wireless_sensors` (
   `sensor_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sensor_deleted` tinyint(1) NOT NULL DEFAULT '0',
@@ -2498,6 +2596,7 @@ CREATE TABLE `wireless_sensors` (
   `lastupdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `sensor_oids` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `access_point_id` int(10) unsigned DEFAULT NULL,
+  `rrd_type` enum('GAUGE','COUNTER','DERIVE','DCOUNTER','DDERIVE','ABSOLUTE') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'GAUGE',
   PRIMARY KEY (`sensor_id`),
   KEY `wireless_sensors_sensor_class_index` (`sensor_class`),
   KEY `wireless_sensors_device_id_index` (`device_id`),
@@ -2709,3 +2808,54 @@ INSERT INTO `migrations` VALUES (194,'2020_10_12_095504_mempools_add_oids',1);
 INSERT INTO `migrations` VALUES (195,'2020_10_21_124101_allow_nullable_ospf_columns',1);
 INSERT INTO `migrations` VALUES (196,'2020_10_30_093601_add_tos_to_ospf_ports',1);
 INSERT INTO `migrations` VALUES (197,'2020_11_02_164331_add_powerstate_enum_to_vminfo',1);
+INSERT INTO `migrations` VALUES (198,'2020_06_24_155119_drop_ports_if_high_speed',2);
+INSERT INTO `migrations` VALUES (199,'2020_12_14_091314_create_port_group_port_table',2);
+INSERT INTO `migrations` VALUES (200,'2020_12_14_091314_create_port_groups_table',2);
+INSERT INTO `migrations` VALUES (201,'2021_02_08_224355_fix_invalid_dates',2);
+INSERT INTO `migrations` VALUES (202,'2021_02_09_084318_remove_perf_times',2);
+INSERT INTO `migrations` VALUES (203,'2021_02_09_122930_migrate_to_utf8mb4',2);
+INSERT INTO `migrations` VALUES (204,'2021_02_21_203415_location_add_fixed_coordinates_flag',2);
+INSERT INTO `migrations` VALUES (205,'2021_03_11_003540_rename_toner_table',2);
+INSERT INTO `migrations` VALUES (206,'2021_03_11_003713_rename_printer_columns',2);
+INSERT INTO `migrations` VALUES (207,'2021_03_17_160729_service_templates_cleanup',2);
+INSERT INTO `migrations` VALUES (208,'2021_03_26_014054_change_cache_to_mediumtext',2);
+INSERT INTO `migrations` VALUES (209,'2021_04_08_151101_add_foreign_keys_to_port_group_port_table',2);
+INSERT INTO `migrations` VALUES (210,'2021_06_07_123600_create_sessions_table',2);
+INSERT INTO `migrations` VALUES (211,'2021_06_11_084830_slas_add_rtt_field',2);
+INSERT INTO `migrations` VALUES (212,'2021_07_06_1845_alter_bill_history_max_min',2);
+INSERT INTO `migrations` VALUES (213,'2021_07_28_102443_plugins_add_version_and_settings',2);
+INSERT INTO `migrations` VALUES (214,'2021_08_04_102914_add_syslog_indexes',2);
+INSERT INTO `migrations` VALUES (215,'2021_08_26_093522_config_value_to_medium_text',2);
+INSERT INTO `migrations` VALUES (216,'2021_09_07_094310_create_push_subscriptions_table',2);
+INSERT INTO `migrations` VALUES (217,'2021_09_26_164200_create_hrsystem_table',2);
+INSERT INTO `migrations` VALUES (218,'2021_10_02_190310_add_device_outages_index',2);
+INSERT INTO `migrations` VALUES (219,'2021_10_03_164200_update_hrsystem_table',2);
+INSERT INTO `migrations` VALUES (220,'2021_10_20_072929_disable_example_plugin',2);
+INSERT INTO `migrations` VALUES (221,'2021_10_20_224207_increase_length_of_attrib_type_column',2);
+INSERT INTO `migrations` VALUES (222,'2021_11_12_123037_change_cpwVcID_to_unsignedInteger',2);
+INSERT INTO `migrations` VALUES (223,'2021_11_17_105321_device_add_display_field',2);
+INSERT INTO `migrations` VALUES (224,'2021_11_29_160744_change_ports_text_fields_to_varchar',2);
+INSERT INTO `migrations` VALUES (225,'2021_11_29_165046_improve_devices_search_index',2);
+INSERT INTO `migrations` VALUES (226,'2021_11_29_165436_improve_ports_search_index',2);
+INSERT INTO `migrations` VALUES (227,'2021_12_02_100709_remove_ports_stp_unique_index',2);
+INSERT INTO `migrations` VALUES (228,'2021_12_02_101739_add_vlan_field_to_stp_table',2);
+INSERT INTO `migrations` VALUES (229,'2021_12_02_101810_add_vlan_and_port_index_fields_to_ports_stp_table',2);
+INSERT INTO `migrations` VALUES (230,'2021_12_02_110154_update_ports_stp_unique_index',2);
+INSERT INTO `migrations` VALUES (231,'2021_12_02_113537_ports_stp_designated_cost_change_to_int',2);
+INSERT INTO `migrations` VALUES (232,'2021_25_01_0127_create_isis_adjacencies_table',2);
+INSERT INTO `migrations` VALUES (233,'2021_25_01_0128_isis_adjacencies_add_admin_status',2);
+INSERT INTO `migrations` VALUES (234,'2021_25_01_0129_isis_adjacencies_nullable',2);
+INSERT INTO `migrations` VALUES (235,'2022_02_03_164059_increase_auth_id_length',2);
+INSERT INTO `migrations` VALUES (236,'2022_02_21_073500_add_iface_field_to_bgp_peers',2);
+INSERT INTO `migrations` VALUES (237,'2022_04_08_085504_isis_adjacencies_table_add_index',2);
+INSERT INTO `migrations` VALUES (238,'2022_05_25_084506_add_widgets_column_to_users_widgets_table',2);
+INSERT INTO `migrations` VALUES (239,'2022_05_25_084617_migrate_widget_ids',2);
+INSERT INTO `migrations` VALUES (240,'2022_05_25_085715_remove_user_widgets_id',2);
+INSERT INTO `migrations` VALUES (241,'2022_05_25_090027_drop_widgets_table',2);
+INSERT INTO `migrations` VALUES (242,'2022_05_30_084932_update-app-status-length',2);
+INSERT INTO `migrations` VALUES (243,'2022_07_03_1947_add_app_data',2);
+INSERT INTO `migrations` VALUES (244,'2022_07_19_081224_plugins_unique_index',2);
+INSERT INTO `migrations` VALUES (245,'2022_08_15_084506_add_rrd_type_to_sensors_table',2);
+INSERT INTO `migrations` VALUES (246,'2022_08_15_084507_add_rrd_type_to_wireless_sensors_table',2);
+INSERT INTO `migrations` VALUES (247,'2022_08_15_091314_create_ports_vdsl_table',2);
+INSERT INTO `migrations` VALUES (248,'2022_09_03_091314_update_ports_adsl_table_with_defaults',2);

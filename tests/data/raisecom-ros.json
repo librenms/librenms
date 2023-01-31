@@ -10,11 +10,11 @@
                     "version": "ROS_6.2.0_20200614",
                     "hardware": "RAX711-C-R P100R001C00",
                     "features": null,
+                    "location": "<private>",
                     "os": "raisecom-ros",
                     "type": "network",
                     "serial": "103002031910S20907S0003G",
-                    "icon": "raisecom.png",
-                    "location": "<private>"
+                    "icon": "raisecom.png"
                 }
             ]
         },
@@ -1822,8 +1822,8 @@
                     "ifName": "fastethernet1/0/1",
                     "portName": null,
                     "ifIndex": 268435456,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
@@ -2137,8 +2137,8 @@
                     "ifName": "tengigabitethernet1/1/3",
                     "portName": null,
                     "ifIndex": 272637963,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2242,8 +2242,8 @@
                     "ifName": "tengigabitethernet1/1/4",
                     "portName": null,
                     "ifIndex": 272637967,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2347,8 +2347,8 @@
                     "ifName": "gigaethernet1/2/1",
                     "portName": null,
                     "ifIndex": 272646147,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2452,8 +2452,8 @@
                     "ifName": "gigaethernet1/2/2",
                     "portName": null,
                     "ifIndex": 272646151,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2557,8 +2557,8 @@
                     "ifName": "gigaethernet1/2/3",
                     "portName": null,
                     "ifIndex": 272646155,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2662,8 +2662,8 @@
                     "ifName": "gigaethernet1/2/4",
                     "portName": null,
                     "ifIndex": 272646159,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2767,8 +2767,8 @@
                     "ifName": "gigaethernet1/2/5",
                     "portName": null,
                     "ifIndex": 272646163,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2872,8 +2872,8 @@
                     "ifName": "gigaethernet1/2/6",
                     "portName": null,
                     "ifIndex": 272646167,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -2977,8 +2977,8 @@
                     "ifName": "gigaethernet1/2/7",
                     "portName": null,
                     "ifIndex": 272646171,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3082,8 +3082,8 @@
                     "ifName": "gigaethernet1/2/8",
                     "portName": null,
                     "ifIndex": 272646175,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3187,8 +3187,8 @@
                     "ifName": "gigaethernet1/2/9",
                     "portName": null,
                     "ifIndex": 272646179,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3292,8 +3292,8 @@
                     "ifName": "gigaethernet1/2/10",
                     "portName": null,
                     "ifIndex": 272646183,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3397,8 +3397,8 @@
                     "ifName": "gigaethernet1/2/11",
                     "portName": null,
                     "ifIndex": 272646187,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3502,8 +3502,8 @@
                     "ifName": "gigaethernet1/2/12",
                     "portName": null,
                     "ifIndex": 272646191,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "down",
@@ -3684,6 +3684,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3708,6 +3709,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3732,6 +3734,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3756,6 +3759,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -3856,6 +3860,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtAlarmMgmtMonitorLevel"
                 },
                 {
@@ -3880,6 +3885,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": 3,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "rosMgmtConfigLoadState"
                 },
                 {
@@ -3904,6 +3910,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -3928,6 +3935,7 @@
                     "entPhysicalIndex_measured": "ports",
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -4001,6 +4009,19 @@
                     "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
+                }
+            ]
+        }
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 4095,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 4095",
+                    "vlan_type": null,
+                    "vlan_mtu": null
                 }
             ]
         }

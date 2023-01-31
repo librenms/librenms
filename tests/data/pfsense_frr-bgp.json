@@ -10,11 +10,11 @@
                     "version": "2.4.5-RELEASE-p1",
                     "hardware": "amd64",
                     "features": null,
+                    "location": null,
                     "os": "pfsense",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "pfsense.svg",
-                    "location": null
+                    "icon": "pfsense.svg"
                 }
             ]
         },
@@ -24,7 +24,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4200000000-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.1",
                     "bgpPeerRemoteAs": 4200000000,
                     "bgpPeerState": "idle",
@@ -32,6 +32,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -43,11 +44,10 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 0,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS4200000004-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.9",
                     "bgpPeerRemoteAs": 4200000004,
                     "bgpPeerState": "idle",
@@ -55,6 +55,7 @@
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -66,15 +67,14 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 0,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ]
         },
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS4200000000-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.1",
                     "bgpPeerRemoteAs": 4200000000,
                     "bgpPeerState": "established",
@@ -82,6 +82,7 @@
                     "bgpPeerLastErrorCode": 4,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "169.254.1.2",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -93,11 +94,10 @@
                     "bgpPeerInUpdateElapsedTime": 96950,
                     "context_name": "",
                     "bgpLocalAs": 0,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS4200000004-MOCK-TEXT",
                     "bgpPeerIdentifier": "169.254.1.9",
                     "bgpPeerRemoteAs": 4200000004,
                     "bgpPeerState": "established",
@@ -105,6 +105,7 @@
                     "bgpPeerLastErrorCode": 2,
                     "bgpPeerLastErrorSubCode": 2,
                     "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null,
                     "bgpLocalAddr": "169.254.1.10",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -116,8 +117,7 @@
                     "bgpPeerInUpdateElapsedTime": 97191,
                     "context_name": "",
                     "bgpLocalAs": 0,
-                    "vrfLocalAs": null,
-                    "bgpPeerIface": null
+                    "vrfLocalAs": null
                 }
             ]
         }

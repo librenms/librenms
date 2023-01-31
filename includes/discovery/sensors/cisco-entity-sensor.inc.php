@@ -63,7 +63,7 @@ if ($device['os_group'] == 'cisco') {
                 }
 
                 // Set description based on measured entity if it exists
-                if (is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
+                if (isset($entry['entSensorMeasuredEntity']) && is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
                     $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
                     if (! $measured_descr) {
                         $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
@@ -74,7 +74,8 @@ if ($device['os_group'] == 'cisco') {
 
                 // Bit dirty also, clean later
                 $descr = str_replace('Temp: ', '', $descr);
-                $descr = str_ireplace('temperature ', '', $descr);
+                $descr = str_ireplace(' temperature', '', $descr);
+                $descr = trim($descr);
 
                 $oid = '.1.3.6.1.4.1.9.9.91.1.1.1.1.4.' . $index;
                 $current = $entry['entSensorValue'];
@@ -135,7 +136,7 @@ if ($device['os_group'] == 'cisco') {
                 $warn_limit_low = null;
 
                 // Check thresholds for this entry (bit dirty, but it works!)
-                if (is_array($t_oids[$index])) {
+                if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
                         // Skip invalid treshold values
                         if ($key['entSensorThresholdValue'] == '-32768') {

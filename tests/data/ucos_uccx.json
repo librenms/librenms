@@ -10,11 +10,11 @@
                     "version": "11.6.2.10000-38",
                     "hardware": "ciscoUCVirtualMachine",
                     "features": "UCCX",
+                    "location": "<private>",
                     "os": "ucos",
                     "type": "collaboration",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

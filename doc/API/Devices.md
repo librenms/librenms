@@ -938,41 +938,6 @@ Output:
 
 Output is an image.
 
-### `list_locations`
-
-Return a list of locations.
-
-Route: `/api/v0/resources/locations`
-
-Input:
-
--
-
-Example:
-
-```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
-```
-
-Output:
-
-```json
-{
-    "status": "ok",
-    "locations": [
-        {
-            "id": "1",
-            "location": "Example location, Example city, Example Country",
-            "lat": "-18.911436",
-            "lng": "47.517446",
-            "timestamp": "2017-04-01 02:40:05"
-        },
-        ...
-    ],
-    "count": 100
-}
-```
-
 ### `list_sensors`
 
 Get a list of all Sensors.
@@ -1049,8 +1014,11 @@ Input:
   - ipv4: search by IPv4 address
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
+  - location_id: serach by locaiton_id
   - hostname: search by hostname
+  - sysName: search by sysName
   - device_id: exact match by device-id
+  - type: search by device type
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1109,13 +1077,28 @@ Route: `/api/v0/devices/:hostname/maintenance`
 
 Input (JSON):
 
-- notes: Some description for the Maintenance
-- duration: Duration of Maintenance in format H:m
+- `title`: *optional* -  Some title for the Maintenance  
+  Will be replaced with hostname if omitted
+- `notes`: *optional* -  Some description for the Maintenance  
+  Will also be added to device notes if user prefs "Add schedule notes to devices notes" is set
+- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
+  eg: 2022-08-01 22:45:00  
+  Current system time `now()` will be used if omitted
+- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
+  eg: 02:00
 
-Example:
+Example with start time:
 
 ```curl
-curl -X POST -d '{"notes":"A 2 hour Maintenance triggered via API","duration":"2:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/localhost/maintenance
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/devices/localhost/maintenance/ \
+  --data-raw '
+ "title":"Device Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with start time",
+  "start":"2022-08-01 08:00:00",
+  "duration":"2:00"
+}
+'
 ```
 
 Output:
@@ -1123,9 +1106,32 @@ Output:
 ```json
 {
     "status": "ok",
-    "message": "Device localhost.localdomain (57) moved into maintenance mode for 2:00 h"
+    "message": "Device localhost (1) will begin maintenance mode at 2022-08-01 22:45:00 for 2:00h"
 }
 ```
+
+Example with no start time:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/devices/localhost/maintenance/ \
+  --data-raw '
+ "title":"Device Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with no start time",
+  "duration":"2:00"
+}
+'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device localhost (1) moved into maintenance mode for 2:00h"
+}
+```
+
 
 ### `add_device`
 

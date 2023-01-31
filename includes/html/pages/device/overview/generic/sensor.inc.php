@@ -28,8 +28,6 @@ if (count($sensors)) {
         // FIXME - make this "four graphs in popup" a function/include and "small graph" a function.
         // FIXME - So now we need to clean this up and move it into a function. Isn't it just "print-graphrow"?
         // FIXME - DUPLICATED IN health/sensors
-        $graph_colour = str_replace('#', '', $row_colour);
-
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';

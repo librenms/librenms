@@ -6,16 +6,25 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'redis';
 $output = 'OK';
+if (! empty($agent_data['app'][$name])) {
+    $parsed_json = json_decode(stripslashes($agent_data['app'][$name]), true);
+    if (json_last_error() !== JSON_ERROR_NONE || empty($parsed_json) || ! isset($parsed_json['error'], $parsed_json['data'], $parsed_json['errorString'], $parsed_json['version']) || $parsed_json['version'] < 1 || $parsed_json['error'] != 0) {
+        update_application($app, '-10:No correct data retrieved', []);
 
-try {
-    $redis_data = json_app_get($device, $name, 1)['data'];
-} catch (JsonAppMissingKeysException $e) {
-    $redis_data = $e->getParsedJson();
-} catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+        return;
+    }
+    $redis_data = $parsed_json['data'];
+} else {
+    try {
+        $redis_data = json_app_get($device, $name, 1)['data'];
+    } catch (JsonAppMissingKeysException $e) {
+        $redis_data = $e->getParsedJson();
+    } catch (JsonAppException $e) {
+        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+        update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
-    return;
+        return;
+    }
 }
 
 $client_data = $redis_data['Clients'];

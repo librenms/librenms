@@ -14,6 +14,9 @@
                     <a type="button" class="btn btn-primary" href="{{ route('device-groups.create') }}">
                         <i class="fa fa-plus"></i> {{ __('New Device Group') }}
                     </a>
+                    <a type="button" class="btn btn-default" href="{{ url('devices/group=none')  }}">
+                        <i class="fas fa-border-none"></i> {{ __('View Ungrouped Devices') }}
+                    </a>
                 </div>
             </div>
             <div class="table-responsive">
@@ -24,6 +27,7 @@
                         <th>{{ __('Description') }}</th>
                         <th>{{ __('Type') }}</th>
                         <th>{{ __('Devices') }}</th>
+                        <th>{{ __('Ports') }}</th>
                         <th>{{ __('Pattern') }}</th>
                         <th>{{ __('Actions') }}</th>
                     </tr>
@@ -36,6 +40,9 @@
                             <td>{{ __(ucfirst($device_group->type)) }}</td>
                             <td>
                                 <a href="{{ url("/devices/group=$device_group->id") }}">{{ $device_group->devices_count }}</a>
+                            </td>
+                            <td>
+                                <a href="{{ url("/ports/devicegroup=$device_group->id") }}">View</a>
                             </td>
                             <td>{{ $device_group->type == 'dynamic' ? $device_group->getParser()->toSql(false) : '' }}</td>
                             <td>
@@ -51,31 +58,6 @@
                                     <i
                                         class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-panel>
-
-        <x-panel id="unmanaged-devices-panel" title="{{ __('Ungrouped Devices') }} ({{ $ungrouped_devices->count() }})">
-            <div class="table-responsive">
-                <table id="ungrouped-devices-table" class="table table-condensed table-hover">
-                    <thead>
-                    <tr>
-                        <th style="width:32px">{{ __('Vendor') }}</th>
-                        <th>{{ __('Device') }}</th>
-                        <th>{{ __('Platform') }}</th>
-                        <th>{{ __('Operating System') }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($ungrouped_devices as $device)
-                        <tr id="row_{{ $device->device_id }}">
-                            <td><img alt="{{ $device->os }}" src="{{ asset($device->icon) }}" width="32px" height="32px" title="{{ $device->os }}"></td>
-                            <td><x-device-link :device="$device" /><br />{{ $device->sysName }}</td>
-                            <td>{{ $device->hardware }}</td>
-                            <td>{{ $device->os }} {{ $device->version }} @if($device->features) ({{ $device->features }}) @endif </td>
                         </tr>
                     @endforeach
                     </tbody>

@@ -25,6 +25,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Exceptions\InvalidNameException;
@@ -41,17 +42,29 @@ class PollerCluster extends Model
 
     // ---- Accessors/Mutators ----
 
-    public function setPollerGroupsAttribute($groups)
+    /**
+     * @param  array|string  $groups
+     * @return void
+     */
+    public function setPollerGroupsAttribute($groups): void
     {
         $this->attributes['poller_groups'] = is_array($groups) ? implode(',', $groups) : $groups;
     }
 
     // ---- Scopes ----
 
-    public function scopeIsActive($query)
+    public function scopeIsActive(Builder $query): Builder
     {
         $default = (int) \LibreNMS\Config::get('service_poller_frequency');
-        $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
+
+        return $query->where('last_report', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
+    }
+
+    public function scopeIsInactive(Builder $query): Builder
+    {
+        $default = (int) \LibreNMS\Config::get('service_poller_frequency');
+
+        return $query->where('last_report', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL COALESCE(`poller_frequency`, $default) SECOND)"));
     }
 
     // ---- Helpers ----

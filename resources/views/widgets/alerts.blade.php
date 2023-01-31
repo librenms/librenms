@@ -3,13 +3,13 @@
         <thead>
         <tr>
             <th data-column-id="severity"></th>
-            <th data-column-id="timestamp">Timestamp</th>
-            <th data-column-id="rule">Rule</th>
+            <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
+            <th data-column-id="rule">{{ __('Rule') }}</th>
             <th data-column-id="details" data-sortable="false"></th>
-            <th data-column-id="hostname">Hostname</th>
-            <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">Location</th>
-            <th data-column-id="ack_ico" data-sortable="false">ACK</th>
-            <th data-column-id="notes" data-sortable="false">Notes</th>
+            <th data-column-id="hostname">{{ __('Hostname') }}</th>
+            <th data-column-id="location" data-visible="{{ $location ? 'true' : 'false' }}">{{ __('Location') }}</th>
+            <th data-column-id="ack_ico" data-sortable="false">{{ __('ACK') }}</th>
+            <th data-column-id="notes" data-sortable="false">{{ __('Notes') }}</th>
             <th data-column-id="proc" data-sortable="false" data-visible="{{ $proc ? 'true' : 'false' }}">URL</th>
         </tr>
         </thead>

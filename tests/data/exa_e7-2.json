@@ -10,11 +10,11 @@
                     "version": "3.1.50.1",
                     "hardware": "Calix E7-2",
                     "features": "tenge4, gpon4",
+                    "location": "<private>",
                     "os": "exa",
                     "type": "network",
                     "serial": "80394580923",
-                    "icon": "calix.svg",
-                    "location": "<private>"
+                    "icon": "calix.svg"
                 }
             ]
         },

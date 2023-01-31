@@ -10,11 +10,11 @@
                     "version": "7.0.1",
                     "hardware": "NCS-5508",
                     "features": null,
+                    "location": "<private>",
                     "os": "iosxr",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": "<private>"
+                    "icon": "cisco.svg"
                 }
             ]
         },

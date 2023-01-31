@@ -10,11 +10,11 @@
                     "version": "3.5.3 (Linux Kernel 4.1.33-1+cl3u12)",
                     "hardware": "Cumulus Networks arm-accton_as4610_54-r0 4610-54P-O-AC-F Chassis",
                     "features": null,
+                    "location": "<private>",
                     "os": "cumulus",
                     "type": "network",
                     "serial": "EC1713000000",
-                    "icon": "cumulus.png",
-                    "location": "<private>"
+                    "icon": "cumulus.png"
                 }
             ]
         },
@@ -12161,6 +12161,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12185,6 +12186,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12209,6 +12211,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12233,6 +12236,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12257,6 +12261,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -12281,6 +12286,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

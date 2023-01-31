@@ -8,13 +8,13 @@
                     "sysDescr": "AIX testhost 1 7 <private>",
                     "sysContact": "<private>",
                     "version": "7.1",
-                    "hardware": null,
+                    "hardware": "",
                     "features": null,
+                    "location": "<private>",
                     "os": "aix",
                     "type": "server",
                     "serial": "<private>",
-                    "icon": "aix.svg",
-                    "location": "<private>"
+                    "icon": "aix.svg"
                 }
             ]
         },

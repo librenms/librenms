@@ -16,117 +16,92 @@ $entity_array = [];
 echo 'Ciena SDS';
 
 // Chassis stuff
-$cienaCesChassisGlobal = snmpwalk_cache_multi_oid(
+$chassis_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisGlobal',
-    $cienaCesChassisGlobal,
+    [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
-$cienaCesChassisPlatform = snmpwalk_cache_multi_oid(
+$chassis_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisPlatform',
-    $cienaCesChassisPlatform,
+    $chassis_array,
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
-$cienaCesChassisIDP = snmpwalk_cache_multi_oid(
+$chassis_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisIDP',
-    $cienaCesChassisIDP,
+    $chassis_array,
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
-);
-
-$chassis_array = array_replace_recursive(
-    $cienaCesChassisGlobal,
-    $cienaCesChassisPlatform,
-    $cienaCesChassisIDP
 );
 
 // PSU Stuff
 $cienaCesChassisPowerModule = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisPowerModule',
-    $cienaCesChassisPowerModule,
+    [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 
 // Fan Stuff
 $cienaCesChassisFanTrayEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisFanTrayEntry',
-    $cienaCesChassisFanTrayEntry,
+    [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $cienaCesChassisFanEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisFanEntry',
-    $cienaCesChassisFanEntry,
+    [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 $cienaCesChassisFanTempEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesChassisFanTempEntry',
-    $cienaCesChassisFanTempEntry,
+    [],
     'CIENA-CES-CHASSIS-MIB',
-    'ciena'
 );
 
 // Module Stuff
-$cienaCesModuleEntry = snmpwalk_cache_multi_oid(
+$module_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesModuleEntry',
-    $cienaCesModuleEntry,
+    [],
     'CIENA-CES-MODULE-MIB',
-    'ciena'
 );
-$cienaCesModuleDescriptionEntry = snmpwalk_cache_multi_oid(
+$module_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesModuleDescriptionEntry',
-    $cienaCesModuleDescriptionEntry,
+    $module_array,
     'CIENA-CES-MODULE-MIB',
-    'ciena'
 );
-$cienaCesModuleSwEntry = snmpwalk_cache_multi_oid(
+$module_array = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesModuleSwEntry',
-    $cienaCesModuleSwEntry,
+    $module_array,
     'CIENA-CES-MODULE-MIB',
-    'ciena'
-);
-
-$module_array = array_merge_recursive(
-    $cienaCesModuleEntry,
-    $cienaCesModuleDescriptionEntry,
-    $cienaCesModuleSwEntry
 );
 
 // Interface stuff
 $interfaceIndexMapping = snmpwalk_cache_multi_oid(
     $device,
     'dot1dBasePortIfIndex',
-    $interfaceIndexMapping,
+    [],
     'BRIDGE-MIB',
-    'ciena'
 );
 
 $cienaCesEttpConfigEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesEttpConfigEntry',
-    $cienaCesEttpConfigEntry,
+    [],
     'CIENA-CES-PORT-MIB',
-    'ciena'
 );
 $cienaCesPortXcvrEntry = snmpwalk_cache_multi_oid(
     $device,
     'cienaCesPortXcvrEntry',
-    $cienaCesPortXcvrEntry,
+    [],
     'CIENA-CES-PORT-XCVR-MIB',
-    'ciena'
 );
 
 foreach ($chassis_array as $cienaCesChassis => $chassis_contents) {
@@ -142,7 +117,7 @@ foreach ($chassis_array as $cienaCesChassis => $chassis_contents) {
         'entPhysicalContainedIn'  => '0',
         'entPhysicalMfgName'      => 'Ciena',
         'entPhysicalParentRelPos' => '-1',
-        'entPhysicalHardwareRev'  => $contents['cienaCesChassisIDPModelRevision'],
+        'entPhysicalHardwareRev'  => $chassis_contents['cienaCesChassisIDPModelRevision'],
         'entPhysicalIsFRU'        => 'true',
     ];
     $entity_array[] = [
@@ -347,8 +322,15 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
 
 echo "\n";
 unset(
-    $update_data,
-    $insert_data,
+    $chassis_array,
+    $cienaCesChassisPowerModule,
+    $cienaCesChassisFanTrayEntry,
+    $cienaCesChassisFanEntry,
+    $cienaCesChassisFanTempEntry,
+    $interfaceIndexMapping,
+    $cienaCesEttpConfigEntry,
+    $cienaCesPortXcvrEntry,
+    $module_array,
     $entry,
     $entity_array
 );

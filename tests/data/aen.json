@@ -21,18 +21,18 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": null,
                     "sysDescr": "AMN-",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
                     "features": null,
+                    "location": null,
                     "os": "aen",
                     "type": "network",
                     "serial": null,
-                    "icon": "accedian.png",
-                    "location": null
+                    "icon": "accedian.png"
                 }
             ]
         },

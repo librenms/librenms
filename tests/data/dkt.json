@@ -10,11 +10,11 @@
                     "version": "DKT_F2_Firmware_v05_29",
                     "hardware": "F2_1 1",
                     "features": null,
+                    "location": "<private>",
                     "os": "dkt",
                     "type": "network",
                     "serial": null,
-                    "icon": "dkt.png",
-                    "location": "<private>"
+                    "icon": "dkt.png"
                 }
             ]
         },
@@ -45,6 +45,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "catvSignalDetect"
                 },
                 {
@@ -69,6 +70,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "catvSwitch"
                 }
             ],

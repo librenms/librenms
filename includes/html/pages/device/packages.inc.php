@@ -6,7 +6,7 @@ $i = 0;
 foreach (dbFetchRows('SELECT * FROM `packages` WHERE `device_id` = ? ORDER BY `name`', [$device['device_id']]) as $entry) {
     echo '<tr class="list">';
     echo '<td width=200><a href="' . \LibreNMS\Util\Url::generate($vars, ['name' => $entry['name']]) . '">' . $entry['name'] . '</a></td>';
-    if ($build != '') {
+    if (! empty($entry['build'])) {
         $dbuild = '-' . $entry['build'];
     } else {
         $dbuild = '';

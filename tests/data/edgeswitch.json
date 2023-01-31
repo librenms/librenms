@@ -10,11 +10,11 @@
                     "version": "1.0.1.4720839",
                     "hardware": "EdgeSwitch 24-Port 250W",
                     "features": null,
+                    "location": "<private>",
                     "os": "edgeswitch",
                     "type": "network",
                     "serial": null,
-                    "icon": "ubiquiti.svg",
-                    "location": "<private>"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },
@@ -63,6 +63,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "boxServicesTempUnitEntry"
                 },
                 {
@@ -87,6 +88,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -111,6 +113,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -135,6 +138,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -159,6 +163,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],

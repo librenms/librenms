@@ -33,6 +33,7 @@ class Telegram extends Transport
     public function deliverAlert($obj, $opts)
     {
         $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
+        $telegram_opts['message_thread_id'] = $this->config['message-thread-id'];
         $telegram_opts['token'] = $this->config['telegram-token'];
         $telegram_opts['format'] = $this->config['telegram-format'];
 
@@ -51,7 +52,11 @@ class Telegram extends Transport
                 $text = urlencode(preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $obj['msg']));
             }
         }
-        curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text{$format}"));
+        $messageThreadId = '';
+        if (! empty($data['message_thread_id'])) {
+            $messageThreadId = '&message_thread_id=' . $data['message_thread_id'];
+        }
+        curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}$messageThreadId&text=$text{$format}"));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
@@ -76,6 +81,12 @@ class Telegram extends Transport
                     'type' => 'text',
                 ],
                 [
+                    'title' => 'Thread ID',
+                    'name' => 'message-thread-id',
+                    'descr' => 'If your group support topics, you can put the topicId here',
+                    'type' => 'text',
+                ],
+                [
                     'title' => 'Token',
                     'name' => 'telegram-token',
                     'descr' => 'Telegram Token',
@@ -95,6 +106,7 @@ class Telegram extends Transport
             ],
             'validation' => [
                 'telegram-chat-id' => 'required|string',
+                'message-thread-id' => 'integer',
                 'telegram-token' => 'required|string',
                 'telegram-format' => 'string',
             ],

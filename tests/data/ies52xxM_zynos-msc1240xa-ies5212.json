@@ -10,11 +10,11 @@
                     "version": "V1.10(AAWC.1)",
                     "hardware": "IES5206 MSC",
                     "features": null,
+                    "location": "<private>",
                     "os": "ies52xxM",
                     "type": "network",
                     "serial": "<private>",
-                    "icon": "zyxel.svg",
-                    "location": "<private>"
+                    "icon": "zyxel.svg"
                 }
             ]
         },
@@ -18509,6 +18509,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18533,6 +18534,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18557,6 +18559,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18581,6 +18584,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18605,6 +18609,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18629,6 +18634,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18653,6 +18659,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -18677,6 +18684,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18686,7 +18694,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.10",
                     "sensor_index": "10",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 10 ",
+                    "sensor_descr": "Slot 10",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18701,6 +18709,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18710,7 +18719,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.11",
                     "sensor_index": "11",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 11 ",
+                    "sensor_descr": "Slot 11",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18725,6 +18734,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18734,7 +18744,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.12",
                     "sensor_index": "12",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 12 ",
+                    "sensor_descr": "Slot 12",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18749,6 +18759,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18773,6 +18784,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18782,7 +18794,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.3",
                     "sensor_index": "3",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 3 ",
+                    "sensor_descr": "Slot 3",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18797,6 +18809,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18806,7 +18819,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.4",
                     "sensor_index": "4",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 4 ",
+                    "sensor_descr": "Slot 4",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18821,6 +18834,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18830,7 +18844,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.5",
                     "sensor_index": "5",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 5 ",
+                    "sensor_descr": "Slot 5",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18845,6 +18859,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18869,6 +18884,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18878,7 +18894,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.7",
                     "sensor_index": "7",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 7 ",
+                    "sensor_descr": "Slot 7",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18893,6 +18909,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18902,7 +18919,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.8",
                     "sensor_index": "8",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 8 ",
+                    "sensor_descr": "Slot 8",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18917,6 +18934,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18926,7 +18944,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.9",
                     "sensor_index": "9",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 9 ",
+                    "sensor_descr": "Slot 9",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -18941,6 +18959,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -18965,6 +18984,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -18989,6 +19009,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -19013,6 +19034,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -19037,6 +19059,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19061,6 +19084,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19085,6 +19109,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19109,6 +19134,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19133,6 +19159,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19157,6 +19184,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19181,6 +19209,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19205,6 +19234,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19229,6 +19259,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19253,6 +19284,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19277,6 +19309,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19301,6 +19334,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19325,6 +19359,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19349,6 +19384,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19373,6 +19409,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19397,6 +19434,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19421,6 +19459,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19445,6 +19484,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19469,6 +19509,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19493,6 +19534,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19517,6 +19559,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19541,6 +19584,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19565,6 +19609,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19589,6 +19634,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -19675,6 +19721,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": -5.4913,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19699,6 +19746,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19723,6 +19771,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19747,6 +19796,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19771,6 +19821,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19795,6 +19846,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19819,6 +19871,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -19843,6 +19896,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19852,7 +19906,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.10",
                     "sensor_index": "10",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 10 ",
+                    "sensor_descr": "Slot 10",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -19867,6 +19921,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19876,7 +19931,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.11",
                     "sensor_index": "11",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 11 ",
+                    "sensor_descr": "Slot 11",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -19891,6 +19946,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19900,7 +19956,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.12",
                     "sensor_index": "12",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 12 ",
+                    "sensor_descr": "Slot 12",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -19915,6 +19971,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19939,6 +19996,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19948,7 +20006,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.3",
                     "sensor_index": "3",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 3 ",
+                    "sensor_descr": "Slot 3",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -19963,6 +20021,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19972,7 +20031,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.4",
                     "sensor_index": "4",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 4 ",
+                    "sensor_descr": "Slot 4",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -19987,6 +20046,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -19996,7 +20056,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.5",
                     "sensor_index": "5",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 5 ",
+                    "sensor_descr": "Slot 5",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -20011,6 +20071,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -20035,6 +20096,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -20044,7 +20106,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.7",
                     "sensor_index": "7",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 7 ",
+                    "sensor_descr": "Slot 7",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -20059,6 +20121,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -20068,7 +20131,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.8",
                     "sensor_index": "8",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 8 ",
+                    "sensor_descr": "Slot 8",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -20083,6 +20146,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -20092,7 +20156,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.890.1.5.13.13.8.1.1.6.9",
                     "sensor_index": "9",
                     "sensor_type": "moduleAlarm",
-                    "sensor_descr": "Slot 9 ",
+                    "sensor_descr": "Slot 9",
                     "group": "Alarm",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -20107,6 +20171,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleAlarm"
                 },
                 {
@@ -20131,6 +20196,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -20155,6 +20221,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -20179,6 +20246,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "moduleStatus"
                 },
                 {
@@ -20203,6 +20271,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20227,6 +20296,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20251,6 +20321,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20275,6 +20346,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20299,6 +20371,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20323,6 +20396,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20347,6 +20421,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20371,6 +20446,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20395,6 +20471,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20419,6 +20496,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20443,6 +20521,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20467,6 +20546,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20491,6 +20571,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20515,6 +20596,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20539,6 +20621,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20563,6 +20646,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20587,6 +20671,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20611,6 +20696,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20635,6 +20721,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20659,6 +20746,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20683,6 +20771,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20707,6 +20796,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20731,6 +20821,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -20755,6 +20846,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ],
@@ -20817,5 +20909,31 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "000000000000",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "000000000000",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 0,
+                    "helloTime": 0,
+                    "holdTime": 0,
+                    "forwardDelay": 0,
+                    "bridgeMaxAge": 0,
+                    "bridgeHelloTime": 0,
+                    "bridgeForwardDelay": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

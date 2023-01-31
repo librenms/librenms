@@ -9,8 +9,8 @@
                     <div class="col-sm-12">
                         {!! Str::markdown($device->notes ?? '') !!}
                     </div>
-		</div>
-	    </div>
-	</div>
+        </div>
+        </div>
+    </div>
     </div>
 </div>

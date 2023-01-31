@@ -36,9 +36,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
     $existing_data = dbFetchRows($sql, [$device['device_id'], $context_name]);
 
-    $ipv4_addresses = array_map(function ($data) {
-        return $data['ipv4_address'];
-    }, $existing_data);
     $arp_table = [];
     $insert_data = [];
     foreach ($arp_data as $ifIndex => $data) {
@@ -46,8 +43,8 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $port_id = $interface['port_id'];
 
         $port_arp = array_merge(
-            (array) $data['IP-MIB::ipNetToMediaPhysAddress'],
-            is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
+            Arr::wrap($data['IP-MIB::ipNetToMediaPhysAddress'] ?? []),
+            isset($data['IP-MIB::ipNetToPhysicalPhysAddress']) && is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
         );
 
         echo "{$interface['ifName']}: \n";
@@ -59,7 +56,14 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             $mac = implode(array_map('zeropad', explode(':', $raw_mac)));
             $arp_table[$port_id][$ip] = $mac;
 
-            $index = array_search($ip, $ipv4_addresses);
+            $index = false;
+            foreach ($existing_data as $existing_key => $existing_value) {
+                if ($existing_value['ipv4_address'] == $ip && $existing_value['port_id'] == $port_id) {
+                    $index = $existing_key;
+                    break;
+                }
+            }
+
             if ($index !== false) {
                 $old_mac = $existing_data[$index]['mac_address'];
                 if ($mac != $old_mac && $mac != '') {

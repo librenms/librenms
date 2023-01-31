@@ -27,10 +27,10 @@ if ($port) {
     if ($port->save()) {
         if (empty($speed)) {
             $port->device->forgetAttrib('ifSpeed:' . $port->ifName);
-            Log::event("{$port->ifName} Port speed cleared manually", $port->device, 'interface', 3, $port_id);
+            \App\Models\Eventlog::log("{$port->ifName} Port speed cleared manually", $port->device, 'interface', 3, $port_id);
         } else {
             $port->device->setAttrib('ifSpeed:' . $port->ifName, 1);
-            Log::event("{$port->ifName} Port speed set manually: $speed", $port->device, 'interface', 3, $port_id);
+            \App\Models\Eventlog::log("{$port->ifName} Port speed set manually: $speed", $port->device, 'interface', 3, $port_id);
             $port_tune = $port->device->getAttrib('ifName_tune:' . $port->ifName);
             $device_tune = $port->device->getAttrib('override_rrdtool_tune');
             if ($port_tune == 'true' ||

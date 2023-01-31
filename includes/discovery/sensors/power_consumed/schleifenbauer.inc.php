@@ -2,7 +2,7 @@
 
 echo 'Schleifenbauer ';
 
-foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
+foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] ?? [] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
     foreach ($pre_cache['sdbDevInKWhTotal'][$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInKWhTotal) {
         $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $power_consumed_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.2.$sdbDevIdIndex.$sdbDevInIndex";
@@ -17,7 +17,7 @@ foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress =
 }
 
 $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
-foreach ($pre_cache['sdbDevOutMtKWhTotal'] as $sdbDevOutMtIndex => $sdbDevOutMtKWhTotal) {
+foreach ($pre_cache['sdbDevOutMtKWhTotal'] ?? [] as $sdbDevOutMtIndex => $sdbDevOutMtKWhTotal) {
     $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
     $power_consumed_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.2.$unit.$sdbDevOutMtIndex";
     $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;

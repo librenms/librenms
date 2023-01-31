@@ -24,6 +24,8 @@
  * @author     LibreNMS Contributors
  */
 
+use App\Models\BgpPeer;
+use App\Models\Vrf;
 use LibreNMS\Config;
 use LibreNMS\Util\IP;
 
@@ -39,11 +41,11 @@ if (Config::get('enable_bgp')) {
         }
         unset($bgpPeersCache);
 
+        $vrfs = DeviceCache::getPrimary()->vrfs->pluck('vrf_id', 'vrf_oid');
+
         foreach ($bgpPeers as $vrfInstance => $peer) {
-            $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfInstance]);
-            if (is_null($vrfId)) {
-                $vrfId = 1; // According to the MIB
-            }
+            $vrfId = $vrfs->get($vrfInstance, 1); // According to the MIB
+
             foreach ($peer as $address => $value) {
                 // resolve AS number by DNS_TXT record
                 $astext = get_astext($value['os10bgp4V2PeerRemoteAs']);
@@ -52,9 +54,8 @@ if (Config::get('enable_bgp')) {
                 // Setting it here avoids the code that resets it to null if not found in BGP4-MIB.
                 $bgpLocalAs = $value['os10bgp4V2PeerLocalAs'];
 
-                if (dbFetchCell('SELECT count(*) FROM `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) == 0) {
+                if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                     $row = [
-                        'device_id' => $device['device_id'],
                         'vrf_id' => $vrfId,
                         'bgpPeerIdentifier' => $address,
                         'bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'],
@@ -70,7 +71,7 @@ if (Config::get('enable_bgp')) {
                         'bgpPeerInUpdateElapsedTime' => 0,
                         'astext' => $astext,
                     ];
-                    dbInsert($row, 'bgpPeers');
+                    DeviceCache::getPrimary()->bgppeers()->create($row);
 
                     if (Config::get('autodiscovery.bgp')) {
                         $name = gethostbyaddr($address);
@@ -78,7 +79,7 @@ if (Config::get('enable_bgp')) {
                     }
                     echo '+';
                 } else {
-                    dbUpdate(['bgpPeerRemoteAs' => $value['os10bgp4V2PeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                    BgpPeer::where('bgpPeerRemoteAs', $value['os10bgp4V2PeerRemoteAs'])->where('astext', $astext)->update(['bgpPeerIdentifier' => $address, 'device_id' => $device['device_id'], 'vrf_id' => $vrfId]);
                     echo '.';
                 }
             }
@@ -97,8 +98,8 @@ if (Config::get('enable_bgp')) {
         }
 
         // clean up peers
-        if (dbFetchCell('SELECT count(*) FROM `vrfs` WHERE `device_id` = ?', [$device['device_id']]) == 0) {
-            $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
+        if (Vrf::where('device_id', $device['device_id'])->count() == 0) {
+            $peers = BgpPeer::select('vrf_id', 'bgpPeerIdentifier')->where('device_id', $device['device_id']);
         } else {
             $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
         }
@@ -107,7 +108,7 @@ if (Config::get('enable_bgp')) {
             $address = $peer['bgpPeerIdentifier'];
 
             if (empty($bgpPeers[$vrfInstance][$address])) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+                $deleted = BgpPeer::where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->delete();
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;

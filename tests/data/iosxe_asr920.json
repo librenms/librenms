@@ -10,11 +10,11 @@
                     "version": "PPC_LINUX_IOSD-UNIVERSALK9_NPE-M 17.6.2",
                     "hardware": "ciscoASR92024SZM",
                     "features": "Bengaluru",
+                    "location": null,
                     "os": "iosxe",
                     "type": "network",
                     "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
+                    "icon": "cisco.svg"
                 }
             ]
         },

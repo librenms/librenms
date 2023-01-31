@@ -1,0 +1,40 @@
+TAIT-TNADMIN-MODULE-MIB DEFINITIONS ::= BEGIN
+--
+-- Versions:
+--
+-- Release 1
+-- Preliminary support for monitoring of core network server.
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+   MODULE-IDENTITY
+      FROM SNMPv2-SMI
+   taitProducts, taitModules
+      FROM TAIT-COMMON-MIB;
+
+tnAdminMibModule MODULE-IDENTITY
+   LAST-UPDATED "202002101200Z"
+   ORGANIZATION "www.taitradio.com"
+   CONTACT-INFO
+      "postal: Tait International Limited
+               245 Wooldridge Road
+               Harewood
+               Christchurch
+               PO Box 1645
+               Christchurch
+               New Zealand
+       phone:  +64 3358 3399
+       email:  support@taitradio.com"
+   DESCRIPTION "TaitNet Administration module and product root OID definition."
+
+   REVISION "202002101200Z"
+   DESCRIPTION "Initial revision of this module."
+      ::= { taitModules 20 }
+
+-- Root for items in the tnAdmin MIB module.
+tnAdminMIB OBJECT IDENTIFIER ::= { taitProducts 15 }
+
+END

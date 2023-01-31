@@ -10,11 +10,11 @@
                     "version": "v6.4.8,build1914,211117 (GA)",
                     "hardware": "FGR_60F_3G4G",
                     "features": null,
+                    "location": "<private>",
                     "os": "fortigate",
                     "type": "firewall",
                     "serial": "FR60Fxxxxxxxxxxx",
-                    "icon": "fortinet.svg",
-                    "location": "<private>"
+                    "icon": "fortinet.svg"
                 }
             ]
         },
@@ -4554,6 +4554,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4578,6 +4579,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4602,6 +4604,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4626,6 +4629,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4650,6 +4654,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4674,6 +4679,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4698,6 +4704,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4722,6 +4729,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4746,6 +4754,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4770,6 +4779,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -4794,6 +4804,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fdLteSessConnStat"
                 },
                 {
@@ -4818,6 +4829,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -4842,6 +4854,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -4866,6 +4879,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -4890,6 +4904,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -4914,6 +4929,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgHwSensors"
                 },
                 {
@@ -4938,6 +4954,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgVpnSslState"
                 },
                 {
@@ -4962,6 +4979,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": "fgVpnTunEntStatus"
                 }
             ],
@@ -5051,7 +5069,7 @@
         "discovery": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "172.16.31.1",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
@@ -5074,7 +5092,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.253",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
@@ -5097,7 +5115,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.2.253",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
@@ -5124,7 +5142,7 @@
         "poller": {
             "bgpPeers": [
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "172.16.31.1",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
@@ -5147,7 +5165,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.1.253",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "established",
@@ -5170,7 +5188,7 @@
                     "vrfLocalAs": null
                 },
                 {
-                    "astext": "",
+                    "astext": "AS65500-MOCK-TEXT",
                     "bgpPeerIdentifier": "192.168.2.253",
                     "bgpPeerRemoteAs": 65500,
                     "bgpPeerState": "idle",
@@ -5217,7 +5235,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.5.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.5.0\"]",
+                    "rrd_type": "GAUGE"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5238,7 +5257,8 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.7.0\"]"
+                    "sensor_oids": "[\".1.3.6.1.4.1.12356.101.14.2.7.0\"]",
+                    "rrd_type": "GAUGE"
                 }
             ]
         },

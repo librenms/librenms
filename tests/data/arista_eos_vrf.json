@@ -10,11 +10,11 @@
                     "version": "4.20.12.1M",
                     "hardware": "DCS-7150S-24",
                     "features": null,
+                    "location": "<private>",
                     "os": "arista_eos",
                     "type": "network",
                     "serial": "serial",
-                    "icon": "arista.svg",
-                    "location": "<private>"
+                    "icon": "arista.svg"
                 }
             ]
         },
@@ -6332,6 +6332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6356,6 +6357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6365,7 +6367,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100711102",
                     "sensor_index": "100711102",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 1 Input ",
+                    "sensor_descr": "PSU 1 Input",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6380,6 +6382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6389,7 +6392,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100711103",
                     "sensor_index": "100711103",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 1 Output ",
+                    "sensor_descr": "PSU 1 Output",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6404,6 +6407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6413,7 +6417,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100721102",
                     "sensor_index": "100721102",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 2 Input ",
+                    "sensor_descr": "PSU 2 Input",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6428,6 +6432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6437,7 +6442,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100721103",
                     "sensor_index": "100721103",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 2 Output ",
+                    "sensor_descr": "PSU 2 Output",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6452,6 +6457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6476,6 +6482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6500,6 +6507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6524,6 +6532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6548,6 +6557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6572,6 +6582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6596,6 +6607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6620,6 +6632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6644,6 +6657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6668,6 +6682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6692,6 +6707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6701,7 +6717,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006001",
                     "sensor_index": "100006001",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Cpu ",
+                    "sensor_descr": "Cpu",
                     "group": "System",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6716,6 +6732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6725,7 +6742,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006002",
                     "sensor_index": "100006002",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Rear ",
+                    "sensor_descr": "Rear",
                     "group": "System",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6740,6 +6757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6749,7 +6767,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006003",
                     "sensor_index": "100006003",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Board ",
+                    "sensor_descr": "Board",
                     "group": "System",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6764,6 +6782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6773,7 +6792,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006004",
                     "sensor_index": "100006004",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "Front-panel ",
+                    "sensor_descr": "Front-panel",
                     "group": "System",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6788,6 +6807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6797,7 +6817,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006005",
                     "sensor_index": "100006005",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Board ",
+                    "sensor_descr": "Board",
                     "group": "System",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6812,6 +6832,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6821,7 +6842,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006006",
                     "sensor_index": "100006006",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "FM6000 ",
+                    "sensor_descr": "FM6000",
                     "group": "Platform",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6836,6 +6857,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6860,6 +6882,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6884,6 +6907,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6893,7 +6917,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100711101",
                     "sensor_index": "100711101",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 1 ",
+                    "sensor_descr": "PSU 1",
                     "group": "PSUs",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6908,6 +6932,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6917,7 +6942,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100721101",
                     "sensor_index": "100721101",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 2 ",
+                    "sensor_descr": "PSU 2",
                     "group": "PSUs",
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
@@ -6932,6 +6957,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6941,7 +6967,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006007",
                     "sensor_index": "100006007",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail1 12V standby",
+                    "sensor_descr": "Rail1 12V standby",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6956,6 +6982,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6965,7 +6992,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006008",
                     "sensor_index": "100006008",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail2 This rail isn't monitored",
+                    "sensor_descr": "Rail2 This rail isn't monitored",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -6980,6 +7007,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -6989,7 +7017,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006009",
                     "sensor_index": "100006009",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail3 5V",
+                    "sensor_descr": "Rail3 5V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7004,6 +7032,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7013,7 +7042,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006010",
                     "sensor_index": "100006010",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail4 3.3V",
+                    "sensor_descr": "Rail4 3.3V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7028,6 +7057,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7037,7 +7067,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006011",
                     "sensor_index": "100006011",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail5 2.5V",
+                    "sensor_descr": "Rail5 2.5V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7052,6 +7082,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7061,7 +7092,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006012",
                     "sensor_index": "100006012",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail6 1.8V",
+                    "sensor_descr": "Rail6 1.8V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7076,6 +7107,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7085,7 +7117,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006013",
                     "sensor_index": "100006013",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail7 1.5V",
+                    "sensor_descr": "Rail7 1.5V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7100,6 +7132,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7109,7 +7142,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006014",
                     "sensor_index": "100006014",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail8 1.1V",
+                    "sensor_descr": "Rail8 1.1V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7124,6 +7157,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7133,7 +7167,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006015",
                     "sensor_index": "100006015",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail9 0.9V",
+                    "sensor_descr": "Rail9 0.9V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7148,6 +7182,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7157,7 +7192,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006016",
                     "sensor_index": "100006016",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail10 0.75V",
+                    "sensor_descr": "Rail10 0.75V",
                     "group": "Cpucard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7172,6 +7207,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7181,7 +7217,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006017",
                     "sensor_index": "100006017",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail1 POS12V",
+                    "sensor_descr": "Rail1 POS12V",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7196,6 +7232,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7205,7 +7242,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006018",
                     "sensor_index": "100006018",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail2 POS12_STDBY",
+                    "sensor_descr": "Rail2 POS12_STDBY",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7220,6 +7257,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7229,7 +7267,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006019",
                     "sensor_index": "100006019",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail3 POS5V_STDBY",
+                    "sensor_descr": "Rail3 POS5V_STDBY",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7244,6 +7282,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7253,7 +7292,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006020",
                     "sensor_index": "100006020",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail4 POS3V3_STDBY",
+                    "sensor_descr": "Rail4 POS3V3_STDBY",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7268,6 +7307,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7277,7 +7317,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006021",
                     "sensor_index": "100006021",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail5 POS3V3",
+                    "sensor_descr": "Rail5 POS3V3",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7292,6 +7332,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7301,7 +7342,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006022",
                     "sensor_index": "100006022",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail6 POS2V5",
+                    "sensor_descr": "Rail6 POS2V5",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7316,6 +7357,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7325,7 +7367,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006023",
                     "sensor_index": "100006023",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail7 POS_ALTA_AVDD",
+                    "sensor_descr": "Rail7 POS_ALTA_AVDD",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7340,6 +7382,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7349,7 +7392,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006024",
                     "sensor_index": "100006024",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail8 POS1V2",
+                    "sensor_descr": "Rail8 POS1V2",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7364,6 +7407,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7373,7 +7417,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006025",
                     "sensor_index": "100006025",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail9 POS_VDD_ALTA",
+                    "sensor_descr": "Rail9 POS_VDD_ALTA",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7388,6 +7432,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7397,7 +7442,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006026",
                     "sensor_index": "100006026",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail10 POS_VDDS",
+                    "sensor_descr": "Rail10 POS_VDDS",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7412,6 +7457,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7421,7 +7467,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006027",
                     "sensor_index": "100006027",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail11 POS3V3_VF",
+                    "sensor_descr": "Rail11 POS3V3_VF",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7436,6 +7482,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7445,7 +7492,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006028",
                     "sensor_index": "100006028",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail12 POS1V2_GTP",
+                    "sensor_descr": "Rail12 POS1V2_GTP",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7460,6 +7507,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7469,7 +7517,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006029",
                     "sensor_index": "100006029",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail13 POS_GATEDRIVE",
+                    "sensor_descr": "Rail13 POS_GATEDRIVE",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7484,6 +7532,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7493,7 +7542,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006030",
                     "sensor_index": "100006030",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail14 POS2V5_156",
+                    "sensor_descr": "Rail14 POS2V5_156",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7508,6 +7557,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7517,7 +7567,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006031",
                     "sensor_index": "100006031",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail15 POS2V5_125",
+                    "sensor_descr": "Rail15 POS2V5_125",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7532,6 +7582,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7541,7 +7592,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006032",
                     "sensor_index": "100006032",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail16 PSU_OK",
+                    "sensor_descr": "Rail16 PSU_OK",
                     "group": "Switchcard",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7556,6 +7607,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7565,7 +7617,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006033",
                     "sensor_index": "100006033",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail1 POS_ALTA_AVDD",
+                    "sensor_descr": "Rail1 POS_ALTA_AVDD",
                     "group": "Chl822x",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7580,6 +7632,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7589,7 +7642,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100006034",
                     "sensor_index": "100006034",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": " Rail2 POS_VDD_ALTA",
+                    "sensor_descr": "Rail2 POS_VDD_ALTA",
                     "group": "Chl822x",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7604,6 +7657,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7628,6 +7682,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7652,6 +7707,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7661,7 +7717,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100711104",
                     "sensor_index": "100711104",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 1 Input ",
+                    "sensor_descr": "PSU 1 Input",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7676,6 +7732,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7685,7 +7742,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100711105",
                     "sensor_index": "100711105",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 1 Output ",
+                    "sensor_descr": "PSU 1 Output",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7700,6 +7757,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7709,7 +7767,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100721104",
                     "sensor_index": "100721104",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 2 Input ",
+                    "sensor_descr": "PSU 2 Input",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7724,6 +7782,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 },
                 {
@@ -7733,7 +7792,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.99.1.1.1.4.100721105",
                     "sensor_index": "100721105",
                     "sensor_type": "entity-sensor",
-                    "sensor_descr": "PSU 2 Output ",
+                    "sensor_descr": "PSU 2 Output",
                     "group": "PSUs",
                     "sensor_divisor": 100,
                     "sensor_multiplier": 1,
@@ -7748,6 +7807,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
+                    "rrd_type": "GAUGE",
                     "state_name": null
                 }
             ]

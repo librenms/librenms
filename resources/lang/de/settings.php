@@ -595,7 +595,7 @@ return [
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports älter als',
+            'description' => 'Purge Ports gelöscht',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'public_status' => [
@@ -737,8 +737,8 @@ return [
         'update_channel' => [
             'description' => 'Definiere Updatekanal',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'virsh' => [

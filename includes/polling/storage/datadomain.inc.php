@@ -12,7 +12,7 @@
  * @author     Abel Laura <abel.laura@gmail.com>
 */
 
-if (! is_array($storage_cache['ddos-storage'])) {
+if (! isset($storage_cache['ddos-storage'])) {
     $storage_cache['ddos-storage'] = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
     d_echo($storage_cache);
 }

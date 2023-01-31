@@ -42,11 +42,13 @@ if ($results) {
     $applications['dhcpstats'] = 'dhcp-stats';
     $applications['fbsdnfsclient'] = 'fbsd-nfs-client';
     $applications['fbsdnfsserver'] = 'fbsd-nfs-server';
+    $applications['hv-monitor'] = 'hv-monitor';
     $applications['mailq'] = 'postfix';
     $applications['osupdate'] = 'os-updates';
     $applications['phpfpmsp'] = 'php-fpm';
     $applications['postfixdetailed'] = 'postfix';
     $applications['suricata-stats'] = 'suricata';
+    $applications['sagan-stats'] = 'sagan';
 }
 
 d_echo(PHP_EOL . 'Available: ' . implode(', ', array_keys($applications)) . PHP_EOL);

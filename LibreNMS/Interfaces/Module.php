@@ -25,17 +25,23 @@
 
 namespace LibreNMS\Interfaces;
 
+use App\Models\Device;
 use LibreNMS\OS;
 
 interface Module
 {
+    /**
+     * An array of all modules this module depends on
+     */
+    public function dependencies(): array;
+
     /**
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function discover(OS $os);
+    public function discover(OS $os): void;
 
     /**
      * Poll data for this module and update the DB / RRD.
@@ -44,13 +50,24 @@ interface Module
      *
      * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os);
+    public function poll(OS $os): void;
 
     /**
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  \App\Models\Device  $device
      */
-    public function cleanup(OS $os);
+    public function cleanup(Device $device): void;
+
+    /**
+     * Dump current module data for the given device for tests.
+     * Make sure to hide transient fields, such as id and date.
+     * You should always order the data by a non-transient column.
+     * Some id fields may need to be joined to tie back to non-transient data.
+     * Module may return false if testing is not supported or required.
+     *
+     * @return array|false
+     */
+    public function dump(Device $device);
 }
