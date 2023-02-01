@@ -725,8 +725,8 @@ Please refer to [NFSen](../Extensions/NFSen.md)
 LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
 
 - Info-keywords
- - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
- - `()` contains optional information that is ignored during GeoCoding lookups.
+  - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
+  - `()` contains optional information that is ignored during GeoCoding lookups.
 
 
 **GeoCoordinates** 
