@@ -729,7 +729,7 @@ LibreNMS can interpret sysLocation information and map the device loction based 
   - `()` contains optional information that is ignored during GeoCoding lookups.
 
 
-**GeoCoordinates** 
+#### **GeoCoordinates** 
 If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
 
 Example:
@@ -737,7 +737,7 @@ Example:
 name_that_can_not_be_looked_up [40.424521, -86.912755]
 ```
 
-**GeoCoding**
+#### **GeoCoding**
 Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
 
 Example:
@@ -746,7 +746,7 @@ Example:
 Geocoding lookup is:
 1100 Congress Ave, Austin, TX 78701
 ```
-**Overrides**
+#### **Overrides**
 1. You can overwrite each device sysLocation information in the webGUI under "Device settings".
 2. You can overwrite the location coordinates n in the webGUI under Device>GEO Locations
 
