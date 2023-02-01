@@ -131,7 +131,6 @@ class Location extends Model
 
             // Removes Location info inside () when looking up lat/lng
             $this->fill($api->getCoordinates(preg_replace($this->location_ignore_regex, '', $this->location)));
-            // $this->fill($api->getCoordinates($this->location));
 
             return true;
         } catch (BindingResolutionException $e) {
