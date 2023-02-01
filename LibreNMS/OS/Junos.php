@@ -73,7 +73,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     public function discoverSlas()
     {
         $slas = new Collection();
-	$sla_table = snmpwalk_group($this->getDeviceArray(), 'pingCtlTable', 'DISMAN-PING-MIB', 2);
+        $sla_table = snmpwalk_group($this->getDeviceArray(), 'pingCtlTable', 'DISMAN-PING-MIB', 2);
 
         if (! empty($sla_table)) {
             $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingResultsRttUs', 'JUNIPER-PING-MIB', 2, $sla_table);
@@ -81,16 +81,15 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
         foreach ($sla_table as $sla_key => $sla_config) {
             foreach ($sla_config as $test_key => $test_config) {
-
-            $slas->push(new Sla([
-                'sla_nr' => hexdec(hash('crc32', $sla_key . $test_key)), // indexed by owner+test, convert to int
-                'owner' => $sla_key,
-                'tag' => $test_key,
-                'rtt_type' => $this->retrieveJuniperType($test_config['pingCtlType']),
-                'rtt' => isset($test_config['jnxPingResultsRttUs']) ? $test_config['jnxPingResultsRttUs'] / 1000 : null,
-                'status' => ($test_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
-                'opstatus' => ($test_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
-            ]));
+                $slas->push(new Sla([
+                    'sla_nr' => hexdec(hash('crc32', $sla_key . $test_key)), // indexed by owner+test, convert to int
+                    'owner' => $sla_key,
+                    'tag' => $test_key,
+                    'rtt_type' => $this->retrieveJuniperType($test_config['pingCtlType']),
+                    'rtt' => isset($test_config['jnxPingResultsRttUs']) ? $test_config['jnxPingResultsRttUs'] / 1000 : null,
+                    'status' => ($test_config['pingCtlAdminStatus'] == 'enabled') ? 1 : 0,
+                    'opstatus' => ($test_config['pingCtlRowStatus'] == 'active') ? 0 : 2,
+                ]));
             }
         }
 
@@ -196,9 +195,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             case 'enterprises.2636.3.7.2.5':
                 return 'NtpQuery';
             case 'enterprises.2636.3.7.2.6':
-		return 'UdpTimestamp';
+                return 'UdpTimestamp';
             case 'zeroDotZero':
-                return 'twamp'; 
+                return 'twamp';
             default:
                 return str_replace('ping', '', $rtt_type);
         }
