@@ -724,19 +724,21 @@ Please refer to [NFSen](../Extensions/NFSen.md)
 
 LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
 
-Info-keywords
-[] contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
-() contains optional information that is ignored during GeoCoding lookups.
+- Info-keywords
+ - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
+ - `()` contains optional information that is ignored during GeoCoding lookups.
 
 
-**GeoCoordinates** - If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
+**GeoCoordinates** 
+If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
 
 Example:
 ```bash
 name_that_can_not_be_looked_up [40.424521, -86.912755]
 ```
 
-**GeoCoding** - Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
+**GeoCoding**
+Next it will attempt to look up the sysLocation with a map engine provided you have configured one under $config['geoloc']['engine']. The information has to be accurate or no result is returned, when it does it will ignore any information inside parentheses, allowing you to add details that would otherwise interfeeer with the lookup.
 
 Example:
 ```bash
