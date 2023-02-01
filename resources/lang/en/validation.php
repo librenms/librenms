@@ -219,7 +219,6 @@ return [
             ],
             'CheckSchemaCollation' => [
                 'ok' => 'Database and column collations are correct',    
-
             ],
         ],
         'distributedpoller' => [
