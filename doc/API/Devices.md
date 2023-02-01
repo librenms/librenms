@@ -1418,9 +1418,9 @@ Output:
 
 Returns a specific device's config from oxidized.
 
-Route: `api/v0/oxidized/config/:device_name`
+Route: `api/v0/oxidized/config/:hostname`
 
-  - device_name is the full dns name of the device used when adding the device to librenms.
+  - hostname is the Hostname or IP of the device used when adding the device to librenms.
 
 Input:
 
