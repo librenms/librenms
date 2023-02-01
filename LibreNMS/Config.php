@@ -321,7 +321,7 @@ class Config
      */
     public static function toJson()
     {
-        return json_encode(self::$config);
+        return json_encode(self::$config, JSON_PRETTY_PRINT);
     }
 
     /**
