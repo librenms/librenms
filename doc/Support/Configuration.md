@@ -28,7 +28,7 @@ If you set up bash completion, you can use tab completion to find config setting
 
 ### Getting a list of all current values
 
-To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`. 
+To get a complete list of all the current values, you can use the command `lnms config:get --dump`.
 
 Example output:
 ```
