@@ -69,9 +69,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * Discover wireless Rx (Received Signal Strength). This is in dBm. Type is power.
+     * Discover wireless Rx & Tx (Signal Strength). This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      * ALU-MICROWAVE-MIB::aluMwRadioLocalRxMainPower
+     * ALU-MICROWAVE-MIB::aluMwRadioLocalTxPower
      *
      * @return array
      */
@@ -79,6 +80,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $name = $this->getCacheByIndex('aluMwRadioName', 'ALU-MICROWAVE-MIB');
         $rsl = snmpwalk_cache_oid($this->getDeviceArray(), 'aluMwRadioLocalRxMainPower', [], 'ALU-MICROWAVE-MIB');
+        $tx = snmpwalk_cache_oid($this->getDeviceArray(), 'aluMwRadioLocalTxPower', [], 'ALU-MICROWAVE-MIB');
 
         $sensors = [];
         $divisor = 10;
@@ -92,8 +94,22 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 $index,
                 "Rx ({$name[$index]})",
                 $data['aluMwRadioLocalRxMainPower'] / $divisor,
-                '1',
-                '10'
+                1,
+                $divisor
+            );
+        }
+
+        foreach ($tx as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.6.1.2.2.7.1.3.1.1.' . $index,
+                'Nokia-Packet-MW-Tx',
+                $index,
+                "Tx ({$name[$index]})",
+                $data['aluMwRadioLocalTxPower'] / $divisor,
+                1,
+                $divisor
             );
         }
 

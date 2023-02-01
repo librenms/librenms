@@ -432,6 +432,34 @@ extend certificate /etc/snmp/certificate.py
 
 The application should be auto-discovered as described at the top of the page. If it is not, please follow the steps set out under `SNMP Extend` heading top of page.
 
+## CAPEv2
+
+1. Copy the shell script to the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/cape -O /etc/snmp/cape
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/cape
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend cape /etc/snmp/cape
+```
+
+4. Install the required packages.
+```
+apt-get install libfile-readbackwards-perl libjson-perl libconfig-tiny-perl libdbi-perl libfile-slurp-perl libstatistics-lite-perl
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## C.H.I.P
 
 C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
@@ -1209,7 +1237,28 @@ chmod +x /etc/snmp/nginx
 extend nginx /etc/snmp/nginx
 ```
 
-4. Restart snmpd on your host
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can request /nginx-status:
+```
+cat << EOF > snmpd_nginx.te
+module snmpd_nginx 1.0;
+
+require {
+        type httpd_t;
+        type http_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t http_port_t:tcp_socket name_connect;
+EOF
+checkmodule -M -m -o snmpd_nginx.mod snmpd_nginx.te
+semodule_package -o snmpd_nginx.pp -m snmpd_nginx.mod
+semodule -i snmpd_nginx.pp
+```
+
+5. Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -2158,6 +2207,29 @@ chmod +x /etc/snmp/redis.py
 extend redis /etc/snmp/redis.py
 ```
 
+4. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can get redis informations and write them:
+```
+cat << EOF > snmpd_redis.te
+module snmpd_redis 1.0;
+
+require {
+        type tmp_t;
+        type redis_port_t;
+        type snmpd_t;
+        class tcp_socket name_connect;
+        class dir { add_name write };
+}
+
+#============= snmpd_t ==============
+
+allow snmpd_t redis_port_t:tcp_socket name_connect;
+allow snmpd_t tmp_t:dir { write add_name };
+EOF
+checkmodule -M -m -o snmpd_redis.mod snmpd_redis.te
+semodule_package -o snmpd_redis.pp -m snmpd_redis.mod
+semodule -i snmpd_redis.pp
+```
+
 ### Agent
 
 [Install the agent](Agent-Setup.md) on this device if it isn't already
@@ -2553,7 +2625,31 @@ extend systemd /etc/snmp/systemd.py
 }
 ```
 
-5. Restart snmpd.
+5. (Optional) If you have SELinux in Enforcing mode, you must add a module so the script can access systemd state:
+```
+cat << EOF > snmpd_systemctl.te
+module snmpd_systemctl 1.0;
+
+require {
+        type snmpd_t;
+        type systemd_systemctl_exec_t;
+        type init_t;
+        class file { execute execute_no_trans map open read };
+        class unix_stream_socket connectto;
+        class system status;
+}
+
+#============= snmpd_t ==============
+allow snmpd_t init_t:system status;
+allow snmpd_t init_t:unix_stream_socket connectto;
+allow snmpd_t systemd_systemctl_exec_t:file { execute execute_no_trans map open read };
+EOF
+checkmodule -M -m -o snmpd_systemctl.mod snmpd_systemctl.te
+semodule_package -o snmpd_systemctl.pp -m snmpd_systemctl.mod
+semodule -i snmpd_systemctl.pp
+```
+
+6. Restart snmpd.
 
 
 ## TinyDNS aka djbdns
