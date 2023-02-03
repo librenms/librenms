@@ -77,10 +77,10 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
 
         if (! empty($sla_table)) {
             $sla_table = snmpwalk_group($this->getDeviceArray(), 'jnxPingResultsRttUs', 'JUNIPER-PING-MIB', 2, $sla_table, snmpFlags: '-OQUstX');
-	}
+        }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-		foreach ($sla_config as $test_key => $test_config) {
+            foreach ($sla_config as $test_key => $test_config) {
                 $slas->push(new Sla([
                     'sla_nr' => hexdec(hash('crc32', $sla_key . $test_key)), // indexed by owner+test, convert to int
                     'owner' => $sla_key,
@@ -92,6 +92,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 ]));
             }
         }
+
         return $slas;
     }
 
@@ -164,17 +165,6 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
-    }
-
-    private function calculateSlaNr($key): int
-    {
-        $sum = 0;
-        $length = strlen($key);
-        for ($i = 0; $i < $length; $i++) {
-            $sum += ord($key[$i]);
-        }
-
-        return $sum;
     }
 
     /**

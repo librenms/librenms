@@ -3736,11 +3736,6 @@ parameters:
 			path: LibreNMS/OS/Ironware.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:calculateSlaNr\\(\\) has parameter \\$key with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Junos.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:discoverSlas\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Junos.php

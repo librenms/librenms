@@ -12329,7 +12329,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 0,
+                    "rtt": 51.32,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -12339,7 +12339,7 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 0,
+                    "rtt": 24.56,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
