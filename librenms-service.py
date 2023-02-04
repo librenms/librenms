@@ -45,10 +45,10 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(format="%(threadName)s(%(levelname)s):%(message)s")
 
-    if args.verbose:
-        logging.getLogger().setLevel(logging.INFO)
-    elif args.debug:
+    if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+    elif args.verbose:
+        logging.getLogger().setLevel(logging.INFO)
     else:
         logging.getLogger().setLevel(logging.WARNING)
 
