@@ -8,7 +8,7 @@ import threading
 
 import LibreNMS
 
-from logging import info
+from logging import info, debug
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -46,13 +46,16 @@ if __name__ == "__main__":
         logging.basicConfig(format="%(threadName)s(%(levelname)s):%(message)s")
 
     if args.debug:
-        logging.getLogger().setLevel(logging.DEBUG)
+       	logging.getLogger().setLevel(logging.DEBUG)
+        debug("Initial log level was set to DEBUG")
     elif args.verbose:
         logging.getLogger().setLevel(logging.INFO)
+       	info("Initial log level was set to INFO")
     else:
-        logging.getLogger().setLevel(logging.WARNING)
+       	logging.getLogger().setLevel(logging.WARNING)
 
     info("Configuring LibreNMS service")
+
     try:
         service = LibreNMS.Service()
     except Exception as e:
