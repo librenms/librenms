@@ -46,11 +46,11 @@ if __name__ == "__main__":
         logging.basicConfig(format="%(threadName)s(%(levelname)s):%(message)s")
 
     if args.debug:
-       	logging.getLogger().setLevel(logging.DEBUG)
+        logging.getLogger().setLevel(logging.DEBUG)
         debug("Initial log level was set to DEBUG")
     elif args.verbose:
         logging.getLogger().setLevel(logging.INFO)
-       	info("Initial log level was set to INFO")
+        info("Initial log level was set to INFO")
     else:
         logging.getLogger().setLevel(logging.WARNING)
 
