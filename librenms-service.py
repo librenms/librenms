@@ -52,7 +52,7 @@ if __name__ == "__main__":
         logging.getLogger().setLevel(logging.INFO)
        	info("Initial log level was set to INFO")
     else:
-       	logging.getLogger().setLevel(logging.WARNING)
+        logging.getLogger().setLevel(logging.WARNING)
 
     info("Configuring LibreNMS service")
 
