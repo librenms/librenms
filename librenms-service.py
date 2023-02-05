@@ -27,10 +27,11 @@ if __name__ == "__main__":
         action="count",
         help="Force verbose ouput - log level is forced to INFO",
     )
-    parser.add_argument("-d",
+    parser.add_argument(
+        "-d",
         "--debug",
         action="store_true",
-        help="Show debug output - log level is forced to DEBUG and PHP debug messages are captured."
+        help="Show debug output - log level is forced to DEBUG and PHP debug messages are captured.",
     )
     parser.add_argument(
         "-m",
