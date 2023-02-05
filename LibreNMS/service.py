@@ -247,6 +247,9 @@ class ServiceConfig(DBConfig):
             # User has set an explicit log level using old variables
             log_level = self.legacy_log_level
 
+        if not isinstance(log_level, int):
+            log_level = getattr(logging, log_level)
+
         self.log_level = min([log_level, self.min_log_level])
 
         try:
