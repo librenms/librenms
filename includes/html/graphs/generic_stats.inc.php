@@ -45,7 +45,7 @@ if (! isset($colour)) {
     }elseif($colours != "rainbow"){
         $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     }else{
-        $colour = \LibreNMS\Config::get("graph_colours.rainbow.4");
+        $colour = \LibreNMS\Config::get("graph_colours.rainbow.5");
     }
 }
 
