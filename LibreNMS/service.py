@@ -72,7 +72,7 @@ class ServiceConfig(DBConfig):
     group = 0
 
     debug = False
-    log_level = 20
+    log_level = logging.INFO
     max_db_failures = 5
 
     alerting = PollerConfig(1, 60)
@@ -100,10 +100,11 @@ class ServiceConfig(DBConfig):
     watchdog_enabled = False
     watchdog_logfile = "logs/librenms.log"
 
-    def populate(self):
+    def populate(self, min_log_level):
         config = LibreNMS.get_config_data(self.BASE_DIR)
 
         # populate config variables
+        self.min_log_level = min_log_level
         self.node_id = os.getenv("NODE_ID")
         self.set_name(config.get("distributed_poller_name", None))
         self.distributed = config.get("distributed_poller", ServiceConfig.distributed)
@@ -124,7 +125,7 @@ class ServiceConfig(DBConfig):
         self.down_retry = config.get(
             "poller_service_down_retry", ServiceConfig.down_retry
         )
-        self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
+        self.legacy_log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
         self.poller.enabled = config.get("service_poller_enabled", True)  # unused
@@ -164,7 +165,7 @@ class ServiceConfig(DBConfig):
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
-        self.log_level = config.get("service_loglevel", ServiceConfig.log_level)
+        self.service_log_level = config.get("service_loglevel", ServiceConfig.log_level)
         self.update_enabled = config.get(
             "service_update_enabled", ServiceConfig.update_enabled
         )
@@ -233,19 +234,29 @@ class ServiceConfig(DBConfig):
         )
         self.watchdog_logfile = config.get("log_file", ServiceConfig.watchdog_logfile)
 
-        # set convenient debug variable
-        self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
+    def set_log_level(self):
+        if self.poller_log_level:
+            # User has set an explicit log level at the poller level
+            log_level = self.poller_log_level
+        elif self.service_log_level:
+            # User has set an explicit log level at the global level
+            log_level = self.service_log_level
+        elif self.legacy_log_level:
+            # User has set an explicit log level using old variables
+            log_level = self.legacy_log_level
 
-        if not self.debug and self.log_level:
-            try:
-                logging.getLogger().setLevel(self.log_level)
-            except ValueError:
-                logger.error(
-                    "Unknown log level {}, must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'".format(
-                        self.log_level
-                    )
+        self.log_level = min([log_level, self.min_log_level])
+
+        try:
+            logging.getLogger().setLevel(self.log_level)
+            self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
+        except ValueError:
+            logger.error(
+                "Unknown log level {}, must be one of 'DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'".format(
+                    self.log_level
                 )
-                logging.getLogger().setLevel(logging.INFO)
+            )
+            logging.getLogger().setLevel(logging.INFO)
 
     def load_poller_config(self, db):
         try:
@@ -303,7 +314,7 @@ class ServiceConfig(DBConfig):
             if settings["update_frequency"] is not None:
                 self.update_frequency = settings["update_frequency"]
             if settings["loglevel"] is not None:
-                self.log_level = settings["loglevel"]
+                self.poller_log_level = settings["loglevel"]
             if settings["watchdog_enabled"] is not None:
                 self.watchdog_enabled = settings["watchdog_enabled"]
             if settings["watchdog_log"] is not None:
@@ -340,12 +351,14 @@ class Service:
     terminate_flag = False
     reload_flag = False
     db_failures = 0
+    min_log_level = None
 
-    def __init__(self):
+    def __init__(self, min_log_level = None):
         self.start_time = time.time()
-        self.config.populate()
+        self.config.populate(min_log_level)
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
+        self.set_log_level()
 
         threading.current_thread().name = self.config.name  # rename main thread
         self.attach_signals()

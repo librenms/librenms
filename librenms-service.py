@@ -21,8 +21,8 @@ if __name__ == "__main__":
         type=int,
         help="Set the poller group for this poller",
     )
-    parser.add_argument("-v", "--verbose", action="count", help="Show verbose output.")
-    parser.add_argument("-d", "--debug", action="store_true", help="Show debug output.")
+    parser.add_argument("-v", "--verbose", action="count", help="Force verbose ouput - log level is forced to INFO")
+    parser.add_argument("-d", "--debug", action="store_true", help="Show debug output - log level is forced to DEBUG and PHP debug messages are captured.")
     parser.add_argument(
         "-m",
         "--multiple",
@@ -45,19 +45,23 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(format="%(threadName)s(%(levelname)s):%(message)s")
 
+    min_log_level = logging.WARNING
+
     if args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
         debug("Initial log level was set to DEBUG")
+        min_log_level = logging.DEBUG
     elif args.verbose:
         logging.getLogger().setLevel(logging.INFO)
         info("Initial log level was set to INFO")
+        min_log_level = logging.INFO
     else:
         logging.getLogger().setLevel(logging.WARNING)
 
     info("Configuring LibreNMS service")
 
     try:
-        service = LibreNMS.Service()
+        service = LibreNMS.Service(min_log_level)
     except Exception as e:
         # catch any initialization errors and print the message instead of a stack trace
         print(e)
