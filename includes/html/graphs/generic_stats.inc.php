@@ -32,7 +32,7 @@ if ($nototal) {
 
 $rrd_options .= "";
 
-if ($height < 99) {
+if ($height > 99) {
     $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
 }
 
@@ -128,6 +128,7 @@ $id = 'ds' . $i;
 
 
 $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
+$rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 
 if ($height > 25) {
     $rrd_options .= ' DEF:' . $id . "1h=$filename:$ds:AVERAGE:step=3600";
@@ -147,7 +148,7 @@ if ($height > 25) {
         $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
     }
 
-    $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
+
     $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ':MIN:%5.' . $float_precision . 'lf%s' . $units;
     $rrd_optionsb .= ' GPRINT:' . $id . ':MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
 
@@ -176,8 +177,9 @@ if ($height > 25) {
     $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
     $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
 
-    $rrd_options .= $rrd_optionsb;
+
 }
+$rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';
 
 unset($stacked);
