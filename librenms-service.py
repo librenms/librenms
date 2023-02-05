@@ -21,8 +21,17 @@ if __name__ == "__main__":
         type=int,
         help="Set the poller group for this poller",
     )
-    parser.add_argument("-v", "--verbose", action="count", help="Force verbose ouput - log level is forced to INFO")
-    parser.add_argument("-d", "--debug", action="store_true", help="Show debug output - log level is forced to DEBUG and PHP debug messages are captured.")
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        help="Force verbose ouput - log level is forced to INFO",
+    )
+    parser.add_argument("-d",
+        "--debug",
+        action="store_true",
+        help="Show debug output - log level is forced to DEBUG and PHP debug messages are captured."
+    )
     parser.add_argument(
         "-m",
         "--multiple",

@@ -125,7 +125,9 @@ class ServiceConfig(DBConfig):
         self.down_retry = config.get(
             "poller_service_down_retry", ServiceConfig.down_retry
         )
-        self.legacy_log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
+        self.legacy_log_level = config.get(
+            "poller_service_loglevel", ServiceConfig.log_level
+        )
 
         # new options
         self.poller.enabled = config.get("service_poller_enabled", True)  # unused
@@ -353,12 +355,12 @@ class Service:
     db_failures = 0
     min_log_level = None
 
-    def __init__(self, min_log_level = None):
+    def __init__(self, min_log_level=None):
         self.start_time = time.time()
         self.config.populate(min_log_level)
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
-        self.set_log_level()
+        self.config.set_log_level()
 
         threading.current_thread().name = self.config.name  # rename main thread
         self.attach_signals()
