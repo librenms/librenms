@@ -1,7 +1,6 @@
 <?php
 
 $unit_text = 'Banned IPs';
-$colours = 'psychedelic';
 $descr = 'Banbed';
 $ds = 'banned';
 
