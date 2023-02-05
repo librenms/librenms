@@ -89,7 +89,7 @@ if (! isset($colour1h)) {
     }elseif($colours != "rainbow"){
         $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     }else{
-        $colour1h = \LibreNMS\Config::get("graph_colours.rainbow.8");
+        $colour1h = \LibreNMS\Config::get("graph_colours.rainbow.7");
     }
     $iter++;
 }
@@ -100,7 +100,7 @@ if (! isset($colour1d)) {
     }elseif($colours != "rainbow"){
         $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     }else{
-        $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.9");
+        $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.8");
     }
     $iter++;
 }
