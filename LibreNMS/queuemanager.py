@@ -493,7 +493,12 @@ class PollerQueueManager(QueueManager):
         if self.lock(device_id, timeout=self.config.poller.frequency):
             logger.info("Polling device {}".format(device_id))
 
-            exit_code, output = LibreNMS.call_script("poller.php", ("-h", device_id))
+            poller_args = ("-h", device_id)
+
+            if self.config.debug:
+                poller_args = ("-d", *poller_args)
+
+            exit_code, output = LibreNMS.call_script("poller.php", poller_args)
             if exit_code == 0:
                 self.unlock(device_id)
             else:
@@ -546,7 +551,13 @@ class DiscoveryQueueManager(TimedQueueManager):
             device_id, timeout=LibreNMS.normalize_wait(self.config.discovery.frequency)
         ):
             logger.info("Discovering device {}".format(device_id))
-            exit_code, output = LibreNMS.call_script("discovery.php", ("-h", device_id))
+
+            discovery_args = ("-h", device_id)
+
+            if self.config.debug:
+                discovery_args = ("-d", *discovery_args)
+
+            exit_code, output = LibreNMS.call_script("discovery.php", discovery_args)
             if exit_code == 0:
                 self.unlock(device_id)
             else:
