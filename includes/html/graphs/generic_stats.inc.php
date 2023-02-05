@@ -32,7 +32,7 @@ if ($nototal) {
 
 $rrd_options .= "";
 
-if ($height < 99 ){
+if ($height < 99) {
     $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l'";
 }
 
@@ -42,9 +42,9 @@ $iter = 0;
 if (! isset($colour)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour = \LibreNMS\Config::get("graph_colours.rainbow.5");
     }
 }
@@ -53,9 +53,9 @@ if (! isset($colour)) {
 if (! isset($colour25th)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour25th = \LibreNMS\Config::get("graph_colours.rainbow.0");
     }
     $iter++;
@@ -64,9 +64,9 @@ if (! isset($colour25th)) {
 if (! isset($colour50th)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour50th = \LibreNMS\Config::get("graph_colours.rainbow.1");
     }
     $iter++;
@@ -75,9 +75,9 @@ if (! isset($colour50th)) {
 if (! isset($colour75th)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour75th = \LibreNMS\Config::get("graph_colours.rainbow.11");
     }
     $iter++;
@@ -86,9 +86,9 @@ if (! isset($colour75th)) {
 if (! isset($colour1h)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour1h = \LibreNMS\Config::get("graph_colours.rainbow.7");
     }
     $iter++;
@@ -97,9 +97,9 @@ if (! isset($colour1h)) {
 if (! isset($colour1d)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.8");
     }
     $iter++;
@@ -108,9 +108,9 @@ if (! isset($colour1d)) {
 if (! isset($colour1w)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
-    }elseif($colours != "rainbow"){
+    } elseif ($colours != "rainbow") {
         $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    }else{
+    } else {
         $colour1w = \LibreNMS\Config::get("graph_colours.rainbow.10");
     }
     $iter++;
@@ -118,7 +118,7 @@ if (! isset($colour1w)) {
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
 
-if ($height > 25 ){
+if ($height > 25) {
     $descr_1h = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 hour avg', $descr_len);
     $descr_1d = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 day avg', $descr_len);
     $descr_1w = \LibreNMS\Data\Store\Rrd::fixedSafeDescr('1 week avg', $descr_len);
@@ -129,7 +129,7 @@ $id = 'ds' . $i;
 
 $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
 
-if ($height > 25 ){
+if ($height > 25) {
     $rrd_options .= ' DEF:' . $id . "1h=$filename:$ds:AVERAGE:step=3600";
     $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
     $rrd_options .= ' VDEF:' . $id . '50th=' . $id . ',50,PERCENTNAN';
