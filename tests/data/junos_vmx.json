@@ -12319,6 +12319,16 @@
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
+                },
+                {
+                    "sla_nr": 2362442542,
+                    "owner": "test-twamp1",
+                    "tag": "twamp",
+                    "rtt_type": "twamp",
+                    "rtt": 27.01,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
                 }
             ]
         },
@@ -12340,6 +12350,16 @@
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
                     "rtt": 24.56,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 2362442542,
+                    "owner": "test-twamp1",
+                    "tag": "twamp",
+                    "rtt_type": "twamp",
+                    "rtt": 26.97,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
