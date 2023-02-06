@@ -12,75 +12,45 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Util\Proxy;
+use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Util\Http;
 
 class LineMessagingAPI extends Transport
 {
+    /**
+     * @var string display name
+     */
     protected $name = 'Line Messaging API';
 
     /**
      * Deliver Alert
      *
-     * @param  array<string, string>  $obj  Alert data
-     * @param  array<string, string>  $opts  Transport options
+     * @param  array<string, string>  $alert_data  Alert data
      * @return bool True if message sent successfully
      */
-    public function deliverAlert($obj, $opts)
-    {
-        $opts['token'] = $this->config['line-messaging-token'];
-        $opts['to'] = $this->config['line-messaging-to'];
-
-        return $this->contactLineMessagingAPI($obj, $opts);
-    }
-
-    /**
-     * Contact Line Messaging API
-     *
-     * @param  array<string, string>  $obj  Alert data
-     * @param  array<string, string>  $opts  Transport options
-     * @return bool True if message sent successfully
-     */
-    public function contactLineMessagingAPI($obj, $opts)
+    public function deliverAlert($alert_data)
     {
         $apiURL = 'https://api.line.me/v2/bot/message/push';
-        $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $opts['token'],
-        ];
-
         $data = [
-            'to' => $opts['to'],
+            'to' => $this->config['line-messaging-to'],
             'messages' => [
                 [
                     'type' => 'text',
-                    'text' => $obj['msg'],
+                    'text' => $alert_data['msg'],
                 ],
             ],
         ];
 
-        $alert_message = json_encode($data);
+        $res = Http::client()
+        ->withToken($this->config['line-messaging-token'])
+        ->asForm()
+        ->post($apiURL, $data);
 
-        $curl = curl_init();
-        Proxy::applyToCurl($curl);
-        curl_setopt($curl, CURLOPT_URL, $apiURL);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_NOBODY, false);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
-        curl_exec($curl);
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        if ($code != 200) {
-            var_dump("API '$apiURL' returned HTTP Status code: $code");
-            var_dump('Params: ' . $alert_message);
-            var_dump('Return: ' . $ret);
-            var_dump('Headers: ', $headers);
-
-            return false;
+        if ($res->successful()) {
+            return true;
         }
 
-        return true;
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
     }
 
     /**
