@@ -73,9 +73,9 @@ if (! isset($colour25th)) {
 }
 
 if (! isset($colour50th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
         $iter = 0;
-    } elseif ($colours != "rainbow") {
+    } elseif ($colours != 'rainbow') {
         $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
         $colour50th = \LibreNMS\Config::get('graph_colours.rainbow.8');
@@ -84,12 +84,12 @@ if (! isset($colour50th)) {
 }
 
 if (! isset($colour75th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
         $iter = 0;
-    } elseif ($colours != "rainbow") {
+    } elseif ($colours != 'rainbow') {
         $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour75th = \LibreNMS\Config::get("graph_colours.rainbow.9");
+        $colour75th = \LibreNMS\Config::get('graph_colours.rainbow.9');
     }
     $iter++;
 }
@@ -159,7 +159,6 @@ if ($height > 25) {
     if ($time_diff >= 61200) {
         $rrd_options .= ' DEF:' . $id . "1d=$filename:$ds:AVERAGE:step=86400";
     }
-
 
     $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ':MIN:%5.' . $float_precision . 'lf%s' . $units;
     $rrd_optionsb .= ' GPRINT:' . $id . ':MAX:%5.' . $float_precision . 'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5." . $float_precision . "lf%s$units\\n'";
