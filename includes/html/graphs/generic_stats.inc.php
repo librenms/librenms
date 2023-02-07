@@ -49,6 +49,15 @@ if (! isset($colour)) {
     }
 }
 
+if (! isset($colourA)) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
+        $iter = 0;
+    } elseif ($colours != "rainbow") {
+        $colourA = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    } else {
+        $colourA = \LibreNMS\Config::get("graph_colours.rainbow.11");
+    }
+}
 
 if (! isset($colour25th)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
@@ -126,9 +135,14 @@ if ($height > 25) {
 
 $id = 'ds' . $i;
 
-
 $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
-$rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
+
+if ($height <= 25) {
+    $rrd_optionsb .= ' AREA:' . $id . '#' . $colourA;
+}else{
+    $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
+}
+
 
 if ($height > 25) {
     $rrd_options .= ' DEF:' . $id . "1h=$filename:$ds:AVERAGE:step=3600";
@@ -176,8 +190,6 @@ if ($height > 25) {
 
     $rrd_optionsb .= ' HRULE:' . $id . '75th#' . $colour75th . ':75th_Percentile';
     $rrd_optionsb .= ' GPRINT:' . $id . '75th:%' . $float_precision . 'lf%s\n';
-
-
 }
 $rrd_options .= $rrd_optionsb;
 $rrd_options .= ' HRULE:0#555555';
