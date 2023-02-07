@@ -6,7 +6,6 @@ $ds = 'value';
 
 $unit_text = 'CPU Steal';
 
-$colours = 'blues';
 $float_precision = 3;
 
 $descr = '';

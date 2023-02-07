@@ -6,7 +6,6 @@ $ds = 'users';
 
 $unit_text = 'Users';
 
-$colours = 'greens';
 $float_precision = 3;
 
 $descr = '';

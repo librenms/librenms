@@ -23,8 +23,6 @@ if ($vars['duration'] > 86400) {
 
     require 'includes/html/graphs/generic_simplex.inc.php';
 } else {
-    $colours = 'blues';
-
     $filename = Rrd::name($device['hostname'], ['availability', $vars['duration']]);
     $descr = '';
 

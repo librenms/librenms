@@ -6,7 +6,6 @@ $ds = 'procs';
 
 $unit_text = 'Processes';
 
-$colours = 'greens';
 $float_precision = 3;
 
 $descr = '';

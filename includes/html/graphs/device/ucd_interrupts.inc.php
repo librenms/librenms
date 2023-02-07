@@ -6,7 +6,6 @@ $ds = 'value';
 
 $unit_text = 'Interrupts/s';
 
-$colours = 'oranges';
 $float_precision = 3;
 
 $descr = '';
