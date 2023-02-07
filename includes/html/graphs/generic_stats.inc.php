@@ -18,7 +18,7 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 if (! isset($colours)) {
-    $colours = 'rainbow';
+    $colours = 'rainbow_stats_purple';
 }
 
 if (! isset($descr_len)) {
@@ -38,13 +38,8 @@ $i = 0;
 $iter = 0;
 
 if (! isset($colour)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
-        $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour = \LibreNMS\Config::get('graph_colours.rainbow.5');
-    }
+    $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $iter++;
 }
 
 if (! isset($colourA)) {
@@ -56,68 +51,50 @@ if (! isset($colourAalpha)) {
 }
 
 if (! isset($colour25th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour25th = \LibreNMS\Config::get('graph_colours.rainbow.7');
     }
+    $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour50th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour50th = \LibreNMS\Config::get('graph_colours.rainbow.8');
     }
+    $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour75th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour75th = \LibreNMS\Config::get('graph_colours.rainbow.9');
     }
+    $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1h)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour1h = \LibreNMS\Config::get('graph_colours.rainbow.10');
     }
+    $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1d)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour1d = \LibreNMS\Config::get('graph_colours.rainbow.1');
     }
+    $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1w)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
+    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
         $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colour1w = \LibreNMS\Config::get('graph_colours.rainbow.0');
     }
+    $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
