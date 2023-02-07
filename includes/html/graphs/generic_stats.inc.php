@@ -59,13 +59,17 @@ if (! isset($colourA)) {
     }
 }
 
+if (! isset($colourAalpha)) {
+    $colourAalpha = 33;
+}
+
 if (! isset($colour25th)) {
     if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != "rainbow")) {
         $iter = 0;
     } elseif ($colours != "rainbow") {
         $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour25th = \LibreNMS\Config::get("graph_colours.rainbow.0");
+        $colour25th = \LibreNMS\Config::get("graph_colours.rainbow.7");
     }
     $iter++;
 }
@@ -76,7 +80,7 @@ if (! isset($colour50th)) {
     } elseif ($colours != "rainbow") {
         $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour50th = \LibreNMS\Config::get("graph_colours.rainbow.1");
+        $colour50th = \LibreNMS\Config::get("graph_colours.rainbow.8");
     }
     $iter++;
 }
@@ -87,7 +91,7 @@ if (! isset($colour75th)) {
     } elseif ($colours != "rainbow") {
         $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour75th = \LibreNMS\Config::get("graph_colours.rainbow.11");
+        $colour75th = \LibreNMS\Config::get("graph_colours.rainbow.9");
     }
     $iter++;
 }
@@ -98,7 +102,7 @@ if (! isset($colour1h)) {
     } elseif ($colours != "rainbow") {
         $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour1h = \LibreNMS\Config::get("graph_colours.rainbow.7");
+        $colour1h = \LibreNMS\Config::get("graph_colours.rainbow.10");
     }
     $iter++;
 }
@@ -109,7 +113,8 @@ if (! isset($colour1d)) {
     } elseif ($colours != "rainbow") {
         $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.8");
+        $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.1");
+//        $colour1d = \LibreNMS\Config::get("graph_colours.rainbow.8");
     }
     $iter++;
 }
@@ -120,7 +125,8 @@ if (! isset($colour1w)) {
     } elseif ($colours != "rainbow") {
         $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
     } else {
-        $colour1w = \LibreNMS\Config::get("graph_colours.rainbow.10");
+        $colour1w = \LibreNMS\Config::get("graph_colours.rainbow.0");
+//        $colour1w = \LibreNMS\Config::get("graph_colours.rainbow.9");
     }
     $iter++;
 }
@@ -137,12 +143,8 @@ $id = 'ds' . $i;
 
 $rrd_options .= ' DEF:' . $id . "=$filename:$ds:AVERAGE";
 
-if ($height <= 25) {
-    $rrd_optionsb .= ' AREA:' . $id . '#' . $colourA;
-}else{
-    $rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
-}
-
+$rrd_optionsb .= ' AREA:' . $id . '#' . $colourA . $colourAalpha;
+$rrd_optionsb .= ' LINE1.25:' . $id . '#' . $colour . ":'$descr'";
 
 if ($height > 25) {
     $rrd_options .= ' DEF:' . $id . "1h=$filename:$ds:AVERAGE:step=3600";
