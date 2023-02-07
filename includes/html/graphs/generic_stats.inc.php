@@ -48,13 +48,7 @@ if (! isset($colour)) {
 }
 
 if (! isset($colourA)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter") && ($colours != 'rainbow')) {
-        $iter = 0;
-    } elseif ($colours != 'rainbow') {
-        $colourA = \LibreNMS\Config::get("graph_colours.$colours.$iter");
-    } else {
-        $colourA = \LibreNMS\Config::get('graph_colours.rainbow.11');
-    }
+    $colourA = $colour;
 }
 
 if (! isset($colourAalpha)) {
