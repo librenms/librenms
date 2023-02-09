@@ -1,0 +1,125 @@
+BAICELLS-CPE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+    Gauge32, Counter32, Counter64, IpAddress, mib-2,enterprises
+                                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF
+    InetAddress, InetAddressType,
+    InetPortNumber                     FROM INET-ADDRESS-MIB
+    DisplayString                      FROM SNMPv2-TC;
+
+baicells OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "The root of the sub-tree assigned to Baicells."
+        -- 1.3.6.1.4.1.53058
+        ::= { enterprises 53058 }
+
+baicellsCPE OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+                "The root of the sub-tree assigned to Baicells CPE."
+        -- 1.3.6.1.4.1.53058.1
+        ::= { baicells 2 }
+
+
+deviceInfo MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"    
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 1 }
+	
+lteSettingsStatus MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 2 }
+
+lteStatus MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 3 }
+
+webSetting MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 4 }
+
+mapnQos MODULE-IDENTITY
+    LAST-UPDATED "200005110000Z"
+    ORGANIZATION "IETF RMON MIB Working Group"
+    CONTACT-INFO
+	"baicells"    
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 5 }
+	
+managementServer MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 6 }
+	
+wanIpConn MODULE-IDENTITY
+    LAST-UPDATED "202104220000Z"
+    ORGANIZATION "Baicells Company"
+    CONTACT-INFO
+	"https://www.baicells.com/cn/"
+    DESCRIPTION
+	""
+    ::= { baicellsCPE 7 }
+
+SpecVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SpecVersion."
+    ::= { deviceInfo 1 }
+
+ProvisioningCode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Provisioning Code."
+    ::= { deviceInfo 2 }
+
+Manufacturer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Manufacturer."
+    ::= { deviceInfo 3 }
+
+
+ManufacturerOUI OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+	DESCRIPTION
+        "Manufacturer OUI."
+    ::= { deviceInfo 4 }
+
+ProductClass OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read

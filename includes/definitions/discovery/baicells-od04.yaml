@@ -1,0 +1,11 @@
+os: baicells-od04
+text: 'Baicells CPE'
+type: network
+icon: rts
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr:
+        - 'BaiCPE'
