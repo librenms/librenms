@@ -229,7 +229,7 @@ user = librenms
 group = librenms
 ```
 
-Change `listen` to a unique name, and please note that the path set here needs to match the path in your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
+Change `listen` to a unique path that must match your webserver's config (`fastcgi_pass` for NGINX and `SetHandler` for Apache) :
 ```
 listen = /run/php-fpm-librenms.sock
 ```
