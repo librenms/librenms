@@ -174,7 +174,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "GitHub"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.github.client_id 7a41f1d8215640ca6b00
         lnms config:set auth.socialite.configs.github.client_secret ea03957288edd0e590be202b239e4f0ff26b8047
@@ -182,7 +182,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "Microsoft"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.microsoft.client_id 7983ac13-c955-40e9-9b85-5ba27be52a52
         lnms config:set auth.socialite.configs.microsoft.client_secret J9P7Q~K2F5C.L243sqzbGj.cOOcjTBgAPak_l
@@ -191,7 +191,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 === "Okta"
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
         lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
@@ -219,7 +219,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\GitHub\GitHubExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.github.listener "\SocialiteProviders\GitHub\GitHubExtendSocialite"
         ```
@@ -238,7 +238,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\Microsoft\MicrosoftExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.microsoft.listener "\SocialiteProviders\Microsoft\MicrosoftExtendSocialite"
         ```
@@ -257,7 +257,7 @@ The final step is to now add an event listener.
     ```
 
     Copy the part: `\SocialiteProviders\Okta\OktaExtendSocialite` and run;
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
         ```bash
         lnms config:set auth.socialite.configs.okta.listener "\SocialiteProviders\Okta\OktaExtendSocialite"
         ```
@@ -266,7 +266,7 @@ The final step is to now add an event listener.
 Now you are done with setting up the OAuth provider!
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:get auth.socialite
     ```
@@ -316,13 +316,13 @@ It is up the IdP to provide the relevant details that you will need for configur
     ![socialite-saml-google-6](/img/socialite-saml-google-6.png)
 
 
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata "$(cat /tmp/GoogleIDPMetadata.xml)"
     ```
 
     Alternatively, you can copy the content of the file and run it like so, this will result in the exact same result as above.
-    !!! setting "auth/socialite"
+    !!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata '''<?xml version="1.0" encoding
     ...
@@ -337,21 +337,21 @@ It is up the IdP to provide the relevant details that you will need for configur
 !!! note
     This is the prefered and easiest way, if your IdP supports it!
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata https://idp.co/metadata/xml
     ```
 
 #### Using an Identity Provider metadata XML file
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.metadata "$(cat GoogleIDPMetadata.xml)"
     ```
 
 #### Manually configuring the Identity Provider with a certificate string
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
     lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
@@ -360,7 +360,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 #### Manually configuring the Identity Provider with a certificate file
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
     lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
@@ -371,7 +371,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 Now we just need to define the listener service within LibreNMS:
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
     ```
@@ -392,7 +392,7 @@ LibreNMS exposes all of this information from your [LibreNMS install](https://*y
 ## Troubleshooting
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     ```bash
     lnms config:get auth.socialite
     ```
@@ -409,7 +409,7 @@ If you have a need to, then you can override redirect url with the following com
 
 ## Post configuration settings
 
-!!! setting "auth/socialite"
+!!! setting "settings/auth/socialite"
     From here you can configure the settings for any identity providers you have configured along with some bespoke options.
 
     Redirect Login page: This setting will skip your LibreNMS login and take the end user straight to the first idP you configured.
