@@ -42,7 +42,7 @@ Please ensure you set `APP_URL` within your `.env` file so that callback URLs wo
 
 === "Okta"
 
-    `lnms plugin:add socialiteproviders/okta'
+    `lnms plugin:add socialiteproviders/okta`
 
 ### Find the provider name
 
