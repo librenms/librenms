@@ -55,7 +55,10 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo('Processing vlan ID: ' . $vlan_id);
-        $vlan_name = empty($vlan['Q-BRIDGE-MIB::dot1qVlanStaticName']) ? "VLAN $vlan_id" : $vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'];
+        if(empty($vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'])){
+            continue;
+        }
+        $vlan_name = $vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'];
 
         //try to get existing data from DB
         $vlanDB = Vlan::firstOrNew([
