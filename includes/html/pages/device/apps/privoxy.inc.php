@@ -1,14 +1,14 @@
 <?php
 
-if (!isset($vars['privoxyPage'])){
+if (!isset($vars['privoxyPage'])) {
     $vars['privoxyPage']='general';
-}elseif( $vars['privoxyPage'] != 'general' &&
+} elseif ($vars['privoxyPage'] != 'general' &&
          $vars['privoxyPage'] != 'blocks' &&
          $vars['privoxyPage'] != 'http_ver' &&
          $vars['privoxyPage'] != 'http_type' &&
          $vars['privoxyPage'] != 'http_resp' &&
          $vars['privoxyPage'] != 'domains' &&
-         $vars['privoxyPage'] != 'conn' ) {
+         $vars['privoxyPage'] != 'conn') {
     $vars['privoxyPage']='general';
 }
 
@@ -61,7 +61,7 @@ echo $link_tmp.' | ';
 print_optionbar_end();
 
 
-if ( $vars['privoxyPage'] == 'general' ){
+if ($vars['privoxyPage'] == 'general') {
     $graphs = [
         'privoxy_client_requests' => 'Client Requests',
         'privoxy_blocks' => 'Blocked Requests',
@@ -73,7 +73,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_bytes_to_client' => 'Bytes Sent To Clients',
         'privoxy_imp_accounted' => 'Improperly Accounted',
     ];
-}elseif( $vars['privoxyPage'] == 'conn' ){
+} elseif ($vars['privoxyPage'] == 'conn') {
     $graphs = [
         'privoxy_nog_conns' => 'New Outgoing Requests',
         'privoxy_reused_server_cons' => 'Reused Server Connections',
@@ -81,7 +81,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_out_requests' => 'Out Going Requests',
         'privoxy_bytes_to_client' => 'Bytes To Client',
     ];
-}elseif( $vars['privoxyPage'] == 'blocks' ){
+} elseif ($vars['privoxyPage'] == 'blocks') {
     $graphs = [
         'privoxy_blocks' => 'Blocked Requests',
         'privoxy_block_percent' => 'Blocked Requests, Percent',
@@ -89,7 +89,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_unique_bdomains' => 'Unique Domains, Blocked',
         'privoxy_unique_bdomains_np' => 'Unique Domains Without Port, Blocked',
     ];
-}elseif( $vars['privoxyPage'] == 'http_ver' ){
+} elseif ($vars['privoxyPage'] == 'http_ver') {
     $graphs = [
         'privoxy_ver' => 'HTTP Versions',
         'privoxy_ver_1_0' => 'HTTP/1.0',
@@ -97,7 +97,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_ver_2' => 'HTTP/2',
         'privoxy_ver_3' => 'HTTP/3',
     ];
-}elseif( $vars['privoxyPage'] == 'http_type' ){
+} elseif ($vars['privoxyPage'] == 'http_type') {
     $graphs = [
         'privoxy_req' => 'HTTP Request Types',
         'privoxy_req_connect' => 'CONNECT',
@@ -110,7 +110,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_req_put' => 'PUT',
         'privoxy_req_trace' => 'TRACE',
     ];
-}elseif( $vars['privoxyPage'] == 'http_resp' ){
+} elseif ($vars['privoxyPage'] == 'http_resp') {
     $graphs = [
         'privoxy_resp_xxx' => 'Response Code Types',
         'privoxy_resp_1xx' => '1xx',
@@ -134,7 +134,7 @@ if ( $vars['privoxyPage'] == 'general' ){
         'privoxy_resp_504' => '504',
         'privoxy_resp_5xx_other' => '5xx Other',
     ];
-}elseif( $vars['privoxyPage'] == 'domains' ){
+} elseif ($vars['privoxyPage'] == 'domains') {
     $graphs = [
         'privoxy_unique_domains' => 'Unique Domains',
         'privoxy_unique_bdomains' => 'Unique Domains, Blocked',

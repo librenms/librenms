@@ -132,8 +132,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('ver_2', 'GAUGE', 0)
     ->addDataset('ver_3', 'GAUGE', 0);
 
-foreach( $fields as $key => $value ){
-    if (isset( $returned['data'][$key] )){
+foreach ($fields as $key => $value) {
+    if (isset($returned['data'][$key])) {
         $fields[$key]=$returned['data'][$key];
     }
 }
