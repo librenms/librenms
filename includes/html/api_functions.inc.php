@@ -2338,6 +2338,34 @@ function list_vlans(Illuminate\Http\Request $request)
     return api_success($vlans, 'vlans');
 }
 
+function list_ports_vlans(Illuminate\Http\Request $request)
+{
+    $sql = '';
+    $sql_params = [];
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
+        $sql = ' AND `devices`.`device_id` = ?';
+        $sql_params[] = $device_id;
+    }
+    if (!Auth::user()->hasGlobalRead()) {
+        $sql .= ' AND `ports_vlans`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
+        $sql_params[] = Auth::id();
+    }
+
+    $ports_vlans = dbFetchRows("SELECT `ports_vlans`.* FROM `ports_vlans` LEFT JOIN `devices` ON `ports_vlans`.`device_id` = `devices`.`device_id` $sql", $sql_params);
+    $vlans_count = count($ports_vlans);
+    if ($vlans_count == 0) {
+        return api_error(404, 'Port VLANs do not exist');
+    }
+
+    return api_success($ports_vlans, 'ports_vlans');
+}
+
 function list_links(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
