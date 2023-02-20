@@ -71,11 +71,11 @@ Output:
 }
 ```
 
-### `list_port_vlans`
+### `list_ports_vlans`
 
-Get a list of all Port VLANs.
+Get a list of all Ports VLANs.
 
-Route: `/api/v0/resources/port_vlans`
+Route: `/api/v0/resources/ports_vlans`
 
 Input:
 
