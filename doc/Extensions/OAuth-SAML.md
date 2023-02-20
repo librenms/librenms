@@ -123,7 +123,7 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 === "Okta"
     For our example with Okta, we go to `Applications>Create App Integration`, Select `OIDC - OpenID Connect`, then `Web Application`.
 
-    ! [socialite-okta-1](/img/socialite-okta-1.png)
+    ![socialite-okta-1](/img/socialite-okta-1.png)
 
     Fill in the Name, Logo, and Assignments based on your preferred settings. Leave the `Sign-In Redirect URI` field, this is where you will edit this later:
     ![socialite-okta-2](/img/socialite-okta-2.png)
