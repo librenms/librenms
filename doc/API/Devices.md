@@ -1017,6 +1017,7 @@ Input:
   - location_id: serach by locaiton_id
   - hostname: search by hostname
   - sysName: search by sysName
+  - display: search by display name
   - device_id: exact match by device-id
   - type: search by device type
 - query: If searching by, then this will be used as the input.
@@ -1418,9 +1419,9 @@ Output:
 
 Returns a specific device's config from oxidized.
 
-Route: `api/v0/oxidized/config/:device_name`
+Route: `api/v0/oxidized/config/:hostname`
 
-  - device_name is the full dns name of the device used when adding the device to librenms.
+  - hostname is the Hostname or IP of the device used when adding the device to librenms.
 
 Input:
 

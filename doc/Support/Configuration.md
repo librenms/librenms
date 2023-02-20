@@ -26,6 +26,38 @@ The LibreNMS uses dot notation for config items:
 
 If you set up bash completion, you can use tab completion to find config settings.
 
+### Getting a list of all current values
+
+To get a complete list of all the current values, you can use the command `lnms config:get --dump`. The output may not be desirable, so you can use the `jq` package to pretty print it. Then it would be `lnms config:get --dump | jq`.
+
+Example output:
+```
+librenms@librenms:~$ lnms config:get --dump | jq 
+{
+  "install_dir": "/opt/librenms",
+  "active_directory": {
+    "users_purge": 0
+  },
+  "addhost_alwayscheckip": false,
+  "alert": {
+    "ack_until_clear": false,
+    "admins": true,
+    "default_copy": true,
+    "default_if_none": false,
+    "default_mail": false,
+    "default_only": true,
+    "disable": false,
+    "fixed-contacts": true,
+    "globals": true,
+    "syscontact": true,
+    "transports": {
+      "mail": 5
+    },
+    "tolerance_window": 5,
+    "users": false,
+    ...
+```
+
 ### Examples
 
 ```bash
