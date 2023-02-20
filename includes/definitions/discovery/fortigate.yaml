@@ -147,7 +147,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsIntrusionsDetected
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.1.{{ $index }}'
-                    descr: 'IPS Intrusions Detected'
+                    descr: 'IPS Intrusions Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsIntrusionsDetected.{{ $index }}'
                     rrd_type: COUNTER
@@ -155,7 +155,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsIntrusionsBlocked
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.2.{{ $index }}'
-                    descr: 'IPS Intrusions Blocked'
+                    descr: 'IPS Intrusions Blocked {{ index }}'
                     group: IPS
                     index: 'fgIpsIntrusionsBlocked.{{ $index }}'
                     rrd_type: COUNTER
@@ -163,7 +163,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsCritSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.3.{{ $index }}'
-                    descr: 'IPS Severity - Critical Detected'
+                    descr: 'IPS Severity - Critical Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsCritSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -171,7 +171,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsHighSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.4.{{ $index }}'
-                    descr: 'IPS Severity - High Detected'
+                    descr: 'IPS Severity - High Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsHighSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -179,7 +179,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsMedSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.5.{{ $index }}'
-                    descr: 'IPS Severity - Medium Detected'
+                    descr: 'IPS Severity - Medium Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsMedSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -187,7 +187,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsLowSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.6.{{ $index }}'
-                    descr: 'IPS Severity - Low Detected'
+                    descr: 'IPS Severity - Low Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsLowSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -195,7 +195,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsInfoSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.7.{{ $index }}'
-                    descr: 'IPS Severity - Informational Detected'
+                    descr: 'IPS Severity - Informational Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsInfoSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -203,7 +203,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsSignatureDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.8.{{ $index }}'
-                    descr: 'IPS Signature Detected'
+                    descr: 'IPS Signature Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsSignatureDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -211,7 +211,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsAnomalyDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.9.{{ $index }}'
-                    descr: 'IPS Anomaly Detected'
+                    descr: 'IPS Anomaly Detected {{ index }}'
                     group: IPS
                     index: 'fgIpsAnomalyDetections.{{ $index }}'
                     rrd_type: COUNTER
