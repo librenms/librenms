@@ -31,7 +31,7 @@ modules:
                         - fgVpnTunEntPhase1Name
                         - fgVpnTunEntPhase2Name
                         - fgVpnTunEntRemGwyIp
-                        -fgVdEntName
+                        - fgVdEntName
         state:
             data:
                 -
