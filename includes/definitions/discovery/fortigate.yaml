@@ -150,6 +150,7 @@ modules:
                     descr: 'IPS Intrusions Detected'
                     group: IPS
                     index: 'fgIpsIntrusionsDetected.{{ $index }}'
+                    rrd_type: COUNTER
                 -
                     oid: fgIpsStatsTable
                     value: fgIpsIntrusionsBlocked
@@ -157,6 +158,7 @@ modules:
                     descr: 'IPS Intrusions Blocked'
                     group: IPS
                     index: 'fgIpsIntrusionsBlocked.{{ $index }}'
+                    rrd_type: COUNTER
         signal:
             data:
                 -
