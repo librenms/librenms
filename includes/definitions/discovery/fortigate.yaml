@@ -163,7 +163,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsCritSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.3.{{ $index }}'
-                    descr: 'IPS Critical Severity Detected'
+                    descr: 'IPS Severity - Critical Detected'
                     group: IPS
                     index: 'fgIpsCritSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -171,7 +171,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsHighSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.4.{{ $index }}'
-                    descr: 'IPS High Severity Detected'
+                    descr: 'IPS Severity - High Detected'
                     group: IPS
                     index: 'fgIpsHighSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -179,7 +179,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsMedSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.5.{{ $index }}'
-                    descr: 'IPS Medium Severity Detected'
+                    descr: 'IPS Severity - Medium Detected'
                     group: IPS
                     index: 'fgIpsMedSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -187,7 +187,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsLowSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.6.{{ $index }}'
-                    descr: 'IPS Low Severity Detected'
+                    descr: 'IPS Severity - Low Detected'
                     group: IPS
                     index: 'fgIpsLowSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -195,7 +195,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsInfoSevDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.7.{{ $index }}'
-                    descr: 'IPS Informational Severity Detected'
+                    descr: 'IPS Severity - Informational Detected'
                     group: IPS
                     index: 'fgIpsInfoSevDetections.{{ $index }}'
                     rrd_type: COUNTER
@@ -211,7 +211,7 @@ modules:
                     oid: fgIpsStatsTable
                     value: fgIpsAnomalyDetections
                     num_oid: '.1.3.6.1.4.1.12356.101.9.2.1.1.9.{{ $index }}'
-                    descr: 'IPS Anomalies Detected'
+                    descr: 'IPS Anomaly Detected'
                     group: IPS
                     index: 'fgIpsAnomalyDetections.{{ $index }}'
                     rrd_type: COUNTER
